@@ -11,7 +11,7 @@
   "scripts": {
     "prepublish": "typings install && npm run prod",
     "lint": "tslint -c tslint.json src/*.ts src/*.tsx src/**/*.ts src/**/*.tsx src/**/**/*.ts src/**/**/*.tsx",
-    "test": "npm run lint && tsc && mocha lib/**/__tests__/*.js",
+    "test": "npm run lint && tsc && mocha --require lib/testHelper.js lib/**/__tests__/*.js",
     "dev": "rm -rf dist && NODE_ENV=development webpack --watch --progress --display-modules --config webpack.config",
     "prod": "rm -rf dist && NODE_ENV=production webpack -p --progress --display-modules --config webpack.config"
   },
@@ -20,6 +20,7 @@
     "css-loader": "^0.23.1",
     "enzyme": "^2.3.0",
     "file-loader": "^0.9.0",
+    "jsdom": "^9.4.1",
     "mocha": "^2.5.3",
     "react-addons-test-utils": "^15.2.0",
     "style-loader": "^0.13.1",

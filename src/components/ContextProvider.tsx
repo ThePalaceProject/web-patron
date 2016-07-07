@@ -27,13 +27,13 @@ export default class ContextProvider extends React.Component<ContextProviderProp
 
   prepareCollectionUrl(url: string): string {
     return encodeURIComponent(
-      url.replace(document.location.origin + "/", "").replace(/\/$/, "").replace(/^\//, "")
+      url.replace(window.location.origin + "/", "").replace(/\/$/, "").replace(/^\//, "")
     );
   }
 
   prepareBookUrl(url: string): string {
     return encodeURIComponent(
-      url.replace(document.location.origin + "/works/", "").replace(/\/$/, "").replace(/^\//, "")
+      url.replace(window.location.origin + "/works/", "").replace(/\/$/, "").replace(/^\//, "")
     );
   }
 
