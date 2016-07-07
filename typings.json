@@ -1,7 +1,11 @@
 {
-  "dependencies": {},
+  "dependencies": {
+    "enzyme": "registry:npm/enzyme#2.2.0+20160322031343"
+  },
   "globalDependencies": {
+    "chai": "registry:dt/chai#3.4.0+20160601211834",
     "core-js": "registry:dt/core-js#0.0.0+20160602141332",
+    "mocha": "registry:dt/mocha#2.2.5+20160619032855",
     "node": "registry:dt/node#6.0.0+20160621231320",
     "react": "registry:dt/react#0.14.0+20160630100702",
     "react-bootstrap": "registry:dt/react-bootstrap#0.0.0+20160706182032",
