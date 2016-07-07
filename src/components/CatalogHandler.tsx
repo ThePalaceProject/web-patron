@@ -7,7 +7,6 @@ import { NavigateContext } from "opds-web-client/lib/interfaces";
 import computeBreadcrumbs from "../computeBreadcrumbs";
 
 export interface CatalogHandlerProps extends React.Props<CatalogHandler> {
-  csrfToken: string;
   params: {
     collectionUrl: string;
     bookUrl: string;
@@ -38,13 +37,13 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
 
   expandCollectionUrl(url: string): string {
     return url ?
-      document.location.origin + "/" + url :
+      window.location.origin + "/" + url :
       url;
   }
 
   expandBookUrl(url: string): string {
     return url ?
-      document.location.origin + "/works/" + url :
+      window.location.origin + "/works/" + url :
       url;
   }
 
@@ -59,7 +58,7 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
 
     let pageTitleTemplate = (collectionTitle, bookTitle) => {
       let details = bookTitle || collectionTitle;
-      return "Circulation Manager" + (details ? " - " + details : "");
+      return "eBook Catalog" + (details ? " - " + details : "");
     };
 
     return (
