@@ -11,7 +11,7 @@ export default class ContextProvider extends React.Component<ContextProviderProp
   constructor(props) {
     super(props);
     this.pathFor = (collectionUrl: string, bookUrl: string, tab?: string) => {
-      let path = "/admin/web";
+      let path = "/web";
       path +=
         collectionUrl ?
         `/collection/${this.prepareCollectionUrl(collectionUrl)}` :

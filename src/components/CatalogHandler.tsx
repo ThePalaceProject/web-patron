@@ -2,8 +2,8 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Router, Route, browserHistory } from "react-router";
 const OPDSCatalog = require("opds-web-client");
+import Header from "./Header";
 import { NavigateContext } from "opds-web-client/lib/interfaces";
-import { ComputeBreadcrumbs } from "opds-web-client/lib/components/Breadcrumbs";
 import computeBreadcrumbs from "../computeBreadcrumbs";
 
 export interface CatalogHandlerProps extends React.Props<CatalogHandler> {
@@ -66,6 +66,7 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
       <OPDSCatalog
         collectionUrl={collectionUrl}
         bookUrl={bookUrl}
+        Header={Header}
         pageTitleTemplate={pageTitleTemplate}
         computeBreadcrumbs={computeBreadcrumbs}
         />
