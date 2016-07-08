@@ -1,7 +1,5 @@
-import { expect } from "chai";
-import * as jsdom from "jsdom";
-
 import * as React from "react";
+import { expect } from "chai";
 import { shallow } from "enzyme";
 
 import ContextProvider from "../ContextProvider";
@@ -14,7 +12,8 @@ describe("ContextProvider", () => {
   beforeEach(() => {
     wrapper = shallow(
       <ContextProvider
-        homeUrl="home url">
+        homeUrl="http://example.com/home"
+        catalogBase="http://example.com">
         <TestComponent />
       </ContextProvider>
     );
@@ -36,10 +35,6 @@ describe("ContextProvider", () => {
     let bookUrl = "book/url";
     let tab = "tab";
     let host = "http://example.com";
-
-    beforeEach(() => {
-      (jsdom as any).changeURL(window, host + "/test");
-    });
 
     it("prepares collection url", () => {
       let url = host + "/groups/eng/Adult%20Fiction";

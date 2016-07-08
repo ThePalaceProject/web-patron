@@ -13,7 +13,8 @@
     "lint": "tslint -c tslint.json src/*.ts src/*.tsx src/**/*.ts src/**/*.tsx src/**/**/*.ts src/**/**/*.tsx",
     "test": "npm run lint && tsc && mocha --require lib/testHelper.js lib/**/__tests__/*.js",
     "dev": "rm -rf dist && NODE_ENV=development webpack --watch --progress --display-modules --config webpack.config",
-    "prod": "rm -rf dist && NODE_ENV=production webpack -p --progress --display-modules --config webpack.config"
+    "prod": "rm -rf dist && NODE_ENV=production webpack -p --progress --display-modules --config webpack.config",
+    "start": "tsc && node lib/server/index.js"
   },
   "devDependencies": {
     "chai": "^3.5.0",
@@ -33,6 +34,7 @@
   },
   "dependencies": {
     "bootstrap": "^3.3.6",
+    "express": "^4.14.0",
     "opds-web-client": "0.0.19",
     "react": "^15.2.0",
     "react-bootstrap": "^0.29.5",

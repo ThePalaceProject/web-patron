@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import { Store } from "redux";
 import { Router, Route, browserHistory } from "react-router";
 const OPDSCatalog = require("opds-web-client");
 import Header from "./Header";
@@ -16,13 +17,19 @@ export interface CatalogHandlerProps extends React.Props<CatalogHandler> {
 
 export interface CatalogHandlerContext {
   homeUrl: string;
+  catalogBase: string;
+  proxyUrl: string;
+  store?: Store<any>;
 }
 
 export default class CatalogHandler extends React.Component<CatalogHandlerProps, any> {
   context: CatalogHandlerContext;
 
   static contextTypes: React.ValidationMap<CatalogHandlerContext> = {
-    homeUrl: React.PropTypes.string.isRequired
+    homeUrl: React.PropTypes.string.isRequired,
+    catalogBase: React.PropTypes.string.isRequired,
+    proxyUrl: React.PropTypes.string,
+    store: React.PropTypes.object
   };
 
   static childContextTypes: React.ValidationMap<any> = {
@@ -35,26 +42,14 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
     };
   }
 
-  expandCollectionUrl(url: string): string {
-    return url ?
-      window.location.origin + "/" + url :
-      url;
-  }
-
-  expandBookUrl(url: string): string {
-    return url ?
-      window.location.origin + "/works/" + url :
-      url;
-  }
-
   render() {
     let { collectionUrl, bookUrl } = this.props.params;
 
     collectionUrl =
-      this.expandCollectionUrl(collectionUrl) ||
+      expandCollectionUrl(this.context.catalogBase, collectionUrl) ||
       this.context.homeUrl ||
       null;
-    bookUrl = this.expandBookUrl(bookUrl) || null;
+    bookUrl = expandBookUrl(this.context.catalogBase, bookUrl) || null;
 
     let pageTitleTemplate = (collectionTitle, bookTitle) => {
       let details = bookTitle || collectionTitle;
@@ -68,7 +63,21 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
         Header={Header}
         pageTitleTemplate={pageTitleTemplate}
         computeBreadcrumbs={computeBreadcrumbs}
+        proxyUrl={this.context.proxyUrl}
+        store={this.context.store}
         />
     );
   }
+}
+
+export function expandCollectionUrl(catalogBase: string, url: string): string {
+  return url ?
+    catalogBase + "/" + url :
+    url;
+}
+
+export function expandBookUrl(catalogBase: string, url: string): string {
+  return url ?
+    catalogBase + "/works/" + url :
+    url;
 }

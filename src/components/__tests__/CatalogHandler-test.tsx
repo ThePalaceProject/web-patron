@@ -1,7 +1,5 @@
-import { expect } from "chai";
-import * as jsdom from "jsdom";
-
 import * as React from "react";
+import { expect } from "chai";
 import { shallow } from "enzyme";
 
 import CatalogHandler from "../CatalogHandler";
@@ -15,14 +13,14 @@ describe("CatalogHandler", () => {
   let host = "http://example.com";
 
   beforeEach(() => {
-    (jsdom as any).changeURL(window, host + "/test");
     params = {
       collectionUrl: "collectionurl",
       bookUrl: "bookurl",
       tab: "tab"
     };
     context = {
-      homeUrl: "home url"
+      homeUrl: host + "/home",
+      catalogBase: host
     };
     wrapper = shallow(
       <CatalogHandler
