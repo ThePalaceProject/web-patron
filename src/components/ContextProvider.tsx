@@ -1,12 +1,12 @@
 import * as React from "react";
-import { Store } from "redux";
 import { PathFor } from "../interfaces";
+import { State } from "opds-web-client/lib/state";
 
 export interface ContextProviderProps extends React.Props<any> {
   homeUrl: string;
   catalogBase: string;
   proxyUrl?: string;
-  store?: Store<any>;
+  initialState?: State;
 }
 
 export default class ContextProvider extends React.Component<ContextProviderProps, any> {
@@ -46,7 +46,7 @@ export default class ContextProvider extends React.Component<ContextProviderProp
     homeUrl: React.PropTypes.string.isRequired,
     catalogBase: React.PropTypes.string.isRequired,
     proxyUrl: React.PropTypes.string,
-    store: React.PropTypes.object
+    initialState: React.PropTypes.object
   };
 
   getChildContext() {
@@ -55,7 +55,7 @@ export default class ContextProvider extends React.Component<ContextProviderProp
       homeUrl: this.props.homeUrl,
       catalogBase: this.props.catalogBase,
       proxyUrl: this.props.proxyUrl,
-      store: this.props.store
+      initialState: this.props.initialState
     };
   }
 

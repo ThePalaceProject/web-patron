@@ -21,7 +21,7 @@ describe("ContextProvider", () => {
         homeUrl={homeUrl}
         catalogBase={catalogBase}
         proxyUrl={proxyUrl}
-        store={store}>
+        initialState={store.getState()}>
         <TestComponent />
       </ContextProvider>
     );
@@ -33,7 +33,7 @@ describe("ContextProvider", () => {
     expect(context.homeUrl).to.equal(homeUrl);
     expect(context.catalogBase).to.equal(catalogBase);
     expect(context.proxyUrl).to.equal(proxyUrl);
-    expect(context.store).to.equal(store);
+    expect(context.initialState).to.equal(store.getState());
   });
 
   it("renders child", () => {

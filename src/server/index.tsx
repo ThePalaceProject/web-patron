@@ -1,13 +1,11 @@
 import * as express from "express";
 import * as React from "react";
 import { renderToString } from "react-dom/server";
-import buildStore from "opds-web-client/lib/store";
 import { match, RouterContext } from "react-router";
 import routes from "../routes";
 import ContextProvider from "../components/ContextProvider";
 import { expandCollectionUrl, expandBookUrl } from "../components/CatalogHandler";
-
-import { createFetchCollectionAndBook } from "opds-web-client/lib/components/mergeRootProps";
+import buildInitialState from "opds-web-client/lib/state";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -26,23 +24,22 @@ function handleRender(req, res) {
     } else if (redirectLocation) {
       res.redirect(302, redirectLocation.pathname + redirectLocation.search);
     } else if (renderProps) {
-      const store = buildStore();
-      const fetchCollectionAndBook = createFetchCollectionAndBook(store.dispatch);
-
       let { collectionUrl, bookUrl } = renderProps.params;
       collectionUrl = expandCollectionUrl(catalogBase, collectionUrl);
       bookUrl = expandBookUrl(catalogBase, bookUrl);
-
-      fetchCollectionAndBook(collectionUrl, bookUrl).then(({ collectionData, bookData }) => {
+      if (!collectionUrl && !bookUrl) {
+        collectionUrl = homeUrl;
+      }
+      buildInitialState(collectionUrl, bookUrl).then(state => {
         const html = renderToString(
           <ContextProvider
             homeUrl={homeUrl}
             catalogBase={catalogBase}
-            store={store}>
+            initialState={state}>
             <RouterContext {...renderProps} />
           </ContextProvider>
         );
-        res.status(200).send(renderFullPage(html, store.getState()));
+        res.status(200).send(renderFullPage(html, state));
       }).catch(err => {
         res.status(404).send(err);
       });
@@ -64,11 +61,11 @@ function renderFullPage(html, preloadedState) {
         <div id="circulation-patron-web">${html}</div>
         <script src="/js/circulation-patron-web.js"></script>
         <script>
-          window.__PRELOADED_STATE__ = ${JSON.stringify(preloadedState)}
           var circulationPatronWeb = new CirculationPatronWeb({
             homeUrl: "${homeUrl}",
             catalogBase: "${catalogBase}",
-            proxyUrl: "${proxyUrl}"
+            proxyUrl: "${proxyUrl}",
+            initialState: ${JSON.stringify(preloadedState)}
           });
         </script>
       </body>

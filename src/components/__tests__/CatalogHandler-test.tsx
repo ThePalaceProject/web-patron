@@ -25,7 +25,7 @@ describe("CatalogHandler", () => {
       homeUrl: host + "/home",
       catalogBase: host,
       proxyUrl: host + "/proxy",
-      store: store
+      intialState: store.getState()
     };
     wrapper = shallow(
       <CatalogHandler
@@ -41,7 +41,7 @@ describe("CatalogHandler", () => {
     expect(catalog.prop("bookUrl")).to.equal(host + "/works/bookurl");
     expect(catalog.prop("Header").name).to.equal("Header");
     expect(catalog.prop("proxyUrl")).to.equal(host + "/proxy");
-    expect(catalog.prop("store")).to.equal(store);
+    expect(catalog.prop("intialState")).to.equal(store.getState());
     expect(catalog.prop("computeBreadcrumbs")).to.be.ok;
     let pageTitleTemplate = catalog.prop("pageTitleTemplate");
     expect(pageTitleTemplate("Collection", "Book")).to.equal("eBook Catalog - Book");

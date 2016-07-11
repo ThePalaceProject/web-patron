@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { Store } from "redux";
+import { State } from "opds-web-client/lib/state";
 import { Router, Route, browserHistory } from "react-router";
 const OPDSCatalog = require("opds-web-client");
 import Header from "./Header";
@@ -19,7 +19,7 @@ export interface CatalogHandlerContext {
   homeUrl: string;
   catalogBase: string;
   proxyUrl: string;
-  store?: Store<any>;
+  initialState?: State;
 }
 
 export default class CatalogHandler extends React.Component<CatalogHandlerProps, any> {
@@ -29,7 +29,7 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
     homeUrl: React.PropTypes.string.isRequired,
     catalogBase: React.PropTypes.string.isRequired,
     proxyUrl: React.PropTypes.string,
-    store: React.PropTypes.object
+    initialState: React.PropTypes.object
   };
 
   static childContextTypes: React.ValidationMap<any> = {
@@ -64,7 +64,7 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
         pageTitleTemplate={pageTitleTemplate}
         computeBreadcrumbs={computeBreadcrumbs}
         proxyUrl={this.context.proxyUrl}
-        store={this.context.store}
+        initialState={this.context.initialState}
         />
     );
   }
