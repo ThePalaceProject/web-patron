@@ -2,7 +2,7 @@ import * as express from "express";
 import * as React from "react";
 import { renderToString } from "react-dom/server";
 import buildStore from "opds-web-client/lib/store";
-import { match, RouterContext } from 'react-router'
+import { match, RouterContext } from "react-router";
 import routes from "../routes";
 import ContextProvider from "../components/ContextProvider";
 import { expandCollectionUrl, expandBookUrl } from "../components/CatalogHandler";
@@ -22,9 +22,9 @@ app.use(handleRender);
 function handleRender(req, res) {
   match({ routes, location: req.url }, (error, redirectLocation, renderProps: any) => {
     if (error) {
-      res.status(500).send(error.message)
+      res.status(500).send(error.message);
     } else if (redirectLocation) {
-      res.redirect(302, redirectLocation.pathname + redirectLocation.search)
+      res.redirect(302, redirectLocation.pathname + redirectLocation.search);
     } else if (renderProps) {
       const store = buildStore();
       const fetchCollectionAndBook = createFetchCollectionAndBook(store.dispatch);
@@ -44,8 +44,7 @@ function handleRender(req, res) {
         );
         res.status(200).send(renderFullPage(html, store.getState()));
       }).catch(err => {
-        console.log(err.stack);
-        res.status(404).send(err)
+        res.status(404).send(err);
       });
     } else {
       res.status(404).send("Not found");

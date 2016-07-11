@@ -3,17 +3,25 @@ import { expect } from "chai";
 import { shallow } from "enzyme";
 
 import ContextProvider from "../ContextProvider";
+import buildStore from "opds-web-client/lib/store";
 
 class TestComponent extends React.Component<any, any> {}
 
 describe("ContextProvider", () => {
   let wrapper;
+  let store;
+  let homeUrl = "http://example.com/home";
+  let catalogBase = "http://example.com";
+  let proxyUrl = "http://example.com/proxy";
 
   beforeEach(() => {
+    store = buildStore();
     wrapper = shallow(
       <ContextProvider
-        homeUrl="http://example.com/home"
-        catalogBase="http://example.com">
+        homeUrl={homeUrl}
+        catalogBase={catalogBase}
+        proxyUrl={proxyUrl}
+        store={store}>
         <TestComponent />
       </ContextProvider>
     );
@@ -22,7 +30,10 @@ describe("ContextProvider", () => {
   it("provides child context", () => {
     let context = wrapper.instance().getChildContext();
     expect(context.pathFor).to.equal(wrapper.instance().pathFor);
-    expect(context.homeUrl).to.equal("home url");
+    expect(context.homeUrl).to.equal(homeUrl);
+    expect(context.catalogBase).to.equal(catalogBase);
+    expect(context.proxyUrl).to.equal(proxyUrl);
+    expect(context.store).to.equal(store);
   });
 
   it("renders child", () => {
