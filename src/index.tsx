@@ -4,8 +4,6 @@ import { Router, Route, browserHistory } from "react-router";
 import ContextProvider from "./components/ContextProvider";
 import routes from "./routes";
 
-require("bootstrap/dist/css/bootstrap.css");
-
 class CirculationPatronWeb {
   constructor(config) {
     let div = document.createElement("div");
