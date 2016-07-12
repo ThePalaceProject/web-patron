@@ -25,7 +25,7 @@ describe("CatalogHandler", () => {
       homeUrl: host + "/home",
       catalogBase: host,
       proxyUrl: host + "/proxy",
-      intialState: store.getState()
+      initialState: store.getState()
     };
     wrapper = shallow(
       <CatalogHandler
@@ -41,11 +41,11 @@ describe("CatalogHandler", () => {
     expect(catalog.prop("bookUrl")).to.equal(host + "/works/bookurl");
     expect(catalog.prop("Header").name).to.equal("Header");
     expect(catalog.prop("proxyUrl")).to.equal(host + "/proxy");
-    expect(catalog.prop("intialState")).to.equal(store.getState());
+    expect(catalog.prop("initialState")).to.equal(store.getState());
     expect(catalog.prop("computeBreadcrumbs")).to.be.ok;
     let pageTitleTemplate = catalog.prop("pageTitleTemplate");
-    expect(pageTitleTemplate("Collection", "Book")).to.equal("eBook Catalog - Book");
-    expect(pageTitleTemplate("Collection", null)).to.equal("eBook Catalog - Collection");
+    expect(pageTitleTemplate("Collection", "Book")).to.equal("NYPL eBooks - Book");
+    expect(pageTitleTemplate("Collection", null)).to.equal("NYPL eBooks - Collection");
   });
 
   it("uses home url as default collection url", () => {
