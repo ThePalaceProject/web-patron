@@ -35,7 +35,7 @@
   "dependencies": {
     "bootstrap": "^3.3.6",
     "express": "^4.14.0",
-    "opds-web-client": "0.0.19",
+    "opds-web-client": "0.0.20",
     "react": "^15.2.0",
     "react-bootstrap": "^0.29.5",
     "react-dom": "^15.2.0",

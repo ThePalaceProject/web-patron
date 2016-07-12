@@ -53,7 +53,7 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
 
     let pageTitleTemplate = (collectionTitle, bookTitle) => {
       let details = bookTitle || collectionTitle;
-      return "eBook Catalog" + (details ? " - " + details : "");
+      return "NYPL eBooks" + (details ? " - " + details : "");
     };
 
     return (
