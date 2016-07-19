@@ -1,17 +1,25 @@
 import * as React from "react";
 import CatalogLink from "opds-web-client/lib/components/CatalogLink";
+import { HeaderProps } from "opds-web-client/lib/components/Root";
 import logo from "../images/nypl-logo-transparent";
 import { Navbar, Nav, NavItem } from "react-bootstrap";
 
-export interface HeaderProps extends React.Props<Header> {
+export interface HeaderProps extends HeaderProps {
 }
 
 export default class Header extends React.Component<HeaderProps, any> {
-  context: { homeUrl: string };
+  context: { homeUrl: string; catalogBase: string };
 
   static contextTypes = {
-    homeUrl: React.PropTypes.string.isRequired
+    homeUrl: React.PropTypes.string.isRequired,
+    catalogBase: React.PropTypes.string.isRequired
   };
+
+  constructor(props) {
+    super(props);
+    this.signIn = this.signIn.bind(this);
+    this.signOut = this.signOut.bind(this);
+  }
 
   render(): JSX.Element {
     let search = this.props.children ? (React.Children.only(this.props.children) as any) : null;
@@ -47,12 +55,32 @@ export default class Header extends React.Component<HeaderProps, any> {
               <CatalogLink
                 collectionUrl={this.context.homeUrl}
                 bookUrl={null}>
-                eBooks
+                Catalog
               </CatalogLink>
+            </li>
+            <li>
+              <CatalogLink
+                collectionUrl={this.context.catalogBase + "/loans"}
+                bookUrl={null}>
+                Loans
+              </CatalogLink>
+            </li>
+            <li>
+              { this.props.isSignedIn ?
+                <a style={{ cursor: "pointer" }} onClick={this.signOut}>Sign Out</a> :
+                <a style={{ cursor: "pointer" }} onClick={this.signIn}>Sign In</a>
+              }
             </li>
           </Nav>
         </Navbar.Collapse>
       </Navbar>
     );
+  }
+
+  signIn() {
+  }
+
+  signOut() {
+    this.props.signOut();    
   }
 }

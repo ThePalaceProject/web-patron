@@ -41,7 +41,22 @@ function handleRender(req, res) {
         );
         res.status(200).send(renderFullPage(html, state));
       }).catch(err => {
-        res.status(404).send(err);
+        // if 401, render catalog root
+        if (err.status === 401) {
+          buildInitialState(null, null).then((state: State) => {
+            const html = renderToString(
+              <ContextProvider
+                homeUrl={homeUrl}
+                catalogBase={catalogBase}
+                initialState={state}>
+                <RouterContext {...renderProps} />
+              </ContextProvider>
+            );
+            res.status(200).send(renderFullPage(html, state));
+          }).catch(err => res.status(500).send(err));
+        } else {
+          res.status(404).send(err);
+        }
       });
     } else {
       res.status(404).send("Not found");

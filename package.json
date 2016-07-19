@@ -14,7 +14,9 @@
     "test": "npm run lint && tsc && mocha --require lib/testHelper.js lib/**/__tests__/*.js",
     "dev": "rm -rf dist && NODE_ENV=development webpack --watch --progress --display-modules --config webpack.config",
     "prod": "rm -rf dist && NODE_ENV=production webpack -p --progress --display-modules --config webpack.config",
-    "start": "tsc && node lib/server/index.js"
+    "start": "node lib/server/index.js",
+    "start-prod": "tsc && npm run prod && npm run start",
+    "start-dev": "tsc && npm run dev | npm run start"
   },
   "devDependencies": {
     "chai": "^3.5.0",
