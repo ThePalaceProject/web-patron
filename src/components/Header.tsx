@@ -3,16 +3,24 @@ import CatalogLink from "opds-web-client/lib/components/CatalogLink";
 import { HeaderProps } from "opds-web-client/lib/components/Root";
 import logo from "../images/nypl-logo-transparent";
 import { Navbar, Nav, NavItem } from "react-bootstrap";
+import { NavigateContext } from "opds-web-client/lib/interfaces";
 
 export interface HeaderProps extends HeaderProps {
 }
 
+export interface HeaderContext extends NavigateContext {
+  homeUrl: string;
+  catalogBase: string;
+}
+
 export default class Header extends React.Component<HeaderProps, any> {
-  context: { homeUrl: string; catalogBase: string };
+  context: HeaderContext;
 
   static contextTypes = {
     homeUrl: React.PropTypes.string.isRequired,
-    catalogBase: React.PropTypes.string.isRequired
+    catalogBase: React.PropTypes.string.isRequired,
+    router: React.PropTypes.object.isRequired,
+    pathFor: React.PropTypes.func.isRequired
   };
 
   constructor(props) {
@@ -78,9 +86,11 @@ export default class Header extends React.Component<HeaderProps, any> {
   }
 
   signIn() {
+    this.props.showBasicAuthForm(() => {}, { login: "Barcode", password: "PIN" }, "Library");
   }
 
   signOut() {
-    this.props.signOut();    
+    this.props.clearBasicAuthCredentials();
+    this.context.router.push(this.context.pathFor(this.context.homeUrl, null));
   }
 }
