@@ -1,8 +1,12 @@
 import * as React from "react";
 import { PathFor } from "../interfaces";
+import { State } from "opds-web-client/lib/state";
 
 export interface ContextProviderProps extends React.Props<any> {
   homeUrl: string;
+  catalogBase: string;
+  proxyUrl?: string;
+  initialState?: State;
 }
 
 export default class ContextProvider extends React.Component<ContextProviderProps, any> {
@@ -20,32 +24,37 @@ export default class ContextProvider extends React.Component<ContextProviderProp
         bookUrl ?
         `/book/${this.prepareBookUrl(bookUrl)}` :
         "";
-      path += tab ? `/tab/${tab}` : "";
       return path;
     };
   }
 
   prepareCollectionUrl(url: string): string {
     return encodeURIComponent(
-      url.replace(document.location.origin + "/", "").replace(/\/$/, "").replace(/^\//, "")
+      url.replace(this.props.catalogBase + "/", "").replace(/\/$/, "").replace(/^\//, "")
     );
   }
 
   prepareBookUrl(url: string): string {
     return encodeURIComponent(
-      url.replace(document.location.origin + "/works/", "").replace(/\/$/, "").replace(/^\//, "")
+      url.replace(this.props.catalogBase + "/works/", "").replace(/\/$/, "").replace(/^\//, "")
     );
   }
 
   static childContextTypes: React.ValidationMap<any> = {
     pathFor: React.PropTypes.func.isRequired,
     homeUrl: React.PropTypes.string.isRequired,
+    catalogBase: React.PropTypes.string.isRequired,
+    proxyUrl: React.PropTypes.string,
+    initialState: React.PropTypes.object
   };
 
   getChildContext() {
     return {
       pathFor: this.pathFor,
       homeUrl: this.props.homeUrl,
+      catalogBase: this.props.catalogBase,
+      proxyUrl: this.props.proxyUrl,
+      initialState: this.props.initialState
     };
   }
 

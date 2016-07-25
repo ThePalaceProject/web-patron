@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import { State } from "opds-web-client/lib/state";
 import { Router, Route, browserHistory } from "react-router";
 const OPDSCatalog = require("opds-web-client");
 import Header from "./Header";
@@ -7,7 +8,6 @@ import { NavigateContext } from "opds-web-client/lib/interfaces";
 import computeBreadcrumbs from "../computeBreadcrumbs";
 
 export interface CatalogHandlerProps extends React.Props<CatalogHandler> {
-  csrfToken: string;
   params: {
     collectionUrl: string;
     bookUrl: string;
@@ -17,13 +17,19 @@ export interface CatalogHandlerProps extends React.Props<CatalogHandler> {
 
 export interface CatalogHandlerContext {
   homeUrl: string;
+  catalogBase: string;
+  proxyUrl: string;
+  initialState?: State;
 }
 
 export default class CatalogHandler extends React.Component<CatalogHandlerProps, any> {
   context: CatalogHandlerContext;
 
   static contextTypes: React.ValidationMap<CatalogHandlerContext> = {
-    homeUrl: React.PropTypes.string.isRequired
+    homeUrl: React.PropTypes.string.isRequired,
+    catalogBase: React.PropTypes.string.isRequired,
+    proxyUrl: React.PropTypes.string,
+    initialState: React.PropTypes.object
   };
 
   static childContextTypes: React.ValidationMap<any> = {
@@ -36,30 +42,18 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
     };
   }
 
-  expandCollectionUrl(url: string): string {
-    return url ?
-      document.location.origin + "/" + url :
-      url;
-  }
-
-  expandBookUrl(url: string): string {
-    return url ?
-      document.location.origin + "/works/" + url :
-      url;
-  }
-
   render() {
     let { collectionUrl, bookUrl } = this.props.params;
 
     collectionUrl =
-      this.expandCollectionUrl(collectionUrl) ||
+      expandCollectionUrl(this.context.catalogBase, collectionUrl) ||
       this.context.homeUrl ||
       null;
-    bookUrl = this.expandBookUrl(bookUrl) || null;
+    bookUrl = expandBookUrl(this.context.catalogBase, bookUrl) || null;
 
     let pageTitleTemplate = (collectionTitle, bookTitle) => {
       let details = bookTitle || collectionTitle;
-      return "Circulation Manager" + (details ? " - " + details : "");
+      return "NYPL eBooks" + (details ? " - " + details : "");
     };
 
     return (
@@ -69,7 +63,21 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
         Header={Header}
         pageTitleTemplate={pageTitleTemplate}
         computeBreadcrumbs={computeBreadcrumbs}
+        proxyUrl={this.context.proxyUrl}
+        initialState={this.context.initialState}
         />
     );
   }
+}
+
+export function expandCollectionUrl(catalogBase: string, url: string): string {
+  return url ?
+    catalogBase + "/" + url :
+    url;
+}
+
+export function expandBookUrl(catalogBase: string, url: string): string {
+  return url ?
+    catalogBase + "/works/" + url :
+    url;
 }

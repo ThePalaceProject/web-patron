@@ -47,7 +47,7 @@ export default class Header extends React.Component<HeaderProps, any> {
               <CatalogLink
                 collectionUrl={this.context.homeUrl}
                 bookUrl={null}>
-                Catalog
+                eBooks
               </CatalogLink>
             </li>
           </Nav>
