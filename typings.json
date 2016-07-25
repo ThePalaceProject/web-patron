@@ -1,9 +1,9 @@
 {
   "dependencies": {
+    "chai": "registry:npm/chai#3.5.0+20160723033700",
     "enzyme": "registry:npm/enzyme#2.2.0+20160322031343"
   },
   "globalDependencies": {
-    "chai": "registry:dt/chai#3.4.0+20160601211834",
     "core-js": "registry:dt/core-js#0.0.0+20160602141332",
     "express": "registry:dt/express#4.0.0+20160317120654",
     "express-serve-static-core": "registry:dt/express-serve-static-core#0.0.0+20160701212727",

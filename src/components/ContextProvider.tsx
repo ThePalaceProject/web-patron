@@ -24,7 +24,6 @@ export default class ContextProvider extends React.Component<ContextProviderProp
         bookUrl ?
         `/book/${this.prepareBookUrl(bookUrl)}` :
         "";
-      path += tab ? `/tab/${tab}` : "";
       return path;
     };
   }
