@@ -1,16 +1,22 @@
 import * as React from "react";
 import CatalogLink from "opds-web-client/lib/components/CatalogLink";
 import BorrowButton from "opds-web-client/lib/components/BorrowButton";
-import { BookDetailsContainerProps } from "opds-web-client/lib/components/Root";
+import { BookData } from "opds-web-client/lib/interfaces";
 
-export default class BookDetails extends React.Component<BookDetailsContainerProps, any> {
+export interface BookDetailsProps {
+  book: BookData;
+  borrowAndFulfillBook: (url: string) => Promise<any>;
+  fulfillBook: (url: string) => Promise<any>;
+}
+
+export default class BookDetails extends React.Component<BookDetailsProps, any> {
   render(): JSX.Element {
     let bookSummaryStyle = {
       paddingTop: "2em",
       borderTop: "1px solid #ccc"
     };
 
-    let links = this.circulationLinks();
+    let circLink = this.circulationLink();
     let audience = this.audience();
     let categories = this.categories();
     let reportUrl = this.reportUrl();
@@ -62,13 +68,14 @@ export default class BookDetails extends React.Component<BookDetailsContainerPro
                 { this.props.book.url &&
                   <CatalogLink
                     className="btn btn-link"
+                    target="_blank"
                     bookUrl={this.props.book.url}>
                     Permalink
                   </CatalogLink>
                 }
               </div>
               <div className="col-sm-4" style={{textAlign: "center", marginBottom: "30px"}}>
-                { links }
+                { circLink }
               </div>
               <div className="col-sm-4" style={{ textAlign: "right" }}>
               { reportUrl &&
@@ -106,11 +113,9 @@ export default class BookDetails extends React.Component<BookDetailsContainerPro
     }
   }
 
-  circulationLinks() {
-    let links = [];
-
+  circulationLink() {
     if (this.props.book.borrowUrl) {
-      links.push(
+      return (
         <BorrowButton
           className="btn btn-default"
           book={this.props.book}
@@ -119,7 +124,7 @@ export default class BookDetails extends React.Component<BookDetailsContainerPro
         </BorrowButton>
       );
     } else if (this.props.book.openAccessUrl) {
-      links.push(
+      return (
         <a
           className="btn btn-default"
           style={{ marginRight: "0.5em" }}
@@ -129,8 +134,6 @@ export default class BookDetails extends React.Component<BookDetailsContainerPro
         </a>
       );
     }
-
-    return links;
   }
 
   audience() {
