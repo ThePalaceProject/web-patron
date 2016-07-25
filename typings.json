@@ -5,7 +5,6 @@
     "sinon": "registry:npm/sinon#1.16.0+20160723033700"
   },
   "globalDependencies": {
-    "chai": "registry:dt/chai#3.4.0+20160601211834",
     "core-js": "registry:dt/core-js#0.0.0+20160602141332",
     "express": "registry:dt/express#4.0.0+20160317120654",
     "express-serve-static-core": "registry:dt/express-serve-static-core#0.0.0+20160701212727",

@@ -15,6 +15,7 @@ const proxyUrl = "http://localhost:3000/proxy";
 
 // This is fired every time the server side receives a request
 app.use("/js", express.static("dist"));
+app.use("/css", express.static("node_modules/bootstrap/dist/css"));
 app.use(handleRender);
 
 function handleRender(req, res) {
@@ -70,7 +71,7 @@ function renderFullPage(html: string, preloadedState: State) {
     <html>
       <head>
         <title>NYPL eBooks</title>
-        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+        <link href="/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
       </head>
       <body>
         <div id="circulation-patron-web">${html}</div>

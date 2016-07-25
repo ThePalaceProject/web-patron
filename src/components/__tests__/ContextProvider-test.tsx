@@ -44,7 +44,6 @@ describe("ContextProvider", () => {
   describe("pathFor", () => {
     let collectionUrl = "collection/url";
     let bookUrl = "book/url";
-    let tab = "tab";
     let host = "http://example.com";
 
     it("prepares collection url", () => {
@@ -57,18 +56,9 @@ describe("ContextProvider", () => {
       expect(wrapper.instance().prepareBookUrl(url)).to.equal("Axis%2520360%2FAxis%2520360%2520ID%2F0016201449");
     });
 
-    it("returns a path with collection, book, and tab", () => {
-      let instance = wrapper.instance();
-      let path = instance.pathFor(collectionUrl, bookUrl, tab);
-      expect(path).to.equal(
-        `/web/collection/${instance.prepareCollectionUrl(collectionUrl)}` +
-        `/book/${instance.prepareBookUrl(bookUrl)}/tab/${tab}`
-      );
-    });
-
     it("returns a path with collection and book", () => {
       let instance = wrapper.instance();
-      let path = instance.pathFor(collectionUrl, bookUrl, null);
+      let path = instance.pathFor(collectionUrl, bookUrl);
       expect(path).to.equal(
         `/web/collection/${instance.prepareCollectionUrl(collectionUrl)}` +
         `/book/${instance.prepareBookUrl(bookUrl)}`
@@ -77,24 +67,18 @@ describe("ContextProvider", () => {
 
     it("returns a path with only collection", () => {
       let instance = wrapper.instance();
-      let path = instance.pathFor(collectionUrl, null, null);
+      let path = instance.pathFor(collectionUrl, null);
       expect(path).to.equal(`/web/collection/${instance.prepareCollectionUrl(collectionUrl)}`);
     });
 
     it("returns a path with only book", () => {
       let instance = wrapper.instance();
-      let path = instance.pathFor(null, bookUrl, null);
+      let path = instance.pathFor(null, bookUrl);
       expect(path).to.equal(`/web/book/${instance.prepareBookUrl(bookUrl)}`);
     });
 
-    it("returns a path with book and tab", () => {
-      let instance = wrapper.instance();
-      let path = instance.pathFor(null, bookUrl, tab);
-      expect(path).to.equal(`/web/book/${instance.prepareBookUrl(bookUrl)}/tab/${tab}`);
-    });
-
-    it("returns a path with no collection, book, or tab", () => {
-      let path = wrapper.instance().pathFor(null, null, null);
+    it("returns a path with no collection or book", () => {
+      let path = wrapper.instance().pathFor(null, null);
       expect(path).to.equal(`/web`);
     });
   });
