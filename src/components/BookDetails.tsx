@@ -78,13 +78,6 @@ export default class BookDetails extends React.Component<BookDetailsProps, any> 
                 { circLink }
               </div>
               <div className="col-sm-4" style={{ textAlign: "right" }}>
-              { reportUrl &&
-                <CatalogLink
-                  className="btn btn-link"
-                  bookUrl={reportUrl}>
-                  Report a Problem
-                </CatalogLink>
-              }
               </div>
             </div>
             <div
