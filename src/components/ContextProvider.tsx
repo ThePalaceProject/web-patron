@@ -1,4 +1,5 @@
 import * as React from "react";
+import buildStore from "../store";
 import { PathFor } from "../interfaces";
 import { State } from "opds-web-client/lib/state";
 
@@ -14,6 +15,7 @@ export default class ContextProvider extends React.Component<ContextProviderProp
 
   constructor(props) {
     super(props);
+    this.store = buildStore();
     this.pathFor = (collectionUrl: string, bookUrl: string, tab?: string) => {
       let path = "/web";
       path +=
@@ -41,6 +43,7 @@ export default class ContextProvider extends React.Component<ContextProviderProp
   }
 
   static childContextTypes: React.ValidationMap<any> = {
+    patronStore: React.PropTypes.object.isRequired,
     pathFor: React.PropTypes.func.isRequired,
     homeUrl: React.PropTypes.string.isRequired,
     catalogBase: React.PropTypes.string.isRequired,
@@ -50,6 +53,7 @@ export default class ContextProvider extends React.Component<ContextProviderProp
 
   getChildContext() {
     return {
+      patronStore: this.store,
       pathFor: this.pathFor,
       homeUrl: this.props.homeUrl,
       catalogBase: this.props.catalogBase,

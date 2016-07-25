@@ -1,4 +1,5 @@
 import * as React from "react";
+import ReportProblemLink from "./ReportProblemLink";
 import CatalogLink from "opds-web-client/lib/components/CatalogLink";
 import BorrowButton from "opds-web-client/lib/components/BorrowButton";
 import { BookData } from "opds-web-client/lib/interfaces";
@@ -79,11 +80,10 @@ export default class BookDetails extends React.Component<BookDetailsProps, any> 
               </div>
               <div className="col-sm-4" style={{ textAlign: "right" }}>
               { reportUrl &&
-                <CatalogLink
+                <ReportProblemLink
                   className="btn btn-link"
-                  bookUrl={reportUrl}>
-                  Report a Problem
-                </CatalogLink>
+                  reportUrl={reportUrl}>
+                </ReportProblemLink>
               }
               </div>
             </div>
