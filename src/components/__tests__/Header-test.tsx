@@ -19,11 +19,19 @@ class TestSearch extends React.Component<any, any> {
 describe("Header", () => {
   let context, wrapper;
   let showBasicAuthForm, clearBasicAuthCredentials;
+  let push, pathFor;
 
   beforeEach(() => {
-    context = { homeUrl: "home url" };
     showBasicAuthForm = spy();
     clearBasicAuthCredentials = spy();
+    push = spy();
+    pathFor = spy((collection, book) => "collection" + "::" + "book");
+    context = {
+      homeUrl: "home url",
+      catalogBase: "base",
+      router: { push },
+      pathFor
+    };
     wrapper = shallow(
       <Header
         collectionTitle="collection"
@@ -38,24 +46,62 @@ describe("Header", () => {
     );
   });
 
-  it("displays logo", () => {
-    let logo = wrapper.find(Navbar.Brand).find("img");
-    expect(logo.length).to.equal(1);
+  describe("rendering", ( ) => {
+    it("displays logo", () => {
+      let logo = wrapper.find(Navbar.Brand).find("img");
+      expect(logo.length).to.equal(1);
+    });
+
+    it("displays library name", () => {
+      let brand = wrapper.find(Navbar.Brand);
+      expect(brand.containsMatchingElement("NYPL")).to.be.true;
+    });
+
+    it("displays link to catalog", () => {
+      let link = wrapper.find(CatalogLink).filterWhere(link => link.children().text() === "Catalog");
+      expect(link.prop("collectionUrl")).to.equal("home url");
+    });
+
+    it("displays link to loans", () => {
+      let link = wrapper.find(CatalogLink).filterWhere(link => link.children().text() === "Loans");
+      expect(link.prop("collectionUrl")).to.equal("base/loans");
+    });
+
+    it("displays link to sign in if not currently signed in", () => {
+      let link = wrapper.find("a");
+      expect(link.text()).to.equal("Sign In");
+      expect(link.prop("onClick")).to.equal(wrapper.instance().signIn);
+    });
+
+    it("displays link to sign out if currently signed in", () => {
+      wrapper.setProps({ isSignedIn: true });
+      let link = wrapper.find("a");
+      expect(link.text()).to.equal("Sign Out");
+      expect(link.prop("onClick")).to.equal(wrapper.instance().signOut);
+    });
+
+    it("shows a search component", () => {
+      let search = wrapper.find(TestSearch);
+      expect(search).to.be.ok;
+    });
   });
 
-  it("displays library name", () => {
-    let brand = wrapper.find(Navbar.Brand);
-    expect(brand.containsMatchingElement("NYPL")).to.be.true;
-  });
+  describe("behavior", () => {
+    it("shows basic auth form when sign in link is clicked", () => {
+      let link = wrapper.find("a");
+      link.simulate("click");
+      expect(showBasicAuthForm.args[0][1]).to.deep.equal({ login: "Barcode", password: "PIN" });
+      expect(showBasicAuthForm.args[0][2]).to.equal("Library");
+    });
 
-  it("displays link to catalog", () => {
-    let link = wrapper.find(CatalogLink);
-    expect(link.prop("collectionUrl")).to.equal("home url");
-    expect(link.children().text()).to.equal("eBooks");
-  });
-
-  it("shows a search component", () => {
-    let search = wrapper.find(TestSearch);
-    expect(search).to.be.ok;
+    it("clears basic auth credentials and loads catalog when sign out link is clicked", () => {
+      wrapper.setProps({ isSignedIn: true });
+      let link = wrapper.find("a");
+      link.simulate("click");
+      expect(clearBasicAuthCredentials.called).to.equal(true);
+      expect(pathFor.args[0][0]).to.equal("home url");
+      expect(pathFor.args[0][1]).to.equal(null);
+      expect(push.args[0]).to.deep.equal([pathFor("home url", null)]);
+    });
   });
 });
