@@ -1,4 +1,5 @@
 import { expect } from "chai";
+import { spy } from "sinon";
 
 import * as React from "react";
 import { shallow } from "enzyme";
@@ -17,11 +18,20 @@ class TestSearch extends React.Component<any, any> {
 
 describe("Header", () => {
   let context, wrapper;
+  let showBasicAuthForm, clearBasicAuthCredentials;
 
   beforeEach(() => {
     context = { homeUrl: "home url" };
+    showBasicAuthForm = spy();
+    clearBasicAuthCredentials = spy();
     wrapper = shallow(
-      <Header>
+      <Header
+        collectionTitle="collection"
+        bookTitle="book"
+        isSignedIn={false}
+        showBasicAuthForm={showBasicAuthForm}
+        clearBasicAuthCredentials={clearBasicAuthCredentials}
+        >
         <TestSearch />
       </Header>,
       { context }

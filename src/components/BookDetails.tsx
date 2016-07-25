@@ -1,6 +1,6 @@
 import * as React from "react";
 import CatalogLink from "opds-web-client/lib/components/CatalogLink";
-import BorrowLink from "opds-web-client/lib/components/BorrowLink";
+import BorrowButton from "opds-web-client/lib/components/BorrowButton";
 import { BookDetailsContainerProps } from "opds-web-client/lib/components/Root";
 
 export default class BookDetails extends React.Component<BookDetailsContainerProps, any> {
@@ -111,12 +111,12 @@ export default class BookDetails extends React.Component<BookDetailsContainerPro
 
     if (this.props.book.borrowUrl) {
       links.push(
-        <BorrowLink
+        <BorrowButton
           className="btn btn-default"
           book={this.props.book}
-          borrowBook={this.props.borrowBook}>
+          borrow={this.props.borrowAndFulfillBook}>
           Borrow
-        </BorrowLink>
+        </BorrowButton>
       );
     } else if (this.props.book.openAccessUrl) {
       links.push(

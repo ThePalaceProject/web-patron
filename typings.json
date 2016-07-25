@@ -1,6 +1,8 @@
 {
   "dependencies": {
-    "enzyme": "registry:npm/enzyme#2.2.0+20160322031343"
+    "chai": "registry:npm/chai#3.5.0+20160723033700",
+    "enzyme": "registry:npm/enzyme#2.2.0+20160322031343",
+    "sinon": "registry:npm/sinon#1.16.0+20160723033700"
   },
   "globalDependencies": {
     "chai": "registry:dt/chai#3.4.0+20160601211834",
