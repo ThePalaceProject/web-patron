@@ -36,6 +36,7 @@ describe("Header", () => {
       <Header
         collectionTitle="collection"
         bookTitle="book"
+        loansUrl="loans url"
         isSignedIn={false}
         showBasicAuthForm={showBasicAuthForm}
         clearBasicAuthCredentials={clearBasicAuthCredentials}
@@ -64,7 +65,7 @@ describe("Header", () => {
 
     it("displays link to loans", () => {
       let link = wrapper.find(CatalogLink).filterWhere(link => link.children().text() === "Loans");
-      expect(link.prop("collectionUrl")).to.equal("base/loans");
+      expect(link.prop("collectionUrl")).to.equal("loans url");
     });
 
     it("displays link to sign in if not currently signed in", () => {

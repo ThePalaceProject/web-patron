@@ -5,9 +5,6 @@ import logo from "../images/nypl-logo-transparent";
 import { Navbar, Nav, NavItem } from "react-bootstrap";
 import { NavigateContext } from "opds-web-client/lib/interfaces";
 
-export interface HeaderProps extends HeaderProps {
-}
-
 export interface HeaderContext extends NavigateContext {
   homeUrl: string;
   catalogBase: string;
@@ -66,13 +63,15 @@ export default class Header extends React.Component<HeaderProps, any> {
                 Catalog
               </CatalogLink>
             </li>
-            <li>
-              <CatalogLink
-                collectionUrl={this.context.catalogBase + "/loans"}
-                bookUrl={null}>
-                Loans
-              </CatalogLink>
-            </li>
+            { this.props.loansUrl &&
+              <li>
+                <CatalogLink
+                  collectionUrl={this.props.loansUrl}
+                  bookUrl={null}>
+                  Loans
+                </CatalogLink>
+              </li>
+            }
             <li>
               { this.props.isSignedIn ?
                 <a style={{ cursor: "pointer" }} onClick={this.signOut}>Sign Out</a> :
