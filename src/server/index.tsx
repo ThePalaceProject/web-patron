@@ -9,9 +9,8 @@ import buildInitialState, { State } from "opds-web-client/lib/state";
 
 const app = express();
 const port = process.env.PORT || 3000;
-const homeUrl = "http://localhost:6500/groups/";
-const catalogBase = "http://localhost:6500";
-const proxyUrl = "http://localhost:3000/proxy";
+const homeUrl = "http://qa.circulation.librarysimplified.org/groups/";
+const catalogBase = "http://qa.circulation.librarysimplified.org";
 
 // This is fired every time the server side receives a request
 app.use("/js", express.static("dist"));
@@ -80,7 +79,6 @@ function renderFullPage(html: string, preloadedState: State) {
           var circulationPatronWeb = new CirculationPatronWeb({
             homeUrl: "${homeUrl}",
             catalogBase: "${catalogBase}",
-            proxyUrl: "${proxyUrl}",
             initialState: ${JSON.stringify(preloadedState)}
           });
         </script>
