@@ -6,6 +6,7 @@ import { shallow } from "enzyme";
 
 import BookDetailsContainer from "../BookDetailsContainer";
 import BookDetails from "../BookDetails";
+import { buildCollectionStore } from "opds-web-client/lib/store";
 
 let book = {
   id: "urn:librarysimplified.org/terms/id/3M%20ID/crrmnr9",
@@ -27,6 +28,7 @@ class DefaultBookDetails extends React.Component<any, any> {
 
 describe("BookDetailsContainer", () => {
   it("renders BookDetails with its child's props", () => {
+    let context = { recommendationsStore: buildCollectionStore() };
     let borrowBook = url => Promise.resolve();
     let fulfillBook = url => Promise.resolve();
     let wrapper = shallow(
@@ -42,7 +44,8 @@ describe("BookDetailsContainer", () => {
           fulfillBook={fulfillBook}
           isSignedIn={true}
           />
-      </BookDetailsContainer>
+      </BookDetailsContainer>,
+      { context }
     );
 
     let bookDetails = wrapper.find(BookDetails);
