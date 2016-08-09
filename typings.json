@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "chai": "registry:npm/chai#3.5.0+20160723033700",
-    "enzyme": "registry:npm/enzyme#2.2.0+20160322031343"
+    "enzyme": "registry:npm/enzyme#2.2.0+20160322031343",
+    "sinon": "registry:npm/sinon#1.16.0+20160723033700"
   },
   "globalDependencies": {
     "core-js": "registry:dt/core-js#0.0.0+20160602141332",

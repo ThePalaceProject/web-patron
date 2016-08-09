@@ -1,17 +1,30 @@
 import * as React from "react";
 import CatalogLink from "opds-web-client/lib/components/CatalogLink";
+import { HeaderProps } from "opds-web-client/lib/components/Root";
 import logo from "../images/nypl-logo-transparent";
 import { Navbar, Nav, NavItem } from "react-bootstrap";
+import { NavigateContext } from "opds-web-client/lib/interfaces";
 
-export interface HeaderProps extends React.Props<Header> {
+export interface HeaderContext extends NavigateContext {
+  homeUrl: string;
+  catalogBase: string;
 }
 
 export default class Header extends React.Component<HeaderProps, any> {
-  context: { homeUrl: string };
+  context: HeaderContext;
 
   static contextTypes = {
-    homeUrl: React.PropTypes.string.isRequired
+    homeUrl: React.PropTypes.string.isRequired,
+    catalogBase: React.PropTypes.string.isRequired,
+    router: React.PropTypes.object.isRequired,
+    pathFor: React.PropTypes.func.isRequired
   };
+
+  constructor(props) {
+    super(props);
+    this.signIn = this.signIn.bind(this);
+    this.signOut = this.signOut.bind(this);
+  }
 
   render(): JSX.Element {
     let search = this.props.children ? (React.Children.only(this.props.children) as any) : null;
@@ -47,12 +60,36 @@ export default class Header extends React.Component<HeaderProps, any> {
               <CatalogLink
                 collectionUrl={this.context.homeUrl}
                 bookUrl={null}>
-                eBooks
+                Catalog
               </CatalogLink>
+            </li>
+            { this.props.loansUrl &&
+              <li>
+                <CatalogLink
+                  collectionUrl={this.props.loansUrl}
+                  bookUrl={null}>
+                  Loans
+                </CatalogLink>
+              </li>
+            }
+            <li>
+              { this.props.isSignedIn ?
+                <a style={{ cursor: "pointer" }} onClick={this.signOut}>Sign Out</a> :
+                <a style={{ cursor: "pointer" }} onClick={this.signIn}>Sign In</a>
+              }
             </li>
           </Nav>
         </Navbar.Collapse>
       </Navbar>
     );
+  }
+
+  signIn() {
+    this.props.showBasicAuthForm(() => {}, { login: "Barcode", password: "PIN" }, "Library");
+  }
+
+  signOut() {
+    this.props.clearBasicAuthCredentials();
+    this.context.router.push(this.context.pathFor(this.context.homeUrl, null));
   }
 }

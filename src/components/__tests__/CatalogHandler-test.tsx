@@ -40,6 +40,7 @@ describe("CatalogHandler", () => {
     expect(catalog.prop("collectionUrl")).to.equal(host + "/collectionurl");
     expect(catalog.prop("bookUrl")).to.equal(host + "/works/bookurl");
     expect(catalog.prop("Header").name).to.equal("Header");
+    expect(catalog.prop("BookDetailsContainer").name).to.equal("BookDetailsContainer");
     expect(catalog.prop("proxyUrl")).to.equal(host + "/proxy");
     expect(catalog.prop("initialState")).to.equal(store.getState());
     expect(catalog.prop("computeBreadcrumbs")).to.be.ok;
