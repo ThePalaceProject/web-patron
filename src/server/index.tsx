@@ -9,19 +9,20 @@ import buildInitialState, { State } from "opds-web-client/lib/state";
 
 const app = express();
 const port = process.env.PORT || 3000;
-const homeUrl = "http://localhost:6500/groups/";
-const catalogBase = "http://localhost:6500";
-const proxyUrl = "http://localhost:3000/proxy";
+const homeUrl = process.env.SIMPLIFIED_PATRON_HOME_URL || "http://localhost:6500/groups/";
+const catalogBase = process.env.SIMPLIFIED_PATRON_CATALOG_BASE || "http://localhost:6500";
 
 // This is fired every time the server side receives a request
 app.use("/js", express.static("dist"));
 app.use("/css", express.static("node_modules/bootstrap/dist/css"));
+app.use("/css", express.static("font-awesome/css"));
+app.use("/css", express.static("css"));
 app.use(handleRender);
 
 function handleRender(req, res) {
   match({ routes, location: req.url }, (error, redirectLocation, renderProps: any) => {
     if (error) {
-      res.status(500).send(error.message);
+      res.status(500).send(renderErrorPage());
     } else if (redirectLocation) {
       res.redirect(302, redirectLocation.pathname + redirectLocation.search);
     } else if (renderProps) {
@@ -42,25 +43,21 @@ function handleRender(req, res) {
         );
         res.status(200).send(renderFullPage(html, state));
       }).catch(err => {
-        // if 401, render catalog root
-        if (err.status === 401) {
-          buildInitialState(null, null).then((state: State) => {
-            const html = renderToString(
-              <ContextProvider
-                homeUrl={homeUrl}
-                catalogBase={catalogBase}
-                initialState={state}>
-                <RouterContext {...renderProps} />
-              </ContextProvider>
-            );
-            res.status(200).send(renderFullPage(html, state));
-          }).catch(err => res.status(500).send(err));
-        } else {
-          res.status(404).send(err);
-        }
+        // if error, render catalog root
+        buildInitialState(null, null).then((state: State) => {
+          const html = renderToString(
+            <ContextProvider
+              homeUrl={homeUrl}
+              catalogBase={catalogBase}
+              initialState={state}>
+              <RouterContext {...renderProps} />
+            </ContextProvider>
+          );
+          res.status(200).send(renderFullPage(html, state));
+        }).catch(err => res.status(500).send(renderErrorPage()));
       });
     } else {
-      res.status(404).send("Not found");
+      res.status(404).send(renderErrorPage("This page doesn't exist."));
     }
   });
 }
@@ -72,6 +69,8 @@ function renderFullPage(html: string, preloadedState: State) {
       <head>
         <title>NYPL eBooks</title>
         <link href="/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+        <link href="/css/font-awesome.min.css" rel="stylesheet" crossorigin="anonymous">
+        <link href="/css/recommendations.css" rel="stylesheet" crossorigin="anonymous">
       </head>
       <body>
         <div id="circulation-patron-web">${html}</div>
@@ -80,10 +79,28 @@ function renderFullPage(html: string, preloadedState: State) {
           var circulationPatronWeb = new CirculationPatronWeb({
             homeUrl: "${homeUrl}",
             catalogBase: "${catalogBase}",
-            proxyUrl: "${proxyUrl}",
             initialState: ${JSON.stringify(preloadedState)}
           });
         </script>
+      </body>
+    </html>
+    `;
+}
+
+function renderErrorPage(message: string = "There was a problem with this request.") {
+  return `
+    <!doctype html>
+    <html>
+      <head>
+        <title>NYPL eBooks</title>
+        <link href="/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+      </head>
+      <body>
+        <div style="text-align: center; margin-top: 200px;">
+          <h1>${message}</h1>
+          <br />
+          <h3><a class="btn btn-lg btn-primary" href="/">Home Page</a></h3>
+        </div>
       </body>
     </html>
     `;

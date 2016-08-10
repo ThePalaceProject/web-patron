@@ -1,23 +1,28 @@
 import * as React from "react";
 import buildStore from "../store";
 import { PathFor } from "../interfaces";
-import { State } from "opds-web-client/lib/state";
+import { State as CatalogState } from "opds-web-client/lib/state";
+import { buildCollectionStore } from "opds-web-client/lib/store";
+import { CollectionData } from "opds-web-client/lib/interfaces";
+import { Store } from "redux";
+import { State } from "../reducers";
 
 export interface ContextProviderProps extends React.Props<any> {
   homeUrl: string;
   catalogBase: string;
-  proxyUrl?: string;
-  initialState?: State;
+  initialState?: CatalogState;
 }
 
 export default class ContextProvider extends React.Component<ContextProviderProps, any> {
   pathFor: PathFor;
+  store: Store<State>
+  recommendationsStore: Store<{ collection: CollectionData }>;
 
   constructor(props) {
     super(props);
     this.store = buildStore();
     this.pathFor = (collectionUrl: string, bookUrl: string, tab?: string) => {
-      let path = "/web";
+      let path = "";
       path +=
         collectionUrl ?
         `/collection/${this.prepareCollectionUrl(collectionUrl)}` :
@@ -28,6 +33,7 @@ export default class ContextProvider extends React.Component<ContextProviderProp
         "";
       return path;
     };
+    this.recommendationsStore = buildCollectionStore();
   }
 
   prepareCollectionUrl(url: string): string {
@@ -47,8 +53,9 @@ export default class ContextProvider extends React.Component<ContextProviderProp
     pathFor: React.PropTypes.func.isRequired,
     homeUrl: React.PropTypes.string.isRequired,
     catalogBase: React.PropTypes.string.isRequired,
-    proxyUrl: React.PropTypes.string,
-    initialState: React.PropTypes.object
+    initialState: React.PropTypes.object,
+    store: React.PropTypes.object.isRequired,
+    recommendationsStore: React.PropTypes.object.isRequired
   };
 
   getChildContext() {
@@ -57,8 +64,9 @@ export default class ContextProvider extends React.Component<ContextProviderProp
       pathFor: this.pathFor,
       homeUrl: this.props.homeUrl,
       catalogBase: this.props.catalogBase,
-      proxyUrl: this.props.proxyUrl,
-      initialState: this.props.initialState
+      initialState: this.props.initialState,
+      store: this.store,
+      recommendationsStore: this.recommendationsStore
     };
   }
 

@@ -2,7 +2,7 @@ import CatalogHandler from "./components/CatalogHandler";
 
 const routes = [
   {
-    path: "/web(/collection/:collectionUrl)(/book/:bookUrl)",
+    path: "/(collection/:collectionUrl)(/)(book/:bookUrl)",
     component: CatalogHandler
   }
 ];

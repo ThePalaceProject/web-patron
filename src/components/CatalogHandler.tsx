@@ -4,7 +4,7 @@ import { State } from "opds-web-client/lib/state";
 import { Router, Route, browserHistory } from "react-router";
 const OPDSCatalog = require("opds-web-client");
 import Header from "./Header";
-import BookDetails from "./BookDetails";
+import BookDetailsContainer from "./BookDetailsContainer";
 import { NavigateContext } from "opds-web-client/lib/interfaces";
 import computeBreadcrumbs from "../computeBreadcrumbs";
 
@@ -19,7 +19,6 @@ export interface CatalogHandlerProps extends React.Props<CatalogHandler> {
 export interface CatalogHandlerContext {
   homeUrl: string;
   catalogBase: string;
-  proxyUrl: string;
   initialState?: State;
 }
 
@@ -29,19 +28,8 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
   static contextTypes: React.ValidationMap<CatalogHandlerContext> = {
     homeUrl: React.PropTypes.string.isRequired,
     catalogBase: React.PropTypes.string.isRequired,
-    proxyUrl: React.PropTypes.string,
     initialState: React.PropTypes.object
   };
-
-  static childContextTypes: React.ValidationMap<any> = {
-    tab: React.PropTypes.string
-  };
-
-  getChildContext() {
-    return {
-      tab: this.props.params.tab
-    };
-  }
 
   render() {
     let { collectionUrl, bookUrl } = this.props.params;
@@ -62,10 +50,9 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
         collectionUrl={collectionUrl}
         bookUrl={bookUrl}
         Header={Header}
-        BookDetailsContainer={BookDetails}
+        BookDetailsContainer={BookDetailsContainer}
         pageTitleTemplate={pageTitleTemplate}
         computeBreadcrumbs={computeBreadcrumbs}
-        proxyUrl={this.context.proxyUrl}
         initialState={this.context.initialState}
         />
     );

@@ -1,0 +1,39 @@
+.relatedBooks h2 {
+  margin-top: 15px !important;
+}
+
+.relatedBooks h2 a.laneTitle {
+  font-size: 20px !important;
+}
+
+.relatedBooks ul.laneBooks {
+  height: 205px !important;
+}
+
+.relatedBooks .laneBook {
+  width: 120px !important;
+  height: 205px !important;
+}
+
+.relatedBooks a.laneBookLink img {
+  width: 120px !important;
+  height: 160px !important;
+}
+
+.relatedBooks a.laneBookLink .bookInfo {
+  width: 120px !important;
+}
+
+.relatedBooks a.laneBookLink .autoBookCover {
+  width: 120px !important;
+  height: 160px !important;
+  font-size: 11px;
+}
+
+.relatedBooks a.laneBookLink .autoBookCover div {
+  width: 120px !important;
+}
+
+.relatedBooks a.laneBookLink .autoBookCover div:first-child {
+  height: 70px !important;
+}

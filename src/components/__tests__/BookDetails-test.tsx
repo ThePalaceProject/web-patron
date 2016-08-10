@@ -1,5 +1,4 @@
 import { expect } from "chai";
-import { spy, stub } from "sinon";
 
 import * as React from "react";
 import { shallow } from "enzyme";
@@ -61,61 +60,17 @@ let book = {
 describe("BookDetails", () => {
   let wrapper;
   let noop = (url: string) => new Promise((resolve, reject) => resolve());
+  let noop2 = (url: string, type: string) => new Promise((resolve, reject) => resolve());
 
   beforeEach(() => {
     wrapper = shallow(
       <BookDetails
         book={book}
-        borrowAndFulfillBook={noop}
+        borrowBook={noop}
         fulfillBook={noop}
+        indirectFulfillBook={noop2}
         />
     );
-  });
-
-  it("shows cover", () => {
-    let coverImage = wrapper.find("img");
-    expect(coverImage.props().src).to.equal(book.imageUrl);
-  });
-
-  it("shows title", () => {
-    let title = wrapper.find("h1");
-    expect(title.text()).to.equal(book.title);
-  });
-
-  it("shows authors", () => {
-    let author = wrapper.find(".bookDetailsAuthors");
-    expect(author.text()).to.equal(book.authors.join(", "));
-  });
-
-  it("shows contributors", () => {
-    let contributor = wrapper.find(".bookDetailsContributors");
-    expect(contributor.text()).to.equal("Contributors: " + book.contributors.join(", "));
-  });
-
-  it("shows publisher", () => {
-    let publisher = wrapper.find(".bookDetailsPublisher");
-    expect(publisher.text()).to.equal("Publisher: " + book.publisher);
-  });
-
-  it("doesn't show publisher when there isn't one", () => {
-    let bookCopy = Object.assign({}, book, {
-      publisher: null
-    });
-    wrapper = shallow(
-      <BookDetails
-        book={bookCopy}
-        borrowAndFulfillBook={noop}
-        fulfillBook={noop}
-        />
-    );
-
-    let publisher = wrapper.find(".bookDetailsPublisher");
-    expect(publisher.length).to.equal(0);
-  });
-
-  it("shows publish date", () => {
-    let published = wrapper.find(".bookDetailsPublished");
-    expect(published.text()).to.equal("Published: " + book.published);
   });
 
   it("shows audience and target age", () => {
@@ -133,54 +88,13 @@ describe("BookDetails", () => {
     wrapper = shallow(
       <BookDetails
         book={bookCopy}
-        borrowAndFulfillBook={noop}
+        borrowBook={noop}
         fulfillBook={noop}
+        indirectFulfillBook={noop2}
         />
     );
 
     let categories = wrapper.find(".bookDetailsCategories");
     expect(categories.length).to.equal(0);
-  });
-
-  it("shows summary", () => {
-    let summary = wrapper.find(".bookDetailsSummary");
-    expect(summary.html()).to.contain("Sam and Remi");
-  });
-
-  it("shows permalink", () => {
-    let permalink = wrapper.find(CatalogLink).filterWhere(link => link.children().text() === "Permalink");
-    expect(permalink.length).to.equal(1);
-    expect(permalink.props().bookUrl).to.equal(book.url);
-    expect(permalink.props().catalogUrl).to.be.undefined;
-  });
-
-  it("shows only borrow button if there's a borrow url and open access url", () => {
-    let borrowAndFulfillBook = noop;
-    wrapper = shallow(
-      <BookDetails
-        book={book}
-        borrowAndFulfillBook={borrowAndFulfillBook}
-        fulfillBook={noop} />
-    );
-
-    let button = wrapper.find(BorrowButton);
-    expect(button.children().text()).to.equal("Borrow");
-    expect(button.props().book).to.equal(book);
-    expect(button.props().borrow).to.equal(borrowAndFulfillBook);
-
-    let download = wrapper.find("a.btn");
-    expect(download.length).to.equal(0);
-  });
-
-  it("shows download button if there's no borrow url", () => {
-    let bookCopy = Object.assign({}, book, {
-      borrowUrl: null
-    });
-    wrapper.setProps({ book: bookCopy });
-    let button = wrapper.find("a.btn");
-    expect(button.text()).to.equal("Download");
-    expect(button.props().href).to.equal("secrets.epub");
-    let borrow = wrapper.find(BorrowButton);
-    expect(borrow.length).to.equal(0);
   });
 });
