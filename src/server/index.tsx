@@ -99,7 +99,7 @@ function renderErrorPage(message: string = "There was a problem with this reques
         <div style="text-align: center; margin-top: 200px;">
           <h1>${message}</h1>
           <br />
-          <h3><a class="btn btn-lg btn-primary" href="/web">Home Page</a></h3>
+          <h3><a class="btn btn-lg btn-primary" href="/">Home Page</a></h3>
         </div>
       </body>
     </html>
