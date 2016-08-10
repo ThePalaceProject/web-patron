@@ -19,7 +19,6 @@ export interface CatalogHandlerProps extends React.Props<CatalogHandler> {
 export interface CatalogHandlerContext {
   homeUrl: string;
   catalogBase: string;
-  proxyUrl: string;
   initialState?: State;
 }
 
@@ -29,7 +28,6 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
   static contextTypes: React.ValidationMap<CatalogHandlerContext> = {
     homeUrl: React.PropTypes.string.isRequired,
     catalogBase: React.PropTypes.string.isRequired,
-    proxyUrl: React.PropTypes.string,
     initialState: React.PropTypes.object
   };
 
@@ -65,7 +63,6 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
         BookDetailsContainer={BookDetailsContainer}
         pageTitleTemplate={pageTitleTemplate}
         computeBreadcrumbs={computeBreadcrumbs}
-        proxyUrl={this.context.proxyUrl}
         initialState={this.context.initialState}
         />
     );

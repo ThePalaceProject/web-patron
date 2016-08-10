@@ -12,7 +12,6 @@ describe("ContextProvider", () => {
   let store;
   let homeUrl = "http://example.com/home";
   let catalogBase = "http://example.com";
-  let proxyUrl = "http://example.com/proxy";
 
   beforeEach(() => {
     store = buildStore();
@@ -20,7 +19,6 @@ describe("ContextProvider", () => {
       <ContextProvider
         homeUrl={homeUrl}
         catalogBase={catalogBase}
-        proxyUrl={proxyUrl}
         initialState={store.getState()}>
         <TestComponent />
       </ContextProvider>
@@ -32,7 +30,6 @@ describe("ContextProvider", () => {
     expect(context.pathFor).to.equal(wrapper.instance().pathFor);
     expect(context.homeUrl).to.equal(homeUrl);
     expect(context.catalogBase).to.equal(catalogBase);
-    expect(context.proxyUrl).to.equal(proxyUrl);
     expect(context.initialState).to.equal(store.getState());
   });
 
@@ -60,7 +57,7 @@ describe("ContextProvider", () => {
       let instance = wrapper.instance();
       let path = instance.pathFor(collectionUrl, bookUrl);
       expect(path).to.equal(
-        `/web/collection/${instance.prepareCollectionUrl(collectionUrl)}` +
+        `/collection/${instance.prepareCollectionUrl(collectionUrl)}` +
         `/book/${instance.prepareBookUrl(bookUrl)}`
       );
     });
@@ -68,18 +65,18 @@ describe("ContextProvider", () => {
     it("returns a path with only collection", () => {
       let instance = wrapper.instance();
       let path = instance.pathFor(collectionUrl, null);
-      expect(path).to.equal(`/web/collection/${instance.prepareCollectionUrl(collectionUrl)}`);
+      expect(path).to.equal(`/collection/${instance.prepareCollectionUrl(collectionUrl)}`);
     });
 
     it("returns a path with only book", () => {
       let instance = wrapper.instance();
       let path = instance.pathFor(null, bookUrl);
-      expect(path).to.equal(`/web/book/${instance.prepareBookUrl(bookUrl)}`);
+      expect(path).to.equal(`/book/${instance.prepareBookUrl(bookUrl)}`);
     });
 
     it("returns a path with no collection or book", () => {
       let path = wrapper.instance().pathFor(null, null);
-      expect(path).to.equal(`/web`);
+      expect(path).to.equal(``);
     });
   });
 });
