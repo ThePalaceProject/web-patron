@@ -1,6 +1,9 @@
 import * as React from "react";
 import { PathFor } from "../interfaces";
 import { State } from "opds-web-client/lib/state";
+import { buildCollectionStore } from "opds-web-client/lib/store";
+import { CollectionData } from "opds-web-client/lib/interfaces";
+import { Store } from "redux";
 
 export interface ContextProviderProps extends React.Props<any> {
   homeUrl: string;
@@ -11,6 +14,7 @@ export interface ContextProviderProps extends React.Props<any> {
 
 export default class ContextProvider extends React.Component<ContextProviderProps, any> {
   pathFor: PathFor;
+  recommendationsStore: Store<{ collection: CollectionData }>;
 
   constructor(props) {
     super(props);
@@ -26,6 +30,7 @@ export default class ContextProvider extends React.Component<ContextProviderProp
         "";
       return path;
     };
+    this.recommendationsStore = buildCollectionStore();
   }
 
   prepareCollectionUrl(url: string): string {
@@ -45,7 +50,8 @@ export default class ContextProvider extends React.Component<ContextProviderProp
     homeUrl: React.PropTypes.string.isRequired,
     catalogBase: React.PropTypes.string.isRequired,
     proxyUrl: React.PropTypes.string,
-    initialState: React.PropTypes.object
+    initialState: React.PropTypes.object,
+    recommendationsStore: React.PropTypes.object.isRequired
   };
 
   getChildContext() {
@@ -54,7 +60,8 @@ export default class ContextProvider extends React.Component<ContextProviderProp
       homeUrl: this.props.homeUrl,
       catalogBase: this.props.catalogBase,
       proxyUrl: this.props.proxyUrl,
-      initialState: this.props.initialState
+      initialState: this.props.initialState,
+      recommendationsStore: this.recommendationsStore
     };
   }
 
