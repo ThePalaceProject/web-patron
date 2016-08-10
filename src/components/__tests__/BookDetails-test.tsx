@@ -60,6 +60,7 @@ let book = {
 describe("BookDetails", () => {
   let wrapper;
   let noop = (url: string) => new Promise((resolve, reject) => resolve());
+  let noop2 = (url: string, type: string) => new Promise((resolve, reject) => resolve());
 
   beforeEach(() => {
     wrapper = shallow(
@@ -67,6 +68,7 @@ describe("BookDetails", () => {
         book={book}
         borrowBook={noop}
         fulfillBook={noop}
+        indirectFulfillBook={noop2}
         />
     );
   });
@@ -88,6 +90,7 @@ describe("BookDetails", () => {
         book={bookCopy}
         borrowBook={noop}
         fulfillBook={noop}
+        indirectFulfillBook={noop2}
         />
     );
 
