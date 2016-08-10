@@ -8,7 +8,6 @@ import { Store } from "redux";
 export interface ContextProviderProps extends React.Props<any> {
   homeUrl: string;
   catalogBase: string;
-  proxyUrl?: string;
   initialState?: State;
 }
 
@@ -49,7 +48,6 @@ export default class ContextProvider extends React.Component<ContextProviderProp
     pathFor: React.PropTypes.func.isRequired,
     homeUrl: React.PropTypes.string.isRequired,
     catalogBase: React.PropTypes.string.isRequired,
-    proxyUrl: React.PropTypes.string,
     initialState: React.PropTypes.object,
     recommendationsStore: React.PropTypes.object.isRequired
   };
@@ -59,7 +57,6 @@ export default class ContextProvider extends React.Component<ContextProviderProp
       pathFor: this.pathFor,
       homeUrl: this.props.homeUrl,
       catalogBase: this.props.catalogBase,
-      proxyUrl: this.props.proxyUrl,
       initialState: this.props.initialState,
       recommendationsStore: this.recommendationsStore
     };
