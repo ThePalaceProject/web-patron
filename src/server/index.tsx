@@ -15,6 +15,8 @@ const catalogBase = "http://qa.circulation.librarysimplified.org";
 // This is fired every time the server side receives a request
 app.use("/js", express.static("dist"));
 app.use("/css", express.static("node_modules/bootstrap/dist/css"));
+app.use("/css", express.static("font-awesome/css"));
+app.use("/css", express.static("css"));
 app.use(handleRender);
 
 function handleRender(req, res) {
@@ -71,6 +73,8 @@ function renderFullPage(html: string, preloadedState: State) {
       <head>
         <title>NYPL eBooks</title>
         <link href="/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+        <link href="/css/font-awesome.min.css" rel="stylesheet" crossorigin="anonymous">
+        <link href="/css/recommendations.css" rel="stylesheet" crossorigin="anonymous">
       </head>
       <body>
         <div id="circulation-patron-web">${html}</div>
