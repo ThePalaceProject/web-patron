@@ -25,25 +25,25 @@ export default class BookDetails extends DefaultBookDetails {
     }
 
     let audience = categories.find(category =>
-      category["$"]["scheme"]["value"] === "http://schema.org/audience"
+      category["$"]["scheme"] && category["$"]["scheme"]["value"] === "http://schema.org/audience"
     );
 
     if (!audience) {
       return null;
     }
 
-    let audienceStr = audience["$"]["label"]["value"];
+    let audienceStr = audience["$"]["label"] && audience["$"]["label"]["value"];
 
     if (["Adult", "Adults Only"].indexOf(audienceStr) !== -1) {
       return audienceStr;
     }
 
     let targetAge = categories.find(category =>
-      category["$"]["scheme"]["value"] === "http://schema.org/typicalAgeRange"
+      category["$"]["scheme"] && category["$"]["scheme"]["value"] === "http://schema.org/typicalAgeRange"
     );
 
     if (targetAge) {
-      let targetAgeStr = targetAge["$"]["label"]["value"];
+      let targetAgeStr = targetAge["$"]["label"] && targetAge["$"]["label"]["value"];
       audienceStr += " (age " + targetAgeStr + ")";
     }
 
@@ -63,13 +63,15 @@ export default class BookDetails extends DefaultBookDetails {
     let rawCategories = this.props.book.raw.category;
 
     let categories = rawCategories.filter(category =>
-      audienceSchemas.concat([fictionScheme])
-        .indexOf(category["$"]["scheme"]["value"]) === -1
+      category["$"]["label"] && category["$"]["scheme"] &&
+          audienceSchemas.concat([fictionScheme])
+              .indexOf(category["$"]["scheme"]["value"]) === -1
     ).map(category => category["$"]["label"]["value"]);
 
     if (!categories.length) {
       categories = rawCategories.filter(category =>
-        category["$"]["scheme"]["value"] === fictionScheme
+        category["$"]["label"] && category["$"]["scheme"] &&
+            category["$"]["scheme"]["value"] === fictionScheme
       ).map(category => category["$"]["label"]["value"]);
     }
 
