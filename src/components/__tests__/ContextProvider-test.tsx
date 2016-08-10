@@ -60,7 +60,7 @@ describe("ContextProvider", () => {
       let instance = wrapper.instance();
       let path = instance.pathFor(collectionUrl, bookUrl);
       expect(path).to.equal(
-        `/web/collection/${instance.prepareCollectionUrl(collectionUrl)}` +
+        `/collection/${instance.prepareCollectionUrl(collectionUrl)}` +
         `/book/${instance.prepareBookUrl(bookUrl)}`
       );
     });
@@ -68,18 +68,18 @@ describe("ContextProvider", () => {
     it("returns a path with only collection", () => {
       let instance = wrapper.instance();
       let path = instance.pathFor(collectionUrl, null);
-      expect(path).to.equal(`/web/collection/${instance.prepareCollectionUrl(collectionUrl)}`);
+      expect(path).to.equal(`/collection/${instance.prepareCollectionUrl(collectionUrl)}`);
     });
 
     it("returns a path with only book", () => {
       let instance = wrapper.instance();
       let path = instance.pathFor(null, bookUrl);
-      expect(path).to.equal(`/web/book/${instance.prepareBookUrl(bookUrl)}`);
+      expect(path).to.equal(`/book/${instance.prepareBookUrl(bookUrl)}`);
     });
 
     it("returns a path with no collection or book", () => {
       let path = wrapper.instance().pathFor(null, null);
-      expect(path).to.equal(`/web`);
+      expect(path).to.equal(``);
     });
   });
 });
