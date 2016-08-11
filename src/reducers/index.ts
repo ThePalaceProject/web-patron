@@ -4,7 +4,7 @@ import collection, { CollectionState } from "opds-web-client/lib/reducers/collec
 
 export interface State {
   complaints: ComplaintsState;
-  recommendations: CollectionState
+  recommendations: CollectionState;
 }
 
 export default combineReducers<State>({

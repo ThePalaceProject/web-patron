@@ -12,8 +12,8 @@ export interface ContextProviderProps extends React.Props<any> {
 }
 
 export default class ContextProvider extends React.Component<ContextProviderProps, any> {
+  store: Store<State>;
   pathFor: PathFor;
-  store: Store<State>
 
   constructor(props) {
     super(props);

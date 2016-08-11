@@ -68,7 +68,7 @@ export function postComplaint(url: string, data: FormData) {
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"
-        },
+        } as { [index: string]: string },
         body: JSON.stringify(data),
         credentials: "same-origin"
       };

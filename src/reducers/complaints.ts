@@ -13,7 +13,7 @@ const initState: ComplaintsState = {
   isPosting: false,
   types: [],
   error: null
-}
+};
 
 export default (state: ComplaintsState = initState, action): ComplaintsState => {
   switch (action.type) {
@@ -42,4 +42,4 @@ export default (state: ComplaintsState = initState, action): ComplaintsState => 
     default:
       return state;
   }
-}
+};

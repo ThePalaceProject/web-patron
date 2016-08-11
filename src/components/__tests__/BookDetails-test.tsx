@@ -3,7 +3,7 @@ import { expect } from "chai";
 import * as React from "react";
 import { shallow } from "enzyme";
 
-import BookDetails from "../BookDetails";
+import { BookDetails } from "../BookDetails";
 import CatalogLink from "opds-web-client/lib/components/CatalogLink";
 import BorrowButton from "opds-web-client/lib/components/BorrowButton";
 
@@ -69,6 +69,9 @@ describe("BookDetails", () => {
         borrowBook={noop}
         fulfillBook={noop}
         indirectFulfillBook={noop2}
+        fetchComplaintTypes={noop}
+        postComplaint={noop}
+        problemTypes={["type1", "type2"]}
         />
     );
   });
@@ -85,15 +88,7 @@ describe("BookDetails", () => {
 
   it("doesn't show categories when there aren't any", () => {
     let bookCopy = Object.assign({}, book, { raw: { category: [], link: [ ]} });
-    wrapper = shallow(
-      <BookDetails
-        book={bookCopy}
-        borrowBook={noop}
-        fulfillBook={noop}
-        indirectFulfillBook={noop2}
-        />
-    );
-
+    wrapper.setProps({ book: bookCopy });
     let categories = wrapper.find(".bookDetailsCategories");
     expect(categories.length).to.equal(0);
   });

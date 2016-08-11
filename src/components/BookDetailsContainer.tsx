@@ -7,8 +7,7 @@ export default class BookDetailsContainer extends React.Component<BookDetailsCon
   context: any;
 
   static contextTypes: React.ValidationMap<any> = {
-    store: React.PropTypes.object.isRequired,
-    recommendationsStore: React.PropTypes.object.isRequired,
+    store: React.PropTypes.object.isRequired
   };
 
   render() {
