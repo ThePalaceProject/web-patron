@@ -81,7 +81,6 @@ export default class ReportProblemForm extends React.Component<any, any> {
   }
 
   submit() {
-    // console.log(!!(this.refs as any).type.value);
     if (this.typeSelected()) {
       let data = {
         type: (this.refs as any).type.value,
@@ -98,7 +97,6 @@ export default class ReportProblemForm extends React.Component<any, any> {
   }
 
   typeSelected() {
-    // console.log(!!(this.refs as any).type.value);
     return !!(this.refs as any).type.value;
   }
 }
