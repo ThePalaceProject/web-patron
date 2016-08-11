@@ -4,6 +4,5 @@ export interface PathFor {
 
 export interface ComplaintData {
   type: string;
-  source: string;
   detail?: string;
 }

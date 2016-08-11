@@ -59,7 +59,7 @@ export function loadComplaintTypes(types: string[]) {
   return { type: LOAD_COMPLAINT_TYPES, types };
 }
 
-export function postComplaint(url: string, data: FormData) {
+export function postComplaint(url: string, data: ComplaintData) {
   return (dispatch): Promise<string[]> => {
     dispatch(postComplaintRequest(url));
     return new Promise((resolve, reject) => {
