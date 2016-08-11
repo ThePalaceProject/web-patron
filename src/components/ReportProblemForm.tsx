@@ -6,13 +6,13 @@ export interface  ReportProblemFormProps {
   report: (url: string) => Promise<any>;
   fetchTypes: (url: string) => Promise<string[]>;
   close: () => void;
+  types: string[];
 }
 
 export default class ReportProblemForm extends React.Component<any, any> {
   constructor(props) {
     super(props);
     this.state = {
-      types: [],
       submitted: false,
       error: null
     };
@@ -23,21 +23,25 @@ export default class ReportProblemForm extends React.Component<any, any> {
     let title = this.state.submitted ? "Problem Reported" : "Report a Problem";
 
     return (
-      <div style={popupStyle(400)}>
+      <div className="problemForm" style={popupStyle(400)}>
         <h3 style={{ marginTop: "0px" }}>{title}</h3>
 
         { this.state.error &&
-          <div style={{ color: "red", marginTop: "1em" }}>{this.state.error}</div>
+          <div
+            className="problemFormError"
+            style={{ color: "red", marginTop: "1em" }}>
+            {this.state.error}
+          </div>
         }
 
-        { !this.state.submitted && this.state.types.length > 0 &&
+        { !this.state.submitted && this.props.types.length > 0 &&
           <div style={{ textAlign: "center", marginTop: "1em" }}>
             <select
               className="form-control"
               style={{ width: "200px" }}
               ref="type">
               <option value="">choose a type</option>
-              { this.state.types.map(type =>
+              { this.props.types.map(type =>
                 <option key={type} value={type}>{this.displayType(type)}</option>
               ) }
             </select>
@@ -64,25 +68,29 @@ export default class ReportProblemForm extends React.Component<any, any> {
   }
 
   componentWillMount() {
-    this.props.fetchTypes(this.props.reportUrl).then(types => {
-      this.setState({ types });
-    });
+    this.props.fetchTypes(this.props.reportUrl);
   }
 
   displayType(type) {
-    return type.replace("http://librarysimplified.org/terms/problem/", "");
+    return type
+      .replace("http://librarysimplified.org/terms/problem/", "")
+      .replace(/-/g, " ")
+      .split(" ")
+      .map(t => t[0].toUpperCase() + t.slice(1))
+      .join(" ");
   }
 
   submit() {
+    // console.log(!!(this.refs as any).type.value);
     if (this.typeSelected()) {
       let data = {
         type: (this.refs as any).type.value,
         detail: (this.refs as any).detail.value
       };
-      this.props.report(this.props.reportUrl, data).then(() => {
+      return this.props.report(this.props.reportUrl, data).then(() => {
         this.setState({ submitted: true, error: null });
       }).catch(err => {
-        this.setState({ error: "There was an error posting this problem." });
+        this.setState({ error: "There was an error posting this problem" });
       });
     } else {
       this.setState({ error: "You must select a type" });
@@ -90,6 +98,7 @@ export default class ReportProblemForm extends React.Component<any, any> {
   }
 
   typeSelected() {
+    // console.log(!!(this.refs as any).type.value);
     return !!(this.refs as any).type.value;
   }
 }

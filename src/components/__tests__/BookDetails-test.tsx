@@ -6,6 +6,7 @@ import { shallow } from "enzyme";
 import { BookDetails } from "../BookDetails";
 import CatalogLink from "opds-web-client/lib/components/CatalogLink";
 import BorrowButton from "opds-web-client/lib/components/BorrowButton";
+import ReportProblemLink from "../ReportProblemLink";
 
 let book = {
   id: "urn:librarysimplified.org/terms/id/3M%20ID/crrmnr9",
@@ -53,7 +54,12 @@ let book = {
         }
       }
     ],
-    link: []
+    link: [{
+      $: {
+        rel: { value: "issues" },
+        href: { value: "http://example.com/report" }
+      }
+    }]
   }
 };
 
@@ -61,6 +67,9 @@ describe("BookDetails", () => {
   let wrapper;
   let noop = (url: string) => new Promise((resolve, reject) => resolve());
   let noop2 = (url: string, type: string) => new Promise((resolve, reject) => resolve());
+  let fetchComplaintTypes = noop;
+  let postComplaint = noop;
+  let problemTypes = ["type1", "type2"];
 
   beforeEach(() => {
     wrapper = shallow(
@@ -69,9 +78,9 @@ describe("BookDetails", () => {
         borrowBook={noop}
         fulfillBook={noop}
         indirectFulfillBook={noop2}
-        fetchComplaintTypes={noop}
-        postComplaint={noop}
-        problemTypes={["type1", "type2"]}
+        fetchComplaintTypes={fetchComplaintTypes}
+        postComplaint={postComplaint}
+        problemTypes={problemTypes}
         />
     );
   });
@@ -91,5 +100,14 @@ describe("BookDetails", () => {
     wrapper.setProps({ book: bookCopy });
     let categories = wrapper.find(".bookDetailsCategories");
     expect(categories.length).to.equal(0);
+  });
+
+  it("shows report problem link", () => {
+    let link = wrapper.find(ReportProblemLink);
+    expect(link.length).to.equal(1);
+    expect(link.props().reportUrl).to.equal("http://example.com/report");
+    expect(link.props().fetchTypes).to.equal(fetchComplaintTypes);
+    expect(link.props().report).to.equal(postComplaint);
+    expect(link.props().types).to.equal(problemTypes);
   });
 });

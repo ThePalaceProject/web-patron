@@ -45,23 +45,20 @@ export default class ContextProvider extends React.Component<ContextProviderProp
   }
 
   static childContextTypes: React.ValidationMap<any> = {
-    patronStore: React.PropTypes.object.isRequired,
+    store: React.PropTypes.object.isRequired,
     pathFor: React.PropTypes.func.isRequired,
     homeUrl: React.PropTypes.string.isRequired,
     catalogBase: React.PropTypes.string.isRequired,
-    initialState: React.PropTypes.object,
-    store: React.PropTypes.object.isRequired,
-    recommendationsStore: React.PropTypes.object.isRequired
+    initialState: React.PropTypes.object
   };
 
   getChildContext() {
     return {
-      patronStore: this.store,
+      store: this.store,
       pathFor: this.pathFor,
       homeUrl: this.props.homeUrl,
       catalogBase: this.props.catalogBase,
-      initialState: this.props.initialState,
-      store: this.store
+      initialState: this.props.initialState
     };
   }
 

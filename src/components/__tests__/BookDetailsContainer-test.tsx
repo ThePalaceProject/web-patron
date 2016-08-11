@@ -75,5 +75,6 @@ describe("BookDetailsContainer", () => {
     expect(lanes.prop("store")).to.equal(store);
     expect(lanes.prop("hideMoreLinks")).to.equal(true);
     expect(lanes.prop("hiddenBookIds")).to.deep.equal([book.id]);
+    expect(lanes.prop("namespace")).to.equal("recommendations");
   });
 });
