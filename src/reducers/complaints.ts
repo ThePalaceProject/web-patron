@@ -39,6 +39,23 @@ export default (state: ComplaintsState = initState, action): ComplaintsState => 
         types: action.types
       });
 
+    case "POST_COMPLAINT_REQUEST":
+      return Object.assign({}, state, {
+        isPosting: true,
+        error: null
+      });
+
+    case "POST_COMPLAINT_SUCCESS":
+      return Object.assign({}, state, {
+        isPosting: false
+      });
+
+    case "POST_COMPLAINT_FAILURE":
+      return Object.assign({}, state, {
+        isPosting: false,
+        error: action.error
+      });
+
     default:
       return state;
   }
