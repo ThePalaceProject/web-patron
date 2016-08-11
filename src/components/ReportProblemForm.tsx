@@ -49,6 +49,8 @@ export default class ReportProblemForm extends React.Component<any, any> {
             </textarea>
             <br />
             <button className="btn btn-default" onClick={this.submit}>Submit</button>
+            &nbsp;
+            <button className="btn btn-default" onClick={this.props.close}>Cancel</button>
           </div>
         }
 
