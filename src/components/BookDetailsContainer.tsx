@@ -24,7 +24,8 @@ export default class BookDetailsContainer extends React.Component<BookDetailsCon
           <div className="relatedBooks" style={{ marginTop: "30px" }}>
             <Lanes
               url={relatedUrl}
-              store={this.context.recommendationsStore}
+              store={this.context.store}
+              namespace="recommendations"
               hideMoreLinks={true}
               hiddenBookIds={this.props.book ? [this.props.book.id] : []}
               />

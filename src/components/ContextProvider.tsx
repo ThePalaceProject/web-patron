@@ -2,8 +2,6 @@ import * as React from "react";
 import buildStore from "../store";
 import { PathFor } from "../interfaces";
 import { State as CatalogState } from "opds-web-client/lib/state";
-import { buildCollectionStore } from "opds-web-client/lib/store";
-import { CollectionData } from "opds-web-client/lib/interfaces";
 import { Store } from "redux";
 import { State } from "../reducers";
 
@@ -16,7 +14,6 @@ export interface ContextProviderProps extends React.Props<any> {
 export default class ContextProvider extends React.Component<ContextProviderProps, any> {
   pathFor: PathFor;
   store: Store<State>
-  recommendationsStore: Store<{ collection: CollectionData }>;
 
   constructor(props) {
     super(props);
@@ -33,7 +30,6 @@ export default class ContextProvider extends React.Component<ContextProviderProp
         "";
       return path;
     };
-    this.recommendationsStore = buildCollectionStore();
   }
 
   prepareCollectionUrl(url: string): string {
@@ -65,8 +61,7 @@ export default class ContextProvider extends React.Component<ContextProviderProp
       homeUrl: this.props.homeUrl,
       catalogBase: this.props.catalogBase,
       initialState: this.props.initialState,
-      store: this.store,
-      recommendationsStore: this.recommendationsStore
+      store: this.store
     };
   }
 

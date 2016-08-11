@@ -124,7 +124,7 @@ function mapStateToProps(state: State, ownProps) {
 function mapDispatchToProps(dispatch) {
   return {
     fetchComplaintTypes: (url: string) => dispatch(fetchComplaintTypes(url)),
-    postComplaint: (url: string, data: ComplaintData) => dispatch(postComplaint(url, data))
+    postComplaint: (url: string, data: FormData) => dispatch(postComplaint(url, data))
   };
 }
 
