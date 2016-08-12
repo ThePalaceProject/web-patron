@@ -31,16 +31,6 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
     initialState: React.PropTypes.object
   };
 
-  static childContextTypes: React.ValidationMap<any> = {
-    tab: React.PropTypes.string
-  };
-
-  getChildContext() {
-    return {
-      tab: this.props.params.tab
-    };
-  }
-
   render() {
     let { collectionUrl, bookUrl } = this.props.params;
 

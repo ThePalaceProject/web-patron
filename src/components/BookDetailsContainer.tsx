@@ -7,12 +7,12 @@ export default class BookDetailsContainer extends React.Component<BookDetailsCon
   context: any;
 
   static contextTypes: React.ValidationMap<any> = {
-    recommendationsStore: React.PropTypes.object.isRequired,
-    proxyUrl: React.PropTypes.string
+    store: React.PropTypes.object.isRequired
   };
 
   render() {
     let child = React.Children.only(this.props.children);
+    let bookProps = Object.assign({}, child.props, { store: this.context.store });
     let book = React.createElement(BookDetails, child.props);
     let relatedUrl = this.relatedUrl();
 
@@ -23,8 +23,8 @@ export default class BookDetailsContainer extends React.Component<BookDetailsCon
           <div className="relatedBooks" style={{ marginTop: "30px" }}>
             <Lanes
               url={relatedUrl}
-              store={this.context.recommendationsStore}
-              proxyUrl={this.context.proxyUrl}
+              store={this.context.store}
+              namespace="recommendations"
               hideMoreLinks={true}
               hiddenBookIds={this.props.book ? [this.props.book.id] : []}
               />

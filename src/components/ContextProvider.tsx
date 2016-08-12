@@ -1,22 +1,23 @@
 import * as React from "react";
+import buildStore from "../store";
 import { PathFor } from "../interfaces";
-import { State } from "opds-web-client/lib/state";
-import { buildCollectionStore } from "opds-web-client/lib/store";
-import { CollectionData } from "opds-web-client/lib/interfaces";
+import { State as CatalogState } from "opds-web-client/lib/state";
 import { Store } from "redux";
+import { State } from "../reducers";
 
 export interface ContextProviderProps extends React.Props<any> {
   homeUrl: string;
   catalogBase: string;
-  initialState?: State;
+  initialState?: CatalogState;
 }
 
 export default class ContextProvider extends React.Component<ContextProviderProps, any> {
+  store: Store<State>;
   pathFor: PathFor;
-  recommendationsStore: Store<{ collection: CollectionData }>;
 
   constructor(props) {
     super(props);
+    this.store = buildStore();
     this.pathFor = (collectionUrl: string, bookUrl: string, tab?: string) => {
       let path = "";
       path +=
@@ -29,7 +30,6 @@ export default class ContextProvider extends React.Component<ContextProviderProp
         "";
       return path;
     };
-    this.recommendationsStore = buildCollectionStore();
   }
 
   prepareCollectionUrl(url: string): string {
@@ -45,20 +45,20 @@ export default class ContextProvider extends React.Component<ContextProviderProp
   }
 
   static childContextTypes: React.ValidationMap<any> = {
+    store: React.PropTypes.object.isRequired,
     pathFor: React.PropTypes.func.isRequired,
     homeUrl: React.PropTypes.string.isRequired,
     catalogBase: React.PropTypes.string.isRequired,
-    initialState: React.PropTypes.object,
-    recommendationsStore: React.PropTypes.object.isRequired
+    initialState: React.PropTypes.object
   };
 
   getChildContext() {
     return {
+      store: this.store,
       pathFor: this.pathFor,
       homeUrl: this.props.homeUrl,
       catalogBase: this.props.catalogBase,
-      initialState: this.props.initialState,
-      recommendationsStore: this.recommendationsStore
+      initialState: this.props.initialState
     };
   }
 

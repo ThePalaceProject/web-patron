@@ -1,5 +1,4 @@
 import { expect } from "chai";
-import { stub } from "sinon";
 
 import * as React from "react";
 import { shallow } from "enzyme";
@@ -7,7 +6,7 @@ import { shallow } from "enzyme";
 import BookDetailsContainer from "../BookDetailsContainer";
 import BookDetails from "../BookDetails";
 import Lanes from "opds-web-client/lib/components/Lanes";
-import { buildCollectionStore } from "opds-web-client/lib/store";
+import buildStore from "../../store";
 
 let book = {
   id: "urn:librarysimplified.org/terms/id/3M%20ID/crrmnr9",
@@ -42,11 +41,8 @@ describe("BookDetailsContainer", () => {
   let fulfillBook = url => Promise.resolve();
 
   beforeEach(() => {
-    store = buildCollectionStore();
-    context = {
-      recommendationsStore: store,
-      proxyUrl: "proxy url"
-    };
+    store = buildStore();
+    context = { store };
     wrapper = shallow(
       <BookDetailsContainer
         book={book}
@@ -76,9 +72,9 @@ describe("BookDetailsContainer", () => {
   it("renders related lanes", () => {
     let lanes = wrapper.find(Lanes);
     expect(lanes.prop("url")).to.equal("related url");
-    expect(lanes.prop("proxyUrl")).to.equal("proxy url");
     expect(lanes.prop("store")).to.equal(store);
     expect(lanes.prop("hideMoreLinks")).to.equal(true);
     expect(lanes.prop("hiddenBookIds")).to.deep.equal([book.id]);
+    expect(lanes.prop("namespace")).to.equal("recommendations");
   });
 });

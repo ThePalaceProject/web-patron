@@ -11,7 +11,7 @@
   "scripts": {
     "prepublish": "typings install && tsc && npm run prod",
     "lint": "tslint -c tslint.json src/*.ts src/*.tsx src/**/*.ts src/**/*.tsx src/**/**/*.ts src/**/**/*.tsx",
-    "test": "npm run lint && tsc && mocha --require lib/testHelper.js lib/**/__tests__/*.js",
+    "test": "npm run lint && tsc && mocha --require lib/testHelper.js lib/__tests__/*.js lib/**/__tests__/*.js",
     "dev": "rm -rf dist && NODE_ENV=development webpack --watch --progress --display-modules --config webpack.config",
     "prod": "rm -rf dist && NODE_ENV=production webpack -p --progress --display-modules --config webpack.config",
     "start": "node lib/server/index.js",
@@ -37,8 +37,9 @@
   "dependencies": {
     "bootstrap": "^3.3.6",
     "express": "^4.14.0",
+    "isomorphic-fetch": "^2.2.1",
     "jsdom": "^9.4.1",
-    "opds-web-client": "0.0.23",
+    "opds-web-client": "0.0.24",
     "react": "^15.3.0",
     "react-bootstrap": "^0.29.5",
     "react-dom": "^15.3.0",

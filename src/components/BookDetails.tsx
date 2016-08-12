@@ -1,7 +1,19 @@
 import * as React from "react";
-import DefaultBookDetails from "opds-web-client/lib/components/BookDetails";
+import { Store } from "redux";
+import { connect } from "react-redux";
+import { fetchComplaintTypes, postComplaint } from "../actions";
+import DefaultBookDetails, { BookDetailsProps as DefaultBooKDetailsProps } from "opds-web-client/lib/components/BookDetails";
+import ReportProblemLink from "./ReportProblemLink";
+import { ComplaintData } from "../interfaces";
+import { State } from "../reducers/index";
 
-export default class BookDetails extends DefaultBookDetails {
+export interface BookDetailsProps extends DefaultBooKDetailsProps {
+  problemTypes: string[];
+  fetchComplaintTypes: (url: string) => Promise<string[]>;
+  postComplaint: (url: string, data: ComplaintData) => Promise<any>;
+}
+
+export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
   fieldNames() {
     return ["Published", "Publisher", "Audience", "Categories"];
   }
@@ -77,4 +89,48 @@ export default class BookDetails extends DefaultBookDetails {
 
     return categories.length > 0 ? categories.join(", ") : null;
   }
+
+  reportUrl() {
+    let reportLink = this.props.book.raw.link.find(link =>
+      link["$"]["rel"]["value"] === "issues"
+    );
+
+    if (!reportLink) {
+      return null;
+    }
+
+    return reportLink["$"]["href"]["value"];
+  }
+
+  rightColumnLinks() {
+    let reportUrl = this.reportUrl();
+    return reportUrl ?
+      <ReportProblemLink
+        className="btn btn-link"
+        reportUrl={reportUrl}
+        fetchTypes={this.props.fetchComplaintTypes}
+        report={this.props.postComplaint}
+        types={this.props.problemTypes}
+        /> : null;
+  }
 }
+
+function mapStateToProps(state: State, ownProps) {
+  return {
+    problemTypes: state.complaints.types
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    fetchComplaintTypes: (url: string) => dispatch(fetchComplaintTypes(url)),
+    postComplaint: (url: string, data: ComplaintData) => dispatch(postComplaint(url, data))
+  };
+}
+
+const ConnectedBookDetails = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(BookDetails);
+
+export default ConnectedBookDetails;
