@@ -12,6 +12,8 @@ describe("ContextProvider", () => {
   let store;
   let homeUrl = "http://example.com/home";
   let catalogBase = "http://example.com";
+  let catalogName = "Example";
+  let logo = "logo";
 
   beforeEach(() => {
     store = buildStore();
@@ -19,6 +21,8 @@ describe("ContextProvider", () => {
       <ContextProvider
         homeUrl={homeUrl}
         catalogBase={catalogBase}
+        catalogName={catalogName}
+        logo={logo}
         initialState={store.getState()}>
         <TestComponent />
       </ContextProvider>
@@ -30,6 +34,8 @@ describe("ContextProvider", () => {
     expect(context.pathFor).to.equal(wrapper.instance().pathFor);
     expect(context.homeUrl).to.equal(homeUrl);
     expect(context.catalogBase).to.equal(catalogBase);
+    expect(context.catalogName).to.equal(catalogName);
+    expect(context.logo).to.equal(logo);
     expect(context.initialState).to.equal(store.getState());
   });
 

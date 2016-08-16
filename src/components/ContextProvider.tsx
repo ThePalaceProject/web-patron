@@ -8,6 +8,8 @@ import { State } from "../reducers";
 export interface ContextProviderProps extends React.Props<any> {
   homeUrl: string;
   catalogBase: string;
+  catalogName: string;
+  logo: string;
   initialState?: CatalogState;
 }
 
@@ -49,6 +51,8 @@ export default class ContextProvider extends React.Component<ContextProviderProp
     pathFor: React.PropTypes.func.isRequired,
     homeUrl: React.PropTypes.string.isRequired,
     catalogBase: React.PropTypes.string.isRequired,
+    catalogName: React.PropTypes.string.isRequired,
+    logo: React.PropTypes.string.isRequired,
     initialState: React.PropTypes.object
   };
 
@@ -58,6 +62,8 @@ export default class ContextProvider extends React.Component<ContextProviderProp
       pathFor: this.pathFor,
       homeUrl: this.props.homeUrl,
       catalogBase: this.props.catalogBase,
+      catalogName: this.props.catalogName,
+      logo: this.props.logo,
       initialState: this.props.initialState
     };
   }

@@ -6,11 +6,14 @@ import routes from "../routes";
 import ContextProvider from "../components/ContextProvider";
 import { expandCollectionUrl, expandBookUrl } from "../components/CatalogHandler";
 import buildInitialState, { State } from "opds-web-client/lib/state";
+import nyplLogo from "../images/nypl-logo-transparent";
 
 const app = express();
 const port = process.env.PORT || 3000;
 const homeUrl = process.env.SIMPLIFIED_PATRON_HOME_URL || "http://localhost:6500/groups/";
 const catalogBase = process.env.SIMPLIFIED_PATRON_CATALOG_BASE || "http://localhost:6500";
+const catalogName = process.env.SIMPLIFIED_PATRON_CATALOG_NAME || "Books";
+const logo = process.env.SIMPLIFIED_PATRON_LOGO || nyplLogo;
 
 // This is fired every time the server side receives a request
 app.use("/js", express.static("dist"));
@@ -37,6 +40,8 @@ function handleRender(req, res) {
           <ContextProvider
             homeUrl={homeUrl}
             catalogBase={catalogBase}
+            catalogName={catalogName}
+            logo={logo}
             initialState={state}>
             <RouterContext {...renderProps} />
           </ContextProvider>
@@ -49,6 +54,8 @@ function handleRender(req, res) {
             <ContextProvider
               homeUrl={homeUrl}
               catalogBase={catalogBase}
+              catalogName={catalogName}
+              logo={logo}
               initialState={state}>
               <RouterContext {...renderProps} />
             </ContextProvider>
@@ -67,7 +74,7 @@ function renderFullPage(html: string, preloadedState: State) {
     <!doctype html>
     <html>
       <head>
-        <title>NYPL eBooks</title>
+        <title>${catalogName}</title>
         <link href="/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
         <link href="/css/font-awesome.min.css" rel="stylesheet" crossorigin="anonymous">
         <link href="/css/recommendations.css" rel="stylesheet" crossorigin="anonymous">
@@ -79,6 +86,8 @@ function renderFullPage(html: string, preloadedState: State) {
           var circulationPatronWeb = new CirculationPatronWeb({
             homeUrl: "${homeUrl}",
             catalogBase: "${catalogBase}",
+            catalogName: "${catalogName}",
+            logo: "${logo}",
             initialState: ${JSON.stringify(preloadedState)}
           });
         </script>
@@ -92,7 +101,7 @@ function renderErrorPage(message: string = "There was a problem with this reques
     <!doctype html>
     <html>
       <head>
-        <title>NYPL eBooks</title>
+        <title>${catalogName}</title>
         <link href="/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
       </head>
       <body>
