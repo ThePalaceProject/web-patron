@@ -1,13 +1,14 @@
 import * as React from "react";
 import CatalogLink from "opds-web-client/lib/components/CatalogLink";
 import { HeaderProps } from "opds-web-client/lib/components/Root";
-import logo from "../images/nypl-logo-transparent";
 import { Navbar, Nav, NavItem } from "react-bootstrap";
 import { NavigateContext } from "opds-web-client/lib/interfaces";
 
 export interface HeaderContext extends NavigateContext {
   homeUrl: string;
   catalogBase: string;
+  catalogName: string;
+  logo: string;
 }
 
 export default class Header extends React.Component<HeaderProps, any> {
@@ -16,6 +17,8 @@ export default class Header extends React.Component<HeaderProps, any> {
   static contextTypes = {
     homeUrl: React.PropTypes.string.isRequired,
     catalogBase: React.PropTypes.string.isRequired,
+    catalogName: React.PropTypes.string.isRequired,
+    logo: React.PropTypes.string.isRequired,
     router: React.PropTypes.object.isRequired,
     pathFor: React.PropTypes.func.isRequired
   };
@@ -42,8 +45,8 @@ export default class Header extends React.Component<HeaderProps, any> {
           <Navbar.Brand>
             <img
               style={logoStyle}
-              src={logo} />
-            NYPL
+              src={this.context.logo} />
+            {this.context.catalogName}
           </Navbar.Brand>
           <Navbar.Toggle />
         </Navbar.Header>

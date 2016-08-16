@@ -19,6 +19,7 @@ export interface CatalogHandlerProps extends React.Props<CatalogHandler> {
 export interface CatalogHandlerContext {
   homeUrl: string;
   catalogBase: string;
+  catalogName: string;
   initialState?: State;
 }
 
@@ -28,6 +29,7 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
   static contextTypes: React.ValidationMap<CatalogHandlerContext> = {
     homeUrl: React.PropTypes.string.isRequired,
     catalogBase: React.PropTypes.string.isRequired,
+    catalogName: React.PropTypes.string.isRequired,
     initialState: React.PropTypes.object
   };
 
@@ -42,7 +44,7 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
 
     let pageTitleTemplate = (collectionTitle, bookTitle) => {
       let details = bookTitle || collectionTitle;
-      return "NYPL eBooks" + (details ? " - " + details : "");
+      return this.context.catalogName + (details ? " - " + details : "");
     };
 
     return (

@@ -13,6 +13,7 @@ describe("CatalogHandler", () => {
   let context;
   let child;
   let host = "http://example.com";
+  let name = "Example";
 
   beforeEach(() => {
     store = buildStore();
@@ -24,6 +25,7 @@ describe("CatalogHandler", () => {
     context = {
       homeUrl: host + "/home",
       catalogBase: host,
+      catalogName: name,
       initialState: store.getState()
     };
     wrapper = shallow(
@@ -43,8 +45,8 @@ describe("CatalogHandler", () => {
     expect(catalog.prop("initialState")).to.equal(store.getState());
     expect(catalog.prop("computeBreadcrumbs")).to.be.ok;
     let pageTitleTemplate = catalog.prop("pageTitleTemplate");
-    expect(pageTitleTemplate("Collection", "Book")).to.equal("NYPL eBooks - Book");
-    expect(pageTitleTemplate("Collection", null)).to.equal("NYPL eBooks - Collection");
+    expect(pageTitleTemplate("Collection", "Book")).to.equal("Example - Book");
+    expect(pageTitleTemplate("Collection", null)).to.equal("Example - Collection");
   });
 
   it("uses home url as default collection url", () => {
