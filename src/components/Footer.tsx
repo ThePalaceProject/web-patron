@@ -22,7 +22,7 @@ export default class Footer extends React.Component<FooterProps, any> {
     Object.keys(labels).forEach(type => {
       let link = this.props.collection.links.find(link => link.type === type);
       if (link) {
-        let linkWithLabel = Object.assign({ text: labels[type] }, link);
+        let linkWithLabel = Object.assign({}, link, { text: labels[type] });
         links.push(linkWithLabel);
       }
     });

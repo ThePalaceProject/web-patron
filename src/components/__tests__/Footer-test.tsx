@@ -15,7 +15,7 @@ describe("Footer", () => {
     books: [],
     navigationLinks: [],
     links: [
-      { url: "about", type: "about", text: null },
+      { url: "about", type: "about", text: "abcd" },
       { url: "terms", type: "terms-of-service", text: null },
       { url: "unknown", type: "unknown", text: null }
     ]
@@ -37,6 +37,8 @@ describe("Footer", () => {
       let termsLink = links.at(1);
       expect(aboutLink.props().href).to.equal("about");
       expect(termsLink.props().href).to.equal("terms");
+      expect(aboutLink.text()).to.equal("About");
+      expect(termsLink.text()).to.equal("Terms of Service");
     });
   });
 });
