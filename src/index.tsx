@@ -6,15 +6,13 @@ import routes from "./routes";
 
 class CirculationPatronWeb {
   constructor(config) {
-    let div = document.createElement("div");
-    div.id = "circulation-patron-web";
-    document.getElementsByTagName("body")[0].appendChild(div);
+    let divId = "circulation-patron-web";
 
     ReactDOM.render(
       <ContextProvider {...config}>
         <Router history={browserHistory} routes={routes} />
       </ContextProvider>,
-      document.getElementById(div.id)
+      document.getElementById(divId)
     );
   }
 }
