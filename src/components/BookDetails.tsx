@@ -15,13 +15,21 @@ export interface BookDetailsProps extends DefaultBooKDetailsProps {
 
 export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
   fieldNames() {
-    return ["Published", "Publisher", "Audience", "Categories"];
+    return ["Published", "Publisher", "Audience", "Categories", "Distributed By"];
   }
 
   fields() {
     let fields = super.fields();
-    fields["Categories"] = this.categories();
-    fields["Audience"] = this.audience();
+    let categoriesIndex = fields.findIndex(field => field.name === "Categories");
+    fields[categoriesIndex].value = this.categories();
+    fields.push({
+      name: "Audience",
+      value: this.audience()
+    });
+    fields.push({
+      name: "Distributed By",
+      value: this.distributor()
+    });
     return fields;
   }
 
@@ -88,6 +96,24 @@ export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
     }
 
     return categories.length > 0 ? categories.join(", ") : null;
+  }
+
+  distributor() {
+    if (!this.props.book) {
+      return null;
+    }
+
+    let rawDistributionTags = this.props.book.raw["bibframe:distribution"];
+    if (!rawDistributionTags || rawDistributionTags.length < 1) {
+      return null;
+    }
+
+    let distributor = rawDistributionTags[0]["$"]["bibframe:ProviderName"];
+    if (!distributor) {
+      return null;
+    }
+
+    return distributor.value;
   }
 
   reportUrl() {
