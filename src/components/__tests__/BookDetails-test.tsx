@@ -54,6 +54,15 @@ let book = {
         }
       }
     ],
+    "bibframe:distribution": [
+      {
+        $: {
+          "bibframe:ProviderName": {
+            value: "Overdrive"
+          }
+        }
+      }
+    ],
     link: [{
       $: {
         rel: { value: "issues" },
@@ -86,12 +95,12 @@ describe("BookDetails", () => {
   });
 
   it("shows audience and target age", () => {
-    let audience = wrapper.find(".bookDetailsAudience");
+    let audience = wrapper.find(".bookDetails-Audience");
     expect(audience.text()).to.equal("Audience: Children (age 10-12)");
   });
 
   it("shows categories", () => {
-    let categories = wrapper.find(".bookDetailsCategories");
+    let categories = wrapper.find(".bookDetails-Categories");
     expect(categories.text()).to.equal("Categories: Adventure, Fantasy");
   });
 
@@ -100,6 +109,11 @@ describe("BookDetails", () => {
     wrapper.setProps({ book: bookCopy });
     let categories = wrapper.find(".bookDetailsCategories");
     expect(categories.length).to.equal(0);
+  });
+
+  it("shows distributor", () => {
+    let distributor = wrapper.find(".bookDetails-Distributed-By");
+    expect(distributor.text()).to.equal("Distributed By: Overdrive");
   });
 
   it("shows report problem link", () => {
