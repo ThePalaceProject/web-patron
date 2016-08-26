@@ -1,4 +1,5 @@
 import { expect } from "chai";
+import { stub } from "sinon";
 
 import * as React from "react";
 import { shallow } from "enzyme";
@@ -7,6 +8,7 @@ import { BookDetails } from "../BookDetails";
 import CatalogLink from "opds-web-client/lib/components/CatalogLink";
 import BorrowButton from "opds-web-client/lib/components/BorrowButton";
 import ReportProblemLink from "../ReportProblemLink";
+import RevokeButton from "../RevokeButton";
 
 let book = {
   id: "urn:librarysimplified.org/terms/id/3M%20ID/crrmnr9",
@@ -17,7 +19,7 @@ let book = {
   summary: "&lt;b&gt;Sam and Remi Fargo race for treasure&#8212;and survival&#8212;in this lightning-paced new adventure from #1&lt;i&gt; New York Times&lt;/i&gt; bestselling author Clive Cussler.&lt;/b&gt;&lt;br /&gt;&lt;br /&gt;Husband-and-wife team Sam and Remi Fargo are in Mexico when they come upon a remarkable discovery&#8212;the mummified remainsof a man clutching an ancient sealed pot. Within the pot is a Mayan book larger than any known before.&lt;br /&gt;&lt;br /&gt;The book contains astonishing information about the Mayans, their cities, and about mankind itself. The secrets are so powerful that some people would do anything to possess them&#8212;as the Fargos are about to find out. Many men and women are going to die for that book.",
   imageUrl: "https://dlotdqc6pnwqb.cloudfront.net/3M/crrmnr9/cover.jpg",
   borrowUrl: "borrow url",
-  openAccessUrl: "secrets.epub",
+  openAccessLinks: [{ url: "secrets.epub", type: "epub" }],
   publisher: "Penguin Publishing Group",
   published: "February 29, 2016",
   categories: ["Children", "10-12", "Fiction", "Adventure", "Fantasy"],
@@ -68,14 +70,19 @@ let book = {
         rel: { value: "issues" },
         href: { value: "http://example.com/report" }
       }
+    },
+    {
+      $: {
+        rel: { value: "http://librarysimplified.org/terms/rel/revoke" },
+        href: { value: "http://example.com/revoke" }
+      }
     }]
   }
 };
 
 describe("BookDetails", () => {
   let wrapper;
-  let noop = (url: string) => new Promise((resolve, reject) => resolve());
-  let noop2 = (url: string, type: string) => new Promise((resolve, reject) => resolve());
+  let noop = stub().returns(new Promise((resolve, reject) => resolve()));
   let fetchComplaintTypes = noop;
   let postComplaint = noop;
   let problemTypes = ["type1", "type2"];
@@ -84,9 +91,9 @@ describe("BookDetails", () => {
     wrapper = shallow(
       <BookDetails
         book={book}
-        borrowBook={noop}
+        updateBook={noop}
         fulfillBook={noop}
-        indirectFulfillBook={noop2}
+        indirectFulfillBook={noop}
         fetchComplaintTypes={fetchComplaintTypes}
         postComplaint={postComplaint}
         problemTypes={problemTypes}
@@ -123,5 +130,29 @@ describe("BookDetails", () => {
     expect(link.props().fetchTypes).to.equal(fetchComplaintTypes);
     expect(link.props().report).to.equal(postComplaint);
     expect(link.props().types).to.equal(problemTypes);
+  });
+
+  it("shows revoke button if book is open access", () => {
+    let button = wrapper.find(RevokeButton);
+    expect(button.length).to.equal(1);
+    expect(button.props().revoke).to.equal(wrapper.instance().revoke);
+    expect(button.props().children).to.equal("Return Now");
+  });
+
+  it("doesn't show revoke button if book isn't open access", () => {
+    let bookCopy = Object.assign({}, book, { openAccessLinks: [] });
+    wrapper = shallow(
+      <BookDetails
+        book={bookCopy}
+        updateBook={noop}
+        fulfillBook={noop}
+        indirectFulfillBook={noop}
+        fetchComplaintTypes={fetchComplaintTypes}
+        postComplaint={postComplaint}
+        problemTypes={problemTypes}
+        />
+    );
+    let button = wrapper.find(RevokeButton);
+    expect(button.length).to.equal(0);
   });
 });

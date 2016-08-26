@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { fetchComplaintTypes, postComplaint } from "../actions";
 import DefaultBookDetails, { BookDetailsProps as DefaultBooKDetailsProps } from "opds-web-client/lib/components/BookDetails";
 import ReportProblemLink from "./ReportProblemLink";
+import RevokeButton from "./RevokeButton";
 import { ComplaintData } from "../interfaces";
 import { State } from "../reducers/index";
 
@@ -14,6 +15,11 @@ export interface BookDetailsProps extends DefaultBooKDetailsProps {
 }
 
 export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
+  constructor(props) {
+    super(props);
+    this.revoke = this.revoke.bind(this);
+  }
+
   fieldNames() {
     return ["Published", "Publisher", "Audience", "Categories", "Distributed By"];
   }
@@ -126,6 +132,40 @@ export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
     }
 
     return reportLink["$"]["href"]["value"];
+  }
+
+  revokeUrl() {
+    let revokeLink = this.props.book.raw.link.find(link =>
+      link["$"]["rel"]["value"] === "http://librarysimplified.org/terms/rel/revoke"
+    );
+
+    if (!revokeLink) {
+      return null;
+    }
+
+    return revokeLink["$"]["href"]["value"];
+  }
+
+  revoke() {
+    let revokeUrl = this.revokeUrl();
+    return this.props.updateBook(revokeUrl);
+  }
+
+  circulationLinks() {
+    let links = super.circulationLinks();
+    // Books with DRM can only be returned through Adobe,
+    // so we don't show revoke links for them.
+    if (this.isOpenAccess() && this.revokeUrl()) {
+      links.push(
+        <RevokeButton
+          className="btn btn-default"
+          revoke={this.revoke}
+          >
+          Return Now
+        </RevokeButton>
+      );
+    }
+    return links;
   }
 
   rightColumnLinks() {
