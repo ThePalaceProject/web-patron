@@ -139,7 +139,7 @@ describe("BookDetails", () => {
     expect(button.props().children).to.equal("Return Now");
   });
 
-  it("doesn't show revoke button is book isn't open access", () => {
+  it("doesn't show revoke button if book isn't open access", () => {
     let bookCopy = Object.assign({}, book, { openAccessLinks: [] });
     wrapper = shallow(
       <BookDetails
