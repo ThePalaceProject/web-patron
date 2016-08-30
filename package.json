@@ -12,8 +12,8 @@
     "prepublish": "typings install && tsc && npm run prod",
     "lint": "tslint -c tslint.json src/*.ts src/*.tsx src/**/*.ts src/**/*.tsx src/**/**/*.ts src/**/**/*.tsx",
     "test": "npm run lint && tsc && mocha --require lib/testHelper.js lib/__tests__/*.js lib/**/__tests__/*.js",
-    "dev": "rm -rf dist && NODE_ENV=development webpack --watch --progress --display-modules --config webpack.config",
-    "prod": "rm -rf dist && NODE_ENV=production webpack -p --progress --display-modules --config webpack.config",
+    "dev": "rm -rf dist && mkdir dist  && cp node_modules/bootstrap/dist/css/* dist && cp css/* dist && NODE_ENV=development webpack --watch --progress --display-modules --config webpack.config",
+    "prod": "rm -rf dist && mkdir dist && cp node_modules/bootstrap/dist/css/* dist && cp css/* dist && NODE_ENV=production webpack -p --progress --display-modules --config webpack.config",
     "start": "node lib/server/index.js",
     "start-prod": "tsc && npm run prod && npm run start",
     "start-dev": "tsc && npm run dev | npm run start"

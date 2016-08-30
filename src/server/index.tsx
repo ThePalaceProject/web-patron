@@ -14,12 +14,11 @@ const homeUrl = process.env.SIMPLIFIED_PATRON_HOME_URL || "http://localhost:6500
 const catalogBase = process.env.SIMPLIFIED_PATRON_CATALOG_BASE || "http://localhost:6500";
 const catalogName = process.env.SIMPLIFIED_PATRON_CATALOG_NAME || "Books";
 const logo = process.env.SIMPLIFIED_PATRON_LOGO || nyplLogo;
+const distDir = process.env.SIMPLIFIED_PATRON_DIST || "dist";
 
 // This is fired every time the server side receives a request
-app.use("/js", express.static("dist"));
-app.use("/css", express.static("node_modules/bootstrap/dist/css"));
-app.use("/css", express.static("font-awesome/css"));
-app.use("/css", express.static("css"));
+app.use("/js", express.static(distDir));
+app.use("/css", express.static(distDir));
 app.use(handleRender);
 
 function handleRender(req, res) {
@@ -76,7 +75,6 @@ function renderFullPage(html: string, preloadedState: State) {
       <head>
         <title>${catalogName}</title>
         <link href="/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-        <link href="/css/font-awesome.min.css" rel="stylesheet" crossorigin="anonymous">
         <link href="/css/recommendations.css" rel="stylesheet" crossorigin="anonymous">
       </head>
       <body>
