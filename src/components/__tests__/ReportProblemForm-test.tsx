@@ -70,7 +70,7 @@ describe("ReportProblemForm", () => {
     it("displays error if submitted without type", () => {
       let button = wrapper.find("button").filterWhere(button => button.text() === "Submit");
       button.simulate("click");
-      let error = wrapper.find(".problemFormError");
+      let error = wrapper.find(".error");
       expect(error.text()).to.equal("You must select a type");
     });
 

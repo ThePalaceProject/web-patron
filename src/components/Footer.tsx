@@ -1,4 +1,5 @@
 import * as React from "react";
+import "../stylesheets/footer.scss";
 import { FooterProps } from "opds-web-client/lib/components/Root";
 import { LinkData } from "opds-web-client/lib/interfaces";
 
@@ -33,7 +34,7 @@ export default class Footer extends React.Component<FooterProps, any> {
     return (
       <ul aria-label="about links" className="list-inline">
         { this.links().map(link =>
-          <li key={link.url} style={{padding: "5px"}}>
+          <li key={link.url}>
             <a href={link.url} target="_blank">{link.text}</a>
           </li>
         ) }

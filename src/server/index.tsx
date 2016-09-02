@@ -76,8 +76,8 @@ function renderFullPage(html: string, preloadedState: State) {
       <head>
         <title>${catalogName}</title>
         <link href="/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-        <link href="/css/recommendations.css" rel="stylesheet" crossorigin="anonymous">
         <link href="/css/opds-web-client.css" rel="stylesheet" crossorigin="anonymous">
+        <link href="/css/circulation-patron-web.css" rel="stylesheet" crossorigin="anonymous">
       </head>
       <body>
         <div id="circulation-patron-web">${html}</div>

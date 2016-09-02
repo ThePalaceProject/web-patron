@@ -1,5 +1,5 @@
 import * as React from "react";
-import { popupStyle } from "opds-web-client/lib/components/styles";
+import "../stylesheets/confirmation_popup.scss";
 
 export interface ConfirmationPopupProps {
   confirm: () => void;
@@ -11,11 +11,9 @@ export interface ConfirmationPopupProps {
 
 export default class ConfirmationPopup extends React.Component<ConfirmationPopupProps, any> {
   render() {
-    let style = popupStyle(300, 300);
-
     return (
-      <div className="confirmation-popup" style={style}>
-        <h3 style={{ marginTop: "0px", marginBottom: "20px" }}>
+      <div className="confirmation-popup">
+        <h3>
           { this.props.text }
         </h3>
         <button

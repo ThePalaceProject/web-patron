@@ -1,0 +1,10 @@
+@import "../../node_modules/opds-web-client/lib/stylesheets/popup";
+
+.confirmation-popuo {
+  @include popup(300px, 300px);
+
+  h3 {
+    margin-top: 0px;
+    margin-bottom: 20px;
+  }
+}

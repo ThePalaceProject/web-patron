@@ -1,4 +1,5 @@
 import * as React from "react";
+import "../stylesheets/book_details_container.scss";
 import BookDetails from "./BookDetails";
 import Lanes from "opds-web-client/lib/components/Lanes";
 import { BookDetailsContainerProps } from "opds-web-client/lib/components/Root";
@@ -17,10 +18,10 @@ export default class BookDetailsContainer extends React.Component<BookDetailsCon
     let relatedUrl = this.relatedUrl();
 
     return (
-      <div className="bookDetailsContainer" style={{ padding: "40px", maxWidth: "700px", margin: "0 auto" }}>
+      <div className="book-details-container">
         { book }
         { relatedUrl &&
-          <div className="relatedBooks" style={{ marginTop: "30px" }}>
+          <div className="related-books">
             <Lanes
               url={relatedUrl}
               store={this.context.store}
