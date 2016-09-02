@@ -1,3 +1,4 @@
+import "../ignore_stylesheet_imports";
 import * as express from "express";
 import * as React from "react";
 import { renderToString } from "react-dom/server";
@@ -10,8 +11,8 @@ import nyplLogo from "../images/nypl-logo-transparent";
 
 const app = express();
 const port = process.env.PORT || 3000;
-const homeUrl = process.env.SIMPLIFIED_PATRON_HOME_URL || "http://localhost:6500/groups/";
-const catalogBase = process.env.SIMPLIFIED_PATRON_CATALOG_BASE || "http://localhost:6500";
+const homeUrl = process.env.SIMPLIFIED_PATRON_HOME_URL || "http://circulation.alpha.librarysimplified.org/groups/";
+const catalogBase = process.env.SIMPLIFIED_PATRON_CATALOG_BASE || "http://circulation.alpha.librarysimplified.org";
 const catalogName = process.env.SIMPLIFIED_PATRON_CATALOG_NAME || "Books";
 const logo = process.env.SIMPLIFIED_PATRON_LOGO || nyplLogo;
 const distDir = process.env.SIMPLIFIED_PATRON_DIST || "dist";
@@ -75,7 +76,8 @@ function renderFullPage(html: string, preloadedState: State) {
       <head>
         <title>${catalogName}</title>
         <link href="/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-        <link href="/css/recommendations.css" rel="stylesheet" crossorigin="anonymous">
+        <link href="/css/opds-web-client.css" rel="stylesheet" crossorigin="anonymous">
+        <link href="/css/circulation-patron-web.css" rel="stylesheet" crossorigin="anonymous">
       </head>
       <body>
         <div id="circulation-patron-web">${html}</div>

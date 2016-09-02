@@ -1,5 +1,5 @@
 import * as React from "react";
-import { popupStyle } from "opds-web-client/lib/components/styles";
+import "../stylesheets/report_problem_form.scss";
 
 export interface  ReportProblemFormProps {
   reportUrl: string;
@@ -23,22 +23,20 @@ export default class ReportProblemForm extends React.Component<any, any> {
     let title = this.state.submitted ? "Problem Reported" : "Report a Problem";
 
     return (
-      <div className="problemForm" style={popupStyle(400)}>
-        <h3 style={{ marginTop: "0px" }}>{title}</h3>
+      <div className="problem-form">
+        <h3>{title}</h3>
 
         { this.state.error &&
           <div
-            className="problemFormError"
-            style={{ color: "red", marginTop: "1em" }}>
+            className="error">
             {this.state.error}
           </div>
         }
 
         { !this.state.submitted && this.props.types.length > 0 &&
-          <div style={{ textAlign: "center", marginTop: "1em" }}>
+          <div className="form">
             <select
               className="form-control"
-              style={{ width: "200px" }}
               ref="type">
               <option value="">choose a type</option>
               { this.props.types.map(type =>
@@ -59,7 +57,7 @@ export default class ReportProblemForm extends React.Component<any, any> {
         }
 
         { this.state.submitted &&
-          <div style={{ marginTop: "1em" }}>
+          <div className="submitted">
             <button className="btn btn-default" onClick={this.props.close}>Close</button>
           </div>
         }

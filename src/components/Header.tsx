@@ -1,4 +1,5 @@
 import * as React from "react";
+import "../stylesheets/header.scss";
 import CatalogLink from "opds-web-client/lib/components/CatalogLink";
 import { HeaderProps } from "opds-web-client/lib/components/Root";
 import { Navbar, Nav, NavItem } from "react-bootstrap";
@@ -32,19 +33,11 @@ export default class Header extends React.Component<HeaderProps, any> {
   render(): JSX.Element {
     let search = this.props.children ? (React.Children.only(this.props.children) as any) : null;
 
-    let logoStyle = {
-      height: "25px",
-      display: "inline",
-      marginRight: "10px",
-      marginTop: "-5px"
-    };
-
     return (
       <Navbar fluid={true} fixedTop={true}>
         <Navbar.Header>
           <Navbar.Brand>
             <img
-              style={logoStyle}
               src={this.context.logo} />
             {this.context.catalogName}
           </Navbar.Brand>
@@ -77,8 +70,8 @@ export default class Header extends React.Component<HeaderProps, any> {
             }
             <li>
               { this.props.isSignedIn ?
-                <a style={{ cursor: "pointer" }} onClick={this.signOut}>Sign Out</a> :
-                <a style={{ cursor: "pointer" }} onClick={this.signIn}>Sign In</a>
+                <a onClick={this.signOut}>Sign Out</a> :
+                <a onClick={this.signIn}>Sign In</a>
               }
             </li>
           </Nav>
