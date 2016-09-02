@@ -10,7 +10,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "prepublish": "typings install && tsc && npm run prod",
-    "lint": "tslint -c tslint.json src/*.ts src/*.tsx src/**/*.ts src/**/*.tsx src/**/**/*.ts src/**/**/*.tsx",
+    "lint": "tslint -c tslint.json src/*.ts src/*.tsx src/**/*.ts src/**/*.tsx src/**/**/*.ts src/**/**/*.tsx && sass-lint -c .sass-lint.yml -v -q",
     "test": "npm run lint && tsc && cp -r src/stylesheets lib && mocha --require lib/testHelper.js lib/__tests__/*.js lib/**/__tests__/*.js",
     "dev": "rm -rf dist && mkdir dist  && cp node_modules/bootstrap/dist/css/* dist && cp node_modules/opds-web-client/dist/*.css dist && cp -r src/stylesheets lib && NODE_ENV=development webpack --watch --progress --display-modules --config webpack.config",
     "prod": "rm -rf dist && mkdir dist && cp node_modules/bootstrap/dist/css/* dist && cp node_modules/opds-web-client/dist/*.css dist && cp -r src/stylesheets lib && NODE_ENV=production webpack -p --progress --display-modules --config webpack.config",
@@ -27,6 +27,7 @@
     "mocha": "^2.5.3",
     "node-sass": "^3.8.0",
     "react-addons-test-utils": "^15.3.0",
+    "sass-lint": "^1.9.1",
     "sass-loader": "^4.0.0",
     "sinon": "^1.17.4",
     "style-loader": "^0.13.1",
