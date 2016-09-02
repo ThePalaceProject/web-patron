@@ -20,6 +20,10 @@ var config = {
   module: {
     loaders: [
       {
+        test: /\.scss$/,
+        loaders: ["style", "css", "sass"]
+      },
+      {
         test: /\.tsx?$/,
         exclude: [/node_modules/],
         loader: 'ts-loader'
@@ -35,7 +39,7 @@ var config = {
     ],
   },
   resolve: {
-    extensions: ["", ".js", ".ts", ".tsx"],
+    extensions: ["", ".js", ".ts", ".tsx", ".scss"],
     root: path.resolve(__dirname, "node_modules")
   }
 };

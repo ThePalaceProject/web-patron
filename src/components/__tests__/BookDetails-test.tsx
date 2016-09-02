@@ -102,24 +102,24 @@ describe("BookDetails", () => {
   });
 
   it("shows audience and target age", () => {
-    let audience = wrapper.find(".bookDetails-Audience");
+    let audience = wrapper.find(".audience");
     expect(audience.text()).to.equal("Audience: Children (age 10-12)");
   });
 
   it("shows categories", () => {
-    let categories = wrapper.find(".bookDetails-Categories");
+    let categories = wrapper.find(".categories");
     expect(categories.text()).to.equal("Categories: Adventure, Fantasy");
   });
 
   it("doesn't show categories when there aren't any", () => {
     let bookCopy = Object.assign({}, book, { raw: { category: [], link: [ ]} });
     wrapper.setProps({ book: bookCopy });
-    let categories = wrapper.find(".bookDetailsCategories");
+    let categories = wrapper.find(".categories");
     expect(categories.length).to.equal(0);
   });
 
   it("shows distributor", () => {
-    let distributor = wrapper.find(".bookDetails-Distributed-By");
+    let distributor = wrapper.find(".distributed-by");
     expect(distributor.text()).to.equal("Distributed By: Overdrive");
   });
 

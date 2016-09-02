@@ -1,3 +1,5 @@
+import "./ignore_stylesheet_imports";
+
 import { jsdom } from "jsdom";
 
 const doc = jsdom("<!doctype html><html><body></body></html>");
