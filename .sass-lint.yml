@@ -4,7 +4,7 @@ options:
   merge-default-rules: false
 # File Options
 files:
-  include: 'src/stylesheets/**/*.scss'
+  include: 'src/**/*.scss'
 # Rule Configuration
 rules:
   extends-before-mixins: 2
@@ -21,10 +21,6 @@ rules:
   no-debug: 2
   no-ids: 2
   no-important: 2
-  hex-notation:
-    - 2
-    -
-      style: uppercase
   indentation:
     - 2
     -

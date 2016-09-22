@@ -7,14 +7,12 @@ import routes from "../routes";
 import ContextProvider from "../components/ContextProvider";
 import { expandCollectionUrl, expandBookUrl } from "../components/CatalogHandler";
 import buildInitialState, { State } from "opds-web-client/lib/state";
-import nyplLogo from "../images/nypl-logo-transparent";
 
 const app = express();
 const port = process.env.PORT || 3000;
 const homeUrl = process.env.SIMPLIFIED_PATRON_HOME_URL || "http://circulation.alpha.librarysimplified.org/groups/";
 const catalogBase = process.env.SIMPLIFIED_PATRON_CATALOG_BASE || "http://circulation.alpha.librarysimplified.org";
 const catalogName = process.env.SIMPLIFIED_PATRON_CATALOG_NAME || "Books";
-const logo = process.env.SIMPLIFIED_PATRON_LOGO || nyplLogo;
 const distDir = process.env.SIMPLIFIED_PATRON_DIST || "dist";
 
 // This is fired every time the server side receives a request
@@ -41,7 +39,6 @@ function handleRender(req, res) {
             homeUrl={homeUrl}
             catalogBase={catalogBase}
             catalogName={catalogName}
-            logo={logo}
             initialState={state}>
             <RouterContext {...renderProps} />
           </ContextProvider>
@@ -55,7 +52,6 @@ function handleRender(req, res) {
               homeUrl={homeUrl}
               catalogBase={catalogBase}
               catalogName={catalogName}
-              logo={logo}
               initialState={state}>
               <RouterContext {...renderProps} />
             </ContextProvider>
@@ -76,7 +72,6 @@ function renderFullPage(html: string, preloadedState: State) {
       <head>
         <title>${catalogName}</title>
         <link href="/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-        <link href="/css/opds-web-client.css" rel="stylesheet" crossorigin="anonymous">
         <link href="/css/circulation-patron-web.css" rel="stylesheet" crossorigin="anonymous">
       </head>
       <body>
@@ -87,7 +82,6 @@ function renderFullPage(html: string, preloadedState: State) {
             homeUrl: "${homeUrl}",
             catalogBase: "${catalogBase}",
             catalogName: "${catalogName}",
-            logo: "${logo}",
             initialState: ${JSON.stringify(preloadedState)}
           });
         </script>

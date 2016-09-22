@@ -2,9 +2,11 @@ var webpack = require("webpack");
 var path = require("path");
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
+var theme = process.env.THEME || "./src/stylesheets/app.scss";
+
 var config = {
   entry: {
-    app: [ "./src/index.tsx" ]
+    app: [ theme, "./src/index.tsx" ]
   },
   output: {
     path: "./dist",

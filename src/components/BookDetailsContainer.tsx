@@ -1,5 +1,4 @@
 import * as React from "react";
-import "../stylesheets/book_details_container.scss";
 import BookDetails from "./BookDetails";
 import Lanes from "opds-web-client/lib/components/Lanes";
 import { BookDetailsContainerProps } from "opds-web-client/lib/components/Root";

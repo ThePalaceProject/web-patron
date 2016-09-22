@@ -1,5 +1,4 @@
 import * as React from "react";
-import "../stylesheets/report_problem_form.scss";
 
 export interface  ReportProblemFormProps {
   reportUrl: string;

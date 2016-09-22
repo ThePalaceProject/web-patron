@@ -50,12 +50,6 @@ describe("Header", () => {
   });
 
   describe("rendering", ( ) => {
-    it("displays logo", () => {
-      let logo = wrapper.find(Navbar.Brand).find("img");
-      expect(logo.length).to.equal(1);
-      expect(logo.props().src).to.equal(context.logo);
-    });
-
     it("displays library name", () => {
       let brand = wrapper.find(Navbar.Brand);
       expect(brand.containsMatchingElement(context.catalogName)).to.be.true;
