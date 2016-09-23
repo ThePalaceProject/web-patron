@@ -1,5 +1,4 @@
 import * as React from "react";
-import "../stylesheets/header.scss";
 import CatalogLink from "opds-web-client/lib/components/CatalogLink";
 import { HeaderProps } from "opds-web-client/lib/components/Root";
 import { Navbar, Nav, NavItem } from "react-bootstrap";
@@ -9,7 +8,6 @@ export interface HeaderContext extends NavigateContext {
   homeUrl: string;
   catalogBase: string;
   catalogName: string;
-  logo: string;
 }
 
 export default class Header extends React.Component<HeaderProps, any> {
@@ -19,7 +17,6 @@ export default class Header extends React.Component<HeaderProps, any> {
     homeUrl: React.PropTypes.string.isRequired,
     catalogBase: React.PropTypes.string.isRequired,
     catalogName: React.PropTypes.string.isRequired,
-    logo: React.PropTypes.string.isRequired,
     router: React.PropTypes.object.isRequired,
     pathFor: React.PropTypes.func.isRequired
   };
@@ -37,8 +34,6 @@ export default class Header extends React.Component<HeaderProps, any> {
       <Navbar fluid={true} fixedTop={true}>
         <Navbar.Header>
           <Navbar.Brand>
-            <img
-              src={this.context.logo} />
             {this.context.catalogName}
           </Navbar.Brand>
           <Navbar.Toggle />

@@ -1,5 +1,4 @@
 import * as React from "react";
-import "../stylesheets/confirmation_popup.scss";
 
 export interface ConfirmationPopupProps {
   confirm: () => void;

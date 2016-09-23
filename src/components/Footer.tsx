@@ -1,5 +1,4 @@
 import * as React from "react";
-import "../stylesheets/footer.scss";
 import { FooterProps } from "opds-web-client/lib/components/Root";
 import { LinkData } from "opds-web-client/lib/interfaces";
 

@@ -1,0 +1,23 @@
+$darkgreen: #3d5416;
+$lightgreen: #75a12b;
+$gray: #eeeeee;
+$light: #f2ffff;
+$dark: #383b43;
+
+$focuscolor: orange;
+$pagecolor: $light;
+$pagecolorlight: $gray;
+$pagetextcolor: $dark;
+$footercolor: $gray;
+$highlightcolor: $darkgreen;
+
+// link colors
+$linkcolor: $lightgreen;
+$linkvisitedcolor: $darkgreen;
+$linkhovercolor: lighten($linkcolor, 10%);
+$invertedlinkcolor: $light;
+$invertedlinkvisitedcolor: darken($invertedlinkcolor, 10%);
+
+$logo: url('openebooks-logo.png');
+
+@import "../stylesheets/app.scss";
