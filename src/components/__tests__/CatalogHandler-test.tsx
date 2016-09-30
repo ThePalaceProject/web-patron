@@ -14,6 +14,12 @@ describe("CatalogHandler", () => {
   let child;
   let host = "http://example.com";
   let name = "Example";
+  let authPlugins = [{
+    type: "test",
+    lookForCredentials: () => {},
+    formComponent: null,
+    buttonComponent: null
+  }];
 
   beforeEach(() => {
     store = buildStore();
@@ -26,6 +32,7 @@ describe("CatalogHandler", () => {
       homeUrl: host + "/home",
       catalogBase: host,
       catalogName: name,
+      authPlugins: authPlugins,
       initialState: store.getState()
     };
     wrapper = shallow(
@@ -43,6 +50,7 @@ describe("CatalogHandler", () => {
     expect(catalog.prop("Header").name).to.equal("Header");
     expect(catalog.prop("Footer").name).to.equal("Footer");
     expect(catalog.prop("BookDetailsContainer").name).to.equal("BookDetailsContainer");
+    expect(catalog.prop("authPlugins")).to.equal(authPlugins);
     expect(catalog.prop("initialState")).to.equal(store.getState());
     expect(catalog.prop("computeBreadcrumbs")).to.be.ok;
     let pageTitleTemplate = catalog.prop("pageTitleTemplate");

@@ -76,11 +76,13 @@ export default class Header extends React.Component<HeaderProps, any> {
   }
 
   signIn() {
-    this.props.showBasicAuthForm(() => {}, { login: "Barcode", password: "PIN" }, "Library");
+    if (this.props.fetchLoans && this.props.loansUrl) {
+      this.props.fetchLoans(this.props.loansUrl);
+    }
   }
 
   signOut() {
-    this.props.clearBasicAuthCredentials();
+    this.props.clearAuthCredentials();
     this.context.router.push(this.context.pathFor(this.context.homeUrl, null));
   }
 }

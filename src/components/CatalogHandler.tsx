@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { State } from "opds-web-client/lib/state";
+import DataFetcher from "opds-web-client/lib/DataFetcher";
 import { Router, Route, browserHistory } from "react-router";
 const OPDSCatalog = require("opds-web-client");
 import Header from "./Header";
@@ -8,6 +9,7 @@ import Footer from "./Footer";
 import BookDetailsContainer from "./BookDetailsContainer";
 import { NavigateContext } from "opds-web-client/lib/interfaces";
 import computeBreadcrumbs from "../computeBreadcrumbs";
+import AuthPlugin from "opds-web-client/lib/AuthPlugin";
 
 export interface CatalogHandlerProps extends React.Props<CatalogHandler> {
   params: {
@@ -21,6 +23,7 @@ export interface CatalogHandlerContext {
   homeUrl: string;
   catalogBase: string;
   catalogName: string;
+  authPlugins: AuthPlugin[];
   initialState?: State;
 }
 
@@ -31,6 +34,7 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
     homeUrl: React.PropTypes.string.isRequired,
     catalogBase: React.PropTypes.string.isRequired,
     catalogName: React.PropTypes.string.isRequired,
+    authPlugins: React.PropTypes.array.isRequired,
     initialState: React.PropTypes.object
   };
 
@@ -57,6 +61,7 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
         BookDetailsContainer={BookDetailsContainer}
         pageTitleTemplate={pageTitleTemplate}
         computeBreadcrumbs={computeBreadcrumbs}
+        authPlugins={this.context.authPlugins}
         initialState={this.context.initialState}
         />
     );
