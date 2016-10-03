@@ -1,11 +1,14 @@
+type FilePath = string;
+type URL = string;
+
 interface Config {
-  theme?: string;
-  homeUrl?: string;
-  catalogBase?: string;
+  theme?: FilePath;
+  homeUrl?: URL;
+  catalogBase?: URL;
   catalogName?: string;
-  distDir?: string;
+  distDir?: FilePath;
   authPlugins?: {
-    [key: string]: string;
+    [key: string]: FilePath;
   };
 }
 

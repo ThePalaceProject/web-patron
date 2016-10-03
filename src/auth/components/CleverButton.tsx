@@ -1,8 +1,14 @@
 import * as React from "react";
-import { AuthProvider } from "opds-web-client/lib/interfaces";
+import { AuthProvider, AuthMethod } from "opds-web-client/lib/interfaces";
 import { AuthButtonProps } from "opds-web-client/lib/components/AuthProviderSelectionForm";
 
-export default class CleverButton extends React.Component<AuthButtonProps, any> {
+export interface CleverAuthMethod extends AuthMethod {
+  links: {
+    authenticate: URL;
+  };
+}
+
+export default class CleverButton extends React.Component<AuthButtonProps<CleverAuthMethod>, any> {
   render() {
     let currentUrl = window.location.href;
     let authUrl = this.props.provider.method.links.authenticate + "&redirect_uri=" + encodeURIComponent(encodeURIComponent(currentUrl));
