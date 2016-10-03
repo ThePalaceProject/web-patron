@@ -1,0 +1,11 @@
+{
+  "theme": "./src/themes/openebooks.scss",
+  "homeUrl": "http://localhost:6500/groups/",
+  "catalogBase": "http://localhost:6500",
+  "catalogName": "Open eBooks",
+  "distDir": "dist",
+  "authPlugins": {
+    "FirstBook": "./src/auth/FirstBookAuthPlugin.ts",
+    "Clever": "./src/auth/CleverAuthPlugin.ts"
+  }
+}
