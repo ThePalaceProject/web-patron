@@ -23,7 +23,7 @@ if (configFile) {
 const homeUrl = config.homeUrl || "http://circulation.alpha.librarysimplified.org/groups/";
 const catalogBase = config.catalogBase || "http://circulation.alpha.librarysimplified.org";
 const catalogName = config.catalogName || "Books";
-const distDir = config.distDir || "dist";
+const distDir = process.env.SIMPLIFIED_PATRON_DIST || "dist";
 const authPlugins = Object.keys(config.authPlugins || {});
 
 const authPluginJsTags = authPlugins.map(plugin => {

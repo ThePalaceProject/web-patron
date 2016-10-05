@@ -3,7 +3,6 @@
   "homeUrl": "https://circulation.openebooks.us/groups/",
   "catalogBase": "https://circulation.openebooks.us",
   "catalogName": "Open eBooks",
-  "distDir": "dist",
   "authPlugins": {
     "FirstBook": "./src/auth/FirstBookAuthPlugin.ts",
     "Clever": "./src/auth/CleverAuthPlugin.ts"
