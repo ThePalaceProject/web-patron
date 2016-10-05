@@ -18,12 +18,12 @@ class TestSearch extends React.Component<any, any> {
 
 describe("Header", () => {
   let context, wrapper;
-  let showBasicAuthForm, clearBasicAuthCredentials;
+  let fetchLoans, clearAuthCredentials;
   let push, pathFor;
 
   beforeEach(() => {
-    showBasicAuthForm = spy();
-    clearBasicAuthCredentials = spy();
+    fetchLoans = spy();
+    clearAuthCredentials = spy();
     push = spy();
     pathFor = spy((collection, book) => "collection" + "::" + "book");
     context = {
@@ -40,8 +40,8 @@ describe("Header", () => {
         bookTitle="book"
         loansUrl="loans url"
         isSignedIn={false}
-        showBasicAuthForm={showBasicAuthForm}
-        clearBasicAuthCredentials={clearBasicAuthCredentials}
+        fetchLoans={fetchLoans}
+        clearAuthCredentials={clearAuthCredentials}
         >
         <TestSearch />
       </Header>,
@@ -85,18 +85,18 @@ describe("Header", () => {
   });
 
   describe("behavior", () => {
-    it("shows basic auth form when sign in link is clicked", () => {
+    it("fetches loans when sign in link is clicked", () => {
       let link = wrapper.find("a");
       link.simulate("click");
-      expect(showBasicAuthForm.args[0][1]).to.deep.equal({ login: "Barcode", password: "PIN" });
-      expect(showBasicAuthForm.args[0][2]).to.equal("Library");
+      expect(fetchLoans.callCount).to.equal(1);
+      expect(fetchLoans.args[0][0]).to.equal("loans url");
     });
 
-    it("clears basic auth credentials and loads catalog when sign out link is clicked", () => {
+    it("clears auth credentials and loads catalog when sign out link is clicked", () => {
       wrapper.setProps({ isSignedIn: true });
       let link = wrapper.find("a");
       link.simulate("click");
-      expect(clearBasicAuthCredentials.called).to.equal(true);
+      expect(clearAuthCredentials.called).to.equal(true);
       expect(pathFor.args[0][0]).to.equal("home url");
       expect(pathFor.args[0][1]).to.equal(null);
       expect(push.args[0]).to.deep.equal([pathFor("home url", null)]);

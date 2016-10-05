@@ -1,0 +1,10 @@
+{
+  "theme": "./src/themes/nypl.scss",
+  "homeUrl": "http://circulation.alpha.librarysimplified.org/groups/",
+  "catalogBase": "http://circulation.alpha.librarysimplified.org",
+  "catalogName": "NYPL eBooks",
+  "distDir": "dist",
+  "authPlugins": {
+    "Millennium": "./src/auth/MillenniumAuthPlugin.ts"
+  }
+}

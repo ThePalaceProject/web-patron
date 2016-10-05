@@ -1,5 +1,6 @@
 import "../ignore_stylesheet_imports";
 import * as express from "express";
+import * as fs from "fs";
 import * as React from "react";
 import { renderToString } from "react-dom/server";
 import { match, RouterContext } from "react-router";
@@ -7,13 +8,27 @@ import routes from "../routes";
 import ContextProvider from "../components/ContextProvider";
 import { expandCollectionUrl, expandBookUrl } from "../components/CatalogHandler";
 import buildInitialState, { State } from "opds-web-client/lib/state";
+import Config from "../Config";
 
 const app = express();
 const port = process.env.PORT || 3000;
-const homeUrl = process.env.SIMPLIFIED_PATRON_HOME_URL || "http://circulation.alpha.librarysimplified.org/groups/";
-const catalogBase = process.env.SIMPLIFIED_PATRON_CATALOG_BASE || "http://circulation.alpha.librarysimplified.org";
-const catalogName = process.env.SIMPLIFIED_PATRON_CATALOG_NAME || "Books";
-const distDir = process.env.SIMPLIFIED_PATRON_DIST || "dist";
+const configFile = process.env.CONFIG;
+
+let config: Config = {};
+
+if (configFile) {
+  config = JSON.parse(fs.readFileSync(configFile, "utf8"));
+}
+
+const homeUrl = config.homeUrl || "http://circulation.alpha.librarysimplified.org/groups/";
+const catalogBase = config.catalogBase || "http://circulation.alpha.librarysimplified.org";
+const catalogName = config.catalogName || "Books";
+const distDir = config.distDir || "dist";
+const authPlugins = Object.keys(config.authPlugins || {});
+
+const authPluginJsTags = authPlugins.map(plugin => {
+  return `<script src="/js/${plugin}.js"></script>\n`;
+}).join("");
 
 // This is fired every time the server side receives a request
 app.use("/js", express.static(distDir));
@@ -39,6 +54,7 @@ function handleRender(req, res) {
             homeUrl={homeUrl}
             catalogBase={catalogBase}
             catalogName={catalogName}
+            authPlugins={[]}
             initialState={state}>
             <RouterContext {...renderProps} />
           </ContextProvider>
@@ -52,6 +68,7 @@ function handleRender(req, res) {
               homeUrl={homeUrl}
               catalogBase={catalogBase}
               catalogName={catalogName}
+              authPlugins={[]}
               initialState={state}>
               <RouterContext {...renderProps} />
             </ContextProvider>
@@ -72,16 +89,18 @@ function renderFullPage(html: string, preloadedState: State) {
       <head>
         <title>${catalogName}</title>
         <link href="/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-        <link href="/css/circulation-patron-web.css" rel="stylesheet" crossorigin="anonymous">
+        <link href="/css/CirculationPatronWeb.css" rel="stylesheet" crossorigin="anonymous">
       </head>
       <body>
         <div id="circulation-patron-web">${html}</div>
-        <script src="/js/circulation-patron-web.js"></script>
+        <script src="/js/CirculationPatronWeb.js"></script>
+        ${authPluginJsTags}
         <script>
           var circulationPatronWeb = new CirculationPatronWeb({
             homeUrl: "${homeUrl}",
             catalogBase: "${catalogBase}",
             catalogName: "${catalogName}",
+            authPlugins: [${authPlugins}],
             initialState: ${JSON.stringify(preloadedState)}
           });
         </script>

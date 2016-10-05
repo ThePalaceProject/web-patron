@@ -1,17 +1,27 @@
 var webpack = require("webpack");
 var path = require("path");
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
+var fs = require("fs");
 
-var theme = process.env.THEME || "./src/stylesheets/app.scss";
+var appConfigFile = process.env.CONFIG;
+var appConfig;
 
-var config = {
-  entry: {
-    app: [ theme, "./src/index.tsx" ]
-  },
+if (appConfigFile) {
+  appConfig = JSON.parse(fs.readFileSync(appConfigFile));
+} else {
+  appConfig = {};
+}
+var theme = appConfig.theme || "./src/stylesheets/app.scss";
+var authPlugins = appConfig.authPlugins || {};
+
+var webpackConfig = {
+  entry: Object.assign({
+    CirculationPatronWeb: [ theme, "./src/index.tsx" ]
+  }, authPlugins),
   output: {
     path: "./dist",
-    filename: "circulation-patron-web.js",
-    library: "CirculationPatronWeb",
+    filename: "[name].js",
+    library: "[name]",
     libraryTarget: "umd"
   },
   plugins: [
@@ -20,8 +30,16 @@ var config = {
     // in the browser even if it is never used, so we ignore it:
     new webpack.IgnorePlugin(/jsdom$/),
 
-    // Extract separate css file.
-    new ExtractTextPlugin("circulation-patron-web.css")
+    // Extract separate css file. This will also create css files for the auth entry points,
+    // which can be ignored.
+    new ExtractTextPlugin("[name].css"),
+
+    // This puts all shared modules into CirculationPatronWeb.js, so the auth js files won't
+    // have extra copies of react.
+    new webpack.optimize.CommonsChunkPlugin({
+      name: "CirculationPatronWeb",
+      file: "CirculationPatronWeb.js"
+    })
   ],
   module: {
     loaders: [
@@ -46,4 +64,4 @@ var config = {
   }
 };
 
-module.exports = config;
+module.exports = webpackConfig;

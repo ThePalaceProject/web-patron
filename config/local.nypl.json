@@ -1,0 +1,10 @@
+{
+  "theme": "./src/themes/nypl.scss",
+  "homeUrl": "http://localhost:6500/groups/",
+  "catalogBase": "http://localhost:6500",
+  "catalogName": "NYPL eBooks",
+  "distDir": "dist",
+  "authPlugins": {
+    "Millennium": "./src/auth/MillenniumAuthPlugin.ts"
+  }
+}

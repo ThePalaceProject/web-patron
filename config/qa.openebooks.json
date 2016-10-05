@@ -1,0 +1,11 @@
+{
+  "theme": "./src/themes/openebooks.scss",
+  "homeUrl": "http://qa.circulation.openebooks.us/groups/",
+  "catalogBase": "http://qa.circulation.openebooks.us",
+  "catalogName": "Open eBooks",
+  "distDir": "dist",
+  "authPlugins": {
+    "FirstBook": "./src/auth/FirstBookAuthPlugin.ts",
+    "Clever": "./src/auth/CleverAuthPlugin.ts"
+  }
+}
