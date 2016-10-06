@@ -85,7 +85,7 @@ function handleRender(req, res) {
 function renderFullPage(html: string, preloadedState: State) {
   return `
     <!doctype html>
-    <html>
+    <html lang="en">
       <head>
         <title>${catalogName}</title>
         <link href="/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
@@ -112,7 +112,7 @@ function renderFullPage(html: string, preloadedState: State) {
 function renderErrorPage(message: string = "There was a problem with this request.") {
   return `
     <!doctype html>
-    <html>
+    <html lang="en">
       <head>
         <title>${catalogName}</title>
         <link href="/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
