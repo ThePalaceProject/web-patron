@@ -1,5 +1,4 @@
 import AuthPlugin from "opds-web-client/lib/AuthPlugin";
-import DataFetcher from "opds-web-client/lib/DataFetcher";
 import CleverButton from "./components/CleverButton";
 
 const CleverAuthPlugin: AuthPlugin = {
@@ -17,15 +16,15 @@ const CleverAuthPlugin: AuthPlugin = {
           let accessTokenStart = hash.indexOf(accessTokenKey);
           let accessToken = hash.slice(accessTokenStart + accessTokenKey.length).split("&")[0];
           let credentials = { provider: "Clever", credentials: "Bearer " + accessToken };
-          new DataFetcher().setAuthCredentials(credentials);
           window.location.hash = "";
+          return { credentials };
         } else if (window.location.hash.indexOf(errorKey) !== -1) {
           let hash = window.location.hash;
           let errorStart = hash.indexOf(errorKey);
           let error = hash.slice(errorStart + errorKey.length).split("&")[0];
           let problemDetail = JSON.parse(decodeURIComponent(error.replace(/\+/g, "%20")));
           window.location.hash = "";
-          return problemDetail.title;
+          return { error: problemDetail.title };
         }
       }
     }
