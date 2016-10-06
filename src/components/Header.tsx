@@ -65,8 +65,8 @@ export default class Header extends React.Component<HeaderProps, any> {
             }
             <li>
               { this.props.isSignedIn ?
-                <a onClick={this.signOut}>Sign Out</a> :
-                <a onClick={this.signIn}>Sign In</a>
+                <a href="#" onClick={this.signOut}>Sign Out</a> :
+                <a href="#" onClick={this.signIn}>Sign In</a>
               }
             </li>
           </Nav>
