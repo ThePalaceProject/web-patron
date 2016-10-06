@@ -15,7 +15,7 @@ describe("FirstBookButton", () => {
   });
 
   it("shows button", () => {
-    let button = wrapper.find("div");
+    let button = wrapper.find("button");
     expect(button.length).to.equal(1);
   });
 });
