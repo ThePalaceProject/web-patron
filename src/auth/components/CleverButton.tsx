@@ -10,7 +10,7 @@ export interface CleverAuthMethod extends AuthMethod {
 
 export default class CleverButton extends React.Component<AuthButtonProps<CleverAuthMethod>, any> {
   render() {
-    let currentUrl = window.location.href;
+    let currentUrl = window.location.origin + window.location.pathname;
     let authUrl = this.props.provider.method.links.authenticate + "&redirect_uri=" + encodeURIComponent(encodeURIComponent(currentUrl));
     return (
       <a href={authUrl} className="clever-button" aria-label="log in with clever" />
