@@ -61,7 +61,7 @@ describe("Header", () => {
     });
 
     it("displays link to loans", () => {
-      let link = wrapper.find(CatalogLink).filterWhere(link => link.children().text() === "Loans");
+      let link = wrapper.find(CatalogLink).filterWhere(link => link.children().text() === "My Books");
       expect(link.prop("collectionUrl")).to.equal("loans url");
     });
 

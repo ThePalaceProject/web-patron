@@ -59,7 +59,7 @@ export default class Header extends React.Component<HeaderProps, any> {
                 <CatalogLink
                   collectionUrl={this.props.loansUrl}
                   bookUrl={null}>
-                  Loans
+                  My Books
                 </CatalogLink>
               </li>
             }
