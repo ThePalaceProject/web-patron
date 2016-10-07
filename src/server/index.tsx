@@ -20,7 +20,7 @@ if (configFile) {
   config = JSON.parse(fs.readFileSync(configFile, "utf8"));
 }
 
-const homeUrl = config.homeUrl || "http://circulation.alpha.librarysimplified.org/groups/";
+const homeUrl = config.homeUrl || "/groups/";
 const catalogBase = config.catalogBase || "http://circulation.alpha.librarysimplified.org";
 const catalogName = config.catalogName || "Books";
 const distDir = process.env.SIMPLIFIED_PATRON_DIST || "dist";
@@ -45,9 +45,12 @@ function handleRender(req, res) {
       let { collectionUrl, bookUrl } = renderProps.params;
       collectionUrl = expandCollectionUrl(catalogBase, collectionUrl);
       bookUrl = expandBookUrl(catalogBase, bookUrl);
+
       if (!collectionUrl && !bookUrl) {
-        collectionUrl = homeUrl;
+        res.redirect(302, "/collection" + homeUrl);
+        return;
       }
+
       buildInitialState(collectionUrl, bookUrl).then((state: State) => {
         const html = renderToString(
           <ContextProvider

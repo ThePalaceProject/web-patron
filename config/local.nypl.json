@@ -1,6 +1,6 @@
 {
   "theme": "./src/themes/nypl.scss",
-  "homeUrl": "http://localhost:6500/groups/",
+  "homeUrl": "/groups/",
   "catalogBase": "http://localhost:6500",
   "catalogName": "NYPL eBooks",
   "authPlugins": {
