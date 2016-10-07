@@ -60,9 +60,15 @@ describe("Header", () => {
       expect(link.prop("collectionUrl")).to.equal("home url");
     });
 
-    it("displays link to loans", () => {
+    it("displays link to loans when currently signed in", () => {
+      wrapper.setProps({ isSignedIn: true });
       let link = wrapper.find(CatalogLink).filterWhere(link => link.children().text() === "My Books");
       expect(link.prop("collectionUrl")).to.equal("loans url");
+    });
+
+    it("hides link to loans when signed out", () => {
+      let link = wrapper.find(CatalogLink).filterWhere(link => link.children().text() === "My Books");
+      expect(link.length).to.equal(0);
     });
 
     it("displays link to sign in if not currently signed in", () => {

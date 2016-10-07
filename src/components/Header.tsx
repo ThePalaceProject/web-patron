@@ -54,7 +54,7 @@ export default class Header extends React.Component<HeaderProps, any> {
                 Catalog
               </CatalogLink>
             </li>
-            { this.props.loansUrl &&
+            { this.props.loansUrl && this.props.isSignedIn &&
               <li>
                 <CatalogLink
                   collectionUrl={this.props.loansUrl}
@@ -63,12 +63,16 @@ export default class Header extends React.Component<HeaderProps, any> {
                 </CatalogLink>
               </li>
             }
-            <li>
-              { this.props.isSignedIn ?
-                <a href="#" onClick={this.signOut}>Sign Out</a> :
+            { this.props.loansUrl && this.props.isSignedIn &&
+              <li>
+                <a href="#" onClick={this.signOut}>Sign Out</a>
+              </li>
+            }
+            { this.props.loansUrl && !this.props.isSignedIn &&
+              <li>
                 <a href="#" onClick={this.signIn}>Sign In</a>
-              }
-            </li>
+              </li>
+            }
           </Nav>
         </Navbar.Collapse>
       </Navbar>
