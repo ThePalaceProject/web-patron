@@ -57,11 +57,4 @@ describe("CatalogHandler", () => {
     expect(pageTitleTemplate("Collection", "Book")).to.equal("Example - Book");
     expect(pageTitleTemplate("Collection", null)).to.equal("Example - Collection");
   });
-
-  it("uses home url as default collection url", () => {
-    let newParams = Object.assign({}, params, { collectionUrl: null, bookUrl: null, tab: null });
-    wrapper.setProps({ params: newParams });
-    let catalog = wrapper.find(OPDSCatalog);
-    expect(catalog.prop("collectionUrl")).to.equal(context.homeUrl);
-  });
 });

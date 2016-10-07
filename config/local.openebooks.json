@@ -1,6 +1,6 @@
 {
   "theme": "./src/themes/openebooks.scss",
-  "homeUrl": "http://localhost:6500/groups/",
+  "homeUrl": "/groups/",
   "catalogBase": "http://localhost:6500",
   "catalogName": "Open eBooks",
   "authPlugins": {
