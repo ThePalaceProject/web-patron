@@ -13,6 +13,7 @@ describe("ContextProvider", () => {
   let homeUrl = "http://example.com/home";
   let catalogBase = "http://example.com";
   let catalogName = "Example";
+  let appName = "Example App";
   let authPlugins = [{
     type: "test",
     lookForCredentials: () => {},
@@ -27,6 +28,7 @@ describe("ContextProvider", () => {
         homeUrl={homeUrl}
         catalogBase={catalogBase}
         catalogName={catalogName}
+        appName={appName}
         authPlugins={authPlugins}
         initialState={store.getState()}>
         <TestComponent />
@@ -40,6 +42,7 @@ describe("ContextProvider", () => {
     expect(context.homeUrl).to.equal(homeUrl);
     expect(context.catalogBase).to.equal(catalogBase);
     expect(context.catalogName).to.equal(catalogName);
+    expect(context.appName).to.equal(appName);
     expect(context.authPlugins).to.deep.equal(authPlugins);
     expect(context.initialState).to.equal(store.getState());
   });

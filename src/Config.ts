@@ -6,6 +6,7 @@ interface Config {
   homeUrl?: URLString;
   catalogBase?: URLString;
   catalogName?: string;
+  appName?: string;
   authPlugins?: {
     [key: string]: FilePath;
   };

@@ -3,6 +3,7 @@
   "homeUrl": "/groups/",
   "catalogBase": "https://circulation.librarysimplified.org",
   "catalogName": "NYPL eBooks",
+  "appName": "NYPL SimplyE",
   "authPlugins": {
     "Millennium": "./src/auth/MillenniumAuthPlugin.ts"
   }

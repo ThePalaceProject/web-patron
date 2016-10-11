@@ -23,6 +23,7 @@ if (configFile) {
 const homeUrl = config.homeUrl || "/groups/";
 const catalogBase = config.catalogBase || "http://circulation.alpha.librarysimplified.org";
 const catalogName = config.catalogName || "Books";
+const appName = config.appName || "";
 const distDir = process.env.SIMPLIFIED_PATRON_DIST || "dist";
 const authPlugins = Object.keys(config.authPlugins || {});
 
@@ -57,6 +58,7 @@ function handleRender(req, res) {
             homeUrl={homeUrl}
             catalogBase={catalogBase}
             catalogName={catalogName}
+            appName={appName}
             authPlugins={[]}
             initialState={state}>
             <RouterContext {...renderProps} />
@@ -71,6 +73,7 @@ function handleRender(req, res) {
               homeUrl={homeUrl}
               catalogBase={catalogBase}
               catalogName={catalogName}
+              appName={appName}
               authPlugins={[]}
               initialState={state}>
               <RouterContext {...renderProps} />
@@ -103,6 +106,7 @@ function renderFullPage(html: string, preloadedState: State) {
             homeUrl: "${homeUrl}",
             catalogBase: "${catalogBase}",
             catalogName: "${catalogName}",
+            appName: "${appName}",
             authPlugins: [${authPlugins}],
             initialState: ${JSON.stringify(preloadedState)}
           });

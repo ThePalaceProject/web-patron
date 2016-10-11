@@ -3,6 +3,7 @@
   "homeUrl": "/groups/",
   "catalogBase": "http://qa.circulation.openebooks.us",
   "catalogName": "Open eBooks",
+  "appName": "Open eBooks",
   "authPlugins": {
     "FirstBook": "./src/auth/FirstBookAuthPlugin.ts",
     "Clever": "./src/auth/CleverAuthPlugin.ts"

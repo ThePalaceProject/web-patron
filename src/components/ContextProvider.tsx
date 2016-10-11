@@ -10,6 +10,7 @@ export interface ContextProviderProps extends React.Props<any> {
   homeUrl: string;
   catalogBase: string;
   catalogName: string;
+  appName: string;
   authPlugins: AuthPlugin[];
   initialState?: CatalogState;
 }
@@ -53,6 +54,7 @@ export default class ContextProvider extends React.Component<ContextProviderProp
     homeUrl: React.PropTypes.string.isRequired,
     catalogBase: React.PropTypes.string.isRequired,
     catalogName: React.PropTypes.string.isRequired,
+    appName: React.PropTypes.string.isRequired,
     authPlugins: React.PropTypes.array.isRequired,
     initialState: React.PropTypes.object
   };
@@ -64,6 +66,7 @@ export default class ContextProvider extends React.Component<ContextProviderProp
       homeUrl: this.props.homeUrl,
       catalogBase: this.props.catalogBase,
       catalogName: this.props.catalogName,
+      appName: this.props.appName,
       authPlugins: this.props.authPlugins,
       initialState: this.props.initialState
     };
