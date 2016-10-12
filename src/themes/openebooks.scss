@@ -18,7 +18,35 @@ $linkhovercolor: lighten($linkcolor, 10%);
 $invertedlinkcolor: $light;
 $invertedlinkvisitedcolor: darken($invertedlinkcolor, 10%);
 
+$headerHeight: 100px;
+
+@import 'raleway';
+$fontfamily: "Raleway", Helvetica, sans-serif;
+
 $logo: url('openebooks-logo.png');
 
 @import "../stylesheets/app.scss";
 @import "./openebooks_login_buttons.scss";
+
+.catalog .navbar {
+  .navbar-nav > li > a {
+    text-decoration: none;
+  }
+
+  .container-fluid, .navbar-header, .navbar-brand {
+    height:100%;
+  }
+
+  .navbar-collapse {
+    padding-top: 20px;
+  }
+
+  .navbar-nav {
+    float: right;
+  }
+
+  .navbar-brand, .navbar-brand:hover {
+    background-size: 98px;
+    color: transparent;
+  }
+}
