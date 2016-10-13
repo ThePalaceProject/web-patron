@@ -3,11 +3,13 @@ import CatalogLink from "opds-web-client/lib/components/CatalogLink";
 import { HeaderProps } from "opds-web-client/lib/components/Root";
 import { Navbar, Nav, NavItem } from "react-bootstrap";
 import { NavigateContext } from "opds-web-client/lib/interfaces";
+import { HeaderLink } from "../Config";
 
 export interface HeaderContext extends NavigateContext {
   homeUrl: string;
   catalogBase: string;
   catalogName: string;
+  headerLinks: HeaderLink[];
 }
 
 export default class Header extends React.Component<HeaderProps, any> {
@@ -18,7 +20,8 @@ export default class Header extends React.Component<HeaderProps, any> {
     catalogBase: React.PropTypes.string.isRequired,
     catalogName: React.PropTypes.string.isRequired,
     router: React.PropTypes.object.isRequired,
-    pathFor: React.PropTypes.func.isRequired
+    pathFor: React.PropTypes.func.isRequired,
+    headerLinks: React.PropTypes.array.isRequired
   };
 
   constructor(props) {
@@ -47,6 +50,11 @@ export default class Header extends React.Component<HeaderProps, any> {
           }
 
           <Nav>
+            { this.context.headerLinks && this.context.headerLinks.map(link =>
+              <li>
+                <a href={link.url} title={link.title}>{link.title}</a>
+              </li>
+            ) }
             <li>
               <CatalogLink
                 collectionUrl={this.context.homeUrl}

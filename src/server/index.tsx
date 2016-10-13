@@ -26,6 +26,7 @@ const catalogName = config.catalogName || "Books";
 const appName = config.appName || "";
 const distDir = process.env.SIMPLIFIED_PATRON_DIST || "dist";
 const authPlugins = Object.keys(config.authPlugins || {});
+const headerLinks = config.headerLinks || [];
 
 const authPluginJsTags = authPlugins.map(plugin => {
   return `<script src="/js/${plugin}.js"></script>\n`;
@@ -60,6 +61,7 @@ function handleRender(req, res) {
             catalogName={catalogName}
             appName={appName}
             authPlugins={[]}
+            headerLinks={headerLinks}
             initialState={state}>
             <RouterContext {...renderProps} />
           </ContextProvider>
@@ -75,6 +77,7 @@ function handleRender(req, res) {
               catalogName={catalogName}
               appName={appName}
               authPlugins={[]}
+              headerLinks={headerLinks}
               initialState={state}>
               <RouterContext {...renderProps} />
             </ContextProvider>
@@ -108,6 +111,7 @@ function renderFullPage(html: string, preloadedState: State) {
             catalogName: "${catalogName}",
             appName: "${appName}",
             authPlugins: [${authPlugins}],
+            headerLinks: ${JSON.stringify(headerLinks)},
             initialState: ${JSON.stringify(preloadedState)}
           });
         </script>

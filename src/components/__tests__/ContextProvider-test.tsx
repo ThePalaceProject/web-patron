@@ -20,6 +20,10 @@ describe("ContextProvider", () => {
     formComponent: null,
     buttonComponent: null
   }];
+  let headerLinks = [{
+    title: "FAQ",
+    url: "http://faq"
+  }];
 
   beforeEach(() => {
     store = buildStore();
@@ -30,6 +34,7 @@ describe("ContextProvider", () => {
         catalogName={catalogName}
         appName={appName}
         authPlugins={authPlugins}
+        headerLinks={headerLinks}
         initialState={store.getState()}>
         <TestComponent />
       </ContextProvider>
@@ -44,6 +49,7 @@ describe("ContextProvider", () => {
     expect(context.catalogName).to.equal(catalogName);
     expect(context.appName).to.equal(appName);
     expect(context.authPlugins).to.deep.equal(authPlugins);
+    expect(context.headerLinks).to.deep.equal(headerLinks);
     expect(context.initialState).to.equal(store.getState());
   });
 

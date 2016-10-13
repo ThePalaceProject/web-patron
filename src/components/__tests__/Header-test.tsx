@@ -30,7 +30,10 @@ describe("Header", () => {
       homeUrl: "home url",
       catalogBase: "base",
       catalogName: "catalog name",
-      logo: "logo",
+      headerLinks: [
+        { title: "link 1", url: "http://link1" },
+        { title: "link 2", url: "http://link2" }
+      ],
       router: { push },
       pathFor
     };
@@ -72,14 +75,13 @@ describe("Header", () => {
     });
 
     it("displays link to sign in if not currently signed in", () => {
-      let link = wrapper.find("a");
-      expect(link.text()).to.equal("Sign In");
+      let link = wrapper.find("a").filterWhere(link => link.text() === "Sign In");
       expect(link.prop("onClick")).to.equal(wrapper.instance().signIn);
     });
 
     it("displays link to sign out if currently signed in", () => {
       wrapper.setProps({ isSignedIn: true });
-      let link = wrapper.find("a");
+      let link = wrapper.find("a").filterWhere(link => link.text() === "Sign Out");
       expect(link.text()).to.equal("Sign Out");
       expect(link.prop("onClick")).to.equal(wrapper.instance().signOut);
     });
@@ -88,11 +90,18 @@ describe("Header", () => {
       let search = wrapper.find(TestSearch);
       expect(search).to.be.ok;
     });
+
+    it("displays header links from context", () => {
+      let link1 = wrapper.find("a").filterWhere(link => link.text() === "link 1");
+      expect(link1.props().href).to.equal("http://link1");
+      let link2 = wrapper.find("a").filterWhere(link => link.text() === "link 2");
+      expect(link2.props().href).to.equal("http://link2");
+    });
   });
 
   describe("behavior", () => {
     it("fetches loans when sign in link is clicked", () => {
-      let link = wrapper.find("a");
+      let link = wrapper.find("a").filterWhere(link => link.text() === "Sign In");
       link.simulate("click");
       expect(fetchLoans.callCount).to.equal(1);
       expect(fetchLoans.args[0][0]).to.equal("loans url");
@@ -100,7 +109,7 @@ describe("Header", () => {
 
     it("clears auth credentials and loads catalog when sign out link is clicked", () => {
       wrapper.setProps({ isSignedIn: true });
-      let link = wrapper.find("a");
+      let link = wrapper.find("a").filterWhere(link => link.text() === "Sign Out");
       link.simulate("click");
       expect(clearAuthCredentials.called).to.equal(true);
       expect(pathFor.args[0][0]).to.equal("home url");

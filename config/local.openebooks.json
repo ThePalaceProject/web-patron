@@ -7,5 +7,10 @@
   "authPlugins": {
     "FirstBook": "./src/auth/FirstBookAuthPlugin.ts",
     "Clever": "./src/auth/CleverAuthPlugin.ts"
-  }
+  },
+  "headerLinks": [
+    { "title": "Home", "url": "http://openebooks.net/index.html" },
+    { "title": "About", "url": "http://openebooks.net/about.html" },
+    { "title": "FAQs","url": "http://openebooks.net/faq.html" }
+  ]
 }

@@ -1,6 +1,11 @@
 type FilePath = string;
 type URLString = string;
 
+export interface HeaderLink {
+  title: string;
+  url: URLString;
+}
+
 interface Config {
   theme?: FilePath;
   homeUrl?: URLString;
@@ -10,6 +15,7 @@ interface Config {
   authPlugins?: {
     [key: string]: FilePath;
   };
+  headerLinks?: HeaderLink[];
 }
 
 export default Config;
