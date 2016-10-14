@@ -14,6 +14,7 @@ export interface ContextProviderProps extends React.Props<any> {
   appName: string;
   authPlugins: AuthPlugin[];
   headerLinks: HeaderLink[];
+  logoLink: string;
   initialState?: CatalogState;
 }
 
@@ -59,6 +60,7 @@ export default class ContextProvider extends React.Component<ContextProviderProp
     appName: React.PropTypes.string.isRequired,
     authPlugins: React.PropTypes.array.isRequired,
     headerLinks: React.PropTypes.array.isRequired,
+    logoLink: React.PropTypes.string.isRequired,
     initialState: React.PropTypes.object
   };
 
@@ -72,6 +74,7 @@ export default class ContextProvider extends React.Component<ContextProviderProp
       appName: this.props.appName,
       authPlugins: this.props.authPlugins,
       headerLinks: this.props.headerLinks,
+      logoLink: this.props.logoLink,
       initialState: this.props.initialState
     };
   }

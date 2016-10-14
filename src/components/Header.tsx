@@ -10,6 +10,7 @@ export interface HeaderContext extends NavigateContext {
   catalogBase: string;
   catalogName: string;
   headerLinks: HeaderLink[];
+  logoLink: string;
 }
 
 export default class Header extends React.Component<HeaderProps, any> {
@@ -21,7 +22,8 @@ export default class Header extends React.Component<HeaderProps, any> {
     catalogName: React.PropTypes.string.isRequired,
     router: React.PropTypes.object.isRequired,
     pathFor: React.PropTypes.func.isRequired,
-    headerLinks: React.PropTypes.array.isRequired
+    headerLinks: React.PropTypes.array.isRequired,
+    logoLink: React.PropTypes.string.isRequired
   };
 
   constructor(props) {
@@ -37,7 +39,10 @@ export default class Header extends React.Component<HeaderProps, any> {
       <Navbar fluid={true} fixedTop={true}>
         <Navbar.Header>
           <Navbar.Brand>
-            {this.context.catalogName}
+            { this.context.logoLink ?
+              <a href={this.context.logoLink}>{this.context.catalogName}</a> :
+              <span>{this.context.catalogName}</span>
+            }
           </Navbar.Brand>
           <Navbar.Toggle />
         </Navbar.Header>

@@ -12,5 +12,6 @@
     { "title": "Home", "url": "http://openebooks.net/index.html" },
     { "title": "About", "url": "http://openebooks.net/about.html" },
     { "title": "FAQs","url": "http://openebooks.net/faq.html" }
-  ]
+  ],
+  "logoLink": "http://openebooks.net/index.html"
 }

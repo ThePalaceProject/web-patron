@@ -27,6 +27,7 @@ const appName = config.appName || "";
 const distDir = process.env.SIMPLIFIED_PATRON_DIST || "dist";
 const authPlugins = Object.keys(config.authPlugins || {});
 const headerLinks = config.headerLinks || [];
+const logoLink = config.logoLink || "";
 
 const authPluginJsTags = authPlugins.map(plugin => {
   return `<script src="/js/${plugin}.js"></script>\n`;
@@ -62,6 +63,7 @@ function handleRender(req, res) {
             appName={appName}
             authPlugins={[]}
             headerLinks={headerLinks}
+            logoLink={logoLink}
             initialState={state}>
             <RouterContext {...renderProps} />
           </ContextProvider>
@@ -78,6 +80,7 @@ function handleRender(req, res) {
               appName={appName}
               authPlugins={[]}
               headerLinks={headerLinks}
+              logoLink={logoLink}
               initialState={state}>
               <RouterContext {...renderProps} />
             </ContextProvider>
@@ -112,6 +115,7 @@ function renderFullPage(html: string, preloadedState: State) {
             appName: "${appName}",
             authPlugins: [${authPlugins}],
             headerLinks: ${JSON.stringify(headerLinks)},
+            logoLink: "${logoLink}",
             initialState: ${JSON.stringify(preloadedState)}
           });
         </script>

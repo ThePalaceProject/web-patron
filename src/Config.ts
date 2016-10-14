@@ -16,6 +16,7 @@ interface Config {
     [key: string]: FilePath;
   };
   headerLinks?: HeaderLink[];
+  logoLink?: URLString;
 }
 
 export default Config;

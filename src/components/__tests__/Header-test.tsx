@@ -34,6 +34,7 @@ describe("Header", () => {
         { title: "link 1", url: "http://link1" },
         { title: "link 2", url: "http://link2" }
       ],
+      logoLink: "home",
       router: { push },
       pathFor
     };
@@ -56,6 +57,8 @@ describe("Header", () => {
     it("displays library name", () => {
       let brand = wrapper.find(Navbar.Brand);
       expect(brand.containsMatchingElement(context.catalogName)).to.be.true;
+      let link = brand.find("a");
+      expect(link.props().href).to.equal("home");
     });
 
     it("displays link to catalog", () => {
