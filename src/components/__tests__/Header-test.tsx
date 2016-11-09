@@ -8,14 +8,6 @@ import Header from "../Header";
 import { Navbar } from "react-bootstrap";
 import CatalogLink from "opds-web-client/lib/components/CatalogLink";
 
-class TestSearch extends React.Component<any, any> {
-  render(): JSX.Element {
-    return (
-      <div className="test-search">collection</div>
-    );
-  }
-}
-
 describe("Header", () => {
   let context, wrapper;
   let fetchLoans, clearAuthCredentials;
@@ -46,9 +38,7 @@ describe("Header", () => {
         isSignedIn={false}
         fetchLoans={fetchLoans}
         clearAuthCredentials={clearAuthCredentials}
-        >
-        <TestSearch />
-      </Header>,
+        />,
       { context }
     );
   });
@@ -87,11 +77,6 @@ describe("Header", () => {
       let link = wrapper.find("a").filterWhere(link => link.text() === "Sign Out");
       expect(link.text()).to.equal("Sign Out");
       expect(link.prop("onClick")).to.equal(wrapper.instance().signOut);
-    });
-
-    it("shows a search component", () => {
-      let search = wrapper.find(TestSearch);
-      expect(search).to.be.ok;
     });
 
     it("displays header links from context", () => {

@@ -38,15 +38,26 @@ $logo: url('openebooks-logo.png');
   }
 
   .navbar-collapse {
-    @media(min-width: 903px) {
+    @media(min-width: 768px) {
       padding-top: 20px;
     }
   }
 
   .navbar-nav {
-    @media(min-width: 767px) {
+    @media(min-width: 768px) {
       float: right;
+
+      @media(max-width: 876px) {
+        >li>a {
+          padding-left: 7px;
+          padding-right: 7px;
+        }
+      }
     }
+  }
+
+  .navbar-brand {
+    padding: 0px;
   }
 
   .navbar-brand, .navbar-brand:hover {
