@@ -155,4 +155,26 @@ describe("BookDetails", () => {
     let button = wrapper.find(RevokeButton);
     expect(button.length).to.equal(0);
   });
+
+  it("shows app info for borrowed book", () => {
+    let bookCopy = Object.assign({}, book, {
+      openAccessLinks: [],
+      fulfillmentLinks: ["http://fulfill"],
+      availability: { status: "available" }
+    });
+    wrapper = shallow(
+      <BookDetails
+        book={bookCopy}
+        updateBook={noop}
+        fulfillBook={noop}
+        indirectFulfillBook={noop}
+        fetchComplaintTypes={fetchComplaintTypes}
+        postComplaint={postComplaint}
+        problemTypes={problemTypes}
+        />
+    );
+    let appInfo = wrapper.find(".app-info");
+    expect(appInfo.length).to.equal(1);
+    expect(appInfo.text()).to.contain("app");
+  });
 });

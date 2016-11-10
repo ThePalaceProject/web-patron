@@ -14,7 +14,17 @@ export interface BookDetailsProps extends DefaultBooKDetailsProps {
   postComplaint: (url: string, data: ComplaintData) => Promise<any>;
 }
 
+export interface BookDetailsContext {
+  appName: string;
+}
+
 export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
+  context: BookDetailsContext;
+
+  static contextTypes: React.ValidationMap<BookDetailsContext> = {
+    appName: React.PropTypes.string.isRequired
+  };
+
   constructor(props) {
     super(props);
     this.revoke = this.revoke.bind(this);
@@ -153,12 +163,20 @@ export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
 
   circulationLinks() {
     let links = super.circulationLinks();
+    if (this.isBorrowed()) {
+      links.push(
+        <div className="app-info">
+          Your book is ready to download in the {this.context.appName} app.
+        </div>
+      );
+    }
+
     // Books with DRM can only be returned through Adobe,
     // so we don't show revoke links for them.
     if (this.isOpenAccess() && this.revokeUrl()) {
       links.push(
         <RevokeButton
-          className="btn btn-default"
+          className="btn btn-default revoke-button"
           revoke={this.revoke}
           >
           Return Now

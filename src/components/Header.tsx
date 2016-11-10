@@ -3,11 +3,14 @@ import CatalogLink from "opds-web-client/lib/components/CatalogLink";
 import { HeaderProps } from "opds-web-client/lib/components/Root";
 import { Navbar, Nav, NavItem } from "react-bootstrap";
 import { NavigateContext } from "opds-web-client/lib/interfaces";
+import { HeaderLink } from "../Config";
 
 export interface HeaderContext extends NavigateContext {
   homeUrl: string;
   catalogBase: string;
   catalogName: string;
+  headerLinks: HeaderLink[];
+  logoLink: string;
 }
 
 export default class Header extends React.Component<HeaderProps, any> {
@@ -18,7 +21,9 @@ export default class Header extends React.Component<HeaderProps, any> {
     catalogBase: React.PropTypes.string.isRequired,
     catalogName: React.PropTypes.string.isRequired,
     router: React.PropTypes.object.isRequired,
-    pathFor: React.PropTypes.func.isRequired
+    pathFor: React.PropTypes.func.isRequired,
+    headerLinks: React.PropTypes.array.isRequired,
+    logoLink: React.PropTypes.string.isRequired
   };
 
   constructor(props) {
@@ -28,25 +33,26 @@ export default class Header extends React.Component<HeaderProps, any> {
   }
 
   render(): JSX.Element {
-    let search = this.props.children ? (React.Children.only(this.props.children) as any) : null;
-
     return (
       <Navbar fluid={true} fixedTop={true}>
         <Navbar.Header>
           <Navbar.Brand>
-            {this.context.catalogName}
+            { this.context.logoLink ?
+              <a href={this.context.logoLink}>{this.context.catalogName}</a> :
+              <span>{this.context.catalogName}</span>
+            }
           </Navbar.Brand>
           <Navbar.Toggle />
         </Navbar.Header>
 
         <Navbar.Collapse>
-          { search &&
-            <Nav pullRight>
-              { React.cloneElement(search, { className: "navbar-form navbar-right" }) }
-            </Nav>
-          }
 
           <Nav>
+            { this.context.headerLinks && this.context.headerLinks.map(link =>
+              <li>
+                <a href={link.url} title={link.title}>{link.title}</a>
+              </li>
+            ) }
             <li>
               <CatalogLink
                 collectionUrl={this.context.homeUrl}
@@ -54,21 +60,25 @@ export default class Header extends React.Component<HeaderProps, any> {
                 Catalog
               </CatalogLink>
             </li>
-            { this.props.loansUrl &&
+            { this.props.loansUrl && this.props.isSignedIn &&
               <li>
                 <CatalogLink
                   collectionUrl={this.props.loansUrl}
                   bookUrl={null}>
-                  Loans
+                  My Books
                 </CatalogLink>
               </li>
             }
-            <li>
-              { this.props.isSignedIn ?
-                <a href="#" onClick={this.signOut}>Sign Out</a> :
+            { this.props.loansUrl && this.props.isSignedIn &&
+              <li>
+                <a href="#" onClick={this.signOut}>Sign Out</a>
+              </li>
+            }
+            { this.props.loansUrl && !this.props.isSignedIn &&
+              <li>
                 <a href="#" onClick={this.signIn}>Sign In</a>
-              }
-            </li>
+              </li>
+            }
           </Nav>
         </Navbar.Collapse>
       </Navbar>

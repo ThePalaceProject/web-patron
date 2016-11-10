@@ -3,8 +3,17 @@
   "homeUrl": "/groups/",
   "catalogBase": "http://localhost:6500",
   "catalogName": "Open eBooks",
+  "appName": "Open eBooks",
   "authPlugins": {
     "FirstBook": "./src/auth/FirstBookAuthPlugin.ts",
     "Clever": "./src/auth/CleverAuthPlugin.ts"
-  }
+  },
+  "headerLinks": [
+    { "title": "Home", "url": "http://openebooks.net/index.html" },
+    { "title": "About", "url": "http://openebooks.net/about.html" },
+    { "title": "Contribute","url": "http://openebooks.net/contribute.html" },
+    { "title": "Resources", "url": "http://openebooks.net/resources.html" },
+    { "title": "Help Center", "url": "https://openebooks.zendesk.com/" }
+  ],
+  "logoLink": "http://openebooks.net/index.html"
 }

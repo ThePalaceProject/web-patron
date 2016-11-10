@@ -13,12 +13,18 @@ describe("ContextProvider", () => {
   let homeUrl = "http://example.com/home";
   let catalogBase = "http://example.com";
   let catalogName = "Example";
+  let appName = "Example App";
   let authPlugins = [{
     type: "test",
     lookForCredentials: () => {},
     formComponent: null,
     buttonComponent: null
   }];
+  let headerLinks = [{
+    title: "FAQ",
+    url: "http://faq"
+  }];
+  let logoLink = "http://home";
 
   beforeEach(() => {
     store = buildStore();
@@ -27,7 +33,10 @@ describe("ContextProvider", () => {
         homeUrl={homeUrl}
         catalogBase={catalogBase}
         catalogName={catalogName}
+        appName={appName}
         authPlugins={authPlugins}
+        headerLinks={headerLinks}
+        logoLink={logoLink}
         initialState={store.getState()}>
         <TestComponent />
       </ContextProvider>
@@ -40,7 +49,10 @@ describe("ContextProvider", () => {
     expect(context.homeUrl).to.equal(homeUrl);
     expect(context.catalogBase).to.equal(catalogBase);
     expect(context.catalogName).to.equal(catalogName);
+    expect(context.appName).to.equal(appName);
     expect(context.authPlugins).to.deep.equal(authPlugins);
+    expect(context.headerLinks).to.deep.equal(headerLinks);
+    expect(context.logoLink).to.equal(logoLink);
     expect(context.initialState).to.equal(store.getState());
   });
 

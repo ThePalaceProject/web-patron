@@ -3,6 +3,7 @@
   "homeUrl": "/groups/",
   "catalogBase": "http://localhost:6500",
   "catalogName": "NYPL eBooks",
+  "appName": "NYPL SimplyE",
   "authPlugins": {
     "Millennium": "./src/auth/MillenniumAuthPlugin.ts"
   }

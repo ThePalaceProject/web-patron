@@ -5,12 +5,16 @@ import { State as CatalogState } from "opds-web-client/lib/state";
 import { Store } from "redux";
 import { State } from "../reducers";
 import AuthPlugin from "opds-web-client/lib/AuthPlugin";
+import { HeaderLink } from "../Config";
 
 export interface ContextProviderProps extends React.Props<any> {
   homeUrl: string;
   catalogBase: string;
   catalogName: string;
+  appName: string;
   authPlugins: AuthPlugin[];
+  headerLinks: HeaderLink[];
+  logoLink: string;
   initialState?: CatalogState;
 }
 
@@ -53,7 +57,10 @@ export default class ContextProvider extends React.Component<ContextProviderProp
     homeUrl: React.PropTypes.string.isRequired,
     catalogBase: React.PropTypes.string.isRequired,
     catalogName: React.PropTypes.string.isRequired,
+    appName: React.PropTypes.string.isRequired,
     authPlugins: React.PropTypes.array.isRequired,
+    headerLinks: React.PropTypes.array.isRequired,
+    logoLink: React.PropTypes.string.isRequired,
     initialState: React.PropTypes.object
   };
 
@@ -64,7 +71,10 @@ export default class ContextProvider extends React.Component<ContextProviderProp
       homeUrl: this.props.homeUrl,
       catalogBase: this.props.catalogBase,
       catalogName: this.props.catalogName,
+      appName: this.props.appName,
       authPlugins: this.props.authPlugins,
+      headerLinks: this.props.headerLinks,
+      logoLink: this.props.logoLink,
       initialState: this.props.initialState
     };
   }
