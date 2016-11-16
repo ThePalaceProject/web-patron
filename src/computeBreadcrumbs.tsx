@@ -1,6 +1,17 @@
 import { CollectionData, LinkData } from "opds-web-client/lib/interfaces";
 import { hierarchyComputeBreadcrumbs } from "opds-web-client/lib/components/Breadcrumbs";
 
+// Custom URL comparator to ignore trailing slashes.
+let urlComparator = (url1: string , url2: string): boolean => {
+  if (url1.endsWith("/")) {
+    url1 = url1.slice(0, -1);
+  }
+  if (url2.endsWith("/")) {
+    url2 = url2.slice(0, -1);
+  }
+  return url1 === url2;
+};
+
 export default (collection: CollectionData, history: LinkData[]): LinkData[] => {
   let links = [];
 
@@ -22,7 +33,7 @@ export default (collection: CollectionData, history: LinkData[]): LinkData[] => 
       text: collection.title
     });
   } else {
-    links = hierarchyComputeBreadcrumbs(collection, history);
+    links = hierarchyComputeBreadcrumbs(collection, history, urlComparator);
   }
 
   return links;
