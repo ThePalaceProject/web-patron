@@ -2,7 +2,6 @@
   "dependencies": {
     "chai": "registry:npm/chai#3.5.0+20160723033700",
     "enzyme": "registry:npm/enzyme#2.2.0+20160322031343",
-    "react-redux": "registry:npm/react-redux#4.4.0+20160614222153",
     "sinon": "registry:npm/sinon#1.16.0+20160723033700"
   },
   "globalDependencies": {
@@ -18,8 +17,10 @@
     "react": "registry:dt/react#0.14.0+20160630100702",
     "react-bootstrap": "registry:dt/react-bootstrap#0.0.0+20160706182032",
     "react-dom": "registry:dt/react-dom#0.14.0+20160412154040",
+    "react-redux": "registry:dt/react-redux#4.4.0+20160908183346",
     "react-router": "registry:dt/react-router#2.0.0+20160621215300",
     "react-router/history": "registry:dt/react-router/history#2.0.0+20160608102730",
+    "redux": "registry:dt/redux#3.5.2+20160703092728",
     "serve-static": "registry:dt/serve-static#0.0.0+20160606155157"
   }
 }
