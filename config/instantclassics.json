@@ -1,13 +1,8 @@
 {
-  "theme": "./src/themes/openebooks.scss",
-  "homeUrl": "/groups/",
-  "catalogBase": "http://qa.circulation.openebooks.us",
-  "catalogName": "Open eBooks",
-  "appName": "Open eBooks",
-  "authPlugins": {
-    "FirstBook": "./src/auth/FirstBookAuthPlugin.ts",
-    "Clever": "./src/auth/CleverAuthPlugin.ts"
-  },
+  "theme": "./src/themes/instantclassics.scss",
+  "homeUrl": "/https%3A%2F%2Finstantclassics.librarysimplified.org%2Findex.xml",
+  "catalogBase": "https://instantclassics.librarysimplified.org",
+  "catalogName": "Instant Classics",
   "headerLinks": [
     { "title": "Home", "url": "http://openebooks.net/index.html" },
     { "title": "About", "url": "http://openebooks.net/about.html" },
@@ -16,5 +11,6 @@
     { "title": "Help Center", "url": "https://openebooks.zendesk.com/" },
     { "title": "Catalog", "url": "http://openebooks.net/catalog.html" }
   ],
-  "logoLink": "http://openebooks.net/index.html"
+  "logoLink": "http://openebooks.net/index.html",
+  "shortenUrls": false
 }

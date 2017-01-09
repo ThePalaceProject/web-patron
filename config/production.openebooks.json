@@ -13,7 +13,8 @@
     { "title": "About", "url": "http://openebooks.net/about.html" },
     { "title": "Contribute","url": "http://openebooks.net/contribute.html" },
     { "title": "Resources", "url": "http://openebooks.net/resources.html" },
-    { "title": "Help Center", "url": "https://openebooks.zendesk.com/" }
+    { "title": "Help Center", "url": "https://openebooks.zendesk.com/" },
+    { "title": "Catalog", "url": "http://openebooks.net/catalog.html" }
   ],
   "logoLink": "http://openebooks.net/index.html"
 }

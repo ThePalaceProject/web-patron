@@ -25,6 +25,7 @@ describe("ContextProvider", () => {
     url: "http://faq"
   }];
   let logoLink = "http://home";
+  let shortenUrls = true;
 
   beforeEach(() => {
     store = buildStore();
@@ -37,6 +38,7 @@ describe("ContextProvider", () => {
         authPlugins={authPlugins}
         headerLinks={headerLinks}
         logoLink={logoLink}
+        shortenUrls={shortenUrls}
         initialState={store.getState()}>
         <TestComponent />
       </ContextProvider>
@@ -61,7 +63,7 @@ describe("ContextProvider", () => {
     expect(children.length).to.equal(1);
   });
 
-  describe("pathFor", () => {
+  describe("pathFor with url shortening", () => {
     let collectionUrl = "collection/url";
     let bookUrl = "book/url";
     let host = "http://example.com";
@@ -100,6 +102,39 @@ describe("ContextProvider", () => {
     it("returns a path with no collection or book", () => {
       let path = wrapper.instance().pathFor(null, null);
       expect(path).to.equal(``);
+    });
+  });
+
+  describe("pathFor without url shortening", () => {
+    let collectionUrl = "collection/url";
+    let bookUrl = "book/url";
+    let host = "http://example.com";
+
+    beforeEach(() => {
+      wrapper = shallow(
+        <ContextProvider
+          homeUrl={homeUrl}
+          catalogBase={catalogBase}
+          catalogName={catalogName}
+          appName={appName}
+          authPlugins={authPlugins}
+          headerLinks={headerLinks}
+          logoLink={logoLink}
+          shortenUrls={false}
+          initialState={store.getState()}>
+          <TestComponent />
+        </ContextProvider>
+      );
+    });
+
+    it("encodes collection url", () => {
+      let url = host + "/groups/eng/Adult%20Fiction";
+      expect(wrapper.instance().prepareCollectionUrl(url)).to.equal(encodeURIComponent(url));
+    });
+
+    it("encodes book url", () => {
+      let url = host + "/works/Axis%20360/Axis%20360%20ID/0016201449";
+      expect(wrapper.instance().prepareBookUrl(url)).to.equal(encodeURIComponent(url));
     });
   });
 });

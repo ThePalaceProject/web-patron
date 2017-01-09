@@ -1,0 +1,13 @@
+@import 'openebooks';
+
+.book-details .main .circulation-links .btn {
+  &.download-button {
+    display: block;
+  }
+}
+
+.catalog .navbar {
+  .navbar-nav > li:nth-child(7) {
+    display: none;
+  }
+}
