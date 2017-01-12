@@ -1,6 +1,6 @@
 {
   "theme": "./src/themes/nypl.scss",
-  "homeUrl": "/groups/",
+  "homeUrl": "groups",
   "catalogBase": "http://qa.circulation.librarysimplified.org",
   "catalogName": "NYPL eBooks",
   "appName": "NYPL SimplyE",
