@@ -1,6 +1,6 @@
 {
   "theme": "./src/themes/instantclassics.scss",
-  "homeUrl": "/https%3A%2F%2Finstantclassics.librarysimplified.org%2Findex.xml",
+  "homeUrl": "https://instantclassics.librarysimplified.org/index.xml",
   "catalogBase": "https://instantclassics.librarysimplified.org",
   "catalogName": "Instant Classics",
   "headerLinks": [

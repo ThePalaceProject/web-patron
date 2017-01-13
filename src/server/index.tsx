@@ -20,7 +20,7 @@ if (configFile) {
   config = JSON.parse(fs.readFileSync(configFile, "utf8"));
 }
 
-const homeUrl = config.homeUrl || "/groups/";
+const homeUrl = "/" + encodeURIComponent(config.homeUrl || "groups");
 const catalogBase = config.catalogBase || "http://circulation.alpha.librarysimplified.org";
 const catalogName = config.catalogName || "Books";
 const appName = config.appName || "";
