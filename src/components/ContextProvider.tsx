@@ -15,6 +15,7 @@ export interface ContextProviderProps extends React.Props<any> {
   authPlugins: AuthPlugin[];
   headerLinks: HeaderLink[];
   logoLink: string;
+  shortenUrls: boolean;
   initialState?: CatalogState;
 }
 
@@ -40,15 +41,17 @@ export default class ContextProvider extends React.Component<ContextProviderProp
   }
 
   prepareCollectionUrl(url: string): string {
-    return encodeURIComponent(
-      url.replace(this.props.catalogBase + "/", "").replace(/\/$/, "").replace(/^\//, "")
-    );
+    if (this.props.shortenUrls) {
+      url = url.replace(this.props.catalogBase + "/", "").replace(/\/$/, "").replace(/^\//, "");
+    }
+    return encodeURIComponent(url);
   }
 
   prepareBookUrl(url: string): string {
-    return encodeURIComponent(
-      url.replace(this.props.catalogBase + "/works/", "").replace(/\/$/, "").replace(/^\//, "")
-    );
+    if (this.props.shortenUrls) {
+      url = url.replace(this.props.catalogBase + "/works/", "").replace(/\/$/, "").replace(/^\//, "");
+    }
+    return encodeURIComponent(url);
   }
 
   static childContextTypes: React.ValidationMap<any> = {
@@ -61,6 +64,7 @@ export default class ContextProvider extends React.Component<ContextProviderProp
     authPlugins: React.PropTypes.array.isRequired,
     headerLinks: React.PropTypes.array.isRequired,
     logoLink: React.PropTypes.string.isRequired,
+    shortenUrls: React.PropTypes.bool.isRequired,
     initialState: React.PropTypes.object
   };
 
@@ -75,6 +79,7 @@ export default class ContextProvider extends React.Component<ContextProviderProp
       authPlugins: this.props.authPlugins,
       headerLinks: this.props.headerLinks,
       logoLink: this.props.logoLink,
+      shortenUrls: this.props.shortenUrls,
       initialState: this.props.initialState
     };
   }

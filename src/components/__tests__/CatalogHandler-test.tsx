@@ -33,17 +33,19 @@ describe("CatalogHandler", () => {
       catalogBase: host,
       catalogName: name,
       authPlugins: authPlugins,
+      shortenUrls: true,
       initialState: store.getState()
     };
+  });
+
+  it("renders OPDSCatalog with shortened urls", () => {
     wrapper = shallow(
       <CatalogHandler
         params={params}
         />,
       { context }
     );
-  });
 
-  it("renders OPDSCatalog", () => {
     let catalog = wrapper.find(OPDSCatalog);
     expect(catalog.prop("collectionUrl")).to.equal(host + "/collectionurl");
     expect(catalog.prop("bookUrl")).to.equal(host + "/works/bookurl");
@@ -56,5 +58,19 @@ describe("CatalogHandler", () => {
     let pageTitleTemplate = catalog.prop("pageTitleTemplate");
     expect(pageTitleTemplate("Collection", "Book")).to.equal("Example - Book");
     expect(pageTitleTemplate("Collection", null)).to.equal("Example - Collection");
+  });
+
+  it("renders OPDSCatalog with full urls", () => {
+    context.shortenUrls = false;
+    wrapper = shallow(
+      <CatalogHandler
+        params={params}
+        />,
+      { context }
+    );
+
+    let catalog = wrapper.find(OPDSCatalog);
+    expect(catalog.prop("collectionUrl")).to.equal("collectionurl");
+    expect(catalog.prop("bookUrl")).to.equal("bookurl");
   });
 });

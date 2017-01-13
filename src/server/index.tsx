@@ -20,7 +20,7 @@ if (configFile) {
   config = JSON.parse(fs.readFileSync(configFile, "utf8"));
 }
 
-const homeUrl = config.homeUrl || "/groups/";
+const homeUrl = "/" + encodeURIComponent(config.homeUrl || "groups");
 const catalogBase = config.catalogBase || "http://circulation.alpha.librarysimplified.org";
 const catalogName = config.catalogName || "Books";
 const appName = config.appName || "";
@@ -28,6 +28,7 @@ const distDir = process.env.SIMPLIFIED_PATRON_DIST || "dist";
 const authPlugins = Object.keys(config.authPlugins || {});
 const headerLinks = config.headerLinks || [];
 const logoLink = config.logoLink || "";
+const shortenUrls = config.shortenUrls !== undefined ? config.shortenUrls : true;
 
 const authPluginJsTags = authPlugins.map(plugin => {
   return `<script src="/js/${plugin}.js"></script>\n`;
@@ -46,8 +47,10 @@ function handleRender(req, res) {
       res.redirect(302, redirectLocation.pathname + redirectLocation.search);
     } else if (renderProps) {
       let { collectionUrl, bookUrl } = renderProps.params;
-      collectionUrl = expandCollectionUrl(catalogBase, collectionUrl);
-      bookUrl = expandBookUrl(catalogBase, bookUrl);
+      if (shortenUrls) {
+        collectionUrl = expandCollectionUrl(catalogBase, collectionUrl);
+        bookUrl = expandBookUrl(catalogBase, bookUrl);
+      }
 
       if (!collectionUrl && !bookUrl) {
         res.redirect(302, "/collection" + homeUrl);
@@ -64,6 +67,7 @@ function handleRender(req, res) {
             authPlugins={[]}
             headerLinks={headerLinks}
             logoLink={logoLink}
+            shortenUrls={shortenUrls}
             initialState={state}>
             <RouterContext {...renderProps} />
           </ContextProvider>
@@ -81,6 +85,7 @@ function handleRender(req, res) {
               authPlugins={[]}
               headerLinks={headerLinks}
               logoLink={logoLink}
+              shortenUrls={shortenUrls}
               initialState={state}>
               <RouterContext {...renderProps} />
             </ContextProvider>
@@ -116,6 +121,7 @@ function renderFullPage(html: string, preloadedState: State) {
             authPlugins: [${authPlugins}],
             headerLinks: ${JSON.stringify(headerLinks)},
             logoLink: "${logoLink}",
+            shortenUrls: ${shortenUrls},
             initialState: ${JSON.stringify(preloadedState)}
           });
         </script>

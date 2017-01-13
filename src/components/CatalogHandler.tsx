@@ -24,6 +24,7 @@ export interface CatalogHandlerContext {
   catalogBase: string;
   catalogName: string;
   authPlugins: AuthPlugin[];
+  shortenUrls: boolean;
   initialState?: State;
 }
 
@@ -35,14 +36,17 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
     catalogBase: React.PropTypes.string.isRequired,
     catalogName: React.PropTypes.string.isRequired,
     authPlugins: React.PropTypes.array.isRequired,
+    shortenUrls: React.PropTypes.bool.isRequired,
     initialState: React.PropTypes.object
   };
 
   render() {
     let { collectionUrl, bookUrl } = this.props.params;
 
-    collectionUrl = expandCollectionUrl(this.context.catalogBase, collectionUrl) || null;
-    bookUrl = expandBookUrl(this.context.catalogBase, bookUrl) || null;
+    if (this.context.shortenUrls) {
+      collectionUrl = expandCollectionUrl(this.context.catalogBase, collectionUrl) || null;
+      bookUrl = expandBookUrl(this.context.catalogBase, bookUrl) || null;
+    }
 
     let pageTitleTemplate = (collectionTitle, bookTitle) => {
       let details = bookTitle || collectionTitle;

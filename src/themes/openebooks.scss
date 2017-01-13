@@ -33,6 +33,11 @@ $logo: url('openebooks-logo.png');
     text-decoration: none;
   }
 
+  .navbar-nav > li:nth-child(7) {
+    /* Hide our Catalog link since we have one to the Open eBooks page that links to the two libraries. */
+    display: none;
+  }
+
   .container-fluid, .navbar-header, .navbar-brand {
     height:100%;
   }
@@ -47,7 +52,7 @@ $logo: url('openebooks-logo.png');
     @media(min-width: 768px) {
       float: right;
 
-      @media(max-width: 876px) {
+      @media(max-width: 964px) {
         >li>a {
           padding-left: 7px;
           padding-right: 7px;
@@ -61,6 +66,7 @@ $logo: url('openebooks-logo.png');
   }
 
   .navbar-brand, .navbar-brand:hover {
+    width: 110px;
     background-size: 98px;
     color: transparent;
   }

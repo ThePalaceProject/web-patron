@@ -17,6 +17,7 @@ interface Config {
   };
   headerLinks?: HeaderLink[];
   logoLink?: URLString;
+  shortenUrls?: boolean;
 }
 
 export default Config;
