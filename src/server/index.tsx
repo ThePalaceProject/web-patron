@@ -100,11 +100,16 @@ function handleRender(req, res) {
 }
 
 function renderFullPage(html: string, preloadedState: State) {
+  let collectionTitle = preloadedState.collection && preloadedState.collection.data && preloadedState.collection.data.title;
+  let bookTitle = preloadedState.book && preloadedState.book.data && preloadedState.book.data.title;
+  let details = bookTitle || collectionTitle;
+  let pageTitle = catalogName + (details ? " - " + details : "");
+
   return `
     <!doctype html>
     <html lang="en">
       <head>
-        <title>${catalogName}</title>
+        <title>${pageTitle}</title>
         <link href="/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
         <link href="/css/CirculationPatronWeb.css" rel="stylesheet" crossorigin="anonymous">
       </head>

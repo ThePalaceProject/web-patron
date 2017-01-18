@@ -34,7 +34,7 @@ export default class Header extends React.Component<HeaderProps, any> {
 
   render(): JSX.Element {
     return (
-      <Navbar fluid={true} fixedTop={true}>
+      <Navbar fluid={true} role="navigation">
         <Navbar.Header>
           <Navbar.Brand>
             { this.context.logoLink ?

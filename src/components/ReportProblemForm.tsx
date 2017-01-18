@@ -36,6 +36,7 @@ export default class ReportProblemForm extends React.Component<any, any> {
           <div className="form">
             <select
               className="form-control"
+              name="problem-type"
               ref="type">
               <option value="">choose a type</option>
               { this.props.types.map(type =>
@@ -45,6 +46,7 @@ export default class ReportProblemForm extends React.Component<any, any> {
             <br />
             <textarea
               className="form-control"
+              name="problem-details"
               placeholder="details"
               ref="detail">
             </textarea>
