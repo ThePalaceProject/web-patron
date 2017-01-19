@@ -21,7 +21,7 @@ if (configFile) {
 }
 
 const homeUrl = "/" + encodeURIComponent(config.homeUrl || "groups");
-const catalogBase = config.catalogBase || "http://circulation.alpha.librarysimplified.org";
+const catalogBase = process.env.SIMPLIFIED_CATALOG_BASE || config.catalogBase || "http://circulation.alpha.librarysimplified.org";
 const catalogName = config.catalogName || "Books";
 const appName = config.appName || "";
 const distDir = process.env.SIMPLIFIED_PATRON_DIST || "dist";
