@@ -1,7 +1,7 @@
 {
   "theme": "./src/themes/instantclassics.scss",
-  "homeUrl": "http://instantclassics-beta.librarysimplified.org/index.xml",
-  "catalogBase": "http://instantclassics-beta.librarysimplified.org",
+  "homeUrl": "https://dev-instantclassics.librarysimplified.org/beta/index.xml",
+  "catalogBase": "https://dev-instantclassics.librarysimplified.org/beta",
   "catalogName": "Instant Classics",
   "headerLinks": [
     { "title": "Home", "url": "http://openebooks.net/index.html" },
