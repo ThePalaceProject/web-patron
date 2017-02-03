@@ -1,9 +1,10 @@
 import * as React from "react";
 import ReportProblemForm from "./ReportProblemForm";
+import { ComplaintData } from "../interfaces";
 
 export interface ReportProblemLinkProps extends React.HTMLProps<any> {
   reportUrl: string;
-  report: (url: string) => Promise<any>;
+  report: (url: string, data: ComplaintData) => Promise<any>;
   fetchTypes: (url: string) => Promise<string[]>;
   types: string[];
 }

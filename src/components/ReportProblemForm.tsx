@@ -1,8 +1,9 @@
 import * as React from "react";
+import { ComplaintData } from "../interfaces";
 
 export interface  ReportProblemFormProps {
   reportUrl: string;
-  report: (url: string) => Promise<any>;
+  report: (url: string, data: ComplaintData) => Promise<any>;
   fetchTypes: (url: string) => Promise<string[]>;
   close: () => void;
   types: string[];
