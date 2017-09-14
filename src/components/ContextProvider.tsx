@@ -49,7 +49,15 @@ export default class ContextProvider extends React.Component<ContextProviderProp
 
   prepareBookUrl(url: string): string {
     if (this.props.shortenUrls) {
-      url = url.replace(this.props.catalogBase + "/works/", "").replace(/\/$/, "").replace(/^\//, "");
+      const regexp = new RegExp(this.props.catalogBase + "/(.*)/works/(.*)");
+      const match = regexp.exec(url);
+      if (match) {
+        const library = match[1];
+        const work = match[2];
+        return encodeURIComponent(
+          library + "/" + work
+        );
+      }
     }
     return encodeURIComponent(url);
   }

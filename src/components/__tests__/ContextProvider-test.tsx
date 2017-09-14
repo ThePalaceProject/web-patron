@@ -74,8 +74,8 @@ describe("ContextProvider", () => {
     });
 
     it("prepares book url", () => {
-      let url = host + "/works/Axis%20360/Axis%20360%20ID/0016201449";
-      expect(wrapper.instance().prepareBookUrl(url)).to.equal("Axis%2520360%2FAxis%2520360%2520ID%2F0016201449");
+      let url = host + "/NYPL/works/Axis%20360/Axis%20360%20ID/0016201449";
+      expect(wrapper.instance().prepareBookUrl(url)).to.equal("NYPL%2FAxis%2520360%2FAxis%2520360%2520ID%2F0016201449");
     });
 
     it("returns a path with collection and book", () => {
