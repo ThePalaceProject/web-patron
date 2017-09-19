@@ -76,7 +76,12 @@ export function expandCollectionUrl(catalogBase: string, url: string): string {
 }
 
 export function expandBookUrl(catalogBase: string, url: string): string {
-  return url ?
-    catalogBase + "/works/" + url :
-    url;
+  if (url) {
+    let urlParts = url.split("/");
+    if (urlParts.length > 0) {
+      let library = urlParts[0];
+      return catalogBase + "/" + library + "/works/" + url.replace(library + "/", "");
+    }
+  }
+  return url;
 }

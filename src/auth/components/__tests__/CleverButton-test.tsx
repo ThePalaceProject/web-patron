@@ -3,20 +3,15 @@ import { expect } from "chai";
 import * as React from "react";
 import { shallow } from "enzyme";
 
-import CleverButton from "../CleverButton";
+import CleverButton, { CleverAuthMethod } from "../CleverButton";
 
 describe("CleverButton", () => {
   let wrapper;
   let provider;
 
   beforeEach(() => {
-    provider = {
-      method: {
-        links: {
-          authenticate: "authenticate"
-        }
-      }
-    };
+    let method = { type: "method", links: [{ "rel": "authenticate", "href": "auth" }] };
+    provider = { method };
 
     wrapper = shallow(
       <CleverButton provider={provider} />
@@ -30,6 +25,26 @@ describe("CleverButton", () => {
 
   it("links to authenticate with redirect", () => {
     let button = wrapper.find("a");
-    expect(button.props().href).to.contain("authenticate&redirect_uri=");
+    expect(button.props().href).to.contain("auth&redirect_uri=");
+  });
+
+  it("doesn't show button if auth document is missing link", () => {
+    let method: CleverAuthMethod = { type: "method" };
+    provider = { method };
+
+    wrapper = shallow(
+      <CleverButton provider={provider} />
+    );
+    let button = wrapper.find("a");
+    expect(button.length).to.equal(0);
+
+    method = { type: "method", links: [] };
+    provider = { method };
+
+    wrapper = shallow(
+      <CleverButton provider={provider} />
+    );
+    button = wrapper.find("a");
+    expect(button.length).to.equal(0);
   });
 });

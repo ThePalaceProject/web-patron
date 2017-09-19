@@ -25,7 +25,7 @@ describe("CatalogHandler", () => {
     store = buildStore();
     params = {
       collectionUrl: "collectionurl",
-      bookUrl: "bookurl",
+      bookUrl: "library/bookurl",
       tab: "tab"
     };
     context = {
@@ -48,7 +48,7 @@ describe("CatalogHandler", () => {
 
     let catalog = wrapper.find(OPDSCatalog);
     expect(catalog.prop("collectionUrl")).to.equal(host + "/collectionurl");
-    expect(catalog.prop("bookUrl")).to.equal(host + "/works/bookurl");
+    expect(catalog.prop("bookUrl")).to.equal(host + "/library/works/bookurl");
     expect(catalog.prop("Header").name).to.equal("Header");
     expect(catalog.prop("Footer").name).to.equal("Footer");
     expect(catalog.prop("BookDetailsContainer").name).to.equal("BookDetailsContainer");
@@ -71,6 +71,6 @@ describe("CatalogHandler", () => {
 
     let catalog = wrapper.find(OPDSCatalog);
     expect(catalog.prop("collectionUrl")).to.equal("collectionurl");
-    expect(catalog.prop("bookUrl")).to.equal("bookurl");
+    expect(catalog.prop("bookUrl")).to.equal("library/bookurl");
   });
 });
