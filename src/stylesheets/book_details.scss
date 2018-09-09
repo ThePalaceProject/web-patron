@@ -2,13 +2,6 @@
   margin-bottom: 10px;
 }
 
-.book-details .main .circulation-links .btn {
-  &.download-button, &.revoke-button {
-    /* Download and revoke buttons are hidden until we have a design for them. */
-    display: none;
-  }
-}
-
 .circulation-info {
   .copies-info, .holds-info {
     display: none;

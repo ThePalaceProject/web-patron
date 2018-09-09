@@ -1,11 +1,9 @@
-@if variable-exists(logo) {
-  .navbar-brand {
-    background-image: $logo;
-    background-repeat: no-repeat;
-    background-size: 30px;
-    background-position: 10% center;
-    padding-left: 60px;
-  }
+.navbar-brand.with-logo {
+  background-image: var(--logo);
+  background-repeat: no-repeat;
+  background-size: 40px;
+  background-position: 4% center;
+  padding-left: 60px;
 }
 
 .navbar {

@@ -1,11 +1,11 @@
 import AuthPlugin from "opds-web-client/lib/AuthPlugin";
-import CleverButton from "./components/CleverButton";
+import OAuthButton from "./components/OAuthButton";
 
-const CleverAuthPlugin: AuthPlugin = {
+const OAuthPlugin: AuthPlugin = {
   type: "http://librarysimplified.org/authtype/OAuth-with-intermediary",
 
   lookForCredentials: () => {
-    // Check for Clever auth
+    // Check for auth token in URL after redirect
     let isServer = (typeof window === "undefined");
     if (!isServer) {
       let accessTokenKey = "access_token=";
@@ -15,7 +15,7 @@ const CleverAuthPlugin: AuthPlugin = {
           let hash = window.location.hash;
           let accessTokenStart = hash.indexOf(accessTokenKey);
           let accessToken = hash.slice(accessTokenStart + accessTokenKey.length).split("&")[0];
-          let credentials = { provider: "Clever", credentials: "Bearer " + accessToken };
+          let credentials = { provider: "OAuth", credentials: "Bearer " + accessToken };
           window.location.hash = "";
           return { credentials };
         } else if (window.location.hash.indexOf(errorKey) !== -1) {
@@ -31,7 +31,7 @@ const CleverAuthPlugin: AuthPlugin = {
   },
 
   formComponent: null,
-  buttonComponent: CleverButton
+  buttonComponent: OAuthButton
 };
 
-export = CleverAuthPlugin;
+export default OAuthPlugin;

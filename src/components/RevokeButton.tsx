@@ -1,11 +1,16 @@
 import * as React from "react";
 import ConfirmationPopup from "./ConfirmationPopup";
+import { BookData } from "opds-web-client/lib/interfaces";
 
-export interface RevokeButtonProps extends React.HTMLProps<any> {
-  revoke: () => Promise<any>;
+export interface RevokeButtonProps extends React.HTMLProps<RevokeButton> {
+  revoke: () => Promise<BookData>;
 }
 
-export default class RevokeButton extends React.Component<RevokeButtonProps, any> {
+export interface RevokeButtonState {
+  showConfirmationPopup: boolean;
+}
+
+export default class RevokeButton extends React.Component<RevokeButtonProps, RevokeButtonState> {
   constructor(props) {
     super(props);
     this.state = { showConfirmationPopup: false };

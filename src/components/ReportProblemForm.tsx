@@ -9,7 +9,12 @@ export interface  ReportProblemFormProps {
   types: string[];
 }
 
-export default class ReportProblemForm extends React.Component<any, any> {
+export interface ReportProblemFormState {
+  submitted: boolean;
+  error?: string;
+}
+
+export default class ReportProblemForm extends React.Component<ReportProblemFormProps, ReportProblemFormState> {
   constructor(props) {
     super(props);
     this.state = {
@@ -89,10 +94,10 @@ export default class ReportProblemForm extends React.Component<any, any> {
       return this.props.report(this.props.reportUrl, data).then(() => {
         this.setState({ submitted: true, error: null });
       }).catch(err => {
-        this.setState({ error: "There was an error posting this problem" });
+        this.setState({ ...this.state, error: "There was an error posting this problem" });
       });
     } else {
-      this.setState({ error: "You must select a type" });
+      this.setState({ ...this.state, error: "You must select a type" });
     }
   }
 

@@ -2,7 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Router, Route, browserHistory } from "react-router";
 import ContextProvider from "./components/ContextProvider";
-import routes from "./routes";
+import { singleLibraryRoutes, multiLibraryRoutes } from "./routes";
 
 class CirculationPatronWeb {
   constructor(config) {
@@ -10,7 +10,10 @@ class CirculationPatronWeb {
 
     ReactDOM.render(
       <ContextProvider {...config}>
-        <Router history={browserHistory} routes={routes} />
+        { config.library.onlyLibrary ?
+          <Router history={browserHistory} routes={singleLibraryRoutes} /> :
+          <Router history={browserHistory} routes={multiLibraryRoutes} />
+        }
       </ContextProvider>,
       document.getElementById(divId)
     );
