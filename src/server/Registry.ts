@@ -13,7 +13,7 @@ export interface RegistryEntry {
 
 export interface AuthDocument {
   links: Link[];
-  web_colors?: {
+  web_color_scheme?: {
     background?: string;
     foreground?: string;
   };
@@ -69,7 +69,7 @@ export default class Registry {
         break;
       }
     }
-    let colors = authDocument["web_colors"];
+    let colors = authDocument["web_color_scheme"];
 
     let headerLinks = [];
     for (const link of catalog["links"]) {

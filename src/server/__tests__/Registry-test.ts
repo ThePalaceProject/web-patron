@@ -88,7 +88,7 @@ describe("Registry", () => {
     let authDocument = { links: [{
       href: "http://library.org/logo",
       rel: "logo"
-    }], web_colors: {
+    }], web_color_scheme: {
       background: "#000000",
       foreground: "#ffffff"
     }};
@@ -112,7 +112,7 @@ describe("Registry", () => {
       let registry = new Registry("base url");
       let data = registry.getDataFromAuthDocumentAndCatalog(authDocument, feed);
       expect(data.logoUrl).to.equal("http://library.org/logo");
-      expect(data.colors).to.deep.equal(authDocument.web_colors);
+      expect(data.colors).to.deep.equal(authDocument.web_color_scheme);
       expect(data.headerLinks).to.deep.equal([feed.links[0], feed.links[1]]);
     });
   });
@@ -133,7 +133,7 @@ describe("Registry", () => {
       authDocument: { links: [{
         href: "http://library.org/logo",
         rel: "logo"
-      }], web_colors: {
+      }], web_color_scheme: {
         background: "#000000",
         foreground: "#ffffff"
       }},
