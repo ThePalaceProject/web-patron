@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { stub } from "sinon";
 
-import Registry, { RegistryEntry, AuthDocument, RegistryCacheEntry } from "../registry";
+import Registry, { RegistryEntry, AuthDocument, RegistryCacheEntry } from "../Registry";
 import { OPDSFeed } from "opds-feed-parser";
 
 describe("Registry", () => {
