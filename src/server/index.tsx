@@ -42,14 +42,16 @@ function handleRender(req, res) {
       let libraryData;
       if (circManagerBase && circManagerName) {
         // We're using a single circ manager library instead of a registry.
-        let authDocument = await registry.getAuthDocument(
-          { links: [{ rel: "http://opds-spec.org/catalog", href: circManagerBase }] }
-        );
+        let fakeRegistryEntry = { links: [
+          { rel: "http://opds-spec.org/catalog", href: circManagerBase }
+        ]};
+        let catalog = await registry.getCatalog(fakeRegistryEntry);
+        let authDocument = await registry.getAuthDocument(catalog);
         libraryData = {
           onlyLibrary: true,
           catalogUrl: circManagerBase,
           catalogName: circManagerName,
-          ...registry.getDataFromAuthDocument(authDocument)
+          ...registry.getDataFromAuthDocumentAndCatalog(authDocument, catalog)
         };
       } else {
         try {

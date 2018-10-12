@@ -17,11 +17,11 @@ export interface AuthDocument {
     background?: string;
     foreground?: string;
   };
-  web_header_links?: Link[];
 }
 
 export interface RegistryCacheEntry {
   registryEntry: RegistryEntry;
+  catalog?: OPDSFeed;
   authDocument?: AuthDocument;
   timestamp: number;
 }
@@ -61,7 +61,7 @@ export default class Registry {
     return this.libraryUrlTemplate;
   }
 
-  getDataFromAuthDocument(authDocument: AuthDocument) {
+  getDataFromAuthDocumentAndCatalog(authDocument: AuthDocument, catalog: OPDSFeed) {
     let logoUrl;
     for (const link of authDocument.links) {
       if (link.rel === "logo") {
@@ -70,7 +70,13 @@ export default class Registry {
       }
     }
     let colors = authDocument["web_colors"];
-    let headerLinks = authDocument["web_header_links"];
+
+    let headerLinks = [];
+    for (const link of catalog["links"]) {
+      if (link.rel === "related") {
+        headerLinks.push(link);
+      }
+    }
 
     return {
       logoUrl,
@@ -95,7 +101,7 @@ export default class Registry {
       id: library,
       catalogUrl,
       catalogName,
-      ...this.getDataFromAuthDocument(entry.authDocument)
+      ...this.getDataFromAuthDocumentAndCatalog(entry.authDocument, entry.catalog)
     };
   }
 
@@ -114,15 +120,25 @@ export default class Registry {
         if (!registryCatalog.catalogs || registryCatalog.catalogs.length !== 1) {
           throw "Registry did not return a catalog for this library id: " + library;
         }
+        let catalog = currentEntry && currentEntry.catalog;
+        try {
+          catalog = await this.getCatalog(registryEntry);
+        } catch (catalogError) {
+          // If we can't get the catalog, patrons won't be able to use the application
+          // anyway.
+          console.warn(catalogError);
+          throw "This library is not available.";
+        }
+
         let authDocument = currentEntry && currentEntry.authDocument;
         try {
-          authDocument = await this.getAuthDocument(registryEntry);
+          authDocument = await this.getAuthDocument(catalog);
         } catch (authDocError) {
           // If we can't get the authentication document, keep the previous cached
           // version or proceed without one.
           console.warn(authDocError);
         }
-        this.CACHE[library] = { registryEntry, authDocument, timestamp: new Date().getTime() };
+        this.CACHE[library] = { registryEntry, catalog, authDocument, timestamp: new Date().getTime() };
       } catch (error) {
         console.warn(error);
         throw "This library is not available.";
@@ -131,7 +147,7 @@ export default class Registry {
     return this.CACHE[library];
   }
 
-  async getAuthDocument(entry: RegistryEntry): Promise<AuthDocument> {
+  async getCatalog(entry: RegistryEntry): Promise<OPDSFeed> {
     // Find the catalog root in the registry entry.
     let rootUrl;
     for (const link of entry["links"]) {
@@ -158,7 +174,10 @@ export default class Registry {
     if (!catalog) {
       throw "Could not get OPDS catalog at " + rootUrl;
     }
+    return catalog;
+  }
 
+  async getAuthDocument(catalog: OPDSFeed): Promise<AuthDocument> {
     // Find the auth document link.
     let authDocLink;
     for (const link of catalog["links"]) {
@@ -168,7 +187,7 @@ export default class Registry {
       }
     }
     if (!authDocLink) {
-      throw "Could not find authentication document in OPDS catalog at " + rootUrl;
+      throw "Could not find authentication document in OPDS catalog";
     }
     try {
       const authDocResponse = await fetch(authDocLink);
