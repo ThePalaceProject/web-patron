@@ -23,9 +23,9 @@ describe("Registry", () => {
       updated: "20180102",
       entries: [],
       links: [
-        { rel: "related", href: "http://library.org/1.html", type: "text/html", title: "One" },
-        { rel: "related", href: "http://library.org/2.html", type: "text/html", title: "Two" },
-        { rel: "about", href: "about.html", type: "text/html", title: "About" }
+        { rel: "related", href: "http://library.org/1.html", type: "text/html", title: "One", role: "navigation" },
+        { rel: "related", href: "http://library.org/2.html", type: "text/html", title: "Two", role: "navigation" },
+        { rel: "about", href: "about.html", type: "text/html", title: "About", role: null }
       ],
       complete: true,
       search: { totalResults: 0, startIndex: 0, itemsPerPage: 0 },
@@ -99,9 +99,9 @@ describe("Registry", () => {
       updated: "20180102",
       entries: [],
       links: [
-        { rel: "related", href: "http://library.org/1.html", type: "text/html", title: "One" },
-        { rel: "related", href: "http://library.org/2.html", type: "text/html", title: "Two" },
-        { rel: "about", href: "about.html", type: "text/html", title: "About" }
+        { rel: "related", href: "http://library.org/1.html", type: "text/html", title: "One", role: "navigation" },
+        { rel: "related", href: "http://library.org/2.html", type: "text/html", title: "Two", role: "navigation" },
+        { rel: "about", href: "about.html", type: "text/html", title: "About", role: null }
       ],
       complete: true,
       search: { totalResults: 0, startIndex: 0, itemsPerPage: 0 },
@@ -143,9 +143,9 @@ describe("Registry", () => {
         updated: "20180102",
         entries: [],
         links: [
-          { rel: "related", href: "http://library.org/1.html", type: "text/html", title: "one" },
-          { rel: "related", href: "http://library.org/2.html", type: "text/html", title: "two" },
-          { rel: "about", href: "about.html", type: "text/html", title: "About" }
+          { rel: "related", href: "http://library.org/1.html", type: "text/html", title: "one", role: "navigation" },
+          { rel: "related", href: "http://library.org/2.html", type: "text/html", title: "two", role: "navigation" },
+          { rel: "about", href: "about.html", type: "text/html", title: "About", role: null }
         ],
         complete: true,
         search: { totalResults: 0, startIndex: 0, itemsPerPage: 0 },
@@ -176,8 +176,8 @@ describe("Registry", () => {
       expect(libraryData.colors.background).to.equal("#000000");
       expect(libraryData.colors.foreground).to.equal("#ffffff");
       expect(libraryData.headerLinks).to.deep.equal([
-        { href: "http://library.org/1.html", title: "one", rel: "related", type: "text/html" },
-        { href: "http://library.org/2.html", title: "two", rel: "related", type: "text/html" }
+        { href: "http://library.org/1.html", title: "one", rel: "related", type: "text/html", role: "navigation" },
+        { href: "http://library.org/2.html", title: "two", rel: "related", type: "text/html", role: "navigation" }
       ]);
     });
   });
@@ -419,9 +419,9 @@ describe("Registry", () => {
       updated: "20180102",
       entries: [],
       links: [
-        { rel: "related", href: "http://library.org/1.html", type: "text/html", title: "One" },
-        { rel: "related", href: "http://library.org/2.html", type: "text/html", title: "Two" },
-        { rel: "http://opds-spec.org/auth/document", href: "http://library.org/authentication_document", type: "application/json", title: "Auth" }
+        { rel: "related", href: "http://library.org/1.html", type: "text/html", title: "One", role: "navigation" },
+        { rel: "related", href: "http://library.org/2.html", type: "text/html", title: "Two", role: "navigation" },
+        { rel: "http://opds-spec.org/auth/document", href: "http://library.org/authentication_document", type: "application/json", title: "Auth", role: null }
       ],
       complete: true,
       search: { totalResults: 0, startIndex: 0, itemsPerPage: 0 },

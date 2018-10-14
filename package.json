@@ -44,7 +44,7 @@
     "font-awesome": "^4.7.0",
     "isomorphic-fetch": "^2.2.1",
     "jsdom": "^9.4.1",
-    "opds-feed-parser": "^0.0.14",
+    "opds-feed-parser": "^0.0.15",
     "opds-web-client": "^0.1.24",
     "react": "^15.3.0",
     "react-bootstrap": "^0.29.5",

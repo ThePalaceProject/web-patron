@@ -73,7 +73,7 @@ export default class Registry {
 
     let headerLinks = [];
     for (const link of catalog["links"]) {
-      if (link.rel === "related") {
+      if (link.role === "navigation") {
         headerLinks.push(link);
       }
     }
