@@ -1,5 +1,5 @@
 import * as React from "react";
-import { AuthProvider, BasicAuthMethod } from "opds-web-client/lib/interfaces";
+import { BasicAuthMethod } from "opds-web-client/lib/interfaces";
 import { AuthButtonProps } from "opds-web-client/lib/components/AuthProviderSelectionForm";
 
 export interface AuthLink {
@@ -22,7 +22,7 @@ export default class BasicAuthButtonWithImage extends React.Component<AuthButton
     }
     let label = this.props.provider.method.description ? "Log in with " + this.props.provider.method.description : "Log in";
     return (
-      <button href="#" className="basic-auth-button" aria-label={label} autoFocus={true}>
+      <button className="basic-auth-button" aria-label={label} autoFocus={true}>
         { image && <img src={image} alt={label} /> }
       </button>
     );
