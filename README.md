@@ -1,6 +1,22 @@
 # circulation-patron-web
 A Circulation Manager web interface for library patrons.
 
+## Running the application
+This application requires either a [library registry](https://github.com/NYPL-Simplified/library_registry) or a [circulation manager](https://github.com/NYPL-Simplified/circulation) to run. By default, it expects a library registry to be running at http://localhost:7000.
+Any circulation manager you'll be using with the app also needs a configuration setting to turn on CORS headers. In the admin interface, go to the Sitewide Settings section under System Configuration and add a setting for "URL of the web catalog for patrons". For development, you can set this to "*", but for production it should be the real URL where you will run the catalog.
+
+Once you have a library registry or circulation manager, run `npm install` in this repository to set up dependencies.
+
+Then run either `npm run dev` or `npm run prod` to start the application. `npm run dev` will watch the code for changes and rebuild the front-end code, but won't reload the server code.
+
+To configure a library registry url, set the environment variable `REGISTRY_BASE`. To use a circulation manager, set `SIMPLIFIED_CATALOG_BASE` and `SIMPLIFIED_CATALOG_NAME`.
+
+Set `SHORTEN_URLS=false` to stop the app from removing common parts of the circulation manager URLs from the web app's URLs.
+
+Set `REGISTRY_EXPIRATION_SECONDS` to control how often the app will check for changes to registry entries and circ manager authentication documents.
+
+
+
 ## License
 
 ```

@@ -3,10 +3,10 @@ import BookDetails from "./BookDetails";
 import Lanes from "opds-web-client/lib/components/Lanes";
 import { BookDetailsContainerProps } from "opds-web-client/lib/components/Root";
 
-export default class BookDetailsContainer extends React.Component<BookDetailsContainerProps, any> {
+export default class BookDetailsContainer extends React.Component<BookDetailsContainerProps, void> {
   context: any;
 
-  static contextTypes: React.ValidationMap<any> = {
+  static contextTypes: React.ValidationMap<void> = {
     store: React.PropTypes.object.isRequired
   };
 

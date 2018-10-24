@@ -7,23 +7,32 @@ export interface AuthLink {
   href: string;
 }
 
-export interface CleverAuthMethod extends AuthMethod {
+export interface OAuthMethod extends AuthMethod {
   links?: AuthLink[];
 }
 
-export default class CleverButton extends React.Component<AuthButtonProps<CleverAuthMethod>, any> {
+export default class OAuthButton extends React.Component<AuthButtonProps<OAuthMethod>, void> {
   render() {
     let currentUrl = window.location.origin + window.location.pathname;
     let authUrl;
+    let image;
     for (const link of this.props.provider.method.links || []) {
       if (link.rel === "authenticate") {
         authUrl = link.href + "&redirect_uri=" + encodeURIComponent(encodeURIComponent(currentUrl));
+      }
+      if (link.rel === "logo") {
+        image = link.href;
+      }
+      if (authUrl && image) {
         break;
       }
     }
+    let label = this.props.provider.method.description ? "Log in with " + this.props.provider.method.description : "Log in";
     return (
       authUrl ?
-      <a href={authUrl} className="clever-button" aria-label="log in with clever" /> :
+      <a href={authUrl} className="oauth-button" aria-label={label}>
+        { image && <img src={image} alt={label} /> }
+      </a> :
       null
     );
   }

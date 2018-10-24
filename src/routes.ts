@@ -1,10 +1,18 @@
 import CatalogHandler from "./components/CatalogHandler";
 
-const routes = [
+export const singleLibraryRoutes = [
   {
     path: "/(collection/:collectionUrl)(/)(book/:bookUrl)",
     component: CatalogHandler
   }
 ];
 
-export default routes;
+export const multiLibraryRoutes = [
+  {
+    path: "/:library(/)(collection/:collectionUrl)(/)(book/:bookUrl)",
+    component: CatalogHandler
+  }
+];
+
+
+export default multiLibraryRoutes;

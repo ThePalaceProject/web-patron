@@ -1,14 +1,14 @@
 import AuthPlugin from "opds-web-client/lib/AuthPlugin";
 import BasicAuthForm from "opds-web-client/lib/components/BasicAuthForm";
-import FirstBookButton from "./components/FirstBookButton";
+import BasicAuthButtonWithImage from "./components/BasicAuthButtonWithImage";
 
-const FirstBookAuthPlugin: AuthPlugin = {
+const BasicAuthWithButtonImagePlugin: AuthPlugin = {
   type: "http://opds-spec.org/auth/basic",
 
   lookForCredentials: () => {},
 
   formComponent: BasicAuthForm,
-  buttonComponent: FirstBookButton
+  buttonComponent: BasicAuthButtonWithImage
 };
 
-export = FirstBookAuthPlugin;
+export default BasicAuthWithButtonImagePlugin;

@@ -19,14 +19,16 @@ describe("Header", () => {
     push = spy();
     pathFor = spy((collection, book) => "collection" + "::" + "book");
     context = {
-      homeUrl: "home url",
-      catalogBase: "base",
-      catalogName: "catalog name",
-      headerLinks: [
-        { title: "link 1", url: "http://link1" },
-        { title: "link 2", url: "http://link2" }
-      ],
-      logoLink: "home",
+      library: {
+        id: "uuid",
+        catalogUrl: "home url",
+        catalogName: "catalog name",
+        headerLinks: [
+          { title: "link 1", href: "http://link1" },
+          { title: "link 2", href: "http://link2" }
+        ],
+        logoUrl: "logo.png",
+      },
       router: { push },
       pathFor
     };
@@ -43,12 +45,15 @@ describe("Header", () => {
     );
   });
 
-  describe("rendering", ( ) => {
+  describe("rendering", () => {
     it("displays library name", () => {
       let brand = wrapper.find(Navbar.Brand);
-      expect(brand.containsMatchingElement(context.catalogName)).to.be.true;
-      let link = brand.find("a");
-      expect(link.props().href).to.equal("home");
+      expect(brand.containsMatchingElement(context.library.catalogName)).to.be.true;
+    });
+
+    it("adds class if there's a logo", () => {
+      let brand = wrapper.find(Navbar.Brand);
+      expect(brand.props().className).to.contain("with-logo");
     });
 
     it("displays link to catalog", () => {

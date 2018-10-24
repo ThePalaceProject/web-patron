@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import * as tinycolor from "tinycolor2";
 import { State } from "opds-web-client/lib/state";
 import DataFetcher from "opds-web-client/lib/DataFetcher";
 import { Router, Route, browserHistory } from "react-router";
@@ -9,10 +10,14 @@ import Footer from "./Footer";
 import BookDetailsContainer from "./BookDetailsContainer";
 import { NavigateContext } from "opds-web-client/lib/interfaces";
 import computeBreadcrumbs from "../computeBreadcrumbs";
-import AuthPlugin from "opds-web-client/lib/AuthPlugin";
+import UrlShortener from "../UrlShortener";
+import { LibraryData } from "../interfaces";
+import BasicAuthWithButtonImagePlugin from "../auth/BasicAuthWithButtonImagePlugin";
+import OAuthPlugin from "../auth/OAuthPlugin";
 
 export interface CatalogHandlerProps extends React.Props<CatalogHandler> {
   params: {
+    library: string;
     collectionUrl: string;
     bookUrl: string;
     tab: string;
@@ -20,11 +25,8 @@ export interface CatalogHandlerProps extends React.Props<CatalogHandler> {
 }
 
 export interface CatalogHandlerContext {
-  homeUrl: string;
-  catalogBase: string;
-  catalogName: string;
-  authPlugins: AuthPlugin[];
-  shortenUrls: boolean;
+  library: LibraryData;
+  urlShortener: UrlShortener;
   initialState?: State;
 }
 
@@ -32,56 +34,71 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
   context: CatalogHandlerContext;
 
   static contextTypes: React.ValidationMap<CatalogHandlerContext> = {
-    homeUrl: React.PropTypes.string.isRequired,
-    catalogBase: React.PropTypes.string.isRequired,
-    catalogName: React.PropTypes.string.isRequired,
-    authPlugins: React.PropTypes.array.isRequired,
-    shortenUrls: React.PropTypes.bool.isRequired,
+    library: React.PropTypes.object.isRequired,
+    urlShortener: React.PropTypes.object.isRequired,
     initialState: React.PropTypes.object
   };
 
   render() {
     let { collectionUrl, bookUrl } = this.props.params;
 
-    if (this.context.shortenUrls) {
-      collectionUrl = expandCollectionUrl(this.context.catalogBase, collectionUrl) || null;
-      bookUrl = expandBookUrl(this.context.catalogBase, bookUrl) || null;
-    }
-
     let pageTitleTemplate = (collectionTitle, bookTitle) => {
       let details = bookTitle || collectionTitle;
-      return this.context.catalogName + (details ? " - " + details : "");
+      return this.context.library.catalogName + (details ? " - " + details : "");
     };
 
+    collectionUrl = this.context.urlShortener.expandCollectionUrl(collectionUrl) || null;
+    bookUrl = this.context.urlShortener.expandBookUrl(bookUrl) || null;
+
+    let cssVariables = {};
+    if (this.context.library.logoUrl) {
+      cssVariables["--logo"] = `url('${this.context.library.logoUrl}')`;
+    }
+    let background = tinycolor((this.context.library.colors && this.context.library.colors.background) || "#ffffff");
+    let foreground = tinycolor((this.context.library.colors && this.context.library.colors.foreground) || "#000000");
+
+    cssVariables["--pagecolor"] = background.toString();
+    if (background.isLight()) {
+      cssVariables["--pagecolorlight"] = background.clone().darken(2).toString();
+      cssVariables["--footercolor"] = background.clone().darken(2).toString();
+    } else {
+      cssVariables["--pagecolorlight"] = background.clone().lighten(2).toString();
+      cssVariables["--footercolor"] = background.clone().lighten(2).toString();
+    }
+    background.setAlpha(0.5);
+    cssVariables["--transparentpagecolor"] = background.toString();
+    background.setAlpha(0.9);
+    cssVariables["--semitransparentpagecolor"] = background.toString();
+
+    cssVariables["--linkcolor"] = foreground.toString();
+    if (foreground.isDark()) {
+      cssVariables["--linkvisitedcolor"] = foreground.clone().lighten(20).toString();
+      cssVariables["--linkhovercolor"] = foreground.clone().lighten(10).toString();
+      cssVariables["--pagetextcolor"] = foreground.clone().desaturate(10).toString();
+      cssVariables["--pagetextcolorlight"] = foreground.clone().desaturate(10).darken(25).toString();
+      cssVariables["--highlightcolor"] = foreground.clone().desaturate(10).toString();
+    } else {
+      cssVariables["--linkvisitedcolor"] = foreground.clone().darken(20).toString();
+      cssVariables["--linkhovercolor"] = foreground.clone().darken(10).toString();
+      cssVariables["--pagetextcolor"] = foreground.clone().desaturate(10).toString();
+      cssVariables["--pagetextcolorlight"] = foreground.clone().desaturate(10).lighten(25).toString();
+      cssVariables["--highlightcolor"] = foreground.clone().desaturate(10).toString();
+    }
+
     return (
-      <OPDSCatalog
-        collectionUrl={collectionUrl}
-        bookUrl={bookUrl}
-        Header={Header}
-        Footer={Footer}
-        BookDetailsContainer={BookDetailsContainer}
-        pageTitleTemplate={pageTitleTemplate}
-        computeBreadcrumbs={computeBreadcrumbs}
-        authPlugins={this.context.authPlugins}
-        initialState={this.context.initialState}
-        />
+      <div style={cssVariables}>
+        <OPDSCatalog
+          collectionUrl={collectionUrl}
+          bookUrl={bookUrl}
+          Header={Header}
+          Footer={Footer}
+          BookDetailsContainer={BookDetailsContainer}
+          pageTitleTemplate={pageTitleTemplate}
+          computeBreadcrumbs={computeBreadcrumbs}
+          initialState={this.context.initialState}
+          authPlugins={[BasicAuthWithButtonImagePlugin, OAuthPlugin]}
+          />
+      </div>
     );
   }
-}
-
-export function expandCollectionUrl(catalogBase: string, url: string): string {
-  return url ?
-    catalogBase + "/" + url :
-    url;
-}
-
-export function expandBookUrl(catalogBase: string, url: string): string {
-  if (url) {
-    let urlParts = url.split("/");
-    if (urlParts.length > 0) {
-      let library = urlParts[0];
-      return catalogBase + "/" + library + "/works/" + url.replace(library + "/", "");
-    }
-  }
-  return url;
 }

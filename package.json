@@ -9,14 +9,14 @@
   "author": "NYPL",
   "license": "Apache-2.0",
   "scripts": {
-    "prepublish": "typings prune && typings install && tsc && npm run prod",
+    "prepublish": "typings prune && typings install && tsc && npm run build-prod",
     "lint": "tslint -c tslint.json src/*.ts src/*.tsx src/**/*.ts src/**/*.tsx src/**/**/*.ts src/**/**/*.tsx src/**/**/**/*.ts src/**/**/**/*/tsx && sass-lint -c .sass-lint.yml -v -q",
     "test": "npm run lint && tsc && cp -r src/stylesheets lib && mocha --require lib/testHelper.js lib/__tests__/*.js lib/**/__tests__/*.js lib/**/**/__tests__/*.js",
-    "dev": "rm -rf dist && mkdir dist && cp node_modules/bootstrap/dist/css/* dist && cp -r src/stylesheets lib && NODE_ENV=development UV_THREADPOOL_SIZE=128 webpack --watch --progress --display-modules --config webpack.config",
-    "prod": "rm -rf dist && mkdir dist && cp node_modules/bootstrap/dist/css/* dist && cp -r src/stylesheets lib && NODE_ENV=production UV_THREADPOOL_SIZE=128 webpack -p --progress --display-modules --config webpack.config",
+    "build-dev": "rm -rf dist && mkdir dist && cp node_modules/bootstrap/dist/css/* dist && cp -r src/stylesheets lib && NODE_ENV=development UV_THREADPOOL_SIZE=128 webpack --watch --progress --display-modules --config webpack.config",
+    "build-prod": "rm -rf dist && mkdir dist && cp node_modules/bootstrap/dist/css/* dist && cp -r src/stylesheets lib && NODE_ENV=production UV_THREADPOOL_SIZE=128 webpack -p --progress --display-modules --config webpack.config",
     "start": "node lib/server/index.js",
-    "start-prod": "tsc && npm run prod && npm run start",
-    "start-dev": "tsc && npm run dev | npm run start"
+    "prod": "tsc && npm run build-prod && npm run start",
+    "dev": "tsc && npm run build-dev | npm run start"
   },
   "devDependencies": {
     "chai": "^3.5.0",
@@ -44,13 +44,16 @@
     "font-awesome": "^4.7.0",
     "isomorphic-fetch": "^2.2.1",
     "jsdom": "^9.4.1",
-    "opds-web-client": "0.1.19",
+    "opds-feed-parser": "^0.0.15",
+    "opds-web-client": "^0.1.25",
     "react": "^15.3.0",
     "react-bootstrap": "^0.29.5",
     "react-dom": "^15.3.0",
     "react-redux": "^4.4.6",
     "react-router": "^3.2.0",
     "redux": "^3.6.0",
-    "redux-thunk": "^2.1.0"
+    "redux-thunk": "^2.1.0",
+    "tinycolor2": "^1.4.1",
+    "universal-url": "^1.0.1"
   }
 }

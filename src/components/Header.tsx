@@ -3,27 +3,19 @@ import CatalogLink from "opds-web-client/lib/components/CatalogLink";
 import { HeaderProps } from "opds-web-client/lib/components/Root";
 import { Navbar, Nav, NavItem } from "react-bootstrap";
 import { NavigateContext } from "opds-web-client/lib/interfaces";
-import { HeaderLink } from "../Config";
+import { LibraryData } from "../interfaces";
 
 export interface HeaderContext extends NavigateContext {
-  homeUrl: string;
-  catalogBase: string;
-  catalogName: string;
-  headerLinks: HeaderLink[];
-  logoLink: string;
+  library: LibraryData;
 }
 
-export default class Header extends React.Component<HeaderProps, any> {
+export default class Header extends React.Component<HeaderProps, void> {
   context: HeaderContext;
 
   static contextTypes = {
-    homeUrl: React.PropTypes.string.isRequired,
-    catalogBase: React.PropTypes.string.isRequired,
-    catalogName: React.PropTypes.string.isRequired,
+    library: React.PropTypes.object.isRequired,
     router: React.PropTypes.object.isRequired,
     pathFor: React.PropTypes.func.isRequired,
-    headerLinks: React.PropTypes.array.isRequired,
-    logoLink: React.PropTypes.string.isRequired
   };
 
   constructor(props) {
@@ -36,11 +28,8 @@ export default class Header extends React.Component<HeaderProps, any> {
     return (
       <Navbar fluid={true} role="navigation">
         <Navbar.Header>
-          <Navbar.Brand>
-            { this.context.logoLink ?
-              <a href={this.context.logoLink}>{this.context.catalogName}</a> :
-              <span>{this.context.catalogName}</span>
-            }
+          <Navbar.Brand className={this.context.library.logoUrl ? "with-logo" : ""}>
+            <span>{this.context.library.catalogName}</span>
           </Navbar.Brand>
           <Navbar.Toggle />
         </Navbar.Header>
@@ -48,14 +37,14 @@ export default class Header extends React.Component<HeaderProps, any> {
         <Navbar.Collapse>
 
           <Nav>
-            { this.context.headerLinks && this.context.headerLinks.map(link =>
+            { this.context.library.headerLinks && this.context.library.headerLinks.map(link =>
               <li>
-                <a href={link.url} title={link.title}>{link.title}</a>
+                <a href={link.href} title={link.title}>{link.title}</a>
               </li>
             ) }
             <li>
               <CatalogLink
-                collectionUrl={this.context.homeUrl}
+                collectionUrl={this.context.library.catalogUrl}
                 bookUrl={null}>
                 Catalog
               </CatalogLink>
@@ -93,6 +82,6 @@ export default class Header extends React.Component<HeaderProps, any> {
 
   signOut() {
     this.props.clearAuthCredentials();
-    this.context.router.push(this.context.pathFor(this.context.homeUrl, null));
+    this.context.router.push(this.context.pathFor(this.context.library.catalogUrl, null));
   }
 }

@@ -1,38 +1,29 @@
 import "../ignore_stylesheet_imports";
 import * as express from "express";
-import * as fs from "fs";
 import * as React from "react";
 import { renderToString } from "react-dom/server";
 import { match, RouterContext } from "react-router";
-import routes from "../routes";
+import { singleLibraryRoutes, multiLibraryRoutes } from "../routes";
 import ContextProvider from "../components/ContextProvider";
-import { expandCollectionUrl, expandBookUrl } from "../components/CatalogHandler";
 import buildInitialState, { State } from "opds-web-client/lib/state";
-import Config from "../Config";
+import Registry from "./Registry";
+import UrlShortener from "../UrlShortener";
+import { LibraryData } from "../interfaces";
 
 const app = express();
 const port = process.env.PORT || 3000;
-const configFile = process.env.CONFIG;
 
-let config: Config = {};
+const registryBase = process.env.REGISTRY_BASE || "http://localhost:7000";
 
-if (configFile) {
-  config = JSON.parse(fs.readFileSync(configFile, "utf8"));
-}
+const circManagerBase = process.env.SIMPLIFIED_CATALOG_BASE;
+const circManagerName = process.env.SIMPLIFIED_CATALOG_NAME;
+let routes = (circManagerBase && circManagerName) ? singleLibraryRoutes : multiLibraryRoutes;
 
-const homeUrl = "/" + encodeURIComponent(config.homeUrl || "groups");
-const catalogBase = process.env.SIMPLIFIED_CATALOG_BASE || config.catalogBase || "http://circulation.alpha.librarysimplified.org";
-const catalogName = config.catalogName || "Books";
-const appName = config.appName || "";
+const shortenUrls: boolean = !(process.env.SHORTEN_URLS === "false");
+
 const distDir = process.env.SIMPLIFIED_PATRON_DIST || "dist";
-const authPlugins = Object.keys(config.authPlugins || {});
-const headerLinks = config.headerLinks || [];
-const logoLink = config.logoLink || "";
-const shortenUrls = config.shortenUrls !== undefined ? config.shortenUrls : true;
-
-const authPluginJsTags = authPlugins.map(plugin => {
-  return `<script src="/js/${plugin}.js"></script>\n`;
-}).join("");
+const registryExpirationSeconds = process.env.REGISTRY_EXPIRATION_SECONDS;
+const registry = new Registry(registryBase, registryExpirationSeconds);
 
 // This is fired every time the server side receives a request
 app.use("/js", express.static(distDir));
@@ -40,57 +31,75 @@ app.use("/css", express.static(distDir));
 app.use(handleRender);
 
 function handleRender(req, res) {
-  match({ routes, location: req.url }, (error, redirectLocation, renderProps: any) => {
+  match({ routes, location: req.url }, async (error, redirectLocation, renderProps: any) => {
     if (error) {
       res.status(500).send(renderErrorPage());
     } else if (redirectLocation) {
       res.redirect(302, redirectLocation.pathname + redirectLocation.search);
     } else if (renderProps) {
-      let { collectionUrl, bookUrl } = renderProps.params;
-      if (shortenUrls) {
-        collectionUrl = expandCollectionUrl(catalogBase, collectionUrl);
-        bookUrl = expandBookUrl(catalogBase, bookUrl);
+      let { library, collectionUrl, bookUrl } = renderProps.params;
+
+      let libraryData;
+      if (circManagerBase && circManagerName) {
+        // We're using a single circ manager library instead of a registry.
+        let fakeRegistryEntry = { links: [
+          { rel: "http://opds-spec.org/catalog", href: circManagerBase }
+        ]};
+        let catalog = await registry.getCatalog(fakeRegistryEntry);
+        let authDocument = await registry.getAuthDocument(catalog);
+        libraryData = {
+          onlyLibrary: true,
+          catalogUrl: circManagerBase,
+          catalogName: circManagerName,
+          ...registry.getDataFromAuthDocumentAndCatalog(authDocument, catalog)
+        };
+      } else {
+        try {
+          libraryData = await registry.getLibraryData(library);
+        } catch (error) {
+          res.status(404).send(renderErrorPage(error));
+          return;
+        }
       }
+      let catalogUrl = libraryData.catalogUrl;
 
       if (!collectionUrl && !bookUrl) {
-        res.redirect(302, "/collection" + homeUrl);
-        return;
+        let urlShortener = new UrlShortener(catalogUrl, shortenUrls);
+        let preparedCollectionUrl = urlShortener.prepareCollectionUrl(catalogUrl);
+        // With short URLS, if the home URL is the library root URL, the prepared URL
+        // will be empty, and we don't need to redirect.
+        if (!shortenUrls || preparedCollectionUrl) {
+          if (library) {
+            res.redirect(302, "/" + library + "/collection/" + preparedCollectionUrl);
+          } else {
+            res.redirect(302, "/collection/" + preparedCollectionUrl);
+          }
+          return;
+        }
       }
 
       buildInitialState(collectionUrl, bookUrl).then((state: State) => {
         const html = renderToString(
           <ContextProvider
-            homeUrl={homeUrl}
-            catalogBase={catalogBase}
-            catalogName={catalogName}
-            appName={appName}
-            authPlugins={[]}
-            headerLinks={headerLinks}
-            logoLink={logoLink}
+            library={libraryData}
             shortenUrls={shortenUrls}
             initialState={state}>
             <RouterContext {...renderProps} />
           </ContextProvider>
         );
-        res.status(200).send(renderFullPage(html, state));
+        res.status(200).send(renderFullPage(html, libraryData, state));
       }).catch(err => {
         // if error, render catalog root
         buildInitialState(null, null).then((state: State) => {
           const html = renderToString(
             <ContextProvider
-              homeUrl={homeUrl}
-              catalogBase={catalogBase}
-              catalogName={catalogName}
-              appName={appName}
-              authPlugins={[]}
-              headerLinks={headerLinks}
-              logoLink={logoLink}
+              library={libraryData}
               shortenUrls={shortenUrls}
               initialState={state}>
               <RouterContext {...renderProps} />
             </ContextProvider>
           );
-          res.status(200).send(renderFullPage(html, state));
+          res.status(200).send(renderFullPage(html, libraryData, state));
         }).catch(err => res.status(500).send(renderErrorPage()));
       });
     } else {
@@ -99,11 +108,11 @@ function handleRender(req, res) {
   });
 }
 
-function renderFullPage(html: string, preloadedState: State) {
+function renderFullPage(html: string, library: LibraryData, preloadedState: State) {
   let collectionTitle = preloadedState.collection && preloadedState.collection.data && preloadedState.collection.data.title;
   let bookTitle = preloadedState.book && preloadedState.book.data && preloadedState.book.data.title;
   let details = bookTitle || collectionTitle;
-  let pageTitle = catalogName + (details ? " - " + details : "");
+  let pageTitle = library.catalogName + (details ? " - " + details : "");
 
   return `
     <!doctype html>
@@ -116,16 +125,9 @@ function renderFullPage(html: string, preloadedState: State) {
       <body>
         <div id="circulation-patron-web">${html}</div>
         <script src="/js/CirculationPatronWeb.js"></script>
-        ${authPluginJsTags}
         <script>
           var circulationPatronWeb = new CirculationPatronWeb({
-            homeUrl: "${homeUrl}",
-            catalogBase: "${catalogBase}",
-            catalogName: "${catalogName}",
-            appName: "${appName}",
-            authPlugins: [${authPlugins}],
-            headerLinks: ${JSON.stringify(headerLinks)},
-            logoLink: "${logoLink}",
+            library: ${JSON.stringify(library)},
             shortenUrls: ${shortenUrls},
             initialState: ${JSON.stringify(preloadedState)}
           });
@@ -140,7 +142,7 @@ function renderErrorPage(message: string = "There was a problem with this reques
     <!doctype html>
     <html lang="en">
       <head>
-        <title>${catalogName}</title>
+        <title>Error</title>
         <link href="/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
       </head>
       <body>
