@@ -11,7 +11,7 @@ Then run either `npm run dev` or `npm run prod` to start the application. `npm r
 
 To configure a library registry url, set the environment variable `REGISTRY_BASE`. To use a circulation manager, set `SIMPLIFIED_CATALOG_BASE` and `SIMPLIFIED_CATALOG_NAME`.
 
-Set `SHORTEN_URLS=true` to make the app remove common parts of the circulation manager URLs from the web app's URLs.
+Set `SHORTEN_URLS=false` to stop the app from removing common parts of the circulation manager URLs from the web app's URLs.
 
 Set `REGISTRY_EXPIRATION_SECONDS` to control how often the app will check for changes to registry entries and circ manager authentication documents.
 

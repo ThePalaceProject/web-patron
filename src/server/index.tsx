@@ -19,7 +19,7 @@ const circManagerBase = process.env.SIMPLIFIED_CATALOG_BASE;
 const circManagerName = process.env.SIMPLIFIED_CATALOG_NAME;
 let routes = (circManagerBase && circManagerName) ? singleLibraryRoutes : multiLibraryRoutes;
 
-const shortenUrls: boolean = !!process.env.SHORTEN_URLS;
+const shortenUrls: boolean = !(process.env.SHORTEN_URLS === "false");
 
 const distDir = process.env.SIMPLIFIED_PATRON_DIST || "dist";
 const registryExpirationSeconds = process.env.REGISTRY_EXPIRATION_SECONDS;
