@@ -9,7 +9,7 @@ Once you have a library registry or circulation manager, run `npm install` in th
 
 Then run either `npm run dev` or `npm run prod` to start the application. `npm run dev` will watch the code for changes and rebuild the front-end code, but won't reload the server code.
 
-To configure a library registry url, set the environment variable `REGISTRY_BASE`. To use a circulation manager, set `SIMPLIFIED_CATALOG_BASE` and `SIMPLIFIED_CATALOG_NAME`.
+To configure a library registry url, set the environment variable `REGISTRY_BASE`. To use a circulation manager, set `SIMPLIFIED_CATALOG_BASE`.
 
 Set `SHORTEN_URLS=false` to stop the app from removing common parts of the circulation manager URLs from the web app's URLs.
 

@@ -32,7 +32,7 @@ describe("Registry", () => {
       unparsed: {}
     });
     getCatalog = stub().returns(new Promise<OPDSFeed>(resolve => resolve(feed)));
-    getAuthDocument = stub().returns(new Promise<AuthDocument>(resolve => resolve({ links: [] })));
+    getAuthDocument = stub().returns(new Promise<AuthDocument>(resolve => resolve({ links: [], title: "title" })));
   });
 
   describe("getLibraryUrlTemplate", () => {
@@ -85,7 +85,7 @@ describe("Registry", () => {
   });
 
   describe("getDataFromAuthDocumentAndCatalog", () => {
-    let authDocument = { links: [{
+    let authDocument = { title: "title", links: [{
       href: "http://library.org/logo",
       rel: "logo"
     }], web_color_scheme: {
@@ -111,6 +111,7 @@ describe("Registry", () => {
     it("returns data", () => {
       let registry = new Registry("base url");
       let data = registry.getDataFromAuthDocumentAndCatalog(authDocument, feed);
+      expect(data.catalogName).to.equal("title");
       expect(data.logoUrl).to.equal("http://library.org/logo");
       expect(data.colors).to.deep.equal(authDocument.web_color_scheme);
       expect(data.headerLinks).to.deep.equal([feed.links[0], feed.links[1]]);
@@ -127,10 +128,10 @@ describe("Registry", () => {
         metadata: {
           updated: "20180901",
           id: "uuid",
-          title: "the library"
+          title: "the library in the registry"
         }
       },
-      authDocument: { links: [{
+      authDocument: { title: "the library in the auth document", links: [{
         href: "http://library.org/logo",
         rel: "logo"
       }], web_color_scheme: {
@@ -170,7 +171,7 @@ describe("Registry", () => {
       let libraryData = await registry.getLibraryData("uuid");
       expect(libraryData.id).to.equal("uuid");
       expect(libraryData.catalogUrl).to.equal("http://library.org/catalog");
-      expect(libraryData.catalogName).to.equal("the library");
+      expect(libraryData.catalogName).to.equal("the library in the auth document");
       expect(libraryData.logoUrl).to.equal("http://library.org/logo");
       expect(libraryData.onlyLibrary).to.be.undefined;
       expect(libraryData.colors.background).to.equal("#000000");
@@ -208,7 +209,7 @@ describe("Registry", () => {
 
       let uncachedResult = await registry.getRegistryEntry("uuid");
       expect(uncachedResult.registryEntry).to.deep.equal(registryEntry);
-      expect(uncachedResult.authDocument).to.deep.equal({ links: [] });
+      expect(uncachedResult.authDocument).to.deep.equal({ links: [], title: "title" });
       expect(mockFetch.callCount).to.equal(1);
       expect(mockFetch.args[0][0]).to.equal("/library/uuid");
       expect(getAuthDocument.callCount).to.equal(1);
@@ -216,7 +217,7 @@ describe("Registry", () => {
       // Now the entry is in the cache so fetch won't be called again.
       let cachedResult = await registry.getRegistryEntry("uuid");
       expect(cachedResult.registryEntry).to.deep.equal(registryEntry);
-      expect(cachedResult.authDocument).to.deep.equal({ links: [] });
+      expect(cachedResult.authDocument).to.deep.equal({ links: [], title: "title" });
       expect(mockFetch.callCount).to.equal(1);
     });
 
@@ -232,7 +233,7 @@ describe("Registry", () => {
 
       let uncachedResult = await registry.getRegistryEntry("uuid");
       expect(uncachedResult.registryEntry).to.deep.equal(registryEntry);
-      expect(uncachedResult.authDocument).to.deep.equal({ links: [] });
+      expect(uncachedResult.authDocument).to.deep.equal({ links: [], title: "title" });
       expect(mockFetch.callCount).to.equal(1);
       expect(mockFetch.args[0][0]).to.equal("/library/uuid");
       expect(getAuthDocument.callCount).to.equal(1);
@@ -242,7 +243,7 @@ describe("Registry", () => {
       await new Promise<void>(resolve => setTimeout(resolve, 1001));
       let cacheExpiredResult = await registry.getRegistryEntry("uuid");
       expect(cacheExpiredResult.registryEntry).to.deep.equal(registryEntry);
-      expect(cacheExpiredResult.authDocument).to.deep.equal({ links: [] });
+      expect(cacheExpiredResult.authDocument).to.deep.equal({ links: [], title: "title" });
       expect(mockFetch.callCount).to.equal(2);
       expect(mockFetch.args[1][0]).to.equal("/library/uuid");
       expect(getAuthDocument.callCount).to.equal(2);
@@ -428,6 +429,7 @@ describe("Registry", () => {
       unparsed: {}
     });
     let authDoc = {
+      title: "title",
       links: []
     };
 

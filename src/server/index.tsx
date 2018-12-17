@@ -16,8 +16,7 @@ const port = process.env.PORT || 3000;
 const registryBase = process.env.REGISTRY_BASE || "http://localhost:7000";
 
 const circManagerBase = process.env.SIMPLIFIED_CATALOG_BASE;
-const circManagerName = process.env.SIMPLIFIED_CATALOG_NAME;
-let routes = (circManagerBase && circManagerName) ? singleLibraryRoutes : multiLibraryRoutes;
+let routes = circManagerBase ? singleLibraryRoutes : multiLibraryRoutes;
 
 const shortenUrls: boolean = !(process.env.SHORTEN_URLS === "false");
 
@@ -40,7 +39,7 @@ function handleRender(req, res) {
       let { library, collectionUrl, bookUrl } = renderProps.params;
 
       let libraryData;
-      if (circManagerBase && circManagerName) {
+      if (circManagerBase) {
         // We're using a single circ manager library instead of a registry.
         let fakeRegistryEntry = { links: [
           { rel: "http://opds-spec.org/catalog", href: circManagerBase }
@@ -50,7 +49,6 @@ function handleRender(req, res) {
         libraryData = {
           onlyLibrary: true,
           catalogUrl: circManagerBase,
-          catalogName: circManagerName,
           ...registry.getDataFromAuthDocumentAndCatalog(authDocument, catalog)
         };
       } else {

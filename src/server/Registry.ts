@@ -12,6 +12,7 @@ export interface RegistryEntry {
 }
 
 export interface AuthDocument {
+  title: string;
   links: Link[];
   web_color_scheme?: {
     background?: string;
@@ -62,6 +63,7 @@ export default class Registry {
   }
 
   getDataFromAuthDocumentAndCatalog(authDocument: AuthDocument, catalog: OPDSFeed) {
+    let catalogName = authDocument["title"];
     let logoUrl;
     for (const link of authDocument.links) {
       if (link.rel === "logo") {
@@ -79,6 +81,7 @@ export default class Registry {
     }
 
     return {
+      catalogName,
       logoUrl,
       colors,
       headerLinks
