@@ -6,7 +6,7 @@ import { match, RouterContext } from "react-router";
 import { singleLibraryRoutes, multiLibraryRoutes } from "../routes";
 import ContextProvider from "../components/ContextProvider";
 import buildInitialState, { State } from "opds-web-client/lib/state";
-import Registry from "./Registry";
+import LibraryDataCache from "./LibraryDataCache";
 import UrlShortener from "../UrlShortener";
 import { LibraryData } from "../interfaces";
 
@@ -21,8 +21,8 @@ let routes = circManagerBase ? singleLibraryRoutes : multiLibraryRoutes;
 const shortenUrls: boolean = !(process.env.SHORTEN_URLS === "false");
 
 const distDir = process.env.SIMPLIFIED_PATRON_DIST || "dist";
-const registryExpirationSeconds = process.env.REGISTRY_EXPIRATION_SECONDS;
-const registry = new Registry(registryBase, registryExpirationSeconds);
+const cacheExpirationSeconds = process.env.CACHE_EXPIRATION_SECONDS;
+const cache = new LibraryDataCache(registryBase, cacheExpirationSeconds);
 
 // This is fired every time the server side receives a request
 app.use("/js", express.static(distDir));
@@ -44,16 +44,16 @@ function handleRender(req, res) {
         let fakeRegistryEntry = { links: [
           { rel: "http://opds-spec.org/catalog", href: circManagerBase }
         ]};
-        let catalog = await registry.getCatalog(fakeRegistryEntry);
-        let authDocument = await registry.getAuthDocument(catalog);
+        let catalog = await cache.getCatalog(fakeRegistryEntry);
+        let authDocument = await cache.getAuthDocument(catalog);
         libraryData = {
           onlyLibrary: true,
           catalogUrl: circManagerBase,
-          ...registry.getDataFromAuthDocumentAndCatalog(authDocument, catalog)
+          ...cache.getDataFromAuthDocumentAndCatalog(authDocument, catalog)
         };
       } else {
         try {
-          libraryData = await registry.getLibraryData(library);
+          libraryData = await cache.getLibraryData(library);
         } catch (error) {
           res.status(404).send(renderErrorPage(error));
           return;

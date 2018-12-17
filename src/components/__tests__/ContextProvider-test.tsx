@@ -80,5 +80,23 @@ describe("ContextProvider", () => {
       let path = wrapper.instance().pathFor(null, null);
       expect(path).to.equal(`/TEST`);
     });
+
+    it("returns a path with no collection or book and no library id", () => {
+      let library = {
+        id: null,
+        catalogUrl: "http://example.com/home",
+        catalogName: "Example"
+      };
+      wrapper = shallow(
+        <ContextProvider
+          library={library}
+          shortenUrls={false}
+          initialState={store.getState()}>
+          <TestComponent />
+        </ContextProvider>
+      );
+      let path = wrapper.instance().pathFor(null, null);
+      expect(path).to.equal(`/`);
+    });
   });
 });

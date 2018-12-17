@@ -13,7 +13,7 @@ To configure a library registry url, set the environment variable `REGISTRY_BASE
 
 Set `SHORTEN_URLS=false` to stop the app from removing common parts of the circulation manager URLs from the web app's URLs.
 
-Set `REGISTRY_EXPIRATION_SECONDS` to control how often the app will check for changes to registry entries and circ manager authentication documents.
+Set `CACHE_EXPIRATION_SECONDS` to control how often the app will check for changes to registry entries and circ manager authentication documents.
 
 
 

@@ -20,7 +20,7 @@ export interface AuthDocument {
   };
 }
 
-export interface RegistryCacheEntry {
+export interface CacheEntry {
   registryEntry: RegistryEntry;
   catalog?: OPDSFeed;
   authDocument?: AuthDocument;
@@ -28,12 +28,13 @@ export interface RegistryCacheEntry {
 }
 
 
-export default class Registry {
-  // An in-memory cache of registry entries. Registry entries don't change very
-  // often, and it's fine to fetch them again if we restart the server.
-  // It's also not a problem if simultaneous requests update the same registry entry,
-  // since they'll get the same data from the registry.
-  private readonly CACHE: { [key: string]: RegistryCacheEntry } = {};
+export default class LibraryDataCache {
+  // An in-memory cache of registry entries and authentication documents.
+  // Registry entries don't change very often, and it's fine to fetch them
+  // again if we restart the server. It's also not a problem if simultaneous
+  // requests update the same registry entry, since they'll get the same
+  // data from the registry.
+  private readonly CACHE: { [key: string]: CacheEntry } = {};
   private readonly registryBase: string;
   private readonly expirationSeconds: number;
   protected libraryUrlTemplate: string = null;
@@ -90,7 +91,7 @@ export default class Registry {
   }
 
   async getLibraryData(library: string): Promise<LibraryData> {
-    const entry = await this.getRegistryEntry(library);
+    const entry = await this.getCacheEntry(library);
     let catalogUrl;
     for (const link of entry.registryEntry.links) {
       if (link.rel === "http://opds-spec.org/catalog") {
@@ -108,7 +109,7 @@ export default class Registry {
     };
   }
 
-  async getRegistryEntry(library: string): Promise<RegistryCacheEntry> {
+  async getCacheEntry(library: string): Promise<CacheEntry> {
     const template = await this.getLibraryUrlTemplate();
     const libraryUrl = template.replace("{uuid}", library);
 
