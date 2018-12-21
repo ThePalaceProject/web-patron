@@ -5,10 +5,15 @@ import LibraryDataCache, { RegistryEntry, AuthDocument, CacheEntry } from "../Li
 import { OPDSFeed } from "opds-feed-parser";
 
 describe("LibraryDataCache", () => {
+  let config = {
+    a: "http://a",
+    b: "http://b"
+  };
+
   let getCatalog;
   let getAuthDocument;
   class LibraryDataCacheWithCatalogAndAuthDocument extends LibraryDataCache {
-    getCatalog(entry: RegistryEntry): Promise<OPDSFeed> {
+    getCatalog(url: string): Promise<OPDSFeed> {
       return getCatalog();
     };
     getAuthDocument(catalog: OPDSFeed): Promise<AuthDocument> {
@@ -166,11 +171,29 @@ describe("LibraryDataCache", () => {
       getCacheEntry = stub().returns(new Promise(resolve => resolve(cacheEntry)));
     });
 
-    it("converts cache entry to library data", async () => {
+    it("converts cache entry from registry to library data", async () => {
       let cache = new LibraryDataCacheWithEntry("base url");
       let libraryData = await cache.getLibraryData("uuid");
       expect(libraryData.id).to.equal("uuid");
       expect(libraryData.catalogUrl).to.equal("http://library.org/catalog");
+      expect(libraryData.catalogName).to.equal("the library in the auth document");
+      expect(libraryData.logoUrl).to.equal("http://library.org/logo");
+      expect(libraryData.onlyLibrary).to.be.undefined;
+      expect(libraryData.colors.background).to.equal("#000000");
+      expect(libraryData.colors.foreground).to.equal("#ffffff");
+      expect(libraryData.headerLinks).to.deep.equal([
+        { href: "http://library.org/1.html", title: "one", rel: "related", type: "text/html", role: "navigation" },
+        { href: "http://library.org/2.html", title: "two", rel: "related", type: "text/html", role: "navigation" }
+      ]);
+    });
+
+    it("converts cache entry from config to library data", async () => {
+      cacheEntry.registryEntry = null;
+      let config = { library: "http://libraryfromconfig.org" };
+      let cache = new LibraryDataCacheWithEntry(null, 100, config);
+      let libraryData = await cache.getLibraryData("library");
+      expect(libraryData.id).to.equal("library");
+      expect(libraryData.catalogUrl).to.equal("http://libraryfromconfig.org");
       expect(libraryData.catalogName).to.equal("the library in the auth document");
       expect(libraryData.logoUrl).to.equal("http://library.org/logo");
       expect(libraryData.onlyLibrary).to.be.undefined;
@@ -190,7 +213,10 @@ describe("LibraryDataCache", () => {
       protected libraryUrlTemplate = "/library/{uuid}";
     }
     let registryEntry = {
-      links: [],
+      links: [{
+        href: "http://library.org/catalog",
+        rel: "http://opds-spec.org/catalog"
+      }],
       metadata: {
         updated: "20180901",
         id: "uuid",
@@ -198,7 +224,7 @@ describe("LibraryDataCache", () => {
       }
     };
 
-    it("fetches an entry if it's not in the cache", async () => {
+    it("fetches an entry from the registry if it's not in the cache", async () => {
       let cache = new LibraryDataCacheWithTemplate("base url");
       let mockFetch = stub().returns(new Promise<any>((resolve) => {
         resolve({ json: () => {
@@ -212,6 +238,7 @@ describe("LibraryDataCache", () => {
       expect(uncachedResult.authDocument).to.deep.equal({ links: [], title: "title" });
       expect(mockFetch.callCount).to.equal(1);
       expect(mockFetch.args[0][0]).to.equal("/library/uuid");
+      expect(getCatalog.callCount).to.equal(1);
       expect(getAuthDocument.callCount).to.equal(1);
 
       // Now the entry is in the cache so fetch won't be called again.
@@ -221,7 +248,27 @@ describe("LibraryDataCache", () => {
       expect(mockFetch.callCount).to.equal(1);
     });
 
-    it("fetches an entry if it's in the cache but expired", async () => {
+    it("fetches an entry from the config file if it's not in the cache", async () => {
+      let config = { library: "http://libraryfromconfig.org" };
+      let cache = new LibraryDataCacheWithTemplate(null, 100, config);
+
+      let mockFetch = stub();
+      fetch = mockFetch as any;
+
+      let uncachedResult = await cache.getCacheEntry("library");
+      expect(uncachedResult.registryEntry).to.be.undefined;
+      expect(uncachedResult.authDocument).to.deep.equal({ links: [], title: "title" });
+      expect(mockFetch.callCount).to.equal(0);
+      expect(getCatalog.callCount).to.equal(1);
+      expect(getAuthDocument.callCount).to.equal(1);
+
+      // Now the entry is in the cache so fetch won't be called again.
+      let cachedResult = await cache.getCacheEntry("library");
+      expect(uncachedResult.registryEntry).to.be.undefined;
+      expect(cachedResult.authDocument).to.deep.equal({ links: [], title: "title" });
+    });
+
+    it("fetches an entry from the registry if it's in the cache but expired", async () => {
       let cache = new LibraryDataCacheWithTemplate("base url", 1);
 
       let mockFetch = stub().returns(new Promise<any>((resolve) => {
@@ -246,6 +293,31 @@ describe("LibraryDataCache", () => {
       expect(cacheExpiredResult.authDocument).to.deep.equal({ links: [], title: "title" });
       expect(mockFetch.callCount).to.equal(2);
       expect(mockFetch.args[1][0]).to.equal("/library/uuid");
+      expect(getAuthDocument.callCount).to.equal(2);
+    });
+
+    it("fetches an entry from the config file if it's in the cache but expired", async () => {
+      let config = { library: "http://libraryfromconfig.org" };
+      let cache = new LibraryDataCacheWithTemplate(null, 1, config);
+
+      let mockFetch = stub();
+      fetch = mockFetch as any;
+
+      let uncachedResult = await cache.getCacheEntry("library");
+      expect(uncachedResult.registryEntry).to.be.undefined;
+      expect(uncachedResult.authDocument).to.deep.equal({ links: [], title: "title" });
+      expect(mockFetch.callCount).to.equal(0);
+      expect(getCatalog.callCount).to.equal(1);
+      expect(getAuthDocument.callCount).to.equal(1);
+
+      // Now the entry is in the cache, but if we wait more than 1 second
+      // it will be expired.
+      await new Promise<void>(resolve => setTimeout(resolve, 1001));
+      let cacheExpiredResult = await cache.getCacheEntry("library");
+      expect(cacheExpiredResult.registryEntry).to.be.undefined;
+      expect(cacheExpiredResult.authDocument).to.deep.equal({ links: [], title: "title" });
+      expect(mockFetch.callCount).to.equal(0);
+      expect(getCatalog.callCount).to.equal(2);
       expect(getAuthDocument.callCount).to.equal(2);
     });
 
@@ -329,10 +401,48 @@ describe("LibraryDataCache", () => {
         expect(mockFetch.callCount).to.equal(1);
       }
     });
+
+    it("returns an error if the registry entry doesn't have a catalog url", async () => {
+      let registryEntryWithoutCatalog = { ...registryEntry, links: [] };
+      let cache = new LibraryDataCacheWithTemplate("base url");
+      let mockFetch = stub().returns(new Promise<any>((resolve, reject) => {
+        resolve({ json: () => {
+          return { catalogs: [registryEntryWithoutCatalog] };
+        }});
+      }));
+      fetch = mockFetch as any;
+
+      try {
+        // This should raise an error.
+        let result = await cache.getCacheEntry("uuid");
+        // Fail the test if it's successful.
+        expect(true, "no error was raised").to.equal(false);
+      } catch (error) {
+        expect(error).to.contain("Registry entry does not have a catalog URL");
+      }
+    });
+
+    it("throws an error if the config file doesn't have an entry for the library", async () => {
+      let config = { library: "http://libraryfromconfig.org" };
+      let cache = new LibraryDataCacheWithTemplate(null, 10, config);
+
+      try {
+        // This should raise an error since the library is not in the config.
+        let result = await cache.getCacheEntry("otherlibrary");
+        // Fail the test if it's successful.
+        expect(true, "no error was raised").to.equal(false);
+      } catch (error) {
+        expect(error).to.contain("No catalog is configured");
+      }
+    });
   });
 
-  describe("getCatalog", () => {
-    let cache = new LibraryDataCache("base url");
+  describe("getRegistryEntry", () => {
+    // Create a mock cache class that already has a url template.
+    class LibraryDataCacheWithTemplate extends LibraryDataCache {
+      protected libraryUrlTemplate = "/library/{uuid}";
+    }
+    let cache = new LibraryDataCacheWithTemplate("base url");
     let registryEntry = {
       links: [{
         href: "http://library.org/catalog",
@@ -344,6 +454,54 @@ describe("LibraryDataCache", () => {
         title: "the library"
       }
     };
+
+    it("fetches a registry entry", async () => {
+      let registryResponse = {
+        catalogs: [registryEntry]
+      };
+
+      let mockFetch = stub();
+      mockFetch.returns(new Promise<any>((resolve) => {
+        resolve({ json: () => registryResponse });
+      }));
+      fetch = mockFetch as any;
+
+      let result = await cache.getRegistryEntry("uuid");
+      expect(result).to.deep.equal(registryEntry);
+      expect(mockFetch.callCount).to.equal(1);
+      expect(mockFetch.args[0][0]).to.equal("/library/uuid");
+    });
+
+    it("throws an error if the registry returns the wrong number of catalogs", async () => {
+      let catalogsLists = [
+        [],
+        [registryEntry, registryEntry]
+      ];
+      for (let catalogs of catalogsLists) {
+        let registryResponse = {
+          catalogs: catalogs
+        };
+
+        let mockFetch = stub();
+        mockFetch.returns(new Promise<any>((resolve) => {
+          resolve({ json: () => registryResponse });
+        }));
+        fetch = mockFetch as any;
+
+        try {
+          // This should raise an error.
+          let result = await cache.getRegistryEntry("uuid");
+          // Fail the test if it's successful.
+          expect(true, "no error was raised").to.equal(false);
+        } catch (error) {
+          expect(error).to.contain("This library is not available");
+        }
+      }
+    });
+  });
+
+  describe("getCatalog", () => {
+    let cache = new LibraryDataCache("base url");
     let opdsFeed = `<feed xmlns:app="http://www.w3.org/2007/app" xmlns:bib="http://bib.schema.org/" xmlns:bibframe="http://bibframe.org/vocab/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:drm="http://librarysimplified.org/terms/drm" xmlns:opds="http://opds-spec.org/2010/catalog" xmlns:opf="http://www.idpf.org/2007/opf" xmlns:schema="http://schema.org/" xmlns:simplified="http://librarysimplified.org/terms/" xmlns="http://www.w3.org/2005/Atom" simplified:entryPoint="http://schema.org/EBook">
       <id>http://library.org/catalog</id>
       <title>Library</title>
@@ -357,7 +515,7 @@ describe("LibraryDataCache", () => {
       }));
       fetch = mockFetch as any;
 
-      let result = await cache.getCatalog(registryEntry);
+      let result = await cache.getCatalog("http://library.org/catalog");
       expect(result.id).to.equal("http://library.org/catalog");
       expect(result.title).to.equal("Library");
       expect(result.links.length).to.equal(1);
@@ -367,25 +525,13 @@ describe("LibraryDataCache", () => {
       expect(mockFetch.args[0][0]).to.equal("http://library.org/catalog");
     });
 
-    it("returns an error if the registry entry doesn't have a catalog url", async () => {
-      let registryEntryWithoutCatalog = { ...registryEntry, links: [] };
-      try {
-        // This should raise an error.
-        let result = await cache.getCatalog(registryEntryWithoutCatalog);
-        // Fail the test if it's successful.
-        expect(true, "no error was raised").to.equal(false);
-      } catch (error) {
-        expect(error).to.contain("Registry entry does not have a catalog URL");
-      }
-    });
-
     it("returns an error if it can't fetch the catalog", async () => {
       let mockFetch = stub();
       mockFetch.returns(new Promise<any>((resolve, reject) => reject()));
       fetch = mockFetch as any;
       try {
         // This should raise an error.
-        let result = await cache.getCatalog(registryEntry);
+        let result = await cache.getCatalog("http://library.org/catalog");
         // Fail the test if it's successful.
         expect(true, "no error was raised").to.equal(false);
       } catch (error) {
@@ -402,7 +548,7 @@ describe("LibraryDataCache", () => {
       fetch = mockFetch as any;
       try {
         // This should raise an error.
-        let result = await cache.getCatalog(registryEntry);
+        let result = await cache.getCatalog("http://library.org/catalog");
         // Fail the test if it's successful.
         expect(true, "no error was raised").to.equal(false);
       } catch (error) {

@@ -2,14 +2,21 @@
 A Circulation Manager web interface for library patrons.
 
 ## Running the application
-This application requires either a [library registry](https://github.com/NYPL-Simplified/library_registry) or a [circulation manager](https://github.com/NYPL-Simplified/circulation) to run. By default, it expects a library registry to be running at http://localhost:7000.
-Any circulation manager you'll be using with the app also needs a configuration setting to turn on CORS headers. In the admin interface, go to the Sitewide Settings section under System Configuration and add a setting for "URL of the web catalog for patrons". For development, you can set this to "*", but for production it should be the real URL where you will run the catalog.
+There are three ways to run this application: with a [library registry](https://github.com/NYPL-Simplified/library_registry), with a single library on a [circulation manager](https://github.com/NYPL-Simplified/circulation), and with a configuration file for multiple circulation manager URLs. By default, it expects a library registry to be running at http://localhost:7000.
+Any circulation manager you'll be using with the app also needs a configuration setting to turn on CORS headers. In the admin interface, go to the Sitewide Settings section under System Configuration and add a setting for "URL of the web catalog for patrons". For development, you can set this to "*", but for production it should be the real URL where you will run the catalog. If you are using a library registry, this configuration will automatically be created when you registry libraries with the registry. Otherwise, you'll need to create a sitewide setting for it.
 
 Once you have a library registry or circulation manager, run `npm install` in this repository to set up dependencies.
 
-Then run either `npm run dev` or `npm run prod` to start the application. `npm run dev` will watch the code for changes and rebuild the front-end code, but won't reload the server code.
+Then you can run either `npm run dev` or `npm run prod` to start the application. `npm run dev` will watch the code for changes and rebuild the front-end code, but won't reload the server code.
 
-To configure a library registry url, set the environment variable `REGISTRY_BASE`. To use a circulation manager, set `SIMPLIFIED_CATALOG_BASE`.
+Set one of the following environment variables:
+To configure a library registry url, set the environment variable `REGISTRY_BASE`.
+To use a circulation manager, set `SIMPLIFIED_CATALOG_BASE`.
+To use a configuration file, set `CONFIG_FILE` to point to a local file or a remote URL. Each line in the file should be a library's desired URL path in the web catalog and the library's circ manager URL, separated by a pipe character. For example:
+```
+library1|http://circulationmanager.org/L1
+library2|http://circulationmanager.org/L2
+```
 
 Set `SHORTEN_URLS=false` to stop the app from removing common parts of the circulation manager URLs from the web app's URLs.
 
