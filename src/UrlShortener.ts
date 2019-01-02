@@ -27,7 +27,7 @@ export default class UrlShortener {
 
   prepareBookUrl(url: string): string {
     if (this.enabled) {
-      url = url.replace(this.catalogBase() + "/works/", "").replace(/\/$/, "").replace(/^\//, "");
+      url = url.replace(this.catalogBase() + "/works/", "").replace(/^\//, "");
     }
     return encodeURIComponent(url);
   }
