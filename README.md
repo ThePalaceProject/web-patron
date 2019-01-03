@@ -6,6 +6,7 @@ There are three ways to run this application:
 * with a [library registry](https://github.com/NYPL-Simplified/library_registry)
 * with a single library on a [circulation manager](https://github.com/NYPL-Simplified/circulation)
 * with a configuration file for multiple circulation manager URLs
+
 By default, it expects a library registry to be running at http://localhost:7000.
 
 Any circulation manager you'll be using with the app also needs a configuration setting to turn on CORS headers. In the admin interface, go to the Sitewide Settings section under System Configuration and add a setting for "URL of the web catalog for patrons". For development, you can set this to "*", but for production it should be the real URL where you will run the catalog. If you are using a library registry, this configuration will automatically be created when you registry libraries with the registry. Otherwise, you'll need to create a sitewide setting for it.
