@@ -42,6 +42,12 @@ describe("UrlShortener", () => {
     it("prepares book url", () => {
       let url = host + "works/" + bookUrl;
       expect(shortener.prepareBookUrl(url)).to.equal("book%2Furl");
+      // it preserves trailing slashes
+      url += "/";
+      expect(shortener.prepareBookUrl(url)).to.equal("book%2Furl%2F");
+      // but not starting slashes
+      url = "/" + url;
+      expect(shortener.prepareBookUrl(url)).to.equal("book%2Furl%2F");
     });
 
     it("expands collection url", () => {

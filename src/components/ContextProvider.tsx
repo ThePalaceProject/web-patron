@@ -37,6 +37,9 @@ export default class ContextProvider extends React.Component<ContextProviderProp
       if (bookUrl) {
         path += `/book/${this.urlShortener.prepareBookUrl(bookUrl)}`;
       }
+      if (!path) {
+        path = "/";
+      }
       return path;
     };
   }
