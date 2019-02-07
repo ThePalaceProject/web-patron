@@ -36,8 +36,10 @@ const initialize = async () => {
       configText = fs.readFileSync(configFile, "utf8");
     }
     for (let entry of configText.split("\n")) {
-      let [path, circManagerUrl] = entry.split("|");
-      config[path] = circManagerUrl;
+      if ( entry.charAt(0) != '#' ) {
+        let [path, circManagerUrl] = entry.split("|");
+        config[path] = circManagerUrl;
+      }
     }
   }
 
