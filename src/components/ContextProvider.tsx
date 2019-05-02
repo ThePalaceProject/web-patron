@@ -6,6 +6,7 @@ import { Store } from "redux";
 import { State } from "../reducers";
 import UrlShortener from "../UrlShortener";
 import { LibraryData } from "../interfaces";
+import * as PropTypes from "prop-types";
 
 export interface ContextProviderProps extends React.Props<ContextProvider> {
   library: LibraryData;
@@ -13,7 +14,7 @@ export interface ContextProviderProps extends React.Props<ContextProvider> {
   initialState?: CatalogState;
 }
 
-export default class ContextProvider extends React.Component<ContextProviderProps, void> {
+export default class ContextProvider extends React.Component<ContextProviderProps, {}> {
   store: Store<State>;
   pathFor: PathFor;
   urlShortener: UrlShortener;
@@ -45,11 +46,11 @@ export default class ContextProvider extends React.Component<ContextProviderProp
   }
 
   static childContextTypes: React.ValidationMap<any> = {
-    store: React.PropTypes.object.isRequired,
-    pathFor: React.PropTypes.func.isRequired,
-    library: React.PropTypes.object.isRequired,
-    urlShortener: React.PropTypes.object.isRequired,
-    initialState: React.PropTypes.object
+    store: PropTypes.object.isRequired,
+    pathFor: PropTypes.func.isRequired,
+    library: PropTypes.object.isRequired,
+    urlShortener: PropTypes.object.isRequired,
+    initialState: PropTypes.object
   };
 
   getChildContext() {

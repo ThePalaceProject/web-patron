@@ -14,6 +14,7 @@ import UrlShortener from "../UrlShortener";
 import { LibraryData } from "../interfaces";
 import BasicAuthWithButtonImagePlugin from "../auth/BasicAuthWithButtonImagePlugin";
 import OAuthPlugin from "../auth/OAuthPlugin";
+import * as PropTypes from "prop-types";
 
 export interface CatalogHandlerProps extends React.Props<CatalogHandler> {
   params: {
@@ -34,9 +35,9 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
   context: CatalogHandlerContext;
 
   static contextTypes: React.ValidationMap<CatalogHandlerContext> = {
-    library: React.PropTypes.object.isRequired,
-    urlShortener: React.PropTypes.object.isRequired,
-    initialState: React.PropTypes.object
+    library: PropTypes.object.isRequired,
+    urlShortener: PropTypes.object.isRequired,
+    initialState: PropTypes.object
   };
 
   render() {

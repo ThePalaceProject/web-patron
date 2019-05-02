@@ -70,7 +70,7 @@ export function postComplaint(url: string, data: ComplaintData) {
           "Content-Type": "application/json"
         } as { [index: string]: string },
         body: JSON.stringify(data),
-        credentials: "same-origin"
+        credentials: "same-origin" as RequestCredentials
       };
       fetch(url, options).then(response => {
         if (response.ok) {

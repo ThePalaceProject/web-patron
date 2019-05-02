@@ -2,7 +2,7 @@ import * as React from "react";
 import { FooterProps } from "opds-web-client/lib/components/Root";
 import { LinkData } from "opds-web-client/lib/interfaces";
 
-export default class Footer extends React.Component<FooterProps, void> {
+export default class Footer extends React.Component<FooterProps, {}> {
 
   constructor(props) {
     super(props);

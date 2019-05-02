@@ -55,7 +55,7 @@ const initialize = async () => {
   const shortenUrls: boolean = !(process.env.SHORTEN_URLS === "false");
 
   const distDir = process.env.SIMPLIFIED_PATRON_DIST || "dist";
-  const cacheExpirationSeconds = process.env.CACHE_EXPIRATION_SECONDS;
+  const cacheExpirationSeconds = parseInt(process.env.CACHE_EXPIRATION_SECONDS, 10);
   const cache = new LibraryDataCache(registryBase, cacheExpirationSeconds, config);
 
   // This is fired every time the server side receives a request
