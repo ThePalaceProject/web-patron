@@ -13,7 +13,7 @@
     "lint": "tslint -c tslint.json src/*.ts src/*.tsx src/**/*.ts src/**/*.tsx src/**/**/*.ts src/**/**/*.tsx src/**/**/**/*.ts src/**/**/**/*/tsx && sass-lint -c .sass-lint.yml -v -q",
     "test": "npm run lint && tsc && cp -r src/stylesheets lib && mocha --require lib/testHelper.js lib/__tests__/*.js lib/**/__tests__/*.js lib/**/**/__tests__/*.js",
     "build-dev": "rm -rf dist && mkdir dist && cp node_modules/bootstrap/dist/css/* dist && cp -r src/stylesheets lib && UV_THREADPOOL_SIZE=128 webpack --watch --progress --display-modules --config webpack.dev.config",
-    "build-prod": "rm -rf dist && mkdir dist && cp node_modules/bootstrap/dist/css/* dist && cp -r src/stylesheets lib && UV_THREADPOOL_SIZE=128 webpack -p --progress --display-modules --config webpack.dev.config",
+    "build-prod": "rm -rf dist && mkdir dist && cp node_modules/bootstrap/dist/css/* dist && cp -r src/stylesheets lib && UV_THREADPOOL_SIZE=128 webpack -p --progress --display-modules --config webpack.prod.config",
     "start": "node lib/server/index.js",
     "prod": "tsc && npm run build-prod && npm run start",
     "dev": "tsc && npm run build-dev | npm run start"
