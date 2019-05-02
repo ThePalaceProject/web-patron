@@ -181,10 +181,10 @@ export default class LibraryDataCache {
     try {
       const registryResponse = await fetch(libraryUrl);
       const registryCatalog = await registryResponse.json();
-      const registryEntry = registryCatalog.catalogs[0];
       if (!registryCatalog.catalogs || registryCatalog.catalogs.length !== 1) {
         throw "Registry did not return a catalog for this library id: " + library;
       }
+      const registryEntry = registryCatalog.catalogs[0];
       return registryEntry;
     } catch (error) {
       console.warn(error);

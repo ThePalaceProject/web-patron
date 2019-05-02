@@ -20,13 +20,13 @@ export default class RevokeButton extends React.Component<RevokeButtonProps, Rev
   }
 
   render() {
-    const { revoke, ref, onCopy, ...p } = this.props;
+    const { revoke, ref, onCopy, ...props } = this.props;
 
     return (
       <div>
         <button
           className="btn btn-default"
-          {...p}
+          {...props}
           onClick={this.showConfirmationPopup}>
           {this.props.children}
         </button>
