@@ -55,8 +55,7 @@ describe("LibraryDataCache", () => {
           href: template
         }]
       };
-      // Originally was { json: () => registryCatalog } for the return promise value
-      // The body prop for the response value now returns both the .text and .json call
+
       fetchMock.mock("/base-url", { status: 200, body: registryCatalog });
       let fetchArgs = fetchMock.calls();
 
