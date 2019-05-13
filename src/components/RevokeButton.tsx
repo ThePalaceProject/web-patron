@@ -2,7 +2,7 @@ import * as React from "react";
 import ConfirmationPopup from "./ConfirmationPopup";
 import { BookData } from "opds-web-client/lib/interfaces";
 
-export interface RevokeButtonProps extends React.HTMLProps<RevokeButton> {
+export interface RevokeButtonProps extends React.HTMLProps<HTMLButtonElement> {
   revoke: () => Promise<BookData>;
 }
 
@@ -20,8 +20,7 @@ export default class RevokeButton extends React.Component<RevokeButtonProps, Rev
   }
 
   render() {
-    let props = Object.assign({}, this.props);
-    delete props["revoke"];
+    const { revoke, ref, onCopy, ...props } = this.props;
 
     return (
       <div>

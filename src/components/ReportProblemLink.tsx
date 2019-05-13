@@ -18,8 +18,7 @@ export default class ReportProblemLink extends React.Component<ReportProblemLink
   }
 
   render() {
-    let props = Object.assign({}, this.props);
-    delete props["reportUrl"];
+    const { ref, reportUrl, ...props } = this.props;
 
     return (
       <div>

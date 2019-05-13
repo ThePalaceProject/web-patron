@@ -11,7 +11,7 @@ export interface OAuthMethod extends AuthMethod {
   links?: AuthLink[];
 }
 
-export default class OAuthButton extends React.Component<AuthButtonProps<OAuthMethod>, void> {
+export default class OAuthButton extends React.Component<AuthButtonProps<OAuthMethod>, {}> {
   render() {
     let currentUrl = window.location.origin + window.location.pathname;
     let authUrl;

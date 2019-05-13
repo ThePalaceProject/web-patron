@@ -11,7 +11,7 @@ export interface BasicAuthWithImageMethod extends BasicAuthMethod {
   links?: AuthLink[];
 }
 
-export default class BasicAuthButtonWithImage extends React.Component<AuthButtonProps<BasicAuthWithImageMethod>, void> {
+export default class BasicAuthButtonWithImage extends React.Component<AuthButtonProps<BasicAuthWithImageMethod>, {}> {
   render() {
     let image;
     for (const link of this.props.provider.method.links || []) {
