@@ -80,7 +80,7 @@ export default class LibraryDataCache {
       logoUrl:      null,
       headerLinks:  [],
       cssLinks:     []
-    }
+    };
 
     for (const link of authDocument.links) {
 
@@ -88,7 +88,7 @@ export default class LibraryDataCache {
         data.logoUrl = link.href;
 
       } else if (link.rel === "stylesheet") {
-        data.cssLinks.push(link)
+        data.cssLinks.push(link);
 
       }
 

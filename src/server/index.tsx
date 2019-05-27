@@ -160,8 +160,8 @@ const initialize = async () => {
           <link href="/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
           <link href="/css/CirculationPatronWeb.css" rel="stylesheet" crossorigin="anonymous">
           ${library.cssLinks.map(link => {
-            return `<link href="${link.href}" rel="${link.rel}" crossorigin="anonymous">`
-          }).join('\n')}
+            return `<link href="${link.href}" rel="${link.rel}" crossorigin="anonymous">`;
+          }).join("\n")}
         </head>
         <body>
           <div id="circulation-patron-web">${html}</div>
