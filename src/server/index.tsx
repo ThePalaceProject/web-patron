@@ -108,6 +108,7 @@ const initialize = async () => {
         }
 
         buildInitialState(collectionUrl, bookUrl).then((state: State) => {
+
           const html = renderToString(
             <ContextProvider
               library={libraryData}
@@ -116,8 +117,11 @@ const initialize = async () => {
               <RouterContext {...renderProps} />
             </ContextProvider>
           );
+
           res.status(200).send(renderFullPage(html, libraryData, state));
+
         }).catch(err => {
+
           // if error, render catalog root
           buildInitialState(null, null).then((state: State) => {
             const html = renderToString(
@@ -128,11 +132,16 @@ const initialize = async () => {
                 <RouterContext {...renderProps} />
               </ContextProvider>
             );
+
             res.status(200).send(renderFullPage(html, libraryData, state));
+
           }).catch(err => res.status(500).send(renderErrorPage()));
+
         });
+
       } else {
         res.status(404).send(renderErrorPage("This page doesn't exist."));
+
       }
     });
   }
@@ -150,6 +159,9 @@ const initialize = async () => {
           <title>${pageTitle}</title>
           <link href="/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
           <link href="/css/CirculationPatronWeb.css" rel="stylesheet" crossorigin="anonymous">
+          ${library.cssLinks.map(link => {
+            return `<link href="${link.href}" rel="${link.rel}" crossorigin="anonymous">`;
+          }).join("\n")}
         </head>
         <body>
           <div id="circulation-patron-web">${html}</div>

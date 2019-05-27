@@ -93,6 +93,12 @@ describe("LibraryDataCache", () => {
       links: [{
         href: "http://library.org/logo",
         rel: "logo"
+      }, {
+        href: "http://library.org/style.css",
+        rel: "stylesheet"
+      }, {
+        href: "http://library.org/style2.css",
+        rel: "stylesheet"
       }],
       web_color_scheme: {
         background: "#000000",
@@ -120,6 +126,7 @@ describe("LibraryDataCache", () => {
       let data = cache.getDataFromAuthDocumentAndCatalog(authDocument, feed);
       expect(data.catalogName).to.equal("title");
       expect(data.logoUrl).to.equal("http://library.org/logo");
+      expect(data.cssLinks).to.deep.equal([authDocument.links[1], authDocument.links[2]]);
       expect(data.colors).to.deep.equal(authDocument.web_color_scheme);
       expect(data.headerLinks).to.deep.equal([feed.links[0], feed.links[1]]);
     });
