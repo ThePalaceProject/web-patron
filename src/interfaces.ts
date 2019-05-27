@@ -25,4 +25,5 @@ export interface LibraryData {
     foreground?: string;
   };
   headerLinks?: Link[];
+  cssLinks?: Link[];
 }

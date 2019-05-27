@@ -73,29 +73,36 @@ export default class LibraryDataCache {
   }
 
   getDataFromAuthDocumentAndCatalog(authDocument: AuthDocument, catalog: OPDSFeed) {
-    let catalogName = authDocument["title"];
-    let logoUrl;
+
+    let data = {
+      catalogName:  authDocument["title"],
+      colors:       authDocument["web_color_scheme"],
+      logoUrl:      null,
+      headerLinks:  [],
+      cssLinks:     []
+    }
+
     for (const link of authDocument.links) {
+
       if (link.rel === "logo") {
-        logoUrl = link.href;
-        break;
-      }
-    }
-    let colors = authDocument["web_color_scheme"];
+        data.logoUrl = link.href;
 
-    let headerLinks = [];
+      } else if (link.rel === "stylesheet") {
+        data.cssLinks.push(link)
+
+      }
+
+    }
+
     for (const link of catalog["links"]) {
+
       if (link.role === "navigation") {
-        headerLinks.push(link);
+        data.headerLinks.push(link);
       }
+
     }
 
-    return {
-      catalogName,
-      logoUrl,
-      colors,
-      headerLinks
-    };
+    return data;
 
   }
 
