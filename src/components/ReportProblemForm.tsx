@@ -65,7 +65,7 @@ export default class ReportProblemForm extends React.Component<ReportProblemForm
 
         { this.state.submitted &&
           <div className="submitted">
-            <button className="btn btn-default" onClick={this.props.close}>Close</button>
+            <button className="btn btn-default close-btn" onClick={this.props.close}>Close</button>
           </div>
         }
       </div>

@@ -89,18 +89,17 @@ describe("ReportProblemForm", () => {
       });
     });
 
-    it("displays result and close button after submitting", (done) => {
+    it("displays result and close button after submitting", async () => {
       wrapper.instance().refs = {
         type: { value: "bad-description" },
         detail: { value: "what an imperfect description!" }
       };
-      wrapper.instance().submit().then(() => {
-        let title = wrapper.find("h3");
-        expect(title.text()).to.equal("Problem Reported");
-        let closeButton = wrapper.find("button").filterWhere(button => button.text() === "Close");
-        expect(closeButton.props().onClick).to.equal(close);
-        done();
-      }).catch(err => { console.log(err); throw(err); });
+      await wrapper.instance().submit();
+
+      let title = wrapper.find("h3");
+      expect(title.text()).to.equal("Problem Reported");
+      let closeButton = wrapper.find("button").at(1);
+      expect(closeButton.props().onClick).to.equal(close);
     });
 
     it("closes", () => {
