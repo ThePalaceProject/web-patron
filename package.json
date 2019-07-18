@@ -1,6 +1,6 @@
 {
   "name": "simplified-circulation-patron-web",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "patron UI for Circulation Manager",
   "repository": {
     "type": "git",
@@ -36,7 +36,8 @@
     "sinon": "^7.3.0",
     "style-loader": "^0.13.1",
     "ts-loader": "^4.3.1",
-    "tslint": "^3.13.2",
+    "tslint": "^4.0.0",
+    "tslint-react-a11y": "^1.0.0",
     "typescript": "2.7.2",
     "url-loader": "^0.5.7",
     "webpack": "^4.29.6",

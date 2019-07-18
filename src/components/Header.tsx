@@ -61,12 +61,12 @@ export default class Header extends React.Component<HeaderProps, {}> {
             }
             { this.props.loansUrl && this.props.isSignedIn &&
               <li>
-                <a href="#" onClick={this.signOut}>Sign Out</a>
+                <a role="button" onClick={this.signOut}>Sign Out</a>
               </li>
             }
             { this.props.loansUrl && !this.props.isSignedIn &&
               <li>
-                <a href="#" onClick={this.signIn}>Sign In</a>
+                <a role="button" onClick={this.signIn}>Sign In</a>
               </li>
             }
           </Nav>
