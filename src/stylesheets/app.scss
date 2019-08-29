@@ -1,3 +1,6 @@
+
+$background: #343434;
+
 $pagecolor: var(--pagecolor);
 $pagecolorlight: var(--pagecolorlight);
 $footercolor: var(--footercolor);
@@ -20,8 +23,13 @@ $semitransparentpagecolor: var(--semitransparentpagecolor);
 @import "footer";
 @import "header";
 @import "report_problem_form";
+@import "overrides";
 
 /* Wrapper div that sets CSS variables also needs full height. */
 body > div > div {
   height: 100%;
+}
+
+* {
+  box-sizing: border-box; // for consistent sizing
 }

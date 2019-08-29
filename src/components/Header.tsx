@@ -1,10 +1,12 @@
 import * as React from "react";
 import CatalogLink from "opds-web-client/lib/components/CatalogLink";
 import { HeaderProps } from "opds-web-client/lib/components/Root";
-import { Navbar, Nav, NavItem } from "react-bootstrap";
 import { NavigateContext } from "opds-web-client/lib/interfaces";
 import { LibraryData } from "../interfaces";
 import * as PropTypes from "prop-types";
+
+import { NavBar, NavHeader, NavBrand, NavBrandTitle, NavBrandSubtitle, NavToggle, NavCollapse, NavList } from "./NavBar"
+import { Search } from "./Search"
 
 export interface HeaderContext extends NavigateContext {
   library: LibraryData;
@@ -27,17 +29,20 @@ export default class Header extends React.Component<HeaderProps, {}> {
 
   render(): JSX.Element {
     return (
-      <Navbar fluid={true} role="navigation">
-        <Navbar.Header>
-          <Navbar.Brand className={this.context.library.logoUrl ? "with-logo" : ""}>
-            <span>{this.context.library.catalogName}</span>
-          </Navbar.Brand>
-          <Navbar.Toggle />
-        </Navbar.Header>
+      <NavBar>
 
-        <Navbar.Collapse>
+        <NavHeader>
+          <NavBrand className={this.context.library.logoUrl ? "with-logo" : ""}>
+            <NavBrandTitle>{this.context.library.catalogName}</NavBrandTitle>
+            <NavBrandSubtitle>Library System</NavBrandSubtitle>
+          </NavBrand>
+          <NavToggle />
+        </NavHeader>
 
-          <Nav>
+        <NavCollapse>
+
+          <NavList>
+
             { this.context.library.headerLinks && this.context.library.headerLinks.map(link =>
               <li>
                 <a href={link.href} title={link.title}>{link.title}</a>
@@ -69,9 +74,14 @@ export default class Header extends React.Component<HeaderProps, {}> {
                 <a href="#" onClick={this.signIn}>Sign In</a>
               </li>
             }
-          </Nav>
-        </Navbar.Collapse>
-      </Navbar>
+
+          </NavList>
+
+          <Search />
+
+        </NavCollapse>
+
+      </NavBar>
     );
   }
 
