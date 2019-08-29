@@ -44,10 +44,13 @@ export default class ReportProblemForm extends React.Component<ReportProblemForm
               className="form-control"
               name="problem-type"
               ref="type">
-              <option value="">choose a type</option>
+              <option value="" aria-selected={false}>choose a type</option>
               { this.props.types.map(type =>
-                <option key={type} value={type}>{this.displayType(type)}</option>
-              ) }
+                  <option key={type} value={type} aria-selected={false}>
+                    {this.displayType(type)}
+                  </option>
+                )
+              }
             </select>
             <br />
             <textarea

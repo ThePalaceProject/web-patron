@@ -42,7 +42,7 @@ export default class LibraryDataCache {
 
   /**
     Create a LibraryDataCache for a registry or from a configuration file.
-    
+
     registryBase: The base URL for a library registry.
     expirationSeconds: The number of seconds to cache registry entries and auth documents.
     config: A pre-configured mapping from library paths to circulation manager URLs.

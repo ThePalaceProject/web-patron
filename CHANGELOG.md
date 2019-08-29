@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+### 0.2.1
+#### Added
+- `tslint-react-a11y` to review accessibility for React components.
+
 ### 0.2.0
 #### Updated
 - Updating to React 16.
