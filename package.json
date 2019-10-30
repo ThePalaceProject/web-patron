@@ -45,6 +45,9 @@
     "webpack-merge": "^4.2.1"
   },
   "dependencies": {
+    "@emotion/core": "^10.0.22",
+    "@emotion/styled": "^10.0.23",
+    "@mdx-js/react": "^1.5.1",
     "bootstrap": "^3.3.6",
     "express": "^4.14.0",
     "font-awesome": "^4.7.0",
@@ -61,6 +64,7 @@
     "redux": "^3.7.2",
     "redux-thunk": "^2.1.0",
     "styled-components": "^4.3.2",
+    "theme-ui": "^0.2.46",
     "tinycolor2": "^1.4.1",
     "universal-url": "^1.0.1"
   }

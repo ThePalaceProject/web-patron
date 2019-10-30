@@ -1,31 +1,31 @@
 
 import * as React from "react";
-import styled from "styled-components"
+import styled from "@emotion/styled"
 
-const SearchForm = styled.form.attrs(props => ({
-    role: "search"
-}))`
+const SearchForm = styled.form`
     display: inline-block;
     position: absolute;
     bottom: 20px;
     right: 20px;
 `
+SearchForm.defaultProps = {
+    role: "search"
+}
 
-const SearchInput = styled.input.attrs(props => ({
-    type: "text",
-    name: "search",
-    title: "Search",
-    placeholder: "Search"
-}))`
+const SearchInput = styled.input`
     border-radius: 10px;
     border-color: #343434;
     padding: 8px;
     border-width: 1px;
 `
+SearchInput.defaultProps = {
+    type: "text",
+    name: "search",
+    title: "Search",
+    placeholder: "Search"
+}
 
-const SearchButton = styled.button.attrs(props => ({
-    type: "submit"
-}))`
+const SearchButton = styled.button`
     -webkit-appearance: none;
     background: #343434;
     color: white;
@@ -38,6 +38,9 @@ const SearchButton = styled.button.attrs(props => ({
     font-weight: bold;
 
 `
+SearchButton.defaultProps = {
+    type: "submit"
+}
 
 export const Search = (props) => {
 

@@ -1,9 +1,7 @@
 import * as React from "react";
-import styled from "styled-components";
+import styled from "@emotion/styled";
 
-export const NavBar = styled.div.attrs(props => ({
-    role: "navigation"
-}))`
+export const NavBar = styled.div`
     position: relative;
     height: 150px;
     margin: 0;
@@ -11,6 +9,9 @@ export const NavBar = styled.div.attrs(props => ({
     background: ${props => props.bg || "white"};
     border: none;
 `
+NavBar.defaultProps = {
+    role: "navigation"
+}
 
 export const NavHeader = styled.div`
     position: relative;
