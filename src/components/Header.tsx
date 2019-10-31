@@ -43,11 +43,11 @@ export default class Header extends React.Component<HeaderProps, {}> {
 
           <NavList>
 
-            { this.context.library.headerLinks && this.context.library.headerLinks.map(link =>
+            {this.context.library.headerLinks && this.context.library.headerLinks.map(link =>
               <li>
                 <a href={link.href} title={link.title}>{link.title}</a>
               </li>
-            ) }
+            )}
             <li>
               <CatalogLink
                 collectionUrl={this.context.library.catalogUrl}
@@ -55,7 +55,7 @@ export default class Header extends React.Component<HeaderProps, {}> {
                 Catalog
               </CatalogLink>
             </li>
-            { this.props.loansUrl && this.props.isSignedIn &&
+            {this.props.loansUrl && this.props.isSignedIn &&
               <li>
                 <CatalogLink
                   collectionUrl={this.props.loansUrl}
@@ -64,12 +64,12 @@ export default class Header extends React.Component<HeaderProps, {}> {
                 </CatalogLink>
               </li>
             }
-            { this.props.loansUrl && this.props.isSignedIn &&
+            {this.props.loansUrl && this.props.isSignedIn &&
               <li>
                 <a role="button" onClick={this.signOut}>Sign Out</a>
               </li>
             }
-            { this.props.loansUrl && !this.props.isSignedIn &&
+            {this.props.loansUrl && !this.props.isSignedIn &&
               <li>
                 <a role="button" onClick={this.signIn}>Sign In</a>
               </li>
