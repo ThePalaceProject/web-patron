@@ -1,7 +1,10 @@
 import * as React from "react";
 import styled from "../styled";
 
-export const NavBar = styled.div`
+type NavBarProps = {
+    bg?: string,
+}
+export const NavBar = styled('div') <NavBarProps>`
     position: relative;
     height: 150px;
     margin: 0;
@@ -13,7 +16,10 @@ NavBar.defaultProps = {
     role: "navigation"
 }
 
-export const NavHeader = styled.div`
+type NavHeaderProps = {
+    bg?: string,
+}
+export const NavHeader = styled('div') <NavHeaderProps>`
     position: relative;
     display: inline-block;
     width: 200px;

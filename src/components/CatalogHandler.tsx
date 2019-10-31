@@ -34,7 +34,7 @@ export interface CatalogHandlerContext {
 export default class CatalogHandler extends React.Component<CatalogHandlerProps, any> {
   context: CatalogHandlerContext;
 
-  static contextTypes: React.ValidationMap<CatalogHandlerContext> = {
+  static contextTypes = {
     library: PropTypes.object.isRequired,
     urlShortener: PropTypes.object.isRequired,
     initialState: PropTypes.object
@@ -98,7 +98,7 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
           computeBreadcrumbs={computeBreadcrumbs}
           initialState={this.context.initialState}
           authPlugins={[BasicAuthWithButtonImagePlugin, OAuthPlugin]}
-          />
+        />
       </div>
     );
   }

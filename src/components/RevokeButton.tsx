@@ -20,7 +20,13 @@ export default class RevokeButton extends React.Component<RevokeButtonProps, Rev
   }
 
   render() {
-    const { revoke, ref, onCopy, ...props } = this.props;
+    const { revoke, ref, onCopy,
+      // pulling these off props so we can safely spread it to the HTML Element
+      children,
+      allowFullScreen,
+      allowTransparency,
+      type,
+      ...props } = this.props;
 
     return (
       <div>
@@ -30,14 +36,14 @@ export default class RevokeButton extends React.Component<RevokeButtonProps, Rev
           onClick={this.showConfirmationPopup}>
           {this.props.children}
         </button>
-        { this.state.showConfirmationPopup &&
+        {this.state.showConfirmationPopup &&
           <ConfirmationPopup
             confirm={this.revoke}
             cancel={this.hideConfirmationPopup}
             text="Are you sure you want to return this book?"
             confirmText="Return Now"
             cancelText="Cancel"
-            />
+          />
         }
       </div>
     );
