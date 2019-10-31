@@ -3,7 +3,7 @@ import * as ReactDOM from "react-dom";
 import { Router, Route, browserHistory } from "react-router";
 import ContextProvider from "./components/ContextProvider";
 import { singleLibraryRoutes, multiLibraryRoutes } from "./routes";
-import ThemeProvider from 'theme-ui';
+import { ThemeProvider } from 'theme-ui';
 import theme from './theme'
 
 class CirculationPatronWeb {

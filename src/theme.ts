@@ -1,4 +1,6 @@
-export default {
+import * as ThemeUi from 'theme-ui'
+
+const Theme: ThemeUi.Theme = {
   fonts: {
     body: 'system-ui, sans-serif',
     heading: '"Avenir Next", sans-serif',
@@ -10,3 +12,5 @@ export default {
     primary: '#33e',
   },
 }
+
+export default Theme
