@@ -4,6 +4,9 @@ import Lanes from "opds-web-client/lib/components/Lanes";
 import { BookDetailsContainerProps } from "opds-web-client/lib/components/Root";
 import * as PropTypes from "prop-types";
 
+const hasProps = (child: React.ReactNode): child is React.ReactElement => {
+  return (child as React.ReactElement).props !== 'undefined'
+}
 export default class BookDetailsContainer extends React.Component<BookDetailsContainerProps, {}> {
   context: any;
 
@@ -13,14 +16,16 @@ export default class BookDetailsContainer extends React.Component<BookDetailsCon
 
   render() {
     let child = React.Children.only(this.props.children);
-    let bookProps = Object.assign({}, child.props, { store: this.context.store });
-    let book = React.createElement(BookDetails, child.props);
+    let childProps = {}
+    if (hasProps(child)) {
+      childProps = { ...child.props }
+    }
     let relatedUrl = this.relatedUrl();
 
     return (
       <div className="book-details-container">
-        { book }
-        { relatedUrl &&
+        <BookDetails {...childProps} />
+        {relatedUrl &&
           <div className="related-books">
             <Lanes
               url={relatedUrl}
@@ -28,7 +33,7 @@ export default class BookDetailsContainer extends React.Component<BookDetailsCon
               namespace="recommendations"
               hideMoreLinks={true}
               hiddenBookIds={this.props.book ? [this.props.book.id] : []}
-              />
+            />
           </div>
         }
       </div>
