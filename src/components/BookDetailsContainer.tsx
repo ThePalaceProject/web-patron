@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from 'theme-ui'
 import * as React from "react";
 import BookDetails from "./BookDetails";
 import Lanes from "opds-web-client/lib/components/Lanes";
@@ -23,19 +25,31 @@ export default class BookDetailsContainer extends React.Component<BookDetailsCon
     let relatedUrl = this.relatedUrl();
 
     return (
-      <div className="book-details-container">
-        <BookDetails {...childProps} />
-        {relatedUrl &&
-          <div className="related-books">
-            <Lanes
-              url={relatedUrl}
-              store={this.context.store}
-              namespace="recommendations"
-              hideMoreLinks={true}
-              hiddenBookIds={this.props.book ? [this.props.book.id] : []}
-            />
-          </div>
-        }
+      <div sx={{ display: 'flex', justifyContent: 'center' }}>
+        <div sx={{
+          // bg: 'background',
+          maxWidth: 'container',
+          mx: 3,
+          px: 5,
+          py: 4,
+          border: 'solid',
+          borderRadius: 2,
+          borderColor: 'darkBlue',
+          flex: 1,
+        }}>
+          <BookDetails {...childProps} />
+          {/* {relatedUrl &&
+            <div className="related-books">
+              <Lanes
+                url={relatedUrl}
+                store={this.context.store}
+                namespace="recommendations"
+                hideMoreLinks={true}
+                hiddenBookIds={this.props.book ? [this.props.book.id] : []}
+              />
+            </div>
+          } */}
+        </div>
       </div>
     );
   }

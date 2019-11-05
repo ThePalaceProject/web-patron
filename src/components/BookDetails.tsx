@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from 'theme-ui'
 import * as React from "react";
 import { Store } from "redux";
 import { connect } from "react-redux";
@@ -7,6 +9,7 @@ import ReportProblemLink from "./ReportProblemLink";
 import RevokeButton from "./RevokeButton";
 import { ComplaintData } from "../interfaces";
 import { State } from "../reducers/index";
+import BookCover from './BookCover'
 
 export interface BookDetailsProps extends DefaultBooKDetailsProps {
   problemTypes: string[];
@@ -22,6 +25,11 @@ export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
 
   fieldNames() {
     return ["Published", "Publisher", "Audience", "Categories", "Distributed By"];
+  }
+
+  // override the inherited setBodyOverflow so that it does nothing.
+  setBodyOverflow(value: string) {
+    return
   }
 
   fields() {
@@ -90,14 +98,14 @@ export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
 
     let categories = rawCategories.filter(category =>
       category["$"]["label"] && category["$"]["scheme"] &&
-          audienceSchemas.concat([fictionScheme])
-              .indexOf(category["$"]["scheme"]["value"]) === -1
+      audienceSchemas.concat([fictionScheme])
+        .indexOf(category["$"]["scheme"]["value"]) === -1
     ).map(category => category["$"]["label"]["value"]);
 
     if (!categories.length) {
       categories = rawCategories.filter(category =>
         category["$"]["label"] && category["$"]["scheme"] &&
-            category["$"]["scheme"]["value"] === fictionScheme
+        category["$"]["scheme"]["value"] === fictionScheme
       ).map(category => category["$"]["label"]["value"]);
     }
 
@@ -168,7 +176,7 @@ export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
         <RevokeButton
           className="btn btn-default revoke-button"
           revoke={this.revoke}
-          >
+        >
           Return Now
         </RevokeButton>
       );
@@ -185,7 +193,17 @@ export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
         fetchTypes={this.props.fetchComplaintTypes}
         report={this.props.postComplaint}
         types={this.props.problemTypes}
-        /> : null;
+      /> : null;
+  }
+
+  render() {
+    return (
+      <div
+        sx={{
+          bg: 'papayawhip',
+        }}
+      ><BookCover /></div >
+    )
   }
 }
 
