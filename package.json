@@ -15,7 +15,8 @@
     "build-prod": "rm -rf dist && mkdir dist && cp node_modules/bootstrap/dist/css/* dist && cp -r src/stylesheets lib && UV_THREADPOOL_SIZE=128 webpack -p --progress --display-modules --config webpack.prod.config",
     "start": "node lib/server/index.js",
     "prod": "tsc && npm run build-prod && npm run start",
-    "dev": "tsc && npm run build-dev | npm run start"
+    "dev": "tsc && npm run build-dev | npm run start",
+    "dev:kristo": "SIMPLIFIED_CATALOG_BASE=http://simplye-dev-cm.amigos.org/xyzlib npm run dev"
   },
   "devDependencies": {
     "@types/mocha": "^5.2.6",
@@ -49,14 +50,14 @@
     "@emotion/core": "^10.0.22",
     "@emotion/styled": "^10.0.23",
     "@mdx-js/react": "^1.5.1",
-    "@types/theme-ui": "^0.2.3",
+    "@types/theme-ui": "^0.2.4",
     "bootstrap": "^3.3.6",
     "express": "^4.14.0",
     "font-awesome": "^4.7.0",
     "isomorphic-fetch": "^2.2.1",
     "jsdom": "^9.4.1",
     "opds-feed-parser": "0.0.16",
-    "opds-web-client": "0.2.4",
+    "opds-web-client": "^0.2.8",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-bootstrap": "^0.32.4",
