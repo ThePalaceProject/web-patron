@@ -6,7 +6,7 @@ var webpackConfig = {
   entry: {
     CirculationPatronWeb: [
       "./src/stylesheets/app.scss",
-      "./src/index.tsx" ]
+      "./src/index.tsx"]
   },
   output: {
     path: path.resolve(__dirname, "./dist"),
@@ -45,7 +45,11 @@ var webpackConfig = {
   },
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".scss"],
-  }
+    alias: {
+      react: path.resolve('./node_modules/react')
+    },
+  },
+
 };
 
 module.exports = webpackConfig;
