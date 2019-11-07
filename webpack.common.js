@@ -44,7 +44,7 @@ var webpackConfig = {
     ],
   },
   resolve: {
-    extensions: [".ts", ".tsx", ".js", ".scss"]
+    extensions: [".ts", ".tsx", ".js", ".scss"],
   }
 };
 

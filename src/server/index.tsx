@@ -121,7 +121,7 @@ const initialize = async () => {
           res.status(200).send(renderFullPage(html, libraryData, state));
 
         }).catch(err => {
-
+          console.error(err)
           // if error, render catalog root
           buildInitialState(null, null).then((state: State) => {
             const html = renderToString(
@@ -135,7 +135,10 @@ const initialize = async () => {
 
             res.status(200).send(renderFullPage(html, libraryData, state));
 
-          }).catch(err => res.status(500).send(renderErrorPage()));
+          }).catch(err => {
+            console.error(err)
+            res.status(500).send(renderErrorPage())
+          });
 
         });
 

@@ -15,6 +15,7 @@ import { LibraryData } from "../interfaces";
 import BasicAuthWithButtonImagePlugin from "../auth/BasicAuthWithButtonImagePlugin";
 import OAuthPlugin from "../auth/OAuthPlugin";
 import * as PropTypes from "prop-types";
+import Layout from './Layout';
 
 export interface CatalogHandlerProps extends React.Props<CatalogHandler> {
   params: {
@@ -41,6 +42,7 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
   };
 
   render() {
+    // these come from the url via router
     let { collectionUrl, bookUrl } = this.props.params;
 
     let pageTitleTemplate = (collectionTitle, bookTitle) => {
@@ -88,7 +90,7 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
 
     return (
       <div style={cssVariables}>
-        <OPDSCatalog
+        {/* <OPDSCatalog
           collectionUrl={collectionUrl}
           bookUrl={bookUrl}
           Header={Header}
@@ -98,7 +100,8 @@ export default class CatalogHandler extends React.Component<CatalogHandlerProps,
           computeBreadcrumbs={computeBreadcrumbs}
           initialState={this.context.initialState}
           authPlugins={[BasicAuthWithButtonImagePlugin, OAuthPlugin]}
-        />
+        /> */}
+        <Layout />
       </div>
     );
   }
