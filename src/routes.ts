@@ -11,6 +11,9 @@ export const multiLibraryRoutes = [
   {
     path: "/:library(/)(collection/:collectionUrl)(/)(book/:bookUrl)",
     component: CatalogHandler
+  },{
+    path: "*",
+    component: CatalogHandler
   }
 ];
 

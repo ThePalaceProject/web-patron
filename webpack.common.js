@@ -12,7 +12,10 @@ var webpackConfig = {
     path: path.resolve(__dirname, "./dist"),
     filename: "[name].js",
     library: "[name]",
-    libraryTarget: "umd"
+    libraryTarget: "umd",
+    // this is just for static files, like js and css bundles.
+    // requests elsewhere will be handled by ssr
+    publicPath: "/static/"
   },
   plugins: [
     // jsdom is needed for server rendering, but causes errors
