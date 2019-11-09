@@ -17,7 +17,7 @@
     "prod": "tsc && npm run build-prod && npm run start",
     "dev": "tsc && npm run build-dev | npm run start",
     "dev:amigos": "SIMPLIFIED_CATALOG_BASE=http://simplye-dev-cm.amigos.org/xyzlib npm run dev",
-    "dev:wds": "SIMPLIFIED_CATALOG_BASE=http://simplye-dev-cm.amigos.org/xyzlib tsc && node lib/server/index.js"
+    "dev:wds": "tsc && SIMPLIFIED_CATALOG_BASE=http://simplye-dev-cm.amigos.org/xyzlib node lib/server/index.js"
   },
   "devDependencies": {
     "@types/mocha": "^5.2.6",

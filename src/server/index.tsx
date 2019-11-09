@@ -3,7 +3,7 @@ import * as express from "express";
 import * as React from "react";
 import webpackDevMiddleware from './wdm'
 import ssr from './ssr'
-import getData from './getData'
+import loadCache from './loadCache'
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
@@ -12,9 +12,9 @@ const initialize = async () => {
   const port = process.env.PORT || 3000;
 
   /**
-   * Get library data
+   * Get library cache and associated properties
    */
-  const data = await getData()
+  const data = await loadCache()
   const { 
     distDir } = data
   
@@ -43,6 +43,8 @@ const initialize = async () => {
   }
   // any request not handled previously will get served html via ssr.
   app.use(ssr(data));
+
+  // error handling middleware here
 
   app.listen(port, function () {
     console.log("Server listening on port " + port);

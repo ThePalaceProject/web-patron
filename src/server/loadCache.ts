@@ -2,7 +2,7 @@ import { singleLibraryRoutes, multiLibraryRoutes } from "../routes";
 import LibraryDataCache from "./LibraryDataCache";
 const fs = require("fs");
 
-async function getData() {
+async function loadCache() {
   let registryBase = process.env.REGISTRY_BASE;
 
   const circManagerBase = process.env.SIMPLIFIED_CATALOG_BASE;
@@ -55,4 +55,4 @@ async function getData() {
   }
 }
 
-export default getData;
+export default loadCache;
