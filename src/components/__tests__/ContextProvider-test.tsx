@@ -2,7 +2,7 @@ import * as React from "react";
 import { expect } from "chai";
 import { shallow } from "enzyme";
 
-import ContextProvider from "../ContextProvider";
+import AppContextProvider from "../ContextProvider";
 import buildStore from "opds-web-client/lib/store";
 
 class TestComponent extends React.Component<any, any> {}
@@ -19,11 +19,13 @@ describe("ContextProvider", () => {
   beforeEach(() => {
     store = buildStore();
     wrapper = shallow(
-      <ContextProvider
+      <AppContextProvider
         library={library}
-        initialState={store.getState()}>
+        initialState={store.getState()}
+        shortenUrls
+        >
         <TestComponent />
-      </ContextProvider>
+      </AppContextProvider>
     );
   });
 
@@ -46,12 +48,12 @@ describe("ContextProvider", () => {
 
     beforeEach(() => {
       wrapper = shallow(
-        <ContextProvider
+        <AppContextProvider
           library={library}
           shortenUrls={false}
           initialState={store.getState()}>
           <TestComponent />
-        </ContextProvider>
+        </AppContextProvider>
       );
     });
 
@@ -88,12 +90,12 @@ describe("ContextProvider", () => {
         catalogName: "Example"
       };
       wrapper = shallow(
-        <ContextProvider
+        <AppContextProvider
           library={library}
           shortenUrls={false}
           initialState={store.getState()}>
           <TestComponent />
-        </ContextProvider>
+        </AppContextProvider>
       );
       let path = wrapper.instance().pathFor(null, null);
       expect(path).to.equal(`/`);

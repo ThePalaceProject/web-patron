@@ -1,12 +1,16 @@
 import * as React from 'react'
-import { match, RouterContext } from "react-router";
+import * as express from 'express'
+// import { match, RouterContext } from "react-router";
 import UrlShortener from "../../UrlShortener";
 import buildInitialState, { State } from "opds-web-client/lib/state";
 import { renderToString } from "react-dom/server";
 import ContextProvider from "../../components/ContextProvider";
 import { LibraryData } from "../../interfaces";
 import renderErrorPage from './renderErrorPage'
-import getAssets, {renderCSS, renderJS} from './getAssets';
+import getAssets, { renderCSS, renderJS } from './getAssets';
+import Html, { DOCTYPE } from './html'
+import { matchPath, StaticRouter, match as Match } from "react-router-dom";
+import App from '../../App'
 
 /**
  * A function that takes in library data and returns a function to
@@ -20,142 +24,134 @@ import getAssets, {renderCSS, renderJS} from './getAssets';
  *  - handle errors
  */
 
+/**
+ * Possibilities
+ *  - no url match -> home page
+ *  - no params on url -> home page
+ *  - can't get library data from cache -> home page
+ *  - no collectionUrl or bookUrl, we need to redirect -> redirect
+ *  - app renders a redirect itself -> redirect
+ *  - building the page fails -> error page
+ * 
+ *  - in order to build a home page, we need library data. Either from the cache
+ *  or we build it ourselves
+ * 
+ *  - 
+ */
+
+type Url = string
+
+type Params = {
+  library?: string,
+  collectionUrl?: Url,
+  bookUrl?: Url,
+}
+
 const ssr = ({
   shortenUrls,
   cache,
   routes,
   circManagerBase
-}) => async (req, res) => {
-  match({ routes, location: req.url }, async (error, redirectLocation, renderProps: any) => {
-    // handle errors and redirections
-    if (error) {
-      res.status(500).send(renderErrorPage());
-    } else if (redirectLocation) {
-      res.redirect(302, redirectLocation.pathname + redirectLocation.search);
-    } else if (renderProps) {
-      // the location matched to the url, so render
-      const { library, collectionUrl, bookUrl } = renderProps.params;
-
-      let libraryData;
-      if (circManagerBase) {
-        // We're using a single circ manager library instead of a registry.
-        let catalog = await cache.getCatalog(circManagerBase);
-        let authDocument = await cache.getAuthDocument(catalog);
-        libraryData = {
-          onlyLibrary: true,
-          catalogUrl: circManagerBase,
-          ...cache.getDataFromAuthDocumentAndCatalog(authDocument, catalog)
-        };
-      } else {
-        try {
-          libraryData = await cache.getLibraryData(library);
-        } catch (error) {
-          res.status(404).send(renderErrorPage(error));
-          return;
-        }
-      }
-      let catalogUrl = libraryData.catalogUrl;
-
-      if (!collectionUrl && !bookUrl) {
-        let urlShortener = new UrlShortener(catalogUrl, shortenUrls);
-        let preparedCollectionUrl = urlShortener.prepareCollectionUrl(catalogUrl);
-        // With short URLS, if the home URL is the library root URL, the prepared URL
-        // will be empty, and we don't need to redirect.
-        if (!shortenUrls || preparedCollectionUrl) {
-          if (library) {
-            res.redirect(302, "/" + library + "/collection/" + preparedCollectionUrl);
-          } else {
-            res.redirect(302, "/collection/" + preparedCollectionUrl);
-          }
-          return;
-        }
-      }
-
-      try {
-        // build the page and send it
-        const fullPage = await buildPage(collectionUrl, bookUrl, libraryData, shortenUrls, renderProps, res);
-
-        res.status(200).send(fullPage)
-
-      } catch (error) {
-        // try to render the homepage, and if you can't then 
-        // just send the error page
-        try {
-          const fullPage = await buildPage(null, null, libraryData, shortenUrls, renderProps, res);
-
-          res.status(200).send(fullPage)
-
-        } catch (error) {
-          console.error(error)
-          res.status(500).send(renderErrorPage())
-        }
-      }
-
-    } else {
-      // no route matched to the url, so send a 404
-      res.status(404).send(renderErrorPage("This page doesn't exist."));
-
+}) => async (req: express.Request, res: express.Response) => {
+  // try to match the page and build it
+  try {
+    // match with the central route config
+    let match: Match<Params> | undefined;
+    const activeRoute = routes.find(
+      (route) => match = matchPath(req.url, route)
+    )
+    // if there is no active route, render the home page
+    if (!match) {
+      // render home page
+      console.error("No route match was found for ", req.url)
     }
-  });
+
+    // otherwise, use the params to get the data, then render.
+    const { library, collectionUrl, bookUrl } = match.params;
+
+    let libraryData: LibraryData;
+    if (circManagerBase) {
+      // We're using a single circ manager library instead of a registry.
+      let catalog = await cache.getCatalog(circManagerBase);
+      let authDocument = await cache.getAuthDocument(catalog);
+      libraryData = {
+        onlyLibrary: true,
+        catalogUrl: circManagerBase,
+        ...cache.getDataFromAuthDocumentAndCatalog(authDocument, catalog)
+      };
+    } else {
+      try {
+        libraryData = await cache.getLibraryData(library);
+      } catch (error) {
+        res.status(404).send(renderErrorPage(error));
+        return;
+      }
+    }
+    let catalogUrl = libraryData.catalogUrl;
+
+    if (!collectionUrl && !bookUrl) {
+      let urlShortener = new UrlShortener(catalogUrl, shortenUrls);
+      let preparedCollectionUrl = urlShortener.prepareCollectionUrl(catalogUrl);
+      // With short URLS, if the home URL is the library root URL, the prepared URL
+      // will be empty, and we don't need to redirect.
+      if (!shortenUrls || preparedCollectionUrl) {
+        if (library) {
+          res.redirect(302, "/" + library + "/collection/" + preparedCollectionUrl);
+        } else {
+          res.redirect(302, "/collection/" + preparedCollectionUrl);
+        }
+        return;
+      }
+    }
+
+
+    // build the page and send it
+    try {
+      const fullPage = await buildPage(collectionUrl, bookUrl, libraryData, shortenUrls, req, res);
+      res.status(200).send(fullPage)
+    } catch (e) {
+      const fullPage = await buildPage(null, null, libraryData, shortenUrls, req, res);
+      res.status(200).send(fullPage)
+    }
+
+  } catch (error) {
+    console.error(error)
+    res.status(500).send(renderErrorPage())
+  }
 }
 
-const buildPage = async (collectionUrl, bookUrl, libraryData, shortenUrls, renderProps, res) => {
+const getLibraryData = () => {
+  
+}
+
+
+const buildPage = async (collectionUrl: Url, bookUrl: Url, libraryData: LibraryData, shortenUrls, req: express.Request, res: express.Response) => {
   const state = await buildInitialState(collectionUrl, bookUrl);
-  // get the html content
 
   const assets = await getAssets(res);
 
-  const html = renderToString(
-    <ContextProvider
-      library={libraryData}
-      shortenUrls={shortenUrls}
-      initialState={state}>
-      <RouterContext {...renderProps} />
-    </ContextProvider>
+  const context = {};
+
+  const htmlContent: string = renderToString(
+    <StaticRouter location={req.url} context={context}>
+      <ContextProvider
+        library={libraryData}
+        shortenUrls={shortenUrls}
+        initialState={state}>
+        <App />
+      </ContextProvider>
+    </StaticRouter>
   );
 
-  // put it into your template and return it
-  return renderFullPage(html, libraryData, state, shortenUrls, assets)
+  return DOCTYPE + '\n' +
+    renderToString(React.createElement(Html, {
+      content: htmlContent,
+      library: libraryData,
+      preloadedState: state,
+      shortenUrls,
+      assets
+    }))
+
 }
-
-
-function renderFullPage(html: string, library: LibraryData, preloadedState: State, shortenUrls, assets) {
-  const collectionTitle = preloadedState.collection && preloadedState.collection.data && preloadedState.collection.data.title;
-
-  const bookTitle = preloadedState.book && preloadedState.book.data && preloadedState.book.data.title;
-
-  const details = bookTitle || collectionTitle;
-  const pageTitle = library.catalogName + (details ? " - " + details : "");
-  return `
-      <!doctype html>
-      <html lang="en">
-        <head>
-          <title>${pageTitle}</title>
-          <link href="/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-          ${library.cssLinks.map(link => {
-    return `<link href="${link.href}" rel="${link.rel}" crossorigin="anonymous">`;
-  }).join("\n")}
-          ${renderCSS(assets.CirculationPatronWeb)}
-        </head>
-        <body>
-          <div id="circulation-patron-web">${html}</div>
-          ${renderJS(assets.CirculationPatronWeb)}
-          <script>
-            var circulationPatronWeb = new CirculationPatronWeb({
-              library: ${JSON.stringify(library)},
-              shortenUrls: ${shortenUrls},
-              initialState: ${JSON.stringify(preloadedState)}
-            });
-          </script>
-        </body>
-      </html>
-      `;
-}
-
-
-
-
-
-
 
 export default ssr

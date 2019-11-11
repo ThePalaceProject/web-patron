@@ -2,7 +2,6 @@ import * as React from "react";
 import { expect } from "chai";
 import { shallow } from "enzyme";
 import * as tinycolor from "tinycolor2";
-
 import CatalogHandler from "../CatalogHandler";
 import OPDSCatalog from "opds-web-client/lib/components/OPDSCatalog";
 import buildStore from "opds-web-client/lib/store";
@@ -11,18 +10,18 @@ import UrlShortener from "../../UrlShortener";
 describe("CatalogHandler", () => {
   let wrapper;
   let store;
-  let params;
+  let match;
   let context;
   let child;
   let name = "Example";
 
   beforeEach(() => {
     store = buildStore();
-    params = {
-      collectionUrl: "collectionurl",
-      bookUrl: "library/bookurl",
-      tab: "tab"
-    };
+    // const match = {
+    //   collectionUrl: "collectionurl",
+    //   bookUrl: "library/bookurl",
+    //   tab: "tab"
+    // };
     context = {
       library: {
         id: "uuid",
@@ -38,8 +37,7 @@ describe("CatalogHandler", () => {
   it("renders OPDSCatalog", () => {
     wrapper = shallow(
       <CatalogHandler
-        params={params}
-        />,
+      />,
       { context }
     );
 

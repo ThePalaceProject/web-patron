@@ -1,3 +1,5 @@
+import { State } from "opds-web-client/lib/state";
+
 export interface PathFor {
   (collectionUrl: string, bookUrl: string): string;
 }
@@ -26,4 +28,20 @@ export interface LibraryData {
   };
   headerLinks?: Link[];
   cssLinks?: Link[];
+}
+
+export interface PreloadedData {
+  library: LibraryData,
+  shortenUrls: boolean,
+  initialState: State
+}
+declare global {
+  interface Window {
+    // our custom global holding data loaded by the server
+    __PRELOADED_DATA__: PreloadedData
+  }
+}
+
+export interface WebpackAssets {
+  CirculationPatronWeb: string[]
 }

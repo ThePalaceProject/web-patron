@@ -48,7 +48,9 @@ export function renderJS(asset: string | string[]) {
     // get just the js bits
     .filter((path) => _.endsWith(path, '.js'))
     // put it into a script tag
-    .map((path, key) => `<script type='text/javascript' src=" ${publicPath + path}" ></script>`);
+    .map((path) => 
+      <script key={path} type='text/javascript' src={publicPath + path} />
+    );
 }
 
 export function renderCSS(asset: string | string[]) {
@@ -56,7 +58,9 @@ export function renderCSS(asset: string | string[]) {
     // get just the css bits
     .filter((path) => _.endsWith(path, '.css'))
     // put it into a link
-    .map((path, key) => `<link rel='stylesheet' href="${publicPath + path}" />`);
+    .map((path) => 
+      <link key={path} rel='stylesheet' href={publicPath + path} />
+    );
 }
 
 export default getAssets

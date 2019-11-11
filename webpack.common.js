@@ -3,12 +3,17 @@ const webpack = require('webpack');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 var webpackConfig = {
   entry: {
     CirculationPatronWeb: [
+      'react-hot-loader/patch',
       "./src/stylesheets/app.scss",
-      "./src/index.tsx"]
+      "./src/index.tsx",
+      'webpack-hot-middleware/client',
+      'webpack/hot/dev-server'
+    ]
   },
   output: {
     // where the files will be placed on the filesystem
@@ -41,19 +46,56 @@ var webpackConfig = {
      */
     new ManifestPlugin({
       generate: (seed, files, entrypoints) => entrypoints
-    })
+    }),
+
+    /**
+     *  since we now use babel instead of ts-loader,
+     *  we need to use this to check ts.
+     */
+    new ForkTsCheckerWebpackPlugin(),
+
+    // hot module replacement
+    new webpack.HotModuleReplacementPlugin(),
   ],
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
+        test: /\.(j|t)s(x)?$/,
         exclude: [/node_modules/],
-        loader: 'ts-loader'
+        use: {
+          loader: 'babel-loader',
+          options: {
+            cacheDirectory: true,
+            babelrc: false,
+            presets: [
+              [
+                '@babel/preset-env',
+                { targets: { browsers: 'last 2 versions' } }, // or whatever your project requires
+              ],
+              '@babel/preset-typescript',
+              '@babel/preset-react',
+            ],
+            plugins: [
+              // plugin-proposal-decorators is only needed if you're using experimental decorators in TypeScript
+              // ['@babel/plugin-proposal-decorators', { legacy: true }],
+              ['@babel/plugin-proposal-class-properties', { loose: true }],
+              'react-hot-loader/babel',
+            ],
+          },
+        },
       },
       {
         test: /\.scss$/,
         use: [
-          MiniCssExtractPlugin.loader,
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              // only enable hot in development
+              hmr: process.env.NODE_ENV === 'development',
+              // if hmr does not work, this is a forceful method.
+              reloadAll: true,
+            },
+          },
           "css-loader",
           "sass-loader"
         ]
@@ -67,7 +109,8 @@ var webpackConfig = {
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".scss"],
     alias: {
-      react: path.resolve('./node_modules/react')
+      react: path.resolve('./node_modules/react'),
+      'react-dom': '@hot-loader/react-dom',
     },
   },
 

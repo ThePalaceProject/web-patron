@@ -1,27 +1,19 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { Router, Route, browserHistory } from "react-router";
+import App from './App'
 import ContextProvider from "./components/ContextProvider";
-import { singleLibraryRoutes, multiLibraryRoutes } from "./routes";
-import { ThemeProvider } from 'theme-ui';
-import theme from './theme'
+import {BrowserRouter} from 'react-router-dom'
+/**
+ * This data is set on the window when server-rendering
+ */
+const preloadedData = window.__PRELOADED_DATA__;
+// delete window.__PRELOADED_DATA__;
+const element = document.getElementById("circulation-patron-web")
 
-class CirculationPatronWeb {
-  constructor(config) {
-    let divId = "circulation-patron-web";
-
-    ReactDOM.render(
-      <ThemeProvider theme={theme}>
-        <ContextProvider {...config}>
-          {config.library.onlyLibrary ?
-            <Router history={browserHistory} routes={singleLibraryRoutes} /> :
-            <Router history={browserHistory} routes={multiLibraryRoutes} />
-          }
-        </ContextProvider>
-      </ThemeProvider>,
-      document.getElementById(divId)
-    );
-  }
-}
-
-export = CirculationPatronWeb;
+ReactDOM.hydrate(
+  <BrowserRouter>
+    <ContextProvider {...preloadedData}>
+      <App />
+    </ContextProvider >
+  </BrowserRouter>, 
+  element)

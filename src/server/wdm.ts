@@ -15,13 +15,12 @@ function wdm (app: express.Application) {
   const compiler = webpack(webpackConfig);
 
   app.use(webpackDevMiddleware(compiler, {
-    hot: false,
+    hot: true,
     // this is the url where static files will be available
     publicPath: webpackConfig.output.publicPath,
     serverSideRender: true,
   }));
-  // enable hot reloading next, probably going to have to switch webpack 
-  // to use babel for ts compilation
+
   app.use(webpackHotMiddleware(compiler));
 
   
