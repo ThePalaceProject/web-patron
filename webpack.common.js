@@ -1,6 +1,8 @@
 const path = require("path");
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const ManifestPlugin = require('webpack-manifest-plugin');
 
 var webpackConfig = {
   entry: {
@@ -9,12 +11,13 @@ var webpackConfig = {
       "./src/index.tsx"]
   },
   output: {
+    // where the files will be placed on the filesystem
     path: path.resolve(__dirname, "./dist"),
     filename: "[name].js",
     library: "[name]",
     libraryTarget: "umd",
-    // this is just for static files, like js and css bundles.
-    // requests elsewhere will be handled by ssr
+    // url where static files like css and js will be
+    // made available by express
     publicPath: "/static/"
   },
   plugins: [
@@ -23,7 +26,22 @@ var webpackConfig = {
     new webpack.IgnorePlugin(/jsdom$/),
 
     // Extract separate css file.
-    new MiniCssExtractPlugin({ filename: "[name].css" })
+    new MiniCssExtractPlugin({ filename: "[name].css" }),
+
+    // empty the dist folder on every build.
+    new CleanWebpackPlugin(),
+
+    /**
+     * Files used to be hard coded into the index.html. Now we
+     * do it dynamically since we source them from the filesystem
+     * in prod and memory in dev. During dev, we read webpackstats
+     * to get the manifest. In prod we generate a manifest file to
+     * get a list of the files to include in index.html when
+     * rendering
+     */
+    new ManifestPlugin({
+      generate: (seed, files, entrypoints) => entrypoints
+    })
   ],
   module: {
     rules: [

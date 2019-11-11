@@ -1,33 +1,23 @@
 import * as React from 'react'
-import * as express from 'express';
 import { match, RouterContext } from "react-router";
-import UrlShortener from "../UrlShortener";
+import UrlShortener from "../../UrlShortener";
 import buildInitialState, { State } from "opds-web-client/lib/state";
 import { renderToString } from "react-dom/server";
-import ContextProvider from "../components/ContextProvider";
-import { LibraryData } from "../interfaces";
-import * as fs from 'fs';
-import * as util from 'util';
-import * as path from 'path';
-
-/**
- * Should work this way: 
- *  - take in some data 
- *  - match with a route, handle 404 and redirect
- *  - get actual library data
- *  - get the assets
- *  - render the html in a react component
- *  - if there is an error, render the homepage
- *  - if there is an error there, render the error page
- *  - wrap everything in async middleware that will catch uncaught async errors
- */
+import ContextProvider from "../../components/ContextProvider";
+import { LibraryData } from "../../interfaces";
+import renderErrorPage from './renderErrorPage'
+import getAssets, {renderCSS, renderJS} from './getAssets';
 
 /**
  * A function that takes in library data and returns a function to
- * render html from the request 
+ * render html from the request.
  * 
- * refactor this to extract the getting of library data even further.
- * it should just take data in and perform the render.
+ *  - match with a route
+ *  - handle 404s, redirects
+ *  - get library data
+ *  - build initial state
+ *  - render the html and send it
+ *  - handle errors
  */
 
 const ssr = ({
@@ -83,7 +73,7 @@ const ssr = ({
 
       try {
         // build the page and send it
-        const fullPage = await buildPage(collectionUrl, bookUrl, libraryData, shortenUrls, renderProps);
+        const fullPage = await buildPage(collectionUrl, bookUrl, libraryData, shortenUrls, renderProps, res);
 
         res.status(200).send(fullPage)
 
@@ -91,7 +81,7 @@ const ssr = ({
         // try to render the homepage, and if you can't then 
         // just send the error page
         try {
-          const fullPage = await buildPage(null, null, libraryData, shortenUrls, renderProps);
+          const fullPage = await buildPage(null, null, libraryData, shortenUrls, renderProps, res);
 
           res.status(200).send(fullPage)
 
@@ -109,9 +99,12 @@ const ssr = ({
   });
 }
 
-const buildPage = async (collectionUrl, bookUrl, libraryData, shortenUrls, renderProps) => {
+const buildPage = async (collectionUrl, bookUrl, libraryData, shortenUrls, renderProps, res) => {
   const state = await buildInitialState(collectionUrl, bookUrl);
   // get the html content
+
+  const assets = await getAssets(res);
+
   const html = renderToString(
     <ContextProvider
       library={libraryData}
@@ -122,32 +115,31 @@ const buildPage = async (collectionUrl, bookUrl, libraryData, shortenUrls, rende
   );
 
   // put it into your template and return it
-  return renderFullPage(html, libraryData, state, shortenUrls)
+  return renderFullPage(html, libraryData, state, shortenUrls, assets)
 }
 
 
-function renderFullPage(html: string, library: LibraryData, preloadedState: State, shortenUrls) {
-  let collectionTitle = preloadedState.collection && preloadedState.collection.data && preloadedState.collection.data.title;
+function renderFullPage(html: string, library: LibraryData, preloadedState: State, shortenUrls, assets) {
+  const collectionTitle = preloadedState.collection && preloadedState.collection.data && preloadedState.collection.data.title;
 
-  let bookTitle = preloadedState.book && preloadedState.book.data && preloadedState.book.data.title;
+  const bookTitle = preloadedState.book && preloadedState.book.data && preloadedState.book.data.title;
 
-  let details = bookTitle || collectionTitle;
-  let pageTitle = library.catalogName + (details ? " - " + details : "");
-
+  const details = bookTitle || collectionTitle;
+  const pageTitle = library.catalogName + (details ? " - " + details : "");
   return `
       <!doctype html>
       <html lang="en">
         <head>
           <title>${pageTitle}</title>
           <link href="/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-          <link href="/css/CirculationPatronWeb.css" rel="stylesheet" crossorigin="anonymous">
           ${library.cssLinks.map(link => {
     return `<link href="${link.href}" rel="${link.rel}" crossorigin="anonymous">`;
   }).join("\n")}
+          ${renderCSS(assets.CirculationPatronWeb)}
         </head>
         <body>
           <div id="circulation-patron-web">${html}</div>
-          <script src="/js/CirculationPatronWeb.js"></script>
+          ${renderJS(assets.CirculationPatronWeb)}
           <script>
             var circulationPatronWeb = new CirculationPatronWeb({
               library: ${JSON.stringify(library)},
@@ -160,65 +152,8 @@ function renderFullPage(html: string, library: LibraryData, preloadedState: Stat
       `;
 }
 
-function renderErrorPage(message: string = "There was a problem with this request.") {
-  return `
-      <!doctype html>
-      <html lang="en">
-        <head>
-          <title>Error</title>
-          <link href="/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-        </head>
-        <body>
-          <div style="text-align: center; margin-top: 200px;">
-            <h1>${message}</h1>
-            <br />
-            <h3><a class="btn btn-lg btn-primary" href="/">Home Page</a></h3>
-          </div>
-        </body>
-      </html>
-      `;
-}
 
-const existsP = util.promisify(fs.exists);
-/**
- * A function to get the css and js etc depending on
- * whether running in dev or prod. In dev it comes from webpackStats
- * and in prod it comes from fs.
- */
-function getAssets(res: express.Response) {
-  if (process.env.NODE_ENV === 'development' && res.locals.webpackStats) {
-    const assets = res.locals.webpackStats.toJson().assetsByChunkName;
-    return Promise.resolve(assets);
-  }
 
-  const assetsPath = path.join(config.PUBLIC_FOLDER, 'manifest.json');
-
-  return existsP(assetsPath)
-    .then((exists) => {
-      let assets = {};
-      if (exists) {
-        assets = require(assetsPath);
-      }
-
-      return Promise.resolve(assets);
-    });
-}
-
-function normalizeAssets(assets: string | string[]) {
-  return Array.isArray(assets) ? assets : [assets];
-}
-
-function renderJS(asset: string | string[]) {
-  return this.normalizeAssets(asset)
-    .filter((path) => _.endsWith(path, '.js'))
-    .map((path, key) => <script key={key} type='text/javascript' src={this.props.publicPath + path} />);
-}
-
-function renderCSS(asset: string | string[]) {
-  return this.normalizeAssets(asset)
-    .filter((path) => _.endsWith(path, '.css'))
-    .map((path, key) => <link key={key} rel='stylesheet' href={this.props.publicPath + path} />);
-}
 
 
 
