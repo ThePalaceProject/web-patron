@@ -1,18 +1,18 @@
 const path = require("path");
-const webpack = require('webpack');
+const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const ManifestPlugin = require('webpack-manifest-plugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const ManifestPlugin = require("webpack-manifest-plugin");
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 
-var webpackConfig = {
+let webpackConfig = {
   entry: {
     CirculationPatronWeb: [
-      'react-hot-loader/patch',
+      "react-hot-loader/patch",
       "./src/stylesheets/app.scss",
       "./src/index.tsx",
-      'webpack-hot-middleware/client',
-      'webpack/hot/dev-server'
+      "webpack-hot-middleware/client",
+      "webpack/hot/dev-server"
     ]
   },
   output: {
@@ -63,26 +63,30 @@ var webpackConfig = {
         test: /\.(j|t)s(x)?$/,
         exclude: [/node_modules/],
         use: {
-          loader: 'babel-loader',
+          loader: "babel-loader",
           options: {
             cacheDirectory: true,
             babelrc: false,
             presets: [
               [
-                '@babel/preset-env',
-                { targets: { browsers: 'last 2 versions' } }, // or whatever your project requires
+                "@babel/preset-env",
+                { targets: { browsers: "last 2 versions" } }, // or whatever your project requires
               ],
-              '@babel/preset-typescript',
-              '@babel/preset-react',
+              "@babel/preset-typescript",
+              "@babel/preset-react",
             ],
             plugins: [
               // plugin-proposal-decorators is only needed if you're using experimental decorators in TypeScript
               // ['@babel/plugin-proposal-decorators', { legacy: true }],
-              ['@babel/plugin-proposal-class-properties', { loose: true }],
-              'react-hot-loader/babel',
+              ["@babel/plugin-proposal-class-properties", { loose: true }],
+              "react-hot-loader/babel",
             ],
           },
         },
+      },
+      {
+        test: /\.css$/i,
+        use: ["style-loader", "css-loader"],
       },
       {
         test: /\.scss$/,
@@ -91,7 +95,7 @@ var webpackConfig = {
             loader: MiniCssExtractPlugin.loader,
             options: {
               // only enable hot in development
-              hmr: process.env.NODE_ENV === 'development',
+              hmr: process.env.NODE_ENV === "development",
               // if hmr does not work, this is a forceful method.
               reloadAll: true,
             },
@@ -102,15 +106,15 @@ var webpackConfig = {
       },
       {
         test: /\.(png|woff|woff2|eot|ttf|svg).*$/,
-        loader: 'url-loader?limit=100000'
+        loader: "url-loader?limit=100000"
       }
     ],
   },
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".scss"],
     alias: {
-      react: path.resolve('./node_modules/react'),
-      'react-dom': '@hot-loader/react-dom',
+      react: path.resolve("./node_modules/react"),
+      "react-dom": "@hot-loader/react-dom",
     },
   },
 

@@ -14,8 +14,8 @@
     "lint:js:fix": "./node_modules/.bin/eslint -c .eslintrc.js src/**/*.ts src/**/*.tsx --fix",
     "lint:sass": "sass-lint -c .sass-lint.yml -v -q",
     "test": "npm run lint:js && tsc && cp -r src/stylesheets lib && mocha --require lib/testHelper.js lib/__tests__/*.js lib/**/__tests__/*.js lib/**/**/__tests__/*.js",
-    "build:server":"tsc && cp -r src/stylesheets lib",
-    "build:client:prod":"cp -r src/stylesheets lib && webpack -p --progress --display-modules --config webpack.prod.config",
+    "build:server": "tsc && cp -r src/stylesheets lib",
+    "build:client:prod": "cp -r src/stylesheets lib && webpack -p --progress --display-modules --config webpack.prod.config",
     "build-prod": "npm run build:server && npm run build:client:prod",
     "start": "node lib/server/index.js",
     "prod": "npm run build:server && npm run build:client:prod && npm run start",
@@ -66,6 +66,7 @@
     "webpack-merge": "^4.2.1"
   },
   "dependencies": {
+    "@csstools/normalize.css": "^10.1.0",
     "@emotion/core": "^10.0.22",
     "@emotion/styled": "^10.0.23",
     "@mdx-js/react": "^1.5.1",
