@@ -37,7 +37,7 @@ const Html = ({
     <html lang='en'>
       <head>
         <title>{pageTitle}</title>
-        {/* will need to put this back */}
+        {/* will need to put this back probably */}
         {/* <link href="/static/bootstrap.min.css" rel="stylesheet" crossOrigin="anonymous" /> */}
         {library.cssLinks.map(link =>
           <link key={link.href} href={link.href} rel={link.rel} crossOrigin="anonymous" />

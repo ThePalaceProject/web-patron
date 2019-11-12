@@ -1,6 +1,5 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-// import { Router, Route, browserHistory } from "react-router";
 import { Switch, Route } from 'react-router-dom'
 import { singleLibraryRoutes, multiLibraryRoutes } from "./routes";
 import { ThemeProvider } from 'theme-ui';

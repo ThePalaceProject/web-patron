@@ -34,7 +34,7 @@ const CatalogHandler = () => {
 
   return (
     <div style={cssVariables}>
-      <OPDSCatalog
+      {/* <OPDSCatalog
         collectionUrl={collectionUrl}
         bookUrl={bookUrl}
         Header={Header}
@@ -44,7 +44,7 @@ const CatalogHandler = () => {
         computeBreadcrumbs={computeBreadcrumbs}
         initialState={initialState}
         authPlugins={[BasicAuthWithButtonImagePlugin, OAuthPlugin]}
-      />
+      /> */}
       <Layout />
     </div>
   )

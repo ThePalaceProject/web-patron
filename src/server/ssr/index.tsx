@@ -7,7 +7,7 @@ import { renderToString } from "react-dom/server";
 import ContextProvider from "../../components/ContextProvider";
 import { LibraryData } from "../../interfaces";
 import renderErrorPage from './renderErrorPage'
-import getAssets, { renderCSS, renderJS } from './getAssets';
+import getAssets from './getAssets';
 import Html, { DOCTYPE } from './html'
 import { matchPath, StaticRouter, match as Match } from "react-router-dom";
 import App from '../../App'
@@ -69,6 +69,10 @@ const ssr = ({
     // otherwise, use the params to get the data, then render.
     const { library, collectionUrl, bookUrl } = match.params;
 
+    /**
+     * Build out libraryData
+     * Send 404 if we fail to get it from the cache
+     */
     let libraryData: LibraryData;
     if (circManagerBase) {
       // We're using a single circ manager library instead of a registry.
@@ -87,11 +91,14 @@ const ssr = ({
         return;
       }
     }
-    let catalogUrl = libraryData.catalogUrl;
+    const catalogUrl = libraryData.catalogUrl;
 
+    /**
+     * Redirect if there is neither a collectionUrl or a bookUrl
+     */
     if (!collectionUrl && !bookUrl) {
-      let urlShortener = new UrlShortener(catalogUrl, shortenUrls);
-      let preparedCollectionUrl = urlShortener.prepareCollectionUrl(catalogUrl);
+      const urlShortener = new UrlShortener(catalogUrl, shortenUrls);
+      const preparedCollectionUrl = urlShortener.prepareCollectionUrl(catalogUrl);
       // With short URLS, if the home URL is the library root URL, the prepared URL
       // will be empty, and we don't need to redirect.
       if (!shortenUrls || preparedCollectionUrl) {
@@ -103,7 +110,6 @@ const ssr = ({
         return;
       }
     }
-
 
     // build the page and send it
     try {
@@ -119,11 +125,6 @@ const ssr = ({
     res.status(500).send(renderErrorPage())
   }
 }
-
-const getLibraryData = () => {
-  
-}
-
 
 const buildPage = async (collectionUrl: Url, bookUrl: Url, libraryData: LibraryData, shortenUrls, req: express.Request, res: express.Response) => {
   const state = await buildInitialState(collectionUrl, bookUrl);

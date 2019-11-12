@@ -7,7 +7,7 @@ import {BrowserRouter} from 'react-router-dom'
  * This data is set on the window when server-rendering
  */
 const preloadedData = window.__PRELOADED_DATA__;
-// delete window.__PRELOADED_DATA__;
+delete window.__PRELOADED_DATA__;
 const element = document.getElementById("circulation-patron-web")
 
 ReactDOM.hydrate(
