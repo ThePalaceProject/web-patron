@@ -2,16 +2,16 @@ import * as React from "react";
 import { ComplaintData } from "../interfaces";
 
 export interface  ReportProblemFormProps {
-  reportUrl: string;
-  report: (url: string, data: ComplaintData) => Promise<any>;
-  fetchTypes: (url: string) => Promise<string[]>;
-  close: () => void;
-  types: string[];
+  reportUrl: string
+  report: (url: string, data: ComplaintData) => Promise<any>
+  fetchTypes: (url: string) => Promise<string[]>
+  close: () => void
+  types: string[]
 }
 
 export interface ReportProblemFormState {
-  submitted: boolean;
-  error?: string;
+  submitted: boolean
+  error?: string
 }
 
 export default class ReportProblemForm extends React.Component<ReportProblemFormProps, ReportProblemFormState> {
@@ -46,10 +46,10 @@ export default class ReportProblemForm extends React.Component<ReportProblemForm
               ref="type">
               <option value="" aria-selected={false}>choose a type</option>
               { this.props.types.map(type =>
-                  <option key={type} value={type} aria-selected={false}>
-                    {this.displayType(type)}
-                  </option>
-                )
+                <option key={type} value={type} aria-selected={false}>
+                  {this.displayType(type)}
+                </option>
+              )
               }
             </select>
             <br />

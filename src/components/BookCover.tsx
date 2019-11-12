@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx } from 'theme-ui'
+import { jsx } from "theme-ui";
 import * as React from "react";
 
 
@@ -12,7 +12,7 @@ const BookCover = () => {
 
   return (
     <div>book cover</div>
-  )
-}
+  );
+};
 
-export default BookCover
+export default BookCover;

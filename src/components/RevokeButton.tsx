@@ -3,11 +3,11 @@ import ConfirmationPopup from "./ConfirmationPopup";
 import { BookData } from "opds-web-client/lib/interfaces";
 
 export interface RevokeButtonProps extends React.HTMLProps<HTMLButtonElement> {
-  revoke: () => Promise<BookData>;
+  revoke: () => Promise<BookData>
 }
 
 export interface RevokeButtonState {
-  showConfirmationPopup: boolean;
+  showConfirmationPopup: boolean
 }
 
 export default class RevokeButton extends React.Component<RevokeButtonProps, RevokeButtonState> {

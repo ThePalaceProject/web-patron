@@ -5,11 +5,11 @@ import { NavigateContext } from "opds-web-client/lib/interfaces";
 import { LibraryData } from "../interfaces";
 import * as PropTypes from "prop-types";
 
-import { NavBar, NavHeader, NavBrand, NavBrandTitle, NavBrandSubtitle, NavToggle, NavCollapse, NavList } from "./NavBar"
-import { Search } from "./Search"
+import { NavBar, NavHeader, NavBrand, NavBrandTitle, NavBrandSubtitle, NavToggle, NavCollapse, NavList } from "./NavBar";
+import { Search } from "./Search";
 
 export interface HeaderContext extends NavigateContext {
-  library: LibraryData;
+  library: LibraryData
 }
 
 export default class Header extends React.Component<HeaderProps, {}> {
@@ -66,12 +66,12 @@ export default class Header extends React.Component<HeaderProps, {}> {
             }
             {this.props.loansUrl && this.props.isSignedIn &&
               <li>
-                <a role="button" onClick={this.signOut}>Sign Out</a>
+                <button onClick={this.signOut}>Sign Out</button>
               </li>
             }
             {this.props.loansUrl && !this.props.isSignedIn &&
               <li>
-                <a role="button" onClick={this.signIn}>Sign In</a>
+                <button onClick={this.signIn}>Sign In</button>
               </li>
             }
 

@@ -1,11 +1,11 @@
 import * as React from "react";
 
 export interface ConfirmationPopupProps {
-  confirm: () => void;
-  cancel: () => void;
-  text: string;
-  confirmText: string;
-  cancelText: string;
+  confirm: () => void
+  cancel: () => void
+  text: string
+  confirmText: string
+  cancelText: string
 }
 
 export default class ConfirmationPopup extends React.Component<ConfirmationPopupProps, any> {

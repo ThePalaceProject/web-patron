@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx } from 'theme-ui'
+import { jsx } from "theme-ui";
 import * as React from "react";
 import { Store } from "redux";
 import { connect } from "react-redux";
@@ -9,12 +9,12 @@ import ReportProblemLink from "./ReportProblemLink";
 import RevokeButton from "./RevokeButton";
 import { ComplaintData } from "../interfaces";
 import { State } from "../reducers/index";
-import BookCover from './BookCover'
+import BookCover from "./BookCover";
 
 export interface BookDetailsProps extends DefaultBooKDetailsProps {
-  problemTypes: string[];
-  fetchComplaintTypes: (url: string) => Promise<string[]>;
-  postComplaint: (url: string, data: ComplaintData) => Promise<any>;
+  problemTypes: string[]
+  fetchComplaintTypes: (url: string) => Promise<string[]>
+  postComplaint: (url: string, data: ComplaintData) => Promise<any>
 }
 
 export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
@@ -29,7 +29,7 @@ export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
 
   // override the inherited setBodyOverflow so that it does nothing.
   setBodyOverflow(value: string) {
-    return
+    return;
   }
 
   fields() {
@@ -200,10 +200,10 @@ export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
     return (
       <div
         sx={{
-          bg: 'papayawhip',
+          bg: "papayawhip",
         }}
       ><BookCover /></div >
-    )
+    );
   }
 }
 

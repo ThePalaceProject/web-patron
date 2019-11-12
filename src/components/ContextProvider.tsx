@@ -7,14 +7,14 @@ import { State } from "../reducers";
 import UrlShortener from "../UrlShortener";
 import { LibraryData } from "../interfaces";
 
-type ProviderProps = PreloadedData 
+type ProviderProps = PreloadedData;
 
 export interface AppContextType {
-  store: Store<State>,
-  pathFor: PathFor,
-  library: LibraryData,
-  urlShortener: UrlShortener,
-  initialState: CatalogState 
+  store: Store<State>
+  pathFor: PathFor
+  library: LibraryData
+  urlShortener: UrlShortener
+  initialState: CatalogState
 }
 
 export const AppContext = React.createContext<AppContextType>({
@@ -23,13 +23,13 @@ export const AppContext = React.createContext<AppContextType>({
   library: null,
   urlShortener: null,
   initialState: null,
-})
+});
 
 const AppContextProvider: React.FunctionComponent<ProviderProps> = ({children, library, shortenUrls, initialState}) => {
   const store = buildStore();
   const libraryId = library.id;
   const urlShortener = new UrlShortener(library.catalogUrl, shortenUrls);
-  const pathFor : PathFor = (collectionUrl, bookUrl) => {
+  const pathFor: PathFor = (collectionUrl, bookUrl) => {
     let path = "";
     if (libraryId) {
       path += "/" + libraryId;
@@ -59,7 +59,7 @@ const AppContextProvider: React.FunctionComponent<ProviderProps> = ({children, l
     }}>
       {children}
     </AppContext.Provider>
-  )
-}
+  );
+};
 
-export default AppContextProvider
+export default AppContextProvider;

@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx } from 'theme-ui'
+import { jsx } from "theme-ui";
 import * as React from "react";
 import BookDetails from "./BookDetails";
 import Lanes from "opds-web-client/lib/components/Lanes";
@@ -7,8 +7,8 @@ import { BookDetailsContainerProps } from "opds-web-client/lib/components/Root";
 import * as PropTypes from "prop-types";
 
 const hasProps = (child: React.ReactNode): child is React.ReactElement => {
-  return (child as React.ReactElement).props !== 'undefined'
-}
+  return (child as React.ReactElement).props !== "undefined";
+};
 export default class BookDetailsContainer extends React.Component<BookDetailsContainerProps, {}> {
   context: any;
 
@@ -18,23 +18,23 @@ export default class BookDetailsContainer extends React.Component<BookDetailsCon
 
   render() {
     let child = React.Children.only(this.props.children);
-    let childProps = {}
+    let childProps = {};
     if (hasProps(child)) {
-      childProps = { ...child.props }
+      childProps = { ...child.props };
     }
     let relatedUrl = this.relatedUrl();
 
     return (
-      <div sx={{ display: 'flex', justifyContent: 'center' }}>
+      <div sx={{ display: "flex", justifyContent: "center" }}>
         <div sx={{
           // bg: 'background',
-          maxWidth: 'container',
+          maxWidth: "container",
           mx: 3,
           px: 5,
           py: 4,
-          border: 'solid',
+          border: "solid",
           borderRadius: 2,
-          borderColor: 'darkBlue',
+          borderColor: "darkBlue",
           flex: 1,
         }}>
           <BookDetails {...childProps} />

@@ -10,7 +10,7 @@ module.exports = {
     },
     "plugins": [
         "@typescript-eslint",
-        "@typescript-eslint/tslint",
+        // "@typescript-eslint/tslint",
         "jsx-a11y",
     ],
     "extends": [
