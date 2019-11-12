@@ -1,37 +1,37 @@
-import * as ThemeUi from 'theme-ui'
+import * as ThemeUi from "theme-ui";
 
 /**
  * It is sometimes useful to define the variables outside the theme object
  * so they can be referenced easily in the theme object
  */
 const heading = {
-  fontFamily: 'heading',
-  lineHeight: 'heading',
-  fontWeight: 'heading',
-}
+  fontFamily: "heading",
+  lineHeight: "heading",
+  fontWeight: "heading",
+};
 
-// custom color variables
-const blues = ['#e1e6f2', '#6899CB', '#0367A6', '#0F2259']
-const pink = '#D00854'
-const grey = '#B3B9BE'
-const lightGrey = '#f4f4f4'
+// Custom color variables
+const blues = ["#e1e6f2", "#6899CB", "#0367A6", "#0F2259"];
+const pink = "#D00854";
+const grey = "#B3B9BE";
+const lightGrey = "#f4f4f4";
 
-// theme color settings... includes above colors
+// Theme color settings... includes above colors
 const colors = {
   text: blues[3],
-  background: '#fff',
+  background: "#fff",
 
-  // ** colors as intentions **
-  // primary button and link color
+  // ** Colors as intentions **
+  // Primary button and link color
   primary: blues[2],
-  // secondary color - can be used for hover states
+  // Secondary color - can be used for hover states
   secondary: blues[1],
-  // a contrast color for emphasizing UI
+  // A contrast color for emphasizing UI
   accent: pink,
-  // a gray or subdued color for decorative purposes
+  // A gray or subdued color for decorative purposes
   muted: blues[0],
 
-  // colors can also be referenced by their aliases directly when needed
+  // Colors can also be referenced by their aliases directly when needed
   backgroundBlue: blues[0],
   lightBlue: blues[1],
   mediumBlue: blues[2],
@@ -39,27 +39,27 @@ const colors = {
   lightGrey,
   pink,
   grey,
-}
+};
 
 /** Borders */
-const radii = [0, 2, 4, 8]
+const radii = [0, 2, 4, 8];
 
 const theme: ThemeUi.Theme = {
   colors,
-  breakpoints: ['40em', '52em', '64em'],
+  breakpoints: ["40em", "52em", "64em"],
   space: [0, 4, 8, 16, 32, 64, 128, 256, 512],
   sizes: {
-    container: 850    // this is currently only used on bookdetails. Might be useful elsewhere tho. We'll see
+    container: 850    // This is currently only used on bookdetails. Might be useful elsewhere tho. We'll see
   },
-  // borders
+  // Borders
   radii,
   borders: {
-    solid: '1px solid',
+    solid: "1px solid",
   },
   fonts: {
-    body: 'system-ui, sans-serif',
-    heading: 'inherit',
-    monospace: 'Menlo, monospace',
+    body: "system-ui, sans-serif",
+    heading: "inherit",
+    monospace: "Menlo, monospace",
   },
   fontSizes: [12, 14, 16, 20, 24, 32, 48, 64, 96],
   fontWeights: {
@@ -74,9 +74,9 @@ const theme: ThemeUi.Theme = {
 
   styles: {
     root: {
-      fontFamily: 'body',
-      lineHeight: 'body',
-      fontWeight: 'body',
+      fontFamily: "body",
+      lineHeight: "body",
+      fontWeight: "body",
     },
     h1: {
       ...heading,
@@ -103,26 +103,26 @@ const theme: ThemeUi.Theme = {
       fontSize: 0,
     },
     pre: {
-      fontFamily: 'monospace',
-      overflowX: 'auto',
+      fontFamily: "monospace",
+      overflowX: "auto",
       code: {
-        color: 'inherit',
+        color: "inherit",
       },
     },
     table: {
-      width: '100%',
-      borderCollapse: 'separate',
+      width: "100%",
+      borderCollapse: "separate",
       borderSpacing: 0,
     },
     th: {
-      textAlign: 'left',
-      borderBottomStyle: 'solid',
+      textAlign: "left",
+      borderBottomStyle: "solid",
     },
     td: {
-      textAlign: 'left',
-      borderBottomStyle: 'solid',
+      textAlign: "left",
+      borderBottomStyle: "solid",
     },
   },
-}
+};
 
-export default theme
+export default theme;

@@ -14,13 +14,13 @@ import { LibraryData } from "../interfaces";
 import BasicAuthWithButtonImagePlugin from "../auth/BasicAuthWithButtonImagePlugin";
 import OAuthPlugin from "../auth/OAuthPlugin";
 import * as PropTypes from "prop-types";
-import Layout from './Layout';
-import { AppContext } from './ContextProvider';
-import { useParams } from 'react-router-dom'
+import Layout from "./Layout";
+import { AppContext } from "./ContextProvider";
+import { useParams } from "react-router-dom";
 
 const CatalogHandler = () => {
   const { collectionUrl, bookUrl } = useParams();
-  const { urlShortener, library, initialState } = React.useContext(AppContext)
+  const { urlShortener, library, initialState } = React.useContext(AppContext);
 
   let pageTitleTemplate = (collectionTitle, bookTitle) => {
     let details = bookTitle || collectionTitle;
@@ -30,7 +30,7 @@ const CatalogHandler = () => {
   const expandedCollectionUrl = urlShortener.expandCollectionUrl(collectionUrl) || null;
   const expandedBookUrl = urlShortener.expandBookUrl(bookUrl) || null;
 
-  const cssVariables = getCssVars(library)
+  const cssVariables = getCssVars(library);
 
   return (
     <div style={cssVariables}>
@@ -47,8 +47,8 @@ const CatalogHandler = () => {
       /> */}
       <Layout />
     </div>
-  )
-}
+  );
+};
 
 const getCssVars = (library: LibraryData) => {
 
@@ -87,7 +87,7 @@ const getCssVars = (library: LibraryData) => {
     cssVariables["--highlightcolor"] = foreground.clone().desaturate(10).toString();
   }
   return cssVariables;
-}
+};
 
 export default CatalogHandler;
 
@@ -95,7 +95,7 @@ export default CatalogHandler;
 // export default class CatalogHandler extends React.Component<CatalogHandlerProps, any> {
 
 //   render() {
-//     // these come from the url via router    
+//     // these come from the url via router
 //     let { params: { collectionUrl, bookUrl } } = this.props.match;
 
 //     let pageTitleTemplate = (collectionTitle, bookTitle) => {

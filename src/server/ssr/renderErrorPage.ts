@@ -19,4 +19,4 @@ function renderErrorPage(message: string = "There was a problem with this reques
       `;
 }
 
-export default renderErrorPage
+export default renderErrorPage;

@@ -3,37 +3,38 @@ import OPDSParser, { OPDSFeed } from "opds-feed-parser";
 import { Link, LibraryData } from "../interfaces";
 
 export interface RegistryEntry {
-  links: Link[];
+  links: Link[]
   metadata?: {
-    updated: string;
-    id: string;
-    title: string;
-  };
+    updated: string
+    id: string
+    title: string
+  }
 }
 
 export interface AuthDocument {
-  title: string;
-  links: Link[];
+  title: string
+  links: Link[]
+  // eslint-disable-next-line camelcase
   web_color_scheme?: {
-    background?: string;
-    foreground?: string;
-  };
+    background?: string
+    foreground?: string
+  }
 }
 
 export interface CacheEntry {
-  registryEntry?: RegistryEntry;
-  catalog?: OPDSFeed;
-  authDocument?: AuthDocument;
-  timestamp: number;
+  registryEntry?: RegistryEntry
+  catalog?: OPDSFeed
+  authDocument?: AuthDocument
+  timestamp: number
 }
 
 
 export default class LibraryDataCache {
   // An in-memory cache of registry entries and authentication documents.
   // Registry entries don't change very often, and it's fine to fetch them
-  // again if we restart the server. It's also not a problem if simultaneous
-  // requests update the same registry entry, since they'll get the same
-  // data from the registry.
+  // Again if we restart the server. It's also not a problem if simultaneous
+  // Requests update the same registry entry, since they'll get the same
+  // Data from the registry.
   private readonly CACHE: { [key: string]: CacheEntry } = {};
   private readonly registryBase: string;
   private readonly expirationSeconds: number;
@@ -162,7 +163,7 @@ export default class LibraryDataCache {
         catalog = await this.getCatalog(catalogUrl);
       } catch (catalogError) {
         // If we can't get the catalog, patrons won't be able to use the application
-        // anyway.
+        // Anyway.
         console.warn(catalogError);
         throw "This library is not available.";
       }
@@ -172,7 +173,7 @@ export default class LibraryDataCache {
         authDocument = await this.getAuthDocument(catalog);
       } catch (authDocError) {
         // If we can't get the authentication document, keep the previous cached
-        // version or proceed without one.
+        // Version or proceed without one.
         console.warn(authDocError);
       }
 

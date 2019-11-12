@@ -1,15 +1,15 @@
-import * as React from 'react';
-import * as Redux from 'redux';
-import { LibraryData, WebpackAssets, PreloadedData } from '../../interfaces';
-import { State } from 'opds-web-client/lib/state';
-import getAssets, { renderCSS, renderJS } from './getAssets';
+import * as React from "react";
+import * as Redux from "redux";
+import { LibraryData, WebpackAssets, PreloadedData } from "../../interfaces";
+import { State } from "opds-web-client/lib/state";
+import getAssets, { renderCSS, renderJS } from "./getAssets";
 
 interface HtmlProps {
-  content?: string;
-  library: LibraryData;
+  content?: string
+  library: LibraryData
   preloadedState: State
-  shortenUrls: any,
-  assets: WebpackAssets,
+  shortenUrls: any
+  assets: WebpackAssets
 }
 
 const Html = ({
@@ -31,8 +31,8 @@ const Html = ({
     library,
     shortenUrls,
     initialState: preloadedState
-  }
-  
+  };
+
   return (
     <html lang='en'>
       <head>
@@ -58,8 +58,8 @@ const Html = ({
       </body>
     </html>
   );
-}
+};
 
-export const DOCTYPE = '<!DOCTYPE html>';
+export const DOCTYPE = "<!DOCTYPE html>";
 
-export default Html
+export default Html;

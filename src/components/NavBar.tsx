@@ -2,31 +2,31 @@ import * as React from "react";
 import styled from "../styled";
 
 type NavBarProps = {
-    bg?: string,
-}
-export const NavBar = styled('div') <NavBarProps>`
+  bg?: string
+};
+export const NavBar = styled("div") <NavBarProps>`
     position: relative;
     height: 150px;
     margin: 0;
     color: ${props => props.color || "#343434"};
     background: ${props => props.bg || "white"};
     border: none;
-`
+`;
 NavBar.defaultProps = {
-    role: "navigation"
-}
+  role: "navigation"
+};
 
 type NavHeaderProps = {
-    bg?: string,
-}
-export const NavHeader = styled('div') <NavHeaderProps>`
+  bg?: string
+};
+export const NavHeader = styled("div") <NavHeaderProps>`
     position: relative;
     display: inline-block;
     width: 200px;
     height: 100%;
     color: ${props => props.color || "white"};
     background: ${props => props.bg || "#1e1e1e"};
-`
+`;
 
 export const NavBrand = styled.div`
     position: absolute;
@@ -34,22 +34,22 @@ export const NavBrand = styled.div`
     top: 50%;
     transform: translateY(-50%);
     text-align: center;
-`
+`;
 
 export const NavBrandTitle = styled.div`
     font-size: 1.5em;
     font-weight: bold;
     line-height: 1;
-`
+`;
 
 export const NavBrandSubtitle = styled.div`
     font-size: 1.1em;
     margin-top: 10px;
-`
+`;
 
 export const NavToggle = styled.div`
 
-`
+`;
 
 export const NavCollapse = styled.div`
     position: relative;
@@ -57,7 +57,7 @@ export const NavCollapse = styled.div`
     vertical-align: top;
     height: 100%;
     width: calc(100% - 200px);
-`
+`;
 
 export const NavList = styled.div`
     display: inline-block;
@@ -74,4 +74,4 @@ export const NavList = styled.div`
         font-size: 1.25em;
     }
 
-`
+`;

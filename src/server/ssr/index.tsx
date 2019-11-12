@@ -1,21 +1,21 @@
-import * as React from 'react'
-import * as express from 'express'
+import * as React from "react";
+import * as express from "express";
 // import { match, RouterContext } from "react-router";
 import UrlShortener from "../../UrlShortener";
 import buildInitialState, { State } from "opds-web-client/lib/state";
 import { renderToString } from "react-dom/server";
 import ContextProvider from "../../components/ContextProvider";
 import { LibraryData } from "../../interfaces";
-import renderErrorPage from './renderErrorPage'
-import getAssets from './getAssets';
-import Html, { DOCTYPE } from './html'
+import renderErrorPage from "./renderErrorPage";
+import getAssets from "./getAssets";
+import Html, { DOCTYPE } from "./html";
 import { matchPath, StaticRouter, match as Match } from "react-router-dom";
-import App from '../../App'
+import App from "../../App";
 
 /**
  * A function that takes in library data and returns a function to
  * render html from the request.
- * 
+ *
  *  - match with a route
  *  - handle 404s, redirects
  *  - get library data
@@ -34,13 +34,13 @@ import App from '../../App'
  *  - building the page fails
  */
 
-type Url = string
+type Url = string;
 
 type Params = {
-  library?: string,
-  collectionUrl?: Url,
-  bookUrl?: Url,
-}
+  library?: string
+  collectionUrl?: Url
+  bookUrl?: Url
+};
 
 const ssr = ({
   shortenUrls,
@@ -54,11 +54,11 @@ const ssr = ({
     let match: Match<Params> | undefined;
     const activeRoute = routes.find(
       (route) => match = matchPath(req.url, route)
-    )
+    );
     // if there is no active route, render the home page
     if (!match) {
       // render home page
-      console.error("No route match was found for ", req.url)
+      console.error("No route match was found for ", req.url);
     }
 
     // otherwise, use the params to get the data, then render.
@@ -109,17 +109,17 @@ const ssr = ({
     // build the page and send it
     try {
       const fullPage = await buildPage(collectionUrl, bookUrl, libraryData, shortenUrls, req, res);
-      res.status(200).send(fullPage)
+      res.status(200).send(fullPage);
     } catch (e) {
       const fullPage = await buildPage(null, null, libraryData, shortenUrls, req, res);
-      res.status(200).send(fullPage)
+      res.status(200).send(fullPage);
     }
 
   } catch (error) {
-    console.error(error)
-    res.status(500).send(renderErrorPage())
+    console.error(error);
+    res.status(500).send(renderErrorPage());
   }
-}
+};
 
 const buildPage = async (collectionUrl: Url, bookUrl: Url, libraryData: LibraryData, shortenUrls, req: express.Request, res: express.Response) => {
   const state = await buildInitialState(collectionUrl, bookUrl);
@@ -139,15 +139,15 @@ const buildPage = async (collectionUrl: Url, bookUrl: Url, libraryData: LibraryD
     </StaticRouter>
   );
 
-  return DOCTYPE + '\n' +
+  return DOCTYPE + "\n" +
     renderToString(React.createElement(Html, {
       content: htmlContent,
       library: libraryData,
       preloadedState: state,
       shortenUrls,
       assets
-    }))
+    }));
 
-}
+};
 
-export default ssr
+export default ssr;

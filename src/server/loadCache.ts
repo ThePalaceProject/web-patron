@@ -52,7 +52,7 @@ async function loadCache() {
     cache,
     routes,
     circManagerBase
-  }
+  };
 }
 
 export default loadCache;

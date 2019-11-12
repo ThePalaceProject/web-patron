@@ -15,12 +15,13 @@ module.exports = {
     ],
     "extends": [
         "plugin:jsx-a11y/strict"
-    ]
+    ],
     "rules": {
         "@typescript-eslint/class-name-casing": "error",
-        "@typescript-eslint/indent": "error",
+        // must disable base rule to not cause conflicts
+        "indent": "off",
+        "@typescript-eslint/indent": ["error", 2],
         "@typescript-eslint/member-delimiter-style": [
-            "error",
             "error",
             {
                 "multiline": {
@@ -38,13 +39,13 @@ module.exports = {
             "error",
             "double"
         ],
+        // must disable base semi rule and use @typescript-eslint/semi instead
+        "semi": "off",
         "@typescript-eslint/semi": [
             "error",
-            null
         ],
         "@typescript-eslint/type-annotation-spacing": "error",
         "camelcase": "error",
-        "capitalized-comments": "error",
         "eqeqeq": [
             "error",
             "smart"
