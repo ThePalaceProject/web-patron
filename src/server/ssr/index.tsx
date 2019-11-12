@@ -26,17 +26,12 @@ import App from '../../App'
 
 /**
  * Possibilities
- *  - no url match -> home page
- *  - no params on url -> home page
- *  - can't get library data from cache -> home page
- *  - no collectionUrl or bookUrl, we need to redirect -> redirect
- *  - app renders a redirect itself -> redirect
- *  - building the page fails -> error page
- * 
- *  - in order to build a home page, we need library data. Either from the cache
- *  or we build it ourselves
- * 
- *  - 
+ *  - no url match
+ *  - no params on url
+ *  - can't get library data from cache
+ *  - no collectionUrl or bookUrl, we need to redirect
+ *  - app renders a redirect itself
+ *  - building the page fails
  */
 
 type Url = string
