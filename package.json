@@ -10,17 +10,17 @@
   "license": "Apache-2.0",
   "scripts": {
     "lint": "npm run lint:js && npm run lint:sass",
-    "lint:js": "./node_modules/.bin/eslint -c .eslintrc.js",
+    "lint:js": "./node_modules/.bin/eslint -c .eslintrc.js src/**/*.ts src/**/*.tsx",
+    "lint:js:fix": "./node_modules/.bin/eslint -c .eslintrc.js src/**/*.ts src/**/*.tsx --fix",
     "lint:sass": "sass-lint -c .sass-lint.yml -v -q",
     "test": "npm run lint && tsc && cp -r src/stylesheets lib && mocha --require lib/testHelper.js lib/__tests__/*.js lib/**/__tests__/*.js lib/**/**/__tests__/*.js",
-    "build-dev": "rm -rf dist && mkdir dist && cp node_modules/bootstrap/dist/css/* dist && cp -r src/stylesheets lib && UV_THREADPOOL_SIZE=128 webpack --watch --progress --display-modules --config webpack.dev.config",
-    "build-prod": "rm -rf dist && mkdir dist && cp node_modules/bootstrap/dist/css/* dist && cp -r src/stylesheets lib && UV_THREADPOOL_SIZE=128 webpack -p --progress --display-modules --config webpack.prod.config",
+    "build:server":"tsc",
+    "build:client:prod":"cp -r src/stylesheets lib && webpack -p --progress --display-modules --config webpack.prod.config",
+    "build-prod": "npm run build:server && npm run build:client:prod",
     "start": "node lib/server/index.js",
-    "prod": "tsc && npm run build-prod && npm run start",
-    "dev": "tsc && npm run build-dev | npm run start",
-    "dev:amigos": "SIMPLIFIED_CATALOG_BASE=http://simplye-dev-cm.amigos.org/xyzlib npm run dev",
-    "dev:wds": "tsc && NODE_ENV=development SIMPLIFIED_CATALOG_BASE=http://simplye-dev-cm.amigos.org/xyzlib node lib/server/index.js",
-    "start:prod": "tsc && NODE_ENV=production SIMPLIFIED_CATALOG_BASE=http://simplye-dev-cm.amigos.org/xyzlib node lib/server/index.js"
+    "prod": "npm run build:server && npm run build:client:prod && npm run start",
+    "dev": "npm run build:server && NODE_ENV=development npm run start",
+    "dev:amigos": "npm run build:server && NODE_ENV=development SIMPLIFIED_CATALOG_BASE=http://simplye-dev-cm.amigos.org/xyzlib node lib/server/index.js"
   },
   "devDependencies": {
     "@babel/core": "^7.7.2",
@@ -56,9 +56,6 @@
     "sass-loader": "^7.1.0",
     "sinon": "^7.3.0",
     "style-loader": "^0.13.1",
-    "ts-loader": "^6.2.1",
-    "tslint": "^5.20.0",
-    "tslint-react-a11y": "^1.1.0",
     "typescript": "^3.6.4",
     "url-loader": "^0.5.7",
     "webpack": "^4.29.6",
@@ -93,7 +90,6 @@
     "styled-system": "^5.1.2",
     "theme-ui": "^0.2.46",
     "tinycolor2": "^1.4.1",
-    "tslint-to-eslint-config": "^0.2.11",
     "universal-url": "^1.0.1"
   }
 }
