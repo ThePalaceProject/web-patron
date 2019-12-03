@@ -115,6 +115,7 @@ let webpackConfig = {
     alias: {
       react: path.resolve("./node_modules/react"),
       "react-dom": "@hot-loader/react-dom",
+      "react-redux": path.resolve("./node_modules/react-redux"),
     },
   },
 
