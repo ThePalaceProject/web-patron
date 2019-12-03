@@ -7,10 +7,74 @@ import * as PropTypes from "prop-types";
 
 import { NavBar, NavHeader, NavBrand, NavBrandTitle, NavBrandSubtitle, NavToggle, NavCollapse, NavList } from "./NavBar";
 import { Search } from "./Search";
+import { AppContext } from "./ContextProvider";
 
 export interface HeaderContext extends NavigateContext {
   library: LibraryData
 }
+
+/**
+ * will get the data it needs from hooks!
+ */
+// const HeaderFC: React.FunctionComponent = () => {
+//   const {library} = React.useContext(AppContext);
+
+//   return (
+//     <NavBar>
+
+//       <NavHeader>
+//         <NavBrand className={library.logoUrl ? "with-logo" : ""}>
+//           <NavBrandTitle>{library.catalogName}</NavBrandTitle>
+//           <NavBrandSubtitle>Library System</NavBrandSubtitle>
+//         </NavBrand>
+//         <NavToggle />
+//       </NavHeader>
+
+//       <NavCollapse>
+
+//         <NavList>
+
+//           {library.headerLinks && library.headerLinks.map(link =>
+//             <li>
+//               <a href={link.href} title={link.title}>{link.title}</a>
+//             </li>
+//           )}
+//           <li>
+//             <CatalogLink
+//               collectionUrl={library.catalogUrl}
+//               bookUrl={null}>
+//               Catalog
+//             </CatalogLink>
+//           </li>
+//           {props.loansUrl && props.isSignedIn &&
+//             <li>
+//               <CatalogLink
+//                 collectionUrl={props.loansUrl}
+//                 bookUrl={null}>
+//                 My Books
+//               </CatalogLink>
+//             </li>
+//           }
+//           {props.loansUrl && props.isSignedIn &&
+//             <li>
+//               <button onClick={signOut}>Sign Out</button>
+//             </li>
+//           }
+//           {props.loansUrl && !props.isSignedIn &&
+//             <li>
+//               <button onClick={signIn}>Sign In</button>
+//             </li>
+//           }
+
+//         </NavList>
+
+//         <Search />
+
+//       </NavCollapse>
+
+//     </NavBar>
+//   );
+// };
 
 export default class Header extends React.Component<HeaderProps, {}> {
   context: HeaderContext;
