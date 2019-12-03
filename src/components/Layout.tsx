@@ -1,6 +1,8 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
+import GlobalStyles from "./GlobalStyles";
+import Header from "./Header";
 
 
 /**
@@ -16,7 +18,12 @@ import * as React from "react";
 const Layout = () => {
 
   return (
-    <div>hello from layout</div>
+    <React.Fragment>
+      <GlobalStyles />
+      {/* <Header /> */}
+      <main>hi from main</main>
+
+    </React.Fragment>
   );
 };
 
