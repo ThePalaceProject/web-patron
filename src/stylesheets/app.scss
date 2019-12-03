@@ -16,6 +16,8 @@ $linkhovercolor: var(--linkhovercolor);
 $transparentpagecolor: var(--transparentpagecolor);
 $semitransparentpagecolor: var(--semitransparentpagecolor);
 
+// css reset
+@import "normalize";
 @import "node_modules/opds-web-client/lib/stylesheets/app.scss";
 // @import "book_details";
 // @import "book_details_container";
