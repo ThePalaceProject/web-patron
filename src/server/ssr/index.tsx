@@ -62,7 +62,10 @@ const ssr = ({
     }
 
     // otherwise, use the params to get the data, then render.
-    const { library, collectionUrl, bookUrl } = match.params;
+    // accessing these with typscript optional chaining.
+    const library = match?.params?.library;
+    const collectionUrl = match?.params?.collectionUrl;
+    const bookUrl = match?.params?.bookUrl;
 
     /**
      * Build out libraryData
