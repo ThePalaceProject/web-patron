@@ -4,7 +4,7 @@ import * as express from "express";
 import UrlShortener from "../../UrlShortener";
 import buildInitialState, { State } from "opds-web-client/lib/state";
 import { renderToString } from "react-dom/server";
-import ContextProvider from "../../components/ContextProvider";
+import ContextProvider from "../../components/context/ContextProvider";
 import { LibraryData } from "../../interfaces";
 import renderErrorPage from "./renderErrorPage";
 import getAssets from "./getAssets";

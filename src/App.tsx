@@ -4,10 +4,11 @@ import { singleLibraryRoutes, multiLibraryRoutes } from "./routes";
 import { ThemeProvider } from "theme-ui";
 import theme from "./theme";
 import { hot } from "react-hot-loader/root";
-import { AppContext } from "./components/ContextProvider";
+import LibraryContext from "./components/context/LibraryContext";
 
 const App: React.FunctionComponent = () => {
-  const { library } = React.useContext(AppContext);
+  const library = React.useContext(LibraryContext);
+
   return (
     <ThemeProvider theme={theme}>
       <Switch>

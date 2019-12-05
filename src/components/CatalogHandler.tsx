@@ -1,26 +1,24 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
 import * as tinycolor from "tinycolor2";
-import { State } from "opds-web-client/lib/state";
-import DataFetcher from "opds-web-client/lib/DataFetcher";
 const OPDSCatalog = require("opds-web-client");
 import Header from "./Header";
 import Footer from "./Footer";
 import BookDetailsContainer from "./BookDetailsContainer";
-import { NavigateContext } from "opds-web-client/lib/interfaces";
 import computeBreadcrumbs from "../computeBreadcrumbs";
-import UrlShortener from "../UrlShortener";
 import { LibraryData } from "../interfaces";
 import BasicAuthWithButtonImagePlugin from "../auth/BasicAuthWithButtonImagePlugin";
 import OAuthPlugin from "../auth/OAuthPlugin";
-import * as PropTypes from "prop-types";
 import Layout from "./Layout";
-import { AppContext } from "./ContextProvider";
 import { useParams } from "react-router-dom";
+import UrlShortenerContext from "./context/UrlShortenerContext";
+import LibraryContext from "./context/LibraryContext";
+import InitialStateContext from "./context/InitialStateContext";
 
 const CatalogHandler = () => {
   const { collectionUrl, bookUrl } = useParams();
-  const { urlShortener, library, initialState } = React.useContext(AppContext);
+  const urlShortener = React.useContext(UrlShortenerContext);
+  const library = React.useContext(LibraryContext);
+  const initialState = React.useContext(InitialStateContext);
 
   const pageTitleTemplate = (collectionTitle, bookTitle) => {
     const details = bookTitle || collectionTitle;

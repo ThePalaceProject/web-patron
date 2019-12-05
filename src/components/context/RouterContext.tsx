@@ -1,0 +1,47 @@
+import * as React from "react";
+import OPDSRouterContextProvider, {
+  RouterContext
+} from "opds-web-client/lib/components/context/RouterContext";
+import { Router as RouterType, Location } from "opds-web-client/lib/interfaces";
+import { useHistory, matchPath, useLocation } from "react-router";
+
+export const RouterContextProvider: React.FC = ({ children }) => {
+  const history = useHistory();
+  const realLocation = useLocation();
+
+  const router: RouterType = {
+    push: history.push,
+    // we need to manipulate the createHref into the type
+    // signature expected by history.createHref
+    createHref: (location: string | Location) =>
+      typeof location === "string"
+        ? history.createHref({
+            pathname: location
+          })
+        : history.createHref(location),
+    /**
+     * recreating the deprecated isActive with the new
+     * matchPath API
+     */
+    isActive: (location: string | Location) =>
+      typeof location === "string"
+        ? !!matchPath(realLocation.pathname, {
+            path: location,
+            exact: false,
+            strict: false
+          })
+        : !!matchPath(realLocation.pathname, {
+            path: location.pathname,
+            exact: false,
+            strict: false
+          })
+  };
+
+  return (
+    <OPDSRouterContextProvider router={router}>
+      {children}
+    </OPDSRouterContextProvider>
+  );
+};
+
+export default RouterContext;

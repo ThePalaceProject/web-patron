@@ -18,7 +18,7 @@ const Layout = () => {
   return (
     <React.Fragment>
       <GlobalStyles />
-      {/* <Header /> */}
+      <Header />
       <main>hi from main</main>
     </React.Fragment>
   );
