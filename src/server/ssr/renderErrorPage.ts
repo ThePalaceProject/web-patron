@@ -1,6 +1,6 @@
-
-
-function renderErrorPage(message: string = "There was a problem with this request.") {
+function renderErrorPage(
+  message: string = "There was a problem with this request."
+) {
   return `
       <!doctype html>
       <html lang="en">

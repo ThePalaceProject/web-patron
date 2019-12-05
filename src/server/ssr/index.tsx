@@ -37,23 +37,21 @@ import App from "../../App";
 type Url = string;
 
 type Params = {
-  library?: string
-  collectionUrl?: Url
-  bookUrl?: Url
+  library?: string;
+  collectionUrl?: Url;
+  bookUrl?: Url;
 };
 
-const ssr = ({
-  shortenUrls,
-  cache,
-  routes,
-  circManagerBase
-}) => async (req: express.Request, res: express.Response) => {
+const ssr = ({ shortenUrls, cache, routes, circManagerBase }) => async (
+  req: express.Request,
+  res: express.Response
+) => {
   // try to match the page and build it
   try {
     // match with the central route config
     let match: Match<Params> | undefined;
     const activeRoute = routes.find(
-      (route) => match = matchPath(req.url, route)
+      route => (match = matchPath(req.url, route))
     );
     // if there is no active route, render the home page
     if (!match) {
@@ -96,12 +94,17 @@ const ssr = ({
      */
     if (!collectionUrl && !bookUrl) {
       const urlShortener = new UrlShortener(catalogUrl, shortenUrls);
-      const preparedCollectionUrl = urlShortener.prepareCollectionUrl(catalogUrl);
+      const preparedCollectionUrl = urlShortener.prepareCollectionUrl(
+        catalogUrl
+      );
       // With short URLS, if the home URL is the library root URL, the prepared URL
       // will be empty, and we don't need to redirect.
       if (!shortenUrls || preparedCollectionUrl) {
         if (library) {
-          res.redirect(302, "/" + library + "/collection/" + preparedCollectionUrl);
+          res.redirect(
+            302,
+            "/" + library + "/collection/" + preparedCollectionUrl
+          );
         } else {
           res.redirect(302, "/collection/" + preparedCollectionUrl);
         }
@@ -111,20 +114,40 @@ const ssr = ({
 
     // build the page and send it
     try {
-      const fullPage = await buildPage(collectionUrl, bookUrl, libraryData, shortenUrls, req, res);
+      const fullPage = await buildPage(
+        collectionUrl,
+        bookUrl,
+        libraryData,
+        shortenUrls,
+        req,
+        res
+      );
       res.status(200).send(fullPage);
     } catch (e) {
-      const fullPage = await buildPage(null, null, libraryData, shortenUrls, req, res);
+      const fullPage = await buildPage(
+        null,
+        null,
+        libraryData,
+        shortenUrls,
+        req,
+        res
+      );
       res.status(200).send(fullPage);
     }
-
   } catch (error) {
     console.error(error);
     res.status(500).send(renderErrorPage());
   }
 };
 
-const buildPage = async (collectionUrl: Url, bookUrl: Url, libraryData: LibraryData, shortenUrls, req: express.Request, res: express.Response) => {
+const buildPage = async (
+  collectionUrl: Url,
+  bookUrl: Url,
+  libraryData: LibraryData,
+  shortenUrls,
+  req: express.Request,
+  res: express.Response
+) => {
   const state = await buildInitialState(collectionUrl, bookUrl);
 
   const assets = await getAssets(res);
@@ -136,21 +159,26 @@ const buildPage = async (collectionUrl: Url, bookUrl: Url, libraryData: LibraryD
       <ContextProvider
         library={libraryData}
         shortenUrls={shortenUrls}
-        initialState={state}>
+        initialState={state}
+      >
         <App />
       </ContextProvider>
     </StaticRouter>
   );
 
-  return DOCTYPE + "\n" +
-    renderToString(React.createElement(Html, {
-      content: htmlContent,
-      library: libraryData,
-      preloadedState: state,
-      shortenUrls,
-      assets
-    }));
-
+  return (
+    DOCTYPE +
+    "\n" +
+    renderToString(
+      React.createElement(Html, {
+        content: htmlContent,
+        library: libraryData,
+        preloadedState: state,
+        shortenUrls,
+        assets
+      })
+    )
+  );
 };
 
 export default ssr;

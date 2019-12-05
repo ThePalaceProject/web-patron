@@ -9,7 +9,10 @@ import * as PropTypes from "prop-types";
 const hasProps = (child: React.ReactNode): child is React.ReactElement => {
   return (child as React.ReactElement).props !== "undefined";
 };
-export default class BookDetailsContainer extends React.Component<BookDetailsContainerProps, {}> {
+export default class BookDetailsContainer extends React.Component<
+  BookDetailsContainerProps,
+  {}
+> {
   context: any;
 
   static contextTypes: React.ValidationMap<{}> = {
@@ -26,17 +29,19 @@ export default class BookDetailsContainer extends React.Component<BookDetailsCon
 
     return (
       <div sx={{ display: "flex", justifyContent: "center" }}>
-        <div sx={{
-          // bg: 'background',
-          maxWidth: "container",
-          mx: 3,
-          px: 5,
-          py: 4,
-          border: "solid",
-          borderRadius: 2,
-          borderColor: "darkBlue",
-          flex: 1,
-        }}>
+        <div
+          sx={{
+            // bg: 'background',
+            maxWidth: "container",
+            mx: 3,
+            px: 5,
+            py: 4,
+            border: "solid",
+            borderRadius: 2,
+            borderColor: "darkBlue",
+            flex: 1
+          }}
+        >
           <BookDetails {...childProps} />
           {/* {relatedUrl &&
             <div className="related-books">

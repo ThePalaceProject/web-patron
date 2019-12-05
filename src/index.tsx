@@ -2,7 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import App from "./App";
 import ContextProvider from "./components/ContextProvider";
-import {BrowserRouter} from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 /**
  * This data is set on the window when server-rendering
  */
@@ -16,6 +16,7 @@ ReactDOM.hydrate(
   <BrowserRouter>
     <ContextProvider {...preloadedData}>
       <App />
-    </ContextProvider >
+    </ContextProvider>
   </BrowserRouter>,
-  element);
+  element
+);

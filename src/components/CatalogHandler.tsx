@@ -27,7 +27,8 @@ const CatalogHandler = () => {
     return library.catalogName + (details ? " - " + details : "");
   };
 
-  const expandedCollectionUrl = urlShortener.expandCollectionUrl(collectionUrl) || null;
+  const expandedCollectionUrl =
+    urlShortener.expandCollectionUrl(collectionUrl) || null;
   const expandedBookUrl = urlShortener.expandBookUrl(bookUrl) || null;
 
   const cssVariables = getCssVars(library);
@@ -51,21 +52,36 @@ const CatalogHandler = () => {
 };
 
 const getCssVars = (library: LibraryData) => {
-
   const cssVariables = {};
   if (library.logoUrl) {
     cssVariables["--logo"] = `url('${library.logoUrl}')`;
   }
-  let background = tinycolor((library.colors && library.colors.background) || "#ffffff");
-  let foreground = tinycolor((library.colors && library.colors.foreground) || "#000000");
+  let background = tinycolor(
+    (library.colors && library.colors.background) || "#ffffff"
+  );
+  let foreground = tinycolor(
+    (library.colors && library.colors.foreground) || "#000000"
+  );
 
   cssVariables["--pagecolor"] = background.toString();
   if (background.isLight()) {
-    cssVariables["--pagecolorlight"] = background.clone().darken(2).toString();
-    cssVariables["--footercolor"] = background.clone().darken(2).toString();
+    cssVariables["--pagecolorlight"] = background
+      .clone()
+      .darken(2)
+      .toString();
+    cssVariables["--footercolor"] = background
+      .clone()
+      .darken(2)
+      .toString();
   } else {
-    cssVariables["--pagecolorlight"] = background.clone().lighten(2).toString();
-    cssVariables["--footercolor"] = background.clone().lighten(2).toString();
+    cssVariables["--pagecolorlight"] = background
+      .clone()
+      .lighten(2)
+      .toString();
+    cssVariables["--footercolor"] = background
+      .clone()
+      .lighten(2)
+      .toString();
   }
   background.setAlpha(0.5);
   cssVariables["--transparentpagecolor"] = background.toString();
@@ -74,23 +90,54 @@ const getCssVars = (library: LibraryData) => {
 
   cssVariables["--linkcolor"] = foreground.toString();
   if (foreground.isDark()) {
-    cssVariables["--linkvisitedcolor"] = foreground.clone().lighten(20).toString();
-    cssVariables["--linkhovercolor"] = foreground.clone().lighten(10).toString();
-    cssVariables["--pagetextcolor"] = foreground.clone().desaturate(10).toString();
-    cssVariables["--pagetextcolorlight"] = foreground.clone().desaturate(10).darken(25).toString();
-    cssVariables["--highlightcolor"] = foreground.clone().desaturate(10).toString();
+    cssVariables["--linkvisitedcolor"] = foreground
+      .clone()
+      .lighten(20)
+      .toString();
+    cssVariables["--linkhovercolor"] = foreground
+      .clone()
+      .lighten(10)
+      .toString();
+    cssVariables["--pagetextcolor"] = foreground
+      .clone()
+      .desaturate(10)
+      .toString();
+    cssVariables["--pagetextcolorlight"] = foreground
+      .clone()
+      .desaturate(10)
+      .darken(25)
+      .toString();
+    cssVariables["--highlightcolor"] = foreground
+      .clone()
+      .desaturate(10)
+      .toString();
   } else {
-    cssVariables["--linkvisitedcolor"] = foreground.clone().darken(20).toString();
-    cssVariables["--linkhovercolor"] = foreground.clone().darken(10).toString();
-    cssVariables["--pagetextcolor"] = foreground.clone().desaturate(10).toString();
-    cssVariables["--pagetextcolorlight"] = foreground.clone().desaturate(10).lighten(25).toString();
-    cssVariables["--highlightcolor"] = foreground.clone().desaturate(10).toString();
+    cssVariables["--linkvisitedcolor"] = foreground
+      .clone()
+      .darken(20)
+      .toString();
+    cssVariables["--linkhovercolor"] = foreground
+      .clone()
+      .darken(10)
+      .toString();
+    cssVariables["--pagetextcolor"] = foreground
+      .clone()
+      .desaturate(10)
+      .toString();
+    cssVariables["--pagetextcolorlight"] = foreground
+      .clone()
+      .desaturate(10)
+      .lighten(25)
+      .toString();
+    cssVariables["--highlightcolor"] = foreground
+      .clone()
+      .desaturate(10)
+      .toString();
   }
   return cssVariables;
 };
 
 export default CatalogHandler;
-
 
 // export default class CatalogHandler extends React.Component<CatalogHandlerProps, any> {
 

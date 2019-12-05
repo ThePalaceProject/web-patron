@@ -4,7 +4,6 @@ import * as React from "react";
 import GlobalStyles from "./GlobalStyles";
 import Header from "./Header";
 
-
 /**
  * Will take over from opds-web-client to handle layout
  * of the app: header, main, footer. Will import from
@@ -16,13 +15,11 @@ import Header from "./Header";
  */
 
 const Layout = () => {
-
   return (
     <React.Fragment>
       <GlobalStyles />
       {/* <Header /> */}
       <main>hi from main</main>
-
     </React.Fragment>
   );
 };

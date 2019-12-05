@@ -4,7 +4,9 @@ import * as React from "react";
 import { Store } from "redux";
 import { connect } from "react-redux";
 import { fetchComplaintTypes, postComplaint } from "../actions";
-import DefaultBookDetails, { BookDetailsProps as DefaultBooKDetailsProps } from "opds-web-client/lib/components/BookDetails";
+import DefaultBookDetails, {
+  BookDetailsProps as DefaultBooKDetailsProps
+} from "opds-web-client/lib/components/BookDetails";
 import ReportProblemLink from "./ReportProblemLink";
 import RevokeButton from "./RevokeButton";
 import { ComplaintData } from "../interfaces";
@@ -12,9 +14,9 @@ import { State } from "../reducers/index";
 import BookCover from "./BookCover";
 
 export interface BookDetailsProps extends DefaultBooKDetailsProps {
-  problemTypes: string[]
-  fetchComplaintTypes: (url: string) => Promise<string[]>
-  postComplaint: (url: string, data: ComplaintData) => Promise<any>
+  problemTypes: string[];
+  fetchComplaintTypes: (url: string) => Promise<string[]>;
+  postComplaint: (url: string, data: ComplaintData) => Promise<any>;
 }
 
 export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
@@ -24,7 +26,13 @@ export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
   }
 
   fieldNames() {
-    return ["Published", "Publisher", "Audience", "Categories", "Distributed By"];
+    return [
+      "Published",
+      "Publisher",
+      "Audience",
+      "Categories",
+      "Distributed By"
+    ];
   }
 
   // override the inherited setBodyOverflow so that it does nothing.
@@ -34,7 +42,9 @@ export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
 
   fields() {
     let fields = super.fields();
-    let categoriesIndex = fields.findIndex(field => field.name === "Categories");
+    let categoriesIndex = fields.findIndex(
+      field => field.name === "Categories"
+    );
     fields[categoriesIndex].value = this.categories();
     fields.push({
       name: "Audience",
@@ -58,8 +68,10 @@ export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
       return null;
     }
 
-    let audience = categories.find(category =>
-      category["$"]["scheme"] && category["$"]["scheme"]["value"] === "http://schema.org/audience"
+    let audience = categories.find(
+      category =>
+        category["$"]["scheme"] &&
+        category["$"]["scheme"]["value"] === "http://schema.org/audience"
     );
 
     if (!audience) {
@@ -72,12 +84,15 @@ export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
       return audienceStr;
     }
 
-    let targetAge = categories.find(category =>
-      category["$"]["scheme"] && category["$"]["scheme"]["value"] === "http://schema.org/typicalAgeRange"
+    let targetAge = categories.find(
+      category =>
+        category["$"]["scheme"] &&
+        category["$"]["scheme"]["value"] === "http://schema.org/typicalAgeRange"
     );
 
     if (targetAge) {
-      let targetAgeStr = targetAge["$"]["label"] && targetAge["$"]["label"]["value"];
+      let targetAgeStr =
+        targetAge["$"]["label"] && targetAge["$"]["label"]["value"];
       audienceStr += " (age " + targetAgeStr + ")";
     }
 
@@ -96,17 +111,26 @@ export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
     let fictionScheme = "http://librarysimplified.org/terms/fiction/";
     let rawCategories = this.props.book.raw.category;
 
-    let categories = rawCategories.filter(category =>
-      category["$"]["label"] && category["$"]["scheme"] &&
-      audienceSchemas.concat([fictionScheme])
-        .indexOf(category["$"]["scheme"]["value"]) === -1
-    ).map(category => category["$"]["label"]["value"]);
+    let categories = rawCategories
+      .filter(
+        category =>
+          category["$"]["label"] &&
+          category["$"]["scheme"] &&
+          audienceSchemas
+            .concat([fictionScheme])
+            .indexOf(category["$"]["scheme"]["value"]) === -1
+      )
+      .map(category => category["$"]["label"]["value"]);
 
     if (!categories.length) {
-      categories = rawCategories.filter(category =>
-        category["$"]["label"] && category["$"]["scheme"] &&
-        category["$"]["scheme"]["value"] === fictionScheme
-      ).map(category => category["$"]["label"]["value"]);
+      categories = rawCategories
+        .filter(
+          category =>
+            category["$"]["label"] &&
+            category["$"]["scheme"] &&
+            category["$"]["scheme"]["value"] === fictionScheme
+        )
+        .map(category => category["$"]["label"]["value"]);
     }
 
     return categories.length > 0 ? categories.join(", ") : null;
@@ -131,8 +155,8 @@ export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
   }
 
   reportUrl() {
-    let reportLink = this.props.book.raw.link.find(link =>
-      link["$"]["rel"]["value"] === "issues"
+    let reportLink = this.props.book.raw.link.find(
+      link => link["$"]["rel"]["value"] === "issues"
     );
 
     if (!reportLink) {
@@ -143,8 +167,10 @@ export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
   }
 
   revokeUrl() {
-    let revokeLink = this.props.book.raw.link.find(link =>
-      link["$"]["rel"]["value"] === "http://librarysimplified.org/terms/rel/revoke"
+    let revokeLink = this.props.book.raw.link.find(
+      link =>
+        link["$"]["rel"]["value"] ===
+        "http://librarysimplified.org/terms/rel/revoke"
     );
 
     if (!revokeLink) {
@@ -186,23 +212,26 @@ export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
 
   rightColumnLinks() {
     let reportUrl = this.reportUrl();
-    return reportUrl ?
+    return reportUrl ? (
       <ReportProblemLink
         className="btn btn-link"
         reportUrl={reportUrl}
         fetchTypes={this.props.fetchComplaintTypes}
         report={this.props.postComplaint}
         types={this.props.problemTypes}
-      /> : null;
+      />
+    ) : null;
   }
 
   render() {
     return (
       <div
         sx={{
-          bg: "papayawhip",
+          bg: "papayawhip"
         }}
-      ><BookCover /></div >
+      >
+        <BookCover />
+      </div>
     );
   }
 }
@@ -216,7 +245,8 @@ function mapStateToProps(state: State, ownProps) {
 function mapDispatchToProps(dispatch) {
   return {
     fetchComplaintTypes: (url: string) => dispatch(fetchComplaintTypes(url)),
-    postComplaint: (url: string, data: ComplaintData) => dispatch(postComplaint(url, data))
+    postComplaint: (url: string, data: ComplaintData) =>
+      dispatch(postComplaint(url, data))
   };
 }
 

@@ -3,13 +3,16 @@ import ReportProblemForm from "./ReportProblemForm";
 import { ComplaintData } from "../interfaces";
 
 export interface ReportProblemLinkProps extends React.HTMLProps<any> {
-  reportUrl: string
-  report: (url: string, data: ComplaintData) => Promise<any>
-  fetchTypes: (url: string) => Promise<string[]>
-  types: string[]
+  reportUrl: string;
+  report: (url: string, data: ComplaintData) => Promise<any>;
+  fetchTypes: (url: string) => Promise<string[]>;
+  types: string[];
 }
 
-export default class ReportProblemLink extends React.Component<ReportProblemLinkProps, any> {
+export default class ReportProblemLink extends React.Component<
+  ReportProblemLinkProps,
+  any
+> {
   constructor(props) {
     super(props);
     this.state = { showForm: false };
@@ -22,8 +25,10 @@ export default class ReportProblemLink extends React.Component<ReportProblemLink
 
     return (
       <div>
-        <button href="javascript:void(0);" {...props} onClick={this.openForm}>Report a Problem</button>
-        { this.state.showForm &&
+        <button href="javascript:void(0);" {...props} onClick={this.openForm}>
+          Report a Problem
+        </button>
+        {this.state.showForm && (
           <ReportProblemForm
             reportUrl={this.props.reportUrl}
             report={this.props.report}
@@ -31,7 +36,7 @@ export default class ReportProblemLink extends React.Component<ReportProblemLink
             close={this.closeForm}
             types={this.props.types}
           />
-        }
+        )}
       </div>
     );
   }

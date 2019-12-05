@@ -5,12 +5,21 @@ import { NavigateContext } from "opds-web-client/lib/interfaces";
 import { LibraryData } from "../interfaces";
 import * as PropTypes from "prop-types";
 
-import { NavBar, NavHeader, NavBrand, NavBrandTitle, NavBrandSubtitle, NavToggle, NavCollapse, NavList } from "./NavBar";
+import {
+  NavBar,
+  NavHeader,
+  NavBrand,
+  NavBrandTitle,
+  NavBrandSubtitle,
+  NavToggle,
+  NavCollapse,
+  NavList
+} from "./NavBar";
 import { Search } from "./Search";
 import { AppContext } from "./ContextProvider";
 
 export interface HeaderContext extends NavigateContext {
-  library: LibraryData
+  library: LibraryData;
 }
 
 /**
@@ -82,7 +91,7 @@ export default class Header extends React.Component<HeaderProps, {}> {
   static contextTypes = {
     library: PropTypes.object.isRequired,
     router: PropTypes.object.isRequired,
-    pathFor: PropTypes.func.isRequired,
+    pathFor: PropTypes.func.isRequired
   };
 
   constructor(props) {
@@ -94,7 +103,6 @@ export default class Header extends React.Component<HeaderProps, {}> {
   render(): JSX.Element {
     return (
       <NavBar>
-
         <NavHeader>
           <NavBrand className={this.context.library.logoUrl ? "with-logo" : ""}>
             <NavBrandTitle>{this.context.library.catalogName}</NavBrandTitle>
@@ -104,47 +112,44 @@ export default class Header extends React.Component<HeaderProps, {}> {
         </NavHeader>
 
         <NavCollapse>
-
           <NavList>
-
-            {this.context.library.headerLinks && this.context.library.headerLinks.map(link =>
-              <li>
-                <a href={link.href} title={link.title}>{link.title}</a>
-              </li>
-            )}
+            {this.context.library.headerLinks &&
+              this.context.library.headerLinks.map(link => (
+                <li>
+                  <a href={link.href} title={link.title}>
+                    {link.title}
+                  </a>
+                </li>
+              ))}
             <li>
               <CatalogLink
                 collectionUrl={this.context.library.catalogUrl}
-                bookUrl={null}>
+                bookUrl={null}
+              >
                 Catalog
               </CatalogLink>
             </li>
-            {this.props.loansUrl && this.props.isSignedIn &&
+            {this.props.loansUrl && this.props.isSignedIn && (
               <li>
-                <CatalogLink
-                  collectionUrl={this.props.loansUrl}
-                  bookUrl={null}>
+                <CatalogLink collectionUrl={this.props.loansUrl} bookUrl={null}>
                   My Books
                 </CatalogLink>
               </li>
-            }
-            {this.props.loansUrl && this.props.isSignedIn &&
+            )}
+            {this.props.loansUrl && this.props.isSignedIn && (
               <li>
                 <button onClick={this.signOut}>Sign Out</button>
               </li>
-            }
-            {this.props.loansUrl && !this.props.isSignedIn &&
+            )}
+            {this.props.loansUrl && !this.props.isSignedIn && (
               <li>
                 <button onClick={this.signIn}>Sign In</button>
               </li>
-            }
-
+            )}
           </NavList>
 
           <Search />
-
         </NavCollapse>
-
       </NavBar>
     );
   }
@@ -157,6 +162,8 @@ export default class Header extends React.Component<HeaderProps, {}> {
 
   signOut() {
     this.props.clearAuthCredentials();
-    this.context.router.push(this.context.pathFor(this.context.library.catalogUrl, null));
+    this.context.router.push(
+      this.context.pathFor(this.context.library.catalogUrl, null)
+    );
   }
 }

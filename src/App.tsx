@@ -8,22 +8,20 @@ import { hot } from "react-hot-loader/root";
 import { AppContext } from "./components/ContextProvider";
 
 const App = () => {
-  const {library} = React.useContext(AppContext);
-  return(
+  const { library } = React.useContext(AppContext);
+  return (
     <ThemeProvider theme={theme}>
       <Switch>
-        {library.onlyLibrary ?
-          singleLibraryRoutes.map(route => (
-            <Route key={route.path} {...route} />
-          ))
-          :
-          multiLibraryRoutes.map(route => (
-            <Route key={route.path} {...route} />
-          ))
-        }
+        {library.onlyLibrary
+          ? singleLibraryRoutes.map(route => (
+              <Route key={route.path} {...route} />
+            ))
+          : multiLibraryRoutes.map(route => (
+              <Route key={route.path} {...route} />
+            ))}
       </Switch>
-    </ThemeProvider>);
+    </ThemeProvider>
+  );
 };
-
 
 export default hot(App);

@@ -10,11 +10,11 @@ import { LibraryData } from "../interfaces";
 type ProviderProps = PreloadedData;
 
 export interface AppContextType {
-  store: Store<State>
-  pathFor: PathFor
-  library: LibraryData
-  urlShortener: UrlShortener
-  initialState: CatalogState
+  store: Store<State>;
+  pathFor: PathFor;
+  library: LibraryData;
+  urlShortener: UrlShortener;
+  initialState: CatalogState;
 }
 
 export const AppContext = React.createContext<AppContextType>({
@@ -22,10 +22,15 @@ export const AppContext = React.createContext<AppContextType>({
   pathFor: null,
   library: null,
   urlShortener: null,
-  initialState: null,
+  initialState: null
 });
 
-const AppContextProvider: React.FunctionComponent<ProviderProps> = ({children, library, shortenUrls, initialState}) => {
+const AppContextProvider: React.FunctionComponent<ProviderProps> = ({
+  children,
+  library,
+  shortenUrls,
+  initialState
+}) => {
   const store = buildStore();
   const libraryId = library.id;
   const urlShortener = new UrlShortener(library.catalogUrl, shortenUrls);
@@ -35,7 +40,9 @@ const AppContextProvider: React.FunctionComponent<ProviderProps> = ({children, l
       path += "/" + libraryId;
     }
     if (collectionUrl) {
-      let preparedCollectionUrl = urlShortener.prepareCollectionUrl(collectionUrl);
+      let preparedCollectionUrl = urlShortener.prepareCollectionUrl(
+        collectionUrl
+      );
       if (preparedCollectionUrl) {
         path += `/collection/${preparedCollectionUrl}`;
       }
@@ -50,13 +57,15 @@ const AppContextProvider: React.FunctionComponent<ProviderProps> = ({children, l
   };
 
   return (
-    <AppContext.Provider value={{
-      store,
-      pathFor,
-      library,
-      urlShortener,
-      initialState
-    }}>
+    <AppContext.Provider
+      value={{
+        store,
+        pathFor,
+        library,
+        urlShortener,
+        initialState
+      }}
+    >
       {children}
     </AppContext.Provider>
   );

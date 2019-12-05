@@ -32,16 +32,14 @@ const initialize = async () => {
     /**
      * Tell express where to get files and how to handle all requests
      * This is fired every time the server side receives a request
-    */
+     */
     app.use("/static", express.static(distDir));
   }
   // Any request not handled previously will get served html via ssr.
   app.use(ssr(data));
 
-  app.listen(port, function () {
+  app.listen(port, function() {
     console.log("Server listening on port " + port);
   });
 };
 initialize();
-
-

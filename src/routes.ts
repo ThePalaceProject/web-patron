@@ -9,7 +9,7 @@ export const singleLibraryRoutes = [
   {
     path: "/",
     exact: true,
-    component: CatalogHandler,
+    component: CatalogHandler
   }
 ];
 
@@ -17,13 +17,13 @@ export const multiLibraryRoutes = [
   {
     path: "/:library(/)(collection/:collectionUrl)(/)(book/:bookUrl)",
     component: CatalogHandler,
-    exact: false,
-  },{
+    exact: false
+  },
+  {
     path: "/",
     exact: true,
     component: CatalogHandler
   }
 ];
-
 
 export default multiLibraryRoutes;

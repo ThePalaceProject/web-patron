@@ -35,23 +35,23 @@ describe("CatalogHandler", () => {
   });
 
   it("renders OPDSCatalog", () => {
-    wrapper = shallow(
-      <CatalogHandler
-      />,
-      { context }
-    );
+    wrapper = shallow(<CatalogHandler />, { context });
 
     let catalog = wrapper.find(OPDSCatalog);
     expect(catalog.prop("collectionUrl")).to.equal("collectionurl");
     expect(catalog.prop("bookUrl")).to.equal("library/bookurl");
     expect(catalog.prop("Header").name).to.equal("Header");
     expect(catalog.prop("Footer").name).to.equal("Footer");
-    expect(catalog.prop("BookDetailsContainer").name).to.equal("BookDetailsContainer");
+    expect(catalog.prop("BookDetailsContainer").name).to.equal(
+      "BookDetailsContainer"
+    );
     expect(catalog.prop("initialState")).to.equal(store.getState());
     expect(catalog.prop("computeBreadcrumbs")).to.be.ok;
     let pageTitleTemplate = catalog.prop("pageTitleTemplate");
     expect(pageTitleTemplate("Collection", "Book")).to.equal("Example - Book");
-    expect(pageTitleTemplate("Collection", null)).to.equal("Example - Collection");
+    expect(pageTitleTemplate("Collection", null)).to.equal(
+      "Example - Collection"
+    );
   });
 
   it("renders div with CSS variables", () => {
@@ -64,8 +64,12 @@ describe("CatalogHandler", () => {
     expect(cssVariables["--pagecolor"]).to.equal("#ffffff");
     expect(cssVariables["--pagecolorlight"]).to.equal("#fafafa");
     expect(cssVariables["--footercolor"]).to.equal("#fafafa");
-    expect(cssVariables["--transparentpagecolor"]).to.equal("rgba(255, 255, 255, 0.5)");
-    expect(cssVariables["--semitransparentpagecolor"]).to.equal("rgba(255, 255, 255, 0.9)");
+    expect(cssVariables["--transparentpagecolor"]).to.equal(
+      "rgba(255, 255, 255, 0.5)"
+    );
+    expect(cssVariables["--semitransparentpagecolor"]).to.equal(
+      "rgba(255, 255, 255, 0.9)"
+    );
 
     expect(cssVariables["--linkcolor"]).to.equal("#000000");
     expect(cssVariables["--linkvisitedcolor"]).to.equal("#333333");
@@ -85,8 +89,12 @@ describe("CatalogHandler", () => {
     expect(cssVariables["--pagecolor"]).to.equal("#000000");
     expect(cssVariables["--pagecolorlight"]).to.equal("#050505");
     expect(cssVariables["--footercolor"]).to.equal("#050505");
-    expect(cssVariables["--transparentpagecolor"]).to.equal("rgba(0, 0, 0, 0.5)");
-    expect(cssVariables["--semitransparentpagecolor"]).to.equal("rgba(0, 0, 0, 0.9)");
+    expect(cssVariables["--transparentpagecolor"]).to.equal(
+      "rgba(0, 0, 0, 0.5)"
+    );
+    expect(cssVariables["--semitransparentpagecolor"]).to.equal(
+      "rgba(0, 0, 0, 0.9)"
+    );
 
     expect(cssVariables["--linkcolor"]).to.equal("#ffffff");
     expect(cssVariables["--linkvisitedcolor"]).to.equal("#cccccc");

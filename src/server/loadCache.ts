@@ -31,20 +31,32 @@ async function loadCache() {
     }
   }
 
-  if (registryBase && circManagerBase || registryBase && configFile || circManagerBase && configFile) {
-    console.warn("Only one of REGISTRY_BASE, SIMPLIFIED_CATALOG_BASE, and CONFIG_FILE should be used.");
+  if (
+    (registryBase && circManagerBase) ||
+    (registryBase && configFile) ||
+    (circManagerBase && configFile)
+  ) {
+    console.warn(
+      "Only one of REGISTRY_BASE, SIMPLIFIED_CATALOG_BASE, and CONFIG_FILE should be used."
+    );
   }
 
   if (!registryBase && !circManagerBase && !configFile) {
     registryBase = "http://localhost:7000";
   }
 
-
   const shortenUrls: boolean = !(process.env.SHORTEN_URLS === "false");
 
   const distDir = process.env.SIMPLIFIED_PATRON_DIST || "dist";
-  const cacheExpirationSeconds = parseInt(process.env.CACHE_EXPIRATION_SECONDS, 10);
-  const cache = new LibraryDataCache(registryBase, cacheExpirationSeconds, config);
+  const cacheExpirationSeconds = parseInt(
+    process.env.CACHE_EXPIRATION_SECONDS,
+    10
+  );
+  const cache = new LibraryDataCache(
+    registryBase,
+    cacheExpirationSeconds,
+    config
+  );
 
   return {
     shortenUrls,

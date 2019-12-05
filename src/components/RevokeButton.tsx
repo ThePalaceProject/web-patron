@@ -3,14 +3,17 @@ import ConfirmationPopup from "./ConfirmationPopup";
 import { BookData } from "opds-web-client/lib/interfaces";
 
 export interface RevokeButtonProps extends React.HTMLProps<HTMLButtonElement> {
-  revoke: () => Promise<BookData>
+  revoke: () => Promise<BookData>;
 }
 
 export interface RevokeButtonState {
-  showConfirmationPopup: boolean
+  showConfirmationPopup: boolean;
 }
 
-export default class RevokeButton extends React.Component<RevokeButtonProps, RevokeButtonState> {
+export default class RevokeButton extends React.Component<
+  RevokeButtonProps,
+  RevokeButtonState
+> {
   constructor(props) {
     super(props);
     this.state = { showConfirmationPopup: false };
@@ -20,23 +23,28 @@ export default class RevokeButton extends React.Component<RevokeButtonProps, Rev
   }
 
   render() {
-    const { revoke, ref, onCopy,
+    const {
+      revoke,
+      ref,
+      onCopy,
       // pulling these off props so we can safely spread it to the HTML Element
       children,
       allowFullScreen,
       allowTransparency,
       type,
-      ...props } = this.props;
+      ...props
+    } = this.props;
 
     return (
       <div>
         <button
           className="btn btn-default"
           {...props}
-          onClick={this.showConfirmationPopup}>
+          onClick={this.showConfirmationPopup}
+        >
           {this.props.children}
         </button>
-        {this.state.showConfirmationPopup &&
+        {this.state.showConfirmationPopup && (
           <ConfirmationPopup
             confirm={this.revoke}
             cancel={this.hideConfirmationPopup}
@@ -44,7 +52,7 @@ export default class RevokeButton extends React.Component<RevokeButtonProps, Rev
             confirmText="Return Now"
             cancelText="Cancel"
           />
-        }
+        )}
       </div>
     );
   }

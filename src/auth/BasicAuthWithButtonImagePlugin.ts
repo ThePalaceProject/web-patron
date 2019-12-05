@@ -5,7 +5,7 @@ import BasicAuthButtonWithImage from "./components/BasicAuthButtonWithImage";
 const BasicAuthWithButtonImagePlugin: AuthPlugin = {
   type: "http://opds-spec.org/auth/basic",
 
-  lookForCredentials: () => { },
+  lookForCredentials: () => {},
 
   formComponent: BasicAuthForm,
   buttonComponent: BasicAuthButtonWithImage

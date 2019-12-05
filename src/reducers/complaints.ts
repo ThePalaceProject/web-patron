@@ -2,10 +2,10 @@ import { ComplaintData } from "../interfaces";
 import { RequestError } from "opds-web-client/lib/DataFetcher";
 
 export interface ComplaintsState {
-  isFetching: boolean
-  isPosting: boolean
-  types: string[]
-  error: any
+  isFetching: boolean;
+  isPosting: boolean;
+  types: string[];
+  error: any;
 }
 
 const initState: ComplaintsState = {
@@ -15,7 +15,10 @@ const initState: ComplaintsState = {
   error: null
 };
 
-export default (state: ComplaintsState = initState, action): ComplaintsState => {
+export default (
+  state: ComplaintsState = initState,
+  action
+): ComplaintsState => {
   switch (action.type) {
     case "FETCH_COMPLAINT_TYPES_REQUEST":
       return Object.assign({}, state, {

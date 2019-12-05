@@ -8,5 +8,4 @@
 import styled, { CreateStyled } from "@emotion/styled";
 import * as ThemeUI from "theme-ui";
 
-
 export default styled as CreateStyled<ThemeUI.Theme>;

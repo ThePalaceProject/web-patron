@@ -23,7 +23,7 @@ describe("ContextProvider", () => {
         library={library}
         initialState={store.getState()}
         shortenUrls
-        >
+      >
         <TestComponent />
       </AppContextProvider>
     );
@@ -51,7 +51,8 @@ describe("ContextProvider", () => {
         <AppContextProvider
           library={library}
           shortenUrls={false}
-          initialState={store.getState()}>
+          initialState={store.getState()}
+        >
           <TestComponent />
         </AppContextProvider>
       );
@@ -61,21 +62,28 @@ describe("ContextProvider", () => {
       let instance = wrapper.instance();
       let path = instance.pathFor(collectionUrl, bookUrl);
       expect(path).to.equal(
-        `/TEST/collection/${instance.urlShortener.prepareCollectionUrl(collectionUrl)}` +
-        `/book/${instance.urlShortener.prepareBookUrl(bookUrl)}`
+        `/TEST/collection/${instance.urlShortener.prepareCollectionUrl(
+          collectionUrl
+        )}` + `/book/${instance.urlShortener.prepareBookUrl(bookUrl)}`
       );
     });
 
     it("returns a path with only collection", () => {
       let instance = wrapper.instance();
       let path = instance.pathFor(collectionUrl, null);
-      expect(path).to.equal(`/TEST/collection/${instance.urlShortener.prepareCollectionUrl(collectionUrl)}`);
+      expect(path).to.equal(
+        `/TEST/collection/${instance.urlShortener.prepareCollectionUrl(
+          collectionUrl
+        )}`
+      );
     });
 
     it("returns a path with only book", () => {
       let instance = wrapper.instance();
       let path = instance.pathFor(null, bookUrl);
-      expect(path).to.equal(`/TEST/book/${instance.urlShortener.prepareBookUrl(bookUrl)}`);
+      expect(path).to.equal(
+        `/TEST/book/${instance.urlShortener.prepareBookUrl(bookUrl)}`
+      );
     });
 
     it("returns a path with no collection or book", () => {
@@ -93,7 +101,8 @@ describe("ContextProvider", () => {
         <AppContextProvider
           library={library}
           shortenUrls={false}
-          initialState={store.getState()}>
+          initialState={store.getState()}
+        >
           <TestComponent />
         </AppContextProvider>
       );
