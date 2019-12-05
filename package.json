@@ -49,6 +49,8 @@
     "file-loader": "^3.0.1",
     "fork-ts-checker-webpack-plugin": "^3.1.0",
     "html-webpack-plugin": "^3.2.0",
+    "husky": "^3.1.0",
+    "lint-staged": "^9.5.0",
     "mini-css-extract-plugin": "^0.5.0",
     "mocha": "^5.2.0",
     "node-sass": "4.13.0",
@@ -95,5 +97,20 @@
     "theme-ui": "^0.2.46",
     "tinycolor2": "^1.4.1",
     "universal-url": "^1.0.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,json}": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "git add"
+    ]
   }
 }
