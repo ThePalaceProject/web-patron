@@ -72,8 +72,8 @@ const ssr = ({ shortenUrls, cache, routes, circManagerBase }) => async (
     let libraryData: LibraryData;
     if (circManagerBase) {
       // We're using a single circ manager library instead of a registry.
-      let catalog = await cache.getCatalog(circManagerBase);
-      let authDocument = await cache.getAuthDocument(catalog);
+      const catalog = await cache.getCatalog(circManagerBase);
+      const authDocument = await cache.getAuthDocument(catalog);
       libraryData = {
         onlyLibrary: true,
         catalogUrl: circManagerBase,
