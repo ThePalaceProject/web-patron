@@ -1,5 +1,4 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
 import { Switch, Route } from "react-router-dom";
 import { singleLibraryRoutes, multiLibraryRoutes } from "./routes";
 import { ThemeProvider } from "theme-ui";
@@ -7,7 +6,7 @@ import theme from "./theme";
 import { hot } from "react-hot-loader/root";
 import { AppContext } from "./components/ContextProvider";
 
-const App = () => {
+const App: React.FunctionComponent = () => {
   const { library } = React.useContext(AppContext);
   return (
     <ThemeProvider theme={theme}>

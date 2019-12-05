@@ -6,7 +6,7 @@ async function loadCache() {
   let registryBase = process.env.REGISTRY_BASE;
 
   const circManagerBase = process.env.SIMPLIFIED_CATALOG_BASE;
-  let routes = circManagerBase ? singleLibraryRoutes : multiLibraryRoutes;
+  const routes = circManagerBase ? singleLibraryRoutes : multiLibraryRoutes;
 
   const config = {};
   const configFile = process.env.CONFIG_FILE;
@@ -23,9 +23,9 @@ async function loadCache() {
     } else {
       configText = fs.readFileSync(configFile, "utf8");
     }
-    for (let entry of configText.split("\n")) {
+    for (const entry of configText.split("\n")) {
       if (entry && entry.charAt(0) !== "#") {
-        let [path, circManagerUrl] = entry.split("|");
+        const [path, circManagerUrl] = entry.split("|");
         config[path] = circManagerUrl;
       }
     }
@@ -45,7 +45,7 @@ async function loadCache() {
     registryBase = "http://localhost:7000";
   }
 
-  const shortenUrls: boolean = !(process.env.SHORTEN_URLS === "false");
+  const shortenUrls = !(process.env.SHORTEN_URLS === "false");
 
   const distDir = process.env.SIMPLIFIED_PATRON_DIST || "dist";
   const cacheExpirationSeconds = parseInt(

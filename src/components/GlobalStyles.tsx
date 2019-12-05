@@ -1,14 +1,16 @@
 /** @jsx jsx */
 import { jsx, Theme } from "theme-ui";
 import * as React from "react";
-import { Global } from "@emotion/core";
+import { Global, Interpolation } from "@emotion/core";
 
-export default () => (
+const GlobalStyles: React.FC = () => (
   <Global
-    styles={(theme: Theme) => ({
+    styles={(_theme: Theme): Interpolation => ({
       body: {
         margin: 0
       }
     })}
   />
 );
+
+export default GlobalStyles;

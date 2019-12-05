@@ -9,9 +9,9 @@ export default class Footer extends React.Component<FooterProps, {}> {
   }
 
   links(): LinkData[] {
-    let links = [];
+    const links = [];
 
-    let labels = {
+    const labels = {
       about: "About",
       "terms-of-service": "Terms of Service",
       "privacy-policy": "Privacy Policy",
@@ -19,9 +19,9 @@ export default class Footer extends React.Component<FooterProps, {}> {
     };
 
     Object.keys(labels).forEach(type => {
-      let link = this.props.collection.links.find(link => link.type === type);
+      const link = this.props.collection.links.find(link => link.type === type);
       if (link) {
-        let linkWithLabel = Object.assign({}, link, { text: labels[type] });
+        const linkWithLabel = Object.assign({}, link, { text: labels[type] });
         links.push(linkWithLabel);
       }
     });
@@ -33,7 +33,7 @@ export default class Footer extends React.Component<FooterProps, {}> {
       <ul aria-label="about links" className="list-inline">
         {this.links().map(link => (
           <li key={link.url}>
-            <a href={link.url} target="_blank">
+            <a href={link.url} target="_blank" rel="noopener noreferrer">
               {link.text}
             </a>
           </li>

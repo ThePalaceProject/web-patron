@@ -1,6 +1,3 @@
-import { ComplaintData } from "../interfaces";
-import { RequestError } from "opds-web-client/lib/DataFetcher";
-
 export interface ComplaintsState {
   isFetching: boolean;
   isPosting: boolean;

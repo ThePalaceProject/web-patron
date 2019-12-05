@@ -18,6 +18,9 @@ export default class ReportProblemForm extends React.Component<
   ReportProblemFormProps,
   ReportProblemFormState
 > {
+  typeRef = React.createRef<HTMLSelectElement>();
+  detailRef = React.createRef<HTMLTextAreaElement>();
+
   constructor(props) {
     super(props);
     this.state = {
@@ -28,7 +31,9 @@ export default class ReportProblemForm extends React.Component<
   }
 
   render() {
-    let title = this.state.submitted ? "Problem Reported" : "Report a Problem";
+    const title = this.state.submitted
+      ? "Problem Reported"
+      : "Report a Problem";
 
     return (
       <div className="problem-form">
@@ -38,7 +43,11 @@ export default class ReportProblemForm extends React.Component<
 
         {!this.state.submitted && this.props.types.length > 0 && (
           <div className="form">
-            <select className="form-control" name="problem-type" ref="type">
+            <select
+              className="form-control"
+              name="problem-type"
+              ref={this.typeRef}
+            >
               <option value="" aria-selected={false}>
                 choose a type
               </option>
@@ -53,7 +62,7 @@ export default class ReportProblemForm extends React.Component<
               className="form-control"
               name="problem-details"
               placeholder="details"
-              ref="detail"
+              ref={this.detailRef}
             ></textarea>
             <br />
             <button className="btn btn-default" onClick={this.submit}>
@@ -92,16 +101,16 @@ export default class ReportProblemForm extends React.Component<
 
   submit() {
     if (this.typeSelected()) {
-      let data = {
-        type: (this.refs as any).type.value,
-        detail: (this.refs as any).detail.value
+      const data = {
+        type: this.typeRef.current.value,
+        detail: this.detailRef.current.value
       };
       return this.props
         .report(this.props.reportUrl, data)
         .then(() => {
           this.setState({ submitted: true, error: null });
         })
-        .catch(err => {
+        .catch(_err => {
           this.setState({
             ...this.state,
             error: "There was an error posting this problem"
@@ -113,6 +122,6 @@ export default class ReportProblemForm extends React.Component<
   }
 
   typeSelected() {
-    return !!(this.refs as any).type.value;
+    return !!this.typeRef.current.value;
   }
 }

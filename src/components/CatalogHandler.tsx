@@ -22,8 +22,8 @@ const CatalogHandler = () => {
   const { collectionUrl, bookUrl } = useParams();
   const { urlShortener, library, initialState } = React.useContext(AppContext);
 
-  let pageTitleTemplate = (collectionTitle, bookTitle) => {
-    let details = bookTitle || collectionTitle;
+  const pageTitleTemplate = (collectionTitle, bookTitle) => {
+    const details = bookTitle || collectionTitle;
     return library.catalogName + (details ? " - " + details : "");
   };
 
@@ -56,10 +56,10 @@ const getCssVars = (library: LibraryData) => {
   if (library.logoUrl) {
     cssVariables["--logo"] = `url('${library.logoUrl}')`;
   }
-  let background = tinycolor(
+  const background = tinycolor(
     (library.colors && library.colors.background) || "#ffffff"
   );
-  let foreground = tinycolor(
+  const foreground = tinycolor(
     (library.colors && library.colors.foreground) || "#000000"
   );
 

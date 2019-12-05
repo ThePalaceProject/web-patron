@@ -7,7 +7,7 @@ import * as React from "react";
  * along with possibly extending it to lazy load the images in the future.
  */
 
-const BookCover = () => {
+const BookCover: React.FC = () => {
   return <div>book cover</div>;
 };
 

@@ -25,7 +25,7 @@ export const AppContext = React.createContext<AppContextType>({
   initialState: null
 });
 
-const AppContextProvider: React.FunctionComponent<ProviderProps> = ({
+const AppContextProvider: React.FC<ProviderProps> = ({
   children,
   library,
   shortenUrls,
@@ -40,7 +40,7 @@ const AppContextProvider: React.FunctionComponent<ProviderProps> = ({
       path += "/" + libraryId;
     }
     if (collectionUrl) {
-      let preparedCollectionUrl = urlShortener.prepareCollectionUrl(
+      const preparedCollectionUrl = urlShortener.prepareCollectionUrl(
         collectionUrl
       );
       if (preparedCollectionUrl) {

@@ -16,7 +16,6 @@ import {
   NavList
 } from "./NavBar";
 import { Search } from "./Search";
-import { AppContext } from "./ContextProvider";
 
 export interface HeaderContext extends NavigateContext {
   library: LibraryData;
@@ -115,7 +114,7 @@ export default class Header extends React.Component<HeaderProps, {}> {
           <NavList>
             {this.context.library.headerLinks &&
               this.context.library.headerLinks.map(link => (
-                <li>
+                <li key={link.href}>
                   <a href={link.href} title={link.title}>
                     {link.title}
                   </a>
