@@ -9,35 +9,48 @@ module.exports = {
     sourceType: "module"
   },
   plugins: [
+    "react",
     "@typescript-eslint",
     // "@typescript-eslint/tslint",
-    "jsx-a11y"
+    "jsx-a11y",
+    "prettier"
   ],
-  extends: ["plugin:jsx-a11y/strict"],
+  extends: [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended",
+    "plugin:jsx-a11y/strict",
+    "prettier",
+    "prettier/@typescript-eslint",
+    "plugin:prettier/recommended"
+  ],
   rules: {
-    "@typescript-eslint/class-name-casing": "error",
-    // must disable base rule to not cause conflicts
-    indent: "off",
-    "@typescript-eslint/indent": ["error", 2],
-    "@typescript-eslint/member-delimiter-style": [
+    "@typescript-eslint/no-use-before-define": [
       "error",
+      { functions: false, variables: false }
+    ],
+    // disabling this bc it is checked by typescript so it is
+    // redundant and doesn't function properly
+    "react/prop-types": 0,
+    // update the no unused var rule to allow _var
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
       {
-        multiline: {
-          delimiter: "none",
-          requireLast: true
-        },
-        singleline: {
-          delimiter: "semi",
-          requireLast: false
-        }
+        vars: "all",
+        args: "after-used",
+        argsIgnorePattern: "^_",
+        ignoreRestSiblings: true
       }
     ],
+    // these are meant to allow jsx to mark react as used. Not working right now though
+    "react/jsx-uses-vars": "error",
+    "react/jsx-uses-react": "error",
+    // disable this rule because it is unnecessarily strict for TS
+    "@typescript-eslint/explicit-function-return-type": 0,
+    "@typescript-eslint/no-var-requires": 0,
+    "@typescript-eslint/class-name-casing": "error",
     "@typescript-eslint/prefer-namespace-keyword": "error",
-    "@typescript-eslint/quotes": ["error", "double"],
-    // must disable base semi rule and use @typescript-eslint/semi instead
-    semi: "off",
-    "@typescript-eslint/semi": ["error"],
-    "@typescript-eslint/type-annotation-spacing": "error",
     camelcase: "error",
     eqeqeq: ["error", "smart"],
     "id-blacklist": [
@@ -55,10 +68,8 @@ module.exports = {
     "id-match": "error",
     "no-eval": "error",
     "no-redeclare": "error",
-    "no-trailing-spaces": "error",
     "no-underscore-dangle": "error",
-    "no-var": "error",
-    "spaced-comment": "error"
+    "no-var": "error"
 
     // a11y rules that are being replaced by "jsx-a11y"
     // "@typescript-eslint/tslint/config": [
@@ -101,5 +112,10 @@ module.exports = {
     //         }
     //     }
     // ]
+  },
+  settings: {
+    react: {
+      version: "detect"
+    }
   }
 };
