@@ -55,7 +55,7 @@ let webpackConfig = {
     new ForkTsCheckerWebpackPlugin(),
 
     // hot module replacement
-    new webpack.HotModuleReplacementPlugin(),
+    new webpack.HotModuleReplacementPlugin()
   ],
   module: {
     rules: [
@@ -70,23 +70,23 @@ let webpackConfig = {
             presets: [
               [
                 "@babel/preset-env",
-                { targets: { browsers: "last 2 versions" } }, // or whatever your project requires
+                { targets: { browsers: "last 2 versions" } } // or whatever your project requires
               ],
               "@babel/preset-typescript",
-              "@babel/preset-react",
+              "@babel/preset-react"
             ],
             plugins: [
               // plugin-proposal-decorators is only needed if you're using experimental decorators in TypeScript
               // ['@babel/plugin-proposal-decorators', { legacy: true }],
               ["@babel/plugin-proposal-class-properties", { loose: true }],
-              "react-hot-loader/babel",
-            ],
-          },
-        },
+              "react-hot-loader/babel"
+            ]
+          }
+        }
       },
       {
         test: /\.css$/i,
-        use: ["style-loader", "css-loader"],
+        use: ["style-loader", "css-loader"]
       },
       {
         test: /\.scss$/,
@@ -97,8 +97,8 @@ let webpackConfig = {
               // only enable hot in development
               hmr: process.env.NODE_ENV === "development",
               // if hmr does not work, this is a forceful method.
-              reloadAll: true,
-            },
+              reloadAll: true
+            }
           },
           "css-loader",
           "sass-loader"
@@ -108,17 +108,16 @@ let webpackConfig = {
         test: /\.(png|woff|woff2|eot|ttf|svg).*$/,
         loader: "url-loader?limit=100000"
       }
-    ],
+    ]
   },
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".scss"],
     alias: {
       react: path.resolve("./node_modules/react"),
       "react-dom": "@hot-loader/react-dom",
-      "react-redux": path.resolve("./node_modules/react-redux"),
-    },
-  },
-
+      "react-redux": path.resolve("./node_modules/react-redux")
+    }
+  }
 };
 
 module.exports = webpackConfig;

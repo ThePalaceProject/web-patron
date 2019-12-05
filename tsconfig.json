@@ -6,7 +6,12 @@
     "lib": ["es2017", "dom"],
     "rootDir": "src",
     "types": ["mocha", "node"],
-    "jsx": "react"
+    "jsx": "react",
+    "baseUrl": ".",
+    "paths": {
+      "*": ["node_modules/@types/*", "*"]
+    }
   },
+  "include": ["./src"],
   "exclude": ["lib", "node_modules"]
 }
