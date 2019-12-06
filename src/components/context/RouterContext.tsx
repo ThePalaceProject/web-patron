@@ -36,10 +36,12 @@ export const RouterContextProvider: React.FC = ({ children }) => {
             strict: false
           })
   };
+  // remove this once we update opds web
+  const castChildren = children as React.ReactChild;
 
   return (
     <OPDSRouterContextProvider router={router}>
-      {children}
+      {castChildren}
     </OPDSRouterContextProvider>
   );
 };
