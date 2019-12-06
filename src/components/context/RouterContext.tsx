@@ -3,7 +3,7 @@ import OPDSRouterContextProvider, {
   RouterContext
 } from "opds-web-client/lib/components/context/RouterContext";
 import { Router as RouterType, Location } from "opds-web-client/lib/interfaces";
-import { useHistory, matchPath, useLocation } from "react-router";
+import { useHistory, matchPath, useLocation } from "react-router-dom";
 
 export const RouterContextProvider: React.FC = ({ children }) => {
   const history = useHistory();
