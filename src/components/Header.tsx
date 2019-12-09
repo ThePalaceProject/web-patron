@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import * as React from "react";
 import CatalogLink from "opds-web-client/lib/components/CatalogLink";
 import { HeaderProps } from "opds-web-client/lib/components/Root";
@@ -28,21 +30,16 @@ export interface HeaderContext extends NavigateContext {
 }
 
 /**
- * will get the data it needs from hooks!
+ * will get the data it needs directly from context/
+ * redux store instead of relying on OPDS web client to provide it
  */
 const HeaderFC: React.FC = () => {
   const library = React.useContext(LibraryContext);
-  const loansUrl = useSelector((state: State) => state.loans.url);
-  const isSignedIn = useSelector((state: State) => !!state.auth.credentials);
+  const loansUrl = useSelector((state: State) => state?.loans?.url);
+  const isSignedIn = useSelector((state: State) => !!state?.auth?.credentials);
   const pathFor = React.useContext(PathForContext);
   const { actions, dispatch } = useActions();
   const router = React.useContext(RouterContext);
-  /**
-   *  clearAuthCredentials
-   *  router.push
-   *  pathFor
-   *  fetchLoans
-   */
 
   const signIn = () => {
     if (actions.fetchLoans && loansUrl) {
@@ -56,16 +53,34 @@ const HeaderFC: React.FC = () => {
   };
 
   return (
-    <NavBar>
-      <NavHeader>
+    <nav>
+      {/* <NavHeader>
         <NavBrand className={library.logoUrl ? "with-logo" : ""}>
           <NavBrandTitle>{library.catalogName}</NavBrandTitle>
           <NavBrandSubtitle>Library System</NavBrandSubtitle>
         </NavBrand>
         <NavToggle />
-      </NavHeader>
-
-      <NavCollapse>
+      </NavHeader> */}
+      <div
+        sx={{
+          bg: "primary",
+          color: "white",
+          py: 3,
+          textAlign: "center"
+        }}
+      >
+        <h1
+          sx={{
+            m: 0,
+            mb: 1,
+            fontSize: 3
+          }}
+        >
+          {library.catalogName}
+        </h1>
+        <div>Library System</div>
+      </div>
+      {/* <NavCollapse>
         <NavList>
           {library.headerLinks &&
             library.headerLinks.map(link => (
@@ -100,8 +115,8 @@ const HeaderFC: React.FC = () => {
         </NavList>
 
         <Search />
-      </NavCollapse>
-    </NavBar>
+      </NavCollapse> */}
+    </nav>
   );
 };
 

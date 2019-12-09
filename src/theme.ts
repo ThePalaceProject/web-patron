@@ -1,5 +1,8 @@
 import * as ThemeUi from "theme-ui";
 
+type Overloadable<T> = T & {
+  [overload: string]: any;
+};
 /**
  * It is sometimes useful to define the variables outside the theme object
  * so they can be referenced easily in the theme object
@@ -10,32 +13,41 @@ const heading = {
   fontWeight: "heading"
 };
 
-// Custom color variables
-const blues = ["#e1e6f2", "#6899CB", "#0367A6", "#0F2259"];
+/**
+ * COLORS
+ */
+const blues: Overloadable<Array<string>> = [
+  "#e1e6f2",
+  "#6899CB",
+  "#0467a6",
+  "#0F2259"
+];
+// helpful aliases
+blues.dark = blues[3];
+blues.primary = blues[2];
+blues.medium = blues[1];
+blues.light = blues[0];
+
 const pink = "#D00854";
 const grey = "#B3B9BE";
 const lightGrey = "#f4f4f4";
 
 // Theme color settings... includes above colors
 const colors = {
-  text: blues[3],
+  text: blues.dark,
   background: "#fff",
 
   // ** Colors as intentions **
   // Primary button and link color
-  primary: blues[2],
+  primary: blues.primary,
   // Secondary color - can be used for hover states
-  secondary: blues[1],
+  secondary: blues.medium,
   // A contrast color for emphasizing UI
   accent: pink,
   // A gray or subdued color for decorative purposes
-  muted: blues[0],
+  muted: blues.light,
 
-  // Colors can also be referenced by their aliases directly when needed
-  backgroundBlue: blues[0],
-  lightBlue: blues[1],
-  mediumBlue: blues[2],
-  darkBlue: blues[3],
+  blues,
   lightGrey,
   pink,
   grey

@@ -10,6 +10,12 @@ import RevokeButton from "./RevokeButton";
 import { ComplaintData } from "../interfaces";
 import BookCover from "./BookCover";
 
+const BookDetailsNew: React.FC = () => {
+  return <div>hi from book details</div>;
+};
+
+export default BookDetailsNew;
+
 export interface BookDetailsProps extends DefaultBooKDetailsProps {
   problemTypes: string[];
   fetchComplaintTypes: (url: string) => Promise<string[]>;
@@ -247,4 +253,4 @@ export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
 //   };
 // }
 
-export default BookDetails;
+// export default BookDetails;

@@ -19,11 +19,11 @@ export const RecommendationsContextProvider: React.FC = ({ children }) => {
   );
 };
 
-const useRecommendationsState = () => {
+function useRecommendationsState() {
   const state = React.useContext(RecommendationsStateContext);
   const dispatch = React.useContext(RecommendationsDispatchContext);
   // possibly bind all the actions with dispatch here?
   return [state, dispatch];
-};
+}
 
 export default useRecommendationsState;

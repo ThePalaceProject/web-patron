@@ -6,7 +6,8 @@ export const ComplaintsStateContext = React.createContext(null);
 export const ComplaintsDispatchContext = React.createContext(null);
 
 export const ComplaintsContextProvider: React.FC = ({ children }) => {
-  const [state, dispatch] = useThunkReducer(complaintsReducer, initState);
+  // const [state, dispatch] = useThunkReducer(complaintsReducer, initState);
+  const [state, dispatch] = [1, 2];
 
   return (
     <ComplaintsStateContext.Provider value={state}>
@@ -18,10 +19,10 @@ export const ComplaintsContextProvider: React.FC = ({ children }) => {
 };
 
 const useComplaintsState = () => {
-  const state = React.useContext(ComplaintsStateContext);
-  const dispatch = React.useContext(ComplaintsDispatchContext);
+  // const state = React.useContext(ComplaintsStateContext);
+  // const dispatch = React.useContext(ComplaintsDispatchContext);
   // possibly bind all the actions with dispatch here?
-  return [state, dispatch];
+  // return [state, dispatch];
 };
 
 export default useComplaintsState;
