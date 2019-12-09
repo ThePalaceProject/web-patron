@@ -1,7 +1,6 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { connect } from "react-redux";
 import { fetchComplaintTypes, postComplaint } from "../actions";
 import DefaultBookDetails, {
   BookDetailsProps as DefaultBooKDetailsProps
@@ -9,7 +8,6 @@ import DefaultBookDetails, {
 import ReportProblemLink from "./ReportProblemLink";
 import RevokeButton from "./RevokeButton";
 import { ComplaintData } from "../interfaces";
-import { State } from "../reducers/index";
 import BookCover from "./BookCover";
 
 export interface BookDetailsProps extends DefaultBooKDetailsProps {
@@ -235,23 +233,18 @@ export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
   }
 }
 
-function mapStateToProps(state: State, ownProps) {
-  return {
-    problemTypes: state.complaints.types
-  };
-}
+// function mapStateToProps(state: State, ownProps) {
+//   return {
+//     problemTypes: state.complaints.types
+//   };
+// }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    fetchComplaintTypes: (url: string) => dispatch(fetchComplaintTypes(url)),
-    postComplaint: (url: string, data: ComplaintData) =>
-      dispatch(postComplaint(url, data))
-  };
-}
+// function mapDispatchToProps(dispatch) {
+//   return {
+//     fetchComplaintTypes: (url: string) => dispatch(fetchComplaintTypes(url)),
+//     postComplaint: (url: string, data: ComplaintData) =>
+//       dispatch(postComplaint(url, data))
+//   };
+// }
 
-const ConnectedBookDetails = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(BookDetails);
-
-export default ConnectedBookDetails;
+export default BookDetails;

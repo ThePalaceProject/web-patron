@@ -1,13 +1,16 @@
 import * as React from "react";
-import buildStore from "../../store";
 import { PathFor, PreloadedData } from "../../interfaces";
 import UrlShortener from "../../UrlShortener";
 import { LibraryContextProvider } from "./LibraryContext";
 import { UrlShortenerProvider } from "./UrlShortenerContext";
 import { InitialStateProvider } from "./InitialStateContext";
-import { Provider as StoreProvider } from "react-redux";
 import PathForProvider from "opds-web-client/lib/components/context/PathForContext";
 import { RouterContextProvider } from "./RouterContext";
+import OPDSStore from "opds-web-client/lib/components/context/StoreContext";
+import BasicAuthWithButtonImagePlugin from "../../auth/BasicAuthWithButtonImagePlugin";
+import OAuthPlugin from "../../auth/OAuthPlugin";
+import { ComplaintsContextProvider } from "./ComplaintsContext";
+import { RecommendationsContextProvider } from "./RecommendationsContext";
 
 type ProviderProps = PreloadedData;
 /**
@@ -19,7 +22,6 @@ const AppContextProvider: React.FC<ProviderProps> = ({
   shortenUrls,
   initialState
 }) => {
-  const store = buildStore();
   const libraryId = library.id;
   const urlShortener = new UrlShortener(library.catalogUrl, shortenUrls);
   const pathFor: PathFor = (collectionUrl, bookUrl) => {
@@ -47,15 +49,26 @@ const AppContextProvider: React.FC<ProviderProps> = ({
   return (
     <RouterContextProvider>
       <PathForProvider pathFor={pathFor}>
-        <StoreProvider store={store}>
-          <LibraryContextProvider library={library}>
-            <UrlShortenerProvider urlShortener={urlShortener}>
-              <InitialStateProvider initialState={initialState}>
-                {children}
-              </InitialStateProvider>
-            </UrlShortenerProvider>
-          </LibraryContextProvider>
-        </StoreProvider>
+        <OPDSStore
+          initialState={initialState}
+          authPlugins={[BasicAuthWithButtonImagePlugin, OAuthPlugin]}
+        >
+          <RecommendationsContextProvider>
+            <ComplaintsContextProvider>
+              <LibraryContextProvider library={library}>
+                <UrlShortenerProvider urlShortener={urlShortener}>
+                  {/* is the initial state provider necessary? Why was the initial
+                        state on context originally? Seems it's only necessary to 
+                        initialize the opds store, which we do above.
+                    */}
+                  <InitialStateProvider initialState={initialState}>
+                    {children}
+                  </InitialStateProvider>
+                </UrlShortenerProvider>
+              </LibraryContextProvider>
+            </ComplaintsContextProvider>
+          </RecommendationsContextProvider>
+        </OPDSStore>
       </PathForProvider>
     </RouterContextProvider>
   );

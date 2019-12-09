@@ -1,4 +1,5 @@
 import { State } from "opds-web-client/lib/state";
+import { CollectionState } from "opds-web-client/lib/reducers/collection";
 
 export interface PathFor {
   (collectionUrl: string, bookUrl: string): string;
@@ -45,3 +46,7 @@ declare global {
 export interface WebpackAssets {
   CirculationPatronWeb: string[];
 }
+
+// our CPW useReducer states
+export type RecommendationsState = CollectionState;
+export { ComplaintsState } from "./reducers/complaints";

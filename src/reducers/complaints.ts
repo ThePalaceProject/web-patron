@@ -5,7 +5,7 @@ export interface ComplaintsState {
   error: any;
 }
 
-const initState: ComplaintsState = {
+export const initState: ComplaintsState = {
   isFetching: false,
   isPosting: false,
   types: [],
