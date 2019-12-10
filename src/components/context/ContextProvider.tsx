@@ -11,6 +11,7 @@ import BasicAuthWithButtonImagePlugin from "../../auth/BasicAuthWithButtonImageP
 import OAuthPlugin from "../../auth/OAuthPlugin";
 import { ComplaintsContextProvider } from "./ComplaintsContext";
 import { RecommendationsContextProvider } from "./RecommendationsContext";
+import { Provider as ReakitProvider } from "reakit";
 
 type ProviderProps = PreloadedData;
 /**
@@ -47,30 +48,32 @@ const AppContextProvider: React.FC<ProviderProps> = ({
   };
 
   return (
-    <RouterContextProvider>
-      <PathForProvider pathFor={pathFor}>
-        <OPDSStore
-          initialState={initialState}
-          authPlugins={[BasicAuthWithButtonImagePlugin, OAuthPlugin]}
-        >
-          <RecommendationsContextProvider>
-            <ComplaintsContextProvider>
-              <LibraryContextProvider library={library}>
-                <UrlShortenerProvider urlShortener={urlShortener}>
-                  {/* is the initial state provider necessary? Why was the initial
-                        state on context originally? Seems it's only necessary to 
-                        initialize the opds store, which we do above.
-                    */}
-                  <InitialStateProvider initialState={initialState}>
-                    {children}
-                  </InitialStateProvider>
-                </UrlShortenerProvider>
-              </LibraryContextProvider>
-            </ComplaintsContextProvider>
-          </RecommendationsContextProvider>
-        </OPDSStore>
-      </PathForProvider>
-    </RouterContextProvider>
+    <ReakitProvider>
+      <RouterContextProvider>
+        <PathForProvider pathFor={pathFor}>
+          <OPDSStore
+            initialState={initialState}
+            authPlugins={[BasicAuthWithButtonImagePlugin, OAuthPlugin]}
+          >
+            <RecommendationsContextProvider>
+              <ComplaintsContextProvider>
+                <LibraryContextProvider library={library}>
+                  <UrlShortenerProvider urlShortener={urlShortener}>
+                    {/* is the initial state provider necessary? Why was the initial
+                          state on context originally? Seems it's only necessary to 
+                          initialize the opds store, which we do above.
+                      */}
+                    <InitialStateProvider initialState={initialState}>
+                      {children}
+                    </InitialStateProvider>
+                  </UrlShortenerProvider>
+                </LibraryContextProvider>
+              </ComplaintsContextProvider>
+            </RecommendationsContextProvider>
+          </OPDSStore>
+        </PathForProvider>
+      </RouterContextProvider>
+    </ReakitProvider>
   );
 };
 
