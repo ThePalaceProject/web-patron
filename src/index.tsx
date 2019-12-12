@@ -3,6 +3,8 @@ import * as ReactDOM from "react-dom";
 import App from "./App";
 import ContextProvider from "./components/context/ContextProvider";
 import { BrowserRouter } from "react-router-dom";
+import "typeface-jomhuria";
+import "typeface-oswald";
 /**
  * This data is set on the window when server-rendering
  */

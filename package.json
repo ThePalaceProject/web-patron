@@ -82,6 +82,7 @@
     "@emotion/core": "^10.0.22",
     "@emotion/styled": "^10.0.23",
     "@mdx-js/react": "^1.5.1",
+    "@theme-ui/color": "^0.2.49",
     "bootstrap": "^3.3.6",
     "express": "^4.14.0",
     "font-awesome": "^4.7.0",
@@ -102,6 +103,8 @@
     "styled-system": "^5.1.2",
     "theme-ui": "^0.2.46",
     "tinycolor2": "^1.4.1",
+    "typeface-jomhuria": "0.0.61",
+    "typeface-oswald": "0.0.75",
     "universal-url": "^1.0.1"
   },
   "husky": {
