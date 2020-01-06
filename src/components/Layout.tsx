@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx } from "theme-ui";
+import { jsx, Styled } from "theme-ui";
 import * as React from "react";
 import GlobalStyles from "./GlobalStyles";
 import Header from "./Header";
@@ -14,13 +14,13 @@ import Header from "./Header";
  * context or should it be passed via render prop or what?
  */
 
-const Layout = () => {
+const Layout: React.FC = ({ children }) => {
   return (
-    <React.Fragment>
+    <Styled.root>
       <GlobalStyles />
       <Header />
-      <main>hi from main</main>
-    </React.Fragment>
+      <main>{children}</main>
+    </Styled.root>
   );
 };
 
