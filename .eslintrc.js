@@ -26,6 +26,7 @@ module.exports = {
     "plugin:prettier/recommended"
   ],
   rules: {
+    "@typescript-eslint/no-empty-interface": 0,
     "@typescript-eslint/no-use-before-define": [
       "error",
       { functions: false, variables: false }
