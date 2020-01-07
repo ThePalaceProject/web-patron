@@ -1,10 +1,16 @@
 import CatalogHandler from "./components/CatalogHandler";
+import BookDetails from "./components/BookDetails";
 
 export const singleLibraryRoutes = [
   {
+    path: "/book/:bookUrl",
+    component: BookDetails,
+    exact: true
+  },
+  {
     path: "/(collection/:collectionUrl)(/)(book/:bookUrl)",
     component: CatalogHandler,
-    exact: false
+    exact: true
   },
   {
     path: "/",
@@ -14,6 +20,11 @@ export const singleLibraryRoutes = [
 ];
 
 export const multiLibraryRoutes = [
+  {
+    path: "/:library/book/:bookUrl",
+    component: BookDetails,
+    exact: false
+  },
   {
     path: "/:library(/)(collection/:collectionUrl)(/)(book/:bookUrl)",
     component: CatalogHandler,

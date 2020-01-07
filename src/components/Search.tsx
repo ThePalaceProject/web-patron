@@ -1,50 +1,72 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import * as React from "react";
-import styled from "../styled";
+import TextInput from "./TextInput";
+import Button from "./Button";
+import { useSelector } from "react-redux";
+import { State } from "opds-web-client/lib/state";
+import useActions from "../hooks/useActions";
+import { useHistory } from "react-router-dom";
 
-const SearchForm = styled.form`
-  display: inline-block;
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-`;
-SearchForm.defaultProps = {
-  role: "search"
-};
+interface SearchProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  // onSearch: () => void;
+  // onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
 
-const SearchInput = styled.input`
-  border-radius: 10px;
-  border-color: #343434;
-  padding: 8px;
-  border-width: 1px;
-`;
-SearchInput.defaultProps = {
-  type: "text",
-  name: "search",
-  title: "Search",
-  placeholder: "Search"
-};
+/**
+ * Search component providing input and
+ * search button with styles and defaults. Relies on OWC
+ * searchData and fetchSearchDescription
+ *
+ * 1. fetchSearchDescription whenever the url changes to get searchData
+ * 2. use searchData to populate the title and placeholder
+ */
+const Search: React.FC<SearchProps> = ({ ...props }) => {
+  const [value, setValue] = React.useState("");
+  const history = useHistory();
+  const searchData = useSelector(
+    (state: State) => state?.collection?.data?.search
+  );
+  const { actions, dispatch } = useActions();
 
-const SearchButton = styled.button`
-  -webkit-appearance: none;
-  background: #343434;
-  color: white;
-  border: none;
-  padding: 10px;
-  margin-left: 20px;
-  border-radius: 10px;
-  text-transform: uppercase;
-  font-size: 0.9em;
-  font-weight: bold;
-`;
-SearchButton.defaultProps = {
-  type: "submit"
-};
+  React.useEffect(() => {
+    // fetch the search description
+    if (searchData?.url) {
+      dispatch(actions.fetchSearchDescription(searchData?.url));
+    }
+  }, [actions, dispatch, searchData]);
 
-export const Search = props => {
+  // handle the search
+  const onSearch = () => {
+    const searchTerms = encodeURIComponent(value);
+    const url = searchData?.searchData.template(searchTerms);
+    // navigate us to the new url
+    history.push(url);
+  };
+
   return (
-    <SearchForm>
-      <SearchInput />
-      <SearchButton>Search</SearchButton>
-    </SearchForm>
+    <form
+      sx={{
+        display: "inline-block"
+      }}
+      onSubmit={onSearch}
+      role="search"
+    >
+      <TextInput
+        type="search"
+        name="search"
+        title={searchData?.searchData?.shortName}
+        placeholder={searchData?.searchData?.shortName}
+        aria-label="Enter search keyword or keywords"
+        value={value}
+        onChange={e => setValue(e.target.value)}
+        {...props}
+      />
+      <Button type="submit" sx={{ m: 1 }} onClick={onSearch}>
+        Search
+      </Button>
+    </form>
   );
 };
+
+export default Search;

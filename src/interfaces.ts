@@ -50,3 +50,7 @@ export interface WebpackAssets {
 // our CPW useReducer states
 export type RecommendationsState = CollectionState;
 export { ComplaintsState } from "./reducers/complaints";
+
+export { Theme, ButtonVariants, TextVariants } from "./theme";
+// helper for theme variant prop types
+export type VariantProp<VType> = Exclude<keyof VType, keyof {}>;

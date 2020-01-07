@@ -44,7 +44,7 @@ const CatalogHandler = () => {
         initialState={initialState}
         authPlugins={[BasicAuthWithButtonImagePlugin, OAuthPlugin]}
       /> */}
-      <Layout />
+      {/* <Layout /> */}
     </div>
   );
 };

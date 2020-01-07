@@ -1,8 +1,23 @@
 import * as ThemeUi from "theme-ui";
+import { darken, lighten } from "@theme-ui/color";
+import { SystemStyleObject } from "@styled-system/css";
 
-type Overloadable<T> = T & {
-  [overload: string]: any;
+type Overloadable<T, K> = T & {
+  [overload: string]: K;
 };
+// allow us to add custom variant keys to the theme
+
+export type ButtonVariants = {
+  primary: SystemStyleObject;
+  flat: SystemStyleObject;
+};
+
+export type TextVariants = {};
+
+export type Theme = {
+  text: TextVariants;
+  buttons: ButtonVariants;
+} & ThemeUi.Theme;
 /**
  * It is sometimes useful to define the variables outside the theme object
  * so they can be referenced easily in the theme object
@@ -16,12 +31,14 @@ const heading = {
 /**
  * COLORS
  */
-const blues: Overloadable<Array<string>> = [
+const blues = [
   "#e1e6f2",
   "#6899CB",
   "#0467a6",
   "#0F2259"
-];
+  // have to cast it beecause ts doesn't let you overload
+  // array literals usually
+] as Overloadable<string[], string>;
 // helpful aliases
 blues.dark = blues[3];
 blues.primary = blues[2];
@@ -56,7 +73,7 @@ const colors = {
 /** Borders */
 const radii = [0, 2, 4, 8];
 
-const theme: ThemeUi.Theme = {
+const theme: Theme = {
   colors,
   breakpoints: ["40em", "52em", "64em"],
   space: [0, 4, 8, 16, 32, 64, 128, 256, 512],
@@ -69,9 +86,10 @@ const theme: ThemeUi.Theme = {
     solid: "1px solid"
   },
   fonts: {
-    body: "system-ui, sans-serif",
+    body: "Oswald, system-ui, sans-serif",
     heading: "inherit",
-    monospace: "Menlo, monospace"
+    monospace: "Menlo, monospace",
+    bookTitle: "Jomhuria"
   },
   fontSizes: [12, 14, 16, 20, 24, 32, 48, 64, 96],
   fontWeights: {
@@ -133,6 +151,27 @@ const theme: ThemeUi.Theme = {
     td: {
       textAlign: "left",
       borderBottomStyle: "solid"
+    }
+  },
+  // variants
+  text: {},
+  buttons: {
+    primary: {
+      bg: "primary",
+      color: "white",
+      borderRadius: "8px",
+      "&:focus,&:hover": {
+        bg: darken("primary", 0.05)
+      },
+      "&:active": {
+        bg: darken("primary", 0.1)
+      },
+      textTransform: "uppercase",
+      letterSpacing: "0.05em"
+    },
+    flat: {
+      bg: "white",
+      color: "blues.dark"
     }
   }
 };

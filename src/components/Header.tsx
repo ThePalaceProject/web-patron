@@ -1,29 +1,18 @@
 /** @jsx jsx */
-import { jsx } from "theme-ui";
+import { jsx, Styled, Flex } from "theme-ui";
 import * as React from "react";
-import CatalogLink from "opds-web-client/lib/components/CatalogLink";
-import { HeaderProps } from "opds-web-client/lib/components/Root";
 import { NavigateContext } from "opds-web-client/lib/interfaces";
 import { LibraryData } from "../interfaces";
-import * as PropTypes from "prop-types";
 import LibraryContext from "./context/LibraryContext";
-import { useSelector } from "react-redux";
 import RouterContext from "./context/RouterContext";
-
-import {
-  NavBar,
-  NavHeader,
-  NavBrand,
-  NavBrandTitle,
-  NavBrandSubtitle,
-  NavToggle,
-  NavCollapse,
-  NavList
-} from "./NavBar";
-import { Search } from "./Search";
+import Search from "./Search";
 import { State } from "opds-web-client/lib/state";
 import { PathForContext } from "opds-web-client/lib/components/context/PathForContext";
 import useActions from "../hooks/useActions";
+import Button from "./Button";
+import useCatalogLink from "../hooks/useCatalogLink";
+import Link from "./Link";
+import useTypedSelector from "../hooks/useTypedSelector";
 
 export interface HeaderContext extends NavigateContext {
   library: LibraryData;
@@ -35,88 +24,113 @@ export interface HeaderContext extends NavigateContext {
  */
 const HeaderFC: React.FC = () => {
   const library = React.useContext(LibraryContext);
-  const loansUrl = useSelector((state: State) => state?.loans?.url);
-  const isSignedIn = useSelector((state: State) => !!state?.auth?.credentials);
+  const loansUrl = useTypedSelector((state: State) => state?.loans?.url);
   const pathFor = React.useContext(PathForContext);
   const { actions, dispatch } = useActions();
   const router = React.useContext(RouterContext);
 
-  const signIn = () => {
-    if (actions.fetchLoans && loansUrl) {
-      dispatch(actions.fetchLoans(loansUrl));
-    }
-  };
+  // nav links
+  const homeUrl = useCatalogLink(null);
+  const myBooksUrl = useCatalogLink(null, loansUrl);
+  const goMyBooks = () => router.push(myBooksUrl);
+  // return <div>hi from header</div>;
 
-  const signOut = () => {
-    dispatch(actions.clearAuthCredentials());
-    router.push(pathFor(library.catalogUrl, null));
-  };
+  // sign in
+  // const isSignedIn = useTypedSelector(
+  //   (state: State) => state.auth //!!state?.auth?.credentials
+  // );
+  // const signIn = () => {
+  //   if (actions.fetchLoans && loansUrl) {
+  //     dispatch(actions.fetchLoans(loansUrl));
+  //   }
+  // };
+  // const signOut = () => {
+  //   dispatch(actions.clearAuthCredentials());
+  //   router.push(pathFor(library.catalogUrl, null));
+  // };
 
   return (
-    <nav>
-      {/* <NavHeader>
-        <NavBrand className={library.logoUrl ? "with-logo" : ""}>
-          <NavBrandTitle>{library.catalogName}</NavBrandTitle>
-          <NavBrandSubtitle>Library System</NavBrandSubtitle>
-        </NavBrand>
-        <NavToggle />
-      </NavHeader> */}
-      <div
+    <header
+      sx={{
+        display: "flex",
+        flexDirection: ["column", "column", "row"],
+        alignItems: ["stretch", "stretch", "flex-end"]
+      }}
+    >
+      <Link
         sx={{
+          display: "block",
           bg: "primary",
           color: "white",
-          py: 3,
-          textAlign: "center"
+          py: 2,
+          textAlign: "center",
+          padding: [2, 4]
         }}
+        to={homeUrl}
       >
-        <h1
+        <Styled.h2
           sx={{
             m: 0,
             mb: 1,
-            fontSize: 3
+            fontSize: [2, 3]
           }}
         >
           {library.catalogName}
-        </h1>
-        <div>Library System</div>
-      </div>
-      {/* <NavCollapse>
-        <NavList>
-          {library.headerLinks &&
-            library.headerLinks.map(link => (
-              <li key={link.href}>
+        </Styled.h2>
+        <span
+          sx={{
+            fontSize: [0, 1],
+            textTransform: "uppercase",
+            letterSpacing: "0.05em"
+          }}
+        >
+          Library System
+        </span>
+      </Link>
+      <Flex
+        sx={{
+          flexDirection: ["column", "row"],
+          flexWrap: "wrap",
+          alignItems: ["center", "flex-end"],
+          justifyContent: "space-between",
+          flex: 1
+        }}
+      >
+        <Flex
+          sx={{ flexDirection: "row", justifyContent: "center", p: [2, 0] }}
+        >
+          <Button
+            sx={{ m: 1, mb: [1, 0] }}
+            variant="primary"
+            onClick={goMyBooks}
+          >
+            My Books
+          </Button>
+          <Button
+            sx={{ m: 1, mb: [1, 0] }}
+            variant="primary"
+            // onClick={goSettings}
+          >
+            Settings
+          </Button>
+          <Flex
+            as="ol"
+            sx={{ flexDirection: "row", alignItems: "center", p: 0, m: 1 }}
+          >
+            {library?.headerLinks?.map(link => (
+              <li sx={{ listStyle: "none" }} key={link.href}>
                 <a href={link.href} title={link.title}>
                   {link.title}
                 </a>
               </li>
             ))}
-          <li>
-            <CatalogLink collectionUrl={library.catalogUrl} bookUrl={null}>
-              Catalog
-            </CatalogLink>
-          </li>
-          {loansUrl && isSignedIn && (
-            <li>
-              <CatalogLink collectionUrl={loansUrl} bookUrl={null}>
-                My Books
-              </CatalogLink>
-            </li>
-          )}
-          {loansUrl && isSignedIn && (
-            <li>
-              <button onClick={signOut}>Sign Out</button>
-            </li>
-          )}
-          {loansUrl && !isSignedIn && (
-            <li>
-              <button onClick={signIn}>Sign In</button>
-            </li>
-          )}
-        </NavList>
-
-        <Search />
-      </NavCollapse> */}
-    </nav>
+          </Flex>
+        </Flex>
+        <Flex sx={{ justifyContent: "center", p: 2 }}>
+          <Search />
+        </Flex>
+      </Flex>
+    </header>
   );
 };
 

@@ -88,12 +88,12 @@ const ssr = ({ shortenUrls, cache, routes, circManagerBase }) => async (
       }
     }
     const catalogUrl = libraryData.catalogUrl;
+    const urlShortener = new UrlShortener(catalogUrl, shortenUrls);
 
     /**
      * Redirect if there is neither a collectionUrl or a bookUrl
      */
     if (!collectionUrl && !bookUrl) {
-      const urlShortener = new UrlShortener(catalogUrl, shortenUrls);
       const preparedCollectionUrl = urlShortener.prepareCollectionUrl(
         catalogUrl
       );
@@ -111,12 +111,14 @@ const ssr = ({ shortenUrls, cache, routes, circManagerBase }) => async (
         return;
       }
     }
-
+    // we need to expand the bookUrl before making a request to it, otherwise
+    // we get an error
+    const fullBookUrl = urlShortener.expandBookUrl(bookUrl);
     // build the page and send it
     try {
       const fullPage = await buildPage(
         collectionUrl,
-        bookUrl,
+        fullBookUrl,
         libraryData,
         shortenUrls,
         req,

@@ -9,235 +9,280 @@ import ReportProblemLink from "./ReportProblemLink";
 import RevokeButton from "./RevokeButton";
 import { ComplaintData } from "../interfaces";
 import BookCover from "./BookCover";
+import { useParams } from "react-router-dom";
+import useTypedSelector from "../hooks/useTypedSelector";
+// import useCollectionAndBook from "../hooks/useCollectionAndBook";
+import {
+  mapDispatchToProps,
+  mapStateToProps,
+  mergeRootProps
+} from "opds-web-client/lib/components/mergeRootProps";
+import { CollectionData, BookData } from "opds-web-client/lib/interfaces";
+import { connect } from "react-redux";
+import { useUrlShortener } from "./context/UrlShortenerContext";
 
-const BookDetailsNew: React.FC = () => {
-  return <div>hi from book details</div>;
+export interface BookDetailsPropsNew extends DefaultBooKDetailsProps {
+  setCollectionAndBook: (
+    collectionUrl: string,
+    bookUrl: string
+  ) => Promise<{
+    collectionData: CollectionData;
+    bookData: BookData;
+  }>;
+}
+
+const BookDetailsNew: React.FC<BookDetailsPropsNew> = ({
+  setCollectionAndBook
+}) => {
+  const { bookUrl, collectionUrl } = useParams();
+  const urlShortener = useUrlShortener();
+
+  // set the collection and book whenever the urls change
+  React.useEffect(() => {
+    const fullCollectionUrl = urlShortener.expandCollectionUrl(collectionUrl);
+    const fullBookUrl = urlShortener.expandBookUrl(bookUrl);
+    setCollectionAndBook(fullCollectionUrl, fullBookUrl);
+  }, [collectionUrl, bookUrl, urlShortener, setCollectionAndBook]);
+
+  const bookState = useTypedSelector(state => state.book);
+  console.log(bookState);
+
+  return <div>Current URL: {bookUrl}</div>;
 };
 
-export default BookDetailsNew;
+const Connected = connect(
+  mapStateToProps,
+  mapDispatchToProps,
+  mergeRootProps
+)(BookDetailsNew);
 
-export interface BookDetailsProps extends DefaultBooKDetailsProps {
-  problemTypes: string[];
-  fetchComplaintTypes: (url: string) => Promise<string[]>;
-  postComplaint: (url: string, data: ComplaintData) => Promise<any>;
-}
+// am doing this because typescript throws an error when trying to use
+// redux ConnectedComponent inside of Route
+const Wrapper = props => <Connected {...props} />;
+export default Wrapper;
 
-export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
-  constructor(props) {
-    super(props);
-    this.revoke = this.revoke.bind(this);
-  }
+// export interface BookDetailsProps extends DefaultBooKDetailsProps {
+//   problemTypes: string[];
+//   fetchComplaintTypes: (url: string) => Promise<string[]>;
+//   postComplaint: (url: string, data: ComplaintData) => Promise<any>;
+// }
 
-  fieldNames() {
-    return [
-      "Published",
-      "Publisher",
-      "Audience",
-      "Categories",
-      "Distributed By"
-    ];
-  }
+// export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
+//   constructor(props) {
+//     super(props);
+//     this.revoke = this.revoke.bind(this);
+//   }
 
-  // override the inherited setBodyOverflow so that it does nothing.
-  setBodyOverflow(value: string) {
-    return;
-  }
+//   fieldNames() {
+//     return [
+//       "Published",
+//       "Publisher",
+//       "Audience",
+//       "Categories",
+//       "Distributed By"
+//     ];
+//   }
 
-  fields() {
-    const fields = super.fields();
-    const categoriesIndex = fields.findIndex(
-      field => field.name === "Categories"
-    );
-    fields[categoriesIndex].value = this.categories();
-    fields.push({
-      name: "Audience",
-      value: this.audience()
-    });
-    fields.push({
-      name: "Distributed By",
-      value: this.distributor()
-    });
-    return fields;
-  }
+//   // override the inherited setBodyOverflow so that it does nothing.
+//   setBodyOverflow(value: string) {
+//     return;
+//   }
 
-  audience() {
-    if (!this.props.book) {
-      return null;
-    }
+//   fields() {
+//     const fields = super.fields();
+//     const categoriesIndex = fields.findIndex(
+//       field => field.name === "Categories"
+//     );
+//     fields[categoriesIndex].value = this.categories();
+//     fields.push({
+//       name: "Audience",
+//       value: this.audience()
+//     });
+//     fields.push({
+//       name: "Distributed By",
+//       value: this.distributor()
+//     });
+//     return fields;
+//   }
 
-    const categories = this.props.book.raw.category;
+//   audience() {
+//     if (!this.props.book) {
+//       return null;
+//     }
 
-    if (!categories) {
-      return null;
-    }
+//     const categories = this.props.book.raw.category;
 
-    const audience = categories.find(
-      category =>
-        category["$"]["scheme"] &&
-        category["$"]["scheme"]["value"] === "http://schema.org/audience"
-    );
+//     if (!categories) {
+//       return null;
+//     }
 
-    if (!audience) {
-      return null;
-    }
+//     const audience = categories.find(
+//       category =>
+//         category["$"]["scheme"] &&
+//         category["$"]["scheme"]["value"] === "http://schema.org/audience"
+//     );
 
-    let audienceStr = audience["$"]["label"] && audience["$"]["label"]["value"];
+//     if (!audience) {
+//       return null;
+//     }
 
-    if (["Adult", "Adults Only"].indexOf(audienceStr) !== -1) {
-      return audienceStr;
-    }
+//     let audienceStr = audience["$"]["label"] && audience["$"]["label"]["value"];
 
-    const targetAge = categories.find(
-      category =>
-        category["$"]["scheme"] &&
-        category["$"]["scheme"]["value"] === "http://schema.org/typicalAgeRange"
-    );
+//     if (["Adult", "Adults Only"].indexOf(audienceStr) !== -1) {
+//       return audienceStr;
+//     }
 
-    if (targetAge) {
-      const targetAgeStr =
-        targetAge["$"]["label"] && targetAge["$"]["label"]["value"];
-      audienceStr += " (age " + targetAgeStr + ")";
-    }
+//     const targetAge = categories.find(
+//       category =>
+//         category["$"]["scheme"] &&
+//         category["$"]["scheme"]["value"] === "http://schema.org/typicalAgeRange"
+//     );
 
-    return audienceStr;
-  }
+//     if (targetAge) {
+//       const targetAgeStr =
+//         targetAge["$"]["label"] && targetAge["$"]["label"]["value"];
+//       audienceStr += " (age " + targetAgeStr + ")";
+//     }
 
-  categories() {
-    if (!this.props.book) {
-      return null;
-    }
+//     return audienceStr;
+//   }
 
-    const audienceSchemas = [
-      "http://schema.org/audience",
-      "http://schema.org/typicalAgeRange"
-    ];
-    const fictionScheme = "http://librarysimplified.org/terms/fiction/";
-    const rawCategories = this.props.book.raw.category;
+//   categories() {
+//     if (!this.props.book) {
+//       return null;
+//     }
 
-    let categories = rawCategories
-      .filter(
-        category =>
-          category["$"]["label"] &&
-          category["$"]["scheme"] &&
-          audienceSchemas
-            .concat([fictionScheme])
-            .indexOf(category["$"]["scheme"]["value"]) === -1
-      )
-      .map(category => category["$"]["label"]["value"]);
+//     const audienceSchemas = [
+//       "http://schema.org/audience",
+//       "http://schema.org/typicalAgeRange"
+//     ];
+//     const fictionScheme = "http://librarysimplified.org/terms/fiction/";
+//     const rawCategories = this.props.book.raw.category;
 
-    if (!categories.length) {
-      categories = rawCategories
-        .filter(
-          category =>
-            category["$"]["label"] &&
-            category["$"]["scheme"] &&
-            category["$"]["scheme"]["value"] === fictionScheme
-        )
-        .map(category => category["$"]["label"]["value"]);
-    }
+//     let categories = rawCategories
+//       .filter(
+//         category =>
+//           category["$"]["label"] &&
+//           category["$"]["scheme"] &&
+//           audienceSchemas
+//             .concat([fictionScheme])
+//             .indexOf(category["$"]["scheme"]["value"]) === -1
+//       )
+//       .map(category => category["$"]["label"]["value"]);
 
-    return categories.length > 0 ? categories.join(", ") : null;
-  }
+//     if (!categories.length) {
+//       categories = rawCategories
+//         .filter(
+//           category =>
+//             category["$"]["label"] &&
+//             category["$"]["scheme"] &&
+//             category["$"]["scheme"]["value"] === fictionScheme
+//         )
+//         .map(category => category["$"]["label"]["value"]);
+//     }
 
-  distributor() {
-    if (!this.props.book) {
-      return null;
-    }
+//     return categories.length > 0 ? categories.join(", ") : null;
+//   }
 
-    const rawDistributionTags = this.props.book.raw["bibframe:distribution"];
-    if (!rawDistributionTags || rawDistributionTags.length < 1) {
-      return null;
-    }
+//   distributor() {
+//     if (!this.props.book) {
+//       return null;
+//     }
 
-    const distributor = rawDistributionTags[0]["$"]["bibframe:ProviderName"];
-    if (!distributor) {
-      return null;
-    }
+//     const rawDistributionTags = this.props.book.raw["bibframe:distribution"];
+//     if (!rawDistributionTags || rawDistributionTags.length < 1) {
+//       return null;
+//     }
 
-    return distributor.value;
-  }
+//     const distributor = rawDistributionTags[0]["$"]["bibframe:ProviderName"];
+//     if (!distributor) {
+//       return null;
+//     }
 
-  reportUrl() {
-    const reportLink = this.props.book.raw.link.find(
-      link => link["$"]["rel"]["value"] === "issues"
-    );
+//     return distributor.value;
+//   }
 
-    if (!reportLink) {
-      return null;
-    }
+//   reportUrl() {
+//     const reportLink = this.props.book.raw.link.find(
+//       link => link["$"]["rel"]["value"] === "issues"
+//     );
 
-    return reportLink["$"]["href"]["value"];
-  }
+//     if (!reportLink) {
+//       return null;
+//     }
 
-  revokeUrl() {
-    const revokeLink = this.props.book.raw.link.find(
-      link =>
-        link["$"]["rel"]["value"] ===
-        "http://librarysimplified.org/terms/rel/revoke"
-    );
+//     return reportLink["$"]["href"]["value"];
+//   }
 
-    if (!revokeLink) {
-      return null;
-    }
+//   revokeUrl() {
+//     const revokeLink = this.props.book.raw.link.find(
+//       link =>
+//         link["$"]["rel"]["value"] ===
+//         "http://librarysimplified.org/terms/rel/revoke"
+//     );
 
-    return revokeLink["$"]["href"]["value"];
-  }
+//     if (!revokeLink) {
+//       return null;
+//     }
 
-  revoke() {
-    const revokeUrl = this.revokeUrl();
-    return this.props.updateBook(revokeUrl);
-  }
+//     return revokeLink["$"]["href"]["value"];
+//   }
 
-  circulationLinks() {
-    const links = super.circulationLinks();
-    if (this.isBorrowed()) {
-      links.push(
-        <div className="app-info">
-          Your book is ready to download in your reading app.
-        </div>
-      );
-    }
+//   revoke() {
+//     const revokeUrl = this.revokeUrl();
+//     return this.props.updateBook(revokeUrl);
+//   }
 
-    // Books with DRM can only be returned through Adobe,
-    // so we don't show revoke links for them.
-    if (this.isOpenAccess() && this.revokeUrl()) {
-      links.push(
-        <RevokeButton
-          className="btn btn-default revoke-button"
-          revoke={this.revoke}
-        >
-          Return Now
-        </RevokeButton>
-      );
-    }
-    return links;
-  }
+//   circulationLinks() {
+//     const links = super.circulationLinks();
+//     if (this.isBorrowed()) {
+//       links.push(
+//         <div className="app-info">
+//           Your book is ready to download in your reading app.
+//         </div>
+//       );
+//     }
 
-  rightColumnLinks() {
-    const reportUrl = this.reportUrl();
-    return reportUrl ? (
-      <ReportProblemLink
-        className="btn btn-link"
-        reportUrl={reportUrl}
-        fetchTypes={this.props.fetchComplaintTypes}
-        report={this.props.postComplaint}
-        types={this.props.problemTypes}
-      />
-    ) : null;
-  }
+//     // Books with DRM can only be returned through Adobe,
+//     // so we don't show revoke links for them.
+//     if (this.isOpenAccess() && this.revokeUrl()) {
+//       links.push(
+//         <RevokeButton
+//           className="btn btn-default revoke-button"
+//           revoke={this.revoke}
+//         >
+//           Return Now
+//         </RevokeButton>
+//       );
+//     }
+//     return links;
+//   }
 
-  render() {
-    return (
-      <div
-        sx={{
-          bg: "papayawhip"
-        }}
-      >
-        <BookCover />
-      </div>
-    );
-  }
-}
+//   rightColumnLinks() {
+//     const reportUrl = this.reportUrl();
+//     return reportUrl ? (
+//       <ReportProblemLink
+//         className="btn btn-link"
+//         reportUrl={reportUrl}
+//         fetchTypes={this.props.fetchComplaintTypes}
+//         report={this.props.postComplaint}
+//         types={this.props.problemTypes}
+//       />
+//     ) : null;
+//   }
+
+//   render() {
+//     return (
+//       <div
+//         sx={{
+//           bg: "papayawhip"
+//         }}
+//       >
+//         <BookCover />
+//       </div>
+//     );
+//   }
+// }
 
 // function mapStateToProps(state: State, ownProps) {
 //   return {
