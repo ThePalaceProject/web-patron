@@ -13,7 +13,8 @@ module.exports = {
     "@typescript-eslint",
     // "@typescript-eslint/tslint",
     "jsx-a11y",
-    "prettier"
+    "prettier",
+    "react-hooks"
   ],
   extends: [
     "eslint:recommended",
@@ -26,6 +27,8 @@ module.exports = {
     "plugin:prettier/recommended"
   ],
   rules: {
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
     "@typescript-eslint/no-empty-interface": 0,
     "@typescript-eslint/no-use-before-define": [
       "error",
