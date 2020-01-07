@@ -65,6 +65,7 @@ let webpackConfig = {
         use: {
           loader: "babel-loader",
           options: {
+            sourceType: "unambiguous",
             cacheDirectory: true,
             babelrc: false,
             presets: [
@@ -78,6 +79,7 @@ let webpackConfig = {
             plugins: [
               // plugin-proposal-decorators is only needed if you're using experimental decorators in TypeScript
               // ['@babel/plugin-proposal-decorators', { legacy: true }],
+              "@babel/plugin-transform-runtime",
               ["@babel/plugin-proposal-class-properties", { loose: true }],
               "react-hot-loader/babel",
               "@babel/plugin-proposal-optional-chaining"
