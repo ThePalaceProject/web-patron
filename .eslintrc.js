@@ -24,7 +24,8 @@ module.exports = {
     "plugin:jsx-a11y/strict",
     "prettier",
     "prettier/@typescript-eslint",
-    "plugin:prettier/recommended"
+    "plugin:prettier/recommended",
+    "prettier/react"
   ],
   rules: {
     "react-hooks/rules-of-hooks": "error",

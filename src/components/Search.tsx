@@ -5,7 +5,7 @@ import TextInput from "./TextInput";
 import Button from "./Button";
 import { useSelector } from "react-redux";
 import { State } from "opds-web-client/lib/state";
-import useActions from "../hooks/useActions";
+import { useActions } from "./context/ActionsContext";
 import { useHistory } from "react-router-dom";
 
 interface SearchProps extends React.InputHTMLAttributes<HTMLInputElement> {

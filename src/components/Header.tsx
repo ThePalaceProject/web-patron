@@ -8,7 +8,7 @@ import RouterContext from "./context/RouterContext";
 import Search from "./Search";
 import { State } from "opds-web-client/lib/state";
 import { PathForContext } from "opds-web-client/lib/components/context/PathForContext";
-import useActions from "../hooks/useActions";
+import { useActions } from "../components/context/ActionsContext";
 import Button from "./Button";
 import useCatalogLink from "../hooks/useCatalogLink";
 import Link from "./Link";
@@ -22,7 +22,7 @@ export interface HeaderContext extends NavigateContext {
  * will get the data it needs directly from context/
  * redux store instead of relying on OPDS web client to provide it
  */
-const HeaderFC: React.FC = () => {
+const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
   const library = React.useContext(LibraryContext);
   const loansUrl = useTypedSelector((state: State) => state?.loans?.url);
   const pathFor = React.useContext(PathForContext);
@@ -56,6 +56,7 @@ const HeaderFC: React.FC = () => {
         flexDirection: ["column", "column", "row"],
         alignItems: ["stretch", "stretch", "flex-end"]
       }}
+      className={className}
     >
       <Link
         sx={{

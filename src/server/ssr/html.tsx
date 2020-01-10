@@ -53,6 +53,10 @@ const Html = ({
           />
         ))}
         {renderCSS(assets.CirculationPatronWeb)}
+        <link
+          href="https://fonts.googleapis.com/css?family=Jomhuria|Oswald&display=swap"
+          rel="stylesheet"
+        ></link>
       </head>
       <body>
         <div

@@ -24,7 +24,7 @@ const Button: React.FC<ButtonProps> = ({ variant = "primary", ...props }) => {
         px: 3,
         py: 1,
         border: 0,
-        borderRadius: 4,
+        borderRadius: 2,
         cursor: "pointer",
         variant: `buttons.${variant}`
       }}

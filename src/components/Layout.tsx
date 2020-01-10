@@ -3,6 +3,7 @@ import { jsx, Styled } from "theme-ui";
 import * as React from "react";
 import GlobalStyles from "./GlobalStyles";
 import Header from "./Header";
+import Footer from "./Footer";
 
 /**
  * Will take over from opds-web-client to handle layout
@@ -16,10 +17,13 @@ import Header from "./Header";
 
 const Layout: React.FC = ({ children }) => {
   return (
-    <Styled.root>
+    <Styled.root
+      sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+    >
       <GlobalStyles />
-      <Header />
-      <main>{children}</main>
+      <Header sx={{ width: "100%" }} />
+      <main sx={{ flex: "1 1 auto", width: "100%" }}>{children}</main>
+      <Footer sx={{ width: "100%" }} />
     </Styled.root>
   );
 };

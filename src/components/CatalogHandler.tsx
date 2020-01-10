@@ -3,7 +3,6 @@ import * as tinycolor from "tinycolor2";
 const OPDSCatalog = require("opds-web-client");
 import Header from "./Header";
 import Footer from "./Footer";
-import BookDetailsContainer from "./BookDetailsContainer";
 import computeBreadcrumbs from "../computeBreadcrumbs";
 import { LibraryData } from "../interfaces";
 import BasicAuthWithButtonImagePlugin from "../auth/BasicAuthWithButtonImagePlugin";

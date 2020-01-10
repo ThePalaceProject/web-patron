@@ -1,17 +1,17 @@
 /** @jsx jsx */
-import { jsx } from "theme-ui";
+import { jsx, Styled } from "theme-ui";
 import * as React from "react";
-import { fetchComplaintTypes, postComplaint } from "../actions";
+import { fetchComplaintTypes, postComplaint } from "../../actions";
 import DefaultBookDetails, {
   BookDetailsProps as DefaultBooKDetailsProps
 } from "opds-web-client/lib/components/BookDetails";
-import ReportProblemLink from "./ReportProblemLink";
-import RevokeButton from "./RevokeButton";
-import { ComplaintData } from "../interfaces";
-import BookCover from "./BookCover";
+import ReportProblemLink from "../ReportProblemLink";
+import RevokeButton from "../RevokeButton";
+import { ComplaintData } from "../../interfaces";
+import BookCover from "../BookCover";
 import { useParams } from "react-router-dom";
-import useTypedSelector from "../hooks/useTypedSelector";
-// import useCollectionAndBook from "../hooks/useCollectionAndBook";
+import useTypedSelector from "../../hooks/useTypedSelector";
+import Recommendations from "./recommendations";
 import {
   mapDispatchToProps,
   mapStateToProps,
@@ -19,7 +19,11 @@ import {
 } from "opds-web-client/lib/components/mergeRootProps";
 import { CollectionData, BookData } from "opds-web-client/lib/interfaces";
 import { connect } from "react-redux";
-import { useUrlShortener } from "./context/UrlShortenerContext";
+import { useUrlShortener } from "../context/UrlShortenerContext";
+import book from "opds-web-client/lib/reducers/book";
+import ExternalLink from "../ExternalLink";
+import Button from "../Button";
+import { getAvailabilityString } from "./utils";
 
 export interface BookDetailsPropsNew extends DefaultBooKDetailsProps {
   setCollectionAndBook: (
@@ -31,6 +35,8 @@ export interface BookDetailsPropsNew extends DefaultBooKDetailsProps {
   }>;
 }
 
+const sidebarWidth = 200;
+
 const BookDetailsNew: React.FC<BookDetailsPropsNew> = ({
   setCollectionAndBook
 }) => {
@@ -38,17 +44,205 @@ const BookDetailsNew: React.FC<BookDetailsPropsNew> = ({
   const urlShortener = useUrlShortener();
 
   // set the collection and book whenever the urls change
+  const fullCollectionUrl = urlShortener.expandCollectionUrl(collectionUrl);
+  const fullBookUrl = urlShortener.expandBookUrl(bookUrl);
   React.useEffect(() => {
-    const fullCollectionUrl = urlShortener.expandCollectionUrl(collectionUrl);
-    const fullBookUrl = urlShortener.expandBookUrl(bookUrl);
     setCollectionAndBook(fullCollectionUrl, fullBookUrl);
-  }, [collectionUrl, bookUrl, urlShortener, setCollectionAndBook]);
+    /**
+     * We will explicitly not have exhaustive deps here because
+     * setCollectionAndBook changes identity on every render, which
+     * would cause this to be run every render. We would ideally memoize
+     * setCollectionAndBook in opds-web-client, but that would require
+     * significant changes. For now we will simply omit it and look out for
+     * potential errors when setCollectionAndBook might be initially incorrect
+     */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [collectionUrl, bookUrl, fullCollectionUrl, fullBookUrl]);
 
   const bookState = useTypedSelector(state => state.book);
-  console.log(bookState);
+  const { data: book } = bookState;
 
-  return <div>Current URL: {bookUrl}</div>;
+  return (
+    <div>
+      <Breadcrumbs />
+      <div
+        sx={{
+          variant: "cards.bookDetails",
+          border: "1px solid",
+          borderColor: "blues.dark",
+          borderRadius: "card",
+          p: [2, 4]
+        }}
+      >
+        <div id="top" sx={{ display: "flex" }}>
+          {/* side bar */}
+          <div
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              flex: 1,
+              maxWidth: sidebarWidth
+            }}
+          >
+            <BookCover book={bookState.data} sx={{ m: 2 }} />
+            {/* download requirements & download links */}
+            <DownloadCard
+              sx={{ m: 2, display: ["none", "none", "block"] }}
+              book={book}
+            />
+            <DownloadRequirements
+              sx={{ m: 2, display: ["none", "none", "block"] }}
+            />
+          </div>
+
+          {/* title, details, summary */}
+          <div sx={{ flex: 2, m: 2 }}>
+            <Styled.h1
+              sx={{
+                variant: "text.bookTitle",
+                lineHeight: [0.7],
+                letterSpacing: [1.4],
+                my: [3],
+                fontSize: [5, 5, 6]
+              }}
+            >
+              {book.title}
+            </Styled.h1>
+            <Styled.h3 sx={{ color: "primary", fontSize: [2, 2, 3] }}>
+              By {book.authors.join(", ")}
+            </Styled.h3>
+            <DetailField heading="Publisher" details={book.publisher} />
+            <DetailField heading="Published" details={book.published} />
+            <DetailField
+              heading="Categories"
+              details={book.categories.join(", ")}
+            />
+            <Summary sx={{ display: ["none", "none", "block"] }} book={book} />
+          </div>
+        </div>
+        {/* the summary is displayed below when on small screens */}
+        <Summary book={book} sx={{ display: ["block", "block", "none"] }} />
+        {/* the download requirements are displayed below on small screens */}
+        <div
+          sx={{
+            display: ["flex", "flex", "none"],
+            flexWrap: "wrap",
+            justifyContent: "center"
+          }}
+        >
+          <DownloadRequirements sx={{ m: 2 }} />
+          <DownloadCard book={book} sx={{ m: 2 }} />
+        </div>
+      </div>
+      <Recommendations book={book} />
+    </div>
+  );
 };
+
+const Summary: React.FC<{ book: BookData; className?: string }> = ({
+  book,
+  className
+}) => (
+  <div sx={{ m: 2 }} className={className}>
+    <Styled.h2>Summary</Styled.h2>
+    <div dangerouslySetInnerHTML={{ __html: book.summary }} />
+  </div>
+);
+
+const DownloadCard: React.FC<{ className?: string; book: BookData }> = ({
+  className,
+  book
+}) => {
+  const availability = getAvailabilityString(book);
+
+  return (
+    <div
+      sx={{
+        border: "1px solid",
+        borderColor: "blues.primary",
+        borderRadius: "card",
+        maxWidth: sidebarWidth
+      }}
+      className={className}
+    >
+      <div
+        sx={{
+          px: 2,
+          py: 3,
+          borderBottom: "1px solid",
+          borderColor: "blues.primary"
+        }}
+      >
+        <span>TYPE</span>
+      </div>
+      <div
+        sx={{
+          px: 2,
+          py: 2,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center"
+        }}
+      >
+        <div sx={{ mb: 2, textAlign: "center" }}>{availability}</div>
+        <Button variant="accent">Download</Button>
+      </div>
+    </div>
+  );
+};
+
+const DownloadRequirements: React.FC<{ className?: string }> = ({
+  className
+}) => {
+  return (
+    <div
+      sx={{
+        border: "1px solid",
+        borderColor: "blues.primary",
+        backgroundColor: "lightGrey",
+        borderRadius: "card",
+        display: "flex",
+        flexDirection: "column",
+        // alignItems: "center",
+        py: 2,
+        px: 3,
+        maxWidth: sidebarWidth
+      }}
+      className={className}
+    >
+      <Styled.h5 sx={{ m: 0, mb: 2 }}>Download Requirements:</Styled.h5>
+      <ol sx={{ m: 0, p: 0, pl: 3, fontSize: 1 }}>
+        <li>
+          <ExternalLink href="https://accounts.adobe.com/">
+            Create Adobe ID
+          </ExternalLink>
+        </li>
+        <li>
+          Install an eBook Reader:
+          <br />
+          <ExternalLink href="https://www.adobe.com/solutions/ebook/digital-editions/download.html">
+            Adobe Digital Editions
+          </ExternalLink>
+          <br />
+          <ExternalLink href="">Bluefire Reader</ExternalLink>
+          <br />
+          <span>* Or another Adobe-compatible application</span>
+        </li>
+      </ol>
+    </div>
+  );
+};
+
+const DetailField: React.FC<{ heading: string; details?: string }> = ({
+  heading,
+  details
+}) =>
+  details ? (
+    <div sx={{ fontSize: 1 }}>
+      <b>{heading}: </b>
+      <span>{details}</span>
+    </div>
+  ) : null;
 
 const Connected = connect(
   mapStateToProps,
@@ -60,6 +254,21 @@ const Connected = connect(
 // redux ConnectedComponent inside of Route
 const Wrapper = props => <Connected {...props} />;
 export default Wrapper;
+
+const Breadcrumbs: React.FC<{}> = () => {
+  return (
+    <nav
+      sx={{
+        backgroundColor: "blues.dark",
+        color: "white",
+        textTransform: "uppercase",
+        p: 2
+      }}
+    >
+      hi from breadcrumbs
+    </nav>
+  );
+};
 
 // export interface BookDetailsProps extends DefaultBooKDetailsProps {
 //   problemTypes: string[];

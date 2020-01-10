@@ -10,13 +10,19 @@ type Overloadable<T, K> = T & {
 export type ButtonVariants = {
   primary: SystemStyleObject;
   flat: SystemStyleObject;
+  accent: SystemStyleObject;
 };
 
 export type TextVariants = {};
 
+export type CardVariants = {
+  bookDetails: SystemStyleObject;
+};
+
 export type Theme = {
   text: TextVariants;
   buttons: ButtonVariants;
+  cards: CardVariants;
 } & ThemeUi.Theme;
 /**
  * It is sometimes useful to define the variables outside the theme object
@@ -71,7 +77,8 @@ const colors = {
 };
 
 /** Borders */
-const radii = [0, 2, 4, 8];
+const radii = [0, 2, 4, 8] as Overloadable<number[], number>;
+radii.card = radii[3];
 
 const theme: Theme = {
   colors,
@@ -93,8 +100,8 @@ const theme: Theme = {
   },
   fontSizes: [12, 14, 16, 20, 24, 32, 48, 64, 96],
   fontWeights: {
-    body: 400,
-    heading: 700,
+    body: 300,
+    heading: 400,
     bold: 700
   },
   lineHeights: {
@@ -103,14 +110,19 @@ const theme: Theme = {
   },
 
   styles: {
+    /**
+     * root wraps the whole app and these are therefore
+     * the default styles
+     */
     root: {
       fontFamily: "body",
       lineHeight: "body",
-      fontWeight: "body"
+      fontWeight: "body",
+      color: "blues.dark"
     },
     h1: {
       ...heading,
-      fontSize: 5
+      fontSize: 6
     },
     h2: {
       ...heading,
@@ -122,7 +134,8 @@ const theme: Theme = {
     },
     h4: {
       ...heading,
-      fontSize: 2
+      fontSize: 2,
+      fontWeight: "normal"
     },
     h5: {
       ...heading,
@@ -154,7 +167,20 @@ const theme: Theme = {
     }
   },
   // variants
-  text: {},
+  text: {
+    bookTitle: {
+      fontFamily: "bookTitle",
+      lineHeight: 0.9,
+      fontWeight: 200
+    }
+  },
+  cards: {
+    bookDetails: {
+      maxWidth: ["none", "none", 800],
+      mx: [2, 2, "auto"],
+      my: 3
+    }
+  },
   buttons: {
     primary: {
       bg: "primary",
@@ -165,6 +191,19 @@ const theme: Theme = {
       },
       "&:active": {
         bg: darken("primary", 0.1)
+      },
+      textTransform: "uppercase",
+      letterSpacing: "0.05em"
+    },
+    accent: {
+      bg: "accent",
+      color: "white",
+      borderRadius: "8px",
+      "&:focus,&:hover": {
+        bg: darken("accent", 0.05)
+      },
+      "&:active": {
+        bg: darken("accent", 0.1)
       },
       textTransform: "uppercase",
       letterSpacing: "0.05em"
