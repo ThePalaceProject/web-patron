@@ -1,8 +1,6 @@
 /** @jsx jsx */
 import { jsx, Styled } from "theme-ui";
 import * as React from "react";
-import { FooterProps } from "opds-web-client/lib/components/Root";
-import { LinkData } from "opds-web-client/lib/interfaces";
 import ExternalLink from "./ExternalLink";
 import useTypedSelector from "../hooks/useTypedSelector";
 
@@ -14,7 +12,17 @@ const labelMap = {
 };
 
 const Footer: React.FC<{ className?: string }> = ({ className }) => {
-  // const links = useTypedSelector(state => state?.collection?.links);
+  const links = useTypedSelector(state => state?.collection?.data?.links ?? []);
+  const title = useTypedSelector(
+    state => state?.collection?.data?.title ?? "Library"
+  );
+
+  const filteredLinks = links.filter(link => {
+    if (typeof labelMap[link.type] === "string") {
+      return link;
+    }
+  });
+
   return (
     <footer
       sx={{ backgroundColor: "blues.dark", color: "white" }}
@@ -24,8 +32,15 @@ const Footer: React.FC<{ className?: string }> = ({ className }) => {
         sx={{ display: "flex", alignItems: "flex-start", letterSpacing: 0.9 }}
       >
         <div sx={{ m: 4 }}>
-          <Styled.h5 sx={{ m: 0 }}>Library Name</Styled.h5>
-          <FooterExternalLink>Library url</FooterExternalLink>
+          <Styled.h5 sx={{ m: 0 }}>{title}</Styled.h5>
+          {links.map(link => (
+            <FooterExternalLink
+              key={`${link.url}${link.type}${link.text}`}
+              href={link.url}
+            >
+              {labelMap[link.type]}
+            </FooterExternalLink>
+          ))}
         </div>
         <div sx={{ m: 4 }}>
           <Styled.h5 sx={{ m: 0 }}>Patron Support</Styled.h5>
@@ -58,44 +73,3 @@ const FooterExternalLink: React.FC<React.HTMLProps<HTMLAnchorElement>> = ({
 };
 
 export default Footer;
-
-// export default class Footer extends React.Component<FooterProps, {}> {
-//   constructor(props) {
-//     super(props);
-//     this.links = this.links.bind(this);
-//   }
-
-//   links(): LinkData[] {
-//     const links = [];
-
-// const labels = {
-//   about: "About",
-//   "terms-of-service": "Terms of Service",
-//   "privacy-policy": "Privacy Policy",
-//   copyright: "Copyright"
-// };
-
-//     Object.keys(labels).forEach(type => {
-//       const link = this.props.collection.links.find(link => link.type === type);
-//       if (link) {
-//         const linkWithLabel = Object.assign({}, link, { text: labels[type] });
-//         links.push(linkWithLabel);
-//       }
-//     });
-//     return links;
-//   }
-
-//   render(): JSX.Element {
-//     return (
-//       <ul aria-label="about links" className="list-inline">
-//         {this.links().map(link => (
-//           <li key={link.url}>
-//             <a href={link.url} target="_blank" rel="noopener noreferrer">
-//               {link.text}
-//             </a>
-//           </li>
-//         ))}
-//       </ul>
-//     );
-//   }
-// }
