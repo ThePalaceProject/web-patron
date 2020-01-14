@@ -5,10 +5,10 @@ import { fetchComplaintTypes, postComplaint } from "../../actions";
 import DefaultBookDetails, {
   BookDetailsProps as DefaultBooKDetailsProps
 } from "opds-web-client/lib/components/BookDetails";
-import ReportProblemLink from "../ReportProblemLink";
-import RevokeButton from "../RevokeButton";
+import ReportProblemLink from "../../components/ReportProblemLink";
+import RevokeButton from "../../components/RevokeButton";
 import { ComplaintData } from "../../interfaces";
-import BookCover from "../BookCover";
+import BookCover from "../../components/BookCover";
 import { useParams } from "react-router-dom";
 import useTypedSelector from "../../hooks/useTypedSelector";
 import Recommendations from "./recommendations";
@@ -19,10 +19,10 @@ import {
 } from "opds-web-client/lib/components/mergeRootProps";
 import { CollectionData, BookData } from "opds-web-client/lib/interfaces";
 import { connect } from "react-redux";
-import { useUrlShortener } from "../context/UrlShortenerContext";
+import { useUrlShortener } from "../../components/context/UrlShortenerContext";
 import book from "opds-web-client/lib/reducers/book";
-import ExternalLink from "../ExternalLink";
-import Button from "../Button";
+import ExternalLink from "../../components/ExternalLink";
+import Button from "../../components/Button";
 import { getAvailabilityString } from "./utils";
 
 export interface BookDetailsPropsNew extends DefaultBooKDetailsProps {
@@ -62,6 +62,7 @@ const BookDetailsNew: React.FC<BookDetailsPropsNew> = ({
   const bookState = useTypedSelector(state => state.book);
   const { data: book } = bookState;
 
+  if (!book) return <div>Loading...</div>;
   return (
     <div>
       <Breadcrumbs />

@@ -1,5 +1,5 @@
 import CatalogHandler from "./components/CatalogHandler";
-import BookDetails from "./components/bookDetails";
+import BookDetails from "./pages/bookDetails";
 
 export const singleLibraryRoutes = [
   {

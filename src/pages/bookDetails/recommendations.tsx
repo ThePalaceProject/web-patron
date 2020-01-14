@@ -3,9 +3,9 @@ import { jsx, Styled } from "theme-ui";
 import * as React from "react";
 import book from "opds-web-client/lib/reducers/book";
 import { BookData, LaneData } from "opds-web-client/lib/interfaces";
-import { useActions } from "../context/ActionsContext";
-import useRecommendationsState from "../context/RecommendationsContext";
-import BookCover from "../BookCover";
+import { useActions } from "../../components/context/ActionsContext";
+import useRecommendationsState from "../../components/context/RecommendationsContext";
+import BookCover from "../../components/BookCover";
 
 const Recommendations: React.FC<{ book: BookData }> = ({ book }) => {
   /**

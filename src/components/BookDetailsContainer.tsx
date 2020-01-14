@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import BookDetails from "./bookDetails";
+import BookDetails from "../pages/bookDetails";
 import Lanes from "opds-web-client/lib/components/Lanes";
 import { BookDetailsContainerProps } from "opds-web-client/lib/components/Root";
 import * as PropTypes from "prop-types";
