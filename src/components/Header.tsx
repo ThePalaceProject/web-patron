@@ -14,6 +14,9 @@ import useCatalogLink from "../hooks/useCatalogLink";
 import Link from "./Link";
 import useTypedSelector from "../hooks/useTypedSelector";
 
+import BookIcon from "../icons/Book";
+import SettingsIcon from "../icons/Settings";
+
 export interface HeaderContext extends NavigateContext {
   library: LibraryData;
 }
@@ -105,14 +108,14 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
             variant="primary"
             onClick={goMyBooks}
           >
-            My Books
+            <BookIcon sx={{ fontSize: 5 }} />
           </Button>
           <Button
             sx={{ m: 1, mb: [1, 0] }}
             variant="primary"
             // onClick={goSettings}
           >
-            Settings
+            <SettingsIcon sx={{ fontSize: 5 }} />
           </Button>
           <Flex
             as="ol"

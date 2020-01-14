@@ -1,5 +1,6 @@
 import CatalogHandler from "./components/CatalogHandler";
 import BookDetails from "./pages/bookDetails";
+import Home from "./pages/home";
 
 export const singleLibraryRoutes = [
   {
@@ -15,7 +16,7 @@ export const singleLibraryRoutes = [
   {
     path: "/",
     exact: true,
-    component: CatalogHandler
+    component: Home
   }
 ];
 

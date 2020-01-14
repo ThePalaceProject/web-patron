@@ -185,6 +185,7 @@ const theme: Theme = {
     primary: {
       bg: "primary",
       color: "white",
+      fill: "white",
       borderRadius: "8px",
       "&:focus,&:hover": {
         bg: darken("primary", 0.05)
@@ -198,6 +199,7 @@ const theme: Theme = {
     accent: {
       bg: "accent",
       color: "white",
+      fill: "white",
       borderRadius: "8px",
       "&:focus,&:hover": {
         bg: darken("accent", 0.05)

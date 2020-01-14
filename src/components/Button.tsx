@@ -14,7 +14,7 @@ const Button: React.FC<ButtonProps> = ({ variant = "primary", ...props }) => {
       {...props}
       sx={{
         appearance: "none",
-        display: "inline-block",
+        display: "inline-flex",
         textAlign: "center",
         lineHeight: "inherit",
         textDecoration: "none",
