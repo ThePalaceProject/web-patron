@@ -7,7 +7,7 @@ import DefaultBookDetails, {
 } from "opds-web-client/lib/components/BookDetails";
 import ReportProblemLink from "../../components/ReportProblemLink";
 import RevokeButton from "../../components/RevokeButton";
-import { ComplaintData } from "../../interfaces";
+import { ComplaintData, SetCollectionAndBook } from "../../interfaces";
 import BookCover from "../../components/BookCover";
 import { useParams } from "react-router-dom";
 import useTypedSelector from "../../hooks/useTypedSelector";
@@ -24,15 +24,10 @@ import book from "opds-web-client/lib/reducers/book";
 import ExternalLink from "../../components/ExternalLink";
 import Button from "../../components/Button";
 import { getAvailabilityString } from "./utils";
+import useSetCollectionAndBook from "../../hooks/useSetCollectionAndBook";
 
 export interface BookDetailsPropsNew extends DefaultBooKDetailsProps {
-  setCollectionAndBook: (
-    collectionUrl: string,
-    bookUrl: string
-  ) => Promise<{
-    collectionData: CollectionData;
-    bookData: BookData;
-  }>;
+  setCollectionAndBook: SetCollectionAndBook;
 }
 
 const sidebarWidth = 200;
@@ -40,29 +35,14 @@ const sidebarWidth = 200;
 const BookDetailsNew: React.FC<BookDetailsPropsNew> = ({
   setCollectionAndBook
 }) => {
-  const { bookUrl, collectionUrl } = useParams();
-  const urlShortener = useUrlShortener();
-
-  // set the collection and book whenever the urls change
-  const fullCollectionUrl = urlShortener.expandCollectionUrl(collectionUrl);
-  const fullBookUrl = urlShortener.expandBookUrl(bookUrl);
-  React.useEffect(() => {
-    setCollectionAndBook(fullCollectionUrl, fullBookUrl);
-    /**
-     * We will explicitly not have exhaustive deps here because
-     * setCollectionAndBook changes identity on every render, which
-     * would cause this to be run every render. We would ideally memoize
-     * setCollectionAndBook in opds-web-client, but that would require
-     * significant changes. For now we will simply omit it and look out for
-     * potential errors when setCollectionAndBook might be initially incorrect
-     */
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [collectionUrl, bookUrl, fullCollectionUrl, fullBookUrl]);
+  // set the collection and book
+  useSetCollectionAndBook(setCollectionAndBook);
 
   const bookState = useTypedSelector(state => state.book);
   const { data: book } = bookState;
 
   if (!book) return <div>Loading...</div>;
+  console.log(book);
   return (
     <div>
       <Breadcrumbs />
@@ -108,6 +88,7 @@ const BookDetailsNew: React.FC<BookDetailsPropsNew> = ({
               }}
             >
               {book.title}
+              {book.subtitle && `: ${book.subtitle}`}
             </Styled.h1>
             <Styled.h3 sx={{ color: "primary", fontSize: [2, 2, 3] }}>
               By {book.authors.join(", ")}

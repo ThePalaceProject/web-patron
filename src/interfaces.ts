@@ -1,5 +1,6 @@
 import { State } from "opds-web-client/lib/state";
 import { CollectionState } from "opds-web-client/lib/reducers/collection";
+import { CollectionData, BookData } from "opds-web-client/lib/interfaces";
 
 export interface PathFor {
   (collectionUrl: string, bookUrl: string): string;
@@ -54,3 +55,11 @@ export { ComplaintsState } from "./reducers/complaints";
 export { Theme, ButtonVariants, TextVariants } from "./theme";
 // helper for theme variant prop types
 export type VariantProp<VType> = Exclude<keyof VType, keyof {}>;
+
+export type SetCollectionAndBook = (
+  collectionUrl: string,
+  bookUrl: string
+) => Promise<{
+  collectionData: CollectionData;
+  bookData: BookData;
+}>;

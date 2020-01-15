@@ -108,14 +108,14 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
             variant="primary"
             onClick={goMyBooks}
           >
-            <BookIcon sx={{ fontSize: 5 }} />
+            <BookIcon sx={{ fontSize: 5 }} /> My Books
           </Button>
           <Button
             sx={{ m: 1, mb: [1, 0] }}
             variant="primary"
             // onClick={goSettings}
           >
-            <SettingsIcon sx={{ fontSize: 5 }} />
+            <SettingsIcon sx={{ fontSize: 5 }} /> Settings
           </Button>
           <Flex
             as="ol"
