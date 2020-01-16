@@ -22,7 +22,11 @@ const Recommendations: React.FC<{ book: BookData }> = ({ book }) => {
 
   // fetch the collection
   React.useEffect(() => {
-    recommendationsDispatch(recommendationsActions.fetchCollection(relatedUrl));
+    if (relatedUrl) {
+      recommendationsDispatch(
+        recommendationsActions.fetchCollection(relatedUrl)
+      );
+    }
 
     /**
      * This will be run on unmount, and before running the effect anytime
@@ -44,13 +48,13 @@ const Recommendations: React.FC<{ book: BookData }> = ({ book }) => {
   return (
     <React.Fragment>
       {lanes.map(lane => (
-        <Lane key={lane.title} lane={lane} selfId={book.id} />
+        <RecommendationsLane key={lane.title} lane={lane} selfId={book.id} />
       ))}
     </React.Fragment>
   );
 };
 
-const Lane: React.FC<{ lane: LaneData; selfId: string }> = ({
+const RecommendationsLane: React.FC<{ lane: LaneData; selfId: string }> = ({
   selfId,
   lane: { title, books }
 }) => {

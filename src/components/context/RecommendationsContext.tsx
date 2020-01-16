@@ -44,6 +44,11 @@ function useRecommendationsState() {
   const dispatch = React.useContext(RecommendationsDispatchContext);
   const { actions, dispatch: _unusedOpdsDispatch } = useActions();
 
+  if (typeof state === "undefined" || typeof dispatch === "undefined") {
+    throw new Error(
+      "useRecommendationsState must be used within a RecommendationsContextProvider"
+    );
+  }
   // possibly bind all the actions with dispatch here?
   return {
     recommendationsState: state,

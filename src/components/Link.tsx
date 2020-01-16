@@ -9,7 +9,9 @@ type LinkProps = React.ComponentProps<typeof BaseLink>;
  * Extends the react router link to add some styles
  */
 function Link(props: LinkProps) {
-  return <BaseLink sx={{ textDecoration: "none" }} {...props} />;
+  return (
+    <BaseLink sx={{ textDecoration: "none", color: "inherit" }} {...props} />
+  );
 }
 
 export default Link;

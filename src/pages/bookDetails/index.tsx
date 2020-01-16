@@ -42,7 +42,6 @@ const BookDetailsNew: React.FC<BookDetailsPropsNew> = ({
   const { data: book } = bookState;
 
   if (!book) return <div>Loading...</div>;
-  console.log(book);
   return (
     <div>
       <Breadcrumbs />
@@ -91,13 +90,13 @@ const BookDetailsNew: React.FC<BookDetailsPropsNew> = ({
               {book.subtitle && `: ${book.subtitle}`}
             </Styled.h1>
             <Styled.h3 sx={{ color: "primary", fontSize: [2, 2, 3] }}>
-              By {book.authors.join(", ")}
+              By {book.authors?.join(", ") ?? "Unknown"}
             </Styled.h3>
             <DetailField heading="Publisher" details={book.publisher} />
             <DetailField heading="Published" details={book.published} />
             <DetailField
               heading="Categories"
-              details={book.categories.join(", ")}
+              details={book.categories?.join(", ")}
             />
             <Summary sx={{ display: ["none", "none", "block"] }} book={book} />
           </div>
@@ -127,7 +126,11 @@ const Summary: React.FC<{ book: BookData; className?: string }> = ({
 }) => (
   <div sx={{ m: 2 }} className={className}>
     <Styled.h2>Summary</Styled.h2>
-    <div dangerouslySetInnerHTML={{ __html: book.summary }} />
+    <div
+      dangerouslySetInnerHTML={{
+        __html: book.summary ?? "Summary not provided."
+      }}
+    />
   </div>
 );
 

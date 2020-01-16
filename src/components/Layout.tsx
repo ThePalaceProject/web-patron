@@ -22,7 +22,16 @@ const Layout: React.FC = ({ children }) => {
     >
       <GlobalStyles />
       <Header sx={{ width: "100%" }} />
-      <main sx={{ flex: "1 1 auto", width: "100%" }}>{children}</main>
+      <main
+        sx={{
+          flex: "1 1 auto",
+          width: "100%",
+          display: "flex",
+          flexDirection: "column"
+        }}
+      >
+        {children}
+      </main>
       <Footer sx={{ width: "100%" }} />
     </Styled.root>
   );
