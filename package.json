@@ -103,6 +103,7 @@
     "react-dom": "^16.8.6",
     "react-redux": "^7.1.3",
     "react-router-dom": "^5.1.2",
+    "react-spinners": "^0.8.0",
     "reakit": "^1.0.0-beta.13",
     "redux": "^4.0.4",
     "redux-thunk": "^2.3.0",
@@ -110,8 +111,6 @@
     "styled-system": "^5.1.2",
     "theme-ui": "^0.2.46",
     "tinycolor2": "^1.4.1",
-    "typeface-jomhuria": "0.0.61",
-    "typeface-oswald": "^1.1.3",
     "universal-url": "^1.0.1"
   },
   "husky": {
