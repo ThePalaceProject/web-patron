@@ -10,7 +10,7 @@ import LibraryContext from "../components/context/LibraryContext";
  *
  * it uses the context provided catalog by default
  */
-function useCatalogLink(bookUrl: string, collectionUrlOverride?: string) {
+export function useGetCatalogLink(collectionUrlOverride?: string) {
   const pathFor = React.useContext(PathForContext);
   const library = React.useContext(LibraryContext);
 
@@ -22,7 +22,21 @@ function useCatalogLink(bookUrl: string, collectionUrlOverride?: string) {
     collectionUrl = library.catalogUrl;
   }
 
-  const location = pathFor(collectionUrl, bookUrl);
+  function getCatalogLink(bookUrl: string) {
+    return pathFor(collectionUrl, bookUrl);
+  }
+
+  return getCatalogLink;
+}
+
+/**
+ * Similar to the above, but simply gets the collectionUrl for a
+ * provided bookUrl.
+ */
+function useCatalogLink(bookUrl: string, collectionUrlOverride?: string) {
+  const getCalalogLink = useGetCatalogLink(collectionUrlOverride);
+
+  const location = getCalalogLink(bookUrl);
 
   return location;
 }

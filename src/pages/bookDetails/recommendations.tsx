@@ -6,12 +6,14 @@ import { BookData, LaneData } from "opds-web-client/lib/interfaces";
 import { useActions } from "../../components/context/ActionsContext";
 import useRecommendationsState from "../../components/context/RecommendationsContext";
 import BookCover from "../../components/BookCover";
+import LoadingIndicator from "../../components/LoadingIndicator";
+import { useGetCatalogLink } from "../../hooks/useCatalogLink";
+import Link from "../../components/Link";
 
 const Recommendations: React.FC<{ book: BookData }> = ({ book }) => {
   /**
    * TODO
-   * - show fetching indicator
-   * - handle multiple lanes
+   * - test multiple lanes
    */
   const relatedUrl = getRelatedUrl(book);
   const {
@@ -43,7 +45,22 @@ const Recommendations: React.FC<{ book: BookData }> = ({ book }) => {
   const lanes = recommendationsState?.data?.lanes ?? [];
   const isFetching = recommendationsState?.isFetching ?? false;
 
-  // console.log(lanes);
+  console.log(recommendationsState);
+
+  if (isFetching) {
+    return (
+      <div
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column"
+        }}
+      >
+        <LoadingIndicator /> Loading recommendations...
+      </div>
+    );
+  }
 
   return (
     <React.Fragment>
@@ -58,6 +75,8 @@ const RecommendationsLane: React.FC<{ lane: LaneData; selfId: string }> = ({
   selfId,
   lane: { title, books }
 }) => {
+  const getCatalogLink = useGetCatalogLink();
+
   // if there are less than two books, show nothing
   if (books.length < 2) return null;
 
@@ -69,15 +88,31 @@ const RecommendationsLane: React.FC<{ lane: LaneData; selfId: string }> = ({
           border: "1px solid",
           borderColor: "blues.dark",
           borderRadius: "card",
-          p: 3
+          p: 2,
+          display: "flex"
         }}
       >
         {books.map(
           book =>
             book.id !== selfId && (
-              <div key={book.id} sx={{ maxWidth: 100 }}>
-                <BookCover book={book} />
-              </div>
+              <Link
+                to={getCatalogLink(book.url)}
+                key={book.id}
+                sx={{ flex: "1 0 auto", maxWidth: 110, m: 2 }}
+              >
+                <BookCover book={book} sx={{ m: 2 }} />
+                <Styled.h3
+                  sx={{
+                    variant: "text.bookTitle",
+                    textAlign: "center",
+                    fontSize: 4,
+                    mt: 2,
+                    mb: 0
+                  }}
+                >
+                  {book.title}
+                </Styled.h3>
+              </Link>
             )
         )}
       </div>

@@ -1,10 +1,13 @@
 /** @jsx jsx */
-import { jsx, Styled } from "theme-ui";
+import { jsx, Styled, useThemeUI } from "theme-ui";
 import * as React from "react";
 import FadeLoader from "react-spinners/FadeLoader";
 
 const LoadingIndicator: React.FC = props => {
-  return <FadeLoader {...props} />;
+  const { theme } = useThemeUI();
+  const darkBlue = theme.colors.blues[3];
+
+  return <FadeLoader color={darkBlue} {...props} />;
 };
 
 export const PageLoader: React.FC = props => {

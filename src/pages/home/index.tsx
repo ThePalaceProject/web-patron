@@ -25,7 +25,6 @@ const Home: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
     return <PageLoader />;
   }
 
-  console.log(collection);
   const lanes = collection?.data?.lanes ?? [];
   return (
     <div>

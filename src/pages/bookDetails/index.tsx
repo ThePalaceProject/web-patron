@@ -25,6 +25,7 @@ import ExternalLink from "../../components/ExternalLink";
 import Button from "../../components/Button";
 import { getAvailabilityString } from "./utils";
 import useSetCollectionAndBook from "../../hooks/useSetCollectionAndBook";
+import { PageLoader } from "../../components/LoadingIndicator";
 
 export interface BookDetailsPropsNew extends DefaultBooKDetailsProps {
   setCollectionAndBook: SetCollectionAndBook;
@@ -41,7 +42,8 @@ const BookDetailsNew: React.FC<BookDetailsPropsNew> = ({
   const bookState = useTypedSelector(state => state.book);
   const { data: book } = bookState;
 
-  if (!book) return <div>Loading...</div>;
+  if (!book) return <PageLoader />;
+
   return (
     <div>
       <Breadcrumbs />

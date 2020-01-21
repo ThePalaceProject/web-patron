@@ -12,6 +12,10 @@ import { Tabbable } from "reakit/Tabbable";
 const BOOK_WIDTH = 200;
 const BOOK_MARGIN = 2;
 
+type Refs = {
+  [id: string]: React.RefObject<HTMLLIElement>;
+};
+
 const Lane: React.FC<{ lane: LaneData; omitIds?: string[] }> = ({
   omitIds,
   lane: { title, books }
@@ -20,18 +24,83 @@ const Lane: React.FC<{ lane: LaneData; omitIds?: string[] }> = ({
     if (!omitIds?.includes(book.id)) return book;
   });
 
-  /** Set up handlers for prev and next buttons */
+  /** we will use state to determine which book should be in view */
+  const [currentIndex, setCurrentIndex] = React.useState<number>(0);
+  const [isBrowserScrolling, setIsBrowserScrolling] = React.useState<boolean>(
+    false
+  );
+  /** keep track of a ref for each book */
+  const bookRefs: Refs = filteredBooks.reduce((acc, value) => {
+    const ref = React.createRef<HTMLLIElement>();
+    acc[value.id] = ref;
+    return acc;
+  }, {});
+  // we need a ref to the UL element so we can scroll it
+  const scrollContainer = React.useRef<HTMLUListElement>();
 
-  // for moving right/left
-  const [scrollPosition, setScrollPosition] = React.useState(0);
-  // we will need the theme to get the book margin and set increment
-  const { theme } = useThemeUI();
-  const increment = BOOK_WIDTH + theme.space[BOOK_MARGIN] * 2;
+  const isAtIndexEnd = currentIndex === filteredBooks.length - 1;
+  const isAtScrollEnd =
+    scrollContainer.current?.scrollLeft ===
+    scrollContainer.current?.scrollWidth - scrollContainer.current?.offsetWidth;
+  const isAtEnd = isAtIndexEnd || isAtScrollEnd;
+  const isAtStart = currentIndex === 0;
+
+  /**
+   * Handlers for button clicks
+   */
   const handleRightClick = () => {
-    setScrollPosition(scrollPosition - increment);
+    const nextIndex = currentIndex + 1;
+    if (isAtEnd) return;
+    scrollToBook(nextIndex);
   };
   const handleLeftClick = () => {
-    setScrollPosition(scrollPosition + increment);
+    const nextIndex = currentIndex - 1;
+    if (isAtStart) return;
+    scrollToBook(nextIndex);
+  };
+
+  // will be used to set a timeout when the browser is auto scrolling
+  const timeoutRef = React.useRef(null);
+  const browserScrollTime = 1000; // guess how long the browser takes to scroll
+
+  const scrollToBook = (nextIndex: number) => {
+    const nextBook = filteredBooks[nextIndex];
+    const nextBookRef = bookRefs[nextBook.id];
+    setCurrentIndex(nextIndex);
+    const bookX = nextBookRef.current?.offsetLeft || 0;
+    scrollContainer.current?.scrollTo({
+      left: bookX,
+      behavior: "smooth"
+    });
+    // allows us to bail out of handleScroll when the browser is autoscrolling
+    setIsBrowserScrolling(true);
+    // if there is a timeout already, clear it
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    // set a new one
+    timeoutRef.current = setTimeout(() => {
+      setIsBrowserScrolling(false);
+    }, browserScrollTime);
+  };
+
+  /**
+   * Keep the currentIndex up to date when the user scrolls/swipes freely
+   */
+  const getBookWidth = () => {
+    const firstBookId = filteredBooks[0].id;
+    const firstBookRef = bookRefs[firstBookId];
+    const firstBookWidth = firstBookRef.current.offsetWidth;
+    return firstBookWidth;
+  };
+  const handleScroll = (e: React.UIEvent<HTMLUListElement>) => {
+    /**
+     * Bail out of this calculation if the browser is scrolling with
+     * scrollTo
+     */
+    if (isBrowserScrolling) return;
+    const position = e.currentTarget.scrollLeft;
+    const bookWidth = getBookWidth();
+    const currentBook = Math.floor(position / bookWidth);
+    setCurrentIndex(currentBook);
   };
 
   return (
@@ -55,89 +124,78 @@ const Lane: React.FC<{ lane: LaneData; omitIds?: string[] }> = ({
           position: "relative"
         }}
       >
-        <PrevNextButton isPrev onClick={handleLeftClick} />
-        <div
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            overflow: "hidden",
-            py: 3
-          }}
-        >
-          <div
-            sx={{
-              display: "flex",
-              transition: "transform 300ms ease 100ms",
-              transform: `translateX(${scrollPosition}px)`
-            }}
-          >
-            {filteredBooks.map(book => (
-              <Book key={book.id} book={book} />
-            ))}
-          </div>
-        </div>
+        <PrevNextButton isPrev onClick={handleLeftClick} disabled={isAtStart} />
 
-        <PrevNextButton onClick={handleRightClick} />
+        <ul
+          ref={scrollContainer}
+          sx={{
+            p: 0,
+            my: 2,
+            display: "flex",
+            transition: "transform 300ms ease 100ms",
+            overflowX: "scroll",
+            position: "relative",
+            width: "100%"
+          }}
+          onScroll={handleScroll}
+        >
+          {filteredBooks.map(book => (
+            <Book key={book.id} book={book} ref={bookRefs[book.id]} />
+          ))}
+        </ul>
+
+        <PrevNextButton onClick={handleRightClick} disabled={isAtEnd} />
       </div>
     </div>
   );
 };
 
-const Book: React.FC<{
-  book: BookData;
-}> = ({ book }) => {
-  const link = useCatalogLink(book.url);
-  return (
-    <Link
-      to={link}
-      sx={{
-        border: "1px solid",
-        borderColor: "blues.dark",
-        borderRadius: "card",
-        py: 3,
-        px: 2,
-        flex: `0 0 ${BOOK_WIDTH}px`,
-        mx: BOOK_MARGIN,
-        textAlign: "center"
-      }}
-    >
-      <BookCover book={book} sx={{ mx: 4 }} />
-      <Styled.h2
+const Book = React.forwardRef<HTMLLIElement, { book: BookData }>(
+  ({ book }, ref) => {
+    const link = useCatalogLink(book.url);
+    return (
+      <li
+        ref={ref}
         sx={{
-          variant: "text.bookTitle",
-          letterSpacing: 0.8,
-          mb: 1
+          listStyle: "none",
+          display: "block",
+          border: "1px solid",
+          borderColor: "blues.dark",
+          borderRadius: "card",
+          py: 3,
+          px: 2,
+          flex: `0 0 ${BOOK_WIDTH}px`,
+          mx: BOOK_MARGIN,
+          textAlign: "center"
         }}
       >
-        {truncateString(book.title, 50, true)}
-      </Styled.h2>
-      <span sx={{ color: "blues.primary" }}>{book.authors.join(", ")}</span>
-    </Link>
-  );
-};
+        <Link to={link} sx={{}}>
+          <BookCover book={book} sx={{ mx: 4 }} />
+          <Styled.h2
+            sx={{
+              variant: "text.bookTitle",
+              letterSpacing: 0.8,
+              mb: 1
+            }}
+          >
+            {truncateString(book.title, 50, true)}
+          </Styled.h2>
+          <span sx={{ color: "blues.primary" }}>{book.authors.join(", ")}</span>
+        </Link>
+      </li>
+    );
+  }
+);
 
-const PrevNextButton: React.FC<{ onClick: () => void; isPrev?: boolean }> = ({
-  onClick,
-  isPrev = false
-}) => {
+const PrevNextButton: React.FC<{
+  onClick: () => void;
+  isPrev?: boolean;
+  disabled: boolean;
+}> = ({ onClick, isPrev = false, disabled }) => {
   return (
     <Tabbable
       as="div"
       sx={{
-        /** the following will make this a semi transparent button */
-        // position: "absolute",
-        // top: 0,
-        // height: "100%",
-        // left: isPrev ? 0 : null,
-        // right: isPrev ? null : 0,
-        // zIndex: 2,
-        // backgroundColor: "rgba(255,255,255,0.9)",
-        // background:
-        //   "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 50%);",
-        // px: 4,
-
-        buttonStyle: "none",
-        backgroundColor: "white",
         fontSize: 60,
         display: "flex",
         justifyContent: "center",
@@ -150,10 +208,11 @@ const PrevNextButton: React.FC<{ onClick: () => void; isPrev?: boolean }> = ({
       onClick={onClick}
       role="button"
       aria-label="scroll right"
+      disabled={disabled}
     >
       <ArrowRight
         sx={{
-          fill: "blues.primary",
+          fill: disabled ? "grey" : "blues.primary",
           transform: isPrev ? "rotate(180deg)" : null
         }}
       />

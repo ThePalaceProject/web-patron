@@ -5,7 +5,6 @@ import { SystemStyleObject } from "@styled-system/css";
 type Overloadable<T, K> = T & {
   [overload: string]: K;
 };
-// allow us to add custom variant keys to the theme
 
 export type ButtonVariants = {
   primary: SystemStyleObject;
@@ -23,6 +22,7 @@ export type Theme = {
   text: TextVariants;
   buttons: ButtonVariants;
   cards: CardVariants;
+  colors: ThemeUi.Theme["colors"];
 } & ThemeUi.Theme;
 /**
  * It is sometimes useful to define the variables outside the theme object
