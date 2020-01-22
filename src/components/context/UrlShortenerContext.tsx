@@ -1,7 +1,9 @@
 import * as React from "react";
 import UrlShortener from "../../UrlShortener";
 
-const UrlShortenerContext = React.createContext<UrlShortener>(null);
+const UrlShortenerContext = React.createContext<UrlShortener | undefined>(
+  undefined
+);
 
 export const UrlShortenerProvider: React.FC<{
   urlShortener: UrlShortener;
@@ -11,7 +13,7 @@ export const UrlShortenerProvider: React.FC<{
   </UrlShortenerContext.Provider>
 );
 
-export function useUrlShortener() {
+export default function useUrlShortener() {
   const context = React.useContext(UrlShortenerContext);
   if (typeof context === "undefined") {
     throw new Error(
@@ -20,5 +22,3 @@ export function useUrlShortener() {
   }
   return context;
 }
-
-export default UrlShortenerContext;

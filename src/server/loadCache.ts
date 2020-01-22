@@ -48,13 +48,16 @@ async function loadCache() {
   const shortenUrls = !(process.env.SHORTEN_URLS === "false");
 
   const distDir = process.env.SIMPLIFIED_PATRON_DIST || "dist";
-  const cacheExpirationSeconds = parseInt(
-    process.env.CACHE_EXPIRATION_SECONDS,
-    10
-  );
+  const cacheExpirationSeconds = process.env.CACHE_EXPIRATION_SECONDS;
+
+  let parsedCacheExpirationSecons: number | undefined = undefined;
+  if (typeof cacheExpirationSeconds === "string") {
+    parsedCacheExpirationSecons = parseInt(cacheExpirationSeconds, 10);
+  }
+
   const cache = new LibraryDataCache(
     registryBase,
-    cacheExpirationSeconds,
+    parsedCacheExpirationSecons,
     config
   );
 

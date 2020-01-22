@@ -28,6 +28,7 @@ export interface CacheEntry {
   timestamp: number;
 }
 
+type Config = { [key: string]: string };
 export default class LibraryDataCache {
   // An in-memory cache of registry entries and authentication documents.
   // Registry entries don't change very often, and it's fine to fetch them
@@ -35,10 +36,10 @@ export default class LibraryDataCache {
   // Requests update the same registry entry, since they'll get the same
   // Data from the registry.
   private readonly CACHE: { [key: string]: CacheEntry } = {};
-  private readonly registryBase: string;
+  private readonly registryBase?: string;
   private readonly expirationSeconds: number;
-  private readonly config: { [key: string]: string };
-  protected libraryUrlTemplate: string = null;
+  private readonly config?: Config;
+  protected libraryUrlTemplate: string | null = null;
 
   /**
     Create a LibraryDataCache for a registry or from a configuration file.
@@ -48,9 +49,9 @@ export default class LibraryDataCache {
     config: A pre-configured mapping from library paths to circulation manager URLs.
   */
   constructor(
-    registryBase: string,
+    registryBase?: string,
     expirationSeconds: number = 60 * 60 * 24,
-    config?: { [key: string]: string }
+    config?: Config
   ) {
     this.registryBase = registryBase;
     this.expirationSeconds = expirationSeconds;
@@ -58,6 +59,11 @@ export default class LibraryDataCache {
   }
 
   async getLibraryUrlTemplate(): Promise<string> {
+    if (!this.registryBase) {
+      throw new Error(
+        "Attempting to fetch registryResponse without process.env.REGISTRY_BASE"
+      );
+    }
     if (!this.libraryUrlTemplate) {
       try {
         const registryResponse = await fetch(this.registryBase);
@@ -75,6 +81,10 @@ export default class LibraryDataCache {
         throw "Library registry is not available.";
       }
     }
+    // if it still not available, throw the same error
+    if (!this.libraryUrlTemplate) {
+      throw new Error("Library registry not available");
+    }
     return this.libraryUrlTemplate;
   }
 
@@ -82,29 +92,31 @@ export default class LibraryDataCache {
     authDocument: AuthDocument,
     catalog: OPDSFeed
   ) {
-    const data = {
-      catalogName: authDocument["title"],
-      colors: authDocument["web_color_scheme"],
-      logoUrl: null,
-      headerLinks: [],
-      cssLinks: []
-    };
+    let logoUrl: string | undefined;
+    const cssLinks: Link[] = [];
+    const headerLinks: Link[] = [];
 
     for (const link of authDocument.links) {
       if (link.rel === "logo") {
-        data.logoUrl = link.href;
+        logoUrl = link.href;
       } else if (link.rel === "stylesheet") {
-        data.cssLinks.push(link);
+        cssLinks.push(link);
       }
     }
 
     for (const link of catalog["links"]) {
       if (link.role === "navigation") {
-        data.headerLinks.push(link);
+        headerLinks?.push(link);
       }
     }
 
-    return data;
+    return {
+      catalogName: authDocument["title"],
+      colors: authDocument["web_color_scheme"],
+      headerLinks,
+      cssLinks,
+      logoUrl
+    };
   }
 
   async getLibraryData(library: string): Promise<LibraryData> {
@@ -112,15 +124,19 @@ export default class LibraryDataCache {
     let catalogUrl;
     let catalogName;
     if (Object.keys(this.config || {}).length) {
-      catalogUrl = this.config[library];
+      catalogUrl = this.config?.[library];
     } else {
-      for (const link of entry.registryEntry.links) {
+      for (const link of entry?.registryEntry?.links ?? []) {
         if (link.rel === "http://opds-spec.org/catalog") {
           catalogUrl = link.href;
           break;
         }
       }
-      catalogName = entry.registryEntry.metadata.title;
+      catalogName = entry.registryEntry?.metadata?.title;
+    }
+
+    if (!entry.authDocument || !entry.catalog) {
+      throw new Error("AuthDocument or Catalog not provided in getLibraryData");
     }
 
     return {
@@ -194,7 +210,7 @@ export default class LibraryDataCache {
     return this.CACHE[library];
   }
 
-  async getRegistryEntry(library): Promise<void> {
+  async getRegistryEntry(library: string): Promise<void> {
     const template = await this.getLibraryUrlTemplate();
     const libraryUrl = template.replace("{uuid}", library);
     try {
@@ -213,7 +229,7 @@ export default class LibraryDataCache {
   }
 
   async getCatalog(rootUrl: string): Promise<OPDSFeed> {
-    let catalog: OPDSFeed;
+    let catalog: OPDSFeed | null = null;
     try {
       const catalogResponse = await fetch(rootUrl);
       const rawCatalog = await catalogResponse.text();

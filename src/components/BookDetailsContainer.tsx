@@ -59,7 +59,7 @@ export default class BookDetailsContainer extends React.Component<
     );
   }
 
-  relatedUrl(): string {
+  relatedUrl(): string | null {
     const { book } = this.props;
     if (!book) return null;
 

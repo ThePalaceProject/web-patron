@@ -4,7 +4,7 @@ import { stub } from "sinon";
 import * as actions from "../actions";
 const fetchMock = require("fetch-mock");
 
-let fetchResponse = null;
+let fetchResponse: string | null = null;
 
 describe("fetchComplaintTypes", () => {
   afterEach(() => {

@@ -25,7 +25,7 @@ export default class ReportProblemForm extends React.Component<
     super(props);
     this.state = {
       submitted: false,
-      error: null
+      error: undefined
     };
     this.submit = this.submit.bind(this);
   }
@@ -100,7 +100,7 @@ export default class ReportProblemForm extends React.Component<
   }
 
   submit() {
-    if (this.typeSelected()) {
+    if (this.typeRef.current?.value && this.detailRef.current?.value) {
       const data = {
         type: this.typeRef.current.value,
         detail: this.detailRef.current.value
@@ -108,7 +108,7 @@ export default class ReportProblemForm extends React.Component<
       return this.props
         .report(this.props.reportUrl, data)
         .then(() => {
-          this.setState({ submitted: true, error: null });
+          this.setState({ submitted: true, error: undefined });
         })
         .catch(_err => {
           this.setState({
@@ -119,9 +119,5 @@ export default class ReportProblemForm extends React.Component<
     } else {
       this.setState({ ...this.state, error: "You must select a type" });
     }
-  }
-
-  typeSelected() {
-    return !!this.typeRef.current.value;
   }
 }

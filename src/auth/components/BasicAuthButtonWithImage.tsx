@@ -17,20 +17,19 @@ export default class BasicAuthButtonWithImage extends React.Component<
 > {
   render() {
     let image;
-    for (const link of this.props.provider.method.links || []) {
+    for (const link of this.props.provider?.method?.links ?? []) {
       if (link.rel === "logo") {
         image = link.href;
         break;
       }
     }
-    let label = this.props.provider.method.description
+    const label = this.props.provider?.method?.description
       ? "Log in with " + this.props.provider.method.description
       : "Log in";
     return (
       <button
         className="basic-auth-button"
         aria-label={label}
-        autoFocus={true}
         onClick={this.props.onClick}
       >
         {image ? <img src={image} alt={label} /> : label}

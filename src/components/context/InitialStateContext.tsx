@@ -1,7 +1,9 @@
 import * as React from "react";
 import { State as CatalogState } from "opds-web-client/lib/state";
 
-const InitialStateContext = React.createContext<CatalogState>(null);
+export const InitialStateContext = React.createContext<
+  CatalogState | undefined
+>(undefined);
 
 export const InitialStateProvider: React.FC<{ initialState: CatalogState }> = ({
   initialState,
@@ -12,4 +14,12 @@ export const InitialStateProvider: React.FC<{ initialState: CatalogState }> = ({
   </InitialStateContext.Provider>
 );
 
-export default InitialStateContext;
+export default function useInitialState() {
+  const context = React.useContext(InitialStateContext);
+  if (typeof context === "undefined") {
+    throw new Error(
+      "useInitialState must be used within a InitialStateContextProvider"
+    );
+  }
+  return context;
+}

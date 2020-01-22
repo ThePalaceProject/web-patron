@@ -1,6 +1,5 @@
-import * as React from "react";
-import { PathForContext } from "opds-web-client/lib/components/context/PathForContext";
-import LibraryContext from "../components/context/LibraryContext";
+import { usePathFor } from "opds-web-client/lib/components/context/PathForContext";
+import useLibraryContext from "../components/context/LibraryContext";
 
 /**
  * uses pathFor to construct the link to either
@@ -11,8 +10,8 @@ import LibraryContext from "../components/context/LibraryContext";
  * it uses the context provided catalog by default
  */
 export function useGetCatalogLink(collectionUrlOverride?: string) {
-  const pathFor = React.useContext(PathForContext);
-  const library = React.useContext(LibraryContext);
+  const pathFor = usePathFor();
+  const library = useLibraryContext();
 
   // use the context provided library by default
   let collectionUrl: string;
@@ -33,8 +32,15 @@ export function useGetCatalogLink(collectionUrlOverride?: string) {
  * Similar to the above, but simply gets the collectionUrl for a
  * provided bookUrl.
  */
-function useCatalogLink(bookUrl: string, collectionUrlOverride?: string) {
+function useCatalogLink(bookUrl?: string, collectionUrlOverride?: string) {
   const getCalalogLink = useGetCatalogLink(collectionUrlOverride);
+
+  if (!bookUrl) {
+    console.error(
+      "You are attempting to call useCatalogLink with a nullish bookUrl"
+    );
+    return "";
+  }
 
   const location = getCalalogLink(bookUrl);
 

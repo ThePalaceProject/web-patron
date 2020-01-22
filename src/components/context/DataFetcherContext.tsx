@@ -6,7 +6,7 @@ const DataFetcherContext = React.createContext<DataFetcher | undefined>(
   undefined
 );
 
-export function DataFetcherProvider({ children, proxyUrl = null }) {
+export function DataFetcherProvider({ children, proxyUrl }) {
   // create our datafetcher
   const fetcher = new DataFetcher({
     proxyUrl,

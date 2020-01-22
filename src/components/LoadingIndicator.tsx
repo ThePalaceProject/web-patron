@@ -5,7 +5,7 @@ import FadeLoader from "react-spinners/FadeLoader";
 
 const LoadingIndicator: React.FC = props => {
   const { theme } = useThemeUI();
-  const darkBlue = theme.colors.blues[3];
+  const darkBlue = theme.colors?.blues[3];
 
   return <FadeLoader color={darkBlue} {...props} />;
 };

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useParams } from "react-router-dom";
 import { SetCollectionAndBook } from "../interfaces";
-import { useUrlShortener } from "../components/context/UrlShortenerContext";
+import useUrlShortener from "../components/context/UrlShortenerContext";
 
 /**
  * Currently have to pass in setCollectionAndBook, which we get from

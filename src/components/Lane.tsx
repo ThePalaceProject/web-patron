@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx, Styled, useThemeUI } from "theme-ui";
+import { jsx, Styled } from "theme-ui";
 import * as React from "react";
 import { LaneData, BookData } from "opds-web-client/lib/interfaces";
 import BookCover from "./BookCover";
@@ -9,13 +9,14 @@ import useCatalogLink from "../hooks/useCatalogLink";
 import ArrowRight from "../icons/ArrowRight";
 import { Tabbable } from "reakit/Tabbable";
 
-const BOOK_WIDTH = 200;
-const BOOK_MARGIN = 2;
-
-type Refs = {
+type BookRefs = {
   [id: string]: React.RefObject<HTMLLIElement>;
 };
 
+/**
+ * - scrolls automatically on button clicks
+ * - allows the user to free scroll / swipe also
+ */
 const Lane: React.FC<{ lane: LaneData; omitIds?: string[] }> = ({
   omitIds,
   lane: { title, books }
@@ -30,24 +31,23 @@ const Lane: React.FC<{ lane: LaneData; omitIds?: string[] }> = ({
     false
   );
   /** keep track of a ref for each book */
-  const bookRefs: Refs = filteredBooks.reduce((acc, value) => {
+  const bookRefs: BookRefs = filteredBooks.reduce((acc, value) => {
     const ref = React.createRef<HTMLLIElement>();
     acc[value.id] = ref;
     return acc;
   }, {});
   // we need a ref to the UL element so we can scroll it
-  const scrollContainer = React.useRef<HTMLUListElement>();
+  const scrollContainer = React.useRef<HTMLUListElement | null>(null);
 
   const isAtIndexEnd = currentIndex === filteredBooks.length - 1;
   const isAtScrollEnd =
-    scrollContainer.current?.scrollLeft ===
-    scrollContainer.current?.scrollWidth - scrollContainer.current?.offsetWidth;
-  const isAtEnd = isAtIndexEnd || isAtScrollEnd;
+    scrollContainer.current &&
+    scrollContainer.current.scrollLeft ===
+      scrollContainer.current.scrollWidth - scrollContainer.current.offsetWidth;
+  const isAtEnd = !!(isAtIndexEnd || isAtScrollEnd);
   const isAtStart = currentIndex === 0;
 
-  /**
-   * Handlers for button clicks
-   */
+  /** Handlers for button clicks */
   const handleRightClick = () => {
     const nextIndex = currentIndex + 1;
     if (isAtEnd) return;
@@ -60,7 +60,7 @@ const Lane: React.FC<{ lane: LaneData; omitIds?: string[] }> = ({
   };
 
   // will be used to set a timeout when the browser is auto scrolling
-  const timeoutRef = React.useRef(null);
+  const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const browserScrollTime = 1000; // guess how long the browser takes to scroll
 
   const scrollToBook = (nextIndex: number) => {
@@ -74,9 +74,10 @@ const Lane: React.FC<{ lane: LaneData; omitIds?: string[] }> = ({
     });
     // allows us to bail out of handleScroll when the browser is autoscrolling
     setIsBrowserScrolling(true);
-    // if there is a timeout already, clear it
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    // set a new one
+    // clear any old timeout and set a new one
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
     timeoutRef.current = setTimeout(() => {
       setIsBrowserScrolling(false);
     }, browserScrollTime);
@@ -88,7 +89,7 @@ const Lane: React.FC<{ lane: LaneData; omitIds?: string[] }> = ({
   const getBookWidth = () => {
     const firstBookId = filteredBooks[0].id;
     const firstBookRef = bookRefs[firstBookId];
-    const firstBookWidth = firstBookRef.current.offsetWidth;
+    const firstBookWidth = firstBookRef.current?.offsetWidth || 0;
     return firstBookWidth;
   };
   const handleScroll = (e: React.UIEvent<HTMLUListElement>) => {
@@ -164,8 +165,8 @@ const Book = React.forwardRef<HTMLLIElement, { book: BookData }>(
           borderRadius: "card",
           py: 3,
           px: 2,
-          flex: `0 0 ${BOOK_WIDTH}px`,
-          mx: BOOK_MARGIN,
+          flex: `0 0 ${200}px`,
+          mx: 2,
           textAlign: "center"
         }}
       >
@@ -180,7 +181,9 @@ const Book = React.forwardRef<HTMLLIElement, { book: BookData }>(
           >
             {truncateString(book.title, 50, true)}
           </Styled.h2>
-          <span sx={{ color: "blues.primary" }}>{book.authors.join(", ")}</span>
+          <span sx={{ color: "blues.primary" }}>
+            {book?.authors?.join(", ")}
+          </span>
         </Link>
       </li>
     );
@@ -213,7 +216,7 @@ const PrevNextButton: React.FC<{
       <ArrowRight
         sx={{
           fill: disabled ? "grey" : "blues.primary",
-          transform: isPrev ? "rotate(180deg)" : null
+          transform: isPrev ? "rotate(180deg)" : ""
         }}
       />
     </Tabbable>

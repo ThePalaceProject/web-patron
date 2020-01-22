@@ -1,10 +1,10 @@
 /** @jsx jsx */
-import { jsx, Styled } from "theme-ui";
+import { jsx } from "theme-ui";
 import * as React from "react";
 import useTypedSelector from "../../hooks/useTypedSelector";
 import { SetCollectionAndBook } from "../../interfaces";
 import useSetCollectionAndBook from "../../hooks/useSetCollectionAndBook";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import {
   mapStateToProps,
   mapDispatchToProps,
@@ -35,8 +35,12 @@ const Home: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
   );
 };
 
-export default connect(
+const Connected = connect(
   mapStateToProps,
   mapDispatchToProps,
   mergeRootProps
 )(Home);
+
+// // we have to do this due to a typing error in react-router-dom
+const Wrapper = props => <Connected {...props} />;
+export default Wrapper;

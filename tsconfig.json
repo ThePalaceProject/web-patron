@@ -10,7 +10,8 @@
     "baseUrl": ".",
     "paths": {
       "*": ["node_modules/@types/*", "*"]
-    }
+    },
+    "strictNullChecks": true
   },
   "include": ["./src"],
   "exclude": ["lib", "node_modules"]

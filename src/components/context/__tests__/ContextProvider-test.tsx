@@ -97,17 +97,19 @@ describe("ContextProvider", () => {
         catalogUrl: "http://example.com/home",
         catalogName: "Example"
       };
-      wrapper = shallow(
-        <AppContextProvider
-          library={library}
-          shortenUrls={false}
-          initialState={store.getState()}
-        >
-          <TestComponent />
-        </AppContextProvider>
-      );
-      const path = wrapper.instance().pathFor(null, null);
-      expect(path).to.equal(`/`);
+      expect(0).to.equal(1);
+      // this doesn't work. ContextProvider expects full LibraryData
+      // wrapper = shallow(
+      //   <AppContextProvider
+      //     library={library}
+      //     shortenUrls={false}
+      //     initialState={store.getState()}
+      //   >
+      //     <TestComponent />
+      //   </AppContextProvider>
+      // );
+      // const path = wrapper.instance().pathFor(null, null);
+      // expect(path).to.equal(`/`);
     });
   });
 });

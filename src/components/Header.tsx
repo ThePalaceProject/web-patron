@@ -7,7 +7,7 @@ import LibraryContext from "./context/LibraryContext";
 import RouterContext from "./context/RouterContext";
 import Search from "./Search";
 import { State } from "opds-web-client/lib/state";
-import { PathForContext } from "opds-web-client/lib/components/context/PathForContext";
+import { usePathFor } from "opds-web-client/lib/components/context/PathForContext";
 import { useActions } from "../components/context/ActionsContext";
 import Button from "./Button";
 import useCatalogLink from "../hooks/useCatalogLink";
@@ -16,6 +16,7 @@ import useTypedSelector from "../hooks/useTypedSelector";
 
 import BookIcon from "../icons/Book";
 import SettingsIcon from "../icons/Settings";
+import useLibraryContext from "./context/LibraryContext";
 
 export interface HeaderContext extends NavigateContext {
   library: LibraryData;
@@ -26,15 +27,15 @@ export interface HeaderContext extends NavigateContext {
  * redux store instead of relying on OPDS web client to provide it
  */
 const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
-  const library = React.useContext(LibraryContext);
+  const library = useLibraryContext();
   const loansUrl = useTypedSelector((state: State) => state?.loans?.url);
-  const pathFor = React.useContext(PathForContext);
+  const pathFor = usePathFor();
   const { actions, dispatch } = useActions();
   const router = React.useContext(RouterContext);
 
   // nav links
-  const homeUrl = useCatalogLink(null);
-  const myBooksUrl = useCatalogLink(null, loansUrl);
+  const homeUrl = useCatalogLink(undefined);
+  const myBooksUrl = useCatalogLink(undefined, loansUrl);
   const goMyBooks = () => router.push(myBooksUrl);
   // return <div>hi from header</div>;
 

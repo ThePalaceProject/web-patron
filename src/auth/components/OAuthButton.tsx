@@ -1,5 +1,5 @@
 import * as React from "react";
-import { AuthProvider, AuthMethod } from "opds-web-client/lib/interfaces";
+import { AuthMethod } from "opds-web-client/lib/interfaces";
 import { AuthButtonProps } from "opds-web-client/lib/components/AuthProviderSelectionForm";
 
 export interface AuthLink {
@@ -16,10 +16,10 @@ export default class OAuthButton extends React.Component<
   {}
 > {
   render() {
-    let currentUrl = window.location.origin + window.location.pathname;
+    const currentUrl = window.location.origin + window.location.pathname;
     let authUrl;
     let image;
-    for (const link of this.props.provider.method.links || []) {
+    for (const link of this.props?.provider?.method?.links ?? []) {
       if (link.rel === "authenticate") {
         authUrl =
           link.href +
@@ -33,7 +33,7 @@ export default class OAuthButton extends React.Component<
         break;
       }
     }
-    let label = this.props.provider.method.description
+    const label = this.props.provider?.method?.description
       ? "Log in with " + this.props.provider.method.description
       : "Log in";
     return authUrl ? (

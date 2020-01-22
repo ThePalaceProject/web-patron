@@ -94,7 +94,8 @@ const RecommendationsLane: React.FC<{ lane: LaneData; selfId: string }> = ({
       >
         {books.map(
           book =>
-            book.id !== selfId && (
+            book.id !== selfId &&
+            book.url && (
               <Link
                 to={getCatalogLink(book.url)}
                 key={book.id}

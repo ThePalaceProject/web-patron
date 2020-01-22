@@ -1,23 +1,18 @@
 import * as React from "react";
 import * as tinycolor from "tinycolor2";
 const OPDSCatalog = require("opds-web-client");
-import Header from "./Header";
-import Footer from "./Footer";
 import computeBreadcrumbs from "../computeBreadcrumbs";
 import { LibraryData } from "../interfaces";
 import BasicAuthWithButtonImagePlugin from "../auth/BasicAuthWithButtonImagePlugin";
 import OAuthPlugin from "../auth/OAuthPlugin";
-import Layout from "./Layout";
 import { useParams } from "react-router-dom";
-import UrlShortenerContext from "./context/UrlShortenerContext";
-import LibraryContext from "./context/LibraryContext";
-import InitialStateContext from "./context/InitialStateContext";
+import useUrlShortener from "./context/UrlShortenerContext";
+import useLibraryContext from "./context/LibraryContext";
 
 const CatalogHandler = () => {
   const { collectionUrl, bookUrl } = useParams();
-  const urlShortener = React.useContext(UrlShortenerContext);
-  const library = React.useContext(LibraryContext);
-  const initialState = React.useContext(InitialStateContext);
+  const urlShortener = useUrlShortener();
+  const library = useLibraryContext();
 
   const pageTitleTemplate = (collectionTitle, bookTitle) => {
     const details = bookTitle || collectionTitle;

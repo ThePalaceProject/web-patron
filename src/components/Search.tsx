@@ -39,8 +39,11 @@ const Search: React.FC<SearchProps> = ({ ...props }) => {
   // handle the search
   const onSearch = () => {
     const searchTerms = encodeURIComponent(value);
-    const url = searchData?.searchData.template(searchTerms);
+    const url = searchData?.searchData?.template(searchTerms);
     // navigate us to the new url
+    if (!url) {
+      throw new Error("Could not perform search");
+    }
     history.push(url);
   };
 

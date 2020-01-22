@@ -19,7 +19,7 @@ export interface Link {
 }
 
 export interface LibraryData {
-  id: string;
+  id?: string;
   onlyLibrary?: boolean;
   catalogUrl: string;
   catalogName: string;

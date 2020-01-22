@@ -9,8 +9,15 @@ import { LibraryData } from "../../interfaces";
 import renderErrorPage from "./renderErrorPage";
 import getAssets from "./getAssets";
 import Html, { DOCTYPE } from "./html";
-import { matchPath, StaticRouter, match as Match } from "react-router-dom";
+import {
+  matchPath,
+  StaticRouter,
+  match as Match,
+  Route,
+  RouteProps
+} from "react-router-dom";
 import App from "../../App";
+import LibraryDataCache from "../LibraryDataCache";
 
 /**
  * A function that takes in library data and returns a function to
@@ -42,22 +49,37 @@ type Params = {
   bookUrl?: Url;
 };
 
-const ssr = ({ shortenUrls, cache, routes, circManagerBase }) => async (
-  req: express.Request,
-  res: express.Response
-) => {
+type SSRProps = {
+  routes: RouteProps[];
+  cache: LibraryDataCache;
+  shortenUrls: boolean;
+  circManagerBase: string | undefined;
+};
+
+const ssr = ({
+  shortenUrls,
+  cache,
+  routes,
+  circManagerBase
+}: SSRProps) => async (req: express.Request, res: express.Response) => {
   // try to match the page and build it
   try {
     // match with the central route config
-    let match: Match<Params> | undefined;
-    const activeRoute = routes.find(
-      route => (match = matchPath(req.url, route))
-    );
+    // let match: Match<Params> | null = null;
+    const matchedRoute = routes.find(route => {
+      const doesMatch = matchPath<Params>(req.url, route);
+      if (doesMatch) {
+        return route;
+      }
+      return false;
+    });
     // if there is no active route, render the home page
-    if (!match) {
-      // render home page
+    if (!matchedRoute) {
       console.error("No route match was found for ", req.url);
+      res.redirect(302, "/");
+      return;
     }
+    const match = matchPath<Params>(req.url, matchedRoute);
 
     // otherwise, use the params to get the data, then render.
     // accessing these with typscript optional chaining.
@@ -69,19 +91,30 @@ const ssr = ({ shortenUrls, cache, routes, circManagerBase }) => async (
      * Build out libraryData
      * Send 404 if we fail to get it from the cache
      */
-    let libraryData: LibraryData;
+    let libraryData: Omit<LibraryData, "id">;
     if (circManagerBase) {
       // We're using a single circ manager library instead of a registry.
       const catalog = await cache.getCatalog(circManagerBase);
       const authDocument = await cache.getAuthDocument(catalog);
+      const authDocAndCat = cache.getDataFromAuthDocumentAndCatalog(
+        authDocument,
+        catalog
+      );
+
       libraryData = {
         onlyLibrary: true,
         catalogUrl: circManagerBase,
-        ...cache.getDataFromAuthDocumentAndCatalog(authDocument, catalog)
+        ...authDocAndCat,
+        logoUrl: authDocAndCat.logoUrl ? authDocAndCat.logoUrl : undefined
       };
     } else {
       try {
-        libraryData = await cache.getLibraryData(library);
+        if (library) {
+          libraryData = await cache.getLibraryData(library);
+        } else {
+          res.status(404).send(renderErrorPage());
+          return;
+        }
       } catch (error) {
         res.status(404).send(renderErrorPage(error));
         return;
@@ -127,8 +160,8 @@ const ssr = ({ shortenUrls, cache, routes, circManagerBase }) => async (
       res.status(200).send(fullPage);
     } catch (e) {
       const fullPage = await buildPage(
-        null,
-        null,
+        undefined,
+        undefined,
         libraryData,
         shortenUrls,
         req,
@@ -143,8 +176,8 @@ const ssr = ({ shortenUrls, cache, routes, circManagerBase }) => async (
 };
 
 const buildPage = async (
-  collectionUrl: Url,
-  bookUrl: Url,
+  collectionUrl: Url | undefined,
+  bookUrl: Url | undefined,
   libraryData: LibraryData,
   shortenUrls,
   req: express.Request,
