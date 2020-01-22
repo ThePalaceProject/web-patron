@@ -3,7 +3,7 @@ import { CollectionState } from "opds-web-client/lib/reducers/collection";
 import { CollectionData, BookData } from "opds-web-client/lib/interfaces";
 
 export interface PathFor {
-  (collectionUrl: string, bookUrl: string): string;
+  (collectionUrl?: string, bookUrl?: string): string;
 }
 
 export interface ComplaintData {

@@ -3,12 +3,9 @@ import { jsx, Styled, Flex } from "theme-ui";
 import * as React from "react";
 import { NavigateContext } from "opds-web-client/lib/interfaces";
 import { LibraryData } from "../interfaces";
-import LibraryContext from "./context/LibraryContext";
 import RouterContext from "./context/RouterContext";
 import Search from "./Search";
 import { State } from "opds-web-client/lib/state";
-import { usePathFor } from "opds-web-client/lib/components/context/PathForContext";
-import { useActions } from "../components/context/ActionsContext";
 import Button from "./Button";
 import useCatalogLink from "../hooks/useCatalogLink";
 import Link from "./Link";
@@ -29,8 +26,6 @@ export interface HeaderContext extends NavigateContext {
 const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
   const library = useLibraryContext();
   const loansUrl = useTypedSelector((state: State) => state?.loans?.url);
-  const pathFor = usePathFor();
-  const { actions, dispatch } = useActions();
   const router = React.useContext(RouterContext);
 
   // nav links

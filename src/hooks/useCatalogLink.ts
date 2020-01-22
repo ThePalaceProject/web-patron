@@ -21,7 +21,7 @@ export function useGetCatalogLink(collectionUrlOverride?: string) {
     collectionUrl = library.catalogUrl;
   }
 
-  function getCatalogLink(bookUrl: string) {
+  function getCatalogLink(bookUrl?: string) {
     return pathFor(collectionUrl, bookUrl);
   }
 
@@ -34,13 +34,6 @@ export function useGetCatalogLink(collectionUrlOverride?: string) {
  */
 function useCatalogLink(bookUrl?: string, collectionUrlOverride?: string) {
   const getCalalogLink = useGetCatalogLink(collectionUrlOverride);
-
-  if (!bookUrl) {
-    console.error(
-      "You are attempting to call useCatalogLink with a nullish bookUrl"
-    );
-    return "";
-  }
 
   const location = getCalalogLink(bookUrl);
 

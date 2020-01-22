@@ -54,7 +54,7 @@ describe("LibraryDataCache", () => {
           href: "about.html",
           type: "text/html",
           title: "About",
-          role: null
+          role: ""
         }
       ],
       complete: true,
@@ -167,7 +167,7 @@ describe("LibraryDataCache", () => {
           href: "about.html",
           type: "text/html",
           title: "About",
-          role: null
+          role: ""
         }
       ],
       complete: true,
@@ -242,7 +242,7 @@ describe("LibraryDataCache", () => {
             href: "about.html",
             type: "text/html",
             title: "About",
-            role: null
+            role: ""
           }
         ],
         complete: true,
@@ -276,8 +276,8 @@ describe("LibraryDataCache", () => {
       );
       expect(libraryData.logoUrl).to.equal("http://library.org/logo");
       expect(libraryData.onlyLibrary).to.be.undefined;
-      expect(libraryData.colors.background).to.equal("#000000");
-      expect(libraryData.colors.foreground).to.equal("#ffffff");
+      expect(libraryData.colors?.background).to.equal("#000000");
+      expect(libraryData.colors?.foreground).to.equal("#ffffff");
       expect(libraryData.headerLinks).to.deep.equal([
         {
           href: "http://library.org/1.html",
@@ -297,9 +297,9 @@ describe("LibraryDataCache", () => {
     });
 
     it("converts cache entry from config to library data", async () => {
-      cacheEntry.registryEntry = null;
+      (cacheEntry as any).registryEntry = null;
       const config = { library: "http://libraryfromconfig.org" };
-      const cache = new LibraryDataCacheWithEntry(null, 100, config);
+      const cache = new LibraryDataCacheWithEntry(undefined, 100, config);
       const libraryData = await cache.getLibraryData("library");
       expect(libraryData.id).to.equal("library");
       expect(libraryData.catalogUrl).to.equal("http://libraryfromconfig.org");
@@ -308,8 +308,8 @@ describe("LibraryDataCache", () => {
       );
       expect(libraryData.logoUrl).to.equal("http://library.org/logo");
       expect(libraryData.onlyLibrary).to.be.undefined;
-      expect(libraryData.colors.background).to.equal("#000000");
-      expect(libraryData.colors.foreground).to.equal("#ffffff");
+      expect(libraryData.colors?.background).to.equal("#000000");
+      expect(libraryData.colors?.foreground).to.equal("#ffffff");
       expect(libraryData.headerLinks).to.deep.equal([
         {
           href: "http://library.org/1.html",
@@ -383,7 +383,7 @@ describe("LibraryDataCache", () => {
 
     it("fetches an entry from the config file if it's not in the cache", async () => {
       const config = { library: "http://libraryfromconfig.org" };
-      const cache = new LibraryDataCacheWithTemplate(null, 100, config);
+      const cache = new LibraryDataCacheWithTemplate(undefined, 100, config);
 
       const uncachedResult = await cache.getCacheEntry("library");
       expect(uncachedResult.registryEntry).to.be.undefined;
@@ -440,7 +440,7 @@ describe("LibraryDataCache", () => {
 
     it("fetches an entry from the config file if it's in the cache but expired", async () => {
       const config = { library: "http://libraryfromconfig.org" };
-      const cache = new LibraryDataCacheWithTemplate(null, 1, config);
+      const cache = new LibraryDataCacheWithTemplate(undefined, 1, config);
 
       const uncachedResult = await cache.getCacheEntry("library");
       expect(uncachedResult.registryEntry).to.be.undefined;
@@ -577,7 +577,7 @@ describe("LibraryDataCache", () => {
 
     it("throws an error if the config file doesn't have an entry for the library", async () => {
       const config = { library: "http://libraryfromconfig.org" };
-      const cache = new LibraryDataCacheWithTemplate(null, 10, config);
+      const cache = new LibraryDataCacheWithTemplate(undefined, 10, config);
 
       try {
         // This should raise an error since the library is not in the config.
@@ -746,7 +746,7 @@ describe("LibraryDataCache", () => {
           href: "http://library.org/authentication_document",
           type: "application/json",
           title: "Auth",
-          role: null
+          role: ""
         }
       ],
       complete: true,
