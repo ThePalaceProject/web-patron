@@ -1,3 +1,4 @@
+import * as React from "react";
 import AuthPlugin from "opds-web-client/lib/AuthPlugin";
 import OAuthButton from "./components/OAuthButton";
 
@@ -37,7 +38,7 @@ const OAuthPlugin: AuthPlugin = {
     }
   },
 
-  formComponent: null,
+  formComponent: undefined,
   buttonComponent: OAuthButton
 };
 

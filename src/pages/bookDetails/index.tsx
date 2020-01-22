@@ -9,7 +9,6 @@ import ReportProblemLink from "../../components/ReportProblemLink";
 import RevokeButton from "../../components/RevokeButton";
 import { ComplaintData, SetCollectionAndBook } from "../../interfaces";
 import BookCover from "../../components/BookCover";
-import { useParams } from "react-router-dom";
 import useTypedSelector from "../../hooks/useTypedSelector";
 import Recommendations from "./recommendations";
 import {
@@ -17,10 +16,8 @@ import {
   mapStateToProps,
   mergeRootProps
 } from "opds-web-client/lib/components/mergeRootProps";
-import { CollectionData, BookData } from "opds-web-client/lib/interfaces";
+import { BookData } from "opds-web-client/lib/interfaces";
 import { connect } from "react-redux";
-import { useUrlShortener } from "../../components/context/UrlShortenerContext";
-import book from "opds-web-client/lib/reducers/book";
 import ExternalLink from "../../components/ExternalLink";
 import Button from "../../components/Button";
 import { getAvailabilityString } from "./utils";

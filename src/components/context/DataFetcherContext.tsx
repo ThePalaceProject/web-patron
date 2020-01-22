@@ -6,7 +6,10 @@ const DataFetcherContext = React.createContext<DataFetcher | undefined>(
   undefined
 );
 
-export function DataFetcherProvider({ children, proxyUrl }) {
+export const DataFetcherProvider: React.FC<{ proxyUrl?: string }> = ({
+  children,
+  proxyUrl
+}) => {
   // create our datafetcher
   const fetcher = new DataFetcher({
     proxyUrl,
@@ -18,7 +21,7 @@ export function DataFetcherProvider({ children, proxyUrl }) {
       {children}
     </DataFetcherContext.Provider>
   );
-}
+};
 
 export function useDataFetcher() {
   const context = React.useContext(DataFetcherContext);
