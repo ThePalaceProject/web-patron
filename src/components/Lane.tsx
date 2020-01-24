@@ -8,6 +8,7 @@ import Link from "./Link";
 import useCatalogLink from "../hooks/useCatalogLink";
 import ArrowRight from "../icons/ArrowRight";
 import { Tabbable } from "reakit/Tabbable";
+import Button, { LinkButton } from "./Button";
 
 type BookRefs = {
   [id: string]: React.RefObject<HTMLLIElement>;
@@ -19,7 +20,7 @@ type BookRefs = {
  */
 const Lane: React.FC<{ lane: LaneData; omitIds?: string[] }> = ({
   omitIds,
-  lane: { title, books }
+  lane: { title, books, url }
 }) => {
   const filteredBooks = books.filter(book => {
     if (!omitIds?.includes(book.id)) return book;
@@ -104,19 +105,27 @@ const Lane: React.FC<{ lane: LaneData; omitIds?: string[] }> = ({
     setCurrentIndex(currentBook);
   };
 
+  const laneUrl = useCatalogLink(undefined, url);
+
   return (
     <div sx={{}}>
-      <Styled.h3
+      <div
         sx={{
           backgroundColor: "blues.dark",
           color: "white",
           m: 0,
           p: 2,
-          textTransform: "uppercase"
+          textTransform: "uppercase",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between"
         }}
       >
-        {title}
-      </Styled.h3>
+        <Styled.h3 sx={{ m: 0 }}>{title}</Styled.h3>
+        <LinkButton to={laneUrl} sx={{ fontSize: 1, fontWeight: 2 }}>
+          View all {title}
+        </LinkButton>
+      </div>
       <div
         sx={{
           display: "flex",

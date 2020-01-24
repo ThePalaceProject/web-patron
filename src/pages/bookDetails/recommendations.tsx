@@ -45,8 +45,6 @@ const Recommendations: React.FC<{ book: BookData }> = ({ book }) => {
   const lanes = recommendationsState?.data?.lanes ?? [];
   const isFetching = recommendationsState?.isFetching ?? false;
 
-  console.log(recommendationsState);
-
   if (isFetching) {
     return (
       <div

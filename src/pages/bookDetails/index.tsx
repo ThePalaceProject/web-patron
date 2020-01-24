@@ -19,16 +19,15 @@ import {
 import { BookData } from "opds-web-client/lib/interfaces";
 import { connect } from "react-redux";
 import ExternalLink from "../../components/ExternalLink";
-import Button from "../../components/Button";
-import { getAvailabilityString } from "./utils";
 import useSetCollectionAndBook from "../../hooks/useSetCollectionAndBook";
 import { PageLoader } from "../../components/LoadingIndicator";
+import DownloadCard from "./DownloadCard";
 
 export interface BookDetailsPropsNew extends DefaultBooKDetailsProps {
   setCollectionAndBook: SetCollectionAndBook;
 }
 
-const sidebarWidth = 200;
+export const sidebarWidth = 200;
 
 const BookDetailsNew: React.FC<BookDetailsPropsNew> = ({
   setCollectionAndBook
@@ -132,48 +131,6 @@ const Summary: React.FC<{ book: BookData; className?: string }> = ({
     />
   </div>
 );
-
-const DownloadCard: React.FC<{ className?: string; book: BookData }> = ({
-  className,
-  book
-}) => {
-  const availability = getAvailabilityString(book);
-
-  return (
-    <div
-      sx={{
-        border: "1px solid",
-        borderColor: "blues.primary",
-        borderRadius: "card",
-        maxWidth: sidebarWidth
-      }}
-      className={className}
-    >
-      <div
-        sx={{
-          px: 2,
-          py: 3,
-          borderBottom: "1px solid",
-          borderColor: "blues.primary"
-        }}
-      >
-        <span>TYPE</span>
-      </div>
-      <div
-        sx={{
-          px: 2,
-          py: 2,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center"
-        }}
-      >
-        <div sx={{ mb: 2, textAlign: "center" }}>{availability}</div>
-        <Button variant="accent">Download</Button>
-      </div>
-    </div>
-  );
-};
 
 const DownloadRequirements: React.FC<{ className?: string }> = ({
   className
