@@ -95,7 +95,7 @@ const DownloadCard: React.FC<{ className?: string; book: BookData }> = ({
         }}
       >
         <div sx={{ mb: 2, textAlign: "center" }}>{availability}</div>
-        <Styled.a sx={{ variant: "buttons.accent" }} as="a" variant="accent">
+        <Styled.a sx={{ variant: "buttons.accent" }} as="a">
           Download
         </Styled.a>
       </div>
