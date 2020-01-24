@@ -105,17 +105,19 @@ const ssr = ({
         onlyLibrary: true,
         catalogUrl: circManagerBase,
         ...authDocAndCat,
-        logoUrl: authDocAndCat.logoUrl ? authDocAndCat.logoUrl : undefined
+        logoUrl: authDocAndCat.logoUrl ?? undefined
       };
     } else {
       try {
         if (library) {
           libraryData = await cache.getLibraryData(library);
         } else {
+          console.error("No library defined");
           res.status(404).send(renderErrorPage());
           return;
         }
       } catch (error) {
+        console.error("Could not get library data from cache", error);
         res.status(404).send(renderErrorPage(error));
         return;
       }
@@ -170,6 +172,7 @@ const ssr = ({
       res.status(200).send(fullPage);
     }
   } catch (error) {
+    console.error("Could not SSR");
     console.error(error);
     res.status(500).send(renderErrorPage());
   }

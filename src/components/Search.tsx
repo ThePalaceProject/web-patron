@@ -6,7 +6,7 @@ import Button from "./Button";
 import { State } from "opds-web-client/lib/state";
 import { useActions } from "./context/ActionsContext";
 import { useHistory } from "react-router-dom";
-import useTypedSelector from "src/hooks/useTypedSelector";
+import useTypedSelector from "../hooks/useTypedSelector";
 
 interface SearchProps extends React.InputHTMLAttributes<HTMLInputElement> {
   // onSearch: () => void;

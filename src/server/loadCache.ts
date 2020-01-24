@@ -60,7 +60,7 @@ async function loadCache() {
     parsedCacheExpirationSecons,
     config
   );
-
+  console.log(circManagerBase, process.env.CIRCULATION_MANAGER_BASE);
   return {
     shortenUrls,
     distDir,

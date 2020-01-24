@@ -18,8 +18,9 @@
     "build:client:prod": "cp -r src/stylesheets lib && webpack -p --progress --display-modules --config webpack.prod.config",
     "build-prod": "npm run build:server && npm run build:client:prod",
     "start": "node lib/server/index.js",
-    "prod": "npm run build:server && npm run build:client:prod && npm run start",
+    "prod": "npm run build:server && npm run build:client:prod && NODE_ENV=production npm run start",
     "dev": "npm run build:server && NODE_ENV=development npm run start",
+    "prod:amigos": "npm run build:server && npm run build:client:prod && NODE_ENV=production SIMPLIFIED_CATALOG_BASE=http://simplye-dev-cm.amigos.org/xyzlib node lib/server/index.js",
     "dev:amigos": "npm run build:server && NODE_ENV=development SIMPLIFIED_CATALOG_BASE=http://simplye-dev-cm.amigos.org/xyzlib node lib/server/index.js",
     "generate-icons": "npx @svgr/cli --template src/icons/_template.js --typescript --icon --ext tsx -d src/icons src/icons"
   },
@@ -97,6 +98,7 @@
     "moment": "^2.24.0",
     "opds-feed-parser": "0.0.16",
     "opds-web-client": "file:.yalc/opds-web-client",
+    "opds-web-client-build": "git://github.com/NYPL-Simplified/opds-web-client.git#beta",
     "prop-types": "^15.7.2",
     "react": "^16.12.0",
     "react-bootstrap": "^0.32.4",
