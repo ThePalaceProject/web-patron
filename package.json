@@ -17,10 +17,10 @@
     "build:server": "tsc && cp -r src/stylesheets lib",
     "build:client:prod": "cp -r src/stylesheets lib && webpack -p --progress --display-modules --config webpack.prod.config",
     "build-prod": "npm run build:server && npm run build:client:prod",
-    "start": "node lib/server/index.js",
+    "start": "NODE_ENV=production SIMPLIFIED_CATALOG_BASE=http://simplye-dev-cm.amigos.org/xyzlib node lib/server/index.js",
     "prod": "npm run build:server && npm run build:client:prod && NODE_ENV=production npm run start",
     "dev": "npm run build:server && NODE_ENV=development npm run start",
-    "prod:amigos": "npm run build:server && npm run build:client:prod && NODE_ENV=production SIMPLIFIED_CATALOG_BASE=http://simplye-dev-cm.amigos.org/xyzlib node lib/server/index.js",
+    "prod:amigos": "npm run build:server && npm run build:client:prod && ",
     "dev:amigos": "npm run build:server && NODE_ENV=development SIMPLIFIED_CATALOG_BASE=http://simplye-dev-cm.amigos.org/xyzlib node lib/server/index.js",
     "generate-icons": "npx @svgr/cli --template src/icons/_template.js --typescript --icon --ext tsx -d src/icons src/icons"
   },
