@@ -1,1 +1,1 @@
-web: npm i && npm run prod:amigos && npm run start:amigos
+web: npm run start:amigos
