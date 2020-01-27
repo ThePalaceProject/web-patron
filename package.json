@@ -129,5 +129,8 @@
       "eslint --fix --quiet",
       "git add"
     ]
+  },
+  "engines": {
+    "node": "13.x"
   }
 }
