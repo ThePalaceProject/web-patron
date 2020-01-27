@@ -14,7 +14,7 @@
     "lint:js:fix": "./node_modules/.bin/eslint -c .eslintrc.js src/**/*.ts src/**/*.tsx --fix",
     "lint:sass": "sass-lint -c .sass-lint.yml -v -q",
     "test": "npm run lint:js && tsc && cp -r src/stylesheets lib && mocha --require lib/testHelper.js lib/__tests__/*.js lib/**/__tests__/*.js lib/**/**/__tests__/*.js",
-    "build:server": "tsc && cp -r src/stylesheets lib",
+    "build:server": "node_modules/typescript/bin/tsc && cp -r src/stylesheets lib",
     "build:client:prod": "cp -r src/stylesheets lib && webpack -p --progress --display-modules --config webpack.prod.config",
     "build-prod": "npm run build:server && npm run build:client:prod",
     "start": "NODE_ENV=production node lib/server/index.js",
