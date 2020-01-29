@@ -29,7 +29,7 @@ export interface BookDetailsPropsNew extends DefaultBooKDetailsProps {
 
 export const sidebarWidth = 200;
 
-const BookDetailsNew: React.FC<BookDetailsPropsNew> = ({
+const BookDetails: React.FC<BookDetailsPropsNew> = ({
   setCollectionAndBook
 }) => {
   // set the collection and book
@@ -39,7 +39,6 @@ const BookDetailsNew: React.FC<BookDetailsPropsNew> = ({
   const { data: book } = bookState;
 
   if (!book) return <PageLoader />;
-
   return (
     <div>
       <Breadcrumbs />
@@ -193,7 +192,7 @@ const Connected = connect(
   mapStateToProps,
   mapDispatchToProps,
   mergeRootProps
-)(BookDetailsNew);
+)(BookDetails);
 
 // am doing this because typescript throws an error when trying to use
 // redux ConnectedComponent inside of Route
