@@ -4,10 +4,9 @@ import * as React from "react";
 import { getAvailabilityString } from "./utils";
 import Button, { LinkButton } from "../../components/Button";
 import { sidebarWidth } from "./index";
-import { BookData } from "opds-web-client/lib/interfaces";
-import download from "downloadjs";
-import { link } from "fs";
-
+import { BookData, OpenAccessLinkType } from "opds-web-client/lib/interfaces";
+import { typeMap } from "opds-web-client/lib/utils/file";
+import useTypedSelector from "../../hooks/useTypedSelector";
 /**
  * This card will handle logic to download books. There are a few cases
  *  1.  It is open access, in which case show download button for different
@@ -36,13 +35,15 @@ const DownloadCard: React.FC<{ className?: string; book: BookData }> = ({
 
   if (!openAccessLinks) throw new Error("No open access links provided");
 
-  const firstType = openAccessLinks?.[0].type;
-  const types = openAccessLinks?.reduce((acc, { url, type }) => {
+  const firstType = openAccessLinks[0].type;
+  const types: {
+    [key in OpenAccessLinkType]?: string;
+  } = openAccessLinks.reduce((acc, { url, type }) => {
     acc[type] = url;
     return acc;
   }, {});
 
-  const [selectedType, setSelectedType] = React.useState(types[firstType]);
+  const [selectedType, setSelectedType] = React.useState<string>(firstType);
 
   const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedType(e.target.value);
@@ -54,8 +55,9 @@ const DownloadCard: React.FC<{ className?: string; book: BookData }> = ({
    *    - download the returned blob
    */
   // const handleDownload = () => {};
+  const collection = useTypedSelector(state => state.collection);
+  // console.log(collection);
 
-  console.log(book);
   return (
     <div
       sx={{
@@ -80,8 +82,8 @@ const DownloadCard: React.FC<{ className?: string; book: BookData }> = ({
           onBlur={handleTypeChange}
           onChange={handleTypeChange}
         >
-          {openAccessLinks.map(({ url, type }) => (
-            <option key={url}>{type}</option>
+          {Object.keys(types).map(type => (
+            <option key={types[type]}>{typeMap[type]?.name ?? type}</option>
           ))}
         </select>
       </div>
@@ -95,7 +97,12 @@ const DownloadCard: React.FC<{ className?: string; book: BookData }> = ({
         }}
       >
         <div sx={{ mb: 2, textAlign: "center" }}>{availability}</div>
-        <Styled.a sx={{ variant: "buttons.accent" }} as="a">
+        <Styled.a
+          target="__blank"
+          rel="noopener noreferrer"
+          href={types[selectedType]}
+          sx={{ variant: "buttons.accent", px: 2, py: 1 }}
+        >
           Download
         </Styled.a>
       </div>
