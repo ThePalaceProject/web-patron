@@ -9,6 +9,8 @@ import useCatalogLink from "../hooks/useCatalogLink";
 import ArrowRight from "../icons/ArrowRight";
 import { Tabbable } from "reakit/Tabbable";
 import Button, { LinkButton } from "./Button";
+import useBreadcrumbs from "../hooks/useBreadcrumbs";
+import { getAuthors } from "../utils/book";
 
 type BookRefs = {
   [id: string]: React.RefObject<HTMLLIElement>;
@@ -107,6 +109,8 @@ const Lane: React.FC<{ lane: LaneData; omitIds?: string[] }> = ({
 
   const laneUrl = useCatalogLink(undefined, url);
 
+  const breadcrumbs = useBreadcrumbs();
+
   return (
     <div sx={{}}>
       <div
@@ -121,7 +125,21 @@ const Lane: React.FC<{ lane: LaneData; omitIds?: string[] }> = ({
           justifyContent: "space-between"
         }}
       >
-        <Styled.h3 sx={{ m: 0 }}>{title}</Styled.h3>
+        <div sx={{ display: "flex", alignItems: "center" }}>
+          {breadcrumbs.map(breadcrumb => (
+            <Styled.h3
+              key={breadcrumb.url}
+              sx={{
+                m: 0,
+                display: "flex",
+                alignItems: "center"
+              }}
+            >
+              {breadcrumb.text} <ArrowRight sx={{ fill: "white" }} />
+            </Styled.h3>
+          ))}
+          <Styled.h3 sx={{ m: 0, fontWeight: "light" }}>{title}</Styled.h3>
+        </div>
         <LinkButton to={laneUrl} sx={{ fontSize: 1, fontWeight: 2 }}>
           View all {title}
         </LinkButton>
@@ -163,6 +181,7 @@ const Lane: React.FC<{ lane: LaneData; omitIds?: string[] }> = ({
 const Book = React.forwardRef<HTMLLIElement, { book: BookData }>(
   ({ book }, ref) => {
     const link = useCatalogLink(book.url);
+    const authors = getAuthors(book, 2);
     return (
       <li
         ref={ref}
@@ -190,9 +209,7 @@ const Book = React.forwardRef<HTMLLIElement, { book: BookData }>(
           >
             {truncateString(book.title, 50, true)}
           </Styled.h2>
-          <span sx={{ color: "blues.primary" }}>
-            {book?.authors?.join(", ")}
-          </span>
+          <span sx={{ color: "blues.primary" }}>{authors.join(", ")}</span>
         </Link>
       </li>
     );
