@@ -2,7 +2,7 @@ import * as React from "react";
 import * as express from "express";
 // import { match, RouterContext } from "react-router";
 import UrlShortener from "../../UrlShortener";
-import buildInitialState, { State } from "opds-web-client/lib/state";
+import buildInitialState from "opds-web-client/lib/state";
 import { renderToString } from "react-dom/server";
 import ContextProvider from "../../components/context/ContextProvider";
 import { LibraryData } from "../../interfaces";
