@@ -1,6 +1,6 @@
-import CatalogHandler from "./components/CatalogHandler";
 import BookDetails from "./pages/bookDetails";
 import Home from "./pages/home";
+import Collection from "./pages/collection";
 
 export const singleLibraryRoutes = [
   {
@@ -9,8 +9,8 @@ export const singleLibraryRoutes = [
     exact: true
   },
   {
-    path: "/(collection/:collectionUrl)(/)(book/:bookUrl)",
-    component: CatalogHandler,
+    path: "/collection/:collectionUrl",
+    component: Collection,
     exact: true
   },
   {
@@ -28,13 +28,13 @@ export const multiLibraryRoutes = [
   },
   {
     path: "/:library(/)(collection/:collectionUrl)(/)(book/:bookUrl)",
-    component: CatalogHandler,
+    component: Collection,
     exact: false
   },
   {
     path: "/",
     exact: true,
-    component: CatalogHandler
+    component: Home
   }
 ];
 

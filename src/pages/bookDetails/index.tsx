@@ -128,6 +128,10 @@ const Summary: React.FC<{ book: BookData; className?: string }> = ({
       dangerouslySetInnerHTML={{
         __html: book.summary ?? "Summary not provided."
       }}
+      sx={{
+        maxHeight: "50vh",
+        overflowY: "scroll"
+      }}
     />
   </div>
 );
