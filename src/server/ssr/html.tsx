@@ -52,7 +52,7 @@ const Html = ({
         ))}
         {renderCSS(assets.CirculationPatronWeb)}
         <link
-          href="https://fonts.googleapis.com/css?family=Jomhuria|Oswald&display=swap"
+          href="https://fonts.googleapis.com/css?family=Jomhuria|Oswald:300,400,500&display=swap"
           rel="stylesheet"
         ></link>
       </head>

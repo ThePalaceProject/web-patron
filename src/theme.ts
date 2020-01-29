@@ -100,6 +100,7 @@ const theme: Theme = {
   },
   fontSizes: [12, 14, 16, 20, 24, 32, 48, 64, 96],
   fontWeights: {
+    light: 200,
     body: 300,
     heading: 400,
     bold: 700
@@ -164,6 +165,10 @@ const theme: Theme = {
     td: {
       textAlign: "left",
       borderBottomStyle: "solid"
+    },
+    a: {
+      cursor: "pointer",
+      textDecoration: "none"
     }
   },
   // variants
