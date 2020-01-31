@@ -11,6 +11,7 @@ import BasicAuthWithButtonImagePlugin from "../../auth/BasicAuthWithButtonImageP
 import OAuthPlugin from "../../auth/OAuthPlugin";
 import { ComplaintsContextProvider } from "./ComplaintsContext";
 import { RecommendationsContextProvider } from "./RecommendationsContext";
+import { FilterStateProvider } from "./FilterStateContext";
 import { DataFetcherProvider } from "./DataFetcherContext";
 import { ActionsProvider } from "./ActionsContext";
 import { Provider as ReakitProvider } from "reakit";
@@ -67,9 +68,11 @@ const AppContextProvider: React.FC<ProviderProps> = ({
                               state on context originally? Seems it's only necessary to 
                               initialize the opds store, which we do above.
                           */}
-                        <InitialStateProvider initialState={initialState}>
-                          {children}
-                        </InitialStateProvider>
+                        <FilterStateProvider>
+                          <InitialStateProvider initialState={initialState}>
+                            {children}
+                          </InitialStateProvider>
+                        </FilterStateProvider>
                       </UrlShortenerProvider>
                     </LibraryContextProvider>
                   </ComplaintsContextProvider>

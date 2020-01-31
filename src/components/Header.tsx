@@ -6,14 +6,15 @@ import { LibraryData } from "../interfaces";
 import RouterContext from "./context/RouterContext";
 import Search from "./Search";
 import { State } from "opds-web-client/lib/state";
-import Button from "./Button";
-import useCatalogLink from "../hooks/useCatalogLink";
+import Button, { NavButton as NavButtonBase } from "./Button";
+import useCatalogLink, { useGetCatalogLink } from "../hooks/useCatalogLink";
 import Link from "./Link";
 import useTypedSelector from "../hooks/useTypedSelector";
 
 import BookIcon from "../icons/Book";
 import SettingsIcon from "../icons/Settings";
 import useLibraryContext from "./context/LibraryContext";
+import FormatFilter from "./FormatFilter";
 
 export interface HeaderContext extends NavigateContext {
   library: LibraryData;
@@ -97,22 +98,27 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
         }}
       >
         <Flex
-          sx={{ flexDirection: "row", justifyContent: "center", p: [2, 0] }}
+          sx={{
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            flex: 1,
+            p: [2, 0]
+          }}
         >
-          <Button
+          <NavButton
             sx={{ m: 1, mb: [1, 0] }}
             variant="primary"
-            onClick={goMyBooks}
+            to={myBooksUrl}
           >
             <BookIcon sx={{ fontSize: 5 }} /> My Books
-          </Button>
-          <Button
+          </NavButton>
+          <NavButton
             sx={{ m: 1, mb: [1, 0] }}
             variant="primary"
-            // onClick={goSettings}
+            to={"/settings"}
           >
             <SettingsIcon sx={{ fontSize: 5 }} /> Settings
-          </Button>
+          </NavButton>
           <Flex
             as="ol"
             sx={{ flexDirection: "row", alignItems: "center", p: 0, m: 1 }}
@@ -126,6 +132,7 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
             ))}
           </Flex>
         </Flex>
+        <FormatFilter />
         <Flex sx={{ justifyContent: "center", p: 2 }}>
           <Search />
         </Flex>
@@ -135,6 +142,23 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
 };
 
 export default HeaderFC;
+
+type ButtonProps = React.ComponentProps<typeof NavButtonBase>;
+const NavButton: React.FC<ButtonProps> = ({
+  children,
+  className,
+  ...props
+}) => {
+  return (
+    <NavButtonBase
+      sx={{ borderBottomRightRadius: 0, borderBottomLeftRadius: 0 }}
+      className={className}
+      {...props}
+    >
+      {children}
+    </NavButtonBase>
+  );
+};
 
 // export default class Header extends React.Component<HeaderProps, {}> {
 //   context: HeaderContext;
