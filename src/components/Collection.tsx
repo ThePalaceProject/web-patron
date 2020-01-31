@@ -35,7 +35,6 @@ const Collection: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
 
   const hasLanes = (collection?.data?.lanes?.length ?? 0) > 1;
   const hasBooks = (collection?.data?.books?.length ?? 0) > 1;
-  console.log(collection);
 
   if (hasLanes) {
     const lanes = collection?.data?.lanes ?? [];
@@ -48,7 +47,7 @@ const Collection: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
     );
   } else if (hasBooks) {
     const books = collection?.data?.books ?? [];
-    return <ListView books={books} />;
+    return <GalleryView books={books} />;
   }
 
   // otherwise it it empty
@@ -64,7 +63,9 @@ const GalleryView: React.FC<{ books: BookData[] }> = ({ books }) => {
           display: "flex",
           flexWrap: "wrap",
           alignItems: "stretch",
-          justifyContent: "center"
+          justifyContent: "center",
+          p: 0,
+          m: 0
         }}
       >
         {books.map(book => (
