@@ -18,12 +18,7 @@ export type CardVariants = {
   bookDetails: SystemStyleObject;
 };
 
-export type Theme = {
-  text: TextVariants;
-  buttons: ButtonVariants;
-  cards: CardVariants;
-  colors: ThemeUi.Theme["colors"];
-} & ThemeUi.Theme;
+export type Theme = typeof theme;
 /**
  * It is sometimes useful to define the variables outside the theme object
  * so they can be referenced easily in the theme object
@@ -80,7 +75,27 @@ const colors = {
 const radii = [0, 2, 4, 8] as Overloadable<number[], number>;
 radii.card = radii[3];
 
-const theme: Theme = {
+/** Base styles */
+const buttonBase = {
+  appearance: "none",
+  display: "inline-flex",
+  alignItems: "center",
+  textAlign: "center",
+  lineHeight: "inherit",
+  textDecoration: "none",
+  fontSize: "inherit",
+  fontWeight: "bold",
+  m: 0,
+  px: 3,
+  py: 1,
+  border: 0,
+  borderRadius: 2,
+  cursor: "pointer",
+  textTransform: "uppercase",
+  letterSpacing: "0.05em"
+};
+
+const theme = {
   colors,
   breakpoints: ["40em", "52em", "64em"],
   space: [0, 4, 8, 16, 32, 64, 128, 256, 512],
@@ -188,32 +203,28 @@ const theme: Theme = {
   },
   buttons: {
     primary: {
+      ...buttonBase,
       bg: "primary",
       color: "white",
       fill: "white",
-      borderRadius: "8px",
       "&:focus,&:hover": {
         bg: darken("primary", 0.05)
       },
       "&:active": {
         bg: darken("primary", 0.1)
-      },
-      textTransform: "uppercase",
-      letterSpacing: "0.05em"
+      }
     },
     accent: {
+      ...buttonBase,
       bg: "accent",
       color: "white",
       fill: "white",
-      borderRadius: "8px",
       "&:focus,&:hover": {
         bg: darken("accent", 0.05)
       },
       "&:active": {
         bg: darken("accent", 0.1)
-      },
-      textTransform: "uppercase",
-      letterSpacing: "0.05em"
+      }
     },
     flat: {
       bg: "white",

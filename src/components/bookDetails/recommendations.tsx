@@ -1,14 +1,12 @@
 /** @jsx jsx */
 import { jsx, Styled } from "theme-ui";
 import * as React from "react";
-import book from "opds-web-client/lib/reducers/book";
 import { BookData, LaneData } from "opds-web-client/lib/interfaces";
-import { useActions } from "../../components/context/ActionsContext";
-import useRecommendationsState from "../../components/context/RecommendationsContext";
-import BookCover from "../../components/BookCover";
-import LoadingIndicator from "../../components/LoadingIndicator";
+import useRecommendationsState from "../context/RecommendationsContext";
+import BookCover from "../BookCover";
+import LoadingIndicator from "../LoadingIndicator";
 import { useGetCatalogLink } from "../../hooks/useCatalogLink";
-import Link from "../../components/Link";
+import Link from "../Link";
 
 const Recommendations: React.FC<{ book: BookData }> = ({ book }) => {
   /**

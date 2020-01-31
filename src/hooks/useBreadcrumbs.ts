@@ -8,6 +8,7 @@ import useTypedSelector from "./useTypedSelector";
 export default function useBreadCrumbs() {
   const collection = useTypedSelector(state => state.collection.data);
   const history = useTypedSelector(state => state.collection.history);
+  if (!collection) return [];
   const breadcrumbs = computeBreadcrumbs(collection, history);
   return breadcrumbs;
 }

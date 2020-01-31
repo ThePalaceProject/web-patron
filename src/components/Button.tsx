@@ -1,29 +1,16 @@
 /** @jsx jsx */
-import { jsx } from "theme-ui";
+import { jsx, Styled } from "theme-ui";
 import { Button as BaseButton } from "reakit";
 import * as React from "react";
 import { ButtonVariants, VariantProp } from "../interfaces";
 import Link from "./Link";
 
+type Variant = VariantProp<ButtonVariants>;
 type ButtonProps = {
-  variant?: VariantProp<ButtonVariants>;
+  variant?: Variant;
 } & React.ComponentProps<typeof BaseButton>;
 
-const buttonStyles = variant => ({
-  appearance: "none",
-  display: "inline-flex",
-  alignItems: "center",
-  textAlign: "center",
-  lineHeight: "inherit",
-  textDecoration: "none",
-  fontSize: "inherit",
-  fontWeight: "bold",
-  m: 0,
-  px: 3,
-  py: 1,
-  border: 0,
-  borderRadius: 2,
-  cursor: "pointer",
+const buttonStyles = (variant: VariantProp<ButtonVariants>) => ({
   variant: `buttons.${variant}`
 });
 
@@ -37,9 +24,9 @@ const Button: React.FC<ButtonProps> = ({
   );
 };
 
-type LinkButtonProps = ButtonProps & React.ComponentProps<typeof Link>;
+type NavButtonProps = ButtonProps & React.ComponentProps<typeof Link>;
 
-export const LinkButton = React.forwardRef<HTMLAnchorElement, LinkButtonProps>(
+export const NavButton = React.forwardRef<HTMLAnchorElement, NavButtonProps>(
   ({ to, children, variant = "primary", ...props }, ref) => {
     return (
       <Link ref={ref} to={to} sx={buttonStyles(variant)} {...props}>
@@ -49,4 +36,20 @@ export const LinkButton = React.forwardRef<HTMLAnchorElement, LinkButtonProps>(
   }
 );
 
+type LinkButtonProps = { variant?: Variant } & React.ComponentProps<
+  typeof Styled.a
+>;
+
+export const LinkButton: React.FC<LinkButtonProps> = ({
+  variant = "primary",
+  className,
+  // I had to pull ref off of here to get typescript not to complain
+  // there must be an upstream bug in @types/theme-ui
+  ref,
+  ...props
+}) => {
+  return (
+    <Styled.a sx={buttonStyles(variant)} className={className} {...props} />
+  );
+};
 export default Button;

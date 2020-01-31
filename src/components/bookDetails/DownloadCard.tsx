@@ -2,7 +2,6 @@
 import { jsx, Styled } from "theme-ui";
 import * as React from "react";
 import { getAvailabilityString } from "./utils";
-import Button, { LinkButton } from "../../components/Button";
 import { sidebarWidth } from "./index";
 import { BookData, OpenAccessLinkType } from "opds-web-client/lib/interfaces";
 import { typeMap } from "opds-web-client/lib/utils/file";

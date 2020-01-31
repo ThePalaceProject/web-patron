@@ -5,10 +5,10 @@ import { fetchComplaintTypes, postComplaint } from "../../actions";
 import DefaultBookDetails, {
   BookDetailsProps as DefaultBooKDetailsProps
 } from "opds-web-client/lib/components/BookDetails";
-import ReportProblemLink from "../../components/ReportProblemLink";
-import RevokeButton from "../../components/RevokeButton";
+import ReportProblemLink from "../ReportProblemLink";
+import RevokeButton from "../RevokeButton";
 import { ComplaintData, SetCollectionAndBook } from "../../interfaces";
-import BookCover from "../../components/BookCover";
+import BookCover from "../BookCover";
 import useTypedSelector from "../../hooks/useTypedSelector";
 import Recommendations from "./recommendations";
 import {
@@ -18,9 +18,9 @@ import {
 } from "opds-web-client/lib/components/mergeRootProps";
 import { BookData } from "opds-web-client/lib/interfaces";
 import { connect } from "react-redux";
-import ExternalLink from "../../components/ExternalLink";
+import ExternalLink from "../ExternalLink";
 import useSetCollectionAndBook from "../../hooks/useSetCollectionAndBook";
-import { PageLoader } from "../../components/LoadingIndicator";
+import { PageLoader } from "../LoadingIndicator";
 import DownloadCard from "./DownloadCard";
 
 export interface BookDetailsPropsNew extends DefaultBooKDetailsProps {

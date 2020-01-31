@@ -1,6 +1,5 @@
-import BookDetails from "./pages/bookDetails";
-import Home from "./pages/home";
-import Collection from "./pages/collection";
+import BookDetails from "./components/bookDetails";
+import Collection from "./components/Collection";
 
 export const singleLibraryRoutes = [
   {
@@ -16,7 +15,7 @@ export const singleLibraryRoutes = [
   {
     path: "/",
     exact: true,
-    component: Home
+    component: Collection
   }
 ];
 
@@ -34,7 +33,7 @@ export const multiLibraryRoutes = [
   {
     path: "/",
     exact: true,
-    component: Home
+    component: Collection
   }
 ];
 
