@@ -13,7 +13,7 @@ import { Theme } from "src/theme";
  * at least two facets with labels:
  *  - Audiobooks
  *  - eBooks
- * It can optionall have an additional "All" facet. Note that the facet
+ * It can optionally have an additional "All" facet. Note that the facet
  * labels must match the spelling and capitalization exactly.
  */
 const FormatFilter: React.FC = () => {
