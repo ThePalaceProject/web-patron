@@ -2,7 +2,7 @@
 import { jsx, Flex } from "theme-ui";
 import * as React from "react";
 import useTypedSelector from "../hooks/useTypedSelector";
-import { useHistory } from "react-router-dom";
+import { useHistory, Route } from "react-router-dom";
 import useCatalogLink from "../hooks/useCatalogLink";
 import { Book, Headset } from "../icons";
 import Button from "./Button";
@@ -39,30 +39,32 @@ const FormatFilter: React.FC = () => {
   const ebookFacetUrl = useCatalogLink(undefined, ebookFacet?.href);
   const allFacetUrl = useCatalogLink(undefined, allFacet?.href);
 
-  console.log(formatFacetGroup);
+  if (!ebookFacet || !audiobookFacet) return null;
   return (
-    <Flex sx={{ py: 0 }}>
-      {allFacet && (
+    <Route path={["/", "/collection/:collectionUrl"]} exact={false}>
+      <Flex sx={{ py: 0 }}>
+        {allFacet && (
+          <FilterButton
+            onClick={() => allFacet.href && history.push(allFacetUrl)}
+            selected={allFacet.active}
+          >
+            ALL
+          </FilterButton>
+        )}
         <FilterButton
-          onClick={() => allFacet.href && history.push(allFacetUrl)}
-          selected={allFacet.active}
+          onClick={() => ebookFacet.href && history.push(ebookFacetUrl)}
+          selected={!!ebookFacet.active}
         >
-          ALL
+          <Book sx={{ fontSize: 4 }} />
         </FilterButton>
-      )}
-      <FilterButton
-        onClick={() => ebookFacet?.href && history.push(ebookFacetUrl)}
-        selected={!!ebookFacet?.active}
-      >
-        <Book sx={{ fontSize: 4 }} />
-      </FilterButton>
-      <FilterButton
-        onClick={() => audiobookFacet?.href && history.push(audioBookUrl)}
-        selected={!!audiobookFacet?.active}
-      >
-        <Headset sx={{ fontSize: 4, m: 0, p: 0 }} />
-      </FilterButton>
-    </Flex>
+        <FilterButton
+          onClick={() => audiobookFacet.href && history.push(audioBookUrl)}
+          selected={!!audiobookFacet.active}
+        >
+          <Headset sx={{ fontSize: 4, m: 0, p: 0 }} />
+        </FilterButton>
+      </Flex>
+    </Route>
   );
 };
 export default FormatFilter;
@@ -105,5 +107,18 @@ const FilterButton: React.FC<FilterButtonProps> = ({
     >
       {children}
     </Button>
+  );
+};
+
+const OnlyInCollection = ({ children }) => {
+  return (
+    <React.Fragment>
+      <Route path="/collection/:collectionUrl" exact>
+        {children}
+      </Route>
+      <Route path="/" exact>
+        {children}
+      </Route>
+    </React.Fragment>
   );
 };
