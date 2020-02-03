@@ -22,6 +22,8 @@ import ExternalLink from "../ExternalLink";
 import useSetCollectionAndBook from "../../hooks/useSetCollectionAndBook";
 import { PageLoader } from "../LoadingIndicator";
 import DownloadCard from "./DownloadCard";
+import BreadcrumbBar from "../BreadcrumbBar";
+import truncateString from "../../utils/truncate";
 
 export interface BookDetailsPropsNew extends DefaultBooKDetailsProps {
   setCollectionAndBook: SetCollectionAndBook;
@@ -41,7 +43,7 @@ const BookDetails: React.FC<BookDetailsPropsNew> = ({
   if (!book) return <PageLoader />;
   return (
     <div>
-      <Breadcrumbs />
+      <BreadcrumbBar currentLocation={truncateString(book.title, 20, false)} />
       <div
         sx={{
           variant: "cards.bookDetails",
@@ -198,21 +200,6 @@ const Connected = connect(
 // redux ConnectedComponent inside of Route
 const Wrapper = props => <Connected {...props} />;
 export default Wrapper;
-
-const Breadcrumbs: React.FC<{}> = () => {
-  return (
-    <nav
-      sx={{
-        backgroundColor: "blues.dark",
-        color: "white",
-        textTransform: "uppercase",
-        p: 2
-      }}
-    >
-      hi from breadcrumbs
-    </nav>
-  );
-};
 
 // export interface BookDetailsProps extends DefaultBooKDetailsProps {
 //   problemTypes: string[];

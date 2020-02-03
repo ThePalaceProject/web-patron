@@ -3,6 +3,8 @@ import { jsx, Styled } from "theme-ui";
 import * as React from "react";
 import useBreadCrumbs from "../hooks/useBreadcrumbs";
 import { ArrowRight } from "../icons";
+import { useGetCatalogLink } from "../hooks/useCatalogLink";
+import Link from "./Link";
 
 /**
  * A simple UI component to provide consistent
@@ -16,6 +18,7 @@ const BreadcrumbBar: React.FC<{
   const breadcrumbs = useBreadCrumbs();
 
   const lastItem = currentLocation ?? breadcrumbs.pop()?.text;
+  const getCatalogLink = useGetCatalogLink();
 
   return (
     <div
@@ -33,18 +36,25 @@ const BreadcrumbBar: React.FC<{
     >
       <div sx={{ display: "flex", alignItems: "center" }}>
         {breadcrumbs.map(breadcrumb => (
-          <Styled.h3
+          <Link
+            to={getCatalogLink(undefined, breadcrumb.url)}
             key={breadcrumb.url}
-            sx={{
-              m: 0,
-              display: "flex",
-              alignItems: "center"
-            }}
           >
-            {breadcrumb.text} <ArrowRight sx={{ fill: "white" }} />
-          </Styled.h3>
+            <Styled.h3
+              sx={{
+                m: 0,
+                display: "flex",
+                alignItems: "center",
+                fontSize: [1, 3]
+              }}
+            >
+              {breadcrumb.text} <ArrowRight sx={{ fill: "white" }} />
+            </Styled.h3>
+          </Link>
         ))}
-        <Styled.h3 sx={{ m: 0, fontWeight: "light" }}>{lastItem}</Styled.h3>
+        <Styled.h3 sx={{ m: 0, fontWeight: "light", fontSize: [1, 3] }}>
+          {lastItem}
+        </Styled.h3>
       </div>
       {children}
     </div>

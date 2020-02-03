@@ -7,22 +7,25 @@ import useLibraryContext from "../components/context/LibraryContext";
  * OPDS catalog. Hook version of CatalogLink in
  * opds-web-client.
  *
- * it uses the context provided catalog by default
+ * you can pass in a collectionUrl to the hook, which makes each call to
+ * getCatalogLink use that url. Or you can not pass one in and it will use
+ * the default unless you specify in the call to getCatalogLink
  */
 export function useGetCatalogLink(collectionUrlOverride?: string) {
   const pathFor = usePathFor();
   const library = useLibraryContext();
 
   // use the context provided library by default
-  let collectionUrl: string;
+  let collectionUrl: string = library.catalogUrl;
   if (collectionUrlOverride) {
     collectionUrl = collectionUrlOverride;
-  } else {
-    collectionUrl = library.catalogUrl;
   }
 
-  function getCatalogLink(bookUrl?: string) {
-    return pathFor(collectionUrl, bookUrl);
+  function getCatalogLink(
+    bookUrl?: string,
+    collection: string = collectionUrl
+  ) {
+    return pathFor(collection, bookUrl);
   }
 
   return getCatalogLink;
