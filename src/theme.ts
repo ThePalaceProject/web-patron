@@ -46,6 +46,9 @@ blues.primary = blues[2];
 blues.medium = blues[1];
 blues.light = blues[0];
 
+// alias this for "primary" also
+const primaries = blues;
+
 const pink = "#D00854";
 const grey = "#B3B9BE";
 const lightGrey = "#f4f4f4";
@@ -58,6 +61,9 @@ const colors = {
   // ** Colors as intentions **
   // Primary button and link color
   primary: blues.primary,
+  // we are going to transition away from "blues.dark" to "primaries.dark" so that libraries
+  // can change these settings in CM
+  primaries,
   // Secondary color - can be used for hover states
   secondary: blues.medium,
   // A contrast color for emphasizing UI

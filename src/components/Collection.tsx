@@ -51,7 +51,20 @@ const Collection: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
   }
 
   // otherwise it it empty
-  return <div>there are no books</div>;
+  return (
+    <div
+      sx={{
+        display: "flex",
+        flex: "1 1 auto",
+        alignItems: "center",
+        justifyContent: "center"
+      }}
+    >
+      <Styled.h3 sx={{ color: "primaries.medium", fontStyle: "italic" }}>
+        This collection is empty.
+      </Styled.h3>
+    </div>
+  );
 };
 
 const GalleryView: React.FC<{ books: BookData[] }> = ({ books }) => {
