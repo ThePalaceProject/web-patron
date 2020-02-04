@@ -1,10 +1,16 @@
 import BookDetails from "./components/bookDetails";
 import Collection from "./components/Collection";
+import MyBooks from "./components/MyBooks";
 
 export const singleLibraryRoutes = [
   {
     path: "/book/:bookUrl",
     component: BookDetails,
+    exact: true
+  },
+  {
+    path: "/collection/loans",
+    component: MyBooks,
     exact: true
   },
   {
