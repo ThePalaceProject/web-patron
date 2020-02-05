@@ -16,6 +16,7 @@ export interface Link {
   rel?: string;
   title?: string;
   type?: string;
+  role?: string;
 }
 
 export interface LibraryData {
@@ -35,7 +36,7 @@ export interface LibraryData {
 export interface PreloadedData {
   library: LibraryData;
   shortenUrls: boolean;
-  initialState: State;
+  initialState?: State;
 }
 declare global {
   interface Window {

@@ -13,6 +13,6 @@
     },
     "strictNullChecks": true
   },
-  "include": ["./src"],
+  "include": ["./src", "./.storybook"],
   "exclude": ["lib", "node_modules"]
 }
