@@ -23,13 +23,12 @@ There are three ways to run this application:
 * with a single library on a [Circulation Manager](https://github.com/NYPL-Simplified/circulation)
 * with a configuration file for multiple Circulation Manager URLs
 
-By default, this application expects a Library Registry to be running at http://localhost:7000.
+By default, this application expects a Library Registry to be running at http://localhost:7000. Make sure that the Circulation Manager is running at the same time and that the library is registered to the Library Registry (setting "Registry Stage" to "production") for all three variations.
 
 Set one of the following environment variables when running the application:
 * `REGISTRY_BASE` - to use a Library Registry
    * Example: `REGISTRY_BASE=localhost:7000 npm run prod`
-   * This is the default setting which will point to the Library Registry located at `localhost:7000`. The libraries can be viewed in the app (running locally) by going to `localhost:3000/{uuid}` where `uuid` is the `uuid` of the library. Get the `uuid` from the Library Registry admin.
-   * A Circulation Manager should be running at the same time and the library must be registered to this Library Registry (setting "Registry Stage" to "production").
+   * This is the default setting which will point to a Library Registry located at `localhost:7000`. The libraries can be viewed in the app (running locally) by going to `localhost:3000/{urn:uuid}` where `urn:uuid` is the `urn:uuid` of the library. Get the `urn:uuid` from the Library Registry admin under the `internal_urn` label for its basic information.
 
 * `SIMPLIFIED_CATALOG_BASE` - to use a Circulation Manager
    * Example: `SIMPLIFIED_CATALOG_BASE=http://localhost:6500 npm run prod`.
