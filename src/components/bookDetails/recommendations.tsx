@@ -85,7 +85,9 @@ const RecommendationsLane: React.FC<{ lane: LaneData; selfId: string }> = ({
           borderColor: "blues.dark",
           borderRadius: "card",
           p: 2,
-          display: "flex"
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center"
         }}
       >
         {books.map(
@@ -97,7 +99,7 @@ const RecommendationsLane: React.FC<{ lane: LaneData; selfId: string }> = ({
                 key={book.id}
                 sx={{ flex: "1 0 auto", maxWidth: 110, m: 2 }}
               >
-                <BookCover book={book} sx={{ m: 2 }} />
+                <BookCover book={book} sx={{ m: 2, width: 100 }} />
                 <Styled.h3
                   sx={{
                     variant: "text.bookTitle",
