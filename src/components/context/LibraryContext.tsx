@@ -3,7 +3,7 @@ import { LibraryData } from "../../interfaces";
 
 const LibraryContext = React.createContext<LibraryData | undefined>(undefined);
 
-export const LibraryContextProvider: React.FC<{ library: LibraryData }> = ({
+export const LibraryProvider: React.FC<{ library: LibraryData }> = ({
   library,
   children
 }) => (

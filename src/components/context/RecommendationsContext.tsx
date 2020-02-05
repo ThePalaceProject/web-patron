@@ -27,7 +27,7 @@ export const RecommendationsDispatchContext = React.createContext<
   React.Dispatch<any> | undefined
 >(undefined);
 
-export const RecommendationsContextProvider: React.FC = ({ children }) => {
+export const RecommendationsProvider: React.FC = ({ children }) => {
   const [state, dispatch] = useThunkReducer(collection, initialState);
 
   return (

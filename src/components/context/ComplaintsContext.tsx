@@ -12,7 +12,7 @@ export const ComplaintsDispatchContext = React.createContext<
   React.Dispatch<any> | undefined
 >(undefined);
 
-export const ComplaintsContextProvider: React.FC = ({ children }) => {
+export const ComplaintsProvider: React.FC = ({ children }) => {
   const [state, dispatch] = useThunkReducer(complaintsReducer, initState);
 
   return (

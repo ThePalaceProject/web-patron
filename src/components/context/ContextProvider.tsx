@@ -1,18 +1,15 @@
 import * as React from "react";
 import { PathFor, PreloadedData } from "../../interfaces";
 import UrlShortener from "../../UrlShortener";
-import { LibraryContextProvider } from "./LibraryContext";
+import { LibraryProvider } from "./LibraryContext";
 import { UrlShortenerProvider } from "./UrlShortenerContext";
-import { InitialStateProvider } from "./InitialStateContext";
 import PathForProvider from "opds-web-client/lib/components/context/PathForContext";
-import { RouterContextProvider } from "./RouterContext";
+import { RouterProvider } from "./RouterContext";
 import OPDSStore from "opds-web-client/lib/components/context/StoreContext";
 import BasicAuthWithButtonImagePlugin from "../../auth/BasicAuthWithButtonImagePlugin";
 import OAuthPlugin from "../../auth/OAuthPlugin";
-import { ComplaintsContextProvider } from "./ComplaintsContext";
-import { RecommendationsContextProvider } from "./RecommendationsContext";
-import { FilterStateProvider } from "./FilterStateContext";
-import { DataFetcherProvider } from "./DataFetcherContext";
+import { ComplaintsProvider } from "./ComplaintsContext";
+import { RecommendationsProvider } from "./RecommendationsContext";
 import { ActionsProvider } from "./ActionsContext";
 import { Provider as ReakitProvider } from "reakit";
 
@@ -52,36 +49,26 @@ const AppContextProvider: React.FC<ProviderProps> = ({
 
   return (
     <ReakitProvider>
-      <RouterContextProvider>
+      <RouterProvider>
         <PathForProvider pathFor={pathFor}>
           <OPDSStore
             initialState={initialState}
             authPlugins={[BasicAuthWithButtonImagePlugin, OAuthPlugin]}
           >
-            <RecommendationsContextProvider>
-              <DataFetcherProvider>
-                <ActionsProvider>
-                  <ComplaintsContextProvider>
-                    <LibraryContextProvider library={library}>
-                      <UrlShortenerProvider urlShortener={urlShortener}>
-                        {/* is the initial state provider necessary? Why was the initial
-                              state on context originally? Seems it's only necessary to 
-                              initialize the opds store, which we do above.
-                          */}
-                        <FilterStateProvider>
-                          <InitialStateProvider initialState={initialState}>
-                            {children}
-                          </InitialStateProvider>
-                        </FilterStateProvider>
-                      </UrlShortenerProvider>
-                    </LibraryContextProvider>
-                  </ComplaintsContextProvider>
-                </ActionsProvider>
-              </DataFetcherProvider>
-            </RecommendationsContextProvider>
+            <RecommendationsProvider>
+              <ActionsProvider>
+                <ComplaintsProvider>
+                  <LibraryProvider library={library}>
+                    <UrlShortenerProvider urlShortener={urlShortener}>
+                      {children}
+                    </UrlShortenerProvider>
+                  </LibraryProvider>
+                </ComplaintsProvider>
+              </ActionsProvider>
+            </RecommendationsProvider>
           </OPDSStore>
         </PathForProvider>
-      </RouterContextProvider>
+      </RouterProvider>
     </ReakitProvider>
   );
 };
