@@ -82,6 +82,21 @@ module.exports = {
       }
     );
 
+    // Use real file paths for symlinked dependencies do avoid including them multiple times
+    config.resolve.symlinks = true;
+
+    // HACK: extend existing JS rule to ensure all dependencies are correctly ignored
+    // https://github.com/storybooks/storybook/issues/3346#issuecomment-459439438
+    const jsRule = config.module.rules.find(rule => rule.test.test(".jsx"));
+    jsRule.exclude = [/node_modules/, /dist/];
+
+    // HACK: Instruct Babel to check module type before injecting Core JS polyfills
+    // https://github.com/i-like-robots/broken-webpack-bundle-test-case
+    const babelConfig = jsRule.use.find(
+      ({ loader }) => loader === "babel-loader"
+    );
+    babelConfig.options.sourceType = "unambiguous";
+
     config.plugins.push(new webpack.IgnorePlugin(/jsdom$/));
 
     config.resolve.extensions.push(".ts", ".tsx");
