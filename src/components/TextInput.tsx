@@ -14,8 +14,9 @@ const TextInput: React.FC<React.InputHTMLAttributes<HTMLInputElement>> = ({
     <input
       type={type}
       sx={{
-        borderRadius: 3,
-        borderColor: "blues.primary",
+        borderRadius: 2,
+        border: "1px solid",
+        borderColor: "primary",
         borderWidth: 2,
         p: 1,
         fontSize: 2
