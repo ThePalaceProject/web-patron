@@ -7,6 +7,7 @@ import BookCover from "../BookCover";
 import LoadingIndicator from "../LoadingIndicator";
 import { useGetCatalogLink } from "../../hooks/useCatalogLink";
 import Link from "../Link";
+import Button, { NavButton } from "../Button";
 
 const Recommendations: React.FC<{ book: BookData }> = ({ book }) => {
   /**
@@ -69,16 +70,27 @@ const Recommendations: React.FC<{ book: BookData }> = ({ book }) => {
 
 const RecommendationsLane: React.FC<{ lane: LaneData; selfId: string }> = ({
   selfId,
-  lane: { title, books }
+  lane: { title, books, url }
 }) => {
   const getCatalogLink = useGetCatalogLink();
 
   // if there are less than two books, show nothing
   if (books.length < 2) return null;
 
+  const laneLink = getCatalogLink(undefined, url);
   return (
     <div sx={{ variant: "cards.bookDetails", border: "none" }}>
-      <Styled.h4>{title}</Styled.h4>
+      <div
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center"
+        }}
+      >
+        <Styled.h4>{title}</Styled.h4>
+        <NavButton to={laneLink}>More...</NavButton>
+      </div>
+
       <div
         sx={{
           border: "1px solid",

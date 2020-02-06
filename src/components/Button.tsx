@@ -13,7 +13,9 @@ type ButtonProps = {
 const buttonStyles = (variant: VariantProp<ButtonVariants>) => ({
   variant: `buttons.${variant}`
 });
-
+/**
+ * A button that takes an "onClick" prop like a normal button
+ */
 const Button: React.FC<ButtonProps> = ({
   variant = "primary",
   disabled,
@@ -25,7 +27,9 @@ const Button: React.FC<ButtonProps> = ({
 };
 
 type NavButtonProps = ButtonProps & React.ComponentProps<typeof Link>;
-
+/**
+ * A button that takes a "to" prop for an internal link
+ */
 export const NavButton = React.forwardRef<HTMLAnchorElement, NavButtonProps>(
   ({ to, children, variant = "primary", ...props }, ref) => {
     return (
@@ -40,6 +44,9 @@ type LinkButtonProps = { variant?: Variant } & React.ComponentProps<
   typeof Styled.a
 >;
 
+/**
+ * A button that takes an href prop for an external link
+ */
 export const LinkButton: React.FC<LinkButtonProps> = ({
   variant = "primary",
   className,
