@@ -111,7 +111,7 @@
     "jsdom": "^9.4.1",
     "moment": "^2.24.0",
     "opds-feed-parser": "0.0.16",
-    "opds-web-client": "file:.yalc/opds-web-client",
+    "opds-web-client": "github:NYPL-Simplified/opds-web-client#opds-web-client-v0.3.4-gitpkg",
     "prop-types": "^15.7.2",
     "react": "^16.12.0",
     "react-bootstrap": "^0.32.4",
