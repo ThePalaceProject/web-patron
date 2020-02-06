@@ -23,11 +23,12 @@ There are three ways to run this application:
 * with a single library on a [Circulation Manager](https://github.com/NYPL-Simplified/circulation)
 * with a configuration file for multiple Circulation Manager URLs
 
-By default, this application expects a Library Registry to be running at http://localhost:7000. Make sure that the Circulation Manager is running at the same time and that the library is registered to the Library Registry (setting "Registry Stage" to "production") for all three variations.
+By default, this application expects a Library Registry to be running at http://localhost:7000. Make sure that (1) the Circulation Manager is running at the same time and that (2) the library is registered to the Library Registry (setting "Registry Stage" to "production") for all three variations below.
 
 Set one of the following environment variables when running the application:
 * `REGISTRY_BASE` - to use a Library Registry
-   * Example: `REGISTRY_BASE=localhost:7000 npm run prod`
+   * Example: `REGISTRY_BASE=http://localhost:7000 npm run prod`
+   * A Library Registry is required for this build.
    * This is the default setting which will point to a Library Registry located at `localhost:7000`. The libraries can be viewed in the app (running locally) by going to `localhost:3000/{urn:uuid}` where `urn:uuid` is the `urn:uuid` of the library. Get the `urn:uuid` from the Library Registry admin under the `internal_urn` label for its basic information.
 
 * `SIMPLIFIED_CATALOG_BASE` - to use a Circulation Manager
@@ -37,7 +38,7 @@ Set one of the following environment variables when running the application:
 * `CONFIG_FILE` - to use a configuration file
    * Example: `CONFIG_FILE=config_file.txt npm run prod`
    * Set `CONFIG_FILE` to point to a local file or a remote URL.
-   Each line in the file should be a library's desired URL path in the web catalog and the library's Circulation Manager URL, separated by a pipe character. For example:
+   Each line in the file should be a library's desired URL path in the web catalog and the library's Circulation Manager URL (the domain of the Circulation Manager along with the library's shortname), separated by a pipe character. For example:
    * ```
       library1|http://circulationmanager.org/L1
       library2|http://localhost:6500/L2
