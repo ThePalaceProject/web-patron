@@ -28,7 +28,7 @@ There are three ways to run this application:
 * with a single library on a [Circulation Manager](https://github.com/NYPL-Simplified/circulation)
 * with a configuration file for multiple Circulation Manager URLs
 
-By default, this application expects a Library Registry to be running at http://localhost:7000. For all three variations below, make sure that (1) the Circulation Manager is running at the same time and that (2) the library is registered to the Library Registry (setting "Registry Stage" to "production").
+By default, this application expects a Library Registry to be running at http://localhost:7000. For all three variations below, make sure that the Circulation Manager is running at the same time. For the first variation, make sure that the library is registered to the Library Registry (setting "Registry Stage" to "production").
 
 Set one of the following environment variables when running the application:
 * `REGISTRY_BASE` - to use a Library Registry
