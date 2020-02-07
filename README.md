@@ -1,7 +1,12 @@
 # circulation-patron-web
 A Circulation catalog web interface for library patrons.
 
-## Installing
+## Background
+The `circulation-patron-web` application serves as a way for libraries to view their collections on the web. A library *must* be part of a [Circulation Manager](https://github.com/NYPL-Simplified/circulation) and *can* be registered to a [Library Registry](https://github.com/NYPL-Simplified/library_registry). Currently, in order for a library to be part of Library Simplified and show up in the SimplyE application, they must register with NYPL's Library Registry. A Library Registry provides details about a library, and a Circulation Manager provides a library's collection of eBooks and audiobooks in OPDS format.
+
+The `circulation-patron-web` app can be used for single-library and multi-library scenarios. The most common scenario may be for a single-library where the app renders the *main* library of a Circulation Manager. Alternatively, it's possible to use one instance of the `circulation-patron-web` app for multiple libraries, either from a single Circulation Manager or from multiple Circulation Managers.
+
+## Installation
 Once you have a [Library Registry](https://github.com/NYPL-Simplified/library_registry) or [Circulation Manager](https://github.com/NYPL-Simplified/circulation), run `npm install` in this repository to install the dependencies.
 
 ## Manager, Registry, and Application Configurations
@@ -23,7 +28,7 @@ There are three ways to run this application:
 * with a single library on a [Circulation Manager](https://github.com/NYPL-Simplified/circulation)
 * with a configuration file for multiple Circulation Manager URLs
 
-By default, this application expects a Library Registry to be running at http://localhost:7000. Make sure that (1) the Circulation Manager is running at the same time and that (2) the library is registered to the Library Registry (setting "Registry Stage" to "production") for all three variations below.
+By default, this application expects a Library Registry to be running at http://localhost:7000. For all three variations below, make sure that (1) the Circulation Manager is running at the same time and that (2) the library is registered to the Library Registry (setting "Registry Stage" to "production").
 
 Set one of the following environment variables when running the application:
 * `REGISTRY_BASE` - to use a Library Registry
@@ -44,7 +49,8 @@ Set one of the following environment variables when running the application:
       library2|http://localhost:6500/L2
       library3|http://anothercirculationmanager.org/L3
       ```
-   * From the example above, when running the command you can visit the app (running locally) at `localhost:3000/library1`, `localhost:3000/library2`, and `localhost:3000/library3` for each library.
+   * From the example above, when running the command you can visit the different libraries (running locally) at `localhost:3000/library1`, `localhost:3000/library2`, and `localhost:3000/library3`.
+   * This is for cases when an organization wants to use the same circulation-patron-web instance for multiple libraries and they are not running their own Library Registry or do not want to run a Library Registry when it's not needed for anything else.
 
 
 The following environment variables can also be set to further configure the application.
