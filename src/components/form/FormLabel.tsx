@@ -6,7 +6,7 @@ type HTMLLabelProps = React.HTMLProps<HTMLLabelElement>;
 type FormLabelProps = HTMLLabelProps & {
   required?: boolean;
   error?: boolean;
-  for: string;
+  htmlFor: string;
 };
 /**
  * A simple form label with styling and

@@ -3,21 +3,25 @@ import { jsx, Styled } from "theme-ui";
 import * as React from "react";
 import { useDialogState, Dialog, DialogBackdrop } from "reakit/Dialog";
 import useLibraryContext from "./context/LibraryContext";
-import TextInput from "./TextInput";
 import Button from "./Button";
 import useTypedSelector from "../hooks/useTypedSelector";
-import FormLabel from "./form/FormLabel";
+import { useForm, OnSubmit } from "react-hook-form";
+import FormInput from "./form/FormInput";
+import { useActions } from "./context/ActionsContext";
+import { generateCredentials } from "opds-web-client/lib/utils/auth";
+import { AuthMethod, AuthProvider } from "opds-web-client/lib/interfaces";
 
 const SignInOverlay = () => {
-  const isVisible = useTypedSelector(state => state.auth.showForm);
-  const cancelAuth = useTypedSelector(state => state.auth.cancel);
-  const authState = useTypedSelector(state => state.auth);
-  console.log(authState);
-  const hide = () => cancelAuth();
+  const showForm = useTypedSelector(state => state.auth.showForm);
+  const cancel = useTypedSelector(state => state.auth.cancel);
+
+  const hide = () => cancel();
 
   // we use some properties from this, but the visibility is in redux state
   const dialog = useDialogState();
   const library = useLibraryContext();
+
+  const onSubmit = data => console.log("submit", data);
 
   return (
     <React.Fragment>
@@ -38,11 +42,11 @@ const SignInOverlay = () => {
           justifyContent: "center",
           alignItems: "center"
         }}
-        visible={isVisible}
+        visible={showForm}
       >
         <Dialog
           {...dialog}
-          visible={isVisible}
+          visible={showForm}
           hide={hide}
           sx={{
             background: "white",
@@ -58,20 +62,79 @@ const SignInOverlay = () => {
             <Styled.h2>{library.catalogName}</Styled.h2>
             <Styled.h4>Login</Styled.h4>
           </div>
-          <form sx={{ display: "flex", flexDirection: "column" }}>
-            <FormLabel for="barcode" sx={{ mx: 2 }}>
-              Barcode
-            </FormLabel>
-            <TextInput id="barcode" placeholder="Barcode" sx={{ m: 2 }} />
-            <FormLabel for="pin" sx={{ mx: 2 }}>
-              Pin
-            </FormLabel>
-            <TextInput id="pin" placeholder="Pin" sx={{ m: 2 }} />
-            <Button sx={{ alignSelf: "flex-end", m: 2 }}>Login</Button>
-          </form>
+          <SignInForm />
         </Dialog>
       </DialogBackdrop>
     </React.Fragment>
+  );
+};
+
+/**
+ * Auth form
+ *  - you can choose between different providers configured in the CM
+ *  - each provider can give it's own form component?
+ *  - each auth method provides its own labels for the username/password
+ *  - handles validation (defined by the provider / plugin?)
+ *  - handles submit (defined by the provider / plugin?)
+ */
+
+/**
+ * 29999087654330
+ * KJacTrMwBz$k
+ */
+type FormData = {
+  barcode: string;
+  pin: string;
+};
+
+const SignInForm: React.FC = () => {
+  const authState = useTypedSelector(state => state.auth);
+  const { showForm, cancel, callback, error, providers } = authState;
+  const provider: AuthProvider<AuthMethod> | undefined = providers?.[0];
+  const { actions, dispatch } = useActions();
+  const { register, handleSubmit, errors } = useForm<FormData>();
+
+  const onSubmit = ({ barcode, pin }) => {
+    // create credentials
+    const credentials = generateCredentials(barcode, pin);
+    // save them with redux
+    dispatch(
+      actions.saveAuthCredentials({
+        provider: provider.id,
+        credentials
+      })
+    );
+    // call the callback that was saved when the form was triggered
+    callback?.();
+  };
+
+  return (
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      sx={{ display: "flex", flexDirection: "column" }}
+    >
+      <FormInput
+        name="barcode"
+        label="Barcode"
+        id="barcode"
+        placeholder="Barcode"
+        ref={register({ required: true, maxLength: 25 })}
+        error={errors?.barcode && "Your barcode is required."}
+      />
+      <FormInput
+        name="pin"
+        label="Pin"
+        ref={register({ required: true, maxLength: 25 })}
+        id="pin"
+        type="password"
+        placeholder="Pin"
+        error={errors?.pin && "Your pin is required."}
+      />
+      <span sx={{ color: "warn" }}>{error}</span>
+      <Button type="submit" sx={{ alignSelf: "flex-end", m: 2 }}>
+        Login
+      </Button>
+    </form>
   );
 };
 

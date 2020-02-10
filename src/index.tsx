@@ -20,3 +20,8 @@ ReactDOM.hydrate(
   </BrowserRouter>,
   element
 );
+
+if (process.env.NODE_ENV === "development") {
+  const axe = require("react-axe");
+  axe(React, ReactDOM, 1000);
+}

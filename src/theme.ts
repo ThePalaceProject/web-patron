@@ -70,6 +70,8 @@ const colors = {
   accent: pink,
   // A gray or subdued color for decorative purposes
   muted: blues.light,
+  // a color for when errors appear
+  warn: "#d93025",
 
   blues,
   lightGrey,
