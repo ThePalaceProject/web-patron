@@ -4,6 +4,7 @@ import * as React from "react";
 import GlobalStyles from "./GlobalStyles";
 import Header from "./Header";
 import Footer from "./Footer";
+import SignInOverlay from "./SignInOverlay";
 
 /**
  * Will take over from opds-web-client to handle layout
@@ -21,6 +22,7 @@ const Layout: React.FC = ({ children }) => {
       sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
     >
       <GlobalStyles />
+      <SignInOverlay />
       <Header sx={{ width: "100%" }} />
       <main
         sx={{

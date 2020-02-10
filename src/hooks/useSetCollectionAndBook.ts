@@ -10,14 +10,18 @@ import useUrlShortener from "../components/context/UrlShortenerContext";
  * hook can be entirely independent
  */
 const useSetCollectionAndBook = (
-  setCollectionAndBook: SetCollectionAndBook
+  setCollectionAndBook: SetCollectionAndBook,
+  // my-books page has to override this and send in a hard coded collectionUrl
+  collectionUrlOverride?: string
 ) => {
   const { bookUrl, collectionUrl } = useParams();
+  const finalCollectionUrl = collectionUrlOverride ?? collectionUrl;
+
   const urlShortener = useUrlShortener();
 
   // set the collection and book whenever the urls change
   const fullCollectionUrl = decodeURIComponent(
-    urlShortener.expandCollectionUrl(collectionUrl)
+    urlShortener.expandCollectionUrl(finalCollectionUrl)
   );
 
   const fullBookUrl = urlShortener.expandBookUrl(bookUrl);

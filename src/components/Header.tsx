@@ -32,12 +32,11 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
   // nav links
   const homeUrl = useCatalogLink(undefined);
   const myBooksUrl = useCatalogLink(undefined, loansUrl);
-  const goMyBooks = () => router.push(myBooksUrl);
   // return <div>hi from header</div>;
 
   // sign in
   // const isSignedIn = useTypedSelector(
-  //   (state: State) => state.auth //!!state?.auth?.credentials
+  //   (state) => state.auth //!!state?.auth?.credentials
   // );
   // const signIn = () => {
   //   if (actions.fetchLoans && loansUrl) {
@@ -105,11 +104,7 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
             p: [2, 0]
           }}
         >
-          <NavButton
-            sx={{ m: 1, mb: [1, 0] }}
-            variant="primary"
-            to={myBooksUrl}
-          >
+          <NavButton sx={{ m: 1, mb: [1, 0] }} variant="primary" to="/loans">
             <BookIcon sx={{ fontSize: 5 }} /> My Books
           </NavButton>
           <NavButton
