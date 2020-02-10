@@ -6,6 +6,7 @@ import useLibraryContext from "./context/LibraryContext";
 import TextInput from "./TextInput";
 import Button from "./Button";
 import useTypedSelector from "../hooks/useTypedSelector";
+import FormLabel from "./form/FormLabel";
 
 const SignInOverlay = () => {
   const isVisible = useTypedSelector(state => state.auth.showForm);
@@ -58,12 +59,14 @@ const SignInOverlay = () => {
             <Styled.h4>Login</Styled.h4>
           </div>
           <form sx={{ display: "flex", flexDirection: "column" }}>
-            <TextInput
-              // label="Barcode"
-              placeholder="Barcode"
-              sx={{ m: 2 }}
-            />
-            <TextInput placeholder="Pin" sx={{ m: 2 }} />
+            <FormLabel for="barcode" sx={{ mx: 2 }}>
+              Barcode
+            </FormLabel>
+            <TextInput id="barcode" placeholder="Barcode" sx={{ m: 2 }} />
+            <FormLabel for="pin" sx={{ mx: 2 }}>
+              Pin
+            </FormLabel>
+            <TextInput id="pin" placeholder="Pin" sx={{ m: 2 }} />
             <Button sx={{ alignSelf: "flex-end", m: 2 }}>Login</Button>
           </form>
         </Dialog>

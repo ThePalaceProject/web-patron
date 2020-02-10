@@ -28,6 +28,9 @@ module.exports = {
     "prettier/react"
   ],
   rules: {
+    // this rule was deprecated in favor of another
+    // not sure why it is still giving errors
+    "jsx-a11y/label-has-for": 0,
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
     "@typescript-eslint/no-empty-interface": 0,
