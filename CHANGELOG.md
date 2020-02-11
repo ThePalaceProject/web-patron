@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+### 0.2.2
+#### Updated
+- Updated documentation explaining how to run the application. Added a separate LICENSE file.
+
 ### 0.2.1
 #### Added
 - `tslint-react-a11y` to review accessibility for React components.

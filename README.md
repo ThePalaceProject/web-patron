@@ -1,52 +1,58 @@
 # circulation-patron-web
-A Circulation Manager web interface for library patrons.
+A Circulation catalog web interface for library patrons.
 
-## Running the application
+## Background
+The `circulation-patron-web` application serves as a way for libraries to view their collections on the web. A library *must* be part of a [Circulation Manager](https://github.com/NYPL-Simplified/circulation) and *can* be registered to a [Library Registry](https://github.com/NYPL-Simplified/library_registry). Currently, in order for a library to be part of Library Simplified and show up in the SimplyE application, they must register with NYPL's Library Registry. A Library Registry provides details about a library, and a Circulation Manager provides a library's collection of eBooks and audiobooks in OPDS format.
+
+The `circulation-patron-web` app can be used for single-library and multi-library scenarios. The most common scenario may be for a single-library where the app renders the *main* library of a Circulation Manager. Alternatively, it's possible to use one instance of the `circulation-patron-web` app for multiple libraries, either from a single Circulation Manager or from multiple Circulation Managers.
+
+## Installation
+Once you have a [Library Registry](https://github.com/NYPL-Simplified/library_registry) or [Circulation Manager](https://github.com/NYPL-Simplified/circulation), run `npm install` in this repository to install the dependencies.
+
+## Manager, Registry, and Application Configurations
+Any Circulation Manager you'll be using with the app also needs a configuration setting to turn on CORS headers. In the Circulation Manager interface, go to the Sitewide Settings section under System Configuration (`/admin/web/config/sitewideSettings`) and add a setting for "URL of the web catalog for patrons". For development, you can set this to "*", but for production it should be the real URL where you will run the catalog.
+
+If you are using a Library Registry, this configuration will automatically be created when you register libraries with the Registry, but you need to configure the URL in the Library Registry by running `bin/configuration/configure_site_setting --setting="web_client_url=http://library.org/{uuid}"` (replace the URL with your web client URL). Otherwise, you'll need to create a sitewide setting for it in the Circulation Manager. Finally, make sure that the libraries are registered to the Library Registry you are using.
+
+## Running the Application
+Once the dependencies are installed and application environments configured, the following two base commands can be used to start the application:
+
+* `npm run dev` - This command will watch the code for changes and rebuild the front-end code, but won't reload the server code.
+* `npm run prod` - This will generate the build that will be used in production servers.
+
+The application will start at the base URL of `localhost:3000`.
+
+### Application Startup Configurations
 There are three ways to run this application:
-* with a [library registry](https://github.com/NYPL-Simplified/library_registry)
-* with a single library on a [circulation manager](https://github.com/NYPL-Simplified/circulation)
-* with a configuration file for multiple circulation manager URLs
+* with a [Library Registry](https://github.com/NYPL-Simplified/library_registry)
+* with a single library on a [Circulation Manager](https://github.com/NYPL-Simplified/circulation)
+* with a configuration file for multiple Circulation Manager URLs
 
-By default, it expects a library registry to be running at http://localhost:7000.
-
-Any circulation manager you'll be using with the app also needs a configuration setting to turn on CORS headers. In the admin interface, go to the Sitewide Settings section under System Configuration and add a setting for "URL of the web catalog for patrons". For development, you can set this to "*", but for production it should be the real URL where you will run the catalog. If you are using a library registry, this configuration will automatically be created when you register libraries with the registry, but you need to configure the URL in the registry by running `bin/configuration/configure_site_setting --setting="web_client_url=http://library.org/{uuid}"` (replace the URL with your web client URL). Otherwise, you'll need to create a sitewide setting for it in the circulation manager.
-
-Once you have a library registry or circulation manager, run `npm install` in this repository to set up dependencies.
-
-Then you can run either `npm run dev` or `npm run prod` to start the application. `npm run dev` will watch the code for changes and rebuild the front-end code, but won't reload the server code.
+By default, this application expects a Library Registry to be running at http://localhost:7000. For all three variations below, make sure that the Circulation Manager is running at the same time. For the first variation, make sure that the library is registered to the Library Registry (setting "Registry Stage" to "production").
 
 Set one of the following environment variables when running the application:
-* To configure a library registry url, set the environment variable `REGISTRY_BASE`.
-   * This is the default setting which will point to the Library Registry located at `localhost:7000`. The libraries can be viewed in the app (running locally) by going to `localhost:3000/{uuid}` where `uuid` is the `uuid` of the library.
-* To use a circulation manager, set `SIMPLIFIED_CATALOG_BASE`.
-   * Point this environment variable to the url of the Circulation Manager, for example `SIMPLIFIED_CATALOG_BASE=http://localhost:6500 npm run prod`. This will load the main library in the Circulation Manager in the app (running locally) by going to `localhost:3000`.
-* To use a configuration file, set `CONFIG_FILE` to point to a local file or a remote URL. Each line in the file should be a library's desired URL path in the web catalog and the library's circ manager URL, separated by a pipe character. For example:
+* `REGISTRY_BASE` - to use a Library Registry
+   * Example: `REGISTRY_BASE=http://localhost:7000 npm run prod`
+   * A Library Registry is required for this build.
+   * This is the default setting which will point to a Library Registry located at `localhost:7000`. The libraries can be viewed in the app (running locally) by going to `localhost:3000/{urn:uuid}` where `urn:uuid` is the `urn:uuid` of the library. Get the `urn:uuid` from the Library Registry admin under the `internal_urn` label for its basic information.
+
+* `SIMPLIFIED_CATALOG_BASE` - to use a Circulation Manager
+   * Example: `SIMPLIFIED_CATALOG_BASE=http://localhost:6500 npm run prod`.
+   * Point this environment variable to the URL of the Circulation Manager (which defaults to `localhost:6500`). This will load the *main* library in the Circulation Manager in the app by going to `localhost:3000`.
+
+* `CONFIG_FILE` - to use a configuration file
+   * Example: `CONFIG_FILE=config_file.txt npm run prod`
+   * Set `CONFIG_FILE` to point to a local file or a remote URL.
+   Each line in the file should be a library's desired URL path in the web catalog and the library's Circulation Manager URL (the domain of the Circulation Manager along with the library's shortname), separated by a pipe character. For example:
    * ```
       library1|http://circulationmanager.org/L1
-      library2|http://circulationmanager.org/L2
+      library2|http://localhost:6500/L2
+      library3|http://anothercirculationmanager.org/L3
       ```
-   * An example command: `CONFIG_FILE=config_file.txt npm run prod`. From the example above, when running the command you can visit the app (running locally) at `localhost:3000/library1` and `localhost:3000/library2` for each library.
-
-Set `SHORTEN_URLS=false` to stop the app from removing common parts of the circulation manager URLs from the web app's URLs.
-
-Set `CACHE_EXPIRATION_SECONDS` to control how often the app will check for changes to registry entries and circ manager authentication documents.
+   * From the example above, when running the command you can visit the different libraries (running locally) at `localhost:3000/library1`, `localhost:3000/library2`, and `localhost:3000/library3`.
+   * This is for cases when an organization wants to use the same circulation-patron-web instance for multiple libraries and they are not running their own Library Registry or do not want to run a Library Registry when it's not needed for anything else.
 
 
-
-## License
-
-```
-Copyright © 2015 The New York Public Library, Astor, Lenox, and Tilden Foundations
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-```
+The following environment variables can also be set to further configure the application.
+* Set `SHORTEN_URLS=false` to stop the app from removing common parts of the circulation manager URLs from the web app's URLs.
+* Set `CACHE_EXPIRATION_SECONDS` to control how often the app will check for changes to registry entries and circ manager authentication documents.
