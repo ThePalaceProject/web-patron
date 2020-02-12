@@ -4,15 +4,16 @@ import DataFetcher from "opds-web-client/lib/DataFetcher";
 import { adapter } from "opds-web-client/lib/OPDSDataAdapter";
 import useThunkDispatch from "../../hooks/useThunkDispatch";
 
-const ActionsContext = React.createContext<ActionsCreator | undefined>(
-  undefined
-);
+type ActionsContextType =
+  | { fetcher: DataFetcher; actions: ActionsCreator }
+  | undefined;
+const ActionsContext = React.createContext<ActionsContextType>(undefined);
 
 export const ActionsProvider: React.FC<{ proxyUrl?: string }> = ({
   children,
   proxyUrl
 }) => {
-  // create our datafetcher
+  // create our context and save it in a ref
   const fetcher = new DataFetcher({
     proxyUrl,
     adapter
@@ -20,7 +21,7 @@ export const ActionsProvider: React.FC<{ proxyUrl?: string }> = ({
   const actions = new ActionsCreator(fetcher);
 
   return (
-    <ActionsContext.Provider value={actions}>
+    <ActionsContext.Provider value={{ actions, fetcher }}>
       {children}
     </ActionsContext.Provider>
   );
@@ -32,7 +33,8 @@ export function useActions() {
   if (typeof context === "undefined") {
     throw new Error("useActions must be used within a ActionsProvider");
   }
-  return { actions: context, dispatch };
+  const { actions, fetcher } = context;
+  return { actions, fetcher, dispatch };
 }
 
 export default ActionsContext;

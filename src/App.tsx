@@ -6,23 +6,26 @@ import theme from "./theme";
 import { hot } from "react-hot-loader/root";
 import Layout from "./components/Layout";
 import useLibraryContext from "./components/context/LibraryContext";
+import Auth from "./components/Auth";
 
 const App: React.FunctionComponent = () => {
   const library = useLibraryContext();
 
   return (
     <ThemeProvider theme={theme}>
-      <Layout>
-        <Switch>
-          {library.onlyLibrary
-            ? singleLibraryRoutes.map(route => (
-                <Route key={route.path} {...route} />
-              ))
-            : multiLibraryRoutes.map(route => (
-                <Route key={route.path} {...route} />
-              ))}
-        </Switch>
-      </Layout>
+      <Auth>
+        <Layout>
+          <Switch>
+            {library.onlyLibrary
+              ? singleLibraryRoutes.map(route => (
+                  <Route key={route.path} {...route} />
+                ))
+              : multiLibraryRoutes.map(route => (
+                  <Route key={route.path} {...route} />
+                ))}
+          </Switch>
+        </Layout>
+      </Auth>
     </ThemeProvider>
   );
 };

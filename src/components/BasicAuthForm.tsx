@@ -1,73 +1,18 @@
 /** @jsx jsx */
-import { jsx, Styled } from "theme-ui";
+import { jsx } from "theme-ui";
 import * as React from "react";
-import { useDialogState, Dialog, DialogBackdrop } from "reakit/Dialog";
-import useLibraryContext from "./context/LibraryContext";
 import Button from "./Button";
 import useTypedSelector from "../hooks/useTypedSelector";
 import { useForm, OnSubmit } from "react-hook-form";
 import FormInput from "./form/FormInput";
 import { useActions } from "./context/ActionsContext";
 import { generateCredentials } from "opds-web-client/lib/utils/auth";
-import { AuthMethod, AuthProvider } from "opds-web-client/lib/interfaces";
-
-const SignInOverlay = () => {
-  const showForm = useTypedSelector(state => state.auth.showForm);
-  const cancel = useTypedSelector(state => state.auth.cancel);
-
-  const hide = () => cancel();
-
-  // we use some properties from this, but the visibility is in redux state
-  const dialog = useDialogState();
-  const library = useLibraryContext();
-
-  const onSubmit = data => console.log("submit", data);
-
-  return (
-    <React.Fragment>
-      {/* <DialogDisclosure {...dialog} visible={isVisible} toggle={toggle}>
-        Open dialog
-      </DialogDisclosure> */}
-      <DialogBackdrop
-        {...dialog}
-        sx={{
-          position: "fixed",
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
-          backgroundColor: "rgba(0,0,0,0.5)",
-          zIndex: ["modal"],
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center"
-        }}
-        visible={showForm}
-      >
-        <Dialog
-          {...dialog}
-          visible={showForm}
-          hide={hide}
-          sx={{
-            background: "white",
-            borderRadius: 2,
-            boxShadow: "modal",
-            px: 4,
-            py: 3,
-            m: 2
-          }}
-          aria-label="Sign In"
-        >
-          <div sx={{ textAlign: "center" }}>
-            <Styled.h2>{library.catalogName}</Styled.h2>
-            <Styled.h4>Login</Styled.h4>
-          </div>
-          <SignInForm />
-        </Dialog>
-      </DialogBackdrop>
-    </React.Fragment>
-  );
-};
+import {
+  AuthMethod,
+  AuthProvider,
+  BasicAuthMethod
+} from "opds-web-client/lib/interfaces";
+import { AuthFormProps } from "opds-web-client/lib/components/AuthProviderSelectionForm";
 
 /**
  * Auth form
@@ -87,8 +32,9 @@ type FormData = {
   pin: string;
 };
 
-const SignInForm: React.FC = () => {
+const BasicAuthForm: React.FC<AuthFormProps<BasicAuthMethod>> = () => {
   const authState = useTypedSelector(state => state.auth);
+  console.log(authState);
   const { showForm, cancel, callback, error, providers } = authState;
   const provider: AuthProvider<AuthMethod> | undefined = providers?.[0];
   const { actions, dispatch } = useActions();
@@ -138,4 +84,4 @@ const SignInForm: React.FC = () => {
   );
 };
 
-export default SignInOverlay;
+export default BasicAuthForm;

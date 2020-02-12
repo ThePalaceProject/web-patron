@@ -4,21 +4,23 @@ import * as React from "react";
 import FormLabel from "./FormLabel";
 import TextInput from "../TextInput";
 
-interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+type FormInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   name: string;
   label: string;
   error?: string;
-}
+  required?: boolean;
+};
 /**
  * An input component to be used in a form that supports errors,
  * labels and uses the base TextInput component
  */
 const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
-  ({ type = "text", label, name, error, ...props }: FormInputProps, ref) => {
+  ({ type = "text", label, name, error, required, ...props }, ref) => {
     return (
-      <React.Fragment>
-        <FormLabel sx={{ mb: 1 }} htmlFor={name}>
+      <div role="group" sx={{ mb: 2 }}>
+        <FormLabel sx={{ mb: 1, display: "inline-block" }} htmlFor={name}>
           {label}
+          {required && <span sx={{ color: "warn" }}>*</span>}
         </FormLabel>
         <TextInput
           id={name}
@@ -26,11 +28,14 @@ const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
           aria-label={`${name} input`}
           ref={ref}
           type={type}
-          sx={{ mb: 2 }}
+          sx={{
+            display: "block",
+            borderColor: error ? "warn" : undefined
+          }}
           {...props}
         />
         <span sx={{ color: "warn", fontStyle: "italic" }}>{error}</span>
-      </React.Fragment>
+      </div>
     );
   }
 );

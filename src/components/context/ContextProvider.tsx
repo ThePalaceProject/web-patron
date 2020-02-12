@@ -53,7 +53,7 @@ const AppContextProvider: React.FC<ProviderProps> = ({
         <PathForProvider pathFor={pathFor}>
           <OPDSStore
             initialState={initialState}
-            authPlugins={[BasicAuthWithButtonImagePlugin, OAuthPlugin]}
+            authPlugins={[BasicAuthWithButtonImagePlugin]}
           >
             <RecommendationsProvider>
               <ActionsProvider>
