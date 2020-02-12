@@ -29,8 +29,6 @@ const Auth: React.FC = ({ children }) => {
   const basicAuthProvider = getBasicAuthProvider(providers);
   const BasicAuthComponent = basicAuthProvider?.plugin?.formComponent;
 
-  const hide = () => cancel();
-
   // we use some properties from this hook,
   // but the visibility is in redux state
   const dialog = useDialogState();
@@ -60,7 +58,7 @@ const Auth: React.FC = ({ children }) => {
         <Dialog
           {...dialog}
           visible={showForm}
-          hide={hide}
+          hide={cancel}
           sx={{
             background: "white",
             borderRadius: 2,
@@ -78,7 +76,7 @@ const Auth: React.FC = ({ children }) => {
           {/* Here we render the auth plugins  */}
           {/* if you would like to enable alternative auth plugins */}
           {/* you should render them (or some way to choose one) here */}
-          {BasicAuthComponent && <BasicAuthComponent />}
+          {BasicAuthComponent && showForm && <BasicAuthComponent />}
         </Dialog>
       </DialogBackdrop>
       {children}

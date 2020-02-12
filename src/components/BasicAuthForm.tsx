@@ -14,28 +14,17 @@ import {
 } from "opds-web-client/lib/interfaces";
 import { AuthFormProps } from "opds-web-client/lib/components/AuthProviderSelectionForm";
 
-/**
- * Auth form
- *  - you can choose between different providers configured in the CM
- *  - each provider can give it's own form component?
- *  - each auth method provides its own labels for the username/password
- *  - handles validation (defined by the provider / plugin?)
- *  - handles submit (defined by the provider / plugin?)
- */
-
-/**
- * 29999087654330
- * KJacTrMwBz$k
- */
 type FormData = {
   barcode: string;
   pin: string;
 };
 
+/**
+ * Auth form
+ */
 const BasicAuthForm: React.FC<AuthFormProps<BasicAuthMethod>> = () => {
   const authState = useTypedSelector(state => state.auth);
-  console.log(authState);
-  const { showForm, cancel, callback, error, providers } = authState;
+  const { callback, error: serverError, providers } = authState;
   const provider: AuthProvider<AuthMethod> | undefined = providers?.[0];
   const { actions, dispatch } = useActions();
   const { register, handleSubmit, errors } = useForm<FormData>();
@@ -53,7 +42,7 @@ const BasicAuthForm: React.FC<AuthFormProps<BasicAuthMethod>> = () => {
     // call the callback that was saved when the form was triggered
     callback?.();
   };
-
+  console.log(errors);
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -76,7 +65,7 @@ const BasicAuthForm: React.FC<AuthFormProps<BasicAuthMethod>> = () => {
         placeholder="Pin"
         error={errors?.pin && "Your pin is required."}
       />
-      <span sx={{ color: "warn" }}>{error}</span>
+      <span sx={{ color: "warn" }}>{serverError}</span>
       <Button type="submit" sx={{ alignSelf: "flex-end", m: 2 }}>
         Login
       </Button>

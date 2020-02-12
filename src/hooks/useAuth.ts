@@ -11,6 +11,8 @@ function useAuth() {
   const authState = useTypedSelector(state => state.auth);
   const isSignedIn = !!authState?.credentials;
   const { fetcher, actions, dispatch } = useActions();
+
+  const signOut = () => dispatch(actions.clearAuthCredentials());
   /**
    * On mount, we need to check for auth data in cookies. This used
    * to be done in componentWillMount of Root in OPDS
@@ -24,7 +26,7 @@ function useAuth() {
     }
   }, [dispatch, actions, fetcher]);
 
-  return { isSignedIn, ...authState };
+  return { isSignedIn, signOut, ...authState };
 }
 
 export default useAuth;
