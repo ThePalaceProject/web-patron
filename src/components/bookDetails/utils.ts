@@ -23,12 +23,12 @@ export const getAvailabilityString = (book: BookData): string => {
 
   let availabilityString = "";
   // there is a number of copies available that is known
-  if (availableCopies && totalCopies) {
+  if (typeof availableCopies === "number" && typeof totalCopies === "number") {
     // show how many available, even if all are taken
     availabilityString += `${availableCopies} of ${totalCopies} copies available.`;
 
     // there is a queue
-    if (totalHolds && availableCopies === 0) {
+    if (typeof totalHolds === "number" && availableCopies === 0) {
       availabilityString += ` ${totalHolds} patrons in queue.`;
 
       if (isReserved(book) && typeof holdsPosition === "number") {
