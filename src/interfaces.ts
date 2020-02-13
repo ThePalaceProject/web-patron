@@ -64,3 +64,7 @@ export type SetCollectionAndBook = (
   collectionData: CollectionData;
   bookData: BookData;
 }>;
+
+/** Utility to make certain keys of a type required */
+export type RequiredKeys<T, K extends keyof T> = Exclude<T, K> &
+  Required<Pick<T, K>>;

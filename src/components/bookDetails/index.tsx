@@ -111,7 +111,7 @@ const BookDetails: React.FC<BookDetailsPropsNew> = ({
           }}
         >
           <DownloadRequirements sx={{ m: 2 }} />
-          <DownloadCard book={book} sx={{ m: 2 }} />
+          <DownloadCard book={book} />
         </div>
       </div>
       <Recommendations book={book} />
