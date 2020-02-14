@@ -34,11 +34,6 @@ const Auth: React.FC = ({ children }) => {
   const dialog = useDialogState();
   const library = useLibraryContext();
 
-  if (!basicAuthProvider) {
-    console.error("Basic Auth Provider is missing");
-    return <span>Basic Auth Provider is missing.</span>;
-  }
-
   return (
     <React.Fragment>
       {/* <DialogDisclosure {...dialog} visible={isVisible} toggle={toggle}>
@@ -81,9 +76,13 @@ const Auth: React.FC = ({ children }) => {
           {/* Here we render the auth plugins  */}
           {/* if you would like to enable alternative auth plugins */}
           {/* you should render them (or some way to choose one) here */}
-          {BasicAuthComponent && showForm && (
-            <BasicAuthComponent provider={basicAuthProvider} />
-          )}
+          {BasicAuthComponent &&
+            showForm &&
+            (basicAuthProvider ? (
+              <BasicAuthComponent provider={basicAuthProvider} />
+            ) : (
+              "Basic auth provider is missing."
+            ))}
         </Dialog>
       </DialogBackdrop>
       {children}

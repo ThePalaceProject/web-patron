@@ -43,7 +43,6 @@ const BasicAuthForm: React.FC<AuthFormProps<BasicAuthMethod>> = ({
     // call the callback that was saved when the form was triggered
     callback?.();
   };
-  console.log(errors);
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}

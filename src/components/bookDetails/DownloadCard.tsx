@@ -59,7 +59,6 @@ const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
   }
   // if the book either on hold, available, or reservable
   if (isBorrowableBook(book)) {
-    console.log("ABLE TO BE BORROWED");
     return <BorrowCard book={book} />;
   }
   // the book cannot be borrowed, something likely went wrong
@@ -69,7 +68,6 @@ const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
 const BorrowCard: React.FC<{ book: BorrowableBook }> = ({ book }) => {
   const bookError = useTypedSelector(state => state.book?.error);
   const state = useTypedSelector(state => state);
-  console.log(state);
   const errorMsg = bookError?.response
     ? // eslint-disable-next-line camelcase
       JSON.parse(bookError?.response)?.debug_message
