@@ -2,6 +2,8 @@ import * as React from "react";
 import { useParams } from "react-router-dom";
 import { SetCollectionAndBook } from "../interfaces";
 import useUrlShortener from "../components/context/UrlShortenerContext";
+import { useActions } from "../components/context/ActionsContext";
+import useTypedSelector from "./useTypedSelector";
 
 /**
  * Currently have to pass in setCollectionAndBook, which we get from
@@ -16,17 +18,25 @@ const useSetCollectionAndBook = (
 ) => {
   const { bookUrl, collectionUrl } = useParams();
   const finalCollectionUrl = collectionUrlOverride ?? collectionUrl;
+  const { actions, dispatch } = useActions();
 
   const urlShortener = useUrlShortener();
 
-  // set the collection and book whenever the urls change
   const fullCollectionUrl = decodeURIComponent(
     urlShortener.expandCollectionUrl(finalCollectionUrl)
   );
+  const fullBookUrl = decodeURIComponent(urlShortener.expandBookUrl(bookUrl));
 
-  const fullBookUrl = urlShortener.expandBookUrl(bookUrl);
+  // set the collection and book whenever the urls change, and fetch loans
   React.useEffect(() => {
-    setCollectionAndBook(fullCollectionUrl, fullBookUrl);
+    setCollectionAndBook(fullCollectionUrl, fullBookUrl).then(
+      // then fetch the loans (like in OPDS root)
+      ({ collectionData }) => {
+        if (collectionData.shelfUrl) {
+          dispatch(actions.fetchLoans(collectionData.shelfUrl));
+        }
+      }
+    );
     /**
      * We will explicitly not have exhaustive deps here because
      * setCollectionAndBook changes identity on every render, which

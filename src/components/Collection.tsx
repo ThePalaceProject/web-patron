@@ -20,24 +20,26 @@ import BookCover from "./BookCover";
 import Link from "./Link";
 import { useGetCatalogLink } from "../hooks/useCatalogLink";
 import { getAuthors } from "../utils/book";
+import useNormalizedCollection from "../hooks/useNormalizedCollection";
 
 const Collection: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
   setCollectionAndBook
 }) => {
-  // set collection and book
   useSetCollectionAndBook(setCollectionAndBook);
 
+  // the first hook just provides the collection, the second subs in loaned book data if existing
   const collection = useTypedSelector(state => state.collection);
+  const collectionData = useNormalizedCollection();
 
   if (collection.isFetching) {
     return <PageLoader />;
   }
 
-  const hasLanes = (collection?.data?.lanes?.length ?? 0) > 1;
-  const hasBooks = (collection?.data?.books?.length ?? 0) > 1;
+  const hasLanes = (collectionData?.lanes?.length ?? 0) > 1;
+  const hasBooks = (collectionData?.books?.length ?? 0) > 1;
 
   if (hasLanes) {
-    const lanes = collection?.data?.lanes ?? [];
+    const lanes = collectionData?.lanes ?? [];
     return (
       <div>
         {lanes.map(lane => (
@@ -46,7 +48,7 @@ const Collection: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
       </div>
     );
   } else if (hasBooks) {
-    const books = collection?.data?.books ?? [];
+    const books = collectionData?.books ?? [];
     return <GalleryView books={books} />;
   }
 

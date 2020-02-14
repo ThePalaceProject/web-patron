@@ -24,6 +24,7 @@ import { PageLoader } from "../LoadingIndicator";
 import DownloadCard from "./DownloadCard";
 import BreadcrumbBar from "../BreadcrumbBar";
 import truncateString from "../../utils/truncate";
+import useNormalizedBook from "../../hooks/useNormalizedBook";
 
 export interface BookDetailsPropsNew extends DefaultBooKDetailsProps {
   setCollectionAndBook: SetCollectionAndBook;
@@ -37,8 +38,7 @@ const BookDetails: React.FC<BookDetailsPropsNew> = ({
   // set the collection and book
   useSetCollectionAndBook(setCollectionAndBook);
 
-  const bookState = useTypedSelector(state => state.book);
-  const { data: book } = bookState;
+  const book = useNormalizedBook();
 
   if (!book) return <PageLoader />;
   return (
