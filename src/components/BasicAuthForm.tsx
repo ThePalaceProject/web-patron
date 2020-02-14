@@ -22,10 +22,11 @@ type FormData = {
 /**
  * Auth form
  */
-const BasicAuthForm: React.FC<AuthFormProps<BasicAuthMethod>> = () => {
+const BasicAuthForm: React.FC<AuthFormProps<BasicAuthMethod>> = ({
+  provider
+}) => {
   const authState = useTypedSelector(state => state.auth);
-  const { callback, error: serverError, providers } = authState;
-  const provider: AuthProvider<AuthMethod> | undefined = providers?.[0];
+  const { callback, error: serverError } = authState;
   const { actions, dispatch } = useActions();
   const { register, handleSubmit, errors } = useForm<FormData>();
 

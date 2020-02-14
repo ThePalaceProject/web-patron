@@ -26,13 +26,9 @@ export interface HeaderContext extends NavigateContext {
  */
 const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
   const library = useLibraryContext();
-  const loansUrl = useTypedSelector((state: State) => state?.loans?.url);
-  const router = React.useContext(RouterContext);
 
   // nav links
   const homeUrl = useCatalogLink(undefined);
-  const myBooksUrl = useCatalogLink(undefined, loansUrl);
-  // return <div>hi from header</div>;
 
   // sign in
   // const isSignedIn = useTypedSelector(

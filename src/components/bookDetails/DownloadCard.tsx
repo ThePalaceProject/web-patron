@@ -88,13 +88,12 @@ const BorrowCard: React.FC<{ book: BorrowableBook }> = ({ book }) => {
   const label = isReserved ? "Reserved" : isReservable ? "Reserve" : "Borrow";
 
   const borrowOrReserve = async () => {
-    console.log("Borrowing", book.borrowUrl);
     const data = await dispatch(actions.updateBook(book.borrowUrl));
     // refetch the loans
-    const fetchloans = await dispatch(actions.fetchLoans(loansUrl));
-    // why isn't my view updating with info from redux?
-
-    console.log(data, fetchloans);
+    if (loansUrl) {
+      await dispatch(actions.fetchLoans(loansUrl));
+    }
+    console.log(data);
   };
   return (
     <CardWrapper>

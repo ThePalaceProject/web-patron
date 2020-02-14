@@ -65,6 +65,8 @@ export type SetCollectionAndBook = (
   bookData: BookData;
 }>;
 
+type PickAndRequire<T, K extends keyof T> = { [P in K]-?: NonNullable<T[P]> };
+
 /** Utility to make certain keys of a type required */
-export type RequiredKeys<T, K extends keyof T> = Exclude<T, K> &
-  Required<Pick<T, K>>;
+export type RequiredKeys<T, K extends keyof T> = Omit<T, K> &
+  PickAndRequire<T, K>;

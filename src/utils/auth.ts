@@ -24,7 +24,7 @@ function providerIsBasicAuth(
 }
 
 export function getBasicAuthProvider(
-  providers: AuthProvider<AuthMethod>[]
+  providers: AuthProvider<AuthMethod>[] | null
 ): AuthProvider<BasicAuthMethod> | null {
   if (!providers) return null;
   for (const provider of providers) {

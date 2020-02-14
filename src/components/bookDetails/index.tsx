@@ -63,7 +63,7 @@ const BookDetails: React.FC<BookDetailsPropsNew> = ({
               maxWidth: sidebarWidth
             }}
           >
-            <BookCover book={bookState.data} sx={{ m: 2 }} />
+            <BookCover book={book} sx={{ m: 2 }} />
             {/* download requirements & download links */}
             <DownloadCard
               sx={{ m: 2, display: ["none", "none", "block"] }}
