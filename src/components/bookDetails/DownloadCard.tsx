@@ -3,7 +3,12 @@ import { jsx, Styled } from "theme-ui";
 import * as React from "react";
 import { getAvailabilityString } from "./utils";
 import { sidebarWidth } from "./index";
-import { BookData, OpenAccessLinkType } from "opds-web-client/lib/interfaces";
+import {
+  BookData,
+  MediaType,
+  MediaLink,
+  FulfillmentLink
+} from "opds-web-client/lib/interfaces";
 import { typeMap } from "opds-web-client/lib/utils/file";
 import useTypedSelector from "../../hooks/useTypedSelector";
 import { RequiredKeys } from "src/interfaces";
@@ -11,20 +16,12 @@ import {
   bookIsBorrowed,
   bookIsOpenAccess,
   bookIsReserved,
-  bookIsReady
+  bookIsReady,
+  bookIsBorrowable
 } from "opds-web-client/lib/utils/book";
 import Button from "../Button";
-import { useActions } from "../context/ActionsContext";
-
-// a simple typeguard
-type OpenAccessBook = RequiredKeys<BookData, "openAccessLinks">;
-function isOpenAccessBook(book: BookData): book is OpenAccessBook {
-  return (book.openAccessLinks?.length ?? 0) > 0;
-}
-type BorrowableBook = RequiredKeys<BookData, "borrowUrl">;
-function isBorrowableBook(book: BookData): book is BorrowableBook {
-  return typeof book.borrowUrl === "string";
-}
+import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
+import useDownloadButton from "opds-web-client/lib/hooks/useDownloadButton";
 
 /**
  * This card will handle logic to download books. There are a few cases
@@ -49,25 +46,44 @@ const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
    * If there are openAccessLinks, we display those and nothing else.
    * Otherwise, patrons need to borrow the book before downloading.
    */
-  if (isOpenAccessBook(book)) {
-    return <DownloadCard book={book} />;
+  if (bookIsOpenAccess(book)) {
+    const availability = getAvailabilityString(book);
+    return (
+      <DownloadCard
+        links={book.openAccessLinks}
+        availability={availability}
+        title={book.title}
+        isOpenAccess={true}
+      />
+    );
   }
   // if the book is borrowed already, show download options
   if (bookIsBorrowed(book)) {
-    console.log("BORROWED. SHOW DL OPS");
-    return null;
+    const availability = getAvailabilityString(book);
+    return (
+      <DownloadCard
+        links={book.fulfillmentLinks}
+        availability={availability}
+        title={book.title}
+      />
+    );
   }
   // if the book either on hold, available, or reservable
-  if (isBorrowableBook(book)) {
+  if (bookIsBorrowable(book)) {
     return <BorrowCard book={book} />;
   }
   // the book cannot be borrowed, something likely went wrong
+  console.error("Something went wrong in the FulfillmentCard");
   return null;
 };
 
-const BorrowCard: React.FC<{ book: BorrowableBook }> = ({ book }) => {
+/**
+ *  Specifically handles the case where it has yet to be borrowed.
+ */
+const BorrowCard: React.FC<{ book: RequiredKeys<BookData, "borrowUrl"> }> = ({
+  book
+}) => {
   const bookError = useTypedSelector(state => state.book?.error);
-  const state = useTypedSelector(state => state);
   const errorMsg = bookError?.response
     ? // eslint-disable-next-line camelcase
       JSON.parse(bookError?.response)?.debug_message
@@ -86,12 +102,11 @@ const BorrowCard: React.FC<{ book: BorrowableBook }> = ({ book }) => {
   const label = isReserved ? "Reserved" : isReservable ? "Reserve" : "Borrow";
 
   const borrowOrReserve = async () => {
-    const data = await dispatch(actions.updateBook(book.borrowUrl));
+    await dispatch(actions.updateBook(book.borrowUrl));
     // refetch the loans
     if (loansUrl) {
       await dispatch(actions.fetchLoans(loansUrl));
     }
-    console.log(data);
   };
   return (
     <CardWrapper>
@@ -115,28 +130,29 @@ const BorrowCard: React.FC<{ book: BorrowableBook }> = ({ book }) => {
   );
 };
 
+/**
+ * Handles the case where it is ready for download either via openAccessLink or
+ * via fulfillmentLink.
+ */
 const DownloadCard: React.FC<{
-  book: OpenAccessBook;
-}> = ({ book }) => {
-  const { openAccessLinks, fulfillmentLinks } = book;
+  links: MediaLink[] | FulfillmentLink[];
+  availability: string;
+  title: string;
+  isOpenAccess?: boolean;
+}> = ({ links, availability, title, isOpenAccess = false }) => {
+  const linksByMimetype: {
+    [key in MediaType]?: MediaLink | FulfillmentLink;
+  } = {};
+  links.forEach(link => (linksByMimetype[link.type] = link));
 
-  //  const links = bookIsOpenAccess(book) ? openAccessLinks : fulfillmentLinks;
-
-  const availability = getAvailabilityString(book);
-
-  const firstType = openAccessLinks[0].type;
-  const types: {
-    [key in OpenAccessLinkType]?: string;
-  } = openAccessLinks.reduce((acc, { url, type }) => {
-    acc[type] = url;
-    return acc;
-  }, {});
-
-  const [selectedType, setSelectedType] = React.useState<string>(firstType);
+  const defaultType = links[0].type;
+  const [selectedType, setSelectedType] = React.useState<string>(defaultType);
 
   const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedType(e.target.value);
   };
+
+  const { fulfill } = useDownloadButton(linksByMimetype[selectedType], title);
 
   return (
     <CardWrapper>
@@ -154,8 +170,10 @@ const DownloadCard: React.FC<{
           onBlur={handleTypeChange}
           onChange={handleTypeChange}
         >
-          {Object.keys(types).map(type => (
-            <option key={types[type]}>{typeMap[type]?.name ?? type}</option>
+          {Object.keys(linksByMimetype).map(mediaType => (
+            <option key={mediaType}>
+              {typeMap[mediaType]?.name ?? mediaType}
+            </option>
           ))}
         </select>
       </div>
@@ -169,14 +187,18 @@ const DownloadCard: React.FC<{
         }}
       >
         <div sx={{ mb: 2, textAlign: "center" }}>{availability}</div>
-        <Styled.a
-          target="__blank"
-          rel="noopener noreferrer"
-          href={types[selectedType]}
-          sx={{ variant: "buttons.accent", px: 2, py: 1 }}
-        >
-          Download
-        </Styled.a>
+        {isOpenAccess ? (
+          <Styled.a
+            target="__blank"
+            rel="noopener noreferrer"
+            href={linksByMimetype[selectedType].url}
+            sx={{ variant: "buttons.accent", px: 2, py: 1 }}
+          >
+            Download
+          </Styled.a>
+        ) : (
+          <Button onClick={fulfill}>Download</Button>
+        )}
       </div>
     </CardWrapper>
   );
