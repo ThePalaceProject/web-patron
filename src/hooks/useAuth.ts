@@ -1,6 +1,6 @@
 import * as React from "react";
 import useTypedSelector from "./useTypedSelector";
-import { useActions } from "../components/context/ActionsContext";
+import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
 
 /**
  * Will get auth data from cookies and make sure it's saved to redux

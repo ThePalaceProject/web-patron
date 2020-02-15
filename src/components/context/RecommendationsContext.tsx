@@ -4,7 +4,7 @@ import collection, {
   CollectionState
 } from "opds-web-client/lib/reducers/collection";
 import useThunkReducer from "../../hooks/useThunkReducer";
-import { useActions } from "./ActionsContext";
+import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
 
 /**
  * The recommendations state is somewhat confusing. It is no longer stored

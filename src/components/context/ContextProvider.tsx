@@ -10,7 +10,7 @@ import BasicAuthWithButtonImagePlugin from "../../auth/BasicAuthWithButtonImageP
 import OAuthPlugin from "../../auth/OAuthPlugin";
 import { ComplaintsProvider } from "./ComplaintsContext";
 import { RecommendationsProvider } from "./RecommendationsContext";
-import { ActionsProvider } from "./ActionsContext";
+import { ActionsProvider } from "opds-web-client/lib/components/context/ActionsContext";
 import { Provider as ReakitProvider } from "reakit";
 
 type ProviderProps = PreloadedData;

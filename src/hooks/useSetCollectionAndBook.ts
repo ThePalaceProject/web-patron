@@ -2,8 +2,7 @@ import * as React from "react";
 import { useParams } from "react-router-dom";
 import { SetCollectionAndBook } from "../interfaces";
 import useUrlShortener from "../components/context/UrlShortenerContext";
-import { useActions } from "../components/context/ActionsContext";
-import useTypedSelector from "./useTypedSelector";
+import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
 
 /**
  * Currently have to pass in setCollectionAndBook, which we get from
