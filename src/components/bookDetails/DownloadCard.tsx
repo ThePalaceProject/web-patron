@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx, Styled } from "theme-ui";
 import * as React from "react";
-import { getAvailabilityString } from "./utils";
+import { getAvailabilityString, getErrorMsg } from "./utils";
 import { sidebarWidth } from "./index";
 import {
   BookData,
@@ -84,10 +84,7 @@ const BorrowCard: React.FC<{ book: RequiredKeys<BookData, "borrowUrl"> }> = ({
   book
 }) => {
   const bookError = useTypedSelector(state => state.book?.error);
-  const errorMsg = bookError?.response
-    ? // eslint-disable-next-line camelcase
-      JSON.parse(bookError?.response)?.debug_message
-    : null;
+  const errorMsg = getErrorMsg(bookError);
   const availability = getAvailabilityString(book);
   const { actions, dispatch } = useActions();
   const loansUrl = useTypedSelector(state => state.loans.url);
@@ -130,6 +127,9 @@ const BorrowCard: React.FC<{ book: RequiredKeys<BookData, "borrowUrl"> }> = ({
   );
 };
 
+type MimetypeToLinkMap = {
+  [key in MediaType]?: MediaLink | FulfillmentLink;
+};
 /**
  * Handles the case where it is ready for download either via openAccessLink or
  * via fulfillmentLink.
@@ -140,20 +140,22 @@ const DownloadCard: React.FC<{
   title: string;
   isOpenAccess?: boolean;
 }> = ({ links, availability, title, isOpenAccess = false }) => {
-  const linksByMimetype: {
-    [key in MediaType]?: MediaLink | FulfillmentLink;
-  } = {};
+  const linksByMimetype: MimetypeToLinkMap = {};
   links.forEach(link => (linksByMimetype[link.type] = link));
 
   const defaultType = links[0].type;
-  const [selectedType, setSelectedType] = React.useState<string>(defaultType);
+  const [selectedType, setSelectedType] = React.useState<MediaType>(
+    defaultType
+  );
 
   const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedType(e.target.value);
+    setSelectedType(e.currentTarget.value as MediaType);
   };
 
-  const { fulfill } = useDownloadButton(linksByMimetype[selectedType], title);
+  const currentLink = linksByMimetype[selectedType];
+  const downloadDetails = useDownloadButton(currentLink, title);
 
+  if (!downloadDetails) return null;
   return (
     <CardWrapper>
       <div
@@ -191,13 +193,13 @@ const DownloadCard: React.FC<{
           <Styled.a
             target="__blank"
             rel="noopener noreferrer"
-            href={linksByMimetype[selectedType].url}
+            href={linksByMimetype[selectedType]?.url}
             sx={{ variant: "buttons.accent", px: 2, py: 1 }}
           >
             Download
           </Styled.a>
         ) : (
-          <Button onClick={fulfill}>Download</Button>
+          <Button onClick={downloadDetails.fulfill}>Download</Button>
         )}
       </div>
     </CardWrapper>

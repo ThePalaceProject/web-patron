@@ -1,12 +1,17 @@
-import { BookData } from "opds-web-client/lib/interfaces";
+import { BookData, FetchErrorData } from "opds-web-client/lib/interfaces";
 import * as moment from "moment";
+import {
+  bookIsOpenAccess,
+  bookIsReserved,
+  bookIsBorrowed
+} from "opds-web-client/lib/utils/book";
 
 export const getAvailabilityString = (book: BookData): string => {
-  if (isOpenAccess(book)) {
+  if (bookIsOpenAccess(book)) {
     return "This open-access book is available to keep.";
   }
 
-  if (isBorrowed(book)) {
+  if (bookIsBorrowed(book)) {
     const availableUntil = book?.availability?.until;
     if (availableUntil) {
       const timeLeft = moment(availableUntil).fromNow(true);
@@ -31,7 +36,7 @@ export const getAvailabilityString = (book: BookData): string => {
     if (typeof totalHolds === "number" && availableCopies === 0) {
       availabilityString += ` ${totalHolds} patrons in queue.`;
 
-      if (isReserved(book) && typeof holdsPosition === "number") {
+      if (bookIsReserved(book) && typeof holdsPosition === "number") {
         availabilityString += ` Your hold position: ${holdsPosition}.`;
       }
     }
@@ -42,33 +47,23 @@ export const getAvailabilityString = (book: BookData): string => {
   return "Availability unknown";
 };
 
-export const isReserved = (book: BookData): boolean => {
-  return book?.availability?.status === "reserved";
-};
-
-export const isOpenAccess = (book: BookData): boolean => {
-  const numLinks = book?.openAccessLinks?.length ?? 0;
-  return numLinks > 0;
-};
-
-export const isBorrowed = (book: BookData): boolean => {
-  const numberOfLinks = book?.fulfillmentLinks?.length ?? 0;
-  return numberOfLinks > 0;
-};
-
-type CirculationLink = {
-  isOpenAccess: boolean;
-  isBorrowed: boolean;
-};
-
-export const getCirculationLinkMap = (book: BookData) => {
-  /**
-   * This should mirror the OPDS logic, but instead of returning an array
-   * of components, it returns a map of links, which lets the consumer render
-   * those links however they desire. It will give you all the possible links,
-   * and the info needed to render them properly
-   * - Open Access links are the first option, shown whether borrowed or not
-   * - If not open access, you must borrow first. set isBorrowed to false
-   * -
-   */
-};
+export function getErrorMsg(error: FetchErrorData | null): string | null {
+  // const errorMsg = bookError?.response
+  //   ? // eslint-disable-next-line camelcase
+  //     JSON.parse(bookError?.response)?.debug_message
+  //   : null;
+  const response = error?.response;
+  if (response) {
+    try {
+      const responseObj = JSON.parse(response);
+      // try to get the debug_message but otherwise just return
+      // the full response as a string.
+      // eslint-disable-next-line camelcase
+      return responseObj?.debug_message ?? response;
+    } catch {
+      // it's not valid json. Just return it.
+      return response;
+    }
+  }
+  return null;
+}
