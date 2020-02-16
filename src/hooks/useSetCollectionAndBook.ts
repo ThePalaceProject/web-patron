@@ -24,7 +24,7 @@ const useSetCollectionAndBook = (
   const fullCollectionUrl = decodeURIComponent(
     urlShortener.expandCollectionUrl(finalCollectionUrl)
   );
-  const fullBookUrl = decodeURIComponent(urlShortener.expandBookUrl(bookUrl));
+  const fullBookUrl = urlShortener.expandBookUrl(bookUrl);
 
   // set the collection and book whenever the urls change, and fetch loans
   React.useEffect(() => {
