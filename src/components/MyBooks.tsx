@@ -24,7 +24,6 @@ const MyBooks: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
   useSetCollectionAndBook(setCollectionAndBook, "loans");
 
   const collection = useTypedSelector(state => state.collection);
-  console.log(collection);
 
   const { isSignedIn, signOut } = useAuth();
 
@@ -47,7 +46,7 @@ const MyBooks: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
     );
 
   if (collection.data?.books) {
-    return <ListView books={collection.data?.books} />;
+    return <ListView books={collection.data?.books} showBorrowButton />;
   }
 
   // otherwise you have no loans / holds

@@ -7,13 +7,22 @@ import { getAuthors } from "../utils/book";
 import Link from "./Link";
 import BookCover from "./BookCover";
 import truncateString from "../utils/truncate";
+import Button from "./Button";
+import useBorrow from "../hooks/useBorrow";
 
 export const BOOK_HEIGHT = 200;
 
-const Book = React.forwardRef<
+const BookCard = React.forwardRef<
   HTMLLIElement,
-  { book: BookData; className?: string }
->(({ book, className }, ref) => {
+  { book: BookData; className?: string; showBorrowButton?: boolean }
+>(({ book, className, showBorrowButton = false }, ref) => {
+  const {
+    borrowOrReserve,
+    label,
+    isBorrowed,
+    isReserved,
+    isBorrowable
+  } = useBorrow(book);
   const link = useCatalogLink(book.url);
   const authors = getAuthors(book, 2);
   return (
@@ -43,9 +52,18 @@ const Book = React.forwardRef<
           {truncateString(book.title, 50, true)}
         </Styled.h2>
         <span sx={{ color: "blues.primary" }}>{authors.join(", ")}</span>
+        {showBorrowButton && (
+          <Button
+            disabled={isBorrowed || isReserved || !isBorrowable}
+            onClick={borrowOrReserve}
+            sx={{ mt: 3 }}
+          >
+            {label}
+          </Button>
+        )}
       </Link>
     </li>
   );
 });
 
-export default Book;
+export default BookCard;

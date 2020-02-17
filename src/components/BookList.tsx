@@ -12,6 +12,8 @@ import Link from "./Link";
 import DetailField from "./BookMetaDetail";
 import useBorrow from "../hooks/useBorrow";
 import Button from "./Button";
+import { useBreakpointIndex } from "@theme-ui/match-media";
+import BookCard, { BOOK_HEIGHT } from "./BookCard";
 
 /**
  * In a collection you can:
@@ -20,32 +22,49 @@ import Button from "./Button";
  *    - Switch between list and gallery in this case
  */
 
-export const GalleryView: React.FC<{ books: BookData[] }> = ({ books }) => {
+export const GalleryView: React.FC<{
+  books: BookData[];
+  breadcrumb?: string;
+  showBorrowButton?: boolean;
+}> = ({ books, breadcrumb, showBorrowButton = false }) => {
   return (
     <div>
-      <BreadcrumbBar>hi from bread</BreadcrumbBar>
+      <BreadcrumbBar>{breadcrumb}</BreadcrumbBar>
       <ul
         sx={{
           display: "flex",
           flexWrap: "wrap",
           alignItems: "stretch",
-          justifyContent: "center",
+          // justifyContent: "center",
           p: 0,
           m: 0
         }}
       >
         {books.map(book => (
-          <BookCover key={book.id} book={book} sx={{ my: 3, mx: 3 }} />
+          <BookCard
+            book={book}
+            key={book.id}
+            sx={{ listStyle: "none", flex: "0 0 170px", my: 3, mx: 3 }}
+            showBorrowButton={showBorrowButton}
+          />
         ))}
       </ul>
     </div>
   );
 };
 
-export const ListView: React.FC<{ books: BookData[]; breadcrumb?: string }> = ({
-  books,
-  breadcrumb
-}) => {
+export const ListView: React.FC<{
+  books: BookData[];
+  breadcrumb?: string;
+  showBorrowButton?: boolean;
+}> = ({ books, breadcrumb, showBorrowButton = false }) => {
+  const breakpoint = useBreakpointIndex();
+  // if we are on mobile, show the gallery instead
+  if (breakpoint < 1) {
+    return (
+      <GalleryView books={books} breadcrumb={breadcrumb} showBorrowButton />
+    );
+  }
   return (
     <React.Fragment>
       <BreadcrumbBar>{breadcrumb}</BreadcrumbBar>
@@ -59,10 +78,13 @@ export const ListView: React.FC<{ books: BookData[]; breadcrumb?: string }> = ({
 };
 
 const BookListItem: React.FC<{ book: BookData }> = ({ book }) => {
-  const { borrowOrReserve, isBorrowed, isReserved, isBorrowable } = useBorrow(
-    book
-  );
-  console.log(book);
+  const {
+    borrowOrReserve,
+    label,
+    isBorrowed,
+    isReserved,
+    isBorrowable
+  } = useBorrow(book);
   const url = useCatalogLink(book.url);
   return (
     <li
@@ -100,7 +122,6 @@ const BookListItem: React.FC<{ book: BookData }> = ({ book }) => {
           mx: 3,
           flex: "0 1 40%",
           display: "flex"
-          // justifyContent: "center"
         }}
       >
         <div>
@@ -124,7 +145,7 @@ const BookListItem: React.FC<{ book: BookData }> = ({ book }) => {
           disabled={isBorrowed || isReserved || !isBorrowable}
           onClick={borrowOrReserve}
         >
-          {isBorrowed ? "Borrowed" : isReserved ? "On hold" : "Borrow"}
+          {label}
         </Button>
       </div>
     </li>

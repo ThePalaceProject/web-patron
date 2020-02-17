@@ -105,6 +105,7 @@
     "@emotion/styled": "^10.0.27",
     "@theme-ui/color": "^0.3.1",
     "@theme-ui/components": "^0.3.1",
+    "@theme-ui/match-media": "^0.3.1",
     "@types/react-helmet": "^5.0.15",
     "bootstrap": "^3.3.6",
     "downloadjs": "^1.4.7",
