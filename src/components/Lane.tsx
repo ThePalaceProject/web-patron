@@ -11,8 +11,10 @@ import { Tabbable } from "reakit/Tabbable";
 import { NavButton } from "./Button";
 import useBreadcrumbs from "../hooks/useBreadcrumbs";
 import { getAuthors } from "../utils/book";
-import Book from "./BookCard";
+import Book, { BOOK_HEIGHT } from "./BookCard";
 import BreadcrumbBar from "./BreadcrumbBar";
+import { withErrorBoundary } from "./ErrorBoundary";
+import { lighten } from "@theme-ui/color";
 
 type BookRefs = {
   [id: string]: React.RefObject<HTMLLIElement>;
@@ -186,4 +188,23 @@ const PrevNextButton: React.FC<{
   );
 };
 
-export default Lane;
+const LaneErrorFallback: React.FC<{ message: string }> = ({ message }) => {
+  return (
+    <div
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: BOOK_HEIGHT,
+        py: 3,
+        px: 2,
+        backgroundColor: lighten("warn", 0.35),
+        m: 2,
+        borderRadius: "card"
+      }}
+    >
+      {message}
+    </div>
+  );
+};
+export default withErrorBoundary(Lane, LaneErrorFallback);

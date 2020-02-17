@@ -8,6 +8,8 @@ import Link from "./Link";
 import BookCover from "./BookCover";
 import truncateString from "../utils/truncate";
 
+export const BOOK_HEIGHT = 200;
+
 const Book = React.forwardRef<
   HTMLLIElement,
   { book: BookData; className?: string }
@@ -26,7 +28,7 @@ const Book = React.forwardRef<
         borderRadius: "card",
         py: 3,
         px: 2,
-        flex: `0 0 ${200}px`,
+        flex: `0 0 ${BOOK_HEIGHT}px`,
         mx: 2,
         textAlign: "center"
       }}

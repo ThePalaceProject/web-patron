@@ -132,6 +132,7 @@ const theme = {
     light: 200,
     body: 300,
     heading: 400,
+    semibold: 500,
     bold: 700
   },
   lineHeights: {
@@ -243,6 +244,15 @@ const theme = {
     flat: {
       bg: "white",
       color: "blues.dark"
+    }
+  },
+  inputs: {
+    select: {
+      borderRadius: 2,
+      borderWidth: 2,
+      p: 1,
+      fontSize: 2,
+      width: "100%"
     }
   }
 };
