@@ -35,7 +35,7 @@ export const GalleryView: React.FC<{
           display: "flex",
           flexWrap: "wrap",
           alignItems: "stretch",
-          // justifyContent: "center",
+          justifyContent: "center",
           p: 0,
           m: 0
         }}
