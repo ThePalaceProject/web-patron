@@ -3,13 +3,10 @@ import { jsx, Styled, Flex } from "theme-ui";
 import * as React from "react";
 import { NavigateContext } from "opds-web-client/lib/interfaces";
 import { LibraryData } from "../interfaces";
-import RouterContext from "./context/RouterContext";
 import Search from "./Search";
-import { State } from "opds-web-client/lib/state";
-import Button, { NavButton as NavButtonBase } from "./Button";
-import useCatalogLink, { useGetCatalogLink } from "../hooks/useCatalogLink";
+import { NavButton as NavButtonBase } from "./Button";
+import useCatalogLink from "../hooks/useCatalogLink";
 import Link from "./Link";
-
 import BookIcon from "../icons/Book";
 import SettingsIcon from "../icons/Settings";
 import useLibraryContext from "./context/LibraryContext";
