@@ -7,7 +7,6 @@ import PathForProvider from "opds-web-client/lib/components/context/PathForConte
 import { RouterProvider } from "./RouterContext";
 import OPDSStore from "opds-web-client/lib/components/context/StoreContext";
 import BasicAuthWithButtonImagePlugin from "../../auth/BasicAuthWithButtonImagePlugin";
-import OAuthPlugin from "../../auth/OAuthPlugin";
 import { ComplaintsProvider } from "./ComplaintsContext";
 import { RecommendationsProvider } from "./RecommendationsContext";
 import { ActionsProvider } from "opds-web-client/lib/components/context/ActionsContext";
