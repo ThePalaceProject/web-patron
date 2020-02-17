@@ -12,6 +12,7 @@ import { ComplaintsProvider } from "./ComplaintsContext";
 import { RecommendationsProvider } from "./RecommendationsContext";
 import { ActionsProvider } from "opds-web-client/lib/components/context/ActionsContext";
 import { Provider as ReakitProvider } from "reakit";
+import { HelmetProvider } from "react-helmet-async";
 
 type ProviderProps = PreloadedData;
 /**
@@ -21,7 +22,8 @@ const AppContextProvider: React.FC<ProviderProps> = ({
   children,
   library,
   shortenUrls,
-  initialState
+  initialState,
+  helmetContext
 }) => {
   const libraryId = library.id;
   const urlShortener = new UrlShortener(library.catalogUrl, shortenUrls);
@@ -48,28 +50,30 @@ const AppContextProvider: React.FC<ProviderProps> = ({
   };
 
   return (
-    <ReakitProvider>
-      <RouterProvider>
-        <PathForProvider pathFor={pathFor}>
-          <OPDSStore
-            initialState={initialState}
-            authPlugins={[BasicAuthWithButtonImagePlugin]}
-          >
-            <RecommendationsProvider>
-              <ActionsProvider>
-                <ComplaintsProvider>
-                  <LibraryProvider library={library}>
-                    <UrlShortenerProvider urlShortener={urlShortener}>
-                      {children}
-                    </UrlShortenerProvider>
-                  </LibraryProvider>
-                </ComplaintsProvider>
-              </ActionsProvider>
-            </RecommendationsProvider>
-          </OPDSStore>
-        </PathForProvider>
-      </RouterProvider>
-    </ReakitProvider>
+    <HelmetProvider context={helmetContext}>
+      <ReakitProvider>
+        <RouterProvider>
+          <PathForProvider pathFor={pathFor}>
+            <OPDSStore
+              initialState={initialState}
+              authPlugins={[BasicAuthWithButtonImagePlugin]}
+            >
+              <RecommendationsProvider>
+                <ActionsProvider>
+                  <ComplaintsProvider>
+                    <LibraryProvider library={library}>
+                      <UrlShortenerProvider urlShortener={urlShortener}>
+                        {children}
+                      </UrlShortenerProvider>
+                    </LibraryProvider>
+                  </ComplaintsProvider>
+                </ActionsProvider>
+              </RecommendationsProvider>
+            </OPDSStore>
+          </PathForProvider>
+        </RouterProvider>
+      </ReakitProvider>
+    </HelmetProvider>
   );
 };
 

@@ -192,12 +192,15 @@ const buildPage = async (
 
   const context = {};
 
+  const helmetContext = {};
+
   const htmlContent: string = renderToString(
     <StaticRouter location={req.url} context={context}>
       <ContextProvider
         library={libraryData}
         shortenUrls={shortenUrls}
         initialState={state}
+        helmetContext={helmetContext}
       >
         <App />
       </ContextProvider>
@@ -213,7 +216,8 @@ const buildPage = async (
         library: libraryData,
         preloadedState: state,
         shortenUrls,
-        assets
+        assets,
+        helmetContext
       })
     )
   );

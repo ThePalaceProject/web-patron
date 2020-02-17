@@ -24,6 +24,7 @@ import FulfillmentCard from "./FulfillmentCard";
 import BreadcrumbBar from "../BreadcrumbBar";
 import truncateString from "../../utils/truncate";
 import useNormalizedBook from "../../hooks/useNormalizedBook";
+import { Helmet } from "react-helmet-async";
 
 export interface BookDetailsPropsNew extends DefaultBooKDetailsProps {
   setCollectionAndBook: SetCollectionAndBook;
@@ -42,6 +43,9 @@ const BookDetails: React.FC<BookDetailsPropsNew> = ({
   if (!book) return <PageLoader />;
   return (
     <div>
+      <Helmet>
+        <title>{book.title}</title>
+      </Helmet>
       <BreadcrumbBar currentLocation={truncateString(book.title, 20, false)} />
       <div
         sx={{

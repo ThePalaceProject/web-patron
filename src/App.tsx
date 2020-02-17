@@ -8,12 +8,16 @@ import Layout from "./components/Layout";
 import useLibraryContext from "./components/context/LibraryContext";
 import Auth from "./components/Auth";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { Helmet } from "react-helmet-async";
 
 const App: React.FunctionComponent = () => {
   const library = useLibraryContext();
 
   return (
     <ErrorBoundary fallback={AppErrorFallback}>
+      <Helmet>
+        <title>{library.catalogName}</title>
+      </Helmet>
       <ThemeProvider theme={theme}>
         <Auth>
           <Layout>

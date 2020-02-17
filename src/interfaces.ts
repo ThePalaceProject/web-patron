@@ -37,6 +37,7 @@ export interface PreloadedData {
   library: LibraryData;
   shortenUrls: boolean;
   initialState?: State;
+  helmetContext?: any;
 }
 declare global {
   interface Window {

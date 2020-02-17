@@ -21,6 +21,7 @@ import Link from "./Link";
 import { useGetCatalogLink } from "../hooks/useCatalogLink";
 import { getAuthors } from "../utils/book";
 import useNormalizedCollection from "../hooks/useNormalizedCollection";
+import { Helmet } from "react-helmet-async";
 
 const Collection: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
   setCollectionAndBook
@@ -42,6 +43,9 @@ const Collection: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
     const lanes = collectionData?.lanes ?? [];
     return (
       <div>
+        <Helmet>
+          <title>{collectionData.title}</title>
+        </Helmet>
         {lanes.map(lane => (
           <Lane key={lane.url} lane={lane} />
         ))}

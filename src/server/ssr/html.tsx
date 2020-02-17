@@ -10,6 +10,7 @@ interface HtmlProps {
   preloadedState: State;
   shortenUrls: any;
   assets: WebpackAssets;
+  helmetContext: any;
 }
 
 const Html = ({
@@ -17,7 +18,8 @@ const Html = ({
   library,
   preloadedState,
   shortenUrls,
-  assets
+  assets,
+  helmetContext
 }: HtmlProps) => {
   const collectionTitle =
     preloadedState.collection &&
@@ -30,7 +32,7 @@ const Html = ({
     preloadedState.book.data.title;
 
   const details = bookTitle || collectionTitle;
-  const pageTitle = library.catalogName + (details ? " - " + details : "");
+  // const pageTitle = library.catalogName + (details ? " - " + details : "");
 
   const preloadedData: PreloadedData = {
     library,
@@ -38,10 +40,16 @@ const Html = ({
     initialState: preloadedState
   };
 
+  const { helmet } = helmetContext;
+  const htmlAttrs = helmet.htmlAttributes?.toComponent?.();
+  const bodyAttrs = helmet.bodyAttributes?.toComponent?.();
+
   return (
-    <html lang="en">
+    <html lang="en" {...htmlAttrs}>
       <head>
-        <title>{pageTitle}</title>
+        {helmet.title?.toComponent?.()}
+        {helmet.meta?.toComponent?.()}
+        {helmet.link?.toComponent?.()}
         {library.cssLinks?.map(link => (
           <link
             key={link.href}
@@ -56,7 +64,7 @@ const Html = ({
           rel="stylesheet"
         ></link>
       </head>
-      <body>
+      <body {...bodyAttrs}>
         <div
           id="circulation-patron-web"
           dangerouslySetInnerHTML={{
