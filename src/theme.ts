@@ -147,6 +147,7 @@ const theme = {
      */
     root: {
       fontFamily: "body",
+      fontSize: 2,
       lineHeight: "body",
       fontWeight: "body",
       color: "blues.dark"

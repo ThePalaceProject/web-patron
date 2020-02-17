@@ -3,6 +3,7 @@ import BookDetails from "./components/bookDetails";
 import Collection from "./components/Collection";
 import MyBooks from "./components/MyBooks";
 import { Redirect } from "react-router-dom";
+import NoMatch from "./components/404";
 
 export const singleLibraryRoutes = [
   {
@@ -34,6 +35,11 @@ export const singleLibraryRoutes = [
     path: "/",
     exact: true,
     component: Collection
+  },
+  {
+    path: "*",
+    component: NoMatch,
+    exact: false
   }
 ];
 
@@ -52,6 +58,11 @@ export const multiLibraryRoutes = [
     path: "/",
     exact: true,
     component: Collection
+  },
+  {
+    path: "*",
+    component: NoMatch,
+    exact: false
   }
 ];
 

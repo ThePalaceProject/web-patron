@@ -8,4 +8,6 @@ export default {
 };
 
 const error = new Error("You did something stupid!");
-export const Default = () => <DefaultFallback error={error} />;
+export const Default = () => (
+  <DefaultFallback error={error} message="You created this problem." />
+);
