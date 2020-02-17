@@ -7,11 +7,9 @@ import { State } from "opds-web-client/lib/state";
 import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
 import { useHistory } from "react-router-dom";
 import useTypedSelector from "../hooks/useTypedSelector";
+import { usePathFor } from "opds-web-client/lib/components/context/PathForContext";
 
-interface SearchProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  // onSearch: () => void;
-  // onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
+interface SearchProps extends React.InputHTMLAttributes<HTMLInputElement> {}
 
 /**
  * Search component providing input and
@@ -26,6 +24,7 @@ const Search: React.FC<SearchProps> = ({ ...props }) => {
   const history = useHistory();
   const searchData = useTypedSelector(state => state?.collection?.data?.search);
   const { actions, dispatch } = useActions();
+  const pathFor = usePathFor();
 
   React.useEffect(() => {
     // fetch the search description
@@ -35,14 +34,11 @@ const Search: React.FC<SearchProps> = ({ ...props }) => {
   }, [actions, dispatch, searchData]);
 
   // handle the search
-  const onSearch = () => {
+  const onSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     const searchTerms = encodeURIComponent(value);
     const url = searchData?.searchData?.template(searchTerms);
-    // navigate us to the new url
-    if (!url) {
-      throw new Error("Could not perform search");
-    }
-    history.push(url);
+    history.push(pathFor(url, null));
   };
 
   return (
@@ -63,7 +59,7 @@ const Search: React.FC<SearchProps> = ({ ...props }) => {
         onChange={e => setValue(e.target.value)}
         {...props}
       />
-      <Button type="submit" sx={{ m: 1 }} onClick={onSearch}>
+      <Button type="submit" sx={{ m: 1 }}>
         Search
       </Button>
     </form>
