@@ -9,7 +9,6 @@ import { State } from "opds-web-client/lib/state";
 import Button, { NavButton as NavButtonBase } from "./Button";
 import useCatalogLink, { useGetCatalogLink } from "../hooks/useCatalogLink";
 import Link from "./Link";
-import useTypedSelector from "../hooks/useTypedSelector";
 
 import BookIcon from "../icons/Book";
 import SettingsIcon from "../icons/Settings";
@@ -29,20 +28,6 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
 
   // nav links
   const homeUrl = useCatalogLink(undefined);
-
-  // sign in
-  // const isSignedIn = useTypedSelector(
-  //   (state) => state.auth //!!state?.auth?.credentials
-  // );
-  // const signIn = () => {
-  //   if (actions.fetchLoans && loansUrl) {
-  //     dispatch(actions.fetchLoans(loansUrl));
-  //   }
-  // };
-  // const signOut = () => {
-  //   dispatch(actions.clearAuthCredentials());
-  //   router.push(pathFor(library.catalogUrl, null));
-  // };
 
   return (
     <header
@@ -110,18 +95,8 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
           >
             <SettingsIcon sx={{ fontSize: 5 }} /> Settings
           </NavButton>
-          <Flex
-            as="ol"
-            sx={{ flexDirection: "row", alignItems: "center", p: 0, m: 1 }}
-          >
-            {library?.headerLinks?.map(link => (
-              <li sx={{ listStyle: "none" }} key={link.href}>
-                <a href={link.href} title={link.title}>
-                  {link.title}
-                </a>
-              </li>
-            ))}
-          </Flex>
+          {/* uncomment to include links from the CM */}
+          {/* <CMDefinedHeaderLinks library={library} /> */}
         </Flex>
         <FormatFilter />
         <Flex sx={{ justifyContent: "center", p: 2 }}>
@@ -129,6 +104,25 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
         </Flex>
       </Flex>
     </header>
+  );
+};
+
+const CMDefinedHeaderLinks: React.FC<{ library: LibraryData }> = ({
+  library
+}) => {
+  return (
+    <Flex
+      as="ol"
+      sx={{ flexDirection: "row", alignItems: "center", p: 0, m: 1 }}
+    >
+      {library?.headerLinks?.map(link => (
+        <li sx={{ listStyle: "none" }} key={link.href}>
+          <a href={link.href} title={link.title}>
+            {link.title}
+          </a>
+        </li>
+      ))}
+    </Flex>
   );
 };
 
