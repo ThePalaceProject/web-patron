@@ -23,7 +23,6 @@ const Collection: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
   // the first hook just provides the collection, the second subs in loaned book data if existing
   const collection = useTypedSelector(state => state.collection);
   const collectionData = useNormalizedCollection();
-
   if (collection.isFetching) {
     return <PageLoader />;
   }

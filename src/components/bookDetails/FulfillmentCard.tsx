@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx, Styled } from "theme-ui";
 import * as React from "react";
-import { getAvailabilityString } from "./utils";
+import { getAvailabilityString } from "../../utils/book";
 import { sidebarWidth } from "./index";
 import {
   BookData,

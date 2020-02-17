@@ -7,7 +7,7 @@ import BookCover from "../BookCover";
 import LoadingIndicator from "../LoadingIndicator";
 import { useGetCatalogLink } from "../../hooks/useCatalogLink";
 import Link from "../Link";
-import Button, { NavButton } from "../Button";
+import { NavButton } from "../Button";
 
 const Recommendations: React.FC<{ book: BookData }> = ({ book }) => {
   /**
