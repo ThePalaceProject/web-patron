@@ -22,6 +22,8 @@ import {
 import Button from "../Button";
 import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
 import useDownloadButton from "opds-web-client/lib/hooks/useDownloadButton";
+import { withErrorBoundary } from "../ErrorBoundary";
+import Select from "../Select";
 
 /**
  * This card will handle logic to download books. There are a few cases
@@ -41,7 +43,10 @@ import useDownloadButton from "opds-web-client/lib/hooks/useDownloadButton";
  * Maybe this would be better as a state map... where you have an object that
  * maps states to a display?
  */
-const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
+const FulfillmentCard: React.FC<{ book: BookData; className?: string }> = ({
+  book,
+  className
+}) => {
   /**
    * If there are openAccessLinks, we display those and nothing else.
    * Otherwise, patrons need to borrow the book before downloading.
@@ -50,6 +55,7 @@ const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
     const availability = getAvailabilityString(book);
     return (
       <DownloadCard
+        className={className}
         links={book.openAccessLinks}
         availability={availability}
         title={book.title}
@@ -62,6 +68,7 @@ const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
     const availability = getAvailabilityString(book);
     return (
       <DownloadCard
+        className={className}
         links={book.fulfillmentLinks}
         availability={availability}
         title={book.title}
@@ -70,7 +77,7 @@ const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
   }
   // if the book either on hold, available, or reservable
   if (bookIsBorrowable(book)) {
-    return <BorrowCard book={book} />;
+    return <BorrowCard className={className} book={book} />;
   }
   // the book cannot be borrowed, something likely went wrong
   console.error("Something went wrong in the FulfillmentCard");
@@ -80,18 +87,17 @@ const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
 /**
  *  Specifically handles the case where it has yet to be borrowed.
  */
-const BorrowCard: React.FC<{ book: RequiredKeys<BookData, "borrowUrl"> }> = ({
-  book
-}) => {
+const BorrowCard: React.FC<{
+  book: RequiredKeys<BookData, "borrowUrl">;
+  className?: string;
+}> = ({ book, className }) => {
   const bookError = useTypedSelector(state => state.book?.error);
   const errorMsg = getErrorMsg(bookError);
   const availability = getAvailabilityString(book);
   const { actions, dispatch } = useActions();
   const loansUrl = useTypedSelector(state => state.loans.url);
 
-  /**
-   * Book can either be available to borrow, available to reserve, or reserved
-   */
+  // Book can either be available to borrow, available to reserve, or reserved
   const isReserved = bookIsReserved(book);
   // if it is not reserved and not reservable, then it is borrowable
   const isReservable = !bookIsReady(book) && book.copies?.available === 0;
@@ -106,23 +112,22 @@ const BorrowCard: React.FC<{ book: RequiredKeys<BookData, "borrowUrl"> }> = ({
     }
   };
   return (
-    <CardWrapper>
-      <div
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          textAlign: "center",
-          px: 2,
-          py: 3
-        }}
-      >
-        {availability}
-        {errorMsg && <p sx={{ color: "warn" }}>Error: {errorMsg}</p>}
-        <Button onClick={borrowOrReserve} disabled={isReserved} sx={{ my: 3 }}>
-          {label}
-        </Button>
-      </div>
+    <CardWrapper
+      className={className}
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        textAlign: "center",
+        px: 2,
+        py: 3
+      }}
+    >
+      {availability}
+      {errorMsg && <p sx={{ color: "warn" }}>Error: {errorMsg}</p>}
+      <Button onClick={borrowOrReserve} disabled={isReserved} sx={{ my: 3 }}>
+        {label}
+      </Button>
     </CardWrapper>
   );
 };
@@ -139,7 +144,9 @@ const DownloadCard: React.FC<{
   availability: string;
   title: string;
   isOpenAccess?: boolean;
-}> = ({ links, availability, title, isOpenAccess = false }) => {
+  className?: string;
+}> = ({ links, availability, title, isOpenAccess = false, className }) => {
+  // for some reason there are duplicate links. Dedupe them w a map by mimeType
   const linksByMimetype: MimetypeToLinkMap = {};
   links.forEach(link => (linksByMimetype[link.type] = link));
 
@@ -157,27 +164,29 @@ const DownloadCard: React.FC<{
 
   if (!downloadDetails) return null;
   return (
-    <CardWrapper>
+    <CardWrapper className={className}>
       <div
         sx={{
           px: 2,
           py: 3,
           borderBottom: "1px solid",
-          borderColor: "blues.primary"
+          borderColor: "blues.primary",
+          display: "flex"
         }}
       >
-        <span>TYPE</span>
-        <select
+        <span sx={{ fontWeight: "semibold" }}>TYPE</span>
+        <Select
           value={selectedType}
           onBlur={handleTypeChange}
           onChange={handleTypeChange}
+          sx={{ ml: 2 }}
         >
           {Object.keys(linksByMimetype).map(mediaType => (
-            <option key={mediaType}>
+            <option key={mediaType} value={mediaType}>
               {typeMap[mediaType]?.name ?? mediaType}
             </option>
           ))}
-        </select>
+        </Select>
       </div>
       <div
         sx={{
@@ -206,9 +215,13 @@ const DownloadCard: React.FC<{
   );
 };
 
-const CardWrapper: React.FC = ({ children }) => {
+const CardWrapper: React.FC<{ className?: string }> = ({
+  children,
+  className
+}) => {
   return (
     <div
+      className={className}
       sx={{
         border: "1px solid",
         borderColor: "blues.primary",
@@ -222,4 +235,19 @@ const CardWrapper: React.FC = ({ children }) => {
   );
 };
 
-export default FulfillmentCard;
+const ErrorFallback: React.FC<{ message: string }> = ({ message }) => {
+  return (
+    <CardWrapper
+      sx={{
+        textAlign: "center",
+        backgroundColor: "warn",
+        color: "white",
+        p: 2
+      }}
+    >
+      <p>{message}</p>
+    </CardWrapper>
+  );
+};
+
+export default withErrorBoundary(FulfillmentCard, ErrorFallback);
