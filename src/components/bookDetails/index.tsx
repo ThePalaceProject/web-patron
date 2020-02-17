@@ -9,7 +9,6 @@ import ReportProblemLink from "../ReportProblemLink";
 import RevokeButton from "../RevokeButton";
 import { ComplaintData, SetCollectionAndBook } from "../../interfaces";
 import BookCover from "../BookCover";
-import useTypedSelector from "../../hooks/useTypedSelector";
 import Recommendations from "./recommendations";
 import {
   mapDispatchToProps,
@@ -21,7 +20,7 @@ import { connect } from "react-redux";
 import ExternalLink from "../ExternalLink";
 import useSetCollectionAndBook from "../../hooks/useSetCollectionAndBook";
 import { PageLoader } from "../LoadingIndicator";
-import DownloadCard from "./DownloadCard";
+import FulfillmentCard from "./FulfillmentCard";
 import BreadcrumbBar from "../BreadcrumbBar";
 import truncateString from "../../utils/truncate";
 import useNormalizedBook from "../../hooks/useNormalizedBook";
@@ -65,7 +64,7 @@ const BookDetails: React.FC<BookDetailsPropsNew> = ({
           >
             <BookCover book={book} sx={{ m: 2 }} />
             {/* download requirements & download links */}
-            <DownloadCard
+            <FulfillmentCard
               sx={{ m: 2, display: ["none", "none", "block"] }}
               book={book}
             />
@@ -111,7 +110,7 @@ const BookDetails: React.FC<BookDetailsPropsNew> = ({
           }}
         >
           <DownloadRequirements sx={{ m: 2 }} />
-          <DownloadCard book={book} />
+          <FulfillmentCard book={book} />
         </div>
       </div>
       <Recommendations book={book} />
