@@ -73,6 +73,8 @@ const colors = {
   // a color for when errors appear
   warn: "#d93025",
 
+  disabled: grey,
+
   blues,
   lightGrey,
   pink,
@@ -207,7 +209,9 @@ const theme = {
     bookTitle: {
       fontFamily: "bookTitle",
       lineHeight: 0.9,
-      fontWeight: 200
+      fontWeight: 200,
+      letterSpacing: 0.8,
+      mb: 1
     }
   },
   cards: {
@@ -228,6 +232,10 @@ const theme = {
       },
       "&:active": {
         bg: darken("primary", 0.1)
+      },
+      "&:disabled": {
+        bg: "disabled",
+        cursor: "default"
       }
     },
     accent: {
@@ -240,6 +248,10 @@ const theme = {
       },
       "&:active": {
         bg: darken("accent", 0.1)
+      },
+      "&:disabled": {
+        bg: "disabled",
+        cursor: "default"
       }
     },
     flat: {

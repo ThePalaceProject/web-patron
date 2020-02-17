@@ -11,6 +11,10 @@ import {
 import { SetCollectionAndBook } from "../interfaces";
 import useAuth from "../hooks/useAuth";
 import Button from "./Button";
+import Collection from "./Collection";
+import useTypedSelector from "../hooks/useTypedSelector";
+import { ListView } from "./BookList";
+import { PageLoader } from "./LoadingIndicator";
 
 const MyBooks: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
   setCollectionAndBook
@@ -19,7 +23,14 @@ const MyBooks: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
   // which is what used to be the route that is now /loans (ie. this page)
   useSetCollectionAndBook(setCollectionAndBook, "loans");
 
+  const collection = useTypedSelector(state => state.collection);
+  console.log(collection);
+
   const { isSignedIn, signOut } = useAuth();
+
+  if (collection.isFetching) {
+    return <PageLoader />;
+  }
   if (!isSignedIn)
     return (
       <div
@@ -35,6 +46,11 @@ const MyBooks: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
       </div>
     );
 
+  if (collection.data?.books) {
+    return <ListView books={collection.data?.books} />;
+  }
+
+  // otherwise you have no loans / holds
   return (
     <div
       sx={{
@@ -46,7 +62,7 @@ const MyBooks: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
       }}
     >
       <Styled.h3 sx={{ color: "primaries.medium" }}>
-        My books page (in progress).
+        Your books will show up here when you have any loaned or on hold.
       </Styled.h3>
       <Button onClick={signOut}>Sign Out</Button>
     </div>

@@ -37,9 +37,7 @@ const Book = React.forwardRef<
         <BookCover book={book} sx={{ mx: 4 }} />
         <Styled.h2
           sx={{
-            variant: "text.bookTitle",
-            letterSpacing: 0.8,
-            mb: 1
+            variant: "text.bookTitle"
           }}
         >
           {truncateString(book.title, 50, true)}

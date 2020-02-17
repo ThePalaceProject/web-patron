@@ -18,11 +18,16 @@ const buttonStyles = (variant: VariantProp<ButtonVariants>) => ({
  */
 const Button: React.FC<ButtonProps> = ({
   variant = "primary",
-  disabled,
+  disabled = false,
   ...props
 }) => {
   return (
-    <BaseButton {...props} disabled={disabled} sx={buttonStyles(variant)} />
+    <BaseButton
+      {...props}
+      disabled={disabled}
+      sx={buttonStyles(variant)}
+      {...props}
+    />
   );
 };
 
@@ -40,9 +45,10 @@ export const NavButton = React.forwardRef<HTMLAnchorElement, NavButtonProps>(
   }
 );
 
-type LinkButtonProps = { variant?: Variant } & React.ComponentProps<
-  typeof Styled.a
->;
+type LinkButtonProps = {
+  variant?: Variant;
+  disabled?: boolean;
+} & React.ComponentProps<typeof Styled.a>;
 
 /**
  * A button that takes an href prop for an external link

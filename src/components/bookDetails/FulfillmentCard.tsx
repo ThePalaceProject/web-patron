@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx, Styled } from "theme-ui";
 import * as React from "react";
-import { getAvailabilityString, getErrorMsg } from "./utils";
+import { getAvailabilityString } from "./utils";
 import { sidebarWidth } from "./index";
 import {
   BookData,
@@ -10,20 +10,17 @@ import {
   FulfillmentLink
 } from "opds-web-client/lib/interfaces";
 import { typeMap } from "opds-web-client/lib/utils/file";
-import useTypedSelector from "../../hooks/useTypedSelector";
 import { RequiredKeys } from "src/interfaces";
 import {
   bookIsBorrowed,
   bookIsOpenAccess,
-  bookIsReserved,
-  bookIsReady,
   bookIsBorrowable
 } from "opds-web-client/lib/utils/book";
 import Button from "../Button";
-import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
 import useDownloadButton from "opds-web-client/lib/hooks/useDownloadButton";
 import { withErrorBoundary } from "../ErrorBoundary";
 import Select from "../Select";
+import useBorrow from "../../hooks/useBorrow";
 
 /**
  * This card will handle logic to download books. There are a few cases
@@ -91,26 +88,13 @@ const BorrowCard: React.FC<{
   book: RequiredKeys<BookData, "borrowUrl">;
   className?: string;
 }> = ({ book, className }) => {
-  const bookError = useTypedSelector(state => state.book?.error);
-  const errorMsg = getErrorMsg(bookError);
-  const availability = getAvailabilityString(book);
-  const { actions, dispatch } = useActions();
-  const loansUrl = useTypedSelector(state => state.loans.url);
-
-  // Book can either be available to borrow, available to reserve, or reserved
-  const isReserved = bookIsReserved(book);
-  // if it is not reserved and not reservable, then it is borrowable
-  const isReservable = !bookIsReady(book) && book.copies?.available === 0;
-
-  const label = isReserved ? "Reserved" : isReservable ? "Reserve" : "Borrow";
-
-  const borrowOrReserve = async () => {
-    await dispatch(actions.updateBook(book.borrowUrl));
-    // refetch the loans
-    if (loansUrl) {
-      await dispatch(actions.fetchLoans(loansUrl));
-    }
-  };
+  const {
+    availability,
+    borrowOrReserve,
+    isReserved,
+    errorMsg,
+    label
+  } = useBorrow(book);
   return (
     <CardWrapper
       className={className}
