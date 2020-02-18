@@ -46,7 +46,8 @@ const BookCard = React.forwardRef<
         <BookCover book={book} sx={{ mx: 4 }} />
         <Styled.h2
           sx={{
-            variant: "text.bookTitle"
+            variant: "text.bookTitle",
+            fontSize: 2
           }}
         >
           {truncateString(book.title, 50, true)}

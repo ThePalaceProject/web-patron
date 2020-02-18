@@ -83,10 +83,8 @@ const BookDetails: React.FC<BookDetailsPropsNew> = ({
             <Styled.h1
               sx={{
                 variant: "text.bookTitle",
-                lineHeight: [0.7],
-                letterSpacing: [1.4],
                 my: [3],
-                fontSize: [5, 5, 6]
+                fontSize: [3, 3, 4]
               }}
             >
               {book.title}

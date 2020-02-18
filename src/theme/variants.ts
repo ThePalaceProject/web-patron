@@ -24,10 +24,8 @@ const variants = {
   text: {
     bookTitle: {
       fontFamily: "bookTitle",
-      lineHeight: 0.7,
-      fontSize: 4,
-      fontWeight: 200,
-      letterSpacing: 0.8,
+      fontSize: 3,
+      fontWeight: "bold",
       mb: 0,
       mt: 3
     }
