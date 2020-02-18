@@ -22,21 +22,30 @@ export default function useBorrow(book: BookData) {
 
   // Book can either be available to borrow, available to reserve, or reserved
   const isReserved = bookIsReserved(book);
-  // if it is not reserved and not reservable, then it is borrowable
-  const isReservable =
-    !isReserved && !bookIsReady(book) && book.copies?.available === 0;
-
   const isBorrowed = bookIsBorrowed(book);
+  const isReservable =
+    !isReserved &&
+    !isBorrowed &&
+    !bookIsReady(book) &&
+    book.copies?.available === 0;
   const isBorrowable = bookIsBorrowable(book);
 
+  /**
+   * Priority
+   *  - Loading
+   *  - Borrowed
+   *  - Reserved
+   *  - Reservable
+   *  - Borrowable (default)
+   */
   const label = isLoading
     ? "Loading..."
+    : isBorrowed
+    ? "Borrowed"
     : isReserved
     ? "Reserved"
     : isReservable
     ? "Reserve"
-    : isBorrowed
-    ? "Borrowed"
     : "Borrow";
 
   const borrowOrReserve = async () => {
