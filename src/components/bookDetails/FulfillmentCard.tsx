@@ -93,7 +93,8 @@ const BorrowCard: React.FC<{
     borrowOrReserve,
     isReserved,
     errorMsg,
-    label
+    label,
+    isLoading
   } = useBorrow(book);
   return (
     <CardWrapper
@@ -109,7 +110,11 @@ const BorrowCard: React.FC<{
     >
       {availability}
       {errorMsg && <p sx={{ color: "warn" }}>Error: {errorMsg}</p>}
-      <Button onClick={borrowOrReserve} disabled={isReserved} sx={{ my: 3 }}>
+      <Button
+        onClick={borrowOrReserve}
+        disabled={isReserved || isLoading}
+        sx={{ my: 3 }}
+      >
         {label}
       </Button>
     </CardWrapper>
