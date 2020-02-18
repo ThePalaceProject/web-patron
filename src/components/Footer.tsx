@@ -3,15 +3,8 @@ import { jsx, Styled } from "theme-ui";
 import * as React from "react";
 import ExternalLink from "./ExternalLink";
 import useTypedSelector from "../hooks/useTypedSelector";
-import { State } from "opds-web-client/lib/state";
 import { LinkData } from "opds-web-client/lib/interfaces";
-
-const labelMap = {
-  about: "About",
-  "terms-of-service": "Terms of Service",
-  "privacy-policy": "Privacy Policy",
-  copyright: "Copyright"
-};
+import useLibraryContext from "./context/LibraryContext";
 
 const getHelpLinkLabel = (link: LinkData): string => {
   if (typeof link.text === "string") return link.text;
@@ -22,10 +15,9 @@ const getHelpLinkLabel = (link: LinkData): string => {
 };
 
 const Footer: React.FC<{ className?: string }> = ({ className }) => {
+  const library = useLibraryContext();
   const links = useTypedSelector(state => state?.collection?.data?.links ?? []);
-  const title = useTypedSelector(
-    state => state?.collection?.data?.title ?? "Library"
-  );
+  const title = library.catalogName;
   const helpLinks = links.filter(link => link.type === "help");
 
   return (
