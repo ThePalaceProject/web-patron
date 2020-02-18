@@ -22,6 +22,8 @@ const useSetCollectionAndBook = (
   const { isSignedIn } = useAuth();
   const urlShortener = useUrlShortener();
 
+  // we save setCollectionAndBook to a ref, because
+
   const fullCollectionUrl = decodeURIComponent(
     urlShortener.expandCollectionUrl(finalCollectionUrl)
   );
@@ -33,7 +35,7 @@ const useSetCollectionAndBook = (
       ({ collectionData }) => {
         // then fetch the loans (like in OPDS root)
         // but only if you are already signed in. Otherwise you don't need them at this point
-        if (collectionData.shelfUrl && isSignedIn) {
+        if (collectionData?.shelfUrl && isSignedIn) {
           dispatch(actions.fetchLoans(collectionData.shelfUrl));
         }
       }
