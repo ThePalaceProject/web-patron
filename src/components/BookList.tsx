@@ -24,7 +24,7 @@ import BookCard, { BOOK_HEIGHT } from "./BookCard";
 
 export const GalleryView: React.FC<{
   books: BookData[];
-  breadcrumb?: string;
+  breadcrumb?: React.ReactNode;
   showBorrowButton?: boolean;
 }> = ({ books, breadcrumb, showBorrowButton = false }) => {
   return (
@@ -55,14 +55,18 @@ export const GalleryView: React.FC<{
 
 export const ListView: React.FC<{
   books: BookData[];
-  breadcrumb?: string;
+  breadcrumb?: React.ReactNode;
   showBorrowButton?: boolean;
 }> = ({ books, breadcrumb, showBorrowButton = false }) => {
   const breakpoint = useBreakpointIndex();
   // if we are on mobile, show the gallery instead
   if (breakpoint < 1) {
     return (
-      <GalleryView books={books} breadcrumb={breadcrumb} showBorrowButton />
+      <GalleryView
+        books={books}
+        breadcrumb={breadcrumb}
+        showBorrowButton={showBorrowButton}
+      />
     );
   }
   return (

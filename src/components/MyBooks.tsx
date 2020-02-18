@@ -25,7 +25,7 @@ const MyBooks: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
 
   const collection = useTypedSelector(state => state.collection);
 
-  const { isSignedIn, signOut } = useAuth();
+  const { isSignedIn, signOutAndGoHome } = useAuth();
 
   if (collection.isFetching) {
     return <PageLoader />;
@@ -46,7 +46,14 @@ const MyBooks: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
     );
 
   if (collection.data?.books) {
-    return <ListView books={collection.data?.books} showBorrowButton />;
+    const signOutButton = <Button onClick={signOutAndGoHome}>Sign out</Button>;
+    return (
+      <ListView
+        books={collection.data?.books}
+        showBorrowButton
+        breadcrumb={signOutButton}
+      />
+    );
   }
 
   // otherwise you have no loans / holds
@@ -63,7 +70,7 @@ const MyBooks: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
       <Styled.h3 sx={{ color: "primaries.medium" }}>
         Your books will show up here when you have any loaned or on hold.
       </Styled.h3>
-      <Button onClick={signOut}>Sign Out</Button>
+      <Button onClick={signOutAndGoHome}>Sign Out</Button>
     </div>
   );
 };
