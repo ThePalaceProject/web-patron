@@ -30,7 +30,7 @@ const Footer: React.FC<{ className?: string }> = ({ className }) => {
 
   return (
     <footer
-      sx={{ backgroundColor: "blues.dark", color: "white" }}
+      sx={{ backgroundColor: "primaries.dark", color: "white" }}
       className={className}
     >
       <div
@@ -67,7 +67,7 @@ const FooterExternalLink: React.FC<React.HTMLProps<HTMLAnchorElement>> = ({
 }) => {
   return (
     <ExternalLink
-      sx={{ color: "blues.medium", textDecoration: "none" }}
+      sx={{ color: "primaries.medium", textDecoration: "none" }}
       className={className}
       {...props}
     >

@@ -33,7 +33,7 @@ const BookCard = React.forwardRef<
         listStyle: "none",
         display: "block",
         border: "1px solid",
-        borderColor: "blues.dark",
+        borderColor: "primaries.dark",
         borderRadius: "card",
         py: 3,
         px: 2,
@@ -51,7 +51,7 @@ const BookCard = React.forwardRef<
         >
           {truncateString(book.title, 50, true)}
         </Styled.h2>
-        <span sx={{ color: "blues.primary" }}>{authors.join(", ")}</span>
+        <span sx={{ color: "primary" }}>{authors.join(", ")}</span>
         {showBorrowButton && (
           <Button
             disabled={isBorrowed || isReserved || !isBorrowable}

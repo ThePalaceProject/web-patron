@@ -79,10 +79,10 @@ const FilterButton: React.FC<FilterButtonProps> = ({
   ...props
 }) => {
   const selectedStyles = {
-    bg: (theme: Theme) => (selected ? theme.colors.blues.dark : undefined),
+    bg: (theme: Theme) => (selected ? theme.colors.primaries.dark : undefined),
     "&:hover,&:focus": selected
       ? {
-          bg: (theme: Theme) => theme.colors.blues.dark
+          bg: (theme: Theme) => theme.colors.primaries.dark
         }
       : undefined
   };

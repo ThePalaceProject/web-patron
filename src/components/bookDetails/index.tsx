@@ -52,7 +52,7 @@ const BookDetails: React.FC<BookDetailsPropsNew> = ({
         sx={{
           variant: "cards.bookDetails",
           border: "1px solid",
-          borderColor: "blues.dark",
+          borderColor: "primaries.dark",
           borderRadius: "card",
           p: [2, 4]
         }}
@@ -148,7 +148,7 @@ const DownloadRequirements: React.FC<{ className?: string }> = ({
     <div
       sx={{
         border: "1px solid",
-        borderColor: "blues.primary",
+        borderColor: "primary",
         backgroundColor: "lightGrey",
         borderRadius: "card",
         display: "flex",

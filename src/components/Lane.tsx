@@ -170,7 +170,7 @@ const PrevNextButton: React.FC<{
         alignItems: "center",
         cursor: "pointer",
         "&:hover": {
-          backgroundColor: "blues.light"
+          backgroundColor: "primaries.light"
         }
       }}
       onClick={onClick}
@@ -180,7 +180,7 @@ const PrevNextButton: React.FC<{
     >
       <ArrowRight
         sx={{
-          fill: disabled ? "grey" : "blues.primary",
+          fill: disabled ? "grey" : "primary",
           transform: isPrev ? "rotate(180deg)" : ""
         }}
       />

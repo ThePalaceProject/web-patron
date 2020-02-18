@@ -22,7 +22,7 @@ const BookCover: React.FC<{ book: BookData; className?: string }> = ({
         border: "1px solid",
         borderColor: "primary",
         borderRadius: 3,
-        backgroundColor: "blues.light",
+        backgroundColor: "primaries.light",
         overflow: "hidden"
       }}
     >

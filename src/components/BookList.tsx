@@ -95,7 +95,7 @@ const BookListItem: React.FC<{ book: BookData }> = ({ book }) => {
       sx={{
         listStyle: "none",
         border: "1px solid",
-        borderColor: "blues.dark",
+        borderColor: "primaries.dark",
         borderRadius: "card",
         height: 140,
         display: "flex",

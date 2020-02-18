@@ -94,7 +94,7 @@ const RecommendationsLane: React.FC<{ lane: LaneData; selfId: string }> = ({
       <div
         sx={{
           border: "1px solid",
-          borderColor: "blues.dark",
+          borderColor: "primaries.dark",
           borderRadius: "card",
           p: 2,
           display: "flex",

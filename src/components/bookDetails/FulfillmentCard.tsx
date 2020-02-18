@@ -154,7 +154,7 @@ const DownloadCard: React.FC<{
           px: 2,
           py: 3,
           borderBottom: "1px solid",
-          borderColor: "blues.primary",
+          borderColor: "primary",
           display: "flex"
         }}
       >
@@ -208,7 +208,7 @@ const CardWrapper: React.FC<{ className?: string }> = ({
       className={className}
       sx={{
         border: "1px solid",
-        borderColor: "blues.primary",
+        borderColor: "primary",
         borderRadius: "card",
         maxWidth: sidebarWidth,
         m: 2
