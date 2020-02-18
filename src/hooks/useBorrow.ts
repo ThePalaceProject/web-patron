@@ -17,8 +17,6 @@ export default function useBorrow(book: BookData) {
   const availability = getAvailabilityString(book);
   const { actions, dispatch } = useActions();
   const loansUrl = useTypedSelector(state => state.loans.url);
-  const state = useTypedSelector(state => state);
-  console.log(state);
 
   // Book can either be available to borrow, available to reserve, or reserved
   const isReserved = bookIsReserved(book);
