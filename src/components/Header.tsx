@@ -85,13 +85,15 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
           <NavButton sx={{ m: 1, mb: [1, 0] }} variant="primary" to="/loans">
             <BookIcon sx={{ fontSize: 5 }} /> My Books
           </NavButton>
-          <NavButton
+          {/* uncomment to enable a settings button */}
+          {/* <NavButton
             sx={{ m: 1, mb: [1, 0] }}
             variant="primary"
             to={"/settings"}
           >
             <SettingsIcon sx={{ fontSize: 5 }} /> Settings
-          </NavButton>
+          </NavButton> */}
+
           {/* uncomment to include links from the CM */}
           {/* <CMDefinedHeaderLinks library={library} /> */}
         </Flex>
@@ -141,86 +143,3 @@ const NavButton: React.FC<ButtonProps> = ({
     </NavButtonBase>
   );
 };
-
-// export default class Header extends React.Component<HeaderProps, {}> {
-//   context: HeaderContext;
-
-//   static contextTypes = {
-//     library: PropTypes.object.isRequired,
-//     router: PropTypes.object.isRequired,
-//     pathFor: PropTypes.func.isRequired
-//   };
-
-//   constructor(props) {
-//     super(props);
-//     this.signIn = this.signIn.bind(this);
-//     this.signOut = this.signOut.bind(this);
-//   }
-
-//   render(): JSX.Element {
-//     return (
-//       <NavBar>
-//         <NavHeader>
-//           <NavBrand className={this.context.library.logoUrl ? "with-logo" : ""}>
-//             <NavBrandTitle>{this.context.library.catalogName}</NavBrandTitle>
-//             <NavBrandSubtitle>Library System</NavBrandSubtitle>
-//           </NavBrand>
-//           <NavToggle />
-//         </NavHeader>
-
-//         <NavCollapse>
-//           <NavList>
-//             {this.context.library.headerLinks &&
-//               this.context.library.headerLinks.map(link => (
-//                 <li key={link.href}>
-//                   <a href={link.href} title={link.title}>
-//                     {link.title}
-//                   </a>
-//                 </li>
-//               ))}
-//             <li>
-//               <CatalogLink
-//                 collectionUrl={this.context.library.catalogUrl}
-//                 bookUrl={null}
-//               >
-//                 Catalog
-//               </CatalogLink>
-//             </li>
-//             {this.props.loansUrl && this.props.isSignedIn && (
-//               <li>
-//                 <CatalogLink collectionUrl={this.props.loansUrl} bookUrl={null}>
-//                   My Books
-//                 </CatalogLink>
-//               </li>
-//             )}
-//             {this.props.loansUrl && this.props.isSignedIn && (
-//               <li>
-//                 <button onClick={this.signOut}>Sign Out</button>
-//               </li>
-//             )}
-//             {this.props.loansUrl && !this.props.isSignedIn && (
-//               <li>
-//                 <button onClick={this.signIn}>Sign In</button>
-//               </li>
-//             )}
-//           </NavList>
-
-//           <Search />
-//         </NavCollapse>
-//       </NavBar>
-//     );
-//   }
-
-//   signIn() {
-//     if (this.props.fetchLoans && this.props.loansUrl) {
-//       this.props.fetchLoans(this.props.loansUrl);
-//     }
-//   }
-
-//   signOut() {
-//     this.props.clearAuthCredentials();
-//     this.context.router.push(
-//       this.context.pathFor(this.context.library.catalogUrl, null)
-//     );
-//   }
-// }
