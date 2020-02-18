@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { SetCollectionAndBook } from "../interfaces";
 import useUrlShortener from "../components/context/UrlShortenerContext";
 import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
+import useAuth from "./useAuth";
 
 /**
  * Currently have to pass in setCollectionAndBook, which we get from
@@ -18,7 +19,7 @@ const useSetCollectionAndBook = (
   const { bookUrl, collectionUrl } = useParams();
   const finalCollectionUrl = collectionUrlOverride ?? collectionUrl;
   const { actions, dispatch } = useActions();
-
+  const { isSignedIn } = useAuth();
   const urlShortener = useUrlShortener();
 
   const fullCollectionUrl = decodeURIComponent(
@@ -29,9 +30,10 @@ const useSetCollectionAndBook = (
   // set the collection and book whenever the urls change, and fetch loans
   React.useEffect(() => {
     setCollectionAndBook(fullCollectionUrl, fullBookUrl).then(
-      // then fetch the loans (like in OPDS root)
       ({ collectionData }) => {
-        if (collectionData.shelfUrl) {
+        // then fetch the loans (like in OPDS root)
+        // but only if you are already signed in. Otherwise you don't need them at this point
+        if (collectionData.shelfUrl && isSignedIn) {
           dispatch(actions.fetchLoans(collectionData.shelfUrl));
         }
       }
