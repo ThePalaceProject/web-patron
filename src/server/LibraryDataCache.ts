@@ -1,6 +1,7 @@
 require("isomorphic-fetch");
 import OPDSParser, { OPDSFeed } from "opds-feed-parser";
 import { Link, LibraryData } from "../interfaces";
+import { parseLinks } from "../utils/libraryLinks";
 
 export interface RegistryEntry {
   links: Link[];
@@ -110,12 +111,15 @@ export default class LibraryDataCache {
       }
     }
 
+    const libraryLinks = parseLinks(authDocument.links);
+
     return {
       catalogName: authDocument["title"],
       colors: authDocument["web_color_scheme"],
       headerLinks,
       cssLinks,
-      logoUrl
+      logoUrl,
+      libraryLinks
     };
   }
 

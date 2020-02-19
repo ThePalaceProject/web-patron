@@ -19,6 +19,16 @@ export interface Link {
   role?: string;
 }
 
+export type LibraryLinks = {
+  helpWebsite?: Link;
+  helpEmail?: Link;
+  libraryWebsite?: Link;
+  tos?: Link;
+  about?: Link;
+  privacyPolicy?: Link;
+  registration?: Link;
+};
+
 export interface LibraryData {
   id?: string;
   onlyLibrary?: boolean;
@@ -31,6 +41,7 @@ export interface LibraryData {
   };
   headerLinks?: Link[];
   cssLinks?: Link[];
+  libraryLinks: LibraryLinks;
 }
 
 export interface PreloadedData {

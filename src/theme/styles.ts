@@ -40,6 +40,13 @@ const styles = {
   a: {
     cursor: "pointer",
     textDecoration: "none"
+  },
+  ul: {
+    p: 0,
+    m: 0
+  },
+  li: {
+    listStyle: "none"
   }
 };
 

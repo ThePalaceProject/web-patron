@@ -22,7 +22,7 @@ export interface HeaderContext extends NavigateContext {
  */
 const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
   const library = useLibraryContext();
-
+  console.log(library);
   // nav links
   const homeUrl = useCatalogLink(undefined);
 

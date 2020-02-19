@@ -27,5 +27,6 @@ export const libraryData: LibraryData = {
       type: "text/css",
       rel: "stylesheet"
     }
-  ]
+  ],
+  libraryLinks: {}
 };

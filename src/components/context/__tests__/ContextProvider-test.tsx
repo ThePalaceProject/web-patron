@@ -13,7 +13,8 @@ describe("ContextProvider", () => {
   const library = {
     id: "TEST",
     catalogUrl: "http://example.com/home",
-    catalogName: "Example"
+    catalogName: "Example",
+    libraryLinks: {}
   };
 
   beforeEach(() => {
