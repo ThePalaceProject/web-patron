@@ -11,6 +11,8 @@ import BookIcon from "../icons/Book";
 import SettingsIcon from "../icons/Settings";
 import useLibraryContext from "./context/LibraryContext";
 import FormatFilter from "./FormatFilter";
+import useView from "./context/ViewContext";
+import ViewSelector from "./ViewSelector";
 
 export interface HeaderContext extends NavigateContext {
   library: LibraryData;
@@ -22,8 +24,6 @@ export interface HeaderContext extends NavigateContext {
  */
 const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
   const library = useLibraryContext();
-  console.log(library);
-  // nav links
   const homeUrl = useCatalogLink(undefined);
 
   return (
@@ -98,6 +98,7 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
           {/* <CMDefinedHeaderLinks library={library} /> */}
         </Flex>
         <FormatFilter />
+        <ViewSelector />
         <Flex sx={{ justifyContent: "center", p: 2 }}>
           <Search />
         </Flex>

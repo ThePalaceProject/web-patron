@@ -13,16 +13,18 @@ import {
 import { PageLoader } from "../components/LoadingIndicator";
 import useNormalizedCollection from "../hooks/useNormalizedCollection";
 import { Helmet } from "react-helmet-async";
-import { GalleryView, LanesView } from "./BookList";
+import { GalleryView, ListView, LanesView } from "./BookList";
+import useView from "./context/ViewContext";
 
 const Collection: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
   setCollectionAndBook
 }) => {
   useSetCollectionAndBook(setCollectionAndBook);
-
+  const { view } = useView();
   // the first hook just provides the collection, the second subs in loaned book data if existing
   const collection = useTypedSelector(state => state.collection);
   const collectionData = useNormalizedCollection();
+
   if (collection.isFetching) {
     return <PageLoader />;
   }
@@ -42,7 +44,11 @@ const Collection: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
     );
   } else if (hasBooks) {
     const books = collectionData?.books ?? [];
-    return <GalleryView books={books} />;
+    return view === "LIST" ? (
+      <ListView books={books} />
+    ) : (
+      <GalleryView books={books} />
+    );
   }
 
   // otherwise it is empty

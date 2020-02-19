@@ -12,6 +12,7 @@ import { RecommendationsProvider } from "./RecommendationsContext";
 import { ActionsProvider } from "opds-web-client/lib/components/context/ActionsContext";
 import { Provider as ReakitProvider } from "reakit";
 import { HelmetProvider } from "react-helmet-async";
+import { ViewProvider } from "./ViewContext";
 
 type ProviderProps = PreloadedData;
 /**
@@ -62,7 +63,7 @@ const AppContextProvider: React.FC<ProviderProps> = ({
                   <ComplaintsProvider>
                     <LibraryProvider library={library}>
                       <UrlShortenerProvider urlShortener={urlShortener}>
-                        {children}
+                        <ViewProvider>{children}</ViewProvider>
                       </UrlShortenerProvider>
                     </LibraryProvider>
                   </ComplaintsProvider>

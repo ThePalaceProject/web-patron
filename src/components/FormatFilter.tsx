@@ -2,11 +2,10 @@
 import { jsx, Flex } from "theme-ui";
 import * as React from "react";
 import useTypedSelector from "../hooks/useTypedSelector";
-import { useHistory, Route } from "react-router-dom";
+import { useHistory, Route, useRouteMatch } from "react-router-dom";
 import useCatalogLink from "../hooks/useCatalogLink";
 import { Book, Headset } from "../icons";
-import Button from "./Button";
-import { Theme } from "src/theme";
+import FilterButton from "./FilterButton";
 
 /**
  * This filter depends on the "Formats" facetGroup, which should have
@@ -22,7 +21,6 @@ const FormatFilter: React.FC = () => {
       facetGroup => facetGroup.label === "Formats"
     )
   );
-
   const ebookFacet = formatFacetGroup?.facets.find(
     facet => facet.label === "eBooks"
   );
@@ -41,7 +39,7 @@ const FormatFilter: React.FC = () => {
 
   if (!ebookFacet || !audiobookFacet) return null;
   return (
-    <Route path={["/", "/collection/:collectionUrl"]} exact={false}>
+    <Route path={["/", "/collection/:collectionUrl"]} exact>
       <Flex sx={{ py: 0 }}>
         {allFacet && (
           <FilterButton
@@ -68,57 +66,3 @@ const FormatFilter: React.FC = () => {
   );
 };
 export default FormatFilter;
-
-type FilterButtonProps = { selected: boolean } & React.ComponentProps<
-  typeof Button
->;
-const FilterButton: React.FC<FilterButtonProps> = ({
-  selected,
-  children,
-  className,
-  ...props
-}) => {
-  const selectedStyles = {
-    bg: (theme: Theme) => (selected ? theme.colors.primaries.dark : undefined),
-    "&:hover,&:focus": selected
-      ? {
-          bg: (theme: Theme) => theme.colors.primaries.dark
-        }
-      : undefined
-  };
-  return (
-    <Button
-      className={className}
-      sx={{
-        height: 40,
-        width: 40,
-        p: 0,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        overflow: "hidden",
-        mx: 1,
-        alignSelf: "flex-end",
-        borderBottomRightRadius: 0,
-        borderBottomLeftRadius: 0,
-        ...selectedStyles
-      }}
-      {...props}
-    >
-      {children}
-    </Button>
-  );
-};
-
-const OnlyInCollection = ({ children }) => {
-  return (
-    <React.Fragment>
-      <Route path="/collection/:collectionUrl" exact>
-        {children}
-      </Route>
-      <Route path="/" exact>
-        {children}
-      </Route>
-    </React.Fragment>
-  );
-};

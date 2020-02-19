@@ -14,22 +14,30 @@ const buttonStyles = (variant: VariantProp<ButtonVariants>) => ({
   variant: `buttons.${variant}`
 });
 /**
- * A button that takes an "onClick" prop like a normal button
+ * Visually a button. It can be backed by whatever element you like, though.
+ * you can provide one of
+ *  - href : will render an achor tag
+ *  - to: will render a react-router link
+ *  - onClick: will render a reakit button
+ *
+ * Alternatively, provide your own component, and it will use that
  */
-const Button: React.FC<ButtonProps> = ({
+function Button({
   variant = "primary",
   disabled = false,
+  as,
   ...props
-}) => {
+}: ButtonProps) {
   return (
     <BaseButton
+      as={as}
       {...props}
       disabled={disabled}
       sx={buttonStyles(variant)}
       {...props}
     />
   );
-};
+}
 
 type NavButtonProps = ButtonProps & React.ComponentProps<typeof Link>;
 /**
