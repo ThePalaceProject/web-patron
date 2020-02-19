@@ -26,6 +26,7 @@ import truncateString from "../../utils/truncate";
 import useNormalizedBook from "../../hooks/useNormalizedBook";
 import { Helmet } from "react-helmet-async";
 import DetailField from "../BookMetaDetail";
+import Button from "../Button";
 
 export interface BookDetailsPropsNew extends DefaultBooKDetailsProps {
   setCollectionAndBook: SetCollectionAndBook;
@@ -99,6 +100,7 @@ const BookDetails: React.FC<BookDetailsPropsNew> = ({
               heading="Categories"
               details={book.categories?.join(", ")}
             />
+            <Button variant="flat">Report a problem</Button>
             <Summary sx={{ display: ["none", "none", "block"] }} book={book} />
           </div>
         </div>

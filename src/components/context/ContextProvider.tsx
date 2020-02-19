@@ -7,7 +7,6 @@ import PathForProvider from "opds-web-client/lib/components/context/PathForConte
 import { RouterProvider } from "./RouterContext";
 import OPDSStore from "opds-web-client/lib/components/context/StoreContext";
 import BasicAuthWithButtonImagePlugin from "../../auth/BasicAuthWithButtonImagePlugin";
-import { ComplaintsProvider } from "./ComplaintsContext";
 import { RecommendationsProvider } from "./RecommendationsContext";
 import { ActionsProvider } from "opds-web-client/lib/components/context/ActionsContext";
 import { Provider as ReakitProvider } from "reakit";
@@ -60,13 +59,11 @@ const AppContextProvider: React.FC<ProviderProps> = ({
             >
               <RecommendationsProvider>
                 <ActionsProvider>
-                  <ComplaintsProvider>
-                    <LibraryProvider library={library}>
-                      <UrlShortenerProvider urlShortener={urlShortener}>
-                        <ViewProvider>{children}</ViewProvider>
-                      </UrlShortenerProvider>
-                    </LibraryProvider>
-                  </ComplaintsProvider>
+                  <LibraryProvider library={library}>
+                    <UrlShortenerProvider urlShortener={urlShortener}>
+                      <ViewProvider>{children}</ViewProvider>
+                    </UrlShortenerProvider>
+                  </LibraryProvider>
                 </ActionsProvider>
               </RecommendationsProvider>
             </OPDSStore>

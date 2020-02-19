@@ -1,22 +1,36 @@
+import { ComplaintsAction } from "./actions";
+
 export interface ComplaintsState {
   isFetching: boolean;
   isPosting: boolean;
   types: string[];
   error: any;
+  showForm: boolean;
 }
 
 export const initState: ComplaintsState = {
   isFetching: false,
   isPosting: false,
   types: [],
-  error: null
+  error: null,
+  showForm: false
 };
 
 export default (
   state: ComplaintsState = initState,
-  action
+  action: ComplaintsAction
 ): ComplaintsState => {
   switch (action.type) {
+    case "REPORT_PROBLEM":
+      return {
+        ...state,
+        showForm: true
+      };
+    case "REPORT_PROBLEM_CANCEL":
+      return {
+        ...state,
+        showForm: false
+      };
     case "FETCH_COMPLAINT_TYPES_REQUEST":
       return Object.assign({}, state, {
         isFetching: true,
@@ -25,18 +39,14 @@ export default (
 
     case "FETCH_COMPLAINT_TYPES_SUCCESS":
       return Object.assign({}, state, {
-        isFetching: false
+        isFetching: false,
+        types: action.types
       });
 
     case "FETCH_COMPLAINT_TYPES_FAILURE":
       return Object.assign({}, state, {
         isFetching: false,
         error: action.error
-      });
-
-    case "LOAD_COMPLAINT_TYPES":
-      return Object.assign({}, state, {
-        types: action.types
       });
 
     case "POST_COMPLAINT_REQUEST":
