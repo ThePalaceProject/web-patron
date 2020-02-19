@@ -87,7 +87,7 @@ const RecommendationsLane: React.FC<{ lane: LaneData; selfId: string }> = ({
           alignItems: "center"
         }}
       >
-        <Styled.h4>{title}</Styled.h4>
+        <Styled.h2 sx={{ fontSize: 2 }}>{title}</Styled.h2>
         <NavButton to={laneLink}>More...</NavButton>
       </div>
 
@@ -116,7 +116,7 @@ const RecommendationsLane: React.FC<{ lane: LaneData; selfId: string }> = ({
                   sx={{
                     variant: "text.bookTitle",
                     textAlign: "center",
-                    fontSize: 4,
+                    fontSize: 2,
                     mt: 2,
                     mb: 0
                   }}

@@ -90,9 +90,9 @@ const BookDetails: React.FC<BookDetailsPropsNew> = ({
               {book.title}
               {book.subtitle && `: ${book.subtitle}`}
             </Styled.h1>
-            <Styled.h3 sx={{ color: "primary", fontSize: [2, 2, 3] }}>
+            <Styled.h2 sx={{ color: "primary", fontSize: [2, 2, 3] }}>
               By {book.authors?.join(", ") ?? "Unknown"}
-            </Styled.h3>
+            </Styled.h2>
             <DetailField heading="Publisher" details={book.publisher} />
             <DetailField heading="Published" details={book.published} />
             <DetailField
@@ -125,15 +125,18 @@ const Summary: React.FC<{ book: BookData; className?: string }> = ({
   book,
   className
 }) => (
-  <div sx={{ m: 2 }} className={className}>
-    <Styled.h2>Summary</Styled.h2>
+  <div sx={{ my: 2 }} className={className}>
+    <Styled.h2 sx={{ mb: 3 }}>Summary</Styled.h2>
     <div
       dangerouslySetInnerHTML={{
         __html: book.summary ?? "Summary not provided."
       }}
       sx={{
         maxHeight: "50vh",
-        overflowY: "scroll"
+        overflowY: "scroll",
+        "&>p": {
+          m: 0
+        }
       }}
     />
   </div>
