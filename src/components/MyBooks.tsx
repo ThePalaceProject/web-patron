@@ -44,8 +44,7 @@ const MyBooks: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
         <Styled.h4>You need to be signed in to view this page.</Styled.h4>
       </div>
     );
-
-  if (collection.data?.books) {
+  if (collection.data?.books && collection.data.books.length > 0) {
     const signOutButton = <Button onClick={signOutAndGoHome}>Sign out</Button>;
     return (
       <ListView
