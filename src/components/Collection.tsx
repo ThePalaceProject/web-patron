@@ -15,6 +15,7 @@ import useNormalizedCollection from "../hooks/useNormalizedCollection";
 import { Helmet } from "react-helmet-async";
 import { GalleryView, ListView, LanesView } from "./BookList";
 import useView from "./context/ViewContext";
+import ListFilters from "./ListFilters";
 
 const Collection: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
   setCollectionAndBook
@@ -45,9 +46,9 @@ const Collection: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
   } else if (hasBooks) {
     const books = collectionData?.books ?? [];
     return view === "LIST" ? (
-      <ListView books={books} />
+      <ListView books={books} breadcrumb={<ListFilters />} />
     ) : (
-      <GalleryView books={books} />
+      <GalleryView books={books} breadcrumb={<ListFilters />} />
     );
   }
 
