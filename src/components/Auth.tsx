@@ -5,6 +5,7 @@ import { useDialogState, Dialog, DialogBackdrop } from "reakit/Dialog";
 import useLibraryContext from "./context/LibraryContext";
 import useAuth from "../hooks/useAuth";
 import { getBasicAuthProvider } from "../utils/auth";
+import Modal from "./Modal";
 
 /**
  *  - makes sure auth state is loaded from cookies
@@ -39,52 +40,27 @@ const Auth: React.FC = ({ children }) => {
       {/* <DialogDisclosure {...dialog} visible={isVisible} toggle={toggle}>
         Open dialog
       </DialogDisclosure> */}
-      <DialogBackdrop
-        {...dialog}
-        sx={{
-          display: showForm ? "flex" : "none",
-          position: "fixed",
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
-          backgroundColor: "rgba(0,0,0,0.5)",
-          zIndex: ["modal"],
-          justifyContent: "center",
-          alignItems: "center"
-        }}
-        visible={showForm}
+      <Modal
+        isVisible={showForm}
+        hide={cancel ?? undefined}
+        label="Sign In"
+        dialog={dialog}
       >
-        <Dialog
-          {...dialog}
-          visible={showForm}
-          hide={cancel ?? undefined}
-          sx={{
-            background: "white",
-            borderRadius: 2,
-            boxShadow: "modal",
-            px: 4,
-            py: 3,
-            m: 2
-          }}
-          aria-label="Sign In"
-        >
-          <div sx={{ textAlign: "center" }}>
-            <Styled.h2>{library.catalogName}</Styled.h2>
-            <Styled.h4>Login</Styled.h4>
-          </div>
-          {/* Here we render the auth plugins  */}
-          {/* if you would like to enable alternative auth plugins */}
-          {/* you should render them (or some way to choose one) here */}
-          {BasicAuthComponent &&
-            showForm &&
-            (basicAuthProvider ? (
-              <BasicAuthComponent provider={basicAuthProvider} />
-            ) : (
-              "Basic auth provider is missing."
-            ))}
-        </Dialog>
-      </DialogBackdrop>
+        <div sx={{ textAlign: "center" }}>
+          <Styled.h2>{library.catalogName}</Styled.h2>
+          <Styled.h4>Login</Styled.h4>
+        </div>
+        {/* Here we render the auth plugins  */}
+        {/* if you would like to enable alternative auth plugins */}
+        {/* you should render them (or some way to choose one) here */}
+        {BasicAuthComponent &&
+          showForm &&
+          (basicAuthProvider ? (
+            <BasicAuthComponent provider={basicAuthProvider} />
+          ) : (
+            "Basic auth provider is missing."
+          ))}
+      </Modal>
       {children}
     </React.Fragment>
   );

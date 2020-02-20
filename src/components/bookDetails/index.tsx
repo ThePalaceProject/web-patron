@@ -1,13 +1,8 @@
 /** @jsx jsx */
 import { jsx, Styled } from "theme-ui";
 import * as React from "react";
-import { fetchComplaintTypes, postComplaint } from "../../actions";
-import DefaultBookDetails, {
-  BookDetailsProps as DefaultBooKDetailsProps
-} from "opds-web-client/lib/components/BookDetails";
-import ReportProblemLink from "../ReportProblemLink";
-import RevokeButton from "../RevokeButton";
-import { ComplaintData, SetCollectionAndBook } from "../../interfaces";
+import { BookDetailsProps as DefaultBooKDetailsProps } from "opds-web-client/lib/components/BookDetails";
+import { SetCollectionAndBook } from "../../interfaces";
 import BookCover from "../BookCover";
 import Recommendations from "./recommendations";
 import {
@@ -26,7 +21,7 @@ import truncateString from "../../utils/truncate";
 import useNormalizedBook from "../../hooks/useNormalizedBook";
 import { Helmet } from "react-helmet-async";
 import DetailField from "../BookMetaDetail";
-import Button from "../Button";
+import ReportProblem from "./ReportProblem";
 
 export interface BookDetailsPropsNew extends DefaultBooKDetailsProps {
   setCollectionAndBook: SetCollectionAndBook;
@@ -100,7 +95,7 @@ const BookDetails: React.FC<BookDetailsPropsNew> = ({
               heading="Categories"
               details={book.categories?.join(", ")}
             />
-            <Button variant="flat">Report a problem</Button>
+            <ReportProblem book={book} />
             <Summary sx={{ display: ["none", "none", "block"] }} book={book} />
           </div>
         </div>

@@ -63,7 +63,7 @@ export interface WebpackAssets {
 
 // our CPW useReducer states
 export type RecommendationsState = CollectionState;
-export { ComplaintsState } from "./reducers/complaints";
+export { ComplaintsState } from "./hooks/useComplaints/reducer";
 
 export { Theme, ButtonVariants, TextVariants } from "./theme";
 // helper for theme variant prop types

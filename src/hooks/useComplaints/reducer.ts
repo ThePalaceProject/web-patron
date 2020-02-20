@@ -6,14 +6,20 @@ export interface ComplaintsState {
   types: string[];
   error: any;
   showForm: boolean;
+  success: boolean;
 }
 
-export const initState: ComplaintsState = {
+const resetState = {
   isFetching: false,
   isPosting: false,
-  types: [],
   error: null,
-  showForm: false
+  showForm: false,
+  success: false
+};
+
+export const initState: ComplaintsState = {
+  ...resetState,
+  types: []
 };
 
 export default (
@@ -24,11 +30,13 @@ export default (
     case "REPORT_PROBLEM":
       return {
         ...state,
+        ...resetState,
         showForm: true
       };
     case "REPORT_PROBLEM_CANCEL":
       return {
         ...state,
+        ...resetState,
         showForm: false
       };
     case "FETCH_COMPLAINT_TYPES_REQUEST":
@@ -57,7 +65,8 @@ export default (
 
     case "POST_COMPLAINT_SUCCESS":
       return Object.assign({}, state, {
-        isPosting: false
+        isPosting: false,
+        success: true
       });
 
     case "POST_COMPLAINT_FAILURE":

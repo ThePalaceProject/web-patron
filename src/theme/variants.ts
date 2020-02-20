@@ -1,4 +1,4 @@
-import { darken } from "@theme-ui/color";
+import { darken, alpha, lighten } from "@theme-ui/color";
 
 const buttonBase = {
   appearance: "none",
@@ -71,8 +71,19 @@ const variants = {
       }
     },
     flat: {
+      ...buttonBase,
       bg: "white",
-      color: "blues.dark"
+      color: "blues.dark",
+      "&:focus,&:hover": {
+        bg: alpha("primary", 0.2)
+      },
+      "&:active": {
+        bg: alpha("primary", 0.4)
+      },
+      "&:disabled": {
+        color: "grey",
+        cursor: "default"
+      }
     }
   },
   inputs: {

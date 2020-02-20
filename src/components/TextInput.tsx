@@ -6,24 +6,28 @@ interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
  * A base component that can be easily customized within
  * the CPW design system
  */
-const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
-  ({ type = "text", ...props }, ref) => {
-    return (
-      <input
-        ref={ref}
-        type={type}
-        sx={{
-          borderRadius: 2,
-          border: "1px solid",
-          borderColor: "primary",
-          borderWidth: 2,
-          p: 1,
-          fontSize: 2
-        }}
-        {...props}
-      />
-    );
-  }
-);
+
+const styles = {
+  borderRadius: 2,
+  border: "1px solid",
+  borderColor: "primary",
+  borderWidth: 2,
+  p: 1,
+  fontSize: 2
+};
+
+const TextInput = React.forwardRef<
+  HTMLInputElement,
+  React.InputHTMLAttributes<HTMLInputElement>
+>(({ type = "text", ...props }, ref) => {
+  return <input ref={ref} type={type} sx={styles} {...props} />;
+});
+
+export const TextArea = React.forwardRef<
+  HTMLTextAreaElement,
+  React.InputHTMLAttributes<HTMLTextAreaElement>
+>(({ type = "text", ...props }, ref) => {
+  return <textarea ref={ref} sx={styles} {...props} />;
+});
 
 export default TextInput;
