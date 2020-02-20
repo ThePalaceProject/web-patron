@@ -34,7 +34,6 @@ const FacetSelector: React.FC<{ facetLabel: string }> = ({ facetLabel }) => {
   const history = useHistory();
   const getCatalogLink = useGetCatalogLink();
 
-  console.log(facetGroup);
   if (!facetGroup) return null;
 
   const { label, facets } = facetGroup;

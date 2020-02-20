@@ -28,13 +28,18 @@ const BreadcrumbBar: React.FC<{
         color: "white",
         m: 0,
         p: 2,
-        textTransform: "uppercase",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between"
       }}
     >
-      <div sx={{ display: "flex", alignItems: "center" }}>
+      <div
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          textTransform: "uppercase"
+        }}
+      >
         {breadcrumbs.map(breadcrumb => (
           <Link
             to={getCatalogLink(undefined, breadcrumb.url)}
