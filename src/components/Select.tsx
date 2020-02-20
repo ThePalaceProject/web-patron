@@ -1,14 +1,26 @@
 /** @jsx jsx */
-import { jsx, Styled } from "theme-ui";
+import { jsx } from "theme-ui";
 import * as React from "react";
-import TextInput from "./TextInput";
 
 type SelectProps = React.ComponentProps<"select">;
-const Select: React.FC<SelectProps> = ({ children, ...props }) => {
+const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
+  ({ children, ...props }, ref) => {
+    return (
+      <select ref={ref} sx={{ variant: "inputs.select" }} {...props}>
+        {children}
+      </select>
+    );
+  }
+);
+
+export const Label: React.FC<React.ComponentProps<"label">> = ({
+  children,
+  ...props
+}) => {
   return (
-    <select sx={{ variant: "inputs.select" }} {...props}>
+    <label sx={{ whiteSpace: "nowrap" }} {...props}>
       {children}
-    </select>
+    </label>
   );
 };
 

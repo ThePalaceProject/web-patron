@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import Button from "../Button";
 import { ComplaintData } from "../../interfaces";
 import LoadingIndicator from "../LoadingIndicator";
+import Select, { Label } from "../Select";
 
 const getDisplayType = (type: string) =>
   type
@@ -75,8 +76,8 @@ const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
             <Styled.h1 sx={{ alignSelf: "center", fontSize: [3, 4] }}>
               Report a problem
             </Styled.h1>
-            <label htmlFor="complaint-type">Complaint Type</label>
-            <select
+            <Label htmlFor="complaint-type">Complaint Type</Label>
+            <Select
               id="complaint-type"
               name="type"
               ref={register({ required: "Please choose a type" })}
@@ -86,7 +87,7 @@ const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
                   {getDisplayType(type)}
                 </option>
               ))}
-            </select>
+            </Select>
             {errors.type && (
               <span sx={{ color: "warn", fontStyle: "italic" }}>
                 {errors.type.message}

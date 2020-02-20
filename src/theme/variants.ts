@@ -87,12 +87,31 @@ const variants = {
     }
   },
   inputs: {
+    // select: {
+    //   borderRadius: 2,
+    //   borderWidth: 2,
+    //   p: 1,
+    //   fontSize: 2,
+    //   width: "100%"
+    // }
     select: {
-      borderRadius: 2,
-      borderWidth: 2,
-      p: 1,
+      width: "100%",
+      display: "flex",
+      alignItems: "center",
+      position: "relative",
+      pl: 1,
+      pr: 2,
+      height: "2rem",
       fontSize: 2,
-      width: "100%"
+      lineHeight: "normal",
+      bg: "white",
+      pb: 1,
+      // color: inherit;
+      transition: "all 0.2s ease 0s",
+      //  borderRadius: "0.25rem",
+      borderRadius: 2,
+      border: "solid",
+      borderColor: "primary"
     }
   }
 };

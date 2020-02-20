@@ -19,7 +19,7 @@ import {
 import Button from "../Button";
 import useDownloadButton from "opds-web-client/lib/hooks/useDownloadButton";
 import { withErrorBoundary } from "../ErrorBoundary";
-import Select from "../Select";
+import Select, { Label } from "../Select";
 import useBorrow from "../../hooks/useBorrow";
 
 /**
@@ -159,23 +159,26 @@ const DownloadCard: React.FC<{
           px: 2,
           py: 3,
           borderBottom: "1px solid",
-          borderColor: "primary",
-          display: "flex"
+          borderColor: "primary"
         }}
       >
-        <span sx={{ fontWeight: "semibold" }}>TYPE</span>
-        <Select
-          value={selectedType}
-          onBlur={handleTypeChange}
-          onChange={handleTypeChange}
-          sx={{ ml: 2 }}
+        <Label
+          sx={{ fontWeight: "semibold", display: "flex", alignItems: "center" }}
         >
-          {Object.keys(linksByMimetype).map(mediaType => (
-            <option key={mediaType} value={mediaType}>
-              {typeMap[mediaType]?.name ?? mediaType}
-            </option>
-          ))}
-        </Select>
+          TYPE
+          <Select
+            value={selectedType}
+            onBlur={handleTypeChange}
+            onChange={handleTypeChange}
+            sx={{ ml: 2 }}
+          >
+            {Object.keys(linksByMimetype).map(mediaType => (
+              <option key={mediaType} value={mediaType}>
+                {typeMap[mediaType]?.name ?? mediaType}
+              </option>
+            ))}
+          </Select>
+        </Label>
       </div>
       <div
         sx={{

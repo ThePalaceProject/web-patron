@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx, Flex } from "theme-ui";
+import { jsx, Styled } from "theme-ui";
 import * as React from "react";
 import useTypedSelector from "../hooks/useTypedSelector";
 import { useHistory, Route, useRouteMatch } from "react-router-dom";
@@ -7,6 +7,7 @@ import useCatalogLink, { useGetCatalogLink } from "../hooks/useCatalogLink";
 import { Book, Headset } from "../icons";
 import FilterButton from "./FilterButton";
 import { FacetGroupData } from "opds-web-client/lib/interfaces";
+import Select, { Label } from "./Select";
 
 /**
  * This filter depends on the "Formats" facetGroup, which should have
@@ -49,10 +50,10 @@ const FacetSelector: React.FC<{ facetLabel: string }> = ({ facetLabel }) => {
   };
   return (
     <React.Fragment>
-      <label htmlFor={`facet-selector-${label}`} sx={{ ml: 3, mr: 2 }}>
+      <Label htmlFor={`facet-selector-${label}`} sx={{ ml: 3, mr: 2 }}>
         {label}
-      </label>
-      <select
+      </Label>
+      <Select
         id={`facet-selector-${label}`}
         value={activeFacet?.label}
         onBlur={handleChange}
@@ -63,7 +64,7 @@ const FacetSelector: React.FC<{ facetLabel: string }> = ({ facetLabel }) => {
             {facet.label}
           </option>
         ))}
-      </select>
+      </Select>
     </React.Fragment>
   );
 };
