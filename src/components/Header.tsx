@@ -11,8 +11,8 @@ import BookIcon from "../icons/Book";
 import SettingsIcon from "../icons/Settings";
 import useLibraryContext from "./context/LibraryContext";
 import FormatFilter from "./FormatFilter";
-import useView from "./context/ViewContext";
 import ViewSelector from "./ViewSelector";
+import useTypedSelector from "../hooks/useTypedSelector";
 
 export interface HeaderContext extends NavigateContext {
   library: LibraryData;
@@ -25,6 +25,7 @@ export interface HeaderContext extends NavigateContext {
 const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
   const library = useLibraryContext();
   const homeUrl = useCatalogLink(undefined);
+  const loansUrl = useTypedSelector(state => state.loans.url);
 
   return (
     <header
@@ -82,7 +83,11 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
             p: [2, 0]
           }}
         >
-          <NavButton sx={{ m: 1, mb: [1, 0] }} variant="primary" to="/loans">
+          <NavButton
+            sx={{ m: 1, mb: [1, 0] }}
+            variant="primary"
+            collectionUrl={loansUrl}
+          >
             <BookIcon sx={{ fontSize: 5 }} /> My Books
           </NavButton>
           {/* uncomment to enable a settings button */}

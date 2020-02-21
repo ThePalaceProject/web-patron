@@ -11,7 +11,7 @@ import useLibraryContext from "../components/context/LibraryContext";
  * getCatalogLink use that url. Or you can not pass one in and it will use
  * the default unless you specify in the call to getCatalogLink
  */
-export function useGetCatalogLink(collectionUrlOverride?: string) {
+export function useGetCatalogLink(collectionUrlOverride?: string | null) {
   const pathFor = usePathFor();
   const library = useLibraryContext();
 
@@ -22,8 +22,8 @@ export function useGetCatalogLink(collectionUrlOverride?: string) {
   }
 
   function getCatalogLink(
-    bookUrl?: string,
-    collection: string = collectionUrl
+    bookUrl?: string | null,
+    collection: string | null = collectionUrl
   ) {
     return pathFor(collection, bookUrl);
   }
@@ -35,7 +35,10 @@ export function useGetCatalogLink(collectionUrlOverride?: string) {
  * Similar to the above, but simply gets the collectionUrl for a
  * provided bookUrl.
  */
-function useCatalogLink(bookUrl?: string, collectionUrlOverride?: string) {
+function useCatalogLink(
+  bookUrl?: string | null,
+  collectionUrlOverride?: string | null
+) {
   const getCalalogLink = useGetCatalogLink(collectionUrlOverride);
 
   const location = getCalalogLink(bookUrl);

@@ -11,7 +11,6 @@ import {
 import { SetCollectionAndBook } from "../interfaces";
 import useAuth from "../hooks/useAuth";
 import Button from "./Button";
-import Collection from "./Collection";
 import useTypedSelector from "../hooks/useTypedSelector";
 import { ListView } from "./BookList";
 import { PageLoader } from "./LoadingIndicator";
@@ -22,7 +21,6 @@ const MyBooks: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
   // here we pass in "loans" to make it look like we are at /collection/loans
   // which is what used to be the route that is now /loans (ie. this page)
   useSetCollectionAndBook(setCollectionAndBook, "loans");
-
   const collection = useTypedSelector(state => state.collection);
 
   const { isSignedIn, signOutAndGoHome } = useAuth();

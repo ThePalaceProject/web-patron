@@ -6,9 +6,10 @@ import { ButtonVariants, VariantProp } from "../interfaces";
 import Link from "./Link";
 
 type Variant = VariantProp<ButtonVariants>;
+type BaseButtonProps = React.ComponentProps<typeof BaseButton>;
 type ButtonProps = {
   variant?: Variant;
-} & React.ComponentProps<typeof BaseButton>;
+} & BaseButtonProps;
 
 const buttonStyles = (variant: VariantProp<ButtonVariants>) => ({
   variant: `buttons.${variant}`
@@ -39,14 +40,18 @@ function Button({
   );
 }
 
-type NavButtonProps = ButtonProps & React.ComponentProps<typeof Link>;
+type NavButtonProps = Omit<ButtonProps, keyof BaseButtonProps> &
+  React.ComponentProps<typeof Link>;
 /**
  * A button that takes a "to" prop for an internal link
  */
-export const NavButton = React.forwardRef<HTMLAnchorElement, NavButtonProps>(
-  ({ to, children, variant = "primary", ...props }, ref) => {
+export const NavButton: React.FC<NavButtonProps> = React.forwardRef(
+  (
+    { children, variant = "primary", ...props }: NavButtonProps,
+    ref: React.Ref<any>
+  ) => {
     return (
-      <Link ref={ref} to={to} sx={buttonStyles(variant)} {...props}>
+      <Link ref={ref} sx={buttonStyles(variant)} {...props}>
         {children}
       </Link>
     );
