@@ -1,12 +1,17 @@
 /** @jsx jsx */
-import { jsx } from "theme-ui";
+import { jsx, Styled } from "theme-ui";
+import { CONTENT_ID } from "./Layout";
 
-const SkipToContent = props => (
-  <a
+/**
+ * Renders a link that is hidden until focused to skip to main content
+ */
+const SkipNavigation = props => (
+  <Styled.a
     {...props}
-    href="#content"
+    href={`#${CONTENT_ID}`}
     sx={{
       clip: "rect(0 0 0 0)",
+      border: 0,
       height: 1,
       width: 1,
       m: -1,
@@ -17,12 +22,12 @@ const SkipToContent = props => (
       ":focus": {
         p: 3,
         position: "fixed",
-        zIndex: 4,
-        top: 0,
-        left: 0,
+        zIndex: "skipNavigation",
+        top: 10,
+        left: 10,
         m: 2,
         fontWeight: "bold",
-        color: "black",
+        // color: "primary",
         bg: "white",
         width: "auto",
         height: "auto",
@@ -31,7 +36,7 @@ const SkipToContent = props => (
     }}
   >
     Skip to content
-  </a>
+  </Styled.a>
 );
 
-export default SkipToContent;
+export default SkipNavigation;

@@ -22,7 +22,8 @@ const sizes = {
 const zIndices = {
   hide: -1,
   base: 0,
-  modal: 1000
+  modal: 1000,
+  skipNavigation: 2000
 };
 
 const shadows = {

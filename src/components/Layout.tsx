@@ -5,7 +5,9 @@ import GlobalStyles from "./GlobalStyles";
 import Header from "./Header";
 import Footer from "./Footer";
 import Auth from "./Auth";
+import SkipNavigation from "./SkipNavigation";
 
+export const CONTENT_ID = "cpw-content";
 /**
  * Will take over from opds-web-client to handle layout
  * of the app: header, main, footer. Will import from
@@ -21,9 +23,11 @@ const Layout: React.FC = ({ children }) => {
     <Styled.root
       sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
     >
+      <SkipNavigation />
       <GlobalStyles />
       <Header sx={{ width: "100%" }} />
       <main
+        id={CONTENT_ID}
         sx={{
           flex: "1 1 auto",
           width: "100%",
