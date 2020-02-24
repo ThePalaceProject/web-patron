@@ -1,4 +1,3 @@
-import { expect } from "chai";
 import { stub } from "sinon";
 
 import * as React from "react";
@@ -15,7 +14,7 @@ describe("BasicAuthButtonWithImage", () => {
   let onClick;
 
   beforeEach(() => {
-    let method: BasicAuthWithImageMethod = {
+    const method: BasicAuthWithImageMethod = {
       type: "method",
       description: "description",
       labels: { login: "login", password: "password" }
@@ -27,17 +26,19 @@ describe("BasicAuthButtonWithImage", () => {
     );
   });
 
-  it("shows button with no image", () => {
-    let button = wrapper.find("button");
-    expect(button.length).to.equal(1);
-    expect(button.text()).to.contain("Log in with description");
-    expect(button.props()["aria-label"]).to.equal("Log in with description");
-    let image = button.find("img");
-    expect(image.length).to.equal(0);
+  test("shows button with no image", () => {
+    const button = wrapper.find("button");
+    expect(button.length).toBe(1);
+    expect(button.text()).toEqual(
+      expect.arrayContaining(["Log in with description"])
+    );
+    expect(button.props()["aria-label"]).toBe("Log in with description");
+    const image = button.find("img");
+    expect(image.length).toBe(0);
   });
 
-  it("shows button with image", () => {
-    let method: BasicAuthWithImageMethod = {
+  test("shows button with image", () => {
+    const method: BasicAuthWithImageMethod = {
       type: "method",
       description: "description",
       labels: { login: "login", password: "password" },
@@ -47,18 +48,18 @@ describe("BasicAuthButtonWithImage", () => {
 
     wrapper = shallow(<BasicAuthButtonWithImage provider={provider} />);
 
-    let button = wrapper.find("button");
-    expect(button.length).to.equal(1);
-    expect(button.props()["aria-label"]).to.equal("Log in with description");
-    let image = button.find("img");
-    expect(image.length).to.equal(1);
-    expect(image.props().src).to.equal("logo.png");
-    expect(image.props().alt).to.equal("Log in with description");
+    const button = wrapper.find("button");
+    expect(button.length).toBe(1);
+    expect(button.props()["aria-label"]).toBe("Log in with description");
+    const image = button.find("img");
+    expect(image.length).toBe(1);
+    expect(image.props().src).toBe("logo.png");
+    expect(image.props().alt).toBe("Log in with description");
   });
 
-  it("calls onClick", () => {
-    let button = wrapper.find("button");
+  test("calls onClick", () => {
+    const button = wrapper.find("button");
     button.simulate("click");
-    expect(onClick.callCount).to.equal(1);
+    expect(onClick.callCount).toBe(1);
   });
 });

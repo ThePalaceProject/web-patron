@@ -1,4 +1,3 @@
-import { expect } from "chai";
 import { stub } from "sinon";
 
 import * as React from "react";
@@ -9,40 +8,38 @@ import ConfirmationPopup from "../ConfirmationPopup";
 
 describe("RevokeButton", () => {
   let wrapper;
-  let revoke = stub();
+  const revoke = stub();
 
   beforeEach(() => {
     wrapper = shallow(<RevokeButton revoke={revoke}>Revoke</RevokeButton>);
   });
 
-  it("shows button", () => {
-    let button = wrapper.find("button");
-    expect(button.text()).to.equal("Revoke");
-    expect(button.props().onClick).to.equal(
+  test("shows button", () => {
+    const button = wrapper.find("button");
+    expect(button.text()).toBe("Revoke");
+    expect(button.props().onClick).toBe(
       wrapper.instance().showConfirmationPopup
     );
   });
 
-  it("shows popup when button is clicked", () => {
-    let button = wrapper.find("button");
+  test("shows popup when button is clicked", () => {
+    const button = wrapper.find("button");
     button.simulate("click");
-    let popup = wrapper.find(ConfirmationPopup);
-    expect(popup.props().confirm).to.equal(wrapper.instance().revoke);
-    expect(popup.props().cancel).to.equal(
-      wrapper.instance().hideConfirmationPopup
-    );
-    expect(popup.props().text).to.contain("return");
+    const popup = wrapper.find(ConfirmationPopup);
+    expect(popup.props().confirm).toBe(wrapper.instance().revoke);
+    expect(popup.props().cancel).toBe(wrapper.instance().hideConfirmationPopup);
+    expect(popup.props().text).toEqual(expect.arrayContaining(["return"]));
   });
 
-  it("shows and hides popup", () => {
+  test("shows and hides popup", () => {
     wrapper.instance().showConfirmationPopup();
     wrapper.update();
     let popup = wrapper.find(ConfirmationPopup);
-    expect(popup.length).to.equal(1);
+    expect(popup.length).toBe(1);
 
     wrapper.instance().hideConfirmationPopup();
     wrapper.update();
     popup = wrapper.find(ConfirmationPopup);
-    expect(popup.length).to.equal(0);
+    expect(popup.length).toBe(0);
   });
 });

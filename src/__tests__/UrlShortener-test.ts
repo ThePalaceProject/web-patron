@@ -1,5 +1,3 @@
-import { expect } from "chai";
-
 import UrlShortener from "../UrlShortener";
 
 describe("UrlShortener", () => {
@@ -10,58 +8,58 @@ describe("UrlShortener", () => {
   describe("with shortening disabled", () => {
     const shortener = new UrlShortener(host, false);
 
-    it("prepares collection url", () => {
+    test("prepares collection url", () => {
       const url = host + collectionUrl;
-      expect(shortener.prepareCollectionUrl(url)).to.equal(
+      expect(shortener.prepareCollectionUrl(url)).toBe(
         "http%3A%2F%2Fexample.com%2Flibrary%2Fcollection%2Furl"
       );
     });
 
-    it("prepares book url", () => {
+    test("prepares book url", () => {
       const url = host + bookUrl;
-      expect(shortener.prepareBookUrl(url)).to.equal(
+      expect(shortener.prepareBookUrl(url)).toBe(
         "http%3A%2F%2Fexample.com%2Flibrary%2Fbook%2Furl"
       );
     });
 
-    it("expands collection url", () => {
+    test("expands collection url", () => {
       const url = host + collectionUrl;
-      expect(shortener.expandCollectionUrl(url)).to.equal(url);
+      expect(shortener.expandCollectionUrl(url)).toBe(url);
     });
 
-    it("expands book url", () => {
+    test("expands book url", () => {
       const url = host + "works/" + bookUrl;
-      expect(shortener.expandBookUrl(url)).to.equal(url);
+      expect(shortener.expandBookUrl(url)).toBe(url);
     });
   });
 
   describe("with shortening enabled", () => {
     const shortener = new UrlShortener(host, true);
 
-    it("prepares collection url", () => {
+    test("prepares collection url", () => {
       const url = host + collectionUrl;
-      expect(shortener.prepareCollectionUrl(url)).to.equal("collection%2Furl");
+      expect(shortener.prepareCollectionUrl(url)).toBe("collection%2Furl");
     });
 
-    it("prepares book url", () => {
+    test("prepares book url", () => {
       let url = host + "works/" + bookUrl;
-      expect(shortener.prepareBookUrl(url)).to.equal("book%2Furl");
+      expect(shortener.prepareBookUrl(url)).toBe("book%2Furl");
       // it preserves trailing slashes
       url += "/";
-      expect(shortener.prepareBookUrl(url)).to.equal("book%2Furl%2F");
+      expect(shortener.prepareBookUrl(url)).toBe("book%2Furl%2F");
       // but not starting slashes
       url = "/" + url;
-      expect(shortener.prepareBookUrl(url)).to.equal("book%2Furl%2F");
+      expect(shortener.prepareBookUrl(url)).toBe("book%2Furl%2F");
     });
 
-    it("expands collection url", () => {
+    test("expands collection url", () => {
       const url = host + collectionUrl;
-      expect(shortener.expandCollectionUrl(collectionUrl)).to.equal(url);
+      expect(shortener.expandCollectionUrl(collectionUrl)).toBe(url);
     });
 
-    it("expands book url", () => {
+    test("expands book url", () => {
       const url = host + "works/" + bookUrl;
-      expect(shortener.expandBookUrl(bookUrl)).to.equal(url);
+      expect(shortener.expandBookUrl(bookUrl)).toBe(url);
     });
   });
 });

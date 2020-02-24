@@ -1,10 +1,9 @@
-import { expect } from "chai";
 import { stub } from "sinon";
 
 import * as React from "react";
 import { mount } from "enzyme";
-
-import ReportProblemForm from "../ReportProblemForm";
+import book from "../../__tests__/fixtures/book";
+import ReportProblemForm from "../bookDetails/ReportProblem";
 
 describe("ReportProblemForm", () => {
   let wrapper;
@@ -18,71 +17,63 @@ describe("ReportProblemForm", () => {
     report = stub().returns(Promise.resolve());
     fetchTypes = stub().returns(Promise.resolve(types));
     close = stub();
-    wrapper = mount(
-      <ReportProblemForm
-        reportUrl="report url"
-        report={report}
-        fetchTypes={fetchTypes}
-        close={close}
-        types={types}
-      />
-    );
+    wrapper = mount(<ReportProblemForm book={book} />);
   });
 
   describe("rendering", () => {
-    it("displays title", () => {
+    test("displays title", () => {
       const title = wrapper.find("h3");
-      expect(title.text()).to.equal("Report a Problem");
+      expect(title.text()).toBe("Report a Problem");
     });
 
-    it("displays type dropdown", () => {
+    test("displays type dropdown", () => {
       const options = wrapper.find("select").find("option");
       const values = options.map(option => option.props().value);
       const names = options.map(option => option.text());
-      expect(values).to.deep.equal([""].concat(types));
-      expect(names).to.deep.equal(
+      expect(values).toEqual([""].concat(types));
+      expect(names).toEqual(
         ["choose a type"].concat(
           types.map(type => wrapper.instance().displayType(type))
         )
       );
     });
 
-    it("displays details input", () => {
+    test("displays details input", () => {
       const details = wrapper.find("textarea");
-      expect(details.props().placeholder).to.equal("details");
+      expect(details.props().placeholder).toBe("details");
     });
 
-    it("displays submit button", () => {
+    test("displays submit button", () => {
       const button = wrapper
         .find("button")
         .filterWhere(button => button.text() === "Submit");
-      expect(button.props().onClick).to.equal(wrapper.instance().submit);
+      expect(button.props().onClick).toBe(wrapper.instance().submit);
     });
 
-    it("displays cancel button", () => {
+    test("displays cancel button", () => {
       const button = wrapper
         .find("button")
         .filterWhere(button => button.text() === "Cancel");
-      expect(button.props().onClick).to.equal(close);
+      expect(button.props().onClick).toBe(close);
     });
   });
 
   describe("behavior", () => {
-    it("fetches types on mount", () => {
-      expect(fetchTypes.callCount).to.equal(1);
-      expect(fetchTypes.args[0][0]).to.equal("report url");
+    test("fetches types on mount", () => {
+      expect(fetchTypes.callCount).toBe(1);
+      expect(fetchTypes.args[0][0]).toBe("report url");
     });
 
-    it("displays error if submitted without type", () => {
+    test("displays error if submitted without type", () => {
       const button = wrapper
         .find("button")
         .filterWhere(button => button.text() === "Submit");
       button.simulate("click");
       const error = wrapper.find(".error");
-      expect(error.text()).to.equal("You must select a type");
+      expect(error.text()).toBe("You must select a type");
     });
 
-    it("submits", () => {
+    test("submits", () => {
       wrapper.instance().refs = {
         type: { value: "bad-description" },
         detail: { value: "what an imperfect description!" }
@@ -91,15 +82,15 @@ describe("ReportProblemForm", () => {
         .find("button")
         .filterWhere(button => button.text() === "Submit");
       button.simulate("click");
-      expect(report.callCount).to.equal(1);
-      expect(report.args[0][0]).to.equal("report url");
-      expect(report.args[0][1]).to.deep.equal({
+      expect(report.callCount).toBe(1);
+      expect(report.args[0][0]).toBe("report url");
+      expect(report.args[0][1]).toEqual({
         type: "bad-description",
         detail: "what an imperfect description!"
       });
     });
 
-    it("displays result and close button after submitting", async () => {
+    test("displays result and close button after submitting", async () => {
       wrapper.instance().refs = {
         type: { value: "bad-description" },
         detail: { value: "what an imperfect description!" }
@@ -107,18 +98,18 @@ describe("ReportProblemForm", () => {
       await wrapper.instance().submit();
 
       const title = wrapper.find("h3");
-      expect(title.text()).to.equal("Problem Reported");
+      expect(title.text()).toBe("Problem Reported");
       const closeButton = wrapper.find("button").at(1);
-      expect(closeButton.props().onClick).to.equal(close);
+      expect(closeButton.props().onClick).toBe(close);
     });
 
-    it("closes", () => {
+    test("closes", () => {
       wrapper.setState({ submitted: true });
       const closeButton = wrapper
         .find("button")
         .filterWhere(button => button.text() === "Close");
       closeButton.simulate("click");
-      expect(close.callCount).to.equal(1);
+      expect(close.callCount).toBe(1);
     });
   });
 });

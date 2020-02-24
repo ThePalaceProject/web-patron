@@ -76,3 +76,5 @@ export const bookFixture: BookData = {
     ]
   }
 };
+
+export default bookFixture;

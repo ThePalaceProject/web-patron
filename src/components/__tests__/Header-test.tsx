@@ -1,4 +1,3 @@
-import { expect } from "chai";
 import { spy } from "sinon";
 
 import * as React from "react";
@@ -46,87 +45,90 @@ describe("Header", () => {
   });
 
   describe("rendering", () => {
-    it("displays library name", () => {
+    test("displays library name", () => {
       const brand = wrapper.find(Navbar.Brand);
-      expect(brand.containsMatchingElement(context.library.catalogName)).to.be
-        .true;
+      expect(brand.containsMatchingElement(context.library.catalogName)).toBe(
+        true
+      );
     });
 
-    it("adds class if there's a logo", () => {
+    test("adds class if there's a logo", () => {
       const brand = wrapper.find(Navbar.Brand);
-      expect(brand.props().className).to.contain("with-logo");
+      expect(brand.props().className).toEqual(
+        expect.arrayContaining(["with-logo"])
+      );
     });
 
-    it("displays link to catalog", () => {
+    test("displays link to catalog", () => {
       const link = wrapper
         .find(CatalogLink)
         .filterWhere(link => link.children().text() === "Catalog");
-      expect(link.prop("collectionUrl")).to.equal("home url");
+      expect(link.prop("collectionUrl")).toBe("home url");
     });
 
-    it("displays link to loans when currently signed in", () => {
+    test("displays link to loans when currently signed in", () => {
       wrapper.setProps({ isSignedIn: true });
       const link = wrapper
         .find(CatalogLink)
         .filterWhere(link => link.children().text() === "My Books");
-      expect(link.prop("collectionUrl")).to.equal("loans url");
+      expect(link.prop("collectionUrl")).toBe("loans url");
     });
 
-    it("hides link to loans when signed out", () => {
+    test("hides link to loans when signed out", () => {
       const link = wrapper
         .find(CatalogLink)
         .filterWhere(link => link.children().text() === "My Books");
-      expect(link.length).to.equal(0);
+      expect(link.length).toBe(0);
     });
 
-    it("displays link to sign in if not currently signed in", () => {
+    test("displays link to sign in if not currently signed in", () => {
       const link = wrapper
         .find("a")
         .filterWhere(link => link.text() === "Sign In");
-      expect(link.prop("onClick")).to.equal(wrapper.instance().signIn);
+      expect(link.prop("onClick")).toBe(wrapper.instance().signIn);
     });
 
-    it("displays link to sign out if currently signed in", () => {
+    test("displays link to sign out if currently signed in", () => {
       wrapper.setProps({ isSignedIn: true });
       const link = wrapper
         .find("a")
         .filterWhere(link => link.text() === "Sign Out");
-      expect(link.text()).to.equal("Sign Out");
-      expect(link.prop("onClick")).to.equal(wrapper.instance().signOut);
+      expect(link.text()).toBe("Sign Out");
+      expect(link.prop("onClick")).toBe(wrapper.instance().signOut);
     });
 
-    it("displays header links from context", () => {
+    test("displays header links from context", () => {
       const link1 = wrapper
         .find("a")
         .filterWhere(link => link.text() === "link 1");
-      expect(link1.props().href).to.equal("http://link1");
+      expect(link1.props().href).toBe("http://link1");
       const link2 = wrapper
         .find("a")
         .filterWhere(link => link.text() === "link 2");
-      expect(link2.props().href).to.equal("http://link2");
+      expect(link2.props().href).toBe("http://link2");
     });
   });
 
   describe("behavior", () => {
-    it("fetches loans when sign in link is clicked", () => {
+    test("fetches loans when sign in link is clicked", () => {
       const link = wrapper
         .find("a")
         .filterWhere(link => link.text() === "Sign In");
       link.simulate("click");
-      expect(fetchLoans.callCount).to.equal(1);
-      expect(fetchLoans.args[0][0]).to.equal("loans url");
+      expect(fetchLoans.callCount).toBe(1);
+      expect(fetchLoans.args[0][0]).toBe("loans url");
     });
 
-    it("clears auth credentials and loads catalog when sign out link is clicked", () => {
+    test("clears auth credentials and loads catalog when sign out link is clicked", () => {
       wrapper.setProps({ isSignedIn: true });
       const link = wrapper
         .find("a")
         .filterWhere(link => link.text() === "Sign Out");
       link.simulate("click");
-      expect(clearAuthCredentials.called).to.equal(true);
-      expect(pathFor.args[0][0]).to.equal("home url");
-      expect(pathFor.args[0][1]).to.equal(null);
-      expect(push.args[0]).to.deep.equal([pathFor("home url", null)]);
+      expect(clearAuthCredentials.called).toBe(true);
+      expect(pathFor.args[0][0]).toBe("home url");
+      expect(pathFor.args[0][1]).toBe(null);
+      expect(push.args[0]).toEqual([pathFor("home url", null)]);
     });
   });
 });

@@ -9,7 +9,7 @@ describe("ReportProblemLink", () => {
   // let fetchTypes = stub();
   // let types = ["type1", "type2", "type3"];
 
-  it("fails", () => {
+  test("fails", () => {
     expect(1).toBe(2);
   });
   // beforeEach(() => {

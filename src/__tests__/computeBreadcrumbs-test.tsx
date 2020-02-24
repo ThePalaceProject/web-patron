@@ -1,5 +1,3 @@
-import { expect } from "chai";
-
 import computeBreadcrumbs from "../computeBreadcrumbs";
 
 describe("computeBreadcrumbs", () => {
@@ -13,7 +11,7 @@ describe("computeBreadcrumbs", () => {
   };
   const history = [];
 
-  it("uses breadcrumbs if they're in the raw collection data", () => {
+  test("uses breadcrumbs if they're in the raw collection data", () => {
     const raw = {
       "simplified:breadcrumbs": [
         {
@@ -33,10 +31,10 @@ describe("computeBreadcrumbs", () => {
       { url: "breadcrumb url", text: "breadcrumb title" },
       { url: collection.url, text: collection.title }
     ];
-    expect(computeBreadcrumbs(data, history)).to.deep.equal(expected);
+    expect(computeBreadcrumbs(data, history)).toEqual(expected);
   });
 
-  it("ignores trailing slashes when using hierarchyComputeBreadcrumbs", () => {
+  test("ignores trailing slashes when using hierarchyComputeBreadcrumbs", () => {
     let catalogRootLink = {
       url: "url/",
       text: "text"
@@ -44,7 +42,7 @@ describe("computeBreadcrumbs", () => {
 
     let data = Object.assign({}, collection, { catalogRootLink });
     let expected = [{ url: collection.url, text: collection.title }];
-    expect(computeBreadcrumbs(data, history)).to.deep.equal(expected);
+    expect(computeBreadcrumbs(data, history)).toEqual(expected);
 
     catalogRootLink = {
       url: "different url/",
@@ -56,6 +54,6 @@ describe("computeBreadcrumbs", () => {
       catalogRootLink,
       { url: collection.url, text: collection.title }
     ];
-    expect(computeBreadcrumbs(data, history)).to.deep.equal(expected);
+    expect(computeBreadcrumbs(data, history)).toEqual(expected);
   });
 });

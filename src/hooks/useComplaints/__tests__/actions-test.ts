@@ -1,6 +1,4 @@
-import { expect } from "chai";
 import { stub } from "sinon";
-
 import * as actions from "../actions";
 const fetchMock = require("fetch-mock");
 
@@ -13,41 +11,33 @@ describe("fetchComplaintTypes", () => {
 
   const reportUrl = "http://example.com/report";
 
-  it("dispatches request, load, and success", async () => {
+  test("dispatches request, load, and success", async () => {
     const dispatch = stub();
     fetchResponse = "type1\ntype2\ntype3";
     fetchMock.mock(reportUrl, fetchResponse);
 
-    const types = await actions.fetchComplaintTypes(reportUrl)(dispatch);
+    const types = await actions.fetchComplaintTypes(dispatch)(reportUrl);
 
-    expect(dispatch.callCount).to.equal(3);
-    expect(dispatch.args[0][0].type).to.equal(
-      actions.FETCH_COMPLAINT_TYPES_REQUEST
-    );
-    expect(dispatch.args[1][0].type).to.equal(
-      actions.FETCH_COMPLAINT_TYPES_SUCCESS
-    );
-    expect(dispatch.args[2][0].type).to.equal(actions.LOAD_COMPLAINT_TYPES);
-    expect(types).to.deep.equal(["type1", "type2", "type3"]);
+    expect(dispatch.callCount).toBe(3);
+    expect(dispatch.args[0][0].type).toBe("FETCH_COMPLAINT_TYPES_REQUEST");
+    expect(dispatch.args[1][0].type).toBe("FETCH_COMPLAINT_TYPES_SUCCESS");
+    expect(dispatch.args[2][0].type).toBe("LOAD_COMPLAINT_TYPES");
+    expect(types).toEqual(["type1", "type2", "type3"]);
   });
 
-  it("dispatches failure", async () => {
+  test("dispatches failure", async () => {
     const dispatch = stub();
     fetchMock.mock(reportUrl, Promise.reject({ message: "test error" }));
 
     try {
-      await actions.fetchComplaintTypes(reportUrl)(dispatch);
+      await actions.fetchComplaintTypes(dispatch)(reportUrl);
       // Should not get here
-      expect(false).to.equal(true);
+      expect(false).toBe(true);
     } catch (err) {
-      expect(dispatch.callCount).to.equal(2);
-      expect(dispatch.args[0][0].type).to.equal(
-        actions.FETCH_COMPLAINT_TYPES_REQUEST
-      );
-      expect(dispatch.args[1][0].type).to.equal(
-        actions.FETCH_COMPLAINT_TYPES_FAILURE
-      );
-      expect(err).to.deep.equal({ message: "test error" });
+      expect(dispatch.callCount).toBe(2);
+      expect(dispatch.args[0][0].type).toBe("FETCH_COMPLAINT_TYPES_REQUEST");
+      expect(dispatch.args[1][0].type).toBe("FETCH_COMPLAINT_TYPES_FAILURE");
+      expect(err).toEqual({ message: "test error" });
     }
   });
 
@@ -58,36 +48,32 @@ describe("fetchComplaintTypes", () => {
       detail: "i would love it if this description were written as a sonnet"
     };
 
-    it("dispatches request, load, and success", async () => {
+    test("dispatches request, load, and success", async () => {
       const dispatch = stub();
       fetchResponse = null;
       fetchMock.mock(reportUrl, { status: 200, body: fetchResponse });
 
-      const types = await actions.postComplaint(reportUrl, data)(dispatch);
+      const types = await actions.postComplaint(dispatch)(reportUrl)(data);
 
-      expect(dispatch.callCount).to.equal(2);
-      expect(dispatch.args[0][0].type).to.equal(actions.POST_COMPLAINT_REQUEST);
-      expect(dispatch.args[1][0].type).to.equal(actions.POST_COMPLAINT_SUCCESS);
-      expect(types).to.equal(undefined);
+      expect(dispatch.callCount).toBe(2);
+      expect(dispatch.args[0][0].type).toBe("POST_COMPLAINT_REQUEST");
+      expect(dispatch.args[1][0].type).toBe("POST_COMPLAINT_SUCCESS");
+      expect(types).toBeUndefined();
     });
 
-    it("dispatches failure", async () => {
+    test("dispatches failure", async () => {
       const dispatch = stub();
       fetchMock.mock(reportUrl, Promise.reject({ message: "test error" }));
 
       try {
-        await actions.postComplaint(reportUrl, data)(dispatch);
+        await actions.postComplaint(dispatch)(reportUrl)(data);
         // Should not get here
-        expect(false).to.equal(true);
+        expect(false).toBe(true);
       } catch (err) {
-        expect(dispatch.callCount).to.equal(2);
-        expect(dispatch.args[0][0].type).to.equal(
-          actions.POST_COMPLAINT_REQUEST
-        );
-        expect(dispatch.args[1][0].type).to.equal(
-          actions.POST_COMPLAINT_FAILURE
-        );
-        expect(err).to.deep.equal({ message: "test error" });
+        expect(dispatch.callCount).toBe(2);
+        expect(dispatch.args[0][0].type).toBe("POST_COMPLAINT_REQUEST");
+        expect(dispatch.args[1][0].type).toBe("POST_COMPLAINT_FAILURE");
+        expect(err).toEqual({ message: "test error" });
       }
     });
   });

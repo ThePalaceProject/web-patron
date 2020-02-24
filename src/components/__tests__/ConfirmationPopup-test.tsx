@@ -1,4 +1,3 @@
-import { expect } from "chai";
 import { stub } from "sinon";
 
 import * as React from "react";
@@ -25,24 +24,24 @@ describe("ConfirmationPopup", () => {
     );
   });
 
-  it("shows popup", () => {
-    let popup = wrapper.find(".confirmation-popup");
-    expect(popup.text()).to.contain("are you sure");
-    let confirmButton = wrapper.find(".confirm-button");
-    let cancelButton = wrapper.find(".cancel-button");
-    expect(confirmButton.text()).to.equal("confirm");
-    expect(cancelButton.text()).to.equal("cancel");
+  test("shows popup", () => {
+    const popup = wrapper.find(".confirmation-popup");
+    expect(popup.text()).toEqual(expect.arrayContaining(["are you sure"]));
+    const confirmButton = wrapper.find(".confirm-button");
+    const cancelButton = wrapper.find(".cancel-button");
+    expect(confirmButton.text()).toBe("confirm");
+    expect(cancelButton.text()).toBe("cancel");
   });
 
-  it("calls confirm", () => {
-    let confirmButton = wrapper.find(".confirm-button");
+  test("calls confirm", () => {
+    const confirmButton = wrapper.find(".confirm-button");
     confirmButton.simulate("click");
-    expect(confirm.callCount).to.equal(1);
+    expect(confirm.callCount).toBe(1);
   });
 
-  it("calls cancel", () => {
-    let cancelButton = wrapper.find(".cancel-button");
+  test("calls cancel", () => {
+    const cancelButton = wrapper.find(".cancel-button");
     cancelButton.simulate("click");
-    expect(cancel.callCount).to.equal(1);
+    expect(cancel.callCount).toBe(1);
   });
 });

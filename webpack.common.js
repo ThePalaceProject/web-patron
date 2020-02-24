@@ -65,25 +65,8 @@ let webpackConfig = {
         use: {
           loader: "babel-loader",
           options: {
-            sourceType: "unambiguous",
-            cacheDirectory: true,
-            babelrc: false,
-            presets: [
-              [
-                "@babel/preset-env",
-                { targets: { browsers: "last 2 versions" } } // or whatever your project requires
-              ],
-              "@babel/preset-typescript",
-              "@babel/preset-react"
-            ],
-            plugins: [
-              "@babel/plugin-transform-runtime",
-              ["@babel/plugin-proposal-class-properties", { loose: true }],
-              "react-hot-loader/babel",
-              "@babel/plugin-proposal-optional-chaining",
-              "@babel/plugin-proposal-nullish-coalescing-operator",
-              "emotion"
-            ]
+            babelrc: true,
+            cacheDirectory: true
           }
         }
       },

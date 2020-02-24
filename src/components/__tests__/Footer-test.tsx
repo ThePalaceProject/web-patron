@@ -1,5 +1,3 @@
-import { expect } from "chai";
-
 import * as React from "react";
 import { shallow } from "enzyme";
 
@@ -26,7 +24,7 @@ describe("Footer", () => {
   });
 
   describe("rendering", () => {
-    it("displays links", () => {
+    test("displays links", () => {
       // let links = wrapper.find("a");
       // expect(links.length).to.equal(2);
       // let aboutLink = links.at(0);
@@ -35,7 +33,7 @@ describe("Footer", () => {
       // expect(termsLink.props().href).to.equal("terms");
       // expect(aboutLink.text()).to.equal("About");
       // expect(termsLink.text()).to.equal("Terms of Service");
-      expect(true).to.equal(false);
+      expect(true).toBe(false);
     });
   });
 });
