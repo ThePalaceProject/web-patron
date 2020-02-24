@@ -48,7 +48,9 @@ const BasicAuthForm: React.FC<AuthFormProps<BasicAuthMethod>> = ({
       onSubmit={handleSubmit(onSubmit)}
       sx={{ display: "flex", flexDirection: "column" }}
     >
-      <span sx={{ color: "warn" }}>{serverError}</span>
+      <span sx={{ color: "warn" }}>
+        {serverError && `Error: ${serverError}`}
+      </span>
       <FormInput
         name="barcode"
         label="Barcode"
