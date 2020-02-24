@@ -15,9 +15,10 @@ const App: React.FunctionComponent = () => {
 
   return (
     <ErrorBoundary fallback={AppErrorFallback}>
-      <Helmet>
-        <title>{library.catalogName}</title>
-      </Helmet>
+      <Helmet
+        titleTemplate={`%s | ${library.catalogName}`}
+        defaultTitle={library.catalogName}
+      />
       <ThemeProvider theme={theme}>
         <Auth>
           <Layout>

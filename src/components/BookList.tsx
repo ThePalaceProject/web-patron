@@ -105,6 +105,7 @@ const BookListItem: React.FC<{ book: BookData }> = ({ book }) => {
         p: 3,
         m: 3
       }}
+      aria-label={`Book: ${book.title}`}
     >
       <div sx={{ mx: 1, flex: "0 1 40%", display: "flex" }}>
         <Link to={url}>
@@ -127,6 +128,7 @@ const BookListItem: React.FC<{ book: BookData }> = ({ book }) => {
           flex: "0 1 40%",
           display: "flex"
         }}
+        aria-label="Book metadata"
       >
         <div>
           <DetailField heading="Publisher" details={book.publisher} />

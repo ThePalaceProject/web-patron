@@ -81,6 +81,7 @@ const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
               id="complaint-type"
               name="type"
               ref={register({ required: "Please choose a type" })}
+              aria-describedby="complaint-type-error"
             >
               {state.types.map(type => (
                 <option key={type} value={type}>
@@ -89,7 +90,10 @@ const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
               ))}
             </Select>
             {errors.type && (
-              <span sx={{ color: "warn", fontStyle: "italic" }}>
+              <span
+                id="complaint-type-error"
+                sx={{ color: "warn", fontStyle: "italic" }}
+              >
                 {errors.type.message}
               </span>
             )}
@@ -101,9 +105,13 @@ const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
                 required: "Please enter details about the problem."
               })}
               sx={{ alignSelf: "stretch", maxWidth: "100%" }}
+              aria-describedby="complaint-body-error"
             />
             {errors.detail && (
-              <span sx={{ color: "warn", fontStyle: "italic" }}>
+              <span
+                id="complaint-body-error"
+                sx={{ color: "warn", fontStyle: "italic" }}
+              >
                 {errors.detail.message}
               </span>
             )}

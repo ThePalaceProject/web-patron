@@ -2,6 +2,7 @@ import { useHistory } from "react-router-dom";
 import * as React from "react";
 import useTypedSelector from "./useTypedSelector";
 import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
+import useCatalogLink from "./useCatalogLink";
 
 /**
  * Will get auth data from cookies and make sure it's saved to redux
@@ -13,11 +14,12 @@ function useAuth() {
   const isSignedIn = !!authState?.credentials;
   const { fetcher, actions, dispatch } = useActions();
   const history = useHistory();
+  const homeUrl = useCatalogLink(undefined, undefined);
 
   const signOut = () => dispatch(actions.clearAuthCredentials());
   const signOutAndGoHome = () => {
     signOut();
-    history.push("/");
+    history.push(homeUrl);
   };
   /**
    * On mount, we need to check for auth data in cookies. This used

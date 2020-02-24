@@ -39,7 +39,7 @@ const BookDetails: React.FC<BookDetailsPropsNew> = ({
 
   if (!book) return <PageLoader />;
   return (
-    <div>
+    <section aria-label="Book details">
       <Helmet>
         <title>{book.title}</title>
       </Helmet>
@@ -75,7 +75,7 @@ const BookDetails: React.FC<BookDetailsPropsNew> = ({
           </div>
 
           {/* title, details, summary */}
-          <div sx={{ flex: 2, m: 2 }}>
+          <section aria-label="Book Info" sx={{ flex: 2, m: 2 }}>
             <Styled.h1
               sx={{
                 variant: "text.bookTitle",
@@ -97,7 +97,7 @@ const BookDetails: React.FC<BookDetailsPropsNew> = ({
             />
             <ReportProblem book={book} />
             <Summary sx={{ display: ["none", "none", "block"] }} book={book} />
-          </div>
+          </section>
         </div>
         {/* the summary is displayed below when on small screens */}
         <Summary book={book} sx={{ display: ["block", "block", "none"] }} />
@@ -114,7 +114,7 @@ const BookDetails: React.FC<BookDetailsPropsNew> = ({
         </div>
       </div>
       <Recommendations book={book} />
-    </div>
+    </section>
   );
 };
 
@@ -122,7 +122,7 @@ const Summary: React.FC<{ book: BookData; className?: string }> = ({
   book,
   className
 }) => (
-  <div sx={{ my: 2 }} className={className}>
+  <div sx={{ my: 2 }} className={className} aria-label="Book summary">
     <Styled.h2 sx={{ mb: 3 }}>Summary</Styled.h2>
     <div
       dangerouslySetInnerHTML={{
@@ -143,7 +143,8 @@ const DownloadRequirements: React.FC<{ className?: string }> = ({
   className
 }) => {
   return (
-    <div
+    <section
+      aria-label="Download requirements"
       sx={{
         border: "1px solid",
         borderColor: "primary",
@@ -158,8 +159,13 @@ const DownloadRequirements: React.FC<{ className?: string }> = ({
       }}
       className={className}
     >
-      <Styled.h5 sx={{ m: 0, mb: 2 }}>Download Requirements:</Styled.h5>
-      <ol sx={{ m: 0, p: 0, pl: 3, fontSize: 1 }}>
+      <Styled.h1 id="requirements-header" sx={{ fontSize: 2, m: 0, mb: 2 }}>
+        Download Requirements:
+      </Styled.h1>
+      <ol
+        sx={{ m: 0, p: 0, pl: 3, fontSize: 1 }}
+        aria-labelledby="requirements-header"
+      >
         <li>
           <ExternalLink href="https://accounts.adobe.com/">
             Create Adobe ID
@@ -177,7 +183,7 @@ const DownloadRequirements: React.FC<{ className?: string }> = ({
           <span>* Or another Adobe-compatible application</span>
         </li>
       </ol>
-    </div>
+    </section>
   );
 };
 

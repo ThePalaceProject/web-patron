@@ -77,10 +77,11 @@ export const multiLibraryRoutes = [
     component: Collection
   },
   {
-    path: "*",
+    path: "/:library/*",
     component: NoMatch,
     exact: false
   }
+  // other no match like /blahblahblah will be handled by the server
 ];
 
 export default multiLibraryRoutes;

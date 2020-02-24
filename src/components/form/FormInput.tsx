@@ -16,6 +16,7 @@ type FormInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
  */
 const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
   ({ type = "text", label, name, error, required, ...props }, ref) => {
+    const describedById = `${name}-errors`;
     return (
       <div role="group" sx={{ mb: 2 }}>
         <FormLabel sx={{ mb: 1, display: "inline-block" }} htmlFor={name}>
@@ -26,6 +27,7 @@ const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
           id={name}
           name={name}
           aria-label={`${name} input`}
+          aria-describedby={describedById}
           ref={ref}
           type={type}
           sx={{
@@ -34,7 +36,9 @@ const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
           }}
           {...props}
         />
-        <span sx={{ color: "warn", fontStyle: "italic" }}>{error}</span>
+        <span id={describedById} sx={{ color: "warn", fontStyle: "italic" }}>
+          {error}
+        </span>
       </div>
     );
   }

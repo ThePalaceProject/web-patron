@@ -48,6 +48,7 @@ const BasicAuthForm: React.FC<AuthFormProps<BasicAuthMethod>> = ({
       onSubmit={handleSubmit(onSubmit)}
       sx={{ display: "flex", flexDirection: "column" }}
     >
+      <span sx={{ color: "warn" }}>{serverError}</span>
       <FormInput
         name="barcode"
         label="Barcode"
@@ -65,7 +66,6 @@ const BasicAuthForm: React.FC<AuthFormProps<BasicAuthMethod>> = ({
         placeholder="Pin"
         error={errors?.pin && "Your pin is required."}
       />
-      <span sx={{ color: "warn" }}>{serverError}</span>
       <Button type="submit" sx={{ alignSelf: "flex-end", m: 2 }}>
         Login
       </Button>

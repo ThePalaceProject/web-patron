@@ -14,6 +14,7 @@ import Button from "./Button";
 import useTypedSelector from "../hooks/useTypedSelector";
 import { ListView } from "./BookList";
 import { PageLoader } from "./LoadingIndicator";
+import { Helmet } from "react-helmet-async";
 
 const MyBooks: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
   setCollectionAndBook
@@ -39,17 +40,29 @@ const MyBooks: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
           flexDirection: "column"
         }}
       >
+        <Helmet>
+          <title>My Books</title>
+        </Helmet>
         <Styled.h4>You need to be signed in to view this page.</Styled.h4>
       </div>
     );
   if (collection.data?.books && collection.data.books.length > 0) {
-    const signOutButton = <Button onClick={signOutAndGoHome}>Sign out</Button>;
+    const signOutButton = (
+      <Button aria-label="Sign out and go home" onClick={signOutAndGoHome}>
+        Sign out
+      </Button>
+    );
     return (
-      <ListView
-        books={collection.data?.books}
-        showBorrowButton
-        breadcrumb={signOutButton}
-      />
+      <React.Fragment>
+        <Helmet>
+          <title>My Books</title>
+        </Helmet>
+        <ListView
+          books={collection.data?.books}
+          showBorrowButton
+          breadcrumb={signOutButton}
+        />
+      </React.Fragment>
     );
   }
 
@@ -64,6 +77,9 @@ const MyBooks: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
         flexDirection: "column"
       }}
     >
+      <Helmet>
+        <title>My Books</title>
+      </Helmet>
       <Styled.h3 sx={{ color: "primaries.medium" }}>
         Your books will show up here when you have any loaned or on hold.
       </Styled.h3>

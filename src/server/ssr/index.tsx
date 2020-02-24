@@ -86,7 +86,6 @@ const ssr = ({
     const library = match?.params?.library;
     const collectionUrl = match?.params?.collectionUrl;
     const bookUrl = match?.params?.bookUrl;
-
     /**
      * Build out libraryData
      * Send 404 if we fail to get it from the cache

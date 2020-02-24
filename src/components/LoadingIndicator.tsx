@@ -22,7 +22,7 @@ export const PageLoader: React.FC = props => {
       }}
     >
       <LoadingIndicator />
-      <Styled.h4>Loading...</Styled.h4>
+      <Styled.h1 sx={{ fontSize: 2 }}>Loading...</Styled.h1>
     </div>
   );
 };

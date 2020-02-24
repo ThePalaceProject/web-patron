@@ -46,9 +46,19 @@ const Collection: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
   } else if (hasBooks) {
     const books = collectionData?.books ?? [];
     return view === "LIST" ? (
-      <ListView books={books} breadcrumb={<ListFilters />} />
+      <React.Fragment>
+        <Helmet>
+          <title>{collectionData.title}</title>
+        </Helmet>
+        <ListView books={books} breadcrumb={<ListFilters />} />
+      </React.Fragment>
     ) : (
-      <GalleryView books={books} breadcrumb={<ListFilters />} />
+      <React.Fragment>
+        <Helmet>
+          <title>{collectionData.title}</title>
+        </Helmet>
+        <GalleryView books={books} breadcrumb={<ListFilters />} />
+      </React.Fragment>
     );
   }
 

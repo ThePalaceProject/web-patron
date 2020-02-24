@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx, Styled } from "theme-ui";
 import * as React from "react";
-import { useDialogState, Dialog, DialogBackdrop } from "reakit/Dialog";
+import { useDialogState } from "reakit/Dialog";
 import useLibraryContext from "./context/LibraryContext";
 import useAuth from "../hooks/useAuth";
 import { getBasicAuthProvider } from "../utils/auth";

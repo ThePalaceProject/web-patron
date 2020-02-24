@@ -25,12 +25,13 @@ const BookCover: React.FC<{ book: BookData; className?: string }> = ({
         backgroundColor: "primaries.light",
         overflow: "hidden"
       }}
+      aria-label={`Cover of book: ${book.title}`}
+      role="img"
     >
       <AspectImage
         ratio={2 / 3}
-        alt="Book Cover"
+        alt={`Cover of book: ${book.title}`}
         src={imageUrl}
-        role="presentation"
         sx={{
           position: "absolute",
           top: 0,
