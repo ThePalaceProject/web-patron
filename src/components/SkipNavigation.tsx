@@ -27,7 +27,6 @@ const SkipNavigation = props => (
         left: 10,
         m: 2,
         fontWeight: "bold",
-        // color: "primary",
         bg: "white",
         width: "auto",
         height: "auto",

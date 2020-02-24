@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx, Styled } from "theme-ui";
 import * as React from "react";
-import { useDialogState } from "reakit/Dialog";
+import { useDialogState, DialogDisclosure } from "reakit/Dialog";
 import useLibraryContext from "./context/LibraryContext";
 import useAuth from "../hooks/useAuth";
 import { getBasicAuthProvider } from "../utils/auth";
@@ -61,6 +61,10 @@ const Auth: React.FC = ({ children }) => {
             "Basic auth provider is missing."
           ))}
       </Modal>
+      {/* We render this to provide the dialog a focus target after it closes
+          even though we don't open the dialog with a button
+      */}
+      <DialogDisclosure sx={{ display: "none" }} {...dialog} />
       {children}
     </React.Fragment>
   );
