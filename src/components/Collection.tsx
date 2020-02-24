@@ -30,10 +30,8 @@ const Collection: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
     return <PageLoader />;
   }
 
-  const hasLanes = (collectionData?.lanes?.length ?? 0) > 0;
-  const hasBooks = (collectionData?.books?.length ?? 0) > 0;
-
-  if (hasLanes) {
+  // if we have lanes, show them
+  if (collectionData?.lanes && collectionData.lanes.length > 0) {
     const lanes = collectionData?.lanes ?? [];
     return (
       <div>
@@ -43,21 +41,20 @@ const Collection: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
         <LanesView lanes={lanes} />
       </div>
     );
-  } else if (hasBooks) {
-    const books = collectionData?.books ?? [];
-    return view === "LIST" ? (
+  }
+  // alternatively, we might have books instead
+  if (collectionData?.books && collectionData.books.length > 0) {
+    const books = collectionData.books;
+    return (
       <React.Fragment>
         <Helmet>
           <title>{collectionData.title}</title>
         </Helmet>
-        <ListView books={books} breadcrumb={<ListFilters />} />
-      </React.Fragment>
-    ) : (
-      <React.Fragment>
-        <Helmet>
-          <title>{collectionData.title}</title>
-        </Helmet>
-        <GalleryView books={books} breadcrumb={<ListFilters />} />
+        {view === "LIST" ? (
+          <ListView books={books} breadcrumb={<ListFilters />} />
+        ) : (
+          <GalleryView books={books} breadcrumb={<ListFilters />} />
+        )}
       </React.Fragment>
     );
   }
