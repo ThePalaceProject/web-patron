@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { bookFixture } from "./../../__tests__/fixtures/book";
-import { getAuthors } from "src/utils/book";
+import { getAuthors } from "../book";
 describe("book utils", () => {
   /**
    * returns all authors default
