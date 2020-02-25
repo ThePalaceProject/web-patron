@@ -7,3 +7,4 @@ npm-debug.log
 config_file.txt
 .yalc
 yalc.lock
+wallaby.js
