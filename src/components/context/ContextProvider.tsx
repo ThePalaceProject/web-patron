@@ -6,7 +6,6 @@ import { UrlShortenerProvider } from "./UrlShortenerContext";
 import PathForProvider from "opds-web-client/lib/components/context/PathForContext";
 import { RouterProvider } from "./RouterContext";
 import OPDSStore from "opds-web-client/lib/components/context/StoreContext";
-import BasicAuthWithButtonImagePlugin from "../../auth/BasicAuthWithButtonImagePlugin";
 import { RecommendationsProvider } from "./RecommendationsContext";
 import { ActionsProvider } from "opds-web-client/lib/components/context/ActionsContext";
 import { Provider as ReakitProvider } from "reakit";
@@ -53,10 +52,7 @@ const AppContextProvider: React.FC<ProviderProps> = ({
       <ReakitProvider>
         <RouterProvider>
           <PathForProvider pathFor={pathFor}>
-            <OPDSStore
-              initialState={initialState}
-              authPlugins={[BasicAuthWithButtonImagePlugin]}
-            >
+            <OPDSStore initialState={initialState}>
               <RecommendationsProvider>
                 <ActionsProvider>
                   <LibraryProvider library={library}>
