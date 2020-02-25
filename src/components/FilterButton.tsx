@@ -1,11 +1,11 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { Theme } from "src/theme";
+import { Theme } from "../theme";
 import { NavButton } from "./Button";
 
 type FilterButtonProps = { selected: boolean } & React.ComponentProps<
-  typeof Button
+  typeof NavButton
 >;
 const FilterButton: React.FC<FilterButtonProps> = ({
   selected,

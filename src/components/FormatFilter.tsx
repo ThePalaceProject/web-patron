@@ -2,8 +2,7 @@
 import { jsx, Flex } from "theme-ui";
 import * as React from "react";
 import useTypedSelector from "../hooks/useTypedSelector";
-import { useHistory, Route } from "react-router-dom";
-import useCatalogLink from "../hooks/useCatalogLink";
+import { Route } from "react-router-dom";
 import { Book, Headset } from "../icons";
 import FilterButton from "./FilterButton";
 
@@ -31,26 +30,20 @@ const FormatFilter: React.FC = () => {
     facet => facet.label === "All"
   );
 
-  const history = useHistory();
-
-  const audioBookUrl = useCatalogLink(undefined, audiobookFacet?.href);
-  const ebookFacetUrl = useCatalogLink(undefined, ebookFacet?.href);
-  const allFacetUrl = useCatalogLink(undefined, allFacet?.href);
-
   if (!ebookFacet || !audiobookFacet) return null;
   return (
     <Route path={["/", "/collection/:collectionUrl"]} exact>
       <Flex sx={{ py: 0 }}>
         {allFacet && (
           <FilterButton
-            onClick={() => allFacet.href && history.push(allFacetUrl)}
+            collectionUrl={allFacet.href}
             selected={allFacet.active}
           >
             ALL
           </FilterButton>
         )}
         <FilterButton
-          onClick={() => ebookFacet.href && history.push(ebookFacetUrl)}
+          collectionUrl={ebookFacet.href}
           selected={!!ebookFacet.active}
           aria-label="Books"
         >
@@ -58,7 +51,7 @@ const FormatFilter: React.FC = () => {
         </FilterButton>
         <FilterButton
           aria-label="Audiobooks"
-          onClick={() => audiobookFacet.href && history.push(audioBookUrl)}
+          collectionUrl={audiobookFacet.href}
           selected={!!audiobookFacet.active}
         >
           <Headset sx={{ fontSize: 4, m: 0, p: 0 }} />
