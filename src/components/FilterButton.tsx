@@ -23,6 +23,8 @@ const FilterButton: React.FC<FilterButtonProps> = ({
   };
   return (
     <NavButton
+      role="tab"
+      aria-selected={selected}
       className={className}
       sx={{
         height: 40,

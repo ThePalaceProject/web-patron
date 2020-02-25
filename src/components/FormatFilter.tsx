@@ -1,5 +1,6 @@
 /** @jsx jsx */
 import { jsx, Flex } from "theme-ui";
+import { Group } from "reakit";
 import * as React from "react";
 import useTypedSelector from "../hooks/useTypedSelector";
 import { Route } from "react-router-dom";
@@ -33,7 +34,7 @@ const FormatFilter: React.FC = () => {
   if (!ebookFacet || !audiobookFacet) return null;
   return (
     <Route path={["/", "/collection/:collectionUrl"]} exact>
-      <Flex sx={{ py: 0 }}>
+      <Group role="tablist" sx={{ display: "flex", py: 0 }}>
         {allFacet && (
           <FilterButton
             collectionUrl={allFacet.href}
@@ -56,7 +57,7 @@ const FormatFilter: React.FC = () => {
         >
           <Headset sx={{ fontSize: 4, m: 0, p: 0 }} />
         </FilterButton>
-      </Flex>
+      </Group>
     </Route>
   );
 };

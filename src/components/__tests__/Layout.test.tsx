@@ -9,13 +9,12 @@ import merge from "deepmerge";
 - [ ]  Clicking my books navigates
 - [ ]  Format filters are visible (home, collection)
 - [ ]  Clicking format filter navigates
+- format filter shows active state
 - [ ]  Clicking home goes home
 - Displays children
 - Provides global styles
 - Footer
  */
-
-// file.only
 
 test("Library name button navigates home", () => {
   const node = render(<Layout>Child</Layout>);
@@ -91,18 +90,44 @@ test("format filters navigate to respective urls", () => {
     initialState: stateWithFacets
   });
 
-  expect(node.queryByText("ALL")?.closest("a")).toHaveAttribute("href", "/all");
-  expect(node.queryByLabelText("Books")).toBeNull();
-  expect(node.queryByLabelText("Audiobooks")).toBeNull();
+  expect(node.queryByText("ALL")?.closest("a")).toHaveAttribute(
+    "href",
+    "/collection/all"
+  );
+  expect(node.queryByLabelText("Books")?.closest("a")).toHaveAttribute(
+    "href",
+    "/collection/ebooks"
+  );
+  expect(node.queryByLabelText("Audiobooks")?.closest("a")).toHaveAttribute(
+    "href",
+    "/collection/audiobooks"
+  );
 });
 
-test("format filter displays active state", () => {
+test("format filter has selected aria state", () => {
   const node = render(<Layout>Child</Layout>, {
     route: "/collection/blah",
     initialState: stateWithFacets
   });
-
-  expect(node.queryByText("ALL")).toBeNull();
-  expect(node.queryByLabelText("Books")).toBeNull();
-  expect(node.queryByLabelText("Audiobooks")).toBeNull();
+  // need to test both visual and aria here
+  expect(node.queryByText("ALL")?.closest("a")).toHaveAttribute(
+    "aria-selected",
+    "false"
+  );
+  expect(node.queryByLabelText("Books")?.closest("a")).toHaveAttribute(
+    "aria-selected",
+    "true"
+  );
+  expect(node.queryByLabelText("Audiobooks")?.closest("a")).toHaveAttribute(
+    "aria-selected",
+    "false"
+  );
 });
+
+/**
+ * Gallery selectors
+ */
+
+/**
+ * Footer
+ */
