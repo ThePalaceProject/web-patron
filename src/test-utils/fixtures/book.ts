@@ -1,6 +1,6 @@
 import { BookData } from "opds-web-client/lib/interfaces";
 
-export const bookFixture: BookData = {
+export const book: BookData = {
   id: "urn:librarysimplified.org/terms/id/3M%20ID/crrmnr9",
   url: "http://circulation.librarysimplified.org/works/3M/crrmnr9",
   title: "The Mayan Secrets",
@@ -77,4 +77,4 @@ export const bookFixture: BookData = {
   }
 };
 
-export default bookFixture;
+export default book;

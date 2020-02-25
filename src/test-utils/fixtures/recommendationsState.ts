@@ -1,4 +1,4 @@
-import { RecommendationsState } from "./../../interfaces";
+import { RecommendationsState } from "../../interfaces";
 /**
  * This huge fixture was copied over from the recommendationsState
  * fetched when viewing "Emma" by Jane Austen.

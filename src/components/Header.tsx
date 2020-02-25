@@ -8,7 +8,6 @@ import { NavButton as NavButtonBase } from "./Button";
 import useCatalogLink from "../hooks/useCatalogLink";
 import Link from "./Link";
 import BookIcon from "../icons/Book";
-import SettingsIcon from "../icons/Settings";
 import useLibraryContext from "./context/LibraryContext";
 import FormatFilter from "./FormatFilter";
 import ViewSelector from "./ViewSelector";

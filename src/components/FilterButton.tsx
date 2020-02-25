@@ -2,7 +2,7 @@
 import { jsx } from "theme-ui";
 import * as React from "react";
 import { Theme } from "src/theme";
-import Button from "./Button";
+import { NavButton } from "./Button";
 
 type FilterButtonProps = { selected: boolean } & React.ComponentProps<
   typeof Button
@@ -22,7 +22,7 @@ const FilterButton: React.FC<FilterButtonProps> = ({
       : undefined
   };
   return (
-    <Button
+    <NavButton
       className={className}
       sx={{
         height: 40,
@@ -41,7 +41,7 @@ const FilterButton: React.FC<FilterButtonProps> = ({
       {...props}
     >
       {children}
-    </Button>
+    </NavButton>
   );
 };
 

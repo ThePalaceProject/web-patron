@@ -2,7 +2,7 @@
 import { jsx, Flex } from "theme-ui";
 import * as React from "react";
 import useTypedSelector from "../hooks/useTypedSelector";
-import { useHistory, Route, useRouteMatch } from "react-router-dom";
+import { useHistory, Route } from "react-router-dom";
 import useCatalogLink from "../hooks/useCatalogLink";
 import { Book, Headset } from "../icons";
 import FilterButton from "./FilterButton";
@@ -52,10 +52,12 @@ const FormatFilter: React.FC = () => {
         <FilterButton
           onClick={() => ebookFacet.href && history.push(ebookFacetUrl)}
           selected={!!ebookFacet.active}
+          aria-label="Books"
         >
           <Book sx={{ fontSize: 4 }} />
         </FilterButton>
         <FilterButton
+          aria-label="Audiobooks"
           onClick={() => audiobookFacet.href && history.push(audioBookUrl)}
           selected={!!audiobookFacet.active}
         >

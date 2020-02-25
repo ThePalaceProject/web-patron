@@ -1,9 +1,9 @@
 import * as React from "react";
 import { action } from "@storybook/addon-actions";
 import Recommendations from "../recommendations";
-import { bookFixture } from "../../../__tests__/fixtures/book";
+import { bookFixture } from "../../../test-utils/fixtures/book";
 import { RecommendationsStateContext } from "../../context/RecommendationsContext";
-import { recommendationsState } from "../../../__tests__/fixtures/recommendationsState";
+import { recommendationsState } from "../../../test-utils/fixtures/recommendationsState";
 import { LaneData, CollectionData } from "opds-web-client/lib/interfaces";
 import { RecommendationsState } from "src/interfaces";
 

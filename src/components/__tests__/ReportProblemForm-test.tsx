@@ -2,7 +2,7 @@ import { stub } from "sinon";
 
 import * as React from "react";
 import { mount } from "enzyme";
-import book from "../../__tests__/fixtures/book";
+import book from "../../test-utils/fixtures/book";
 import ReportProblemForm from "../bookDetails/ReportProblem";
 
 describe("ReportProblemForm", () => {

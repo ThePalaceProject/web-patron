@@ -10,7 +10,7 @@ import {
   FulfillmentLink
 } from "opds-web-client/lib/interfaces";
 import { typeMap } from "opds-web-client/lib/utils/file";
-import { RequiredKeys } from "src/interfaces";
+import { RequiredKeys } from "../../interfaces";
 import {
   bookIsBorrowed,
   bookIsOpenAccess,

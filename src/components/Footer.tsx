@@ -2,8 +2,6 @@
 import { jsx, Styled } from "theme-ui";
 import * as React from "react";
 import ExternalLink from "./ExternalLink";
-import useTypedSelector from "../hooks/useTypedSelector";
-import { LinkData } from "opds-web-client/lib/interfaces";
 import useLibraryContext from "./context/LibraryContext";
 
 const Footer: React.FC<{ className?: string }> = ({ className }) => {

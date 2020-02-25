@@ -1,4 +1,4 @@
-import { LibraryData } from "./../../interfaces";
+import { LibraryData } from "../../interfaces";
 
 /**
  * Copied via chrome console from sample app.
@@ -30,3 +30,5 @@ export const libraryData: LibraryData = {
   ],
   libraryLinks: {}
 };
+
+export default libraryData;

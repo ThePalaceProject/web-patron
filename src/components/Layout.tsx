@@ -4,7 +4,6 @@ import * as React from "react";
 import GlobalStyles from "./GlobalStyles";
 import Header from "./Header";
 import Footer from "./Footer";
-import Auth from "./Auth";
 import SkipNavigation from "./SkipNavigation";
 
 export const CONTENT_ID = "cpw-content";

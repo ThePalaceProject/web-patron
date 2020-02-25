@@ -7,11 +7,12 @@
     "rootDir": "src",
     "types": ["jest", "node"],
     "jsx": "react",
-    "baseUrl": ".",
+    "baseUrl": "src",
     "paths": {
       "*": ["node_modules/@types/*", "*"]
     },
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "esModuleInterop": true
   },
   "include": ["./src", "./.storybook"],
   "exclude": ["lib", "node_modules"]
