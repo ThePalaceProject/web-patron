@@ -1,4 +1,4 @@
-import { bookFixture } from "../../test-utils/fixtures/book";
+import { book as bookFixture } from "../../test-utils/fixtures/book";
 import { getAuthors } from "../book";
 describe("book utils", () => {
   /**

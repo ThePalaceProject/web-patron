@@ -1,11 +1,11 @@
 import * as React from "react";
 import { action } from "@storybook/addon-actions";
 import Recommendations from "../recommendations";
-import { bookFixture } from "../../../test-utils/fixtures/book";
+import { book as bookFixture } from "../../../test-utils/fixtures";
 import { RecommendationsStateContext } from "../../context/RecommendationsContext";
 import { recommendationsState } from "../../../test-utils/fixtures/recommendationsState";
 import { LaneData, CollectionData } from "opds-web-client/lib/interfaces";
-import { RecommendationsState } from "src/interfaces";
+import { RecommendationsState } from "../../../interfaces";
 
 export default {
   component: Recommendations,

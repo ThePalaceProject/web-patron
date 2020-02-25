@@ -1,5 +1,5 @@
 import { BookData, FetchErrorData } from "opds-web-client/lib/interfaces";
-import * as moment from "moment";
+import moment from "moment";
 import {
   bookIsOpenAccess,
   bookIsReserved,

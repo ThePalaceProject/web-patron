@@ -1,5 +1,4 @@
-import "../ignore_stylesheet_imports";
-import * as express from "express";
+import express from "express";
 import * as React from "react";
 import webpackDevMiddleware from "./wdm";
 import ssr from "./ssr";

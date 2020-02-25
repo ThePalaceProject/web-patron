@@ -16,7 +16,6 @@ import { ListView, GalleryView } from "./BookList";
 import { PageLoader } from "./LoadingIndicator";
 import { Helmet } from "react-helmet-async";
 import useView from "./context/ViewContext";
-import { Gallery } from "src/icons";
 
 const MyBooks: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
   setCollectionAndBook
