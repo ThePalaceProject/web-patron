@@ -27,14 +27,14 @@ const ViewSelector: React.FC = () => {
         role="radio"
         onClick={() => setView("GALLERY")}
         selected={view === "GALLERY"}
-        aria-label="Gallery"
+        aria-label="Gallery View"
         aria-checked={view === "GALLERY"}
       >
         <Gallery />
       </FilterButton>
       <FilterButton
         role="radio"
-        aria-label="List"
+        aria-label="List View"
         aria-checked={view === "LIST"}
         onClick={() => setView("LIST")}
         selected={view === "LIST"}

@@ -1,6 +1,7 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
+import { VisuallyHidden } from "reakit";
 
 const ExternalLink: React.FC<React.HTMLProps<HTMLAnchorElement>> = ({
   children,
@@ -13,6 +14,7 @@ const ExternalLink: React.FC<React.HTMLProps<HTMLAnchorElement>> = ({
     {...props}
   >
     {children}
+    <VisuallyHidden>(Opens in a new tab)</VisuallyHidden>
   </a>
 );
 

@@ -34,7 +34,6 @@ const Link: React.FC<LinkProps> = React.forwardRef(
 
     delete (props as CatalogLinkProps).collectionUrl;
     delete (props as CatalogLinkProps).bookUrl;
-
     return (
       <BaseLink
         to={computedTo}

@@ -3,7 +3,6 @@ import { jsx } from "theme-ui";
 import * as React from "react";
 import TextInput from "./TextInput";
 import Button from "./Button";
-import { State } from "opds-web-client/lib/state";
 import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
 import { useHistory } from "react-router-dom";
 import useTypedSelector from "../hooks/useTypedSelector";

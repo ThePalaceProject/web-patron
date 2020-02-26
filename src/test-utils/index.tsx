@@ -12,6 +12,7 @@ import { MemoryRouter } from "react-router-dom";
 // our fixtures
 import * as fixtures from "./fixtures";
 import { State } from "opds-web-client/lib/state";
+import { LibraryData } from "interfaces";
 export { fixtures };
 
 configure({ adapter: new Adapter() });
@@ -19,6 +20,7 @@ configure({ adapter: new Adapter() });
 type CustomRenderOptions = Parameters<typeof render>[1] & {
   route?: string;
   initialState?: State;
+  library?: LibraryData;
 };
 const customRender = (ui: any, options?: CustomRenderOptions) => {
   const AllTheProviders = ({ children }) => {
@@ -26,7 +28,7 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
       <MemoryRouter initialEntries={[options?.route ?? "/"]}>
         <ThemeProvider theme={theme}>
           <ContextProvider
-            library={library}
+            library={options?.library ?? library}
             shortenUrls
             helmetContext={{}}
             initialState={options?.initialState}
