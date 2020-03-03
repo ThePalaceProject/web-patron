@@ -7,8 +7,6 @@ import merge from "deepmerge";
 import userEvent from "@testing-library/user-event";
 import { LibraryData, Link } from "interfaces";
 
-// file.only
-
 describe("Layout nav + structure", () => {
   test("Library name button navigates home", () => {
     const node = render(<Layout>Child</Layout>);

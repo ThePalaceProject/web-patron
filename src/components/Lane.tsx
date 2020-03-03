@@ -2,15 +2,10 @@
 import { jsx, Styled } from "theme-ui";
 import * as React from "react";
 import { LaneData, BookData } from "opds-web-client/lib/interfaces";
-import BookCover from "./BookCover";
-import truncateString from "../utils/truncate";
-import Link from "./Link";
 import useCatalogLink from "../hooks/useCatalogLink";
 import ArrowRight from "../icons/ArrowRight";
 import { Tabbable } from "reakit/Tabbable";
 import { NavButton } from "./Button";
-import useBreadcrumbs from "../hooks/useBreadcrumbs";
-import { getAuthors } from "../utils/book";
 import Book, { BOOK_HEIGHT } from "./BookCard";
 import BreadcrumbBar from "./BreadcrumbBar";
 import { withErrorBoundary } from "./ErrorBoundary";
@@ -115,7 +110,7 @@ const Lane: React.FC<{ lane: LaneData; omitIds?: string[] }> = ({
   const laneUrl = useCatalogLink(undefined, url);
 
   return (
-    <div sx={{}}>
+    <div>
       <BreadcrumbBar currentLocation={title}>
         <NavButton to={laneUrl} sx={{ fontSize: 1, fontWeight: 2 }}>
           View all {title}
