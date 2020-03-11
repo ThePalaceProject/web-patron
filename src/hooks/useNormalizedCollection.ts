@@ -1,4 +1,3 @@
-import * as React from "react";
 import useTypedSelector from "./useTypedSelector";
 import { collectionDataWithLoans } from "opds-web-client/lib/utils";
 

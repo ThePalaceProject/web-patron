@@ -1,11 +1,5 @@
 import * as React from "react";
-import {
-  render,
-  fixtures,
-  wait,
-  mockDispatch,
-  fireEvent
-} from "../../test-utils";
+import { render, fixtures, fireEvent } from "../../test-utils";
 // this file with the custom mock must be imported before the useActions
 import "../../test-utils/mockUseActions";
 import { useActions } from "opds-web-client/lib/components/context/ActionsContext";

@@ -12,6 +12,7 @@ import BasicAuthPlugin from "opds-web-client/lib/BasicAuthPlugin";
 import buildStore from "opds-web-client/lib/store";
 import { State } from "opds-web-client/lib/state";
 import { LibraryData } from "interfaces";
+import "./mockScrollTo";
 // our fixtures
 import * as fixtures from "./fixtures";
 export { fixtures };

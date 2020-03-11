@@ -16,10 +16,9 @@ const BreadcrumbBar: React.FC<{
   currentLocation?: string;
 }> = ({ children, className, currentLocation }) => {
   const breadcrumbs = useBreadCrumbs();
-
   const lastItem = currentLocation ?? breadcrumbs.pop()?.text;
   const getCatalogLink = useGetCatalogLink();
-
+  console.log(breadcrumbs);
   return (
     <div
       className={className}
@@ -40,23 +39,27 @@ const BreadcrumbBar: React.FC<{
           textTransform: "uppercase"
         }}
       >
-        {breadcrumbs.map(breadcrumb => (
-          <Link
-            to={getCatalogLink(undefined, breadcrumb.url)}
-            key={breadcrumb.url}
-          >
-            <Styled.h1
-              sx={{
-                m: 0,
-                display: "flex",
-                alignItems: "center",
-                fontSize: [1, 3]
-              }}
-            >
-              {breadcrumb.text} <ArrowRight sx={{ fill: "white" }} />
-            </Styled.h1>
-          </Link>
-        ))}
+        {breadcrumbs.map(
+          breadcrumb =>
+            breadcrumb.text &&
+            breadcrumb.url && (
+              <Link
+                to={getCatalogLink(undefined, breadcrumb.url)}
+                key={breadcrumb.url}
+              >
+                <Styled.h1
+                  sx={{
+                    m: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    fontSize: [1, 3]
+                  }}
+                >
+                  {breadcrumb.text} <ArrowRight sx={{ fill: "white" }} />
+                </Styled.h1>
+              </Link>
+            )
+        )}
         <Styled.h3 sx={{ m: 0, fontWeight: "light", fontSize: [1, 3] }}>
           {lastItem}
         </Styled.h3>

@@ -17,9 +17,9 @@ import { GalleryView, ListView, LanesView } from "./BookList";
 import useView from "./context/ViewContext";
 import ListFilters from "./ListFilters";
 
-const Collection: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
-  setCollectionAndBook
-}) => {
+export const Collection: React.FC<{
+  setCollectionAndBook: SetCollectionAndBook;
+}> = ({ setCollectionAndBook }) => {
   useSetCollectionAndBook(setCollectionAndBook);
   const { view } = useView();
   // the first hook just provides the collection, the second subs in loaned book data if existing

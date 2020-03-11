@@ -1,4 +1,36 @@
 import { BookData } from "opds-web-client/lib/interfaces";
+import merge from "deepmerge";
+
+export const mergeBook = (input: Partial<BookData>) =>
+  merge(book, input, {
+    arrayMerge: (a, b) => b
+  });
+
+export function makeBook(i: number) {
+  return {
+    id: `Book Id ${i}`,
+    url: `/book-url-${i}`,
+    title: `Book Title ${i}`,
+    authors: [`Book ${i} author`],
+    publisher: `Book ${i} publisher`,
+    categories: [`Book ${i} cat 1`, `Book ${i} cat 2`]
+  };
+}
+
+/**
+ * makes n books with a make function that takes index and outputs some
+ * custom book info which gets merged with the default book fixture
+ */
+export function makeBooks(
+  n: number,
+  make: (i: number) => Partial<BookData> = makeBook
+) {
+  const books: BookData[] = [];
+  for (let i = 0; i < n; i++) {
+    books[i] = mergeBook(make(i));
+  }
+  return books;
+}
 
 export const book: BookData = {
   id: "urn:librarysimplified.org/terms/id/3M%20ID/crrmnr9",

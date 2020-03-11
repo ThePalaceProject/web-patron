@@ -10,7 +10,7 @@ const LoadingIndicator: React.FC = props => {
   return <FadeLoader color={darkBlue} {...props} />;
 };
 
-export const PageLoader: React.FC = props => {
+export const PageLoader: React.FC = () => {
   return (
     <div
       sx={{
