@@ -18,7 +18,6 @@ const BreadcrumbBar: React.FC<{
   const breadcrumbs = useBreadCrumbs();
   const lastItem = currentLocation ?? breadcrumbs.pop()?.text;
   const getCatalogLink = useGetCatalogLink();
-  console.log(breadcrumbs);
   return (
     <div
       className={className}

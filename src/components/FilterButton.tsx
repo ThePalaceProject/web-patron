@@ -2,10 +2,10 @@
 import { jsx } from "theme-ui";
 import * as React from "react";
 import { Theme } from "../theme";
-import { NavButton } from "./Button";
+import { LinkButton } from "./Button";
 
 type FilterButtonProps = { selected: boolean } & React.ComponentProps<
-  typeof NavButton
+  typeof LinkButton
 >;
 const FilterButton: React.FC<FilterButtonProps> = ({
   selected,
@@ -22,7 +22,7 @@ const FilterButton: React.FC<FilterButtonProps> = ({
       : undefined
   };
   return (
-    <NavButton
+    <LinkButton
       role="tab"
       aria-selected={selected}
       className={className}
@@ -43,7 +43,7 @@ const FilterButton: React.FC<FilterButtonProps> = ({
       {...props}
     >
       {children}
-    </NavButton>
+    </LinkButton>
   );
 };
 
