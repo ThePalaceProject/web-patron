@@ -12,7 +12,8 @@
       "*": ["node_modules/@types/*", "*"]
     },
     "strictNullChecks": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "downlevelIteration": true
   },
   "include": ["./src", "./.storybook"],
   "exclude": ["lib", "node_modules"]
