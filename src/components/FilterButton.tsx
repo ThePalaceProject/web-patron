@@ -2,10 +2,11 @@
 import { jsx } from "theme-ui";
 import * as React from "react";
 import { Theme } from "../theme";
-import { LinkButton } from "./Button";
+import Button from "./Button";
+import Link from "./Link";
 
 type FilterButtonProps = { selected: boolean } & React.ComponentProps<
-  typeof LinkButton
+  typeof Button
 >;
 const FilterButton: React.FC<FilterButtonProps> = ({
   selected,
@@ -21,8 +22,13 @@ const FilterButton: React.FC<FilterButtonProps> = ({
         }
       : undefined
   };
+
+  // if there is a "to" prop, make a link, otherwise it's a regular button
+  const computedAs =
+    props.to || props.collectionUrl || props.bookUrl ? Link : undefined;
   return (
-    <LinkButton
+    <Button
+      as={computedAs}
       role="tab"
       aria-selected={selected}
       className={className}
@@ -43,7 +49,7 @@ const FilterButton: React.FC<FilterButtonProps> = ({
       {...props}
     >
       {children}
-    </LinkButton>
+    </Button>
   );
 };
 
