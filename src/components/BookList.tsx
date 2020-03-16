@@ -31,6 +31,7 @@ export const GalleryView: React.FC<{
     <div>
       <BreadcrumbBar>{breadcrumb}</BreadcrumbBar>
       <ul
+        data-testid="gallery-list"
         sx={{
           display: "flex",
           flexWrap: "wrap",
@@ -72,7 +73,7 @@ export const ListView: React.FC<{
   return (
     <React.Fragment>
       <BreadcrumbBar>{breadcrumb}</BreadcrumbBar>
-      <ul sx={{ p: 0, m: 0 }}>
+      <ul sx={{ p: 0, m: 0 }} data-testid="listview-list">
         {books.map(book => (
           <BookListItem key={book.id} book={book} />
         ))}
