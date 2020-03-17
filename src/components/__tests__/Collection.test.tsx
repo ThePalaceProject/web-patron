@@ -7,8 +7,6 @@ import { LaneData } from "opds-web-client/lib/interfaces";
 import Layout from "../Layout";
 import { useBreakpointIndex } from "@theme-ui/match-media";
 
-//file.only
-
 const setCollectionAndBook = jest.fn().mockReturnValue(Promise.resolve({}));
 
 test("calls setCollectionAndBook", () => {
