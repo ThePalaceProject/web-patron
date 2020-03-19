@@ -62,15 +62,6 @@ test("filters books", () => {
   expect(node.getByText("Book Title 9")).toBeInTheDocument();
 });
 
-// mock out the react router stuff
-const mockPush = jest.fn();
-jest.mock("react-router-dom", () => ({
-  ...jest.requireActual("react-router-dom"),
-  useHistory: () => ({
-    push: mockPush
-  })
-}));
-
 test("more button navigates to the right link", () => {
   const node = render(<Lane lane={laneData} />);
 

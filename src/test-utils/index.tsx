@@ -7,7 +7,8 @@ import ContextProvider from "../components/context/ContextProvider";
 import Adapter from "enzyme-adapter-react-16";
 import { configure } from "enzyme";
 import library from "./fixtures/library";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, Router } from "react-router-dom";
+import { createMemoryHistory } from "history";
 import BasicAuthPlugin from "opds-web-client/lib/BasicAuthPlugin";
 import buildStore from "opds-web-client/lib/store";
 import { State } from "opds-web-client/lib/state";
@@ -36,9 +37,13 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
   const store = buildStore(options?.initialState, [BasicAuthPlugin], pathFor);
   store.dispatch = mockDispatch;
 
+  const history = createMemoryHistory({
+    initialEntries: [options?.route ?? "/"]
+  });
+
   const AllTheProviders = ({ children }) => {
     return (
-      <MemoryRouter initialEntries={[options?.route ?? "/"]}>
+      <Router history={history}>
         <ThemeProvider theme={theme}>
           <ContextProvider
             library={options?.library ?? library}
@@ -50,14 +55,15 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
             {children}
           </ContextProvider>
         </ThemeProvider>
-      </MemoryRouter>
+      </Router>
     );
   };
 
   return {
     ...render(ui, { wrapper: AllTheProviders, ...options }),
-    // we pass the store along so we can assert on it
-    store
+    // we pass the store and history along so we can assert on it
+    store,
+    history
   };
 };
 

@@ -81,15 +81,6 @@ test("renders availability select with correct options", () => {
   expect(facet).toHaveValue("All");
 });
 
-// mock out the react router stuff
-const mockPush = jest.fn();
-jest.mock("react-router-dom", () => ({
-  ...jest.requireActual("react-router-dom"),
-  useHistory: () => ({
-    push: mockPush
-  })
-}));
-
 test("does redirect when selected", () => {
   const node = render(<ListFilters />, {
     initialState: stateWithFacets([sortByFacet])
@@ -99,6 +90,5 @@ test("does redirect when selected", () => {
 
   userEvent.selectOptions(facet, "title");
 
-  expect(mockPush).toHaveBeenCalledTimes(1);
-  expect(mockPush).toHaveBeenCalledWith("/collection/title");
+  expect(node.history.location.pathname).toBe("/collection/title");
 });

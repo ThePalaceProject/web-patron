@@ -26,15 +26,6 @@ test("fetches search description", async () => {
   expect(node.store.dispatch).toHaveBeenCalledTimes(1);
 });
 
-// mock out the react router stuff
-const mockPush = jest.fn();
-jest.mock("react-router-dom", () => ({
-  ...jest.requireActual("react-router-dom"),
-  useHistory: () => ({
-    push: mockPush
-  })
-}));
-
 test("searching calls history.push with url", async () => {
   const mockedTemplate = jest.fn().mockReturnValue("templatereturn");
   const node = render(<Search />, {
@@ -58,8 +49,7 @@ test("searching calls history.push with url", async () => {
   fireEvent.click(searchButton);
 
   // assert
-  expect(mockPush).toHaveBeenCalledTimes(1);
   expect(mockedTemplate).toHaveBeenCalledTimes(1);
   expect(mockedTemplate).toHaveBeenCalledWith("my%20search");
-  expect(mockPush).toHaveBeenCalledWith("/collection/templatereturn");
+  expect(node.history.location.pathname).toBe("/collection/templatereturn");
 });
