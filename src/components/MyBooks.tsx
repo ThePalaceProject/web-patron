@@ -17,9 +17,9 @@ import { PageLoader } from "./LoadingIndicator";
 import { Helmet } from "react-helmet-async";
 import useView from "./context/ViewContext";
 
-const MyBooks: React.FC<{ setCollectionAndBook: SetCollectionAndBook }> = ({
-  setCollectionAndBook
-}) => {
+export const MyBooks: React.FC<{
+  setCollectionAndBook: SetCollectionAndBook;
+}> = ({ setCollectionAndBook }) => {
   // here we pass in "loans" to make it look like we are at /collection/loans
   // which is what used to be the route that is now /loans (ie. this page)
   useSetCollectionAndBook(setCollectionAndBook, "loans");

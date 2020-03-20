@@ -1,15 +1,14 @@
 import * as React from "react";
-import { render, fixtures, fireEvent } from "../../test-utils";
-// this file with the custom mock must be imported before the useActions
-import "../../test-utils/mockUseActions";
-import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
+import { render, fixtures, fireEvent, actions } from "../../test-utils";
 import Search from "../Search";
 import merge from "deepmerge";
 import userEvent from "@testing-library/user-event";
 
 test("fetches search description", async () => {
-  // we can call this hook here because it is actually a mocked hook
-  const { actions, dispatch } = useActions();
+  const mockedFetchSearchDescription = jest.spyOn(
+    actions,
+    "fetchSearchDescription"
+  );
   const node = render(<Search />, {
     initialState: merge(fixtures.initialState, {
       collection: {
@@ -21,9 +20,10 @@ test("fetches search description", async () => {
       }
     })
   });
-  expect(actions.fetchSearchDescription).toHaveBeenCalledTimes(1);
-  expect(actions.fetchSearchDescription).toHaveBeenCalledWith("/search-url");
-  expect(node.store.dispatch).toHaveBeenCalledTimes(1);
+
+  expect(mockedFetchSearchDescription).toHaveBeenCalledTimes(1);
+  expect(mockedFetchSearchDescription).toHaveBeenCalledWith("/search-url");
+  expect(node.dispatch).toHaveBeenCalledTimes(1);
 });
 
 test("searching calls history.push with url", async () => {

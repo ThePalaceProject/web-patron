@@ -13,10 +13,16 @@ import { HelmetProvider } from "react-helmet-async";
 import { ViewProvider } from "./ViewContext";
 import { State } from "opds-web-client/lib/state";
 import { Store } from "redux";
+import DataFetcher from "opds-web-client/lib/DataFetcher";
+import ActionsCreator from "opds-web-client/lib/actions";
+import { adapter } from "opds-web-client/lib/OPDSDataAdapter";
 
 type ProviderProps = PreloadedData & {
-  // we allow custom store to be passed in for the sake of mocking during testing
+  // we allow custom store and actions
+  // to be passed in for the sake of mocking during testing
   store?: Store<State>;
+  actions?: ActionsCreator;
+  fetcher?: DataFetcher;
 };
 /**
  * Combines all of the apps context provider into a single component for simplicity
@@ -27,7 +33,9 @@ const AppContextProvider: React.FC<ProviderProps> = ({
   shortenUrls,
   initialState,
   helmetContext,
-  store
+  store,
+  actions,
+  fetcher
 }) => {
   const libraryId = library.id;
   const urlShortener = new UrlShortener(library.catalogUrl, shortenUrls);
@@ -52,6 +60,9 @@ const AppContextProvider: React.FC<ProviderProps> = ({
     }
     return path;
   };
+  const computedFetcher = fetcher ?? new DataFetcher({ adapter });
+  const computedActions = actions ?? new ActionsCreator(computedFetcher);
+
   return (
     <HelmetProvider context={helmetContext}>
       <ReakitProvider>
@@ -59,7 +70,10 @@ const AppContextProvider: React.FC<ProviderProps> = ({
           <PathForProvider pathFor={pathFor}>
             <OPDSStore initialState={initialState} store={store}>
               <RecommendationsProvider>
-                <ActionsProvider>
+                <ActionsProvider
+                  actions={computedActions}
+                  fetcher={computedFetcher}
+                >
                   <LibraryProvider library={library}>
                     <UrlShortenerProvider urlShortener={urlShortener}>
                       <ViewProvider>{children}</ViewProvider>

@@ -7,20 +7,30 @@ import ContextProvider from "../components/context/ContextProvider";
 import Adapter from "enzyme-adapter-react-16";
 import { configure } from "enzyme";
 import library from "./fixtures/library";
-import { MemoryRouter, Router } from "react-router-dom";
+import { Router } from "react-router-dom";
 import { createMemoryHistory } from "history";
 import BasicAuthPlugin from "opds-web-client/lib/BasicAuthPlugin";
 import buildStore from "opds-web-client/lib/store";
 import { State } from "opds-web-client/lib/state";
 import { LibraryData } from "interfaces";
 import "./mockScrollTo";
-// our fixtures
 import * as fixtures from "./fixtures";
+import ActionsCreator from "opds-web-client/lib/actions";
+import DataFetcher from "opds-web-client/lib/DataFetcher";
+import { adapter } from "opds-web-client/lib/OPDSDataAdapter";
+
 export { fixtures };
 
 configure({ adapter: new Adapter() });
 
-export const mockDispatch = jest.fn();
+/**
+ * We create the actions and fetcher here so that they can
+ * be imported by our test file and spied on using:
+ * jest.spyOn(actions, "fetchSearchDescription")
+ * and then asserted against
+ */
+export const fetcher = new DataFetcher({ adapter });
+export const actions = new ActionsCreator(fetcher);
 
 type CustomRenderOptions = Parameters<typeof render>[1] & {
   route?: string;
@@ -35,12 +45,13 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
     );
 
   const store = buildStore(options?.initialState, [BasicAuthPlugin], pathFor);
-  store.dispatch = mockDispatch;
+
+  // spy on dispatch by default
+  const dispatch = jest.spyOn(store, "dispatch");
 
   const history = createMemoryHistory({
     initialEntries: [options?.route ?? "/"]
   });
-
   const AllTheProviders = ({ children }) => {
     return (
       <Router history={history}>
@@ -51,6 +62,8 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
             helmetContext={{}}
             initialState={options?.initialState}
             store={store}
+            fetcher={fetcher}
+            actions={actions}
           >
             {children}
           </ContextProvider>
@@ -61,9 +74,10 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
 
   return {
     ...render(ui, { wrapper: AllTheProviders, ...options }),
-    // we pass the store and history along so we can assert on it
+    // we pass our mocks along so they can be used in assertions
     store,
-    history
+    history,
+    dispatch
   };
 };
 
