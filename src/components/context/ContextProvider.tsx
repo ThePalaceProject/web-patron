@@ -16,6 +16,7 @@ import { Store } from "redux";
 import DataFetcher from "opds-web-client/lib/DataFetcher";
 import ActionsCreator from "opds-web-client/lib/actions";
 import { adapter } from "opds-web-client/lib/OPDSDataAdapter";
+import basicAuthPlugin from "../../authPlugin";
 
 type ProviderProps = PreloadedData & {
   // we allow custom store and actions
@@ -68,7 +69,11 @@ const AppContextProvider: React.FC<ProviderProps> = ({
       <ReakitProvider>
         <RouterProvider>
           <PathForProvider pathFor={pathFor}>
-            <OPDSStore initialState={initialState} store={store}>
+            <OPDSStore
+              initialState={initialState}
+              store={store}
+              authPlugins={[basicAuthPlugin]}
+            >
               <RecommendationsProvider>
                 <ActionsProvider
                   actions={computedActions}

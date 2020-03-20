@@ -9,7 +9,7 @@ import { configure } from "enzyme";
 import library from "./fixtures/library";
 import { Router } from "react-router-dom";
 import { createMemoryHistory } from "history";
-import BasicAuthPlugin from "opds-web-client/lib/BasicAuthPlugin";
+import BasicAuthPlugin from "../authPlugin";
 import buildStore from "opds-web-client/lib/store";
 import { State } from "opds-web-client/lib/state";
 import { LibraryData } from "interfaces";
