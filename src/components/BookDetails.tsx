@@ -5,6 +5,7 @@ import { fetchComplaintTypes, postComplaint } from "../actions";
 import DefaultBookDetails, {
   BookDetailsProps as DefaultBooKDetailsProps
 } from "opds-web-client/lib/components/BookDetails";
+import DownloadButton from "opds-web-client/lib/components/DownloadButton";
 import ReportProblemLink from "./ReportProblemLink";
 import RevokeButton from "./RevokeButton";
 import { ComplaintData } from "../interfaces";
@@ -179,6 +180,25 @@ export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
 
   circulationLinks() {
     let links = super.circulationLinks();
+
+    /* If any links have the same file extension, only keep one of them, since
+    the patron has no way to distinguish them. If any links have no file
+    extension, leave them out. This relies on an old version of opds-web-client
+    and should be removed once the download button there is updated. */
+    let linksWithUniqueTypes = {};
+    if (links.length > 0) {
+      for (let link of links[0]) {
+        if (link.props) {
+          let type = link.props.mimeType;
+          let extension = DownloadButton.prototype.fileExtension.bind({ mimeType: () => type })();
+          if (type && extension && !linksWithUniqueTypes[type]) {
+            linksWithUniqueTypes[type] = link;
+          }
+        }
+      }
+    }
+    links = Object.values(linksWithUniqueTypes);
+
     if (this.isBorrowed()) {
       links.push(
         <div className="app-info">
