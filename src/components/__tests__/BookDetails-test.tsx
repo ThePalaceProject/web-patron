@@ -5,11 +5,15 @@ import * as React from "react";
 import { shallow } from "enzyme";
 
 import { BookDetails } from "../BookDetails";
+import { MediaType } from "opds-web-client/lib/interfaces";
 import CatalogLink from "opds-web-client/lib/components/CatalogLink";
 import BorrowButton from "opds-web-client/lib/components/BorrowButton";
 import ReportProblemLink from "../ReportProblemLink";
 import RevokeButton from "../RevokeButton";
+import DownloadButton from "opds-web-client/lib/components/DownloadButton";
 
+let epubType: MediaType = "application/epub+zip";
+let pdfType: MediaType = "application/pdf";
 let book = {
   id: "urn:librarysimplified.org/terms/id/3M%20ID/crrmnr9",
   url: "http://circulation.librarysimplified.org/works/3M/crrmnr9",
@@ -20,7 +24,7 @@ let book = {
     "&lt;b&gt;Sam and Remi Fargo race for treasure&#8212;and survival&#8212;in this lightning-paced new adventure from #1&lt;i&gt; New York Times&lt;/i&gt; bestselling author Clive Cussler.&lt;/b&gt;&lt;br /&gt;&lt;br /&gt;Husband-and-wife team Sam and Remi Fargo are in Mexico when they come upon a remarkable discovery&#8212;the mummified remainsof a man clutching an ancient sealed pot. Within the pot is a Mayan book larger than any known before.&lt;br /&gt;&lt;br /&gt;The book contains astonishing information about the Mayans, their cities, and about mankind itself. The secrets are so powerful that some people would do anything to possess them&#8212;as the Fargos are about to find out. Many men and women are going to die for that book.",
   imageUrl: "https://dlotdqc6pnwqb.cloudfront.net/3M/crrmnr9/cover.jpg",
   borrowUrl: "borrow url",
-  openAccessLinks: [{ url: "secrets.epub", type: "epub" }],
+  openAccessLinks: [{ url: "secrets.epub", type: epubType }],
   publisher: "Penguin Publishing Group",
   published: "February 29, 2016",
   categories: ["Children", "10-12", "Fiction", "Adventure", "Fantasy"],
@@ -99,8 +103,6 @@ describe("BookDetails", () => {
       <BookDetails
         book={book}
         updateBook={noop}
-        fulfillBook={noop}
-        indirectFulfillBook={noop}
         fetchComplaintTypes={fetchComplaintTypes}
         postComplaint={postComplaint}
         problemTypes={problemTypes}
@@ -152,8 +154,6 @@ describe("BookDetails", () => {
       <BookDetails
         book={bookCopy}
         updateBook={noop}
-        fulfillBook={noop}
-        indirectFulfillBook={noop}
         fetchComplaintTypes={fetchComplaintTypes}
         postComplaint={postComplaint}
         problemTypes={problemTypes}
@@ -173,8 +173,6 @@ describe("BookDetails", () => {
       <BookDetails
         book={bookCopy}
         updateBook={noop}
-        fulfillBook={noop}
-        indirectFulfillBook={noop}
         fetchComplaintTypes={fetchComplaintTypes}
         postComplaint={postComplaint}
         problemTypes={problemTypes}
@@ -183,5 +181,21 @@ describe("BookDetails", () => {
     let appInfo = wrapper.find(".app-info");
     expect(appInfo.length).to.equal(1);
     expect(appInfo.text()).to.contain("app");
+  });
+
+  it("removes duplicate open access links", () => {
+    let openAccessLinks = [{ url: "secrets.epub", type: epubType }, { url: "secrets.pdf", type: pdfType }, { url: "secrets2.pdf", type: pdfType }];
+    let bookCopy = Object.assign({}, book, { openAccessLinks });
+    wrapper = shallow(
+      <BookDetails
+        book={bookCopy}
+        updateBook={noop}
+        fetchComplaintTypes={fetchComplaintTypes}
+        postComplaint={postComplaint}
+        problemTypes={problemTypes}
+      />
+    );
+    let downloadButtons = wrapper.find(DownloadButton);
+    expect(downloadButtons.length).to.equal(2);
   });
 });

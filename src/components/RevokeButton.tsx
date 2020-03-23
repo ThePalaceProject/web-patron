@@ -23,7 +23,7 @@ export default class RevokeButton extends React.Component<
   }
 
   render() {
-    const { revoke, ref, onCopy, ...props } = this.props;
+    const { revoke, ref, onCopy, type, ...props } = this.props;
 
     return (
       <div>
