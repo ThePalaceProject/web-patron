@@ -9,6 +9,11 @@ import ReportProblemLink from "./ReportProblemLink";
 import RevokeButton from "./RevokeButton";
 import { ComplaintData } from "../interfaces";
 import { State } from "../reducers/index";
+import {
+  bookIsBorrowed,
+  bookIsOpenAccess
+} from "opds-web-client/lib/utils/book";
+import { typeMap } from "opds-web-client/lib/utils/file";
 
 export interface BookDetailsProps extends DefaultBooKDetailsProps {
   problemTypes: string[];
@@ -179,7 +184,25 @@ export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
 
   circulationLinks() {
     let links = super.circulationLinks();
-    if (this.isBorrowed()) {
+
+    /* If any links have the same file extension, only keep one of them, since
+    the patron has no way to distinguish them. If any links have no file
+    extension, leave them out, since the patron won't know how to open them. */
+    let linksWithUniqueTypes = {};
+    if (links.length > 0) {
+      for (let link of links) {
+        if (link.props) {
+          let type = link.props.mimeType;
+          let extension = typeMap[type];
+          if (type && extension && !linksWithUniqueTypes[type]) {
+            linksWithUniqueTypes[type] = link;
+          }
+        }
+      }
+    }
+    links = Object.values(linksWithUniqueTypes);
+
+    if (bookIsBorrowed(this.props.book)) {
       links.push(
         <div className="app-info">
           Your book is ready to download in your reading app.
@@ -189,7 +212,7 @@ export class BookDetails extends DefaultBookDetails<BookDetailsProps> {
 
     // Books with DRM can only be returned through Adobe,
     // so we don't show revoke links for them.
-    if (this.isOpenAccess() && this.revokeUrl()) {
+    if (bookIsOpenAccess(this.props.book) && this.revokeUrl()) {
       links.push(
         <RevokeButton
           className="btn btn-default revoke-button"

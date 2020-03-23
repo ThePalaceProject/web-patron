@@ -4,7 +4,7 @@ import * as React from "react";
 import { shallow } from "enzyme";
 
 import BookDetailsContainer from "../BookDetailsContainer";
-import BookDetails from "../BookDetails";
+import { BookDetails } from "../BookDetails";
 import Lanes from "opds-web-client/lib/components/Lanes";
 import buildStore from "../../store";
 

@@ -15,6 +15,7 @@ import { LibraryData } from "../interfaces";
 import BasicAuthWithButtonImagePlugin from "../auth/BasicAuthWithButtonImagePlugin";
 import OAuthPlugin from "../auth/OAuthPlugin";
 import * as PropTypes from "prop-types";
+import { ActionsProvider } from "opds-web-client/lib/components/context/ActionsContext";
 
 export interface CatalogHandlerProps extends React.Props<CatalogHandler> {
   params: {
@@ -37,7 +38,7 @@ export default class CatalogHandler extends React.Component<
 > {
   context: CatalogHandlerContext;
 
-  static contextTypes: React.ValidationMap<CatalogHandlerContext> = {
+  static contextTypes = {
     library: PropTypes.object.isRequired,
     urlShortener: PropTypes.object.isRequired,
     initialState: PropTypes.object
@@ -144,17 +145,19 @@ export default class CatalogHandler extends React.Component<
 
     return (
       <div style={cssVariables}>
-        <OPDSCatalog
-          collectionUrl={collectionUrl}
-          bookUrl={bookUrl}
-          Header={Header}
-          Footer={Footer}
-          BookDetailsContainer={BookDetailsContainer}
-          pageTitleTemplate={pageTitleTemplate}
-          computeBreadcrumbs={computeBreadcrumbs}
-          initialState={this.context.initialState}
-          authPlugins={[BasicAuthWithButtonImagePlugin, OAuthPlugin]}
-        />
+        <ActionsProvider>
+          <OPDSCatalog
+            collectionUrl={collectionUrl}
+            bookUrl={bookUrl}
+            Header={Header}
+            Footer={Footer}
+            BookDetailsContainer={BookDetailsContainer}
+            pageTitleTemplate={pageTitleTemplate}
+            computeBreadcrumbs={computeBreadcrumbs}
+            initialState={this.context.initialState}
+            authPlugins={[BasicAuthWithButtonImagePlugin, OAuthPlugin]}
+          />
+        </ActionsProvider>
       </div>
     );
   }
