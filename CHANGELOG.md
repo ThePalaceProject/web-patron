@@ -1,5 +1,13 @@
 ## CHANGELOG
 
+### 1.0.0
+#### Updated
+- Updated opds-web-client and Typescript to more recent versions.
+- Changed the download buttons to remove duplicate mime types and hide unknown mime types.
+
+#### Added
+- The application has a docker submodule and Docker images are now automatically built in Docker hub.
+
 ### 0.2.2
 #### Updated
 - Updated documentation explaining how to run the application. Added a separate LICENSE file.
