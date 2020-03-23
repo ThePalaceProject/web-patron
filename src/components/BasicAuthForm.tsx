@@ -7,16 +7,12 @@ import { useForm, OnSubmit } from "react-hook-form";
 import FormInput from "./form/FormInput";
 import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
 import { generateCredentials } from "opds-web-client/lib/utils/auth";
-import {
-  AuthMethod,
-  AuthProvider,
-  BasicAuthMethod
-} from "opds-web-client/lib/interfaces";
+import { BasicAuthMethod } from "opds-web-client/lib/interfaces";
 import { AuthFormProps } from "opds-web-client/lib/components/AuthProviderSelectionForm";
 
 type FormData = {
-  barcode: string;
-  pin: string;
+  login: string;
+  password: string;
 };
 
 /**
@@ -30,9 +26,9 @@ const BasicAuthForm: React.FC<AuthFormProps<BasicAuthMethod>> = ({
   const { actions, dispatch } = useActions();
   const { register, handleSubmit, errors } = useForm<FormData>();
 
-  const onSubmit = ({ barcode, pin }) => {
+  const onSubmit = async ({ login, password }) => {
     // create credentials
-    const credentials = generateCredentials(barcode, pin);
+    const credentials = generateCredentials(login, password);
     // save them with redux
     dispatch(
       actions.saveAuthCredentials({
@@ -52,21 +48,26 @@ const BasicAuthForm: React.FC<AuthFormProps<BasicAuthMethod>> = ({
         {serverError && `Error: ${serverError}`}
       </span>
       <FormInput
-        name="barcode"
-        label="Barcode"
-        id="barcode"
-        placeholder="Barcode"
+        name="login"
+        label={provider.method.labels.login}
+        id="login"
+        placeholder={provider.method.labels.login}
         ref={register({ required: true, maxLength: 25 })}
-        error={errors?.barcode && "Your barcode is required."}
+        error={
+          errors?.login && `Your ${provider.method.labels.login} is required.`
+        }
       />
       <FormInput
-        name="pin"
-        label="Pin"
+        name="password"
+        label={provider.method.labels.password}
         ref={register({ required: true, maxLength: 25 })}
-        id="pin"
+        id="password"
         type="password"
-        placeholder="Pin"
-        error={errors?.pin && "Your pin is required."}
+        placeholder={provider.method.labels.password}
+        error={
+          errors?.password &&
+          `Your ${provider.method.labels.password} is required.`
+        }
       />
       <Button type="submit" sx={{ alignSelf: "flex-end", m: 2 }}>
         Login
