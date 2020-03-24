@@ -1,7 +1,6 @@
 /** @jsx jsx */
 import { jsx, Styled } from "theme-ui";
 import * as React from "react";
-import { BookDetailsProps as DefaultBooKDetailsProps } from "opds-web-client/lib/components/BookDetails";
 import { SetCollectionAndBook } from "../../interfaces";
 import BookCover from "../BookCover";
 import Recommendations from "./recommendations";
@@ -23,13 +22,13 @@ import { Helmet } from "react-helmet-async";
 import DetailField from "../BookMetaDetail";
 import ReportProblem from "./ReportProblem";
 
-export interface BookDetailsPropsNew extends DefaultBooKDetailsProps {
+export interface BookDetailsPropsNew {
   setCollectionAndBook: SetCollectionAndBook;
 }
 
 export const sidebarWidth = 200;
 
-const BookDetails: React.FC<BookDetailsPropsNew> = ({
+export const BookDetails: React.FC<BookDetailsPropsNew> = ({
   setCollectionAndBook
 }) => {
   // set the collection and book

@@ -22,7 +22,6 @@ const Auth: React.FC = ({ children }) => {
    * from cookies, at least for basic auth
    */
   const { showForm, cancel, providers } = useAuth();
-
   /**
    * We only support BasicAuth currently, but if you want to support more
    * then you should allow a user to choose one of these auth providers
@@ -34,7 +33,6 @@ const Auth: React.FC = ({ children }) => {
   // but the visibility is in redux state
   const dialog = useDialogState();
   const library = useLibraryContext();
-
   return (
     <React.Fragment>
       {/* <DialogDisclosure {...dialog} visible={isVisible} toggle={toggle}>
@@ -53,13 +51,11 @@ const Auth: React.FC = ({ children }) => {
         {/* Here we render the auth plugins  */}
         {/* if you would like to enable alternative auth plugins */}
         {/* you should render them (or some way to choose one) here */}
-        {BasicAuthComponent &&
-          showForm &&
-          (basicAuthProvider ? (
-            <BasicAuthComponent provider={basicAuthProvider} />
-          ) : (
-            "Basic auth provider is missing."
-          ))}
+        {BasicAuthComponent && basicAuthProvider && showForm ? (
+          <BasicAuthComponent provider={basicAuthProvider} />
+        ) : (
+          "Basic auth provider is missing."
+        )}
       </Modal>
       {/* We render this to provide the dialog a focus target after it closes
           even though we don't open the dialog with a button

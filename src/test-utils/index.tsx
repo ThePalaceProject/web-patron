@@ -47,7 +47,12 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
   const store = buildStore(options?.initialState, [BasicAuthPlugin], pathFor);
 
   // spy on dispatch by default
-  const dispatch = jest.spyOn(store, "dispatch");
+  const origDispatch = store.dispatch;
+  const mockDispatch: jest.Mock<typeof origDispatch> = jest
+    .fn()
+    .mockImplementation(origDispatch);
+  store.dispatch = mockDispatch as typeof origDispatch;
+  // const dispatch = jest.spyOn(store, "dispatch");
 
   const history = createMemoryHistory({
     initialEntries: [options?.route ?? "/"]
@@ -77,7 +82,7 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
     // we pass our mocks along so they can be used in assertions
     store,
     history,
-    dispatch
+    dispatch: mockDispatch
   };
 };
 

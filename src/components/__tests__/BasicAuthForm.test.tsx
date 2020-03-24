@@ -14,8 +14,6 @@ import { State } from "opds-web-client/lib/state";
 import userEvent from "@testing-library/user-event";
 import * as authDep from "opds-web-client/lib/utils/auth";
 
-// file.only
-
 const provider: AuthProvider<BasicAuthMethod> = {
   id: "provider-id",
   plugin: {
