@@ -291,6 +291,4 @@ describe("report problem", () => {
 
     expect(mockBoundPostComplaint).toHaveBeenCalledTimes(0);
   });
-
-  test.todo("rest of report problem tests");
 });
