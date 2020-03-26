@@ -43,7 +43,6 @@ const Recommendations: React.FC<{ book: BookData }> = ({ book }) => {
   // get the lanes data from state
   const lanes = recommendationsState?.data?.lanes ?? [];
   const isFetching = recommendationsState?.isFetching ?? false;
-
   if (isFetching) {
     return (
       <div
@@ -58,7 +57,6 @@ const Recommendations: React.FC<{ book: BookData }> = ({ book }) => {
       </div>
     );
   }
-
   return (
     <React.Fragment>
       {lanes.map(lane => (

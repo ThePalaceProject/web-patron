@@ -96,13 +96,23 @@ export const book: BookData = {
       {
         $: {
           rel: { value: "issues" },
-          href: { value: "http://example.com/report" }
+          href: { value: "/report-url" }
         }
       },
       {
         $: {
           rel: { value: "http://librarysimplified.org/terms/rel/revoke" },
           href: { value: "http://example.com/revoke" }
+        }
+      },
+      {
+        $: {
+          rel: {
+            value: "related"
+          },
+          href: {
+            value: "/related-url"
+          }
         }
       }
     ]

@@ -1,0 +1,38 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`handles error state 1`] = `
+<div>
+  <section
+    aria-label="Book details"
+    class="css-1l95cqh"
+  >
+    <div>
+      <p>
+        There was a problem fetching this book. Please refresh the page or return home.
+      </p>
+      <div>
+        <span
+          class="css-1vg6q84"
+        >
+          Error Code: 
+        </span>
+        401
+      </div>
+      <div>
+        <span
+          class="css-1vg6q84"
+        >
+          Error Message: 
+        </span>
+        Some error
+      </div>
+      <a
+        class="css-fvfcr2"
+        href="/"
+      >
+        Return Home
+      </a>
+    </div>
+  </section>
+</div>
+`;

@@ -3,13 +3,13 @@ import { jsx, Styled } from "theme-ui";
 import * as React from "react";
 import { SetCollectionAndBook } from "../../interfaces";
 import BookCover from "../BookCover";
-import Recommendations from "./recommendations";
+import Recommendations from "./Recommendations";
 import {
   mapDispatchToProps,
   mapStateToProps,
   mergeRootProps
 } from "opds-web-client/lib/components/mergeRootProps";
-import { BookData } from "opds-web-client/lib/interfaces";
+import { BookData, FetchErrorData } from "opds-web-client/lib/interfaces";
 import { connect } from "react-redux";
 import ExternalLink from "../ExternalLink";
 import useSetCollectionAndBook from "../../hooks/useSetCollectionAndBook";
@@ -21,6 +21,8 @@ import useNormalizedBook from "../../hooks/useNormalizedBook";
 import { Helmet } from "react-helmet-async";
 import DetailField from "../BookMetaDetail";
 import ReportProblem from "./ReportProblem";
+import useTypedSelector from "../../hooks/useTypedSelector";
+import { NavButton } from "../Button";
 
 export interface BookDetailsPropsNew {
   setCollectionAndBook: SetCollectionAndBook;
@@ -36,6 +38,11 @@ export const BookDetails: React.FC<BookDetailsPropsNew> = ({
 
   const book = useNormalizedBook();
 
+  const error = useTypedSelector(state => state.book.error);
+
+  if (error) {
+    return <Error error={error} />;
+  }
   if (!book) return <PageLoader />;
   return (
     <section aria-label="Book details">
@@ -185,6 +192,40 @@ const DownloadRequirements: React.FC<{ className?: string }> = ({
     </section>
   );
 };
+
+const Error: React.FC<{ error: FetchErrorData }> = ({ error }) => (
+  <section
+    aria-label="Book details"
+    sx={{
+      display: "flex",
+      flexDirection: "column",
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center"
+    }}
+  >
+    <Helmet>
+      <title>Book error</title>
+    </Helmet>
+    <div>
+      <p>
+        There was a problem fetching this book. Please refresh the page or
+        return home.
+      </p>
+      <div>
+        <span sx={{ fontWeight: "bold" }}>Error Code: </span>
+        {error.status ?? "unknown"}
+      </div>
+      <div>
+        <span sx={{ fontWeight: "bold" }}>Error Message: </span>
+        {error.response}
+      </div>
+      <NavButton sx={{ mt: 3 }} to="/">
+        Return Home
+      </NavButton>
+    </div>
+  </section>
+);
 
 const Connected = connect(
   mapStateToProps,

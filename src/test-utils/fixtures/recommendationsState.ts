@@ -1,4 +1,13 @@
 import { RecommendationsState } from "../../interfaces";
+
+export const emptyRecommendationsState: RecommendationsState = {
+  isFetching: false,
+  isFetchingPage: false,
+  url: "/recommmendation-url",
+  error: null,
+  history: [],
+  data: null
+};
 /**
  * This huge fixture was copied over from the recommendationsState
  * fetched when viewing "Emma" by Jane Austen.
@@ -18,14 +27,12 @@ export const recommendationsState: RecommendationsState = {
       type: "start"
     }
   ],
-  url:
-    "http://simplye-dev-cm.amigos.org/xyzlib/works/URI/https://standardebooks.org/ebooks/jane-austen/emma/related_books",
+  url: "/related-url",
   data: {
     id:
       "http://simplye-dev-cm.amigos.org/xyzlib/works/URI/https://standardebooks.org/ebooks/jane-austen/emma/related_books?available=all&after=0&collection=main&entrypoint=Book&order=author&size=50",
     title: "Related Books",
-    url:
-      "http://simplye-dev-cm.amigos.org/xyzlib/works/URI/https://standardebooks.org/ebooks/jane-austen/emma/related_books",
+    url: "/data-related-url",
     lanes: [
       {
         title: "Jane Austen",
@@ -35,7 +42,7 @@ export const recommendationsState: RecommendationsState = {
           {
             id:
               "https://standardebooks.org/ebooks/jane-austen/pride-and-prejudice",
-            title: "Pride and Prejudice",
+            title: "Recommendation 1",
             series: undefined,
             authors: ["Jane Austen"],
             contributors: [],
@@ -83,8 +90,7 @@ export const recommendationsState: RecommendationsState = {
               "Historical Fiction"
             ],
             language: "en",
-            url:
-              "http://simplye-dev-cm.amigos.org/xyzlib/works/URI/https://standardebooks.org/ebooks/jane-austen/pride-and-prejudice",
+            url: "/recommendation-1-url",
             raw: {
               $: {
                 "schema:additionalType": {

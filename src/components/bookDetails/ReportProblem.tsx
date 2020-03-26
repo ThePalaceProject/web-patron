@@ -34,7 +34,7 @@ const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
     dispatch({ type: "REPORT_PROBLEM_CANCEL" });
   };
 
-  const onSubmit = handleSubmit(async ({ type, detail }) => {
+  const onSubmit = handleSubmit(({ type, detail }) => {
     postComplaint({ type, detail });
   });
 
@@ -129,6 +129,7 @@ const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
         onClick={handleClick}
         as={Styled.a}
         sx={{ fontStyle: "italic", mt: 2, display: "inline-block" }}
+        data-testid="report-problem-link"
       >
         Report a problem
       </DialogDisclosure>

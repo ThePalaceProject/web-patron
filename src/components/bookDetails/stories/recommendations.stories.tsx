@@ -1,6 +1,6 @@
 import * as React from "react";
 import { action } from "@storybook/addon-actions";
-import Recommendations from "../recommendations";
+import Recommendations from "../Recommendations";
 import { book as bookFixture } from "../../../test-utils/fixtures";
 import { RecommendationsStateContext } from "../../context/RecommendationsContext";
 import { recommendationsState } from "../../../test-utils/fixtures/recommendationsState";

@@ -12,16 +12,16 @@ import { BookData } from "opds-web-client/lib/interfaces";
  *
  * eg. const doSomething = dispatch => url => fetch(url);
  *
- * when we call const boundDoSomething = doSomething(url),
+ * when we call const boundDoSomething = doSomething(dispatch),
  * boundDoSomething is a function we can then use in our app:
  * (url) => fetch(url)
  */
-
 export default function useComplaints(book: BookData) {
   const [state, dispatch] = React.useReducer(complaints, initState);
   const dialog = useDialogState();
 
   const reportUrl = getReportUrl(book.raw);
+
   // when the hook mounts, fetch the complaint types
   React.useEffect(() => {
     fetchComplaintTypes(dispatch)(reportUrl);
@@ -30,7 +30,6 @@ export default function useComplaints(book: BookData) {
   return {
     state,
     dispatch,
-    fetchComplaintTypes: fetchComplaintTypes(dispatch),
     // this makes it so postComplaint just takes the data.
     postComplaint: postComplaint(dispatch)(reportUrl),
     dialog
