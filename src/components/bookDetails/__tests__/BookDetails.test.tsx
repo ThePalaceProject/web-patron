@@ -5,7 +5,6 @@ import { BookDetails } from "../index";
 import { State } from "opds-web-client/lib/state";
 import { BookData, CollectionData } from "opds-web-client/lib/interfaces";
 import * as complaintActions from "../../../hooks/useComplaints/actions";
-import * as useComplaints from "../../../hooks/useComplaints";
 import { RecommendationsStateContext } from "../../context/RecommendationsContext";
 import userEvent from "@testing-library/user-event";
 import ReportProblem from "../ReportProblem";
@@ -163,10 +162,7 @@ const mockBoundFetchComplaintTypes = jest
 const fetchComplaintTypesSpy = jest
   .spyOn(complaintActions, "fetchComplaintTypes")
   .mockReturnValue(mockBoundFetchComplaintTypes);
-const mockBoundPostComplaint = jest.fn().mockResolvedValue(["some-string"]);
-jest
-  .spyOn(complaintActions, "postComplaint")
-  .mockReturnValue(_url => mockBoundPostComplaint);
+const postComplaintSpy = jest.spyOn(complaintActions, "postComplaint");
 
 const bookWithReportUrl = merge<BookData>(fixtures.book, {
   raw: {
@@ -244,6 +240,9 @@ describe("report problem", () => {
       return Promise.resolve(complaintTypes);
     });
 
+    const mockBoundPostComplaint = jest.fn().mockResolvedValue(["some-string"]);
+    postComplaintSpy.mockReturnValue(_url => mockBoundPostComplaint);
+
     const node = render(
       <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
       {
@@ -263,6 +262,7 @@ describe("report problem", () => {
     // submit the form
     userEvent.click(node.getByText("Submit"));
 
+    // actually posted the complaint
     await wait(() => expect(mockBoundPostComplaint).toHaveBeenCalledTimes(1));
     expect(mockBoundPostComplaint).toHaveBeenCalledWith({
       type: "complaint-type-b",
@@ -270,7 +270,56 @@ describe("report problem", () => {
     });
   });
 
-  test.only("displays client error when unfilled", async () => {
+  test("displays thank you after submitting", async () => {
+    const complaintTypes = ["complaint-type-a", "complaint-type-b"];
+    fetchComplaintTypesSpy.mockImplementationOnce(dispatch => url => {
+      dispatch({
+        type: "FETCH_COMPLAINT_TYPES_SUCCESS",
+        types: complaintTypes
+      });
+      return Promise.resolve(complaintTypes);
+    });
+
+    // make postComplaint dispatch a success message
+    postComplaintSpy.mockImplementation(dispatch => _url => _data => {
+      dispatch({ type: "POST_COMPLAINT_SUCCESS" });
+      return Promise.resolve(["some string"]);
+    });
+
+    const node = render(
+      <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
+      {
+        initialState: makeStateWithBook(bookWithReportUrl)
+      }
+    );
+    // open the form
+    const reportProblemLink = node.getByTestId("report-problem-link");
+    userEvent.click(reportProblemLink);
+
+    // fill the form
+    userEvent.selectOptions(
+      node.getByLabelText("Complaint Type"),
+      "complaint-type-b"
+    );
+    userEvent.type(node.getByLabelText("Details"), "Some issue happened.");
+    // submit the form
+    userEvent.click(node.getByText("Submit"));
+
+    // shows thank you message
+    expect(
+      await node.findByText("Your problem was reported. Thank you!")
+    ).toBeInTheDocument();
+    expect(await node.findByText("Done")).toBeInTheDocument();
+
+    // can close the form
+    userEvent.click(node.getByText("Done"));
+    expect(node.getByText("Complaint Type")).not.toBeVisible();
+  });
+
+  test("displays client error when unfilled", async () => {
+    const mockBoundPostComplaint = jest.fn().mockResolvedValue(["some-string"]);
+    postComplaintSpy.mockReturnValue(_url => mockBoundPostComplaint);
+
     const node = render(<ReportProblem book={fixtures.book} />, {
       initialState: makeStateWithBook(bookWithReportUrl)
     });

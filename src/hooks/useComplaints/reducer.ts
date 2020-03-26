@@ -54,7 +54,7 @@ export default (
     case "FETCH_COMPLAINT_TYPES_FAILURE":
       return Object.assign({}, state, {
         isFetching: false,
-        error: action.error
+        error: action.error.message
       });
 
     case "POST_COMPLAINT_REQUEST":
@@ -72,7 +72,7 @@ export default (
     case "POST_COMPLAINT_FAILURE":
       return Object.assign({}, state, {
         isPosting: false,
-        error: action.error
+        error: action.error.message
       });
 
     default:

@@ -37,7 +37,6 @@ const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
   const onSubmit = handleSubmit(({ type, detail }) => {
     postComplaint({ type, detail });
   });
-
   return (
     <React.Fragment>
       <Modal

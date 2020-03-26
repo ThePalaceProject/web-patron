@@ -18,10 +18,9 @@ describe("fetchComplaintTypes", () => {
 
     const types = await actions.fetchComplaintTypes(dispatch)(reportUrl);
 
-    expect(dispatch.callCount).toBe(3);
+    expect(dispatch.callCount).toBe(2);
     expect(dispatch.args[0][0].type).toBe("FETCH_COMPLAINT_TYPES_REQUEST");
     expect(dispatch.args[1][0].type).toBe("FETCH_COMPLAINT_TYPES_SUCCESS");
-    expect(dispatch.args[2][0].type).toBe("LOAD_COMPLAINT_TYPES");
     expect(types).toEqual(["type1", "type2", "type3"]);
   });
 

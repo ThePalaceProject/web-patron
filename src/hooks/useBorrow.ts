@@ -55,6 +55,7 @@ export default function useBorrow(book: BookData) {
       throw Error("No borrow url present for book");
     }
     // refetch the loans
+    console.log("what", loansUrl);
     if (loansUrl) {
       await dispatch(actions.fetchLoans(loansUrl));
     }

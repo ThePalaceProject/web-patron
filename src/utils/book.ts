@@ -27,7 +27,7 @@ export const getAvailabilityString = (book: BookData): string => {
       return `You have this book on loan for ${timeLeft}`;
     }
     // you have borrowed the book but it is unknown until when
-    return "You have this book on loan";
+    return "You have this book on loan.";
   }
 
   const availableCopies = book?.copies?.available;
