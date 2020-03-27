@@ -2,6 +2,13 @@
 /* eslint-disable camelcase */
 const fetchMock = require("fetch-mock");
 
+/**
+ * we disable console warns in this file because otherwise our tests are polluted.
+ * These warns are helpful, however, in dev and production
+ */
+const consoleErrorSpy = jest.spyOn(global.console, "warn");
+consoleErrorSpy.mockImplementation(() => null);
+
 import LibraryDataCache, {
   RegistryEntry,
   AuthDocument,
