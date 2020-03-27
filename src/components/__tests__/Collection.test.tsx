@@ -9,6 +9,14 @@ import { useBreakpointIndex } from "@theme-ui/match-media";
 
 const setCollectionAndBook = jest.fn().mockReturnValue(Promise.resolve({}));
 
+beforeEach(() => {
+  /**
+   * We do this because Lane does use timeouts, so we need to be
+   * sure they are mocked or we get nebulous errors
+   */
+  jest.useFakeTimers();
+});
+
 test("calls setCollectionAndBook", () => {
   render(<Collection setCollectionAndBook={setCollectionAndBook} />);
 

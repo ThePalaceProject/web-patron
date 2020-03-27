@@ -22,10 +22,14 @@ import { LaneData } from "opds-web-client/lib/interfaces";
  *  which is the most important functionality.
  */
 
+beforeEach(() => {
+  jest.useFakeTimers();
+});
+
 const laneData: LaneData = {
   title: "my lane",
   url: "/link-to-lane",
-  books: fixtures.makeBooks(10)
+  books: fixtures.makeBooks(4)
 };
 
 test("Renders", () => {
@@ -59,7 +63,6 @@ test("filters books", () => {
 
   expect(node.getByText("Book Title 0")).toBeInTheDocument();
   expect(node.getByText("Book Title 3")).toBeInTheDocument();
-  expect(node.getByText("Book Title 9")).toBeInTheDocument();
 });
 
 test("more button navigates to the right link", () => {
