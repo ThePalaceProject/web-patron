@@ -79,7 +79,7 @@ export default class LibraryDataCache {
           }
         }
       } catch (error) {
-        throw "Library registry is not available.";
+        throw new Error("Library registry is not available.");
       }
     }
     // if it still not available, throw the same error
@@ -175,12 +175,12 @@ export default class LibraryDataCache {
           }
         }
         if (!catalogUrl) {
-          throw "Registry entry does not have a catalog URL";
+          throw new Error("Registry entry does not have a catalog URL");
         }
       } else if (this.config) {
         catalogUrl = this.config[library];
         if (!catalogUrl) {
-          throw "No catalog is configured for library " + library;
+          throw new Error("No catalog is configured for library " + library);
         }
       }
 
@@ -191,7 +191,7 @@ export default class LibraryDataCache {
         // If we can't get the catalog, patrons won't be able to use the application
         // Anyway.
         console.warn(catalogError);
-        throw "This library is not available.";
+        throw new Error("This library is not available.");
       }
 
       let authDocument = currentEntry && currentEntry.authDocument;
@@ -221,14 +221,15 @@ export default class LibraryDataCache {
       const registryResponse = await fetch(libraryUrl);
       const registryCatalog = await registryResponse.json();
       if (!registryCatalog.catalogs || registryCatalog.catalogs.length !== 1) {
-        throw "Registry did not return a catalog for this library id: " +
-          library;
+        throw new Error(
+          "Registry did not return a catalog for this library id: " + library
+        );
       }
       const registryEntry = registryCatalog.catalogs[0];
       return registryEntry;
     } catch (error) {
       console.warn(error);
-      throw "This library is not available.";
+      throw new Error("This library is not available.");
     }
   }
 
@@ -243,10 +244,10 @@ export default class LibraryDataCache {
         catalog = parsedCatalog;
       }
     } catch (error) {
-      throw "Could not get OPDS catalog at " + rootUrl;
+      throw new Error("Could not get OPDS catalog at " + rootUrl);
     }
     if (!catalog) {
-      throw "Could not get OPDS catalog at " + rootUrl;
+      throw new Error("Could not get OPDS catalog at " + rootUrl);
     }
     return catalog;
   }
@@ -261,14 +262,16 @@ export default class LibraryDataCache {
       }
     }
     if (!authDocLink) {
-      throw "Could not find authentication document in OPDS catalog";
+      throw new Error("Could not find authentication document in OPDS catalog");
     }
     try {
       const authDocResponse = await fetch(authDocLink);
       const authDoc = await authDocResponse.json();
       return authDoc;
     } catch (error) {
-      throw "Could not get authentication document at " + authDocLink;
+      throw new Error(
+        "Could not get authentication document at " + authDocLink
+      );
     }
   }
 }

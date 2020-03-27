@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable camelcase */
-import { stub } from "sinon";
 const fetchMock = require("fetch-mock");
 
 import LibraryDataCache, {
@@ -60,14 +59,10 @@ describe("LibraryDataCache", () => {
       search: { totalResults: 0, startIndex: 0, itemsPerPage: 0 },
       unparsed: {}
     });
-    getCatalog = stub().returns(
-      new Promise<OPDSFeed>(resolve => resolve(feed))
-    );
-    getAuthDocument = stub().returns(
-      new Promise<AuthDocument>(resolve =>
-        resolve({ links: [], title: "title" })
-      )
-    );
+    getCatalog = jest.fn().mockResolvedValue(feed);
+    getAuthDocument = jest
+      .fn()
+      .mockResolvedValue({ links: [], title: "title" });
   });
 
   afterEach(() => {
@@ -106,18 +101,12 @@ describe("LibraryDataCache", () => {
       const cache = new LibraryDataCache("base-url");
       fetchMock.mock("/base-url", 400);
 
-      try {
-        // This should raise an error since the registry response was an error.
-        const result = await cache.getLibraryUrlTemplate();
-        // Fail the test if it's successful.
-        // "no error was raised"
-        expect(true).toBe(false);
-      } catch (error) {
-        expect(error).toEqual(
-          expect.arrayContaining(["Library registry is not available"])
-        );
-        expect(fetchMock.called()).toBe(true);
-      }
+      await expect(
+        cache.getLibraryUrlTemplate()
+      ).rejects.toThrowErrorMatchingInlineSnapshot(
+        `"Library registry is not available."`
+      );
+      expect(fetchMock.called()).toBe(true);
     });
   });
 
@@ -262,9 +251,7 @@ describe("LibraryDataCache", () => {
     }
 
     beforeEach(() => {
-      getCacheEntry = stub().returns(
-        new Promise(resolve => resolve(cacheEntry))
-      );
+      getCacheEntry = jest.fn().mockResolvedValue(cacheEntry);
     });
 
     test("converts cache entry from registry to library data", async () => {
@@ -366,8 +353,8 @@ describe("LibraryDataCache", () => {
       expect(fetchMock.called()).toBe(true);
       expect(fetchArgs.length).toBe(1);
       expect(fetchArgs[0][0]).toBe("/library/uuid");
-      expect(getCatalog.callCount).toBe(1);
-      expect(getAuthDocument.callCount).toBe(1);
+      expect(getCatalog).toHaveBeenCalledTimes(1);
+      expect(getAuthDocument).toHaveBeenCalledTimes(1);
 
       // Now the entry is in the cache so fetch won't be called again.
       const cachedResult = await cache.getCacheEntry("uuid");
@@ -390,8 +377,8 @@ describe("LibraryDataCache", () => {
         title: "title"
       });
       expect(fetchMock.called()).toBe(false);
-      expect(getCatalog.callCount).toBe(1);
-      expect(getAuthDocument.callCount).toBe(1);
+      expect(getCatalog).toHaveBeenCalledTimes(1);
+      expect(getAuthDocument).toHaveBeenCalledTimes(1);
 
       // Now the entry is in the cache so fetch won't be called.
       const cachedResult = await cache.getCacheEntry("library");
@@ -420,7 +407,7 @@ describe("LibraryDataCache", () => {
       });
       expect(fetchArgs.length).toBe(1);
       expect(fetchArgs[0][0]).toBe("/library/uuid");
-      expect(getAuthDocument.callCount).toBe(1);
+      expect(getAuthDocument).toHaveBeenCalledTimes(1);
 
       // Now the entry is in the cache, but if we wait more than 1 second
       // it will be expired.
@@ -433,7 +420,7 @@ describe("LibraryDataCache", () => {
       });
       expect(fetchArgs.length).toBe(2);
       expect(fetchArgs[1][0]).toBe("/library/uuid");
-      expect(getAuthDocument.callCount).toBe(2);
+      expect(getAuthDocument).toHaveBeenCalledTimes(2);
     });
 
     test("fetches an entry from the config file if it's in the cache but expired", async () => {
@@ -447,8 +434,8 @@ describe("LibraryDataCache", () => {
         title: "title"
       });
       expect(fetchMock.called()).toBe(false);
-      expect(getCatalog.callCount).toBe(1);
-      expect(getAuthDocument.callCount).toBe(1);
+      expect(getCatalog).toHaveBeenCalledTimes(1);
+      expect(getAuthDocument).toHaveBeenCalledTimes(1);
 
       // Now the entry is in the cache, but if we wait more than 1 second
       // it will be expired.
@@ -460,15 +447,13 @@ describe("LibraryDataCache", () => {
         title: "title"
       });
       expect(fetchMock.called()).toBe(false);
-      expect(getCatalog.callCount).toBe(2);
-      expect(getAuthDocument.callCount).toBe(2);
+      expect(getCatalog).toHaveBeenCalledTimes(2);
+      expect(getAuthDocument).toHaveBeenCalledTimes(2);
     });
 
     test("ignores errors fetching the auth document", async () => {
       const cache = new LibraryDataCacheWithTemplate("base-url");
-      getAuthDocument.returns(
-        new Promise<AuthDocument>((resolve, reject) => reject())
-      );
+      getAuthDocument.mockRejectedValue();
 
       fetchMock.mock("/library/uuid", {
         status: 200,
@@ -482,42 +467,31 @@ describe("LibraryDataCache", () => {
       expect(fetchMock.called()).toBe(true);
       expect(fetchArgs[0][0]).toBe("/library/uuid");
       // "getAuthDocument call count"
-      expect(getAuthDocument.callCount).toBe(1);
+      expect(getAuthDocument).toHaveBeenCalledTimes(1);
     });
 
     test("throws an error if there's an error fetching the catalog", async () => {
       const cache = new LibraryDataCacheWithTemplate("/base-url");
-      getCatalog.returns(
-        new Promise<OPDSFeed>((resolve, reject) => reject())
-      );
+      getCatalog.mockRejectedValue();
 
-      const mockFetch = stub().returns(
-        new Promise<any>(resolve => {
-          resolve({
-            json: () => {
-              return { catalogs: [registryEntry] };
-            }
-          });
-        })
-      );
+      const mockFetch = jest.fn().mockResolvedValue({
+        json: () => {
+          return { catalogs: [registryEntry] };
+        }
+      });
 
       fetchMock.mock("/library/uuid", {
         status: 200,
         body: { catalogs: [registryEntry] }
       });
 
-      try {
-        const result = await cache.getCacheEntry("uuid");
-        // Fail the test if it's successful
-        // "no error was raised"
-        expect(true).toBe(false);
-      } catch (error) {
-        expect(error).toEqual(
-          expect.arrayContaining(["This library is not available"])
-        );
-        expect(fetchMock.called()).toBe(true);
-        expect(getCatalog.callCount).toBe(1);
-      }
+      await expect(
+        cache.getCacheEntry("uuid")
+      ).rejects.toThrowErrorMatchingInlineSnapshot(
+        `"This library is not available."`
+      );
+      expect(fetchMock.called()).toBe(true);
+      expect(getCatalog).toHaveBeenCalledTimes(1);
     });
 
     test("throws an error if the registry response doesn't have a library catalog.", async () => {
@@ -526,18 +500,12 @@ describe("LibraryDataCache", () => {
       fetchMock.mock("/base-url", 200);
       fetchMock.mock("/library/uuid", { status: 200, body: { catalogs: [] } });
 
-      try {
-        // This should raise an error since the registry response does not have a catalog.
-        const result = await cache.getCacheEntry("uuid");
-        // Fail the test if it's successful.
-        // "no error was raised"
-        expect(true).toBe(false);
-      } catch (error) {
-        expect(error).toEqual(
-          expect.arrayContaining(["This library is not available"])
-        );
-        expect(fetchMock.called()).toBe(true);
-      }
+      await expect(
+        cache.getCacheEntry("uuid")
+      ).rejects.toThrowErrorMatchingInlineSnapshot(
+        `"This library is not available."`
+      );
+      expect(fetchMock.called()).toBe(true);
     });
 
     test("throws an error if the registry returns a problem detail", async () => {
@@ -547,18 +515,12 @@ describe("LibraryDataCache", () => {
         throw "some problem detail";
       });
 
-      try {
-        // This should raise an error since the registry response was an error.
-        const result = await cache.getCacheEntry("uuid");
-        // Fail the test if it's successful.
-        // "no error was raised"
-        expect(true).toBe(false);
-      } catch (error) {
-        expect(error).toEqual(
-          expect.arrayContaining(["This library is not available"])
-        );
-        expect(fetchMock.called()).toBe(true);
-      }
+      await expect(
+        cache.getCacheEntry("uuid")
+      ).rejects.toThrowErrorMatchingInlineSnapshot(
+        `"This library is not available."`
+      );
+      expect(fetchMock.called()).toBe(true);
     });
 
     test("returns an error if the registry entry doesn't have a catalog url", async () => {
@@ -571,34 +533,23 @@ describe("LibraryDataCache", () => {
         body: { catalogs: [registryEntryWithoutCatalog] }
       });
 
-      try {
-        // This should raise an error.
-        const result = await cache.getCacheEntry("uuid");
-        // Fail the test if it's successful.
-        // "no error was raised"
-        expect(true).toBe(false);
-      } catch (error) {
-        expect(error).toEqual(
-          expect.arrayContaining(["Registry entry does not have a catalog URL"])
-        );
-      }
+      await expect(
+        cache.getCacheEntry("uuid")
+      ).rejects.toThrowErrorMatchingInlineSnapshot(
+        `"Registry entry does not have a catalog URL"`
+      );
+      expect(fetchMock.called()).toBe(true);
     });
 
     test("throws an error if the config file doesn't have an entry for the library", async () => {
       const config = { library: "http://libraryfromconfig.org" };
       const cache = new LibraryDataCacheWithTemplate(undefined, 10, config);
 
-      try {
-        // This should raise an error since the library is not in the config.
-        const result = await cache.getCacheEntry("otherlibrary");
-        // Fail the test if it's successful.
-        // "no error was raised"
-        expect(true).toBe(false);
-      } catch (error) {
-        expect(error).toEqual(
-          expect.arrayContaining(["No catalog is configured"])
-        );
-      }
+      await expect(
+        cache.getCacheEntry("uuid")
+      ).rejects.toThrowErrorMatchingInlineSnapshot(
+        `"No catalog is configured for library uuid"`
+      );
     });
   });
 
@@ -627,12 +578,8 @@ describe("LibraryDataCache", () => {
         catalogs: [registryEntry]
       };
 
-      const mockFetch = stub();
-      mockFetch.returns(
-        new Promise<any>(resolve => {
-          resolve({ json: () => registryResponse });
-        })
-      );
+      const mockFetch = jest.fn();
+      mockFetch.mockResolvedValue({ json: () => registryResponse });
 
       fetchMock.mock("/library/uuid", { status: 200, body: registryResponse });
 
@@ -655,18 +602,11 @@ describe("LibraryDataCache", () => {
           status: 200,
           body: registryResponse
         });
-
-        try {
-          // This should raise an error.
-          const result = await cache.getRegistryEntry("uuid");
-          // Fail the test if it's successful.
-          // "no error was raised"
-          expect(true).toBe(false);
-        } catch (error) {
-          expect(error).toEqual(
-            expect.arrayContaining(["This library is not available"])
-          );
-        }
+        await expect(
+          cache.getCacheEntry("uuid")
+        ).rejects.toThrowErrorMatchingInlineSnapshot(
+          `"This library is not available."`
+        );
 
         fetchMock.restore();
       }
@@ -704,18 +644,12 @@ describe("LibraryDataCache", () => {
     test("returns an error if it can't fetch the catalog", async () => {
       fetchMock.mock("http://library.org/catalog", () => Promise.reject(""));
 
-      try {
-        // This should raise an error.
-        const result = await cache.getCatalog("http://library.org/catalog");
-        // Fail the test if it's successful.
-        // "no error was raised"
-        expect(true).toBe(false);
-      } catch (error) {
-        expect(error).toEqual(
-          expect.arrayContaining(["Could not get OPDS catalog"])
-        );
-        expect(fetchMock.called()).toBe(true);
-      }
+      await expect(
+        cache.getCatalog("http://library.org/catalog")
+      ).rejects.toThrowErrorMatchingInlineSnapshot(
+        `"Could not get OPDS catalog at http://library.org/catalog"`
+      );
+      expect(fetchMock.called()).toBe(true);
     });
 
     test("returns an error if fetching the catalog does not return an OPDS feed", async () => {
@@ -723,18 +657,12 @@ describe("LibraryDataCache", () => {
         status: 200,
         body: "not OPDS"
       });
-      try {
-        // This should raise an error.
-        const result = await cache.getCatalog("http://library.org/catalog");
-        // Fail the test if it's successful.
-        // "no error was raised"
-        expect(true).toBe(false);
-      } catch (error) {
-        expect(error).toEqual(
-          expect.arrayContaining(["Could not get OPDS catalog"])
-        );
-        expect(fetchMock.called()).toBe(true);
-      }
+      await expect(
+        cache.getCatalog("http://library.org/catalog")
+      ).rejects.toThrowErrorMatchingInlineSnapshot(
+        `"Could not get OPDS catalog at http://library.org/catalog"`
+      );
+      expect(fetchMock.called()).toBe(true);
     });
   });
 
@@ -793,7 +721,7 @@ describe("LibraryDataCache", () => {
     });
 
     test("returns an error if the catalog does not have an auth document url", async () => {
-      const mockFetch = stub();
+      const mockFetch = jest.fn();
       const feedWithoutAuthDoc = new OPDSFeed({
         id: "1",
         title: "Library",
@@ -805,17 +733,11 @@ describe("LibraryDataCache", () => {
         unparsed: {}
       });
 
-      try {
-        // This should raise an error.
-        const result = await cache.getAuthDocument(feedWithoutAuthDoc);
-        // Fail the test if it's successful.
-        // "no error was raised"
-        expect(true).toBe(false);
-      } catch (error) {
-        expect(error).toEqual(
-          expect.arrayContaining(["Could not find authentication document"])
-        );
-      }
+      await expect(
+        cache.getAuthDocument(feedWithoutAuthDoc)
+      ).rejects.toThrowErrorMatchingInlineSnapshot(
+        `"Could not find authentication document in OPDS catalog"`
+      );
     });
 
     test("returns an error if it can't fetch the auth document", async () => {
@@ -823,18 +745,12 @@ describe("LibraryDataCache", () => {
         Promise.reject("")
       );
 
-      try {
-        // This should raise an error.
-        const result = await cache.getAuthDocument(feed);
-        // Fail the test if it's successful.
-        // "no error was raised"
-        expect(true).toBe(false);
-      } catch (error) {
-        expect(error).toEqual(
-          expect.arrayContaining(["Could not get authentication document"])
-        );
-        expect(fetchMock.called()).toBe(true);
-      }
+      await expect(
+        cache.getAuthDocument(feed)
+      ).rejects.toThrowErrorMatchingInlineSnapshot(
+        `"Could not get authentication document at http://library.org/authentication_document"`
+      );
+      expect(fetchMock.called()).toBe(true);
     });
   });
 });
