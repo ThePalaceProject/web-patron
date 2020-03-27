@@ -12,8 +12,6 @@ import userEvent from "@testing-library/user-event";
 import theme from "../../theme";
 import { darken, alpha, lighten } from "@theme-ui/color";
 
-//file.only
-
 describe("variants", () => {
   test("primary (default)", () => {
     const node = render(<Button>child</Button>);

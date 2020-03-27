@@ -1,6 +1,7 @@
 import { book as bookFixture } from "../../test-utils/fixtures/book";
 import { getAuthors } from "../book";
-describe("book utils", () => {
+
+describe("get authors", () => {
   /**
    * returns all authors default
    * returns limited number of authors
@@ -21,7 +22,7 @@ describe("book utils", () => {
       ...bookFixture,
       authors: someAuthors
     };
-    expect(getAuthors(book, 2)).toBe(["Peter sieger", "Jeff"]);
+    expect(getAuthors(book, 2)).toStrictEqual(["Peter sieger", "Jeff"]);
   });
 
   test("returns contributors if no authors", () => {
@@ -30,7 +31,7 @@ describe("book utils", () => {
       authors: [],
       contributors: someAuthors
     };
-    expect(getAuthors(book)).toBe(someAuthors);
+    expect(getAuthors(book)).toStrictEqual(someAuthors);
   });
 
   test("returns 'Authors unknown' when neither authors nor contributors provided", () => {
@@ -39,6 +40,6 @@ describe("book utils", () => {
       authors: [],
       contributors: []
     };
-    expect(getAuthors(book)).toBe(["Authors unknown"]);
+    expect(getAuthors(book)).toStrictEqual(["Authors unknown"]);
   });
 });

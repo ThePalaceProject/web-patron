@@ -1,4 +1,3 @@
-import { stub } from "sinon";
 import * as actions from "../actions";
 const fetchMock = require("fetch-mock");
 
@@ -12,20 +11,26 @@ describe("fetchComplaintTypes", () => {
   const reportUrl = "http://example.com/report";
 
   test("dispatches request, load, and success", async () => {
-    const dispatch = stub();
+    const dispatch = jest.fn();
     fetchResponse = "type1\ntype2\ntype3";
     fetchMock.mock(reportUrl, fetchResponse);
 
     const types = await actions.fetchComplaintTypes(dispatch)(reportUrl);
 
-    expect(dispatch.callCount).toBe(2);
-    expect(dispatch.args[0][0].type).toBe("FETCH_COMPLAINT_TYPES_REQUEST");
-    expect(dispatch.args[1][0].type).toBe("FETCH_COMPLAINT_TYPES_SUCCESS");
+    expect(dispatch).toHaveBeenCalledTimes(2);
+    expect(dispatch).toHaveBeenNthCalledWith(1, {
+      type: "FETCH_COMPLAINT_TYPES_REQUEST",
+      url: "http://example.com/report"
+    });
+    expect(dispatch).toHaveBeenNthCalledWith(2, {
+      type: "FETCH_COMPLAINT_TYPES_SUCCESS",
+      types: ["type1", "type2", "type3"]
+    });
     expect(types).toEqual(["type1", "type2", "type3"]);
   });
 
   test("dispatches failure", async () => {
-    const dispatch = stub();
+    const dispatch = jest.fn();
     fetchMock.mock(reportUrl, Promise.reject({ message: "test error" }));
 
     try {
@@ -33,9 +38,16 @@ describe("fetchComplaintTypes", () => {
       // Should not get here
       expect(false).toBe(true);
     } catch (err) {
-      expect(dispatch.callCount).toBe(2);
-      expect(dispatch.args[0][0].type).toBe("FETCH_COMPLAINT_TYPES_REQUEST");
-      expect(dispatch.args[1][0].type).toBe("FETCH_COMPLAINT_TYPES_FAILURE");
+      expect(dispatch).toHaveBeenCalledTimes(2);
+      expect(dispatch).toHaveBeenNthCalledWith(1, {
+        type: "FETCH_COMPLAINT_TYPES_REQUEST",
+        url: "http://example.com/report"
+      });
+      expect(dispatch).toHaveBeenNthCalledWith(2, {
+        type: "FETCH_COMPLAINT_TYPES_FAILURE",
+        error: { message: "test error" }
+      });
+
       expect(err).toEqual({ message: "test error" });
     }
   });
@@ -48,20 +60,25 @@ describe("fetchComplaintTypes", () => {
     };
 
     test("dispatches request, load, and success", async () => {
-      const dispatch = stub();
+      const dispatch = jest.fn();
       fetchResponse = null;
       fetchMock.mock(reportUrl, { status: 200, body: fetchResponse });
 
       const types = await actions.postComplaint(dispatch)(reportUrl)(data);
 
-      expect(dispatch.callCount).toBe(2);
-      expect(dispatch.args[0][0].type).toBe("POST_COMPLAINT_REQUEST");
-      expect(dispatch.args[1][0].type).toBe("POST_COMPLAINT_SUCCESS");
+      expect(dispatch).toHaveBeenCalledTimes(2);
+      expect(dispatch).toHaveBeenNthCalledWith(1, {
+        type: "POST_COMPLAINT_REQUEST",
+        url: "http://example.com/report"
+      });
+      expect(dispatch).toHaveBeenNthCalledWith(2, {
+        type: "POST_COMPLAINT_SUCCESS"
+      });
       expect(types).toBeUndefined();
     });
 
     test("dispatches failure", async () => {
-      const dispatch = stub();
+      const dispatch = jest.fn();
       fetchMock.mock(reportUrl, Promise.reject({ message: "test error" }));
 
       try {
@@ -69,9 +86,15 @@ describe("fetchComplaintTypes", () => {
         // Should not get here
         expect(false).toBe(true);
       } catch (err) {
-        expect(dispatch.callCount).toBe(2);
-        expect(dispatch.args[0][0].type).toBe("POST_COMPLAINT_REQUEST");
-        expect(dispatch.args[1][0].type).toBe("POST_COMPLAINT_FAILURE");
+        expect(dispatch).toHaveBeenCalledTimes(2);
+        expect(dispatch).toHaveBeenNthCalledWith(1, {
+          type: "POST_COMPLAINT_REQUEST",
+          url: "http://example.com/report"
+        });
+        expect(dispatch).toHaveBeenNthCalledWith(2, {
+          type: "POST_COMPLAINT_FAILURE",
+          error: { message: "test error" }
+        });
         expect(err).toEqual({ message: "test error" });
       }
     });

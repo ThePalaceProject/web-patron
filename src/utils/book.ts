@@ -7,7 +7,15 @@ import {
 } from "opds-web-client/lib/utils/book";
 
 export function getAuthors(book: BookData, lim?: number): string[] {
-  const allAuth = book.authors ?? book.contributors ?? ["Authors unknown"];
+  // select contributors if the authors array is undefined or empty.
+  const allAuth =
+    typeof book.authors?.length === "number" && book.authors.length > 0
+      ? book.authors
+      : typeof book.contributors?.length === "number" &&
+        book.contributors.length > 0
+      ? book.contributors
+      : ["Authors unknown"];
+
   // now limit it to however many
   if (lim) {
     return allAuth.slice(0, lim);
