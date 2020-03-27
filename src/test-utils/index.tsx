@@ -18,6 +18,9 @@ import * as fixtures from "./fixtures";
 import ActionsCreator from "opds-web-client/lib/actions";
 import DataFetcher from "opds-web-client/lib/DataFetcher";
 import { adapter } from "opds-web-client/lib/OPDSDataAdapter";
+import serializer from "jest-emotion";
+
+expect.addSnapshotSerializer(serializer);
 
 export { fixtures };
 
