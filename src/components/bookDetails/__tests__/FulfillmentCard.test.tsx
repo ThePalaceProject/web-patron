@@ -20,6 +20,8 @@ const makeBook = (data: Partial<BookData>) =>
     arrayMerge: (_a, b) => b
   });
 
+global["URL"].createObjectURL = jest.fn();
+
 describe("open-access book", () => {
   test("correct availability string", () => {
     const node = render(<FulfillmentCard book={fixtures.book} />);
