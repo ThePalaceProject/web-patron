@@ -25,7 +25,7 @@ expect.addSnapshotSerializer(serializer);
 /**
  * uncomment this if you would like console errors to to
  * error the test. Useful if you don't know where a console
- * error is coming from
+ * error is coming from.
  */
 // const consoleErrorSpy = jest.spyOn(global.console, "error");
 // consoleErrorSpy.mockImplementation((msg, ...opts) => {
