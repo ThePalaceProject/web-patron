@@ -42,9 +42,7 @@ configure({ adapter: new Adapter() });
  * available on jsdom
  */
 const mockCreateObjectURL = jest.fn();
-Object.defineProperty(window.URL, "createObjectURL", {
-  value: mockCreateObjectURL
-});
+global["URL"].createObjectURL = mockCreateObjectURL;
 
 /**
  * We create the actions and fetcher here so that they can
