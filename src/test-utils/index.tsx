@@ -38,6 +38,15 @@ export { fixtures };
 configure({ adapter: new Adapter() });
 
 /**
+ * mock out the window.URL.createObjectURL since it isn't
+ * available on jsdom
+ */
+const mockCreateObjectURL = jest.fn();
+Object.defineProperty(window.URL, "createObjectURL", {
+  value: mockCreateObjectURL
+});
+
+/**
  * We create the actions and fetcher here so that they can
  * be imported by our test file and spied on using:
  * jest.spyOn(actions, "fetchSearchDescription")
