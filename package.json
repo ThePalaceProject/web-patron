@@ -15,22 +15,15 @@
     "lint:sass": "sass-lint -c .sass-lint.yml -v -q",
     "test": "jest",
     "test:watch": "jest --watch",
-    "build:server": "tsc && cp -r src/stylesheets lib",
-    "build:client:prod": "cp -r src/stylesheets lib && webpack -p --progress --display-modules --config webpack.prod.config",
-    "build-prod": "npm run build:server && npm run build:client:prod",
+    "build:server": "tsc",
+    "build:client:prod": "webpack -p --progress --config webpack.prod.config",
+    "build:prod": "NODE_ENV=production npm run build:server && npm run build:client:prod",
     "start": "NODE_ENV=production node lib/server/index.js",
-    "start:amigos": "SIMPLIFIED_CATALOG_BASE=http://simplye-dev-cm.amigos.org/xyzlib node lib/server/index.js",
-    "prod": "npm run build:server && npm run build:client:prod && NODE_ENV=production npm run start",
     "dev": "npm run build:server && NODE_ENV=development npm run start",
-    "prod:amigos": "npm run build:server && npm run build:client:prod",
-    "dev:amigos": "npm run build:server && NODE_ENV=development SIMPLIFIED_CATALOG_BASE=http://simplye-dev-cm.amigos.org/xyzlib node lib/server/index.js",
-    "dev:brazoria": "npm run build:server && NODE_ENV=development SIMPLIFIED_CATALOG_BASE=https://simplye.amigos.org/txbrazoria node lib/server/index.js",
-    "dev:config": "npm run build:server && NODE_ENV=development CONFIG_FILE=./config_file.txt node lib/server/index.js",
+    "dev:configfile": "npm run build:server && NODE_ENV=development CONFIG_FILE=./config_file.txt node lib/server/index.js",
     "generate-icons": "npx @svgr/cli --template src/icons/_template.js --typescript --icon --ext tsx -d src/icons src/icons",
-    "heroku-postbuild": "npm run prod:amigos",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook",
-    "jest": "jest"
+    "build-storybook": "build-storybook"
   },
   "devDependencies": {
     "@babel/core": "^7.7.2",
@@ -166,16 +159,5 @@
   },
   "engines": {
     "node": "13.x"
-  },
-  "mocha": {
-    "spec": "src/**/__tests__/*.ts",
-    "require": [
-      "ts-node/register",
-      "src/testHelper.ts"
-    ],
-    "extension": [
-      "ts",
-      "tsx"
-    ]
   }
 }
