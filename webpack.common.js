@@ -5,6 +5,9 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const ManifestPlugin = require("webpack-manifest-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 
+const OUTPUT_PATH = path.resolve(__dirname, "../../dist");
+const PUBLIC_PATH = "/static/";
+
 let webpackConfig = {
   entry: {
     CirculationPatronWeb: [
@@ -17,13 +20,13 @@ let webpackConfig = {
   },
   output: {
     // where the files will be placed on the filesystem
-    path: path.resolve(__dirname, "./dist"),
+    path: OUTPUT_PATH,
     filename: "[name].js",
     library: "[name]",
     libraryTarget: "umd",
     // url where static files like css and js will be
     // made available by express
-    publicPath: "/static/"
+    publicPath: PUBLIC_PATH
   },
   plugins: [
     // jsdom is needed for server rendering, but causes errors

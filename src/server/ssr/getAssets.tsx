@@ -5,9 +5,10 @@ import * as path from "path";
 import * as express from "express";
 import * as _ from "lodash";
 import isDevelopment from "../isDevelopment";
-const webpackConfig = isDevelopment
-  ? require("../../../webpack.dev.config.js")
-  : require("../../../webpack.prod.config.js");
+
+const OUTPUT_PATH = path.resolve(__dirname, "../../dist");
+const PUBLIC_PATH = "/static/";
+
 /**
  * Assets are the files we need to link to in our HTML,
  * like css and js files. Where we get them now depends
@@ -26,7 +27,7 @@ function getAssets(res: express.Response) {
 
   // otherwise we are in production, and we get our assets
   // from the public folder.
-  const manifestPath = webpackConfig.output.path + "/manifest.json";
+  const manifestPath = OUTPUT_PATH + "/manifest.json";
   return existsP(manifestPath).then(exists => {
     let assets = {};
     if (exists) {
@@ -41,8 +42,6 @@ function normalizeAssets(assets: string | string[]) {
   return Array.isArray(assets) ? assets : [assets];
 }
 
-const publicPath = webpackConfig.output.publicPath;
-
 export function renderJS(asset: string | string[]) {
   return (
     normalizeAssets(asset)
@@ -50,7 +49,7 @@ export function renderJS(asset: string | string[]) {
       .filter(path => _.endsWith(path, ".js"))
       // put it into a script tag
       .map(path => (
-        <script key={path} type="text/javascript" src={publicPath + path} />
+        <script key={path} type="text/javascript" src={PUBLIC_PATH + path} />
       ))
   );
 }
@@ -62,7 +61,7 @@ export function renderCSS(asset: string | string[]) {
       .filter(path => _.endsWith(path, ".css"))
       // put it into a link
       .map(path => (
-        <link key={path} rel="stylesheet" href={publicPath + path} />
+        <link key={path} rel="stylesheet" href={PUBLIC_PATH + path} />
       ))
   );
 }
