@@ -6,7 +6,7 @@ import * as express from "express";
 import * as _ from "lodash";
 import isDevelopment from "../isDevelopment";
 
-const OUTPUT_PATH = path.resolve(__dirname, "../../dist");
+const OUTPUT_PATH = path.resolve(__dirname, "../../../dist");
 const PUBLIC_PATH = "/static/";
 
 /**
@@ -27,6 +27,7 @@ function getAssets(res: express.Response) {
 
   // otherwise we are in production, and we get our assets
   // from the public folder.
+  console.log("Fetching assets from ", OUTPUT_PATH);
   const manifestPath = OUTPUT_PATH + "/manifest.json";
   return existsP(manifestPath).then(exists => {
     let assets = {};

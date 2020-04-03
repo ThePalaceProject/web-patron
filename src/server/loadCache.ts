@@ -12,6 +12,7 @@ async function loadCache() {
   const configFile = process.env.CONFIG_FILE;
 
   if (configFile) {
+    console.log("Using config file found at ", configFile);
     let configText;
     if (configFile.startsWith("http")) {
       try {
@@ -42,6 +43,7 @@ async function loadCache() {
   }
 
   if (!registryBase && !circManagerBase && !configFile) {
+    console.log("Setting registry base to http://localhost:7000");
     registryBase = "http://localhost:7000";
   }
 
@@ -60,7 +62,6 @@ async function loadCache() {
     parsedCacheExpirationSecons,
     config
   );
-  console.log(circManagerBase, process.env.CIRCULATION_MANAGER_BASE);
   return {
     shortenUrls,
     distDir,
