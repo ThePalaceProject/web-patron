@@ -5,18 +5,12 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const ManifestPlugin = require("webpack-manifest-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 
-const OUTPUT_PATH = path.resolve(__dirname, "../../dist");
+const OUTPUT_PATH = path.resolve(__dirname, "./dist");
 const PUBLIC_PATH = "/static/";
 
 let webpackConfig = {
   entry: {
-    CirculationPatronWeb: [
-      "react-hot-loader/patch",
-      "./src/stylesheets/app.scss",
-      "./src/index.tsx",
-      "webpack-hot-middleware/client",
-      "webpack/hot/dev-server"
-    ]
+    CirculationPatronWeb: ["./src/index.tsx"]
   },
   output: {
     // where the files will be placed on the filesystem
@@ -55,10 +49,7 @@ let webpackConfig = {
      *  since we now use babel instead of ts-loader,
      *  we need to use this to check ts.
      */
-    new ForkTsCheckerWebpackPlugin(),
-
-    // hot module replacement
-    new webpack.HotModuleReplacementPlugin()
+    new ForkTsCheckerWebpackPlugin()
   ],
   module: {
     rules: [
@@ -103,7 +94,7 @@ let webpackConfig = {
     extensions: [".ts", ".tsx", ".js", ".scss"],
     alias: {
       react: path.resolve("./node_modules/react"),
-      "react-dom": "@hot-loader/react-dom",
+      "react-dom": path.resolve("./node_modules/react-dom"),
       "react-redux": path.resolve("./node_modules/react-redux")
     }
   }
