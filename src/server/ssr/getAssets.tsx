@@ -5,9 +5,7 @@ import * as path from "path";
 import * as express from "express";
 import * as _ from "lodash";
 import isDevelopment from "../isDevelopment";
-
-const OUTPUT_PATH = path.resolve(__dirname, "../../../dist");
-const PUBLIC_PATH = "/static/";
+import { OUTPUT_PATH, PUBLIC_PATH } from "../constants";
 
 /**
  * Assets are the files we need to link to in our HTML,

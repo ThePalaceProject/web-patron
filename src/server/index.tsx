@@ -1,5 +1,6 @@
 import express from "express";
 import * as React from "react";
+import * as path from "path";
 import webpackDevMiddleware from "./wdm";
 import ssr from "./ssr";
 import loadCache from "./loadCache";
@@ -32,7 +33,13 @@ const initialize = async () => {
      * Tell express where to get files and how to handle all requests
      * This is fired every time the server side receives a request
      */
-    app.use("/static", express.static(distDir));
+    const absoluteDistDir = distDir;
+    console.log(
+      "Statically serving files from " +
+        absoluteDistDir +
+        " via the url /static"
+    );
+    app.use("/static", express.static(absoluteDistDir));
   }
   // Any request not handled previously will get served html via ssr.
   app.use(ssr(data));
