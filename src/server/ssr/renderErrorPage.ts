@@ -1,12 +1,9 @@
-function renderErrorPage(
-  message: string = "There was a problem with this request."
-) {
+function renderErrorPage(message = "There was a problem with this request.") {
   return `
       <!doctype html>
       <html lang="en">
         <head>
           <title>Error</title>
-          <link href="/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
         </head>
         <body>
           <div style="text-align: center; margin-top: 200px;">

@@ -104,7 +104,6 @@
     "@theme-ui/components": "^0.3.1",
     "@theme-ui/match-media": "^0.3.1",
     "@types/react-helmet": "^5.0.15",
-    "bootstrap": "^3.3.6",
     "deepmerge": "^4.2.2",
     "downloadjs": "^1.4.7",
     "express": "^4.14.0",
