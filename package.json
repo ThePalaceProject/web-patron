@@ -9,9 +9,9 @@
   "author": "NYPL",
   "license": "Apache-2.0",
   "scripts": {
-    "lint": "npm run lint:js && npm run lint:sass",
-    "lint:js": "./node_modules/.bin/eslint -c .eslintrc.js src/**/*.ts src/**/*.tsx",
-    "lint:js:fix": "./node_modules/.bin/eslint -c .eslintrc.js src/**/*.ts src/**/*.tsx --fix",
+    "lint": "npm run lint:ts && npm run lint:sass",
+    "lint:ts": "./node_modules/.bin/eslint -c .eslintrc.js src/**/*.ts src/**/*.tsx",
+    "lint:ts:fix": "./node_modules/.bin/eslint -c .eslintrc.js src/**/*.ts src/**/*.tsx --fix",
     "lint:sass": "sass-lint -c .sass-lint.yml -v -q",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -20,7 +20,6 @@
     "build:prod": "NODE_ENV=production npm run build:server && npm run build:client:prod",
     "start": "NODE_ENV=production node lib/server/index.js",
     "dev": "npm run build:server && NODE_ENV=development npm run start",
-    "dev:configfile": "npm run build:server && NODE_ENV=development CONFIG_FILE=./config/cm_libraries.txt node lib/server/index.js",
     "generate-icons": "npx @svgr/cli --template src/icons/_template.js --typescript --icon --ext tsx -d src/icons src/icons",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"

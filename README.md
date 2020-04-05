@@ -22,8 +22,8 @@ If you are using a Library Registry, this configuration will automatically be cr
 
 Once the dependencies are installed and application environments configured, the following two base commands can be used to start the application:
 
-- `npm run dev` - This command will watch the code for changes and rebuild the front-end code, but won't reload the server code.
-- `npm run prod` - This will generate the build that will be used in production servers.
+- `npm run dev` - This command will watch the code for changes and rebuild the front-end code, but won't reload the server code. Unless you have a library registry running locally, remember to have a manager, registry or config file set when running this. eg. `CONFIG_FILE=config/cm_libraries.txt npm run dev`
+- `npm run build:prod` - This will build both the server and the client code into `/lib` and `/dist` respectively. You can then run `npm run start` to start the built server.
 
 The application will start at the base URL of `localhost:3000`.
 
@@ -41,13 +41,13 @@ Set one of the following environment variables when running the application:
 
 - `REGISTRY_BASE` - to use a Library Registry
 
-  - Example: `REGISTRY_BASE=http://localhost:7000 npm run prod`
+  - Example: `REGISTRY_BASE=http://localhost:7000 npm run dev`
   - A Library Registry is required for this build.
   - This is the default setting which will point to a Library Registry located at `localhost:7000`. The libraries can be viewed in the app (running locally) by going to `localhost:3000/{urn:uuid}` where `urn:uuid` is the `urn:uuid` of the library. Get the `urn:uuid` from the Library Registry admin under the `internal_urn` label for its basic information.
 
 - `SIMPLIFIED_CATALOG_BASE` - to use a Circulation Manager
 
-  - Example: `SIMPLIFIED_CATALOG_BASE=http://localhost:6500 npm run prod`.
+  - Example: `SIMPLIFIED_CATALOG_BASE=http://localhost:6500 npm run dev`.
   - Point this environment variable to the URL of the Circulation Manager (which defaults to `localhost:6500`). This will load the _main_ library in the Circulation Manager in the app by going to `localhost:3000`.
 
 - `CONFIG_FILE` - to use a configuration file
@@ -66,3 +66,11 @@ The following environment variables can also be set to further configure the app
 
 - Set `SHORTEN_URLS=false` to stop the app from removing common parts of the circulation manager URLs from the web app's URLs.
 - Set `CACHE_EXPIRATION_SECONDS` to control how often the app will check for changes to registry entries and circ manager authentication documents.
+
+### Useful Scripts
+
+- `npm run test` - This will launch the test runner (jest) and run all tests.
+- `npm run test:watch` - This will run jest in watch mode, rerunning and affected tests whenever you save a file. It's recommended to have this running when developing, that way you know immediately when a change causes some test to fail.
+- `npm run lint` - Will lint all code and show errors/warnings in the console.
+- `npm run lint:ts:fix` - Will lint the ts and tsx files and apply automatic fixes where possible.
+- `npm run generate-icons` - You can place svg files in `src/icons` and then run this command, and it will generate react components that can be imported and rendered normally.
