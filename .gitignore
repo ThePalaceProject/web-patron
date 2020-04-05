@@ -4,7 +4,7 @@ node_modules/*
 typings/*
 *~
 npm-debug.log
-config_file.txt
+config/cm_libraries.txt
 .yalc
 yalc.lock
 wallaby.js
