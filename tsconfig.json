@@ -15,6 +15,6 @@
     "esModuleInterop": true,
     "downlevelIteration": true
   },
-  "include": ["./src", "./.storybook"],
+  "include": ["./src"],
   "exclude": ["lib", "node_modules"]
 }
