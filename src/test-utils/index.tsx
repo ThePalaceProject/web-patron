@@ -12,7 +12,7 @@ import { createMemoryHistory } from "history";
 import BasicAuthPlugin from "../auth/basicAuthPlugin";
 import buildStore from "opds-web-client/lib/store";
 import { State } from "opds-web-client/lib/state";
-import { LibraryData } from "interfaces";
+import { LibraryData } from "../interfaces";
 import "./mockScrollTo";
 import * as fixtures from "./fixtures";
 import ActionsCreator from "opds-web-client/lib/actions";

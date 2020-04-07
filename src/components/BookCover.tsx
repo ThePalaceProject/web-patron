@@ -1,9 +1,8 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import DefaulBookCover from "opds-web-client/lib/components/BookCover";
 import { BookData } from "opds-web-client/lib/interfaces";
-import { AspectRatio, AspectImage } from "@theme-ui/components";
+import { AspectImage } from "@theme-ui/components";
 
 /**
  * This is meant to be a book cover. Primarily the image and styling,
@@ -15,6 +14,7 @@ const BookCover: React.FC<{ book: BookData; className?: string }> = ({
   className
 }) => {
   const { imageUrl } = book;
+
   return (
     <div
       className={className}
@@ -37,7 +37,19 @@ const BookCover: React.FC<{ book: BookData; className?: string }> = ({
           top: 0,
           left: 0,
           width: "100%",
-          height: "100%"
+          height: "100%",
+          "::before": {
+            backgroundColor: "primaries.light",
+            content: '"Book cover image failed to load."',
+            position: "absolute",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            top: 0,
+            left: 0,
+            height: "100%",
+            width: "100%"
+          }
         }}
       />
     </div>
