@@ -49,7 +49,17 @@ let webpackConfig = {
      *  since we now use babel instead of ts-loader,
      *  we need to use this to check ts.
      */
-    new ForkTsCheckerWebpackPlugin()
+    new ForkTsCheckerWebpackPlugin(),
+
+    // pass our environment variables through to the front end.
+    new webpack.EnvironmentPlugin({
+      NODE_ENV: "production",
+      CONFIG_FILE: null,
+      SIMPLIFIED_CATALOG_BASE: null,
+      REGISTRY_BASE: null,
+      SHORTEN_URLS: true,
+      AXE_TEST: false
+    })
   ],
   module: {
     rules: [

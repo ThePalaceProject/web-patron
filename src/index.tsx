@@ -21,7 +21,8 @@ ReactDOM.hydrate(
   element
 );
 
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV === "development" && process.env.AXE_TEST === "true") {
+  console.log("Running with react-axe");
   const axe = require("react-axe");
   axe(React, ReactDOM, 1000);
 }
