@@ -66,11 +66,13 @@ The following environment variables can also be set to further configure the app
 
 - Set `SHORTEN_URLS=false` to stop the app from removing common parts of the circulation manager URLs from the web app's URLs.
 - Set `CACHE_EXPIRATION_SECONDS` to control how often the app will check for changes to registry entries and circ manager authentication documents.
+- Set `AXE_TEST=true` to run the application with `react-axe` enabled (only works when `NODE_ENV` is "development").
 
 ### Useful Scripts
 
 - `npm run test` - This will launch the test runner (jest) and run all tests.
 - `npm run test:watch` - This will run jest in watch mode, rerunning and affected tests whenever you save a file. It's recommended to have this running when developing, that way you know immediately when a change causes some test to fail.
+- `npm run dev:axe` - Will run the dev script with react-axe enabled for viewing accessibility issues.
 - `npm run lint` - Will lint all code and show errors/warnings in the console.
 - `npm run lint:ts:fix` - Will lint the ts and tsx files and apply automatic fixes where possible.
 - `npm run generate-icons` - You can place svg files in `src/icons` and then run this command, and it will generate react components that can be imported and rendered normally.

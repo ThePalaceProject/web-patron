@@ -20,6 +20,7 @@
     "build:prod": "NODE_ENV=production npm run build:server && npm run build:client:prod",
     "start": "NODE_ENV=production node lib/server/index.js",
     "dev": "npm run build:server && NODE_ENV=development node lib/server/index.js",
+    "dev:axe": "AXE_TEST=true npm run dev",
     "generate-icons": "npx @svgr/cli --template src/icons/_template.js --typescript --icon --ext tsx -d src/icons src/icons"
   },
   "devDependencies": {
