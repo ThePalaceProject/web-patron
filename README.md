@@ -68,6 +68,15 @@ The following environment variables can also be set to further configure the app
 - Set `CACHE_EXPIRATION_SECONDS` to control how often the app will check for changes to registry entries and circ manager authentication documents.
 - Set `AXE_TEST=true` to run the application with `react-axe` enabled (only works when `NODE_ENV` is "development").
 
+### Useful Scripts
+
+- `npm run test` - This will launch the test runner (jest) and run all tests.
+- `npm run test:watch` - This will run jest in watch mode, rerunning and affected tests whenever you save a file. It's recommended to have this running when developing, that way you know immediately when a change causes some test to fail.
+- `npm run dev:axe` - Will run the dev script with react-axe enabled for viewing accessibility issues.
+- `npm run lint` - Will lint all code and show errors/warnings in the console.
+- `npm run lint:ts:fix` - Will lint the ts and tsx files and apply automatic fixes where possible.
+- `npm run generate-icons` - You can place svg files in `src/icons` and then run this command, and it will generate react components that can be imported and rendered normally.
+
 ## Testing
 
 The code is tested using Jest as a test runner and mocking library, and a combination of [React Testing Library](https://testing-library.com/docs/react-testing-library/intro) and [Enzyme](https://enzymejs.github.io/enzyme/). New tests are generally written with React Testing Library while the legacy tests were written with Enzyme. React Testing Library is good because it encourages devs not to test implementation details, but instead test the expected user experience. This results in tests that provide more confidence and change less frequently (they are implementation agnostic), therefore requiring less maintenance. In general, we have favored integration over unit tests, and testing components higher up the tree instead of in complete isolation. Similarly we have chosen to mock as few values and modules as possible. Both of these decisions will lead to higher confidence that the app works as expected for users.
@@ -136,11 +145,72 @@ test("fetches search description", async () => {
 });
 ```
 
-### Useful Scripts
+## Deploying
 
-- `npm run test` - This will launch the test runner (jest) and run all tests.
-- `npm run test:watch` - This will run jest in watch mode, rerunning and affected tests whenever you save a file. It's recommended to have this running when developing, that way you know immediately when a change causes some test to fail.
-- `npm run dev:axe` - Will run the dev script with react-axe enabled for viewing accessibility issues.
-- `npm run lint` - Will lint all code and show errors/warnings in the console.
-- `npm run lint:ts:fix` - Will lint the ts and tsx files and apply automatic fixes where possible.
-- `npm run generate-icons` - You can place svg files in `src/icons` and then run this command, and it will generate react components that can be imported and rendered normally.
+This repository includes a Dockerfile, and the master branch is built as an image in Docker Hub in the Hub repository [nypl/patron-web](https://hub.docker.com/r/nypl/patron-web). You can deploy the application simply by running the image from Docker Hub.
+
+Alternatively, you can build your own container from local changes as described below. If you would like to deploy from Docker Hub, skip to [Running a container from the image](#running-a-container-from-the-image).
+
+### Build a docker container
+
+When you have code changes you wish to review locally, you will need to build a local Docker image with your changes included. There are a few steps to get a working build:
+
+1. Clone this repository and make some changes.
+
+2. Build the image
+   ```
+   docker build -t patronweb  .
+   ```
+
+If you wanted to customize the image, you could create an additional Dockerfile (e.g., Dockerfile.second) and simply specify its name in the docker build commands. The Docker file you specify will guide the image build. For this image, the build takes about 4-6 minutes, depending on your Internet speed and load on the Node package servers, to complete the final image. Eg: `docker build -f Dockerfile.second -t patronweb .`
+
+### Running the docker container
+
+Whether running the container from a Docker Hub image, or a local one, you will need to provide at least one environment variable to specify the circulation manager backend, as described in [Application Startup Configurations](#Application-Startup-Configurations). You can also provide the other optional environment variables when running your docker container. There are two ways to run the container: (1) via the command line, and (2) via `docker-compose` with a `docker-compose.yml` file.
+
+When running the image with the `CONFIG_FILE` option, you will want to provide the file's directory to the container as a volume, so the container can access the file on your host machine. When doing this, replace `$PATH_TO_LOCAL_VOLUME` with the absolute path to the `/config` directory on the host machine.
+
+#### From the command line
+
+This command will download the image from NYPL's Docker Hub repo, and then run it with the `CONFIG_FILE` option (using a file named `cm_libraries.txt`) and the name `patronweb`. If you would like to run your locally built image, substitute `nypl/patron-web` with the tag of the image you built previously (just `patronweb` in the example above).
+
+```
+docker run -d --name patronweb -p 3000:3000\
+  --restart=unless-stopped \
+  -e "CONFIG_FILE=/config/cm_libraries.txt" \
+  -v $PATH_TO_LOCAL_VOLUME:/config \
+  nypl/patronweb
+```
+
+To run the container with a `SIMPLIFIED_CATALOG_BASE` or `LIBRARY_REGISTRY` instead of a `CONFIG_FILE`, simply replace the env variable in the run command. You will also not need to provide the volume, since no config file is being read.
+
+```
+docker run --name patronweb -d -p 3000:3000\
+  --restart=unless-stopped \
+  -e "SIMPLIFIED_CATALOG_BASE=https://example.catalog-base.com/" \
+  nypl/patron-web
+```
+
+What are these commands doing?
+
+- `--name` - allows you to name your docker container
+- `-d` - detatches the docker container from the terminal. If running locally, you can still view the container with Docker Desktop.
+- `-p 3000:3000` - the default port exposed in the image during the build is 3000. This command maps that to port 3000 on the host machine so it can be accessed there.
+- `--restart=unless-stopped` - this will make the container restart if it exits erroneously.
+- `-e` - define environment variable(s).
+- `-v $PATH_TO_LOCAL_VOLUME:/config` - allows you to specify which directory on the host machine will contain your config.
+
+#### Using `docker-compose`
+
+Instead of using the `docker run` command at the command line, it's also possible to use the `docker-compose` utility to create the container. Using docker-compose provides the advantage of encapsulating the run parameters in a configuration file that can be committed to source control. We've added an example `docker-compose.yml` file in this repository, which you can adjust as needed with parameters that fit your development.
+
+To create the container using the `docker-compose.yml` file in this repository, simply run `docker-compose up`. This will build the image and start the container. To stop the container and remove it, run `docker-compose down`. Similarly you can run `docker-compose stop` to stop the container without removing it, and `docker-compose start` to restart a stopped container.
+
+If you would like to use a `SIMPLIFIED_CATALOG_BASE` or `LIBRARY_REGISTRY`, or provide any of the other documented [ENV vars](#Application-Startup-Configurations), simply replace the `CONFIG_FILE` setting in `docker-compose.yml`.
+
+#### Helpful commands
+
+- For debuggin purposes, you can run the container and skip the command to start the app, instead launching it directly into a shell. To do so, use this command:
+  ```
+  docker run -it --name patronweb -v $PATH_TO_LOCAL_VOLUME:/config --rm --entrypoint=/bin/sh patronweb
+  ```
