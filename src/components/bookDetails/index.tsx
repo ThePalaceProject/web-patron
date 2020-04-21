@@ -196,39 +196,47 @@ const DownloadRequirements: React.FC<{ className?: string }> = ({
   );
 };
 
-const Error: React.FC<{ error: FetchErrorData }> = ({ error }) => (
-  <section
-    aria-label="Book details"
-    sx={{
-      display: "flex",
-      flexDirection: "column",
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center"
-    }}
-  >
-    <Helmet>
-      <title>Book error</title>
-    </Helmet>
-    <div>
-      <p>
-        There was a problem fetching this book. Please refresh the page or
-        return home.
-      </p>
-      <div>
-        <span sx={{ fontWeight: "bold" }}>Error Code: </span>
-        {error.status ?? "unknown"}
+const Error: React.FC<{ error: FetchErrorData }> = ({ error }) => {
+  let detail: string;
+  try {
+    detail = JSON.parse(error.response).detail;
+  } catch {
+    detail = error.response;
+  }
+  return (
+    <section
+      aria-label="Book details"
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center"
+      }}
+    >
+      <Helmet>
+        <title>Book error</title>
+      </Helmet>
+      <div sx={{ maxWidth: "70%" }}>
+        <p>
+          There was a problem fetching this book. Please refresh the page or
+          return home.
+        </p>
+        <div>
+          <span sx={{ fontWeight: "bold" }}>Error Code: </span>
+          {error.status ?? "unknown"}
+        </div>
+        <div>
+          <span sx={{ fontWeight: "bold" }}>Error Message: </span>
+          {detail}
+        </div>
+        <NavButton sx={{ mt: 3 }} collectionUrl={undefined}>
+          Return Home
+        </NavButton>
       </div>
-      <div>
-        <span sx={{ fontWeight: "bold" }}>Error Message: </span>
-        {error.response}
-      </div>
-      <NavButton sx={{ mt: 3 }} to="/">
-        Return Home
-      </NavButton>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 const Connected = connect(
   mapStateToProps,
