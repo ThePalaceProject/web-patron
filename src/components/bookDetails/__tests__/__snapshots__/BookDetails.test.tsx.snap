@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`book details page handles error state 1`] = `
-.emotion-3 {
+.emotion-4 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -20,6 +20,10 @@ exports[`book details page handles error state 1`] = `
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
+}
+
+.emotion-3 {
+  max-width: 70%;
 }
 
 .emotion-0 {
@@ -83,9 +87,11 @@ exports[`book details page handles error state 1`] = `
 <div>
   <section
     aria-label="Book details"
-    class="emotion-3"
+    class="emotion-4"
   >
-    <div>
+    <div
+      class="emotion-3"
+    >
       <p>
         There was a problem fetching this book. Please refresh the page or return home.
       </p>
