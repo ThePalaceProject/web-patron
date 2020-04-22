@@ -21,7 +21,8 @@
 - Turned on typescript's [strictNullChecks](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-0.html#--strictnullchecks).
 - Added `react-axe` for accessibility warnings in development.
 - Created numerous hooks that allow re-use of various functionality like auth, linking, etc.
-- Switched to Jest and React Testing Library for testing.
+- Switched to Jest and React Testing Library for testing. Legacy test suites are still run with Enzyme.
+- Added [Reakit](https://reakit.io/) as an accessible UI component library.
 
 ### 1.0.0
 
