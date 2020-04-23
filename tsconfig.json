@@ -5,8 +5,16 @@
     "outDir": "lib",
     "lib": ["es2017", "dom"],
     "rootDir": "src",
-    "types": ["mocha", "node"],
-    "jsx": "react"
+    "types": ["jest", "node"],
+    "jsx": "react",
+    "baseUrl": "src",
+    "paths": {
+      "*": ["node_modules/@types/*", "*"]
+    },
+    "strictNullChecks": true,
+    "esModuleInterop": true,
+    "downlevelIteration": true
   },
+  "include": ["./src"],
   "exclude": ["lib", "node_modules"]
 }

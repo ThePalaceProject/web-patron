@@ -1,44 +1,111 @@
+/** @jsx jsx */
+import { jsx, Styled } from "theme-ui";
 import * as React from "react";
-import { FooterProps } from "opds-web-client/lib/components/Root";
-import { LinkData } from "opds-web-client/lib/interfaces";
+import ExternalLink from "./ExternalLink";
+import useLibraryContext from "./context/LibraryContext";
 
-export default class Footer extends React.Component<FooterProps, {}> {
-  constructor(props) {
-    super(props);
-    this.links = this.links.bind(this);
-  }
+const Footer: React.FC<{ className?: string }> = ({ className }) => {
+  const library = useLibraryContext();
+  const {
+    helpEmail,
+    helpWebsite,
+    privacyPolicy,
+    tos,
+    about,
+    registration,
+    libraryWebsite
+  } = library.libraryLinks;
+  const title = library.catalogName;
 
-  links(): LinkData[] {
-    let links = [];
+  return (
+    <footer
+      sx={{ backgroundColor: "primaries.dark", color: "white" }}
+      className={className}
+    >
+      <div
+        sx={{ display: "flex", alignItems: "flex-start", letterSpacing: 0.9 }}
+      >
+        <div sx={{ m: 4 }}>
+          <Styled.h5 sx={{ m: 0 }}>{title}</Styled.h5>
+          <Styled.ul>
+            <Styled.li>
+              {libraryWebsite && (
+                <FooterExternalLink href={libraryWebsite.href}>
+                  Library Website
+                </FooterExternalLink>
+              )}
+            </Styled.li>
+            <Styled.li>
+              {registration && (
+                <FooterExternalLink href={registration.href}>
+                  Patron Registration
+                </FooterExternalLink>
+              )}
+            </Styled.li>
+          </Styled.ul>
+        </div>
+        <div sx={{ m: 4, mb: 2 }}>
+          <Styled.h5 sx={{ m: 0 }}>Patron Support</Styled.h5>
+          <Styled.ul>
+            {helpEmail && (
+              <Styled.li>
+                <FooterExternalLink href={helpEmail.href}>
+                  Email Support
+                </FooterExternalLink>
+              </Styled.li>
+            )}
+            {helpWebsite && (
+              <Styled.li>
+                <FooterExternalLink href={helpWebsite.href}>
+                  Help Website
+                </FooterExternalLink>
+              </Styled.li>
+            )}
+          </Styled.ul>
+        </div>
+      </div>
+      <div sx={{ mx: 4, my: 2, fontSize: 1 }}>
+        {/* <span sx={{ mr: 2 }}>Copyright</span> */}
+        <Styled.ul sx={{ display: "inline-flex", "&>li": { mx: 2 } }}>
+          {privacyPolicy && (
+            <Styled.li>
+              <FooterExternalLink href={privacyPolicy.href}>
+                Privacy
+              </FooterExternalLink>
+            </Styled.li>
+          )}
+          {tos && (
+            <Styled.li>
+              <FooterExternalLink href={tos.href}>
+                Terms of Use
+              </FooterExternalLink>
+            </Styled.li>
+          )}
+          {about && (
+            <Styled.li>
+              <FooterExternalLink href={about.href}>About</FooterExternalLink>
+            </Styled.li>
+          )}
+        </Styled.ul>
+      </div>
+    </footer>
+  );
+};
 
-    let labels = {
-      about: "About",
-      "terms-of-service": "Terms of Service",
-      "privacy-policy": "Privacy Policy",
-      copyright: "Copyright"
-    };
+const FooterExternalLink: React.FC<React.HTMLProps<HTMLAnchorElement>> = ({
+  children,
+  className,
+  ...props
+}) => {
+  return (
+    <ExternalLink
+      sx={{ color: "primaries.medium", textDecoration: "none", fontSize: 1 }}
+      className={className}
+      {...props}
+    >
+      {children}
+    </ExternalLink>
+  );
+};
 
-    Object.keys(labels).forEach(type => {
-      let link = this.props.collection.links.find(link => link.type === type);
-      if (link) {
-        let linkWithLabel = Object.assign({}, link, { text: labels[type] });
-        links.push(linkWithLabel);
-      }
-    });
-    return links;
-  }
-
-  render(): JSX.Element {
-    return (
-      <ul aria-label="about links" className="list-inline">
-        {this.links().map(link => (
-          <li key={link.url}>
-            <a href={link.url} target="_blank">
-              {link.text}
-            </a>
-          </li>
-        ))}
-      </ul>
-    );
-  }
-}
+export default Footer;

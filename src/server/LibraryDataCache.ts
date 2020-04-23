@@ -1,6 +1,7 @@
 require("isomorphic-fetch");
 import OPDSParser, { OPDSFeed } from "opds-feed-parser";
 import { Link, LibraryData } from "../interfaces";
+import { parseLinks } from "../utils/libraryLinks";
 
 export interface RegistryEntry {
   links: Link[];
@@ -14,6 +15,7 @@ export interface RegistryEntry {
 export interface AuthDocument {
   title: string;
   links: Link[];
+  // eslint-disable-next-line camelcase
   web_color_scheme?: {
     background?: string;
     foreground?: string;
@@ -27,17 +29,18 @@ export interface CacheEntry {
   timestamp: number;
 }
 
+type Config = { [key: string]: string };
 export default class LibraryDataCache {
   // An in-memory cache of registry entries and authentication documents.
   // Registry entries don't change very often, and it's fine to fetch them
-  // again if we restart the server. It's also not a problem if simultaneous
-  // requests update the same registry entry, since they'll get the same
-  // data from the registry.
+  // Again if we restart the server. It's also not a problem if simultaneous
+  // Requests update the same registry entry, since they'll get the same
+  // Data from the registry.
   private readonly CACHE: { [key: string]: CacheEntry } = {};
-  private readonly registryBase: string;
+  private readonly registryBase?: string;
   private readonly expirationSeconds: number;
-  private readonly config: { [key: string]: string };
-  protected libraryUrlTemplate: string = null;
+  private readonly config?: Config;
+  protected libraryUrlTemplate: string | null = null;
 
   /**
     Create a LibraryDataCache for a registry or from a configuration file.
@@ -47,9 +50,9 @@ export default class LibraryDataCache {
     config: A pre-configured mapping from library paths to circulation manager URLs.
   */
   constructor(
-    registryBase: string,
+    registryBase?: string,
     expirationSeconds: number = 60 * 60 * 24,
-    config?: { [key: string]: string }
+    config?: Config
   ) {
     this.registryBase = registryBase;
     this.expirationSeconds = expirationSeconds;
@@ -57,6 +60,11 @@ export default class LibraryDataCache {
   }
 
   async getLibraryUrlTemplate(): Promise<string> {
+    if (!this.registryBase) {
+      throw new Error(
+        "Attempting to fetch registryResponse without process.env.REGISTRY_BASE"
+      );
+    }
     if (!this.libraryUrlTemplate) {
       try {
         const registryResponse = await fetch(this.registryBase);
@@ -71,8 +79,12 @@ export default class LibraryDataCache {
           }
         }
       } catch (error) {
-        throw "Library registry is not available.";
+        throw new Error("Library registry is not available.");
       }
+    }
+    // if it still not available, throw the same error
+    if (!this.libraryUrlTemplate) {
+      throw new Error("Library registry not available");
     }
     return this.libraryUrlTemplate;
   }
@@ -81,29 +93,34 @@ export default class LibraryDataCache {
     authDocument: AuthDocument,
     catalog: OPDSFeed
   ) {
-    let data = {
-      catalogName: authDocument["title"],
-      colors: authDocument["web_color_scheme"],
-      logoUrl: null,
-      headerLinks: [],
-      cssLinks: []
-    };
+    let logoUrl: string | undefined;
+    const cssLinks: Link[] = [];
+    const headerLinks: Link[] = [];
 
     for (const link of authDocument.links) {
       if (link.rel === "logo") {
-        data.logoUrl = link.href;
+        logoUrl = link.href;
       } else if (link.rel === "stylesheet") {
-        data.cssLinks.push(link);
+        cssLinks.push(link);
       }
     }
 
     for (const link of catalog["links"]) {
       if (link.role === "navigation") {
-        data.headerLinks.push(link);
+        headerLinks?.push(link);
       }
     }
 
-    return data;
+    const libraryLinks = parseLinks(authDocument.links);
+
+    return {
+      catalogName: authDocument["title"],
+      colors: authDocument["web_color_scheme"],
+      headerLinks,
+      cssLinks,
+      logoUrl,
+      libraryLinks
+    };
   }
 
   async getLibraryData(library: string): Promise<LibraryData> {
@@ -111,15 +128,19 @@ export default class LibraryDataCache {
     let catalogUrl;
     let catalogName;
     if (Object.keys(this.config || {}).length) {
-      catalogUrl = this.config[library];
+      catalogUrl = this.config?.[library];
     } else {
-      for (const link of entry.registryEntry.links) {
+      for (const link of entry?.registryEntry?.links ?? []) {
         if (link.rel === "http://opds-spec.org/catalog") {
           catalogUrl = link.href;
           break;
         }
       }
-      catalogName = entry.registryEntry.metadata.title;
+      catalogName = entry.registryEntry?.metadata?.title;
+    }
+
+    if (!entry.authDocument || !entry.catalog) {
+      throw new Error("AuthDocument or Catalog not provided in getLibraryData");
     }
 
     return {
@@ -154,12 +175,12 @@ export default class LibraryDataCache {
           }
         }
         if (!catalogUrl) {
-          throw "Registry entry does not have a catalog URL";
+          throw new Error("Registry entry does not have a catalog URL");
         }
       } else if (this.config) {
         catalogUrl = this.config[library];
         if (!catalogUrl) {
-          throw "No catalog is configured for library " + library;
+          throw new Error("No catalog is configured for library " + library);
         }
       }
 
@@ -168,9 +189,9 @@ export default class LibraryDataCache {
         catalog = await this.getCatalog(catalogUrl);
       } catch (catalogError) {
         // If we can't get the catalog, patrons won't be able to use the application
-        // anyway.
+        // Anyway.
         console.warn(catalogError);
-        throw "This library is not available.";
+        throw new Error("This library is not available.");
       }
 
       let authDocument = currentEntry && currentEntry.authDocument;
@@ -178,7 +199,7 @@ export default class LibraryDataCache {
         authDocument = await this.getAuthDocument(catalog);
       } catch (authDocError) {
         // If we can't get the authentication document, keep the previous cached
-        // version or proceed without one.
+        // Version or proceed without one.
         console.warn(authDocError);
       }
 
@@ -193,26 +214,27 @@ export default class LibraryDataCache {
     return this.CACHE[library];
   }
 
-  async getRegistryEntry(library): Promise<void> {
+  async getRegistryEntry(library: string): Promise<void> {
     const template = await this.getLibraryUrlTemplate();
     const libraryUrl = template.replace("{uuid}", library);
     try {
       const registryResponse = await fetch(libraryUrl);
       const registryCatalog = await registryResponse.json();
       if (!registryCatalog.catalogs || registryCatalog.catalogs.length !== 1) {
-        throw "Registry did not return a catalog for this library id: " +
-          library;
+        throw new Error(
+          "Registry did not return a catalog for this library id: " + library
+        );
       }
       const registryEntry = registryCatalog.catalogs[0];
       return registryEntry;
     } catch (error) {
       console.warn(error);
-      throw "This library is not available.";
+      throw new Error("This library is not available.");
     }
   }
 
   async getCatalog(rootUrl: string): Promise<OPDSFeed> {
-    let catalog: OPDSFeed;
+    let catalog: OPDSFeed | null = null;
     try {
       const catalogResponse = await fetch(rootUrl);
       const rawCatalog = await catalogResponse.text();
@@ -222,10 +244,10 @@ export default class LibraryDataCache {
         catalog = parsedCatalog;
       }
     } catch (error) {
-      throw "Could not get OPDS catalog at " + rootUrl;
+      throw new Error("Could not get OPDS catalog at " + rootUrl);
     }
     if (!catalog) {
-      throw "Could not get OPDS catalog at " + rootUrl;
+      throw new Error("Could not get OPDS catalog at " + rootUrl);
     }
     return catalog;
   }
@@ -240,14 +262,16 @@ export default class LibraryDataCache {
       }
     }
     if (!authDocLink) {
-      throw "Could not find authentication document in OPDS catalog";
+      throw new Error("Could not find authentication document in OPDS catalog");
     }
     try {
       const authDocResponse = await fetch(authDocLink);
       const authDoc = await authDocResponse.json();
       return authDoc;
     } catch (error) {
-      throw "Could not get authentication document at " + authDocLink;
+      throw new Error(
+        "Could not get authentication document at " + authDocLink
+      );
     }
   }
 }
