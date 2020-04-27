@@ -44,7 +44,7 @@ jobs:
         run: tsc --noEmit
 
   test:
-    name: Test
+    name: Test & Coverage
     runs-on: ubuntu-latest
     env:
       CI: true
@@ -57,4 +57,8 @@ jobs:
       - name: Cache and install node modules
         uses: bahmutov/npm-install@v1
       - name: Test
-        run: npm run test
+        run: npm run test -- --coverage
+      - name: Coveralls Report
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
