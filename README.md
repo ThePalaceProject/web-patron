@@ -1,5 +1,8 @@
 # circulation-patron-web
 
+![Docker Image Version (latest semver)](https://img.shields.io/docker/v/nypl/patron-web?label=Docker%20Hub&logo=docker&sort=semver&style=flat)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/NYPL-Simplified/circulation-patron-web/CI?label=Tests&logo=github&style=flat)
+
 A Circulation catalog web interface for library patrons.
 
 ## Background
@@ -77,6 +80,13 @@ The following environment variables can also be set to further configure the app
 - `npm run lint:ts:fix` - Will lint the ts and tsx files and apply automatic fixes where possible.
 - `npm run generate-icons` - You can place svg files in `src/icons` and then run this command, and it will generate react components that can be imported and rendered normally.
 
+## Contributing
+
+There are two protected branches in this repository: `beta`, and `master`.
+
+- `master` is the most current production deployment code. Any time a PR is merged in to master, a release is tagged and created. A Docker Image is then built by Github Actions, which is finally pushed to Docker Hub with the tag `latest` as well as the specific version tag of the release (ie `2.3.6`). Generally, we only make PRs to `master` from `beta` unless a hotfix is necessary in production.
+- `beta` is the development and qa branch where feature PRs are brought together and staged/tried before being pushed into production. This is the default branch that most PRs should be pointed to. It is also tested, built and deployed by Github Actions with the tag `beta` and `beta.short_sha` where `short_sha` is from the most recent commit to beta. This way users can install the most recent beta using `beta` tag, or one at a specific commit for testing purposes.
+
 ## Testing
 
 The code is tested using Jest as a test runner and mocking library, and a combination of [React Testing Library](https://testing-library.com/docs/react-testing-library/intro) and [Enzyme](https://enzymejs.github.io/enzyme/). New tests are generally written with React Testing Library while the legacy tests were written with Enzyme. React Testing Library is good because it encourages devs not to test implementation details, but instead test the expected user experience. This results in tests that provide more confidence and change less frequently (they are implementation agnostic), therefore requiring less maintenance. In general, we have favored integration over unit tests, and testing components higher up the tree instead of in complete isolation. Similarly we have chosen to mock as few values and modules as possible. Both of these decisions will lead to higher confidence that the app works as expected for users.
@@ -147,7 +157,7 @@ test("fetches search description", async () => {
 
 ## Deploying
 
-This repository includes a Dockerfile, and the master branch is built as an image in Docker Hub in the Hub repository [nypl/patron-web](https://hub.docker.com/r/nypl/patron-web). You can deploy the application simply by running the image from Docker Hub.
+This repository includes a Dockerfile, and the master branch is built as an image in Docker Hub in the Hub repository [nypl/patron-web](https://hub.docker.com/r/nypl/patron-web). You can deploy the application simply by running the image from Docker Hub. You can either use the `latest` tag in Docker Hub, or a specific version tagged with the version number. There will also be an image tagged `beta` for the most recent code on the `beta` branch.
 
 Alternatively, you can build your own container from local changes as described below. If you would like to deploy from Docker Hub, skip to [Running a container from the image](#running-a-container-from-the-image).
 
