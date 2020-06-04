@@ -15,16 +15,16 @@ describe("Layout nav + structure", () => {
     expect(homeButton.closest("a")).toHaveAttribute("href", "/");
   });
 
-  test("my books navigates to /collections/loans", () => {
+  test("my books navigates to /loans", () => {
     const node = render(<Layout>Child</Layout>, {
       initialState: merge(fixtures.initialState, {
         loans: {
-          url: "/myloans"
+          url: "/myloans" // this url is not used for navigation, but for fetching loans
         }
       })
     });
     const myBooks = node.getByText("My Books").closest("a");
-    expect(myBooks).toHaveAttribute("href", "/collection/myloans");
+    expect(myBooks).toHaveAttribute("href", "/loans");
   });
 
   test("displays children within main", () => {
@@ -82,9 +82,17 @@ const stateWithFacets: State = merge(fixtures.initialState, {
 });
 
 describe("Format filters", () => {
-  test("Format filters are visible on home w/ facets", () => {
+  test("Format filters not rendered when showFormatFilter not provided", () => {
     const node = render(<Layout>Child</Layout>, {
-      route: "/",
+      initialState: stateWithFacets
+    });
+    expect(node.queryByLabelText("Format filters")).toBeFalsy();
+    expect(node.queryByText("All")).toBeFalsy();
+    expect(node.queryByLabelText("Books")).toBeFalsy();
+    expect(node.queryByLabelText("Audiobooks")).toBeFalsy();
+  });
+  test("Format filters are visible on home w/ facets", () => {
+    const node = render(<Layout showFormatFilter>Child</Layout>, {
       initialState: stateWithFacets
     });
     expect(node.getByText("ALL")).toBeTruthy();
@@ -93,8 +101,7 @@ describe("Format filters", () => {
   });
 
   test("format filters are visible on collection w/ facets present", () => {
-    const node = render(<Layout>Child</Layout>, {
-      route: "/collection/blah",
+    const node = render(<Layout showFormatFilter>Child</Layout>, {
       initialState: stateWithFacets
     });
     expect(node.getByText("ALL")).toBeTruthy();
@@ -103,8 +110,7 @@ describe("Format filters", () => {
   });
 
   test("format filters are not visible if facets arent present", () => {
-    const node = render(<Layout>Child</Layout>, {
-      route: "/collection/blah",
+    const node = render(<Layout showFormatFilter>Child</Layout>, {
       // should render collection.data = null
       initialState: undefined
     });
@@ -115,8 +121,7 @@ describe("Format filters", () => {
   });
 
   test("format filters navigate to respective urls", () => {
-    const node = render(<Layout>Child</Layout>, {
-      route: "/collection/blah",
+    const node = render(<Layout showFormatFilter>Child</Layout>, {
       initialState: stateWithFacets
     });
 
@@ -134,22 +139,21 @@ describe("Format filters", () => {
     );
   });
 
-  test("format filter has selected aria state", () => {
-    const node = render(<Layout>Child</Layout>, {
-      route: "/collection/blah",
+  test("format filter has aria-current", () => {
+    const node = render(<Layout showFormatFilter>Child</Layout>, {
       initialState: stateWithFacets
     });
     // need to test both visual and aria here
     expect(node.queryByText("ALL")?.closest("a")).toHaveAttribute(
-      "aria-selected",
+      "aria-current",
       "false"
     );
     expect(node.queryByLabelText("Books")?.closest("a")).toHaveAttribute(
-      "aria-selected",
+      "aria-current",
       "true"
     );
     expect(node.queryByLabelText("Audiobooks")?.closest("a")).toHaveAttribute(
-      "aria-selected",
+      "aria-current",
       "false"
     );
   });
@@ -193,8 +197,8 @@ describe("Gallery selectors", () => {
     });
     const galleryRadio = node.getByLabelText("Gallery View");
     const listRadio = node.getByLabelText("List View");
-    expect(galleryRadio).toHaveAttribute("aria-selected", "true");
-    expect(listRadio).toHaveAttribute("aria-selected", "false");
+    expect(galleryRadio).toHaveAttribute("aria-checked", "true");
+    expect(listRadio).toHaveAttribute("aria-checked", "false");
   });
 
   test("correctly toggles between gallery/list views", () => {
@@ -203,11 +207,11 @@ describe("Gallery selectors", () => {
     });
     const galleryRadio = node.getByLabelText("Gallery View");
     const listRadio = node.getByLabelText("List View");
-    expect(galleryRadio).toHaveAttribute("aria-selected", "true");
+    expect(galleryRadio).toHaveAttribute("aria-checked", "true");
 
     userEvent.click(listRadio);
 
-    expect(listRadio).toHaveAttribute("aria-selected", "true");
+    expect(listRadio).toHaveAttribute("aria-checked", "true");
   });
 
   test("doesn't show view changer if no books present", () => {

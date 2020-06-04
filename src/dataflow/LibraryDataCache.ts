@@ -1,4 +1,3 @@
-require("isomorphic-fetch");
 import OPDSParser, { OPDSFeed } from "opds-feed-parser";
 import { Link, LibraryData } from "../interfaces";
 import { parseLinks } from "../utils/libraryLinks";
@@ -125,8 +124,8 @@ export default class LibraryDataCache {
 
   async getLibraryData(library: string): Promise<LibraryData> {
     const entry = await this.getCacheEntry(library);
-    let catalogUrl;
-    let catalogName;
+    let catalogUrl: string | undefined;
+    let catalogName: string | undefined;
     if (Object.keys(this.config || {}).length) {
       catalogUrl = this.config?.[library];
     } else {
@@ -143,14 +142,20 @@ export default class LibraryDataCache {
       throw new Error("AuthDocument or Catalog not provided in getLibraryData");
     }
 
+    const authDocData = this.getDataFromAuthDocumentAndCatalog(
+      entry.authDocument,
+      entry.catalog
+    );
+    catalogName = catalogName ?? authDocData.catalogName;
+
+    if (typeof catalogUrl !== "string")
+      throw new Error("Catalog Url is mistakenly undefined.");
+
     return {
       id: library,
+      ...authDocData,
       catalogUrl,
-      catalogName,
-      ...this.getDataFromAuthDocumentAndCatalog(
-        entry.authDocument,
-        entry.catalog
-      )
+      catalogName
     };
   }
 
@@ -180,19 +185,12 @@ export default class LibraryDataCache {
       } else if (this.config) {
         catalogUrl = this.config[library];
         if (!catalogUrl) {
-          throw new Error("No catalog is configured for library " + library);
+          throw new Error(`No catalog is configured for library "${library}".`);
         }
       }
 
       let catalog = currentEntry && currentEntry.catalog;
-      try {
-        catalog = await this.getCatalog(catalogUrl);
-      } catch (catalogError) {
-        // If we can't get the catalog, patrons won't be able to use the application
-        // Anyway.
-        console.warn(catalogError);
-        throw new Error("This library is not available.");
-      }
+      catalog = await this.getCatalog(catalogUrl);
 
       let authDocument = currentEntry && currentEntry.authDocument;
       try {

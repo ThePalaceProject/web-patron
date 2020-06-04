@@ -1,10 +1,9 @@
 import * as React from "react";
-import { render, fixtures, actions } from "../../../test-utils";
+import { render, fixtures, actions, waitFor } from "../../../test-utils";
 import { CollectionData } from "opds-web-client/lib/interfaces";
 import { RecommendationsStateContext } from "../../context/RecommendationsContext";
-import { wait } from "@testing-library/react";
 import Recommendations from "../Recommendations";
-import { RecommendationsState } from "interfaces";
+import { RecommendationsState } from "../../../interfaces";
 
 const renderWithRecState = (
   children,
@@ -37,7 +36,7 @@ test("shows recommendations loading state", async () => {
     ...fixtures.emptyRecommendationsState,
     isFetching: true
   });
-  await wait(() =>
+  await waitFor(() =>
     expect(node.getByText("Loading recommendations...")).toBeInTheDocument()
   );
 });
@@ -75,7 +74,7 @@ test("displays a more button for recommendations", () => {
   const moreButton = node.getByText("More...");
   expect(moreButton).toHaveAttribute(
     "href",
-    "/collection/works%2Fcontributor%2FJane%20Austen%2Feng"
+    "/collection/works%2Fcontributor%2FJane%2520Austen%2Feng"
   );
 });
 

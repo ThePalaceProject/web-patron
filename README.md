@@ -31,8 +31,8 @@ If you are using a Library Registry, this configuration will automatically be cr
 
 Once the dependencies are installed and application environments configured, the following two base commands can be used to start the application:
 
-- `npm run dev` - This command will watch the code for changes and rebuild the front-end code, but won't reload the server code. Unless you have a library registry running locally, remember to have a manager, registry or config file set when running this. eg. `CONFIG_FILE=config/cm_libraries.txt npm run dev`
-- `npm run build:prod` - This will build both the server and the client code into `/lib` and `/dist` respectively. You can then run `npm run start` to start the built server.
+- `npm run dev` - This command will start the development server, which builds pages lazily (when you request them) to shorten the startup time.
+- `npm run build` - This will build both the server and the client code into `./next`. You can then run `npm run start` to start the server.
 
 The application will start at the base URL of `localhost:3000`.
 
@@ -56,8 +56,9 @@ Set one of the following environment variables when running the application:
 
 - `SIMPLIFIED_CATALOG_BASE` - to use a Circulation Manager
 
-  - Example: `SIMPLIFIED_CATALOG_BASE=http://localhost:6500 npm run dev`.
+  - Example: `SIMPLIFIED_CATALOG_BASE=http://localhost:6500/:library/groups npm run dev`.
   - Point this environment variable to the URL of the Circulation Manager (which defaults to `localhost:6500`). This will load the _main_ library in the Circulation Manager in the app by going to `localhost:3000`.
+  - Note that you cannot point the application to the base url of your Circulation Manager - it must point at the specific library you are starting the application for: `http://localhost:6500` won't work. You must use `http://localhost:6500/:library/groups` where `:library` is the short name of the library you are using.
 
 - `CONFIG_FILE` - to use a configuration file
   - Example: `CONFIG_FILE=config_file.txt npm run prod`
@@ -76,6 +77,15 @@ The following environment variables can also be set to further configure the app
 - Set `SHORTEN_URLS=false` to stop the app from removing common parts of the circulation manager URLs from the web app's URLs.
 - Set `CACHE_EXPIRATION_SECONDS` to control how often the app will check for changes to registry entries and circ manager authentication documents.
 - Set `AXE_TEST=true` to run the application with `react-axe` enabled (only works when `NODE_ENV` is "development").
+- Set `ANALYZE=true` to generate bundle analysis files inside `.next/analyze` which will show bundle sizes for server and client, as well as composition.
+
+#### Using a `.env` file
+
+Next.js will automatically load environment variables set in a `.env` file. There is a default `.env` file which is committed to source control. If you would like to override this locally only (ie. for development purposes), use `.env.local`, which will be ignored by git and will override anything in the `.env` file. If needed, we can also set test and development specific env vars via `.env` files. Read more in the [Next.js env documentation](https://nextjs.org/docs/basic-features/environment-variables).
+
+#### ENV Vars and Building
+
+When building for production using `npm run build`, the env vars are set at build time. This means whatever you have in your `.env` or `.env.local` or set in the command line when running `npm run build` will be taken as the env for the app when you run it. Overriding env vars like this `CONFIG_FILE=config.txt npm run start` will not work, you have to set them at build time.
 
 ### Useful Scripts
 
@@ -160,6 +170,14 @@ test("fetches search description", async () => {
   expect(node.dispatch).toHaveBeenCalledTimes(1);
 });
 ```
+
+## Developing
+
+We use [Next.js](https://nextjs.org/) as our react framework. This handles build configuration as well as server management, providing simple APIs to allow server-rendering or even static-rendering.
+
+### Links and Routing
+
+- When creating links using `<Link>`, you don't need to worry about whether it is for a single or multi-library route config. Write the `as` and `href` like you would if the package only supported one-library setups, and the `<Link>` will prepend `/[libraryId]` to your routes if need be.
 
 ## Deploying
 

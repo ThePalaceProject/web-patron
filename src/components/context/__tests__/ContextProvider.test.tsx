@@ -4,11 +4,10 @@ import { renderHook } from "@testing-library/react-hooks";
 import AppContextProvider from "../ContextProvider";
 import buildStore from "opds-web-client/lib/store";
 import { usePathFor } from "opds-web-client/lib/components/context/PathForContext";
-import { LibraryData } from "interfaces";
+import { LibraryData } from "../../../interfaces";
 import { State } from "opds-web-client/lib/state";
-import { createMemoryHistory } from "history";
-import { Router } from "react-router-dom";
 import useLibraryContext from "../LibraryContext";
+import { MockNextRouterContextProvider } from "../../../test-utils/mockNextRouter";
 
 const TestComponent: React.FC = () => <div>test child</div>;
 
@@ -23,23 +22,14 @@ type MakeContextConfig = {
   library?: LibraryData;
   initialState?: State;
   shortenUrls?: boolean;
-  route?: string;
 };
 
 const makeContextWrapper = (config: MakeContextConfig = {}) => ({
   children
 }) => {
-  const {
-    library = testLibrary,
-    initialState,
-    shortenUrls = false,
-    route = "/"
-  } = config;
-  const history = createMemoryHistory({
-    initialEntries: [route]
-  });
+  const { library = testLibrary, initialState, shortenUrls = false } = config;
   return (
-    <Router history={history}>
+    <MockNextRouterContextProvider>
       <AppContextProvider
         library={library}
         initialState={initialState}
@@ -47,7 +37,7 @@ const makeContextWrapper = (config: MakeContextConfig = {}) => ({
       >
         {children}
       </AppContextProvider>
-    </Router>
+    </MockNextRouterContextProvider>
   );
 };
 

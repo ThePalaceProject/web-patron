@@ -18,11 +18,11 @@ import FulfillmentCard from "./FulfillmentCard";
 import BreadcrumbBar from "../BreadcrumbBar";
 import truncateString from "../../utils/truncate";
 import useNormalizedBook from "../../hooks/useNormalizedBook";
-import { Helmet } from "react-helmet-async";
 import DetailField from "../BookMetaDetail";
 import ReportProblem from "./ReportProblem";
 import useTypedSelector from "../../hooks/useTypedSelector";
 import { NavButton } from "../Button";
+import Head from "next/head";
 
 export interface BookDetailsPropsNew {
   setCollectionAndBook: SetCollectionAndBook;
@@ -46,9 +46,9 @@ export const BookDetails: React.FC<BookDetailsPropsNew> = ({
   if (!book) return <PageLoader />;
   return (
     <section aria-label="Book details">
-      <Helmet>
+      <Head>
         <title>{book.title}</title>
-      </Helmet>
+      </Head>
       <BreadcrumbBar currentLocation={truncateString(book.title, 20, false)} />
       <div
         sx={{
@@ -214,9 +214,9 @@ const Error: React.FC<{ error: FetchErrorData }> = ({ error }) => {
         alignItems: "center"
       }}
     >
-      <Helmet>
+      <Head>
         <title>Book error</title>
-      </Helmet>
+      </Head>
       <div sx={{ maxWidth: "70%" }}>
         <p>
           There was a problem fetching this book. Please refresh the page or
@@ -230,7 +230,7 @@ const Error: React.FC<{ error: FetchErrorData }> = ({ error }) => {
           <span sx={{ fontWeight: "bold" }}>Error Message: </span>
           {detail}
         </div>
-        <NavButton sx={{ mt: 3 }} collectionUrl={undefined}>
+        <NavButton sx={{ mt: 3 }} href="/">
           Return Home
         </NavButton>
       </div>
@@ -246,5 +246,4 @@ const Connected = connect(
 
 // am doing this because typescript throws an error when trying to use
 // redux ConnectedComponent inside of Route
-const Wrapper = props => <Connected {...props} />;
-export default Wrapper;
+export default Connected;

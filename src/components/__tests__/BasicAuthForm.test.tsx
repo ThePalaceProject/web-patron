@@ -1,11 +1,5 @@
 import * as React from "react";
-import {
-  render,
-  fixtures,
-  actions,
-  wait,
-  waitForElement
-} from "../../test-utils";
+import { render, fixtures, actions, waitFor } from "../../test-utils";
 import merge from "deepmerge";
 import BasicAuthForm from "../BasicAuthForm";
 import { AuthProvider, BasicAuthMethod } from "opds-web-client/lib/interfaces";
@@ -92,9 +86,9 @@ test("sumbits", async () => {
   userEvent.click(loginButton);
 
   // assert
-  // we wrap this in wait because the handleSubmit from react-hook-form has
+  // we wrap this in waitFor because the handleSubmit from react-hook-form has
   // async code in it
-  await wait(() => {
+  await waitFor(() => {
     expect(node.dispatch).toHaveBeenCalledTimes(1);
     expect(mockedGenerateCredentials).toHaveBeenCalledTimes(1);
     expect(mockedGenerateCredentials).toHaveBeenCalledWith("1234", "pinpin");
@@ -118,8 +112,8 @@ test("displays client error when unfilled", async () => {
   userEvent.click(loginButton);
 
   // assert
-  await waitForElement(() => node.getByText("Your Barcode is required."));
-  await waitForElement(() => node.getByText("Your Pin is required."));
+  await node.findByText("Your Barcode is required.");
+  await node.findByText("Your Pin is required.");
   expect(node.dispatch).toHaveBeenCalledTimes(0);
   expect(mockedGenerateCredentials).toHaveBeenCalledTimes(0);
   expect(authCallback).toHaveBeenCalledTimes(0);

@@ -1,7 +1,6 @@
 import * as React from "react";
 import { render } from "../../test-utils";
 import Button, { NavButton, AnchorButton } from "../Button";
-import userEvent from "@testing-library/user-event";
 
 describe("variants", () => {
   test("primary (default)", () => {
@@ -28,13 +27,10 @@ test("disabled style", () => {
   expect(button).toMatchSnapshot();
 });
 test("NavButton renders correct element", () => {
-  const node = render(<NavButton to="/somewhere">child</NavButton>);
+  const node = render(<NavButton href="/somewhere">child</NavButton>);
   const button = node.getByText("child");
   expect(button).toHaveAttribute("href", "/somewhere");
   expect(button).toMatchSnapshot();
-  // make sure clicking it actually tries to route you home
-  userEvent.click(button);
-  expect(node.history.location.pathname).toBe("/somewhere");
 });
 test("LinkButton renders correct element", () => {
   const node = render(

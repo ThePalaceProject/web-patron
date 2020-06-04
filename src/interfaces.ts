@@ -63,9 +63,9 @@ export interface WebpackAssets {
 
 // our CPW useReducer states
 export type RecommendationsState = CollectionState;
-export { ComplaintsState } from "./hooks/useComplaints/reducer";
+export type { ComplaintsState } from "./hooks/useComplaints/reducer";
 
-export { Theme, ButtonVariants, TextVariants } from "./theme";
+export type { Theme, ButtonVariants, TextVariants } from "./theme";
 // helper for theme variant prop types
 export type VariantProp<VType> = Exclude<keyof VType, keyof {}>;
 
@@ -82,3 +82,8 @@ type PickAndRequire<T, K extends keyof T> = { [P in K]-?: NonNullable<T[P]> };
 /** Utility to make certain keys of a type required */
 export type RequiredKeys<T, K extends keyof T> = Omit<T, K> &
   PickAndRequire<T, K>;
+
+export type NextLinkConfig = {
+  href: string;
+  as?: string;
+};

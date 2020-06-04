@@ -12,10 +12,10 @@ import {
 } from "opds-web-client/lib/components/mergeRootProps";
 import { PageLoader } from "../components/LoadingIndicator";
 import useNormalizedCollection from "../hooks/useNormalizedCollection";
-import { Helmet } from "react-helmet-async";
 import { GalleryView, ListView, LanesView } from "./BookList";
 import useView from "./context/ViewContext";
 import ListFilters from "./ListFilters";
+import Head from "next/head";
 
 export const Collection: React.FC<{
   setCollectionAndBook: SetCollectionAndBook;
@@ -35,9 +35,9 @@ export const Collection: React.FC<{
     const lanes = collectionData?.lanes ?? [];
     return (
       <div>
-        <Helmet>
+        <Head>
           <title>{collectionData.title}</title>
-        </Helmet>
+        </Head>
         <LanesView lanes={lanes} />
       </div>
     );
@@ -47,9 +47,9 @@ export const Collection: React.FC<{
     const books = collectionData.books;
     return (
       <React.Fragment>
-        <Helmet>
+        <Head>
           <title>{collectionData.title}</title>
-        </Helmet>
+        </Head>
         {view === "LIST" ? (
           <ListView books={books} breadcrumb={<ListFilters />} />
         ) : (
@@ -82,6 +82,4 @@ const Connected = connect(
   mergeRootProps
 )(Collection);
 
-// // we have to do this due to a typing error in react-router-dom
-const Wrapper = props => <Connected {...props} />;
-export default Wrapper;
+export default Connected;

@@ -3,7 +3,7 @@ import { jsx } from "theme-ui";
 import React from "react";
 
 export interface BoxOwnProps<E extends React.ElementType = React.ElementType> {
-  as?: E;
+  component?: E;
 }
 
 export type BoxProps<E extends React.ElementType> = BoxOwnProps<E> &
@@ -12,14 +12,14 @@ export type BoxProps<E extends React.ElementType> = BoxOwnProps<E> &
 const defaultElement = "div";
 
 /**
- * This component allows us to create components that use an "as" prop
+ * This component allows us to create components that use a "component" prop
  * with full type-safety. It is somewhat fragile, refer to <Button> to see
  * usage.
  */
 // eslint-disable-next-line react/display-name
 export const Box = React.forwardRef(
   (
-    { as: Element = defaultElement, ...restProps }: BoxOwnProps,
+    { component: Element = defaultElement, ...restProps }: BoxOwnProps,
     ref: React.Ref<Element>
   ) => {
     return <Element ref={ref} {...restProps} />;

@@ -1,4 +1,5 @@
 module.exports = {
+  root: true,
   env: {
     browser: true,
     node: true
@@ -6,12 +7,14 @@ module.exports = {
   parser: "@typescript-eslint/parser",
   parserOptions: {
     project: "tsconfig.json",
-    sourceType: "module"
+    sourceType: "module",
+    ecmaFeatures: {
+      jsx: true
+    }
   },
   plugins: [
     "react",
     "@typescript-eslint",
-    // "@typescript-eslint/tslint",
     "jsx-a11y",
     "prettier",
     "react-hooks"

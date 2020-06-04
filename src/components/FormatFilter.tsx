@@ -3,7 +3,6 @@ import { jsx } from "theme-ui";
 import { Group } from "reakit";
 import * as React from "react";
 import useTypedSelector from "../hooks/useTypedSelector";
-import { Route } from "react-router-dom";
 import { Book, Headset } from "../icons";
 import FilterButton from "./FilterButton";
 
@@ -31,41 +30,39 @@ const FormatFilter: React.FC = () => {
     facet => facet.label === "All"
   );
   if (!ebookFacet || !audiobookFacet) return null;
+
   return (
-    <Route
-      path={[
-        "/",
-        "/collection/:collectionUrl",
-        "/:library/",
-        "/:library/collection/:collectionUrl"
-      ]}
-      exact
+    <Group
+      role="navigation"
+      aria-label="Format filters"
+      sx={{ display: "flex", py: 0 }}
     >
-      <Group role="tablist" sx={{ display: "flex", py: 0 }}>
-        {allFacet && (
-          <FilterButton
-            collectionUrl={allFacet.href}
-            selected={allFacet.active}
-          >
-            ALL
-          </FilterButton>
-        )}
+      {allFacet && (
         <FilterButton
-          collectionUrl={ebookFacet.href}
-          selected={!!ebookFacet.active}
-          aria-label="Books"
+          collectionUrl={allFacet.href}
+          selected={allFacet.active}
+          aria-current={allFacet.active}
         >
-          <Book sx={{ fontSize: 4 }} />
+          ALL
         </FilterButton>
-        <FilterButton
-          aria-label="Audiobooks"
-          collectionUrl={audiobookFacet.href}
-          selected={!!audiobookFacet.active}
-        >
-          <Headset sx={{ fontSize: 4, m: 0, p: 0 }} />
-        </FilterButton>
-      </Group>
-    </Route>
+      )}
+      <FilterButton
+        collectionUrl={ebookFacet.href}
+        selected={!!ebookFacet.active}
+        aria-current={!!ebookFacet.active}
+        aria-label="Books"
+      >
+        <Book sx={{ fontSize: 4 }} />
+      </FilterButton>
+      <FilterButton
+        aria-label="Audiobooks"
+        collectionUrl={audiobookFacet.href}
+        selected={!!audiobookFacet.active}
+        aria-current={!!audiobookFacet.active}
+      >
+        <Headset sx={{ fontSize: 4, m: 0, p: 0 }} />
+      </FilterButton>
+    </Group>
   );
 };
 export default FormatFilter;
