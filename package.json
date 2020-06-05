@@ -34,6 +34,7 @@
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
     "next": "^9.4.2",
+    "nypl-simplified-webpub-viewer": "git+https://git@github.com/NYPL-Simplified/webpub-viewer#SFR-develop",
     "opds-feed-parser": "0.0.18",
     "opds-web-client": "^0.4.2",
     "react": "16.13.1",
