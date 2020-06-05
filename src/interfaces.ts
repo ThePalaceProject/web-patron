@@ -65,7 +65,7 @@ export interface WebpackAssets {
 export type RecommendationsState = CollectionState;
 export type { ComplaintsState } from "./hooks/useComplaints/reducer";
 
-export type { Theme, ButtonVariants, TextVariants } from "./theme";
+export type { Theme } from "./theme";
 // helper for theme variant prop types
 export type VariantProp<VType> = Exclude<keyof VType, keyof {}>;
 

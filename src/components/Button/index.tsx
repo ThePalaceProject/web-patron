@@ -2,13 +2,16 @@
 import { jsx } from "theme-ui";
 import { Button as BaseButton } from "reakit";
 import * as React from "react";
-import { ButtonVariants, VariantProp } from "../interfaces";
-import Link from "./Link";
-import { Box, PolymorphicComponentProps } from "./PolymorphicBox";
+import Link from "../Link";
+import { Box, PolymorphicComponentProps } from "../PolymorphicBox";
+import { styleProps } from "./styles";
 
-type Variant = VariantProp<ButtonVariants>;
+export type ButtonVariant = "filled" | "outline" | "link";
+export type ButtonSize = "sm" | "md" | "lg";
 type ButtonOwnProps = {
-  variant?: Variant;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  color?: string;
   disabled?: boolean;
   className?: string;
 };
@@ -24,13 +27,15 @@ const defaultComponent = BaseButton;
  * "as" prop to control the backing component
  */
 function Button<E extends React.ElementType = typeof defaultComponent>({
-  variant = "primary",
+  variant = "filled",
+  color = "brand.primary",
+  size = "md",
   ...props
 }: ButtonProps<E>): JSX.Element {
   return (
     <Box
       component={defaultComponent}
-      sx={{ variant: `buttons.${variant}` }}
+      sx={styleProps(color, size, variant)}
       {...props}
     />
   );

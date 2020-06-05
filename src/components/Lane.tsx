@@ -150,9 +150,7 @@ const Lane: React.FC<{ lane: LaneData; omitIds?: string[] }> = ({
   return (
     <div>
       <BreadcrumbBar currentLocation={title}>
-        <NavButton collectionUrl={url} sx={{ fontSize: 1, fontWeight: 2 }}>
-          View all {title}
-        </NavButton>
+        <NavButton collectionUrl={url}>View all {title}</NavButton>
       </BreadcrumbBar>
       <div
         sx={{

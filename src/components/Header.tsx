@@ -81,7 +81,7 @@ const HeaderFC: React.FC<{ className?: string; showFormatFilter: boolean }> = ({
             p: [2, 0]
           }}
         >
-          <NavButton sx={{ m: 1, mb: [1, 0] }} variant="primary" href="/loans">
+          <NavButton sx={{ m: 1, mb: [1, 0] }} href="/loans">
             <BookIcon sx={{ fontSize: 5 }} /> My Books
           </NavButton>
           {/* uncomment to enable a settings button */}
