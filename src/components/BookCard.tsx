@@ -33,8 +33,7 @@ const BookCard = React.forwardRef<
       sx={{
         listStyle: "none",
         display: "block",
-        border: "1px solid",
-        borderColor: "primaries.dark",
+        border: "solid",
         borderRadius: "card",
         py: 3,
         px: 2,
