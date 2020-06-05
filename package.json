@@ -47,6 +47,7 @@
     "redux-thunk": "^2.3.0",
     "request": "^2.88.2",
     "styled-system": "^5.1.2",
+    "system-font-css": "^2.0.2",
     "theme-ui": "^0.3.1",
     "universal-url": "^1.0.1"
   },
