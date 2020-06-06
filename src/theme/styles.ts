@@ -1,5 +1,3 @@
-import { heading } from "./typography";
-
 const styles = {
   /**
    * root wraps the whole app and these are therefore
@@ -7,10 +5,10 @@ const styles = {
    */
   root: {
     fontFamily: "body",
+    fontWeight: "light",
     fontSize: 0,
-    lineHeight: "body",
-    fontWeight: "body",
-    color: "text"
+    lineHeight: 3,
+    color: "ui.black"
   }
 };
 

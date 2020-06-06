@@ -1,5 +1,4 @@
 const variants = {
-  // variants
   text: {
     bookTitle: {
       fontSize: 3,
@@ -95,9 +94,7 @@ const variants = {
       lineHeight: "normal",
       bg: "white",
       pb: 1,
-      // color: inherit;
       transition: "all 0.2s ease 0s",
-      //  borderRadius: "0.25rem",
       borderRadius: 2,
       border: "solid",
       borderColor: "primary"

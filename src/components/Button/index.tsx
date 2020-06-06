@@ -6,7 +6,7 @@ import Link from "../Link";
 import { Box, PolymorphicComponentProps } from "../PolymorphicBox";
 import { styleProps } from "./styles";
 
-export type ButtonVariant = "filled" | "outline" | "link";
+export type ButtonVariant = "filled" | "outline" | "ghost" | "link";
 export type ButtonSize = "sm" | "md" | "lg";
 type ButtonOwnProps = {
   variant?: ButtonVariant;
@@ -14,6 +14,7 @@ type ButtonOwnProps = {
   color?: string;
   disabled?: boolean;
   className?: string;
+  iconLeft?: React.ComponentType;
 };
 type ButtonProps<E extends React.ElementType> = PolymorphicComponentProps<
   E,
@@ -30,6 +31,8 @@ function Button<E extends React.ElementType = typeof defaultComponent>({
   variant = "filled",
   color = "brand.primary",
   size = "md",
+  children,
+  iconLeft: IconLeft,
   ...props
 }: ButtonProps<E>): JSX.Element {
   return (
@@ -37,7 +40,10 @@ function Button<E extends React.ElementType = typeof defaultComponent>({
       component={defaultComponent}
       sx={styleProps(color, size, variant)}
       {...props}
-    />
+    >
+      {IconLeft && <IconLeft sx={{ mr: 2, ml: -1 }} />}
+      {children}
+    </Box>
   );
 }
 

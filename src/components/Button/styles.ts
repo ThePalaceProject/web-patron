@@ -1,5 +1,5 @@
 import { SystemStyleObject } from "@styled-system/css";
-import { darken } from "@theme-ui/color";
+import { darken, lightness } from "@theme-ui/color";
 import { ButtonSize, ButtonVariant } from "./index";
 
 export const sizes = {
@@ -23,7 +23,6 @@ const buttonBase = {
   alignItems: "center",
   justifyContent: "center",
   textAlign: "center",
-  lineHeight: "inherit",
   whiteSpace: "nowrap",
   verticalAlign: "middle",
   m: 0,
@@ -31,7 +30,7 @@ const buttonBase = {
   border: 0,
   borderRadius: "button",
   cursor: "pointer",
-  letterSpacing: "0.05em"
+  textDecoration: "none"
 };
 
 export const styleProps = (
@@ -59,6 +58,23 @@ export const styleProps = (
           bg: "ui.gray.light",
           color: "ui.gray.dark",
           cursor: "default"
+        }
+      };
+
+    case "ghost":
+      return {
+        // sets the text style
+        variant: "text.body.bold",
+        ...buttonBase,
+        ...sizes[size],
+        bg: "transparent",
+        color: color,
+        fill: color,
+        "&:focus,&:hover": {
+          bg: lightness(color, 0.85)
+        },
+        "&:active": {
+          // bg: darken(color, 0.1)
         }
       };
 
