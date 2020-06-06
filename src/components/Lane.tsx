@@ -9,6 +9,7 @@ import Book, { BOOK_HEIGHT } from "./BookCard";
 import BreadcrumbBar from "./BreadcrumbBar";
 import { withErrorBoundary } from "./ErrorBoundary";
 import { lighten } from "@theme-ui/color";
+import { H2 } from "./Text";
 
 type BookRefs = {
   [id: string]: React.RefObject<HTMLLIElement>;
@@ -148,7 +149,8 @@ const Lane: React.FC<{ lane: LaneData; omitIds?: string[] }> = ({
   };
 
   return (
-    <div>
+    <div sx={{ mb: 3 }}>
+      <H2 sx={{ px: 5, mt: 0, mb: 3 }}>{title}</H2>
       <div
         sx={{
           display: "flex",

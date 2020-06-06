@@ -11,7 +11,7 @@ const LibraryHome = ({ statusCode }: { statusCode?: number }) => {
   const libraryTitle = useLibraryContext().catalogName;
 
   return (
-    <Layout>
+    <Layout bg="ui.gray.lightWarm">
       <PageTitle>{libraryTitle} Home</PageTitle>
       {statusCode === 404 ? <ErrorPage /> : <Collection />}
     </Layout>

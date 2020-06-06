@@ -34,6 +34,7 @@ const BookCard = React.forwardRef<
         listStyle: "none",
         display: "block",
         border: "solid",
+        bg: "ui.white",
         borderRadius: "card",
         py: 3,
         px: 2,

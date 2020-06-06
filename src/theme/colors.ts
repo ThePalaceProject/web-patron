@@ -35,7 +35,7 @@ const ui = {
     dark: "#616161",
     medium: "#bdbdbd",
     light: "#e0e0e0",
-    lightWarm: "#efebdeb",
+    lightWarm: "#EFEDEB",
     extraLight: "#f5f5f5",
     extraLightWarm: "#f8f8f7",
     extraExtraLight: "#fafafa"
