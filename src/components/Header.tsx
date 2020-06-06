@@ -9,6 +9,7 @@ import Link from "./Link";
 import BookIcon from "../icons/Book";
 import useLibraryContext from "./context/LibraryContext";
 import Stack from "./Stack";
+import BreadcrumbBar from "./BreadcrumbBar";
 
 export interface HeaderContext extends NavigateContext {
   library: LibraryData;
@@ -22,58 +23,34 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
   const library = useLibraryContext();
 
   return (
-    <header
-      sx={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "stretch",
-        px: 5
-      }}
-      className={className}
-    >
-      <Link
+    <>
+      <header
         sx={{
-          display: "block",
-          bg: "primary",
-          color: "white",
-          py: 2,
-          textAlign: "center",
-          padding: [2, 4]
+          display: "flex",
+          flexDirection: ["column", "column", "row"],
+          alignItems: "stretch",
+          px: 5
         }}
-        href="/"
+        className={className}
       >
-        <Styled.h2
+        <Link href="/">
+          <img src={library.logoUrl} alt={`${library.catalogName} Logo`} />
+        </Link>
+        <Flex
           sx={{
-            m: 0,
-            mb: 1,
-            fontSize: [2, 3]
+            flexDirection: "column",
+            flexWrap: "wrap",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+            flex: 1
           }}
         >
-          {library.catalogName}
-        </Styled.h2>
-        <span
-          sx={{
-            fontSize: [0, 1],
-            textTransform: "uppercase",
-            letterSpacing: "0.05em"
-          }}
-        >
-          Library System
-        </span>
-      </Link>
-      <Flex
-        sx={{
-          flexDirection: "column",
-          flexWrap: "wrap",
-          alignItems: "flex-end",
-          justifyContent: "space-between",
-          flex: 1
-        }}
-      >
-        <HeaderLinks library={library} />
-        <Search />
-      </Flex>
-    </header>
+          <HeaderLinks library={library} />
+          <Search />
+        </Flex>
+      </header>
+      <BreadcrumbBar />
+    </>
   );
 };
 
