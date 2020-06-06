@@ -1,15 +1,10 @@
 /** @jsx jsx */
-import { jsx, Styled } from "theme-ui";
+import { jsx } from "theme-ui";
 import * as React from "react";
 import useBreadCrumbs from "../hooks/useBreadcrumbs";
-import { ArrowRight } from "../icons";
 import Link from "./Link";
+import { Text } from "./Text";
 
-/**
- * A simple UI component to provide consistent
- * styling for the breadcrumb bar used in multiple
- * places.
- */
 const BreadcrumbBar: React.FC<{
   className?: string;
   currentLocation?: string;
@@ -24,6 +19,7 @@ const BreadcrumbBar: React.FC<{
         color: "white",
         m: 0,
         p: 2,
+        px: 5,
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between"
@@ -33,8 +29,8 @@ const BreadcrumbBar: React.FC<{
         sx={{
           display: "flex",
           alignItems: "center",
-          textTransform: "uppercase",
-          variant: "lists.unstyled"
+          variant: "lists.unstyled",
+          fontSize: "-1"
         }}
       >
         {breadcrumbs.map(
@@ -43,24 +39,13 @@ const BreadcrumbBar: React.FC<{
             breadcrumb.url && (
               <li key={breadcrumb.url}>
                 <Link collectionUrl={breadcrumb.url}>
-                  <Styled.h2
-                    sx={{
-                      m: 0,
-                      display: "flex",
-                      alignItems: "center",
-                      fontSize: [1, 3]
-                    }}
-                  >
-                    {breadcrumb.text} <ArrowRight sx={{ fill: "white" }} />
-                  </Styled.h2>
+                  <Text>{breadcrumb.text} /&nbsp;</Text>
                 </Link>
               </li>
             )
         )}
         <li>
-          <Styled.h3 sx={{ m: 0, fontWeight: "light", fontSize: [1, 3] }}>
-            {lastItem}
-          </Styled.h3>
+          <Text>{lastItem}</Text>
         </li>
       </ul>
       {children}
