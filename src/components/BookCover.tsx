@@ -34,8 +34,6 @@ const BookCover: React.FC<{ book: BookData; className?: string }> = ({
     <div
       className={className}
       sx={{
-        border: "1px solid",
-        borderColor: "primary",
         borderRadius: 3,
         backgroundColor: "primaries.light",
         overflow: "hidden",

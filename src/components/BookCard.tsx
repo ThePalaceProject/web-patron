@@ -8,8 +8,10 @@ import BookCover from "./BookCover";
 import truncateString from "../utils/truncate";
 import Button from "./Button";
 import useBorrow from "../hooks/useBorrow";
+import { Text, H3 } from "./Text";
 
-export const BOOK_HEIGHT = 200;
+export const BOOK_WIDTH = 215;
+const BOOK_HEIGHT = 330;
 
 const BookCard = React.forwardRef<
   HTMLLIElement,
@@ -36,24 +38,19 @@ const BookCard = React.forwardRef<
         border: "solid",
         bg: "ui.white",
         borderRadius: "card",
-        py: 3,
-        px: 2,
-        flex: `0 0 ${BOOK_HEIGHT}px`,
-        mx: 2,
-        textAlign: "center"
+        p: 3,
+        flex: `0 0 ${BOOK_WIDTH}px`,
+        height: BOOK_HEIGHT,
+        // width: 215,
+        mx: 2
       }}
     >
       <Link bookUrl={book.url}>
-        <BookCover book={book} sx={{ mx: 4 }} />
-        <Styled.h2
-          sx={{
-            variant: "text.bookTitle",
-            fontSize: 2
-          }}
-        >
+        <BookCover book={book} sx={{ mx: 40 - 16 }} />
+        <H3 sx={{ m: 0, mt: 2, fontSize: 1 }}>
           {truncateString(book.title, 50, true)}
-        </Styled.h2>
-        <span sx={{ color: "primary" }}>{authors.join(", ")}</span>
+        </H3>
+        <Text sx={{ color: "brand.secondary" }}>{authors.join(", ")}</Text>
         {showBorrowButton && (
           <Button
             disabled={isBorrowed || isReserved || !isBorrowable}
