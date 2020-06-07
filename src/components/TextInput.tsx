@@ -13,7 +13,7 @@ const styles = {
   borderColor: "primary",
   borderWidth: 2,
   p: 1,
-  fontSize: 2
+  fontSize: "0"
 };
 
 const TextInput = React.forwardRef<
