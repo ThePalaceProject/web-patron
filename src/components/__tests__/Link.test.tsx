@@ -7,9 +7,6 @@ test("Renders expected styles", () => {
   const utils = render(<Link href="/somewhere">click here</Link>);
   expect(utils.getByText("click here")).toMatchInlineSnapshot(`
     .emotion-0 {
-      cursor: pointer;
-      -webkit-text-decoration: none;
-      text-decoration: none;
       -webkit-text-decoration: none;
       text-decoration: none;
       color: inherit;

@@ -7,7 +7,7 @@ import merge from "deepmerge";
 import userEvent from "@testing-library/user-event";
 
 describe("Layout nav + structure", () => {
-  test.only("Library icon button navigates home", () => {
+  test("Library icon button navigates home", () => {
     const node = render(<Layout>Child</Layout>);
     const homeButton = node.getByLabelText("Library catalog, back to homepage");
 
@@ -180,46 +180,4 @@ const stateWithLanes: State = merge(fixtures.initialState, {
       lanes: [lane]
     }
   }
-});
-
-describe("Gallery selectors", () => {
-  test("shows gallery/list selector when books are present", () => {
-    const node = render(<Layout>Some children</Layout>, {
-      initialState: stateWithBooks
-    });
-    expect(node.getByLabelText("Gallery View")).toBeInTheDocument();
-    expect(node.getByLabelText("List View")).toBeInTheDocument();
-  });
-
-  test("gallery is selected by default", () => {
-    const node = render(<Layout>Some children</Layout>, {
-      initialState: stateWithBooks
-    });
-    const galleryRadio = node.getByLabelText("Gallery View");
-    const listRadio = node.getByLabelText("List View");
-    expect(galleryRadio).toHaveAttribute("aria-checked", "true");
-    expect(listRadio).toHaveAttribute("aria-checked", "false");
-  });
-
-  test("correctly toggles between gallery/list views", () => {
-    const node = render(<Layout>Some children</Layout>, {
-      initialState: stateWithBooks
-    });
-    const galleryRadio = node.getByLabelText("Gallery View");
-    const listRadio = node.getByLabelText("List View");
-    expect(galleryRadio).toHaveAttribute("aria-checked", "true");
-
-    userEvent.click(listRadio);
-
-    expect(listRadio).toHaveAttribute("aria-checked", "true");
-  });
-
-  test("doesn't show view changer if no books present", () => {
-    const node = render(<Layout>Some children</Layout>, {
-      initialState: stateWithLanes
-    });
-    expect(node.queryAllByRole("radio")).toHaveLength(0);
-    expect(node.queryByLabelText("Gallery View")).toBeNull();
-    expect(node.queryByLabelText("List View")).toBeNull();
-  });
 });
