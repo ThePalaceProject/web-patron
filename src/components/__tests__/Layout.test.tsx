@@ -7,9 +7,9 @@ import merge from "deepmerge";
 import userEvent from "@testing-library/user-event";
 
 describe("Layout nav + structure", () => {
-  test("Library name button navigates home", () => {
+  test.only("Library icon button navigates home", () => {
     const node = render(<Layout>Child</Layout>);
-    const homeButton = node.getByText("Library System");
+    const homeButton = node.getByLabelText("Library catalog, back to homepage");
 
     // the home button should navigate to "/"
     expect(homeButton.closest("a")).toHaveAttribute("href", "/");

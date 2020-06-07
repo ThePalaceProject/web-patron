@@ -33,7 +33,7 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
         }}
         className={className}
       >
-        <Link href="/">
+        <Link href="/" aria-label="Library catalog, back to homepage">
           <img src={library.logoUrl} alt={`${library.catalogName} Logo`} />
         </Link>
         <Flex

@@ -36,10 +36,14 @@ const buildLinkFromProps = (props: LinkProps, linkUtils: LinkUtils) => {
     const { collectionUrl, ...rest } = props;
     return { ...linkUtils.buildCollectionLink(collectionUrl), ...rest };
   }
-  return linkUtils.buildMultiLibraryLink({
-    as: props.as,
-    href: props.href
-  });
+  const { as, href, ...rest } = props;
+  return {
+    ...linkUtils.buildMultiLibraryLink({
+      as: props.as,
+      href: props.href
+    }),
+    ...rest
+  };
 };
 /**
  * Extends next/Link to:
@@ -54,6 +58,7 @@ const Link: React.FC<LinkProps> = React.forwardRef(
   ({ children, className, ...props }, ref: React.Ref<any>) => {
     const linkUtils = useLinkUtils();
     const { as, href, ...rest } = buildLinkFromProps(props, linkUtils);
+    console.log(props);
     return (
       <BaseLink href={href} as={as} passHref>
         <Styled.a
