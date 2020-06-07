@@ -10,10 +10,10 @@ test("TextInput renders properly and passes styles through", () => {
     .emotion-0 {
       border-radius: 4px;
       border: 1px solid;
-      border-color: var(--theme-ui-colors-primary,#0467a6);
+      border-color: var(--theme-ui-colors-primary,#377F8B);
       border-width: 2px;
       padding: 4px;
-      font-size: 16px;
+      font-size: 1rem;
       color: red;
     }
 
@@ -22,6 +22,7 @@ test("TextInput renders properly and passes styles through", () => {
       type="text"
     />
   `);
+
   expect(node.container.firstChild).toHaveStyle("color: red");
 });
 
@@ -31,7 +32,7 @@ test("type textarea renders properly and passes styles throug", () => {
     .emotion-0 {
       border-radius: 4px;
       border: 1px solid;
-      border-color: var(--theme-ui-colors-primary,#0467a6);
+      border-color: var(--theme-ui-colors-primary,#377F8B);
       border-width: 2px;
       padding: 4px;
       font-size: 16px;
