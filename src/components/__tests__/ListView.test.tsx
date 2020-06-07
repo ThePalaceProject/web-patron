@@ -44,12 +44,6 @@ test("includes breadcrumb children", () => {
   expect(node.getByText("Hi from breadcrumb")).toBeInTheDocument();
 });
 
-test("displays borrow button ", () => {
-  const node = render(<ListView books={books} showBorrowButton />);
-  const borrowButtons = node.getAllByText("Borrow");
-  expect(borrowButtons).toHaveLength(3);
-});
-
 test("shows gallery on mobile instead of list", () => {
   mockeduseBreakpointsIndex.mockReturnValueOnce(0);
   const node = render(<ListView books={books} />);

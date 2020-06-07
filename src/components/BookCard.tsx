@@ -1,13 +1,11 @@
 /** @jsx jsx */
-import { jsx, Styled } from "theme-ui";
+import { jsx } from "theme-ui";
 import * as React from "react";
 import { BookData } from "opds-web-client/lib/interfaces";
 import { getAuthors } from "../utils/book";
 import Link from "./Link";
 import BookCover from "./BookCover";
 import truncateString from "../utils/truncate";
-import Button from "./Button";
-import useBorrow from "../hooks/useBorrow";
 import { Text, H3 } from "./Text";
 
 export const BOOK_WIDTH = 215;
@@ -15,15 +13,8 @@ export const BOOK_HEIGHT = 330;
 
 const BookCard = React.forwardRef<
   HTMLLIElement,
-  { book: BookData; className?: string; showBorrowButton?: boolean }
->(({ book, className, showBorrowButton = false }, ref) => {
-  const {
-    borrowOrReserve,
-    label,
-    isBorrowed,
-    isReserved,
-    isBorrowable
-  } = useBorrow(book);
+  { book: BookData; className?: string }
+>(({ book, className }, ref) => {
   const authors = getAuthors(book, 2);
 
   // if the book url is undefined, there is no sense displaying it.
@@ -51,15 +42,6 @@ const BookCard = React.forwardRef<
           {truncateString(book.title, 50, true)}
         </H3>
         <Text sx={{ color: "brand.secondary" }}>{authors.join(", ")}</Text>
-        {showBorrowButton && (
-          <Button
-            disabled={isBorrowed || isReserved || !isBorrowable}
-            onClick={borrowOrReserve}
-            sx={{ mt: 3 }}
-          >
-            {label}
-          </Button>
-        )}
       </Link>
     </li>
   );

@@ -172,10 +172,11 @@ const Lane: React.FC<{ lane: LaneData; omitIds?: string[] }> = ({
           data-testid="lane-list"
           sx={{
             p: 0,
-            my: 2,
+            m: 0,
             display: "flex",
             transition: "transform 300ms ease 100ms",
             overflowX: "scroll",
+            overflowY: "hidden",
             position: "relative",
             width: "100%"
           }}

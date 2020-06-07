@@ -12,16 +12,13 @@ import {
 } from "opds-web-client/lib/components/mergeRootProps";
 import { PageLoader } from "../components/LoadingIndicator";
 import useNormalizedCollection from "../hooks/useNormalizedCollection";
-import { GalleryView, ListView, LanesView } from "./BookList";
-import useView from "./context/ViewContext";
-import ListFilters from "./ListFilters";
+import { ListView, LanesView } from "./BookList";
 import Head from "next/head";
 
 export const Collection: React.FC<{
   setCollectionAndBook: SetCollectionAndBook;
 }> = ({ setCollectionAndBook }) => {
   useSetCollectionAndBook(setCollectionAndBook);
-  const { view } = useView();
   // the first hook just provides the collection, the second subs in loaned book data if existing
   const collection = useTypedSelector(state => state.collection);
   const collectionData = useNormalizedCollection();
@@ -30,30 +27,19 @@ export const Collection: React.FC<{
     return <PageLoader />;
   }
 
-  // if we have lanes, show them
-  if (collectionData?.lanes && collectionData.lanes.length > 0) {
-    const lanes = collectionData?.lanes ?? [];
-    return (
-      <div>
-        <Head>
-          <title>{collectionData.title}</title>
-        </Head>
-        <LanesView lanes={lanes} />
-      </div>
-    );
-  }
-  // alternatively, we might have books instead
-  if (collectionData?.books && collectionData.books.length > 0) {
-    const books = collectionData.books;
+  const hasLanes = collectionData?.lanes && collectionData.lanes.length > 0;
+  const hasBooks = collectionData?.books && collectionData.books.length > 0;
+
+  if (hasBooks || hasLanes) {
     return (
       <React.Fragment>
         <Head>
           <title>{collectionData.title}</title>
         </Head>
-        {view === "LIST" ? (
-          <ListView books={books} breadcrumb={<ListFilters />} />
+        {hasLanes ? (
+          <LanesView lanes={collectionData.lanes ?? []} />
         ) : (
-          <GalleryView books={books} breadcrumb={<ListFilters />} />
+          <ListView books={collectionData.books} />
         )}
       </React.Fragment>
     );

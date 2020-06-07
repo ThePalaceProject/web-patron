@@ -12,9 +12,8 @@ import { SetCollectionAndBook } from "../interfaces";
 import useAuth from "../hooks/useAuth";
 import Button from "./Button";
 import useTypedSelector from "../hooks/useTypedSelector";
-import { ListView, GalleryView } from "./BookList";
+import { ListView } from "./BookList";
 import { PageLoader } from "./LoadingIndicator";
-import useView from "./context/ViewContext";
 import Head from "next/head";
 
 export const MyBooks: React.FC<{
@@ -24,8 +23,6 @@ export const MyBooks: React.FC<{
   // which is what used to be the route that is now /loans (ie. this page)
   useSetCollectionAndBook(setCollectionAndBook, "loans");
   const collection = useTypedSelector(state => state.collection);
-
-  const { view } = useView();
 
   const { isSignedIn, signOutAndGoHome } = useAuth();
 
@@ -60,19 +57,7 @@ export const MyBooks: React.FC<{
         <Head>
           <title>My Books</title>
         </Head>
-        {view === "LIST" ? (
-          <ListView
-            books={collection.data?.books}
-            showBorrowButton
-            breadcrumb={signOutButton}
-          />
-        ) : (
-          <GalleryView
-            books={collection.data.books}
-            showBorrowButton
-            breadcrumb={signOutButton}
-          />
-        )}
+        <ListView books={collection.data?.books} breadcrumb={signOutButton} />
       </React.Fragment>
     );
   }

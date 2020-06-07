@@ -11,8 +11,6 @@ import Link from "./Link";
 import DetailField from "./BookMetaDetail";
 import useBorrow from "../hooks/useBorrow";
 import Button from "./Button";
-import { useBreakpointIndex } from "@theme-ui/match-media";
-import BookCard from "./BookCard";
 import LoadingIndicator from "./LoadingIndicator";
 import useInfiniteScroll from "../hooks/useInfiniteScroll";
 
@@ -38,61 +36,13 @@ const ListLoadingIndicator = () => (
   </div>
 );
 
-export const GalleryView: React.FC<{
-  books: BookData[];
-  breadcrumb?: React.ReactNode;
-  showBorrowButton?: boolean;
-}> = ({ books, breadcrumb, showBorrowButton = false }) => {
-  // this hook will refetch the page when we reach the bottom of the screen
-  const { listRef, isFetchingPage } = useInfiniteScroll();
-
-  return (
-    <div>
-      <BreadcrumbBar>{breadcrumb}</BreadcrumbBar>
-      <ul
-        ref={listRef}
-        data-testid="gallery-list"
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "stretch",
-          justifyContent: "center",
-          p: 0,
-          m: 0
-        }}
-      >
-        {books.map(book => (
-          <BookCard
-            book={book}
-            key={book.id}
-            sx={{ listStyle: "none", flex: "0 0 170px", my: 3, mx: 3 }}
-            showBorrowButton={showBorrowButton}
-          />
-        ))}
-      </ul>
-      {isFetchingPage && <ListLoadingIndicator />}
-    </div>
-  );
-};
-
 export const ListView: React.FC<{
   books: BookData[];
   breadcrumb?: React.ReactNode;
-  showBorrowButton?: boolean;
-}> = ({ books, breadcrumb, showBorrowButton = false }) => {
+}> = ({ books, breadcrumb }) => {
   // this hook will refetch the page when we reach the bottom of the screen
   const { listRef, isFetchingPage } = useInfiniteScroll();
-  const breakpoint = useBreakpointIndex();
-  // if we are on mobile, show the gallery instead
-  if (breakpoint < 1) {
-    return (
-      <GalleryView
-        books={books}
-        breadcrumb={breadcrumb}
-        showBorrowButton={showBorrowButton}
-      />
-    );
-  }
+
   return (
     <React.Fragment>
       <BreadcrumbBar>{breadcrumb}</BreadcrumbBar>

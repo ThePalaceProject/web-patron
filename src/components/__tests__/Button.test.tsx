@@ -3,28 +3,27 @@ import { render } from "../../test-utils";
 import Button, { NavButton, AnchorButton } from "../Button";
 
 describe("variants", () => {
-  test("primary (default)", () => {
+  test("filled (default)", () => {
     const node = render(<Button>child</Button>);
     const button = node.getByText("child");
     expect(button).toMatchSnapshot();
   });
-
-  test("flat", () => {
-    const node = render(<Button variant="flat">child</Button>);
+  test("ghost", () => {
+    const node = render(<Button variant="ghost">child</Button>);
     const button = node.getByText("child");
     expect(button).toMatchSnapshot();
   });
-  test("accent", () => {
-    const node = render(<Button variant="accent">child</Button>);
-    const button = node.getByText("child");
-    expect(button).toMatchSnapshot();
-  });
-});
-test("disabled style", () => {
-  const node = render(<Button disabled>child</Button>);
-  const button = node.getByText("child");
-  expect(button).toBeDisabled();
-  expect(button).toMatchSnapshot();
+  // TODO: newvariants
+  // test("outline", () => {
+  //   const node = render(<Button variant="outline">child</Button>);
+  //   const button = node.getByText("child");
+  //   expect(button).toMatchSnapshot();
+  // });
+  // test("link", () => {
+  //   const node = render(<Button variant="link">child</Button>);
+  //   const button = node.getByText("child");
+  //   expect(button).toMatchSnapshot();
+  // });
 });
 test("NavButton renders correct element", () => {
   const node = render(<NavButton href="/somewhere">child</NavButton>);
