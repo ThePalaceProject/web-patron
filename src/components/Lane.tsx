@@ -4,10 +4,13 @@ import * as React from "react";
 import { LaneData, BookData } from "opds-web-client/lib/interfaces";
 import ArrowRight from "../icons/ArrowRight";
 import { Tabbable } from "reakit/Tabbable";
-import Book from "./BookCard";
+import Book, { BOOK_HEIGHT } from "./BookCard";
 import { withErrorBoundary } from "./ErrorBoundary";
 import { lighten } from "@theme-ui/color";
 import { H2 } from "./Text";
+import { NavButton } from "./Button";
+import ArrowForward from "icons/ArrowForward";
+import Stack from "./Stack";
 
 type BookRefs = {
   [id: string]: React.RefObject<HTMLLIElement>;
@@ -148,7 +151,12 @@ const Lane: React.FC<{ lane: LaneData; omitIds?: string[] }> = ({
 
   return (
     <div sx={{ mb: 3 }}>
-      <H2 sx={{ px: 5, mt: 0, mb: 3 }}>{title}</H2>
+      <Stack>
+        <H2 sx={{ pl: 5, pr: 4, m: 0, mb: 3 }}>{title}</H2>
+        <NavButton variant="ghost" collectionUrl={url} iconRight={ArrowForward}>
+          See More
+        </NavButton>
+      </Stack>
       <div
         sx={{
           display: "flex",

@@ -15,6 +15,7 @@ type ButtonOwnProps = {
   disabled?: boolean;
   className?: string;
   iconLeft?: React.ComponentType;
+  iconRight?: React.ComponentType;
 };
 type ButtonProps<E extends React.ElementType> = PolymorphicComponentProps<
   E,
@@ -33,6 +34,7 @@ function Button<E extends React.ElementType = typeof defaultComponent>({
   size = "md",
   children,
   iconLeft: IconLeft,
+  iconRight: IconRight,
   ...props
 }: ButtonProps<E>): JSX.Element {
   return (
@@ -41,8 +43,9 @@ function Button<E extends React.ElementType = typeof defaultComponent>({
       sx={styleProps(color, size, variant)}
       {...props}
     >
-      {IconLeft && <IconLeft sx={{ mr: 2, ml: -1 }} />}
+      {IconLeft && <IconLeft sx={{ mr: 1, ml: -1 }} />}
       {children}
+      {IconRight && <IconRight sx={{ mr: -1, ml: 1 }} />}
     </Box>
   );
 }

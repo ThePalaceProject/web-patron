@@ -11,7 +11,7 @@ import useBorrow from "../hooks/useBorrow";
 import { Text, H3 } from "./Text";
 
 export const BOOK_WIDTH = 215;
-const BOOK_HEIGHT = 330;
+export const BOOK_HEIGHT = 330;
 
 const BookCard = React.forwardRef<
   HTMLLIElement,
