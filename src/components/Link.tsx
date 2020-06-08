@@ -58,7 +58,6 @@ const Link: React.FC<LinkProps> = React.forwardRef(
   ({ children, className, ...props }, ref: React.Ref<any>) => {
     const linkUtils = useLinkUtils();
     const { as, href, ...rest } = buildLinkFromProps(props, linkUtils);
-    console.log(props);
     return (
       <BaseLink href={href} as={as} passHref>
         <Styled.a

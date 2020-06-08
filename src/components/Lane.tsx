@@ -161,7 +161,6 @@ const Lane: React.FC<{ lane: LaneData; omitIds?: string[] }> = ({
         sx={{
           display: "flex",
           flexDirection: "row",
-          width: "100vw",
           position: "relative"
         }}
       >
@@ -202,23 +201,25 @@ const PrevNextButton: React.FC<{
     <Tabbable
       as="div"
       sx={{
-        fontSize: 60,
+        width: 64,
+        fontSize: 4,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
         cursor: "pointer",
         "&:hover": {
-          backgroundColor: "primaries.light"
-        }
+          backgroundColor: "ui.gray.medium"
+        },
+        transition: "all 100ms ease-in"
       }}
       onClick={onClick}
       role="button"
       aria-label={isPrev ? "scroll left" : "scroll right"}
       disabled={disabled}
     >
-      <ArrowRight
+      <ArrowForward
         sx={{
-          fill: disabled ? "grey" : "primary",
+          fill: disabled ? "ui.gray.medium" : "ui.gray.extraDark",
           transform: isPrev ? "rotate(180deg)" : ""
         }}
       />
