@@ -1,8 +1,30 @@
 import * as React from "react";
 import { render, fixtures, actions } from "../../test-utils";
 import merge from "deepmerge";
+import { FacetGroupData } from "opds-web-client/lib/interfaces";
 
-test.todo("Format Filter tests", () => {});
+const formatsFacet: FacetGroupData = {
+  label: "Formats",
+  facets: [
+    {
+      label: "eBooks",
+      active: true,
+      href: "/ebooks"
+    },
+    {
+      label: "Audiobooks",
+      href: "/audiobooks",
+      active: false
+    },
+    {
+      label: "All",
+      href: "/all",
+      active: false
+    }
+  ]
+};
+
+test.todo("Format Filter tests");
 
 // describe.skip("Format filters", () => {
 //   test("Format filters not rendered when showFormatFilter not provided", () => {

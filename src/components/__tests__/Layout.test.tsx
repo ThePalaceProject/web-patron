@@ -1,8 +1,6 @@
 import * as React from "react";
 import { render, fixtures } from "../../test-utils";
 import Layout from "../Layout";
-import { State } from "opds-web-client/lib/state";
-import { FacetGroupData, LaneData } from "opds-web-client/lib/interfaces";
 import merge from "deepmerge";
 import userEvent from "@testing-library/user-event";
 
@@ -51,24 +49,3 @@ describe("Layout nav + structure", () => {
     expect(document.body).toHaveStyle("margin: 0;");
   });
 });
-
-const formatsFacet: FacetGroupData = {
-  label: "Formats",
-  facets: [
-    {
-      label: "eBooks",
-      active: true,
-      href: "/ebooks"
-    },
-    {
-      label: "Audiobooks",
-      href: "/audiobooks",
-      active: false
-    },
-    {
-      label: "All",
-      href: "/all",
-      active: false
-    }
-  ]
-};
