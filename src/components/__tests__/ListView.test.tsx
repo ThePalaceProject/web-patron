@@ -37,30 +37,6 @@ test("renders books", () => {
   expectBook(2);
 });
 
-test("includes breadcrumb children", () => {
-  const node = render(
-    <ListView books={books} breadcrumb={<div>Hi from breadcrumb</div>} />
-  );
-  expect(node.getByText("Hi from breadcrumb")).toBeInTheDocument();
-});
-
-test("shows gallery on mobile instead of list", () => {
-  mockeduseBreakpointsIndex.mockReturnValueOnce(0);
-  const node = render(<ListView books={books} />);
-
-  const list = node.getByTestId("gallery-list");
-
-  expect(list).toHaveStyle("display: flex; flex-wrap: wrap;");
-});
-
-test("shows list not gallery on desktop", () => {
-  const node = render(<ListView books={books} />);
-
-  const list = node.getByTestId("listview-list");
-
-  expect(list).toHaveStyle("display: block;");
-});
-
 test("truncates long titles", () => {
   const longBook = merge<BookData>(fixtures.book, {
     title: "This is an extremely long title it's really way too long"

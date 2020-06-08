@@ -81,7 +81,7 @@ const stateWithFacets: State = merge(fixtures.initialState, {
   }
 });
 
-describe("Format filters", () => {
+describe.skip("Format filters", () => {
   test("Format filters not rendered when showFormatFilter not provided", () => {
     const node = render(<Layout>Child</Layout>, {
       initialState: stateWithFacets

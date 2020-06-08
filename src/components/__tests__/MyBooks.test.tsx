@@ -4,9 +4,6 @@ import { MyBooks } from "../MyBooks";
 import { AuthCredentials } from "opds-web-client/lib/interfaces";
 import merge from "deepmerge";
 import { State } from "opds-web-client/lib/state";
-import Layout from "../Layout";
-import userEvent from "@testing-library/user-event";
-import { useBreakpointIndex } from "@theme-ui/match-media";
 import { mockPush } from "../../test-utils/mockNextRouter";
 
 const mockSetCollectionAndBook = jest.fn().mockReturnValue(Promise.resolve({}));
@@ -143,27 +140,4 @@ test("shows loading state", () => {
   );
 
   expect(node.getByText("Loading...")).toBeInTheDocument();
-});
-
-jest.mock("@theme-ui/match-media");
-const mockeduseBreakpointsIndex = useBreakpointIndex as jest.MockedFunction<
-  typeof useBreakpointIndex
->;
-mockeduseBreakpointsIndex.mockReturnValue(1);
-
-test("toggles between list and gallery view", () => {
-  const node = render(
-    <Layout>
-      <MyBooks setCollectionAndBook={mockSetCollectionAndBook} />
-    </Layout>,
-    { initialState: withAuthAndBooks }
-  );
-
-  const galleryRadio = node.getByLabelText("Gallery View");
-  const listRadio = node.getByLabelText("List View");
-  expect(galleryRadio).toHaveAttribute("aria-checked", "true");
-
-  userEvent.click(listRadio);
-
-  expect(listRadio).toHaveAttribute("aria-checked", "true");
 });

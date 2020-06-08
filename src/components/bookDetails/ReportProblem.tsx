@@ -115,7 +115,7 @@ const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
               </span>
             )}
             <div sx={{ mt: 3, "&>button": { ml: 2 }, alignSelf: "flex-end" }}>
-              <Button variant="flat" onClick={cancel}>
+              <Button variant="ghost" onClick={cancel}>
                 Cancel
               </Button>
               <Button type="submit">Submit</Button>

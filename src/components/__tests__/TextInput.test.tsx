@@ -35,7 +35,7 @@ test("type textarea renders properly and passes styles throug", () => {
       border-color: var(--theme-ui-colors-primary,#377F8B);
       border-width: 2px;
       padding: 4px;
-      font-size: 16px;
+      font-size: 1rem;
       color: maroon;
     }
 

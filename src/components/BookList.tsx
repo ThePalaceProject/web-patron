@@ -2,7 +2,6 @@
 import { jsx, Styled } from "theme-ui";
 import * as React from "react";
 import { BookData, LaneData } from "opds-web-client/lib/interfaces";
-import BreadcrumbBar from "./BreadcrumbBar";
 import BookCover from "./BookCover";
 import truncateString from "../utils/truncate";
 import { getAuthors } from "../utils/book";
