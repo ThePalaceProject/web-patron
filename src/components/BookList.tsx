@@ -39,13 +39,12 @@ const ListLoadingIndicator = () => (
 export const ListView: React.FC<{
   books: BookData[];
   breadcrumb?: React.ReactNode;
-}> = ({ books, breadcrumb }) => {
+}> = ({ books }) => {
   // this hook will refetch the page when we reach the bottom of the screen
   const { listRef, isFetchingPage } = useInfiniteScroll();
 
   return (
     <React.Fragment>
-      <BreadcrumbBar>{breadcrumb}</BreadcrumbBar>
       <ul ref={listRef} sx={{ p: 0, m: 0 }} data-testid="listview-list">
         {books.map(book => (
           <BookListItem key={book.id} book={book} />
