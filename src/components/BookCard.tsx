@@ -7,7 +7,7 @@ import Link from "./Link";
 import BookCover from "./BookCover";
 import truncateString from "../utils/truncate";
 import { Text, H3 } from "./Text";
-import MediaTypeIndicator from "./MediaType";
+import BookMediumIndicator from "./MediumIndicator";
 
 export const BOOK_WIDTH = 215;
 export const BOOK_HEIGHT = 330;
@@ -26,7 +26,8 @@ const BookCard = React.forwardRef<
       ref={ref}
       sx={{
         listStyle: "none",
-        display: "block",
+        display: "flex",
+        flexDirection: "column",
         border: "solid",
         bg: "ui.white",
         borderRadius: "card",
@@ -39,12 +40,13 @@ const BookCard = React.forwardRef<
     >
       <Link bookUrl={book.url}>
         <BookCover book={book} sx={{ mx: 40 - 16 }} />
-        <H3 sx={{ m: 0, mt: 2, fontSize: 1 }}>
-          {truncateString(book.title, 50, true)}
-        </H3>
       </Link>
+      <div sx={{ flex: "1 1 auto" }} />
+      <H3 sx={{ m: 0, mt: 2, fontSize: 0 }}>
+        {truncateString(book.title, 39, true)}
+      </H3>
       <Text sx={{ color: "brand.secondary" }}>{authors.join(", ")}</Text>
-      <MediaTypeIndicator book={book} />
+      <BookMediumIndicator book={book} />
     </li>
   );
 });
