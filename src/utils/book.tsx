@@ -1,10 +1,16 @@
-import { BookData, FetchErrorData } from "opds-web-client/lib/interfaces";
+import * as React from "react";
+import {
+  BookData,
+  FetchErrorData,
+  BookMedium
+} from "opds-web-client/lib/interfaces";
 import moment from "moment";
 import {
   bookIsOpenAccess,
   bookIsReserved,
   bookIsBorrowed
 } from "opds-web-client/lib/utils/book";
+import { Book, Headset } from "../icons";
 
 export function getAuthors(book: BookData, lim?: number): string[] {
   // select contributors if the authors array is undefined or empty.
@@ -80,3 +86,14 @@ export function getErrorMsg(error: FetchErrorData | null): string | null {
   }
   return null;
 }
+
+export const bookMediumMap: {
+  [key in BookMedium]: React.ReactNode;
+} = {
+  "http://bib.schema.org/Audiobook": {
+    name: "Audiobook",
+    icon: Headset
+  },
+  "http://schema.org/EBook": { name: "eBook", icon: Book },
+  "http://schema.org/Book": { name: "Book", icon: Book }
+};

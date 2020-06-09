@@ -31,7 +31,7 @@ export const H3: NativeComponent<"h3"> = ({ children, ...rest }) => {
   );
 };
 
-export const Text: React.FC<{ variant?: string }> = ({
+export const Text: React.FC<{ variant?: string; className?: string }> = ({
   variant = "text.body.regular",
   children,
   ...rest
