@@ -10,8 +10,6 @@ import {
   CONFIG_FILE
 } from "../utils/env";
 import fs from "fs";
-import { join } from "path";
-import getConfig from "next/config";
 
 async function setupCache() {
   // we don't want this to be run on the client
@@ -48,10 +46,7 @@ async function setupCache() {
       }
       // it is a local config file.
     } else {
-      const { serverRuntimeConfig } = getConfig();
-      const pathToFile = join(serverRuntimeConfig.PROJECT_ROOT, CONFIG_FILE);
-      console.log("PATH TO CONFIG", pathToFile);
-      configText = fs.readFileSync(pathToFile, "utf8");
+      configText = fs.readFileSync(CONFIG_FILE, "utf8");
     }
     // read the entries.
     for (const entry of configText.split("\n")) {
