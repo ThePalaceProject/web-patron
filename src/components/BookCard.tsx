@@ -46,7 +46,7 @@ const BookCard = React.forwardRef<
         {truncateString(book.title, 39, true)}
       </H3>
       <Text sx={{ color: "brand.secondary" }}>{authors.join(", ")}</Text>
-      <BookMediumIndicator book={book} />
+      <BookMediumIndicator book={book} sx={{ color: "ui.gray.dark" }} />
     </li>
   );
 });
