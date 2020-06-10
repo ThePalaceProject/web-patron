@@ -1,16 +1,16 @@
-import SepiaTheme from "../../public/viewer/alice/SepiaTheme";
-import SerifFont from "../../public/viewer/alice/SerifFont";
-import SansFont from "../../public/viewer/alice/SansFont";
-import PublisherFont from "../../public/viewer/alice/PublisherFont";
-import LocalStorageStore from "../../public/viewer/alice/LocalStorageStore";
-import IFrameNavigator from "../../public/viewer/alice/IFrameNavigator";
-import DayTheme from "../../public/viewer/alice/DayTheme";
-import NightTheme from "../../public/viewer/alice/NightTheme";
-import BookSettings from "../../public/viewer/alice/BookSettings";
-import LocalAnnotator from "../../public/viewer/alice/LocalAnnotator";
-import ServiceWorkerCacher from "../../public/viewer/alice/ServiceWorkerCacher";
-import ColumnsPaginatedBookView from "../../public/viewer/alice/ColumnsPaginatedBookView";
-import ScrollingBookView from "../../public/viewer/alice/ScrollingBookView";
+import SepiaTheme from "../../public/webpub-viewer/SepiaTheme";
+import SerifFont from "../../public/webpub-viewer/SerifFont";
+import SansFont from "../../public/webpub-viewer/SansFont";
+import PublisherFont from "../../public/webpub-viewer/PublisherFont";
+import LocalStorageStore from "../../public/webpub-viewer/LocalStorageStore";
+import IFrameNavigator from "../../public/webpub-viewer/IFrameNavigator";
+import DayTheme from "../../public/webpub-viewer/DayTheme";
+import NightTheme from "../../public/webpub-viewer/NightTheme";
+import BookSettings from "../../public/webpub-viewer/BookSettings";
+import LocalAnnotator from "../../public/webpub-viewer/LocalAnnotator";
+import ServiceWorkerCacher from "../../public/webpub-viewer/ServiceWorkerCacher";
+import ColumnsPaginatedBookView from "../../public/webpub-viewer/ColumnsPaginatedBookView";
+import ScrollingBookView from "../../public/webpub-viewer/ScrollingBookView";
 // ( after
 export default function () {
   (function (
@@ -30,7 +30,8 @@ export default function () {
   ) {
     const element = document.getElementById("viewer");
     const webpubManifestUrl = new URL(
-      "/viewer/alice/manifest.json",
+      /* this manifest url should be dynamic */
+      "/alice/manifest.json",
       window.location.href
     );
     const store = new LocalStorageStore({
