@@ -33,3 +33,5 @@ config/
 .vscode/
 
 lib/
+
+config.txt
