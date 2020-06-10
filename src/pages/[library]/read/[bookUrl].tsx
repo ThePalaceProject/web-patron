@@ -1,13 +1,12 @@
-import React, { useEffect } from "react";
-import { useRouter } from "next/router";
+import React from "react";
+import reader from "utils/reader";
 
 const BookPage = () => {
-  const router = useRouter();
-  const { bookUrl } = router.query;
-  useEffect(() => {
-    router.push(`/viewer/${bookUrl}/index.html`);
-  }, [bookUrl, router]);
-  return null;
+  if (typeof window !== "undefined") {
+    reader();
+  }
+
+  return <div id="viewer" />;
 };
 
 export default BookPage;

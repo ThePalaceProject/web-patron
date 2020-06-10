@@ -22,6 +22,9 @@ import Head from "next/head";
 import Error from "../pages/_error";
 import { ParsedUrlQuery } from "querystring";
 import enableAxe from "utils/axe";
+import "../css/core.css";
+import "../css/local.css";
+import "../css/main.css";
 
 type NotFoundProps = {
   statusCode: number;

@@ -31,3 +31,5 @@ yalc.lock
 wallaby.js
 config/
 .vscode/
+
+lib/
