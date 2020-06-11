@@ -1,7 +1,8 @@
 /** @jsx jsx */
-import { jsx, Styled, useThemeUI } from "theme-ui";
+import { jsx, useThemeUI } from "theme-ui";
 import * as React from "react";
 import FadeLoader from "react-spinners/FadeLoader";
+import { H2 } from "./Text";
 
 const LoadingIndicator: React.FC = props => {
   const { theme } = useThemeUI();
@@ -22,7 +23,7 @@ export const PageLoader: React.FC = () => {
       }}
     >
       <LoadingIndicator />
-      <Styled.h2 sx={{ fontSize: 2 }}>Loading...</Styled.h2>
+      <H2 sx={{ fontSize: 2 }}>Loading...</H2>
     </div>
   );
 };

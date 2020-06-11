@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx, Styled } from "theme-ui";
+import { jsx } from "theme-ui";
 import * as React from "react";
 import { getAvailabilityString } from "../../utils/book";
 import { sidebarWidth } from "./index";
@@ -192,14 +192,14 @@ const DownloadCard: React.FC<{
       >
         <div sx={{ mb: 2, textAlign: "center" }}>{availability}</div>
         {isOpenAccess ? (
-          <Styled.a
+          <a
             target="__blank"
             rel="noopener noreferrer"
             href={linksByMimetype[selectedType]?.url}
             sx={{ variant: "buttons.accent", px: 2, py: 1 }}
           >
             Download
-          </Styled.a>
+          </a>
         ) : (
           <Button onClick={downloadDetails.fulfill}>Download</Button>
         )}

@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx, Styled } from "theme-ui";
+import { jsx } from "theme-ui";
 import * as React from "react";
 import { BookData, LaneData } from "opds-web-client/lib/interfaces";
 import useRecommendationsState from "../context/RecommendationsContext";
@@ -7,6 +7,7 @@ import BookCover from "../BookCover";
 import LoadingIndicator from "../LoadingIndicator";
 import Link from "../Link";
 import { NavButton } from "../Button";
+import { H3, H2 } from "components/Text";
 
 const Recommendations: React.FC<{ book: BookData }> = ({ book }) => {
   /**
@@ -81,7 +82,7 @@ const RecommendationsLane: React.FC<{ lane: LaneData; selfId: string }> = ({
           alignItems: "center"
         }}
       >
-        <Styled.h2 sx={{ fontSize: 2 }}>{title}</Styled.h2>
+        <H2 sx={{ fontSize: 2 }}>{title}</H2>
         <NavButton collectionUrl={url}>More...</NavButton>
       </div>
 
@@ -106,7 +107,7 @@ const RecommendationsLane: React.FC<{ lane: LaneData; selfId: string }> = ({
                 sx={{ flex: "1 0 auto", maxWidth: 110, m: 2 }}
               >
                 <BookCover book={book} sx={{ m: 2, width: 100 }} />
-                <Styled.h3
+                <H3
                   sx={{
                     variant: "text.bookTitle",
                     textAlign: "center",
@@ -116,7 +117,7 @@ const RecommendationsLane: React.FC<{ lane: LaneData; selfId: string }> = ({
                   }}
                 >
                   {book.title}
-                </Styled.h3>
+                </H3>
               </Link>
             )
         )}

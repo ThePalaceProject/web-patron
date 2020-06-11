@@ -7,6 +7,7 @@ import useAuth from "../hooks/useAuth";
 import { getBasicAuthProvider } from "../utils/auth";
 import Modal from "./Modal";
 import ClientOnly from "./ClientOnly";
+import { H2 } from "./Text";
 
 /**
  *  - makes sure auth state is loaded from cookies
@@ -47,8 +48,8 @@ const Auth: React.FC = ({ children }) => {
           dialog={dialog}
         >
           <div sx={{ textAlign: "center" }}>
-            <Styled.h2>{library.catalogName}</Styled.h2>
-            <Styled.h4>Login</Styled.h4>
+            <H2>{library.catalogName}</H2>
+            <h4>Login</h4>
           </div>
           {/* Here we render the auth plugins  */}
           {/* if you would like to enable alternative auth plugins */}

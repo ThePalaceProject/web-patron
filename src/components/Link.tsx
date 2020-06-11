@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx, Styled } from "theme-ui";
+import { jsx } from "theme-ui";
 import * as React from "react";
 import BaseLink from "next/link";
 import useLinkUtils, { LinkUtils } from "./context/LinkUtilsContext";
@@ -60,14 +60,14 @@ const Link: React.FC<LinkProps> = React.forwardRef(
     const { as, href, ...rest } = buildLinkFromProps(props, linkUtils);
     return (
       <BaseLink href={href} as={as} passHref>
-        <Styled.a
+        <a
           ref={ref}
           sx={{ textDecoration: "none", color: "inherit" }}
           className={className}
           {...rest}
         >
           {children}
-        </Styled.a>
+        </a>
       </BaseLink>
     );
   }

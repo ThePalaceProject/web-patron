@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx, Styled } from "theme-ui";
+import { jsx } from "theme-ui";
 import * as React from "react";
 import { SetCollectionAndBook } from "../../interfaces";
 import BookCover from "../BookCover";
@@ -23,6 +23,7 @@ import ReportProblem from "./ReportProblem";
 import useTypedSelector from "../../hooks/useTypedSelector";
 import { NavButton } from "../Button";
 import Head from "next/head";
+import { H2 } from "components/Text";
 
 export interface BookDetailsPropsNew {
   setCollectionAndBook: SetCollectionAndBook;
@@ -83,7 +84,7 @@ export const BookDetails: React.FC<BookDetailsPropsNew> = ({
 
           {/* title, details, summary */}
           <section aria-label="Book Info" sx={{ flex: 2, m: 2 }}>
-            <Styled.h2
+            <H2
               sx={{
                 variant: "text.bookTitle",
                 my: [3],
@@ -92,10 +93,10 @@ export const BookDetails: React.FC<BookDetailsPropsNew> = ({
             >
               {book.title}
               {book.subtitle && `: ${book.subtitle}`}
-            </Styled.h2>
-            <Styled.h3 sx={{ color: "primary", fontSize: [2, 2, 3] }}>
+            </H2>
+            <h3 sx={{ color: "primary", fontSize: [2, 2, 3] }}>
               By {book.authors?.join(", ") ?? "Unknown"}
-            </Styled.h3>
+            </h3>
             <DetailField heading="Publisher" details={book.publisher} />
             <DetailField heading="Published" details={book.published} />
             <DetailField
@@ -130,7 +131,7 @@ const Summary: React.FC<{ book: BookData; className?: string }> = ({
   className
 }) => (
   <div sx={{ my: 2 }} className={className} aria-label="Book summary">
-    <Styled.h3 sx={{ mb: 3, fontSize: 4 }}>Summary</Styled.h3>
+    <h3 sx={{ mb: 3, fontSize: 4 }}>Summary</h3>
     <div
       dangerouslySetInnerHTML={{
         __html: book.summary ?? "Summary not provided."
@@ -166,9 +167,9 @@ const DownloadRequirements: React.FC<{ className?: string }> = ({
       }}
       className={className}
     >
-      <Styled.h3 id="requirements-header" sx={{ fontSize: 2, m: 0, mb: 2 }}>
+      <h3 id="requirements-header" sx={{ fontSize: 2, m: 0, mb: 2 }}>
         Download Requirements:
-      </Styled.h3>
+      </h3>
       <ol
         sx={{ m: 0, p: 0, pl: 3, fontSize: 1 }}
         aria-labelledby="requirements-header"

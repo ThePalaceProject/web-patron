@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx, Styled } from "theme-ui";
+import { jsx } from "theme-ui";
 import * as React from "react";
 import useSetCollectionAndBook from "../hooks/useSetCollectionAndBook";
 import { connect } from "react-redux";
@@ -43,7 +43,7 @@ export const MyBooks: React.FC<{
         <Head>
           <title>My Books</title>
         </Head>
-        <Styled.h4>You need to be signed in to view this page.</Styled.h4>
+        <h4>You need to be signed in to view this page.</h4>
       </div>
     );
   if (collection.data?.books && collection.data.books.length > 0) {
@@ -76,9 +76,9 @@ export const MyBooks: React.FC<{
       <Head>
         <title>My Books</title>
       </Head>
-      <Styled.h3 sx={{ color: "primaries.medium" }}>
+      <h3 sx={{ color: "primaries.medium" }}>
         Your books will show up here when you have any loaned or on hold.
-      </Styled.h3>
+      </h3>
       <Button onClick={signOutAndGoHome}>Sign Out</Button>
     </div>
   );

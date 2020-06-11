@@ -1,5 +1,6 @@
 /** @jsx jsx */
-import { jsx, Styled } from "theme-ui";
+import { jsx } from "theme-ui";
+import { H1 } from "./Text";
 
 const statusCodes: { [code: number]: string } = {
   400: "Bad Request",
@@ -22,9 +23,9 @@ const ErrorComponent = ({
 
   return (
     <>
-      <Styled.h1 sx={{ fontSize: 3, textAlign: `center` }}>
+      <H1 sx={{ fontSize: 3, textAlign: `center` }}>
         Error{`: ${errorTitle}`}
-      </Styled.h1>
+      </H1>
       <p sx={{ textAlign: `center` }}>
         {statusCode
           ? `A ${statusCode} error occurred on server`

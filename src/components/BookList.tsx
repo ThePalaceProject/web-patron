@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx, Styled } from "theme-ui";
+import { jsx } from "theme-ui";
 import * as React from "react";
 import { BookData, LaneData } from "opds-web-client/lib/interfaces";
 import BookCover from "./BookCover";
@@ -12,6 +12,7 @@ import useBorrow from "../hooks/useBorrow";
 import Button from "./Button";
 import LoadingIndicator from "./LoadingIndicator";
 import useInfiniteScroll from "../hooks/useInfiniteScroll";
+import { H2 } from "./Text";
 
 /**
  * In a collection you can:
@@ -85,9 +86,9 @@ const BookListItem: React.FC<{ book: BookData }> = ({ book }) => {
         <BookCover book={book} sx={{ width: 70, height: 105 }} />
         <div sx={{ ml: 3 }}>
           <Link bookUrl={book.url}>
-            <Styled.h2 sx={{ my: 2, variant: "text.bookTitle" }}>
+            <H2 sx={{ my: 2, variant: "text.bookTitle" }}>
               {truncateString(book.title, 50, true)}
-            </Styled.h2>
+            </H2>
           </Link>
           <span sx={{ color: "primary", fontSize: 2 }}>
             {getAuthors(book, 2).join(", ")}

@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx, Styled } from "theme-ui";
+import { jsx } from "theme-ui";
 import * as React from "react";
 import Modal from "../Modal";
 import useComplaints from "../../hooks/useComplaints";
@@ -11,6 +11,7 @@ import Button from "../Button";
 import { ComplaintData } from "../../interfaces";
 import LoadingIndicator from "../LoadingIndicator";
 import Select, { Label } from "../Select";
+import { H1 } from "components/Text";
 
 const getDisplayType = (type: string) =>
   type
@@ -48,9 +49,9 @@ const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
       >
         {state.success ? (
           <div sx={{ display: "flex", flexDirection: "column" }}>
-            <Styled.h1 sx={{ fontSize: 3, textAlign: "center" }}>
+            <H1 sx={{ fontSize: 3, textAlign: "center" }}>
               Your problem was reported. Thank you!
-            </Styled.h1>
+            </H1>
             <Button sx={{ alignSelf: "flex-end" }} onClick={cancel}>
               Done
             </Button>
@@ -72,9 +73,9 @@ const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
               }
             }}
           >
-            <Styled.h1 sx={{ alignSelf: "center", fontSize: [3, 4] }}>
+            <H1 sx={{ alignSelf: "center", fontSize: [3, 4] }}>
               Report a problem
-            </Styled.h1>
+            </H1>
             <Label htmlFor="complaint-type">Complaint Type</Label>
             <Select
               id="complaint-type"
@@ -126,7 +127,7 @@ const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
       <DialogDisclosure
         {...dialog}
         onClick={handleClick}
-        as={Styled.a}
+        as="a"
         sx={{ fontStyle: "italic", mt: 2, display: "inline-block" }}
         data-testid="report-problem-link"
       >
