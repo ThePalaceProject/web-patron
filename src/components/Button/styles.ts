@@ -30,7 +30,8 @@ const buttonBase = {
   border: 0,
   borderRadius: "button",
   cursor: "pointer",
-  textDecoration: "none"
+  textDecoration: "none",
+  bg: "transparent"
 };
 
 export const styleProps = (
@@ -78,58 +79,16 @@ export const styleProps = (
         }
       };
 
+    case "link":
+      return {
+        ...buttonBase,
+        variant: "text.textLink",
+        p: 0,
+        color,
+        fill: color
+      };
+
     default:
       throw new Error(`You chose an unimplemented Button Variant: ${variant}`);
   }
 };
-
-// export const style = (color: string) =>
-// {
-// primary: {
-//   ...buttonBase,
-//   bg: "primary",
-//   color: "white",
-//   fill: "white",
-//   "&:focus,&:hover": {
-//     bg: darken("primary", 0.05)
-//   },
-//   "&:active": {
-//     bg: darken("primary", 0.1)
-//   },
-//   "&:disabled": {
-//     bg: "disabled",
-//     cursor: "default"
-//   }
-// },
-//   accent: {
-//     ...buttonBase,
-//     bg: "accent",
-//     color: "white",
-//     fill: "white",
-//     "&:focus,&:hover": {
-//       bg: darken("accent", 0.05)
-//     },
-//     "&:active": {
-//       bg: darken("accent", 0.1)
-//     },
-//     "&:disabled": {
-//       bg: "disabled",
-//       cursor: "default"
-//     }
-//   }
-// };
-// flat: {
-//   ...buttonBase,
-//   bg: "white",
-//   color: "blues.dark",
-//   "&:focus,&:hover": {
-//     bg: alpha("primary", 0.2)
-//   },
-//   "&:active": {
-//     bg: alpha("primary", 0.4)
-//   },
-//   "&:disabled": {
-//     color: "grey",
-//     cursor: "default"
-//   }
-// }
