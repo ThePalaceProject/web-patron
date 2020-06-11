@@ -74,32 +74,7 @@ const variants = {
       my: 3
     }
   },
-  inputs: {
-    // select: {
-    //   borderRadius: 2,
-    //   borderWidth: 2,
-    //   p: 1,
-    //   fontSize: 2,
-    //   width: "100%"
-    // }
-    select: {
-      width: "100%",
-      display: "flex",
-      alignItems: "center",
-      position: "relative",
-      pl: 1,
-      pr: 2,
-      height: "2rem",
-      fontSize: 2,
-      lineHeight: "normal",
-      bg: "white",
-      pb: 1,
-      transition: "all 0.2s ease 0s",
-      borderRadius: 2,
-      border: "solid",
-      borderColor: "primary"
-    }
-  },
+
   lists: {
     unstyled: {
       m: 0,

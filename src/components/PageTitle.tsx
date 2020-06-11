@@ -3,7 +3,7 @@ import { jsx } from "theme-ui";
 import * as React from "react";
 import { H1 } from "./Text";
 import Stack from "./Stack";
-import Select from "./Select";
+import FormatFilter from "./FormatFilter";
 
 const PageTitle: React.FC = ({ children }) => {
   return (
@@ -17,9 +17,7 @@ const PageTitle: React.FC = ({ children }) => {
       }}
     >
       <H1>{children}</H1>
-      <Select>
-        <option>hi</option>
-      </Select>
+      <FormatFilter />
     </Stack>
   );
 };
