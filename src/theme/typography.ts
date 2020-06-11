@@ -20,7 +20,7 @@ const typography = {
     medium: 500,
     bold: 700
   },
-  lineHeights: ["1rem", "1.1rem", "1.25rem", "1.5rem"],
+  lineHeights: [1, 1.1, 1.25, 1.5],
   letterSpacings: {
     tighter: "-0.05em",
     tight: "-0.025em",

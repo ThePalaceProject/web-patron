@@ -16,7 +16,7 @@ const PageTitle: React.FC = ({ children }) => {
         alignItems: "center"
       }}
     >
-      <H1>{children}</H1>
+      <H1 sx={{ m: 0 }}>{children}</H1>
       <FormatFilter />
     </Stack>
   );
