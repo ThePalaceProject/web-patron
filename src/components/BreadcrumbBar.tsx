@@ -4,6 +4,7 @@ import * as React from "react";
 import useBreadCrumbs from "../hooks/useBreadcrumbs";
 import Link from "./Link";
 import { Text } from "./Text";
+import List, { ListItem } from "./List";
 
 const BreadcrumbBar: React.FC<{
   className?: string;
@@ -25,7 +26,7 @@ const BreadcrumbBar: React.FC<{
         justifyContent: "space-between"
       }}
     >
-      <ul
+      <List
         sx={{
           display: "flex",
           alignItems: "center",
@@ -37,17 +38,15 @@ const BreadcrumbBar: React.FC<{
           breadcrumb =>
             breadcrumb.text &&
             breadcrumb.url && (
-              <li key={breadcrumb.url}>
+              <ListItem key={breadcrumb.url}>
                 <Link collectionUrl={breadcrumb.url}>
-                  <Text>{breadcrumb.text} /&nbsp;</Text>
+                  {breadcrumb.text} /&nbsp;
                 </Link>
-              </li>
+              </ListItem>
             )
         )}
-        <li>
-          <Text>{lastItem}</Text>
-        </li>
-      </ul>
+        <ListItem>{lastItem}</ListItem>
+      </List>
       {children}
     </div>
   );

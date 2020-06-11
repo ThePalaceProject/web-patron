@@ -1,11 +1,5 @@
 const variants = {
   text: {
-    bookTitle: {
-      fontSize: 3,
-      fontWeight: "bold",
-      mb: 0,
-      mt: 3
-    },
     headers: {
       primary: {
         fontFamily: "body",
@@ -75,23 +69,6 @@ const variants = {
       lineHeight: 3,
       color: "ui.link.primary",
       textDecoration: "underline"
-    }
-  },
-  cards: {
-    bookDetails: {
-      maxWidth: ["none", "none", 800],
-      mx: [2, 2, "auto"],
-      my: 3
-    }
-  },
-
-  lists: {
-    unstyled: {
-      m: 0,
-      p: 0,
-      "&>li": {
-        listStyle: "none"
-      }
     }
   }
 };
