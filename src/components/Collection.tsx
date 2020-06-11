@@ -28,7 +28,7 @@ export const Collection: React.FC<{
   const hasLanes = collectionData?.lanes && collectionData.lanes.length > 0;
   const hasBooks = collectionData?.books && collectionData.books.length > 0;
 
-  const pageTitle = title ?? `Collection: ${collectionData.title}`;
+  const pageTitle = title ?? `Collection: ${collectionData.title ?? ""}`;
 
   return (
     <div
