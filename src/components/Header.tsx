@@ -40,7 +40,8 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
           sx={{
             display: "flex",
             flexDirection: "column",
-            justifyContent: "center"
+            justifyContent: "center",
+            alignItems: "flex-start"
           }}
         >
           {library.logoUrl ? (
