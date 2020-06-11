@@ -11,8 +11,8 @@ import LocalAnnotator from "../webpub-viewer/LocalAnnotator";
 import ServiceWorkerCacher from "../webpub-viewer/ServiceWorkerCacher";
 import ColumnsPaginatedBookView from "../webpub-viewer/ColumnsPaginatedBookView";
 import ScrollingBookView from "../webpub-viewer/ScrollingBookView";
-// ( after
-export default function () {
+
+export default function (bookManifestUrl: string) {
   (function (
     LocalStorageStore,
     ServiceWorkerCacher,
@@ -29,11 +29,7 @@ export default function () {
     BookSettings
   ) {
     const element = document.getElementById("viewer");
-    const webpubManifestUrl = new URL(
-      /* this manifest url should be dynamic */
-      "/alice/manifest.json",
-      window.location.href
-    );
+    const webpubManifestUrl = new URL(bookManifestUrl, window.location.href);
     const store = new LocalStorageStore({
       prefix: webpubManifestUrl.href
     });
@@ -54,7 +50,6 @@ export default function () {
     const serif = new SerifFont();
     const sans = new SansFont();
     const fontSizes = [12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32];
-    const FontSize = 20;
     const day = new DayTheme();
     const sepia = new SepiaTheme();
     const night = new NightTheme();
@@ -73,7 +68,6 @@ export default function () {
       store: settingsStore,
       bookFonts: [publisher, serif, sans],
       fontSizesInPixels: fontSizes,
-      //      FontSizeInPixels: FontSize,
       bookThemes: [day, sepia, night],
       bookViews: [paginator, scroller]
     }).then(function (settings) {
@@ -111,4 +105,4 @@ export default function () {
     LocalAnnotator,
     BookSettings
   );
-} //); //();
+}
