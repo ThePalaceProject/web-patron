@@ -7,7 +7,7 @@ import List, { ListItem } from "./List";
 import { H3, Text } from "./Text";
 import { NavButton } from "./Button";
 import SvgPhone from "icons/Phone";
-import IosBadge from "./storeBadges/IOSBadge";
+import IosBadge from "./storeBadges/IosBadge";
 import GooglePlayBadge from "./storeBadges/GooglePlayBadge";
 
 const Footer: React.FC<{ className?: string }> = ({ className }) => {
