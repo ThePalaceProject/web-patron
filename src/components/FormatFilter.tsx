@@ -61,7 +61,8 @@ const FormatFilter: React.FC = () => {
       sx={{
         display: "flex",
         justifyContent: "flex-end",
-        alignItems: "center"
+        alignItems: "center",
+        width: "initial"
       }}
     >
       <FormLabel htmlFor="formatSelect">Format</FormLabel>
