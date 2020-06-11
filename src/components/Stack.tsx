@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx } from "theme-ui";
+import { jsx, css } from "theme-ui";
 import * as React from "react";
 
 type StackProps = {
@@ -12,20 +12,27 @@ const Stack: React.FC<StackProps> = ({
   children,
   ...rest
 }) => {
-  const validChildrenArray = React.Children.toArray(children).filter(
-    React.isValidElement
-  );
+  const numChildren = React.Children.count(children);
 
   return (
     <div sx={{ display: "flex" }} {...rest}>
-      {validChildrenArray.map((child, index) => {
-        const isLastChild = validChildrenArray.length === index + 1;
-        const spacingProps =
+      {React.Children.map(children, (child, index) => {
+        const isLastChild = index === numChildren - 1;
+        if (!React.isValidElement(child)) return null;
+        const propsWithSpacing =
           direction === "row"
-            ? { sx: { mr: isLastChild ? null : spacing } }
-            : { sx: { mb: isLastChild ? null : spacing } };
+            ? {
+                css: css({
+                  mr: isLastChild ? null : spacing
+                }),
+                ...child.props
+              }
+            : {
+                css: css({ mb: isLastChild ? null : spacing }),
+                ...child.props
+              };
 
-        return React.cloneElement(child, spacingProps);
+        return React.cloneElement(child, propsWithSpacing);
       })}
     </div>
   );
