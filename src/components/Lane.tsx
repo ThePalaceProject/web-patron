@@ -201,7 +201,7 @@ const PrevNextButton: React.FC<{
     <Tabbable
       as="div"
       sx={{
-        width: 64,
+        flex: "0 0 64px",
         fontSize: 4,
         display: "flex",
         justifyContent: "center",
