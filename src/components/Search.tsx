@@ -7,6 +7,8 @@ import { useActions } from "opds-web-client/lib/components/context/ActionsContex
 import Router from "next/router";
 import useTypedSelector from "../hooks/useTypedSelector";
 import useLinkUtils from "./context/LinkUtilsContext";
+import FormLabel from "./form/FormLabel";
+import SvgSearch from "icons/Search";
 
 interface SearchProps extends React.InputHTMLAttributes<HTMLInputElement> {}
 
@@ -43,23 +45,35 @@ const Search: React.FC<SearchProps> = ({ ...props }) => {
 
   return (
     <form
-      sx={{
-        display: "inline-block"
-      }}
       onSubmit={onSearch}
       role="search"
+      sx={{ display: "flex", flexDirection: "row", m: 3, mr: 0 }}
     >
       <TextInput
+        id="search-bar"
         type="search"
         name="search"
         title={searchData?.searchData?.shortName}
-        placeholder={searchData?.searchData?.shortName}
+        placeholder="Enter an author, keyword, etc..."
         aria-label="Enter search keyword or keywords"
         value={value}
         onChange={e => setValue(e.target.value)}
+        sx={{
+          borderRight: "none",
+          borderTopRightRadius: 0,
+          borderBottomRightRadius: 0,
+          minWidth: 320
+        }}
         {...props}
       />
-      <Button type="submit" sx={{ m: 1 }}>
+      <Button
+        type="submit"
+        color="ui.black"
+        sx={{
+          height: "100%"
+        }}
+        iconLeft={SvgSearch}
+      >
         Search
       </Button>
     </form>
