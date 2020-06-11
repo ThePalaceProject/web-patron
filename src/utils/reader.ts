@@ -1,16 +1,16 @@
-import SepiaTheme from "../../public/webpub-viewer/SepiaTheme";
-import SerifFont from "../../public/webpub-viewer/SerifFont";
-import SansFont from "../../public/webpub-viewer/SansFont";
-import PublisherFont from "../../public/webpub-viewer/PublisherFont";
-import LocalStorageStore from "../../public/webpub-viewer/LocalStorageStore";
-import IFrameNavigator from "../../public/webpub-viewer/IFrameNavigator";
-import DayTheme from "../../public/webpub-viewer/DayTheme";
-import NightTheme from "../../public/webpub-viewer/NightTheme";
-import BookSettings from "../../public/webpub-viewer/BookSettings";
-import LocalAnnotator from "../../public/webpub-viewer/LocalAnnotator";
-import ServiceWorkerCacher from "../../public/webpub-viewer/ServiceWorkerCacher";
-import ColumnsPaginatedBookView from "../../public/webpub-viewer/ColumnsPaginatedBookView";
-import ScrollingBookView from "../../public/webpub-viewer/ScrollingBookView";
+import SepiaTheme from "../webpub-viewer/SepiaTheme";
+import SerifFont from "../webpub-viewer/SerifFont";
+import SansFont from "../webpub-viewer/SansFont";
+import PublisherFont from "../webpub-viewer/PublisherFont";
+import LocalStorageStore from "../webpub-viewer/LocalStorageStore";
+import IFrameNavigator from "../webpub-viewer/IFrameNavigator";
+import DayTheme from "../webpub-viewer/DayTheme";
+import NightTheme from "../webpub-viewer/NightTheme";
+import BookSettings from "../webpub-viewer/BookSettings";
+import LocalAnnotator from "../webpub-viewer/LocalAnnotator";
+import ServiceWorkerCacher from "../webpub-viewer/ServiceWorkerCacher";
+import ColumnsPaginatedBookView from "../webpub-viewer/ColumnsPaginatedBookView";
+import ScrollingBookView from "../webpub-viewer/ScrollingBookView";
 // ( after
 export default function () {
   (function (
