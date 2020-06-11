@@ -10,6 +10,7 @@ import BookIcon from "../icons/Book";
 import useLibraryContext from "./context/LibraryContext";
 import Stack from "./Stack";
 import BreadcrumbBar from "./BreadcrumbBar";
+import { Text } from "./Text";
 
 export interface HeaderContext extends NavigateContext {
   library: LibraryData;
@@ -33,8 +34,20 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
         }}
         className={className}
       >
-        <Link href="/" aria-label="Library catalog, back to homepage">
-          <img src={library.logoUrl} alt={`${library.catalogName} Logo`} />
+        <Link
+          href="/"
+          aria-label="Library catalog, back to homepage"
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center"
+          }}
+        >
+          {library.logoUrl ? (
+            <img src={library.logoUrl} alt={`${library.catalogName} Logo`} />
+          ) : (
+            <Text variant="text.headers.primary">{library.catalogName}</Text>
+          )}
         </Link>
         <Flex
           sx={{
