@@ -18,7 +18,8 @@
     "importHelpers": true,
     "baseUrl": "src"
   },
-  "exclude": ["node_modules", "config/srv"],
+  "excludedFiles": "*.test.js",
+  "exclude": ["node_modules", "config/srv", "src/webpub-viewer"],
   "include": [
     "next-env.d.ts",
     "**/*.ts",
