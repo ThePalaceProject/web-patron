@@ -50,10 +50,10 @@ export const styleProps = (
         color: "white",
         fill: "white",
         "&:focus,&:hover": {
-          bg: darken("primary", 0.05)
+          bg: darken(color, 0.05)
         },
         "&:active": {
-          bg: darken("primary", 0.1)
+          bg: darken(color, 0.1)
         },
         "&:disabled": {
           bg: "ui.gray.light",

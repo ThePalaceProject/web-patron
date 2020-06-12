@@ -70,7 +70,7 @@ const Search: React.FC<SearchProps> = ({ ...props }) => {
         type="submit"
         color="ui.black"
         sx={{
-          height: "100%"
+          height: "initial"
         }}
         iconLeft={SvgSearch}
       >
