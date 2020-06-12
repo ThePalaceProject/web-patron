@@ -150,4 +150,9 @@ const fetchLibraryData = async (
   return null;
 };
 
+export const getConfig = async () => {
+  if (!IS_SERVER) return;
+  return (await cachePromise)?.getConfig();
+};
+
 export default getLibraryData;

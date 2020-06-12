@@ -10,7 +10,10 @@ import {
 } from "../utils/env";
 import getPathFor from "../utils/getPathFor";
 import UrlShortener from "../UrlShortener";
-import getLibraryData, { setLibraryData } from "../dataflow/getLibraryData";
+import getLibraryData, {
+  setLibraryData,
+  getConfig
+} from "../dataflow/getLibraryData";
 import getOrCreateStore from "../dataflow/getOrCreateStore";
 import { LibraryData } from "../interfaces";
 import { State } from "opds-web-client/lib/state";
@@ -19,13 +22,15 @@ import theme from "../theme";
 import Auth from "../components/Auth";
 import ErrorBoundary from "../components/ErrorBoundary";
 import Head from "next/head";
-import Error from "../pages/_error";
+import Error from "components/Error";
 import { ParsedUrlQuery } from "querystring";
 import enableAxe from "utils/axe";
 import "system-font-css";
+import { Config } from "dataflow/LibraryDataCache";
 
 type NotFoundProps = {
   statusCode: number;
+  configFile?: Config;
 };
 
 type InitialData = {
@@ -45,7 +50,9 @@ const MyApp = (props: MyAppProps & AppProps) => {
    */
 
   if (is404(props)) {
-    return <Error statusCode={props.statusCode} />;
+    return (
+      <Error statusCode={props.statusCode} configFile={props.configFile} />
+    );
   }
 
   const { library, initialState, Component, pageProps } = props;
@@ -117,8 +124,9 @@ MyApp.getInitialProps = async ({ ctx, _err }) => {
       " and as path: ",
       ctx.asPath
     );
-    ctx.res.statusCode = 404;
-    return { statusCode: 404 };
+    const config = await getConfig();
+    if (ctx.res) ctx.res.statusCode = 404;
+    return { statusCode: 404, configFile: config };
   }
 
   /**
