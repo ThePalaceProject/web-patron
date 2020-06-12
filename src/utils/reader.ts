@@ -72,6 +72,7 @@ export default function (bookManifestUrl: string) {
       bookViews: [paginator, scroller]
     }).then(function (settings) {
       IFrameNavigator.create({
+        /* @ts-ignore next-line*/
         element: element,
         manifestUrl: webpubManifestUrl,
         store: store,

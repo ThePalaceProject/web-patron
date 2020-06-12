@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/ban-ts-ignore*/
-/* @ts-ignore*/
 /* eslint-disable @typescript-eslint/no-empty-function*/
 
 import BookView from "./BookView";
@@ -206,6 +205,7 @@ export default class BookSettings {
           bookFont.label
         )
       );
+      /* @ts-ignore next-line*/
       sections.push(sectionTemplate(fontOptions.join("")));
     }
 
@@ -227,6 +227,7 @@ export default class BookSettings {
           "",
           "increase-font"
         );
+      /* @ts-ignore next-line*/
       sections.push(sectionTemplate(fontSizeOptions));
     }
 
@@ -241,6 +242,7 @@ export default class BookSettings {
           bookTheme.label
         )
       );
+      /* @ts-ignore next-line*/
       sections.push(sectionTemplate(themeOptions.join("")));
     }
 
@@ -255,8 +257,10 @@ export default class BookSettings {
           bookView.label
         )
       );
+      /* @ts-ignore next-line*/
       sections.push(sectionTemplate(viewOptions.join("")));
     }
+    /* @ts-ignore next-line*/
     sections.push(offlineTemplate);
 
     element.innerHTML = template(sections.join(""));
