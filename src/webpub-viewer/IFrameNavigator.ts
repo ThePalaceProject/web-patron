@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-empty-function*/
+/* eslint-disable @typescript-eslint/interface-name-prefix*/
+/* eslint-disable no-self-assign*/
+
 import Navigator from "./Navigator";
 import Store from "./Store";
 import Cacher from "./Cacher";

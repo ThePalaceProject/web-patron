@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/ban-ts-ignore*/
+/* @ts-ignore*/
+/* eslint-disable @typescript-eslint/no-empty-function*/
+
 import BookView from "./BookView";
 import BookTheme from "./BookTheme";
 import BookFont from "./BookFont";

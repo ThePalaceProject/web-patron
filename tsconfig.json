@@ -19,7 +19,7 @@
     "baseUrl": "src"
   },
   "excludedFiles": "*.test.js",
-  "exclude": ["node_modules", "config/srv", "src/webpub-viewer"],
+  "exclude": ["node_modules", "config/srv"],
   "include": [
     "next-env.d.ts",
     "**/*.ts",
@@ -27,6 +27,7 @@
     "**/*.tsx",
     "next.config.js",
     "src/utils/require.js",
-    "src/utils/fetch.js"
+    "src/utils/fetch.js",
+    "src/webpub-viewer"
   ]
 }

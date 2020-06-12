@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/ban-ts-ignore*/
+/* @ts-ignore*/
+/* eslint-disable @typescript-eslint/no-empty-function*/
+
 import Cacher from "./Cacher";
 import { CacheStatus } from "./Cacher";
 import Store from "./Store";
