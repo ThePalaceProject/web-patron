@@ -25,6 +25,10 @@ import { NavButton } from "../Button";
 import Head from "next/head";
 import { H3, Text, H1 } from "components/Text";
 import MediumIndicator from "components/MediumIndicator";
+import SimplyELogo from "components/SimplyELogo";
+import IosBadge from "components/storeBadges/IosBadge";
+import GooglePlayBadge from "components/storeBadges/GooglePlayBadge";
+import Stack from "components/Stack";
 
 /**
  * How will I build my grid?
@@ -87,7 +91,7 @@ export const BookDetails: React.FC<{
         <Column columns={4}>
           <BookCover book={book} />
           {/* download requirements & download links */}
-          <DownloadRequirements />
+          <SimplyECallout />
         </Column>
         <Column columns={8} aria-label="Book info">
           <H1 sx={{ m: 0 }}>
@@ -136,9 +140,7 @@ const Summary: React.FC<{ book: BookData; className?: string }> = ({
   </div>
 );
 
-const DownloadRequirements: React.FC<{ className?: string }> = ({
-  className
-}) => {
+const SimplyECallout: React.FC = () => {
   return (
     <section
       aria-label="Download requirements"
@@ -147,37 +149,20 @@ const DownloadRequirements: React.FC<{ className?: string }> = ({
         bg: "ui.gray.lightWarm",
         display: "flex",
         flexDirection: "column",
-        py: 2,
-        px: 3
+        p: 3,
+        textAlign: "center"
       }}
-      className={className}
     >
-      <h3 id="requirements-header" sx={{ fontSize: 2, m: 0, mb: 2 }}>
-        Download Requirements:
-      </h3>
-      <ol
-        sx={{ m: 0, p: 0, pl: 3, fontSize: 1 }}
-        aria-labelledby="requirements-header"
-      >
-        <li>
-          <ExternalLink href="https://accounts.adobe.com/">
-            Create Adobe ID
-          </ExternalLink>
-        </li>
-        <li>
-          Install an eBook Reader:
-          <br />
-          <ExternalLink href="https://www.adobe.com/solutions/ebook/digital-editions/download.html">
-            Adobe Digital Editions
-          </ExternalLink>
-          <br />
-          <ExternalLink href="http://www.bluefirereader.com/bluefire-reader.html">
-            Bluefire Reader
-          </ExternalLink>
-          <br />
-          <span>* Or another Adobe-compatible application</span>
-        </li>
-      </ol>
+      <SimplyELogo sx={{ m: 3 }} />
+      <H3 sx={{ mt: 0 }}>Read Now. Read Everywhere.</H3>
+      <Text>
+        Browse and read our collection of eBooks and Audiobooks right from your
+        phone.
+      </Text>
+      <div sx={{ maxWidth: 140, mx: "auto", mt: 3 }}>
+        <IosBadge sx={{ m: "6%" }} />
+        <GooglePlayBadge />
+      </div>
     </section>
   );
 };
