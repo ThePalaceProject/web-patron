@@ -72,8 +72,15 @@ export function AmbiguousButton(props: AmbiguousButtonProps) {
 }
 
 type AnchorButtonProps = Omit<React.ComponentProps<"a">, "ref"> &
-  ButtonOwnProps;
+  ButtonOwnProps & { newTab?: boolean };
 export function AnchorButton(props: AnchorButtonProps) {
-  return <Button component="a" {...props} />;
+  return (
+    <Button
+      rel={props.newTab ? "noreferrer noopener" : undefined}
+      target={props.newTab ? "__blank" : undefined}
+      component="a"
+      {...props}
+    />
+  );
 }
 export default Button;
