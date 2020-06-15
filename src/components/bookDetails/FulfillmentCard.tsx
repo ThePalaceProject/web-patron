@@ -9,7 +9,6 @@ import {
   FulfillmentLink
 } from "opds-web-client/lib/interfaces";
 import { typeMap } from "opds-web-client/lib/utils/file";
-import { RequiredKeys } from "../../interfaces";
 import { bookIsOpenAccess } from "opds-web-client/lib/utils/book";
 import Button, { AnchorButton } from "../Button";
 import useDownloadButton from "opds-web-client/lib/hooks/useDownloadButton";
@@ -254,5 +253,4 @@ const DownloadCard: React.FC<{
   );
 };
 
-// const WithBoundary = withErrorBoundary(FulfillmentCard, ErrorFallback);
-export default FulfillmentCard;
+export default withErrorBoundary(FulfillmentCard, ErrorCard);
