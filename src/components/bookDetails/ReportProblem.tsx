@@ -130,6 +130,7 @@ const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
         as={Button}
         data-testid="report-problem-link"
         variant="link"
+        color="ui.gray.extraDark"
         sx={{ fontStyle: "italic" }}
       >
         Report a problem
