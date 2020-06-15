@@ -12,24 +12,23 @@ const Stack: React.FC<StackProps> = ({
   children,
   ...rest
 }) => {
-  const numChildren = React.Children.count(children);
-
   return (
     <div
       sx={{
-        display: "flex"
+        display: "flex",
+        flexDirection: direction,
+        "&>*": {
+          mr: direction === "row" ? spacing : undefined,
+          mb: direction === "column" ? spacing : undefined
+        },
+        "&>*:last-child": {
+          mr: direction === "row" ? 0 : undefined,
+          mb: direction === "column" ? 0 : undefined
+        }
       }}
       {...rest}
     >
-      {React.Children.map(children, (child, index) => {
-        const isLastChild = index === numChildren - 1;
-        const newSpacing = {
-          mr: !isLastChild && direction === "row" ? spacing : undefined,
-          mb: !isLastChild && direction === "column" ? spacing : undefined
-        };
-        if (!React.isValidElement(child)) return null;
-        return <div sx={newSpacing}>{child}</div>;
-      })}
+      {children}
     </div>
   );
 };
