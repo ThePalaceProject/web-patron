@@ -2,13 +2,17 @@ import * as React from "react";
 import {
   BookData,
   FetchErrorData,
-  BookMedium
+  BookMedium,
+  MediaType,
+  MediaLink,
+  FulfillmentLink
 } from "opds-web-client/lib/interfaces";
 import moment from "moment";
 import {
   bookIsOpenAccess,
   bookIsReserved,
-  bookIsBorrowed
+  bookIsBorrowed,
+  bookIsBorrowable
 } from "opds-web-client/lib/utils/book";
 import { Book, Headset } from "../icons";
 
@@ -29,46 +33,37 @@ export function getAuthors(book: BookData, lim?: number): string[] {
   return allAuth;
 }
 
-export const getAvailabilityString = (book: BookData): string => {
-  if (bookIsOpenAccess(book)) {
-    return "This open-access book is available to keep.";
-  }
+// export function getDedupedLinks(links: MediaLink[] | FulfillmentLink[]) {
+//   return links.filter(link => )
+// }
 
-  if (bookIsBorrowed(book)) {
-    const availableUntil = book?.availability?.until;
-    if (availableUntil) {
-      const timeLeft = moment(availableUntil).fromNow(true);
-      return `You have this book on loan for ${timeLeft}`;
-    }
-    // you have borrowed the book but it is unknown until when
-    return "You have this book on loan.";
-  }
+export type BookFullfillmentState =
+  | "openAccess"
+  | "availableToBorrow"
+  | "availableToReserve"
+  | "reserved"
+  | "borrowed/protected"
+  | "error";
+
+export function getFulfillmentState(book: BookData): BookFullfillmentState {
+  if (bookIsOpenAccess(book)) return "openAccess";
+  if (bookIsBorrowed(book)) return "borrowed/protected";
+  if (bookIsReserved(book)) return "reserved";
 
   const availableCopies = book?.copies?.available;
   const totalCopies = book?.copies?.total;
-  const totalHolds = book?.holds?.total;
-  const holdsPosition = book?.holds?.position;
 
-  let availabilityString = "";
-  // there is a number of copies available that is known
-  if (typeof availableCopies === "number" && typeof totalCopies === "number") {
-    // show how many available, even if all are taken
-    availabilityString += `${availableCopies} of ${totalCopies} copies available.`;
-
-    // there is a queue
-    if (typeof totalHolds === "number" && availableCopies === 0) {
-      availabilityString += ` ${totalHolds} patrons in queue.`;
-
-      if (bookIsReserved(book) && typeof holdsPosition === "number") {
-        availabilityString += ` Your hold position: ${holdsPosition}.`;
-      }
-    }
-
-    return availabilityString;
+  if (
+    typeof book.borrowUrl === "string" &&
+    typeof availableCopies === "number" &&
+    typeof totalCopies === "number"
+  ) {
+    if (availableCopies > 0) return "availableToBorrow";
+    return "availableToReserve";
   }
-  // the number of available copies is unknown
-  return "Availability unknown";
-};
+
+  return "error";
+}
 
 export function getErrorMsg(error: FetchErrorData | null): string | null {
   const response = error?.response;

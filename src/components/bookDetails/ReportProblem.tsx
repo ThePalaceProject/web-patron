@@ -127,9 +127,10 @@ const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
       <DialogDisclosure
         {...dialog}
         onClick={handleClick}
-        as="a"
-        sx={{ fontStyle: "italic", mt: 2, display: "inline-block" }}
+        as={Button}
         data-testid="report-problem-link"
+        variant="link"
+        sx={{ fontStyle: "italic" }}
       >
         Report a problem
       </DialogDisclosure>

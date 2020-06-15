@@ -6,7 +6,7 @@ import { Text } from "./Text";
 import { getMedium } from "opds-web-client/lib/utils/book";
 import { bookMediumMap } from "utils/book";
 
-const MediaTypeIndicator: React.FC<{ book: BookData; className?: string }> = ({
+const MediumIndicator: React.FC<{ book: BookData; className?: string }> = ({
   book,
   className
 }) => {
@@ -14,13 +14,25 @@ const MediaTypeIndicator: React.FC<{ book: BookData; className?: string }> = ({
 
   if (Object.keys(bookMediumMap).indexOf(medium) === -1) return null;
   const mediumInfo = bookMediumMap[medium];
-  const MediumSvg = mediumInfo.icon;
   return (
     <Text sx={{ display: "flex", alignItems: "center" }} className={className}>
-      {MediumSvg && <MediumSvg sx={{ mr: 1 }} />}
+      <MediumIcon sx={{ mr: 1 }} book={book} />
       {mediumInfo.name}
     </Text>
   );
 };
 
-export default MediaTypeIndicator;
+export default MediumIndicator;
+
+export const MediumIcon: React.FC<{ book: BookData; className?: string }> = ({
+  book,
+  className,
+  ...rest
+}) => {
+  const medium = getMedium(book);
+
+  if (Object.keys(bookMediumMap).indexOf(medium) === -1) return null;
+  const mediumInfo = bookMediumMap[medium];
+  const MediumSvg = mediumInfo.icon;
+  return MediumSvg ? <MediumSvg className={className} {...rest} /> : null;
+};

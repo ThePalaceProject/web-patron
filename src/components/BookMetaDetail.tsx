@@ -4,10 +4,11 @@ import * as React from "react";
 
 const DetailField: React.FC<{ heading: string; details?: string }> = ({
   heading,
-  details
+  details,
+  ...rest
 }) =>
   details ? (
-    <div sx={{ fontSize: [1, 2] }}>
+    <div {...rest}>
       <b>{heading}: </b>
       <span>{details}</span>
     </div>

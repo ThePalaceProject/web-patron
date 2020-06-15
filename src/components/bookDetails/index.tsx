@@ -23,17 +23,48 @@ import ReportProblem from "./ReportProblem";
 import useTypedSelector from "../../hooks/useTypedSelector";
 import { NavButton } from "../Button";
 import Head from "next/head";
-import { H2 } from "components/Text";
+import { H2, H3, Text, H1 } from "components/Text";
+import MediumIndicator from "components/MediumIndicator";
 
-export interface BookDetailsPropsNew {
+/**
+ * How will I build my grid?
+ *  - Margin: 64px (when does this go away / change?). This should change for the whole layout at some point for mobile.
+ *  - 12 columns. Each element decides how many columns it takes up...
+ *  - Every column except the last gets 32px padding right
+ *  - How do you deal with the extra columns on the side?
+ */
+
+const Grid: React.FC = ({ children, ...rest }) => (
+  <div
+    sx={{
+      display: "flex",
+      mx: 5,
+      "&>div": {
+        mr: 4
+      },
+      "&>div:last-child": {
+        mr: 0
+      }
+    }}
+    {...rest}
+  >
+    {children}
+  </div>
+);
+
+const Column: React.FC<{ columns: number }> = ({
+  children,
+  columns,
+  ...rest
+}) => (
+  <div sx={{ flex: columns / 12 }} {...rest}>
+    {children}
+  </div>
+);
+
+export const BookDetails: React.FC<{
   setCollectionAndBook: SetCollectionAndBook;
-}
-
-export const sidebarWidth = 200;
-
-export const BookDetails: React.FC<BookDetailsPropsNew> = ({
-  setCollectionAndBook
-}) => {
+}> = ({ setCollectionAndBook }) => {
   // set the collection and book
   useSetCollectionAndBook(setCollectionAndBook);
 
@@ -51,77 +82,42 @@ export const BookDetails: React.FC<BookDetailsPropsNew> = ({
         <title>{book.title}</title>
       </Head>
       <BreadcrumbBar currentLocation={truncateString(book.title, 20, false)} />
-      <div
-        sx={{
-          variant: "cards.bookDetails",
-          border: "1px solid",
-          borderColor: "primaries.dark",
-          borderRadius: "card",
-          p: [2, 4]
-        }}
-      >
-        <div id="top" sx={{ display: "flex" }}>
-          {/* side bar */}
-          <div
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              flex: 1,
-              maxWidth: sidebarWidth
-            }}
-          >
-            <BookCover book={book} sx={{ m: 2 }} />
-            {/* download requirements & download links */}
-            <div
-              sx={{
-                display: ["none", "none", "block"]
-              }}
-            >
-              <FulfillmentCard sx={{ m: 2 }} book={book} />
-              <DownloadRequirements sx={{ m: 2 }} />
-            </div>
-          </div>
+      <Grid sx={{ my: 4 }}>
+        <Column columns={1} />
+        <Column columns={4}>
+          <BookCover book={book} />
+          {/* download requirements & download links */}
+          <DownloadRequirements />
+        </Column>
+        <Column columns={8} aria-label="Book info">
+          <H1 sx={{ m: 0 }}>
+            {book.title}
+            {book.subtitle && `: ${book.subtitle}`}
+          </H1>
 
-          {/* title, details, summary */}
-          <section aria-label="Book Info" sx={{ flex: 2, m: 2 }}>
-            <H2
-              sx={{
-                variant: "text.bookTitle",
-                my: [3],
-                fontSize: [3, 3, 4]
-              }}
-            >
-              {book.title}
-              {book.subtitle && `: ${book.subtitle}`}
-            </H2>
-            <h3 sx={{ color: "primary", fontSize: [2, 2, 3] }}>
-              By {book.authors?.join(", ") ?? "Unknown"}
-            </h3>
+          <Text
+            variant="text.callouts.regular"
+            sx={{ color: "brand.secondary" }}
+          >
+            <span sx={{ color: "ui.black" }}>by </span>
+            {book.authors?.join(", ") ?? "Unknown"}
+          </Text>
+          <MediumIndicator book={book} />
+          <div sx={{ mt: 2 }}>
             <DetailField heading="Publisher" details={book.publisher} />
             <DetailField heading="Published" details={book.published} />
             <DetailField
               heading="Categories"
               details={book.categories?.join(", ")}
             />
-            <ReportProblem book={book} />
-            <Summary sx={{ display: ["none", "none", "block"] }} book={book} />
-          </section>
-        </div>
-        {/* the summary is displayed below when on small screens */}
-        <Summary book={book} sx={{ display: ["block", "block", "none"] }} />
-        {/* the download requirements are displayed below on small screens */}
-        <div
-          sx={{
-            display: ["flex", "flex", "none"],
-            flexWrap: "wrap",
-            justifyContent: "center"
-          }}
-        >
-          <DownloadRequirements sx={{ m: 2 }} />
-          <FulfillmentCard book={book} />
-        </div>
-      </div>
-      <Recommendations book={book} />
+          </div>
+          <FulfillmentCard book={book} sx={{ mt: 3 }} />
+          <ReportProblem book={book} />
+          <Summary sx={{ display: ["none", "none", "block"] }} book={book} />
+        </Column>
+        <Column columns={1} />
+      </Grid>
+      {/* <Recommendations book={book} /> */}
     </section>
   );
 };
@@ -131,17 +127,10 @@ const Summary: React.FC<{ book: BookData; className?: string }> = ({
   className
 }) => (
   <div sx={{ my: 2 }} className={className} aria-label="Book summary">
-    <h3 sx={{ mb: 3, fontSize: 4 }}>Summary</h3>
+    <H3 sx={{ mb: 2 }}>Summary</H3>
     <div
       dangerouslySetInnerHTML={{
         __html: book.summary ?? "Summary not provided."
-      }}
-      sx={{
-        maxHeight: "50vh",
-        overflowY: "scroll",
-        "&>p": {
-          m: 0
-        }
       }}
     />
   </div>
@@ -154,16 +143,12 @@ const DownloadRequirements: React.FC<{ className?: string }> = ({
     <section
       aria-label="Download requirements"
       sx={{
-        border: "1px solid",
-        borderColor: "primary",
-        backgroundColor: "lightGrey",
-        borderRadius: "card",
+        mt: 4,
+        bg: "ui.gray.lightWarm",
         display: "flex",
         flexDirection: "column",
-        // alignItems: "center",
         py: 2,
-        px: 3,
-        maxWidth: sidebarWidth
+        px: 3
       }}
       className={className}
     >
