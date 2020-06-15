@@ -39,9 +39,8 @@ const FormatFilter: React.FC = () => {
 
   if (!isCollectionLoaded) return null;
   if (!ebookFacet || !audiobookFacet) {
-    console.warn(
-      "In order to display the format selector, you must configure an eBook and audiobook facet. You can also have an optional All facet."
-    );
+    // in order to display the format selector, you must have an audiobook and ebook filter set
+    // up in the CM
     return null;
   }
   const handleChange: React.ChangeEventHandler<HTMLSelectElement> = e => {

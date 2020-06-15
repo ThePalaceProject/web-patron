@@ -9,7 +9,6 @@ import Link from "./Link";
 import BookIcon from "../icons/Book";
 import useLibraryContext from "./context/LibraryContext";
 import Stack from "./Stack";
-import BreadcrumbBar from "./BreadcrumbBar";
 import { Text } from "./Text";
 
 export interface HeaderContext extends NavigateContext {
@@ -63,7 +62,6 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
           <Search />
         </Flex>
       </header>
-      <BreadcrumbBar />
     </>
   );
 };
@@ -112,7 +110,7 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
       >
         My Books
       </NavButton>
-      <NavButton href="/login">Sign In</NavButton>
+      <NavButton href="/loans">Sign In</NavButton>
     </Stack>
   );
 };

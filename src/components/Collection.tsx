@@ -16,6 +16,7 @@ import { ListView, LanesView } from "./BookList";
 import Head from "next/head";
 import PageTitle from "./PageTitle";
 import { Text } from "./Text";
+import BreadcrumbBar from "./BreadcrumbBar";
 
 export const Collection: React.FC<{
   setCollectionAndBook: SetCollectionAndBook;
@@ -42,6 +43,7 @@ export const Collection: React.FC<{
       <Head>
         <title>{pageTitle}</title>
       </Head>
+      <BreadcrumbBar />
       <PageTitle>{pageTitle}</PageTitle>
       {isFetching ? (
         <PageLoader />

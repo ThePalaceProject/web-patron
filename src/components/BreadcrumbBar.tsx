@@ -3,7 +3,6 @@ import { jsx } from "theme-ui";
 import * as React from "react";
 import useBreadCrumbs from "../hooks/useBreadcrumbs";
 import Link from "./Link";
-import { Text } from "./Text";
 import List, { ListItem } from "./List";
 
 const BreadcrumbBar: React.FC<{
