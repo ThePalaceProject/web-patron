@@ -9,6 +9,7 @@ const GooglePlayBadge = (props: React.ComponentProps<"a">) => {
       target="__blank"
       aria-label="Get SimplyE on the Google Play Store"
       href="https://play.google.com/store/apps/details?id=org.nypl.simplified.simplye&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1"
+      sx={{ display: "block" }}
       {...props}
     >
       <img
