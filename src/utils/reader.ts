@@ -1,16 +1,18 @@
-import { SepiaTheme, 
-  SerifFont, 
-  SansFont, 
-  PublisherFont, 
-  LocalStorageStore, 
-  IFrameNavigator, 
-  DayTheme, 
-  NightTheme, 
-  BookSettings, 
-  LocalAnnotator, 
-  ServiceWorkerCacher, 
-  ColumnsPaginatedBookView, 
-  ScrollingBookView } from "library-simplified-webpub-viewer";
+import {
+  SepiaTheme,
+  SerifFont,
+  SansFont,
+  PublisherFont,
+  LocalStorageStore,
+  IFrameNavigator,
+  DayTheme,
+  NightTheme,
+  BookSettings,
+  LocalAnnotator,
+  ServiceWorkerCacher,
+  ColumnsPaginatedBookView,
+  ScrollingBookView
+} from "library-simplified-webpub-viewer";
 
 export default function (bookManifestUrl: string) {
   (function (
