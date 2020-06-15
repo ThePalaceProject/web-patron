@@ -5,6 +5,8 @@ import * as React from "react";
 import Link from "../Link";
 import { Box, PolymorphicComponentProps } from "../PolymorphicBox";
 import { styleProps } from "./styles";
+import LoadingIndicator from "components/LoadingIndicator";
+import { Text } from "components/Text";
 
 export type ButtonVariant = "filled" | "outline" | "ghost" | "link";
 export type ButtonSize = "sm" | "md" | "lg";
@@ -16,6 +18,8 @@ type ButtonOwnProps = {
   className?: string;
   iconLeft?: React.ComponentType;
   iconRight?: React.ComponentType;
+  loading?: boolean;
+  loadingText?: string;
 };
 type ButtonProps<E extends React.ElementType> = PolymorphicComponentProps<
   E,
@@ -35,17 +39,32 @@ function Button<E extends React.ElementType = typeof defaultComponent>({
   children,
   iconLeft: IconLeft,
   iconRight: IconRight,
+  loading = false,
+  loadingText,
+  disabled,
   ...props
 }: ButtonProps<E>): JSX.Element {
   return (
     <Box
       component={defaultComponent}
       sx={styleProps(color, size, variant)}
+      disabled={loading || disabled}
       {...props}
     >
-      {IconLeft && <IconLeft sx={{ mr: 1, ml: -1 }} />}
-      {children}
-      {IconRight && <IconRight sx={{ mr: -1, ml: 1 }} />}
+      {!loading && IconLeft && <IconLeft sx={{ mr: 1, ml: -1 }} />}
+      {!loading && children}
+      {!loading && IconRight && <IconRight sx={{ mr: -1, ml: 1 }} />}
+      {loading && (
+        <LoadingIndicator
+          color="ui.gray.extraDark"
+          size={18}
+          sx={{
+            ml: loadingText ? -2 : undefined,
+            mr: loadingText ? 2 : undefined
+          }}
+        />
+      )}
+      {loading && loadingText && <Text>{loadingText}</Text>}
     </Box>
   );
 }

@@ -11,8 +11,8 @@ export const sizes = {
     px: 3
   },
   lg: {
-    height: 48,
-    minWidth: 48,
+    height: 43,
+    minWidth: 43,
     px: 4
   }
 };
@@ -57,7 +57,7 @@ export const styleProps = (
         },
         "&:disabled": {
           bg: "ui.gray.light",
-          color: "ui.gray.dark",
+          color: "ui.gray.extraDark",
           cursor: "default"
         }
       };
