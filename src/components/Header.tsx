@@ -70,7 +70,7 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
   const { helpWebsite, libraryWebsite } = library.libraryLinks;
   const libraryName = library.catalogName;
   return (
-    <Stack spacing={1} sx={{ m: 2, mr: 0 }}>
+    <div sx={{ display: "flex", m: 2, mr: 0 }}>
       {library?.headerLinks?.map(link => (
         <AnchorButton
           variant="ghost"
@@ -107,11 +107,12 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
         color="ui.black"
         href="/loans"
         iconLeft={BookIcon}
+        sx={{ mr: 1 }}
       >
         My Books
       </NavButton>
       <NavButton href="/loans">Sign In</NavButton>
-    </Stack>
+    </div>
   );
 };
 

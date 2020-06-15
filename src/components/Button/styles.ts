@@ -25,7 +25,6 @@ const buttonBase = {
   textAlign: "center",
   whiteSpace: "nowrap",
   verticalAlign: "middle",
-  m: 0,
   px: 3,
   border: 0,
   borderRadius: "button",
