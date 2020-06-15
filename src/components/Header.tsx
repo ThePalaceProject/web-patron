@@ -8,7 +8,6 @@ import { NavButton, AnchorButton } from "./Button";
 import Link from "./Link";
 import BookIcon from "../icons/Book";
 import useLibraryContext from "./context/LibraryContext";
-import Stack from "./Stack";
 import { Text } from "./Text";
 
 export interface HeaderContext extends NavigateContext {

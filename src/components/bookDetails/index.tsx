@@ -23,7 +23,7 @@ import ReportProblem from "./ReportProblem";
 import useTypedSelector from "../../hooks/useTypedSelector";
 import { NavButton } from "../Button";
 import Head from "next/head";
-import { H2, H3, Text, H1 } from "components/Text";
+import { H3, Text, H1 } from "components/Text";
 import MediumIndicator from "components/MediumIndicator";
 
 /**
@@ -81,7 +81,7 @@ export const BookDetails: React.FC<{
       <Head>
         <title>{book.title}</title>
       </Head>
-      <BreadcrumbBar currentLocation={truncateString(book.title, 20, false)} />
+      <BreadcrumbBar currentLocation={truncateString(book.title, 60, false)} />
       <Grid sx={{ my: 4 }}>
         <Column columns={1} />
         <Column columns={4}>
