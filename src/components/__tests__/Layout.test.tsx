@@ -21,8 +21,8 @@ describe("Layout nav + structure", () => {
         }
       })
     });
-    const myBooks = node.getByText("My Books").closest("a");
-    expect(myBooks).toHaveAttribute("href", "/loans");
+    const myBooks = node.getAllByRole("link", { name: "My Books" });
+    myBooks.forEach(ln => expect(ln).toHaveAttribute("href", "/loans"));
   });
 
   test("displays children within main", () => {

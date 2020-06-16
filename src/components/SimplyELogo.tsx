@@ -25,9 +25,9 @@ function SimplyELogo(props: React.SVGProps<SVGSVGElement>) {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 511.98438 147"
+      aria-label="SimplyE Logo"
       {...props}
     >
-      <title>SimplyE Logo</title>
       <g id="logo_mark">
         <path
           id="blue_e"

@@ -1,11 +1,9 @@
 import * as React from "react";
-import { render, fixtures, fireEvent } from "../../test-utils";
+import { render, fixtures } from "../../test-utils";
 import { Collection } from "../Collection";
 import merge from "deepmerge";
 import { State } from "opds-web-client/lib/state";
 import { LaneData } from "opds-web-client/lib/interfaces";
-import Layout from "../Layout";
-import { useBreakpointIndex } from "@theme-ui/match-media";
 
 const setCollectionAndBook = jest.fn().mockResolvedValue({});
 
@@ -34,7 +32,7 @@ test("displays loader", () => {
       })
     }
   );
-  expect(node.getByText("Loading...")).toBeInTheDocument();
+  expect(node.getByRole("heading", { name: "Loading..." })).toBeInTheDocument();
 });
 
 test("displays lanes when present", () => {

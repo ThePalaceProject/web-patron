@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { getFulfillmentState } from "../../utils/book";
+import { getFulfillmentState, dedupeLinks } from "utils/book";
 import {
   BookData,
   MediaType,
@@ -42,11 +42,23 @@ const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
 };
 
 const FulfillmentContent: React.FC<{ book: BookData }> = ({ book }) => {
+  book.fulfillmentLinks = [
+    {
+      url: "/epub-open-access-link",
+      type: "application/epub+zip",
+      indirectType: "indirectType"
+    },
+    {
+      url: "/pdf-open-access-link",
+      type: "application/pdf",
+      indirectType: "indirectType"
+    }
+  ];
   const fulfillmentState = getFulfillmentState(book);
 
   switch (fulfillmentState) {
     case "openAccess":
-      return <OpenAccess book={book} />;
+      return <DownloadCard links={book.openAccessLinks} book={book} />;
     case "availableToBorrow":
       return <BorrowOrReserve book={book} />;
     case "availableToReserve":
@@ -54,13 +66,14 @@ const FulfillmentContent: React.FC<{ book: BookData }> = ({ book }) => {
     case "reserved":
       return <Reserved book={book} />;
     case "borrowed/protected":
-      return <DownloadCard book={book} />;
+      return <DownloadCard links={book.fulfillmentLinks} book={book} />;
     case "error":
-      return <ErrorCard book={book} />;
+      return <ErrorCard />;
   }
 };
 
 const OpenAccess: React.FC<{ book: BookData }> = ({ book }) => {
+  const links = dedupeLinks(book.openAccessLinks ?? []);
   return (
     <>
       <Stack sx={{ alignItems: "center" }}>
@@ -69,7 +82,7 @@ const OpenAccess: React.FC<{ book: BookData }> = ({ book }) => {
           <Text variant="text.callouts.bold">
             You&apos;re ready to read this book in SimplyE!
           </Text>
-          <Text>This open access book is available to keep forever.</Text>
+          <Text>This open-access book is available to keep forever.</Text>
         </Stack>
       </Stack>
       <Stack direction="column" sx={{ mt: 3 }}>
@@ -77,7 +90,7 @@ const OpenAccess: React.FC<{ book: BookData }> = ({ book }) => {
           If you would rather read on your computer, you can:
         </Text>
         <Stack sx={{ justifyContent: "center" }}>
-          {book.openAccessLinks?.map(link => (
+          {links.map(link => (
             <AnchorButton
               key={link.url}
               variant="link"
@@ -122,26 +135,29 @@ const BorrowOrReserve: React.FC<{ book: BookData }> = ({ book }) => {
       >
         <Text variant="text.body.bold">{buttonLabel}</Text>
       </Button>
-      {errorMsg && <Text sx={{ color: "ui.error" }}>{errorMsg}</Text>}
+      {errorMsg && <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>}
     </>
   );
 };
 
 const Reserved: React.FC<{ book: BookData }> = ({ book }) => {
+  const position = book.holds?.position;
   return (
     <>
       <Text variant="text.callouts.bold">You have this book on hold.</Text>
-      <Text
-        variant="text.body.italic"
-        sx={{ display: "inline-flex", alignItems: "center" }}
-      >
-        <MediumIcon book={book} sx={{ mr: 1 }} />
-        You&apos;re 14th in the queue.
-      </Text>
+      {position && (
+        <Text
+          variant="text.body.italic"
+          sx={{ display: "inline-flex", alignItems: "center" }}
+        >
+          <MediumIcon book={book} sx={{ mr: 1 }} />
+          Your hold position is: {position}.
+        </Text>
+      )}
       <Button size="lg" disabled>
         <Text variant="text.body.bold">Reserved</Text>
       </Button>
-      {/* {errorMsg && <Text sx={{ color: "ui.error" }}>{errorMsg}</Text>} */}
+      {/* {errorMsg && <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>} */}
     </>
   );
 };
@@ -173,83 +189,51 @@ const ErrorCard: React.FC = () => {
  */
 const DownloadCard: React.FC<{
   book: BookData;
-  className?: string;
-}> = ({ book }) => {
-  const isOpenAccess = bookIsOpenAccess(book);
-  const { fulfillmentLinks, openAccessLinks, title } = book;
-  const links = (isOpenAccess ? openAccessLinks : fulfillmentLinks) ?? [];
+  links: MediaLink[] | FulfillmentLink[];
+}> = ({ book, links }) => {
+  const { title } = book;
+  const dedupedLinks = dedupeLinks(links ?? []);
 
-  // for some reason there are duplicate links. Dedupe them w a map by mimeType
-  type MimetypeToLinkMap = {
-    [key in MediaType]?: MediaLink | FulfillmentLink;
-  };
-  const linksByMimetype: MimetypeToLinkMap = {};
-  links.forEach(link => (linksByMimetype[link.type] = link));
-
-  const defaultType = links[0]?.type;
-  const [selectedType, setSelectedType] = React.useState<MediaType>(
-    defaultType
-  );
-
-  const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedType(e.currentTarget.value as MediaType);
-  };
-
-  const currentLink = linksByMimetype[selectedType];
-  const downloadDetails = useDownloadButton(currentLink, title);
-
-  if (!downloadDetails) return null;
   return (
     <>
-      <div
-        sx={{
-          borderBottom: "1px solid",
-          borderColor: "primary"
-        }}
-      >
-        <div
-          sx={{ fontWeight: "semibold", display: "flex", alignItems: "center" }}
-        >
-          <Label htmlFor="format-select">TYPE</Label>
-          <Select
-            id="format-select"
-            value={selectedType}
-            onBlur={handleTypeChange}
-            onChange={handleTypeChange}
-            sx={{ ml: 2 }}
-          >
-            {Object.keys(linksByMimetype).map(mediaType => (
-              <option key={mediaType} value={mediaType}>
-                {typeMap[mediaType]?.name ?? mediaType}
-              </option>
-            ))}
-          </Select>
-        </div>
-      </div>
-      <div
-        sx={{
-          px: 2,
-          py: 2,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center"
-        }}
-      >
-        <div sx={{ mb: 2, textAlign: "center" }}>availability</div>
-        {isOpenAccess ? (
-          <a
-            target="__blank"
-            rel="noopener noreferrer"
-            href={linksByMimetype[selectedType]?.url}
-            sx={{ variant: "buttons.accent", px: 2, py: 1 }}
-          >
-            Download
-          </a>
-        ) : (
-          <Button onClick={downloadDetails.fulfill}>Download</Button>
-        )}
-      </div>
+      <Stack sx={{ alignItems: "center" }}>
+        <SvgPhone sx={{ fontSize: 64 }} />
+        <Stack direction="column">
+          <Text variant="text.callouts.bold">
+            You&apos;re ready to read this book in SimplyE!
+          </Text>
+          <Text>This open-access book is available to keep forever.</Text>
+        </Stack>
+      </Stack>
+      <Stack direction="column" sx={{ mt: 3 }}>
+        <Text variant="text.body.italic">
+          If you would rather read on your computer, you can:
+        </Text>
+        <Stack sx={{ justifyContent: "center" }}>
+          {dedupedLinks.map(link => (
+            <DownloadButton key={link.url} link={link} title={title} />
+          ))}
+        </Stack>
+      </Stack>
     </>
+  );
+};
+
+const DownloadButton: React.FC<{
+  link: FulfillmentLink | MediaLink;
+  title;
+}> = ({ link, title }) => {
+  const { fulfill, downloadLabel, isIndirect } = useDownloadButton(link, title);
+
+  return (
+    <Button
+      onClick={fulfill}
+      variant="ghost"
+      color="ui.gray.extraDark"
+      iconLeft={SvgDownload}
+    >
+      {downloadLabel}
+    </Button>
   );
 };
 

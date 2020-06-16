@@ -11,7 +11,6 @@ import {
 } from "opds-web-client/lib/components/mergeRootProps";
 import { BookData, FetchErrorData } from "opds-web-client/lib/interfaces";
 import { connect } from "react-redux";
-import ExternalLink from "../ExternalLink";
 import useSetCollectionAndBook from "../../hooks/useSetCollectionAndBook";
 import { PageLoader } from "../LoadingIndicator";
 import FulfillmentCard from "./FulfillmentCard";
@@ -28,7 +27,6 @@ import MediumIndicator from "components/MediumIndicator";
 import SimplyELogo from "components/SimplyELogo";
 import IosBadge from "components/storeBadges/IosBadge";
 import GooglePlayBadge from "components/storeBadges/GooglePlayBadge";
-import Stack from "components/Stack";
 
 /**
  * How will I build my grid?

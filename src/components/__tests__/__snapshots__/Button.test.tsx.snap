@@ -2,9 +2,10 @@
 
 exports[`LinkButton renders correct element 1`] = `
 .emotion-0 {
+  font-family: -apple-system,BlinkMacSystemFont,system-ui,sans-serif;
   font-size: 0.875rem;
   font-weight: 300;
-  line-height: 1.5rem;
+  line-height: 1.5;
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -23,7 +24,6 @@ exports[`LinkButton renders correct element 1`] = `
   text-align: center;
   white-space: nowrap;
   vertical-align: middle;
-  margin: 0;
   padding-left: 16px;
   padding-right: 16px;
   border: 0;
@@ -31,9 +31,9 @@ exports[`LinkButton renders correct element 1`] = `
   cursor: pointer;
   -webkit-text-decoration: none;
   text-decoration: none;
+  background-color: var(--theme-ui-colors-brand-primary,#377F8B);
   height: 32px;
   min-width: 32px;
-  background-color: var(--theme-ui-colors-brand-primary,#377F8B);
   color: white;
   fill: white;
 }
@@ -49,7 +49,7 @@ exports[`LinkButton renders correct element 1`] = `
 
 .emotion-0:disabled {
   background-color: var(--theme-ui-colors-ui-gray-light,#e0e0e0);
-  color: var(--theme-ui-colors-ui-gray-dark,#616161);
+  color: var(--theme-ui-colors-ui-gray-extraDark,#424242);
   cursor: default;
 }
 
@@ -66,9 +66,10 @@ exports[`NavButton renders correct element 1`] = `
   -webkit-text-decoration: none;
   text-decoration: none;
   color: inherit;
+  font-family: -apple-system,BlinkMacSystemFont,system-ui,sans-serif;
   font-size: 0.875rem;
   font-weight: 300;
-  line-height: 1.5rem;
+  line-height: 1.5;
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -87,7 +88,6 @@ exports[`NavButton renders correct element 1`] = `
   text-align: center;
   white-space: nowrap;
   vertical-align: middle;
-  margin: 0;
   padding-left: 16px;
   padding-right: 16px;
   border: 0;
@@ -95,9 +95,9 @@ exports[`NavButton renders correct element 1`] = `
   cursor: pointer;
   -webkit-text-decoration: none;
   text-decoration: none;
+  background-color: var(--theme-ui-colors-brand-primary,#377F8B);
   height: 32px;
   min-width: 32px;
-  background-color: var(--theme-ui-colors-brand-primary,#377F8B);
   color: white;
   fill: white;
 }
@@ -113,7 +113,7 @@ exports[`NavButton renders correct element 1`] = `
 
 .emotion-0:disabled {
   background-color: var(--theme-ui-colors-ui-gray-light,#e0e0e0);
-  color: var(--theme-ui-colors-ui-gray-dark,#616161);
+  color: var(--theme-ui-colors-ui-gray-extraDark,#424242);
   cursor: default;
 }
 
@@ -127,9 +127,10 @@ exports[`NavButton renders correct element 1`] = `
 
 exports[`variants filled (default) 1`] = `
 .emotion-0 {
+  font-family: -apple-system,BlinkMacSystemFont,system-ui,sans-serif;
   font-size: 0.875rem;
   font-weight: 300;
-  line-height: 1.5rem;
+  line-height: 1.5;
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -148,7 +149,6 @@ exports[`variants filled (default) 1`] = `
   text-align: center;
   white-space: nowrap;
   vertical-align: middle;
-  margin: 0;
   padding-left: 16px;
   padding-right: 16px;
   border: 0;
@@ -156,9 +156,9 @@ exports[`variants filled (default) 1`] = `
   cursor: pointer;
   -webkit-text-decoration: none;
   text-decoration: none;
+  background-color: var(--theme-ui-colors-brand-primary,#377F8B);
   height: 32px;
   min-width: 32px;
-  background-color: var(--theme-ui-colors-brand-primary,#377F8B);
   color: white;
   fill: white;
 }
@@ -174,7 +174,7 @@ exports[`variants filled (default) 1`] = `
 
 .emotion-0:disabled {
   background-color: var(--theme-ui-colors-ui-gray-light,#e0e0e0);
-  color: var(--theme-ui-colors-ui-gray-dark,#616161);
+  color: var(--theme-ui-colors-ui-gray-extraDark,#424242);
   cursor: default;
 }
 
@@ -188,9 +188,10 @@ exports[`variants filled (default) 1`] = `
 
 exports[`variants ghost 1`] = `
 .emotion-0 {
+  font-family: -apple-system,BlinkMacSystemFont,system-ui,sans-serif;
   font-size: 0.875rem;
   font-weight: 700;
-  line-height: 1.5rem;
+  line-height: 1.5;
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -209,7 +210,6 @@ exports[`variants ghost 1`] = `
   text-align: center;
   white-space: nowrap;
   vertical-align: middle;
-  margin: 0;
   padding-left: 16px;
   padding-right: 16px;
   border: 0;
@@ -217,9 +217,9 @@ exports[`variants ghost 1`] = `
   cursor: pointer;
   -webkit-text-decoration: none;
   text-decoration: none;
+  background-color: transparent;
   height: 32px;
   min-width: 32px;
-  background-color: transparent;
   color: var(--theme-ui-colors-brand-primary,#377F8B);
   fill: var(--theme-ui-colors-brand-primary,#377F8B);
 }
@@ -227,6 +227,51 @@ exports[`variants ghost 1`] = `
 .emotion-0:focus,
 .emotion-0:hover {
   background-color: #c8e5e9;
+}
+
+<button
+  class="emotion-0"
+  type="button"
+>
+  child
+</button>
+`;
+
+exports[`variants link 1`] = `
+.emotion-0 {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  padding-left: 16px;
+  padding-right: 16px;
+  border: 0;
+  border-radius: 2px;
+  cursor: pointer;
+  -webkit-text-decoration: underline;
+  text-decoration: underline;
+  background-color: transparent;
+  font-family: -apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.5;
+  color: var(--theme-ui-colors-brand-primary,#377F8B);
+  padding: 0;
+  fill: var(--theme-ui-colors-brand-primary,#377F8B);
 }
 
 <button

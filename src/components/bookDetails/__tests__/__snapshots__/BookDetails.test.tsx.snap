@@ -34,9 +34,10 @@ exports[`book details page handles error state 1`] = `
   -webkit-text-decoration: none;
   text-decoration: none;
   color: inherit;
+  font-family: -apple-system,BlinkMacSystemFont,system-ui,sans-serif;
   font-size: 0.875rem;
   font-weight: 300;
-  line-height: 1.5rem;
+  line-height: 1.5;
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -55,7 +56,6 @@ exports[`book details page handles error state 1`] = `
   text-align: center;
   white-space: nowrap;
   vertical-align: middle;
-  margin: 0;
   padding-left: 16px;
   padding-right: 16px;
   border: 0;
@@ -63,9 +63,9 @@ exports[`book details page handles error state 1`] = `
   cursor: pointer;
   -webkit-text-decoration: none;
   text-decoration: none;
+  background-color: var(--theme-ui-colors-brand-primary,#377F8B);
   height: 32px;
   min-width: 32px;
-  background-color: var(--theme-ui-colors-brand-primary,#377F8B);
   color: white;
   fill: white;
   margin-top: 16px;
@@ -82,7 +82,7 @@ exports[`book details page handles error state 1`] = `
 
 .emotion-2:disabled {
   background-color: var(--theme-ui-colors-ui-gray-light,#e0e0e0);
-  color: var(--theme-ui-colors-ui-gray-dark,#616161);
+  color: var(--theme-ui-colors-ui-gray-extraDark,#424242);
   cursor: default;
 }
 

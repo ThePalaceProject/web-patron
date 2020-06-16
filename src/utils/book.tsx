@@ -33,9 +33,15 @@ export function getAuthors(book: BookData, lim?: number): string[] {
   return allAuth;
 }
 
-// export function getDedupedLinks(links: MediaLink[] | FulfillmentLink[]) {
-//   return links.filter(link => )
-// }
+export function dedupeLinks<T extends MediaLink>(links: T[]) {
+  return links.reduce<T[]>((uniqueArr, current) => {
+    const isDup = uniqueArr.find(
+      uniqueLink => uniqueLink.type === current.type
+    );
+
+    return isDup ? uniqueArr : [...uniqueArr, current];
+  }, []);
+}
 
 export type BookFullfillmentState =
   | "openAccess"

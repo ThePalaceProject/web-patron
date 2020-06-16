@@ -13,14 +13,14 @@ describe("variants", () => {
     const button = node.getByText("child");
     expect(button).toMatchSnapshot();
   });
+  test("link", () => {
+    const node = render(<Button variant="link">child</Button>);
+    const button = node.getByText("child");
+    expect(button).toMatchSnapshot();
+  });
   // TODO: newvariants
   // test("outline", () => {
   //   const node = render(<Button variant="outline">child</Button>);
-  //   const button = node.getByText("child");
-  //   expect(button).toMatchSnapshot();
-  // });
-  // test("link", () => {
-  //   const node = render(<Button variant="link">child</Button>);
   //   const button = node.getByText("child");
   //   expect(button).toMatchSnapshot();
   // });

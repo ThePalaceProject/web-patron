@@ -139,5 +139,5 @@ test("shows loading state", () => {
     }
   );
 
-  expect(node.getByText("Loading...")).toBeInTheDocument();
+  expect(node.getByRole("heading", { name: "Loading..." })).toBeInTheDocument();
 });

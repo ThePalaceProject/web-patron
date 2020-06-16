@@ -27,46 +27,49 @@ const makeBook = (data: Partial<BookData>) =>
     arrayMerge: (_a, b) => b
   });
 
-describe("open-access book", () => {
-  test("correct availability string", () => {
+describe("open-access", () => {
+  test("correct title and subtitle", () => {
     const node = render(<FulfillmentCard book={fixtures.book} />);
     expect(
-      node.getByText("This open-access book is available to keep.")
+      node.getByText("This open-access book is available to keep forever.")
     ).toBeInTheDocument();
+    expect(node.getByText("You're ready to read this book in SimplyE!"));
   });
-  test("shows download button", () => {
+  test("shows download options", () => {
     const node = render(<FulfillmentCard book={fixtures.book} />);
-    const downloadButton = node.getByText("Download");
+    expect(
+      node.getByText("If you would rather read on your computer, you can:")
+    );
+    const downloadButton = node.getByText("Download EPUB");
     expect(downloadButton).toBeInTheDocument();
     expect(downloadButton).toHaveAttribute("target", "__blank");
     expect(downloadButton).toHaveAttribute("href", "/epub-open-access-link");
-  });
-  test("allows selecting types", () => {
-    const node = render(<FulfillmentCard book={fixtures.book} />);
-    const typeSelector = node.getByLabelText("TYPE");
 
-    expect(typeSelector).toHaveValue("application/epub+zip");
-    expect(within(typeSelector).getByText("PDF")).toBeInTheDocument();
-    expect(within(typeSelector).getByText("EPUB")).toBeInTheDocument();
+    const PDFButton = node.getByText("Download PDF");
+    expect(PDFButton).toBeInTheDocument();
+    expect(PDFButton).toHaveAttribute("target", "__blank");
+    expect(PDFButton).toHaveAttribute("href", "/pdf-open-access-link");
   });
-  test("doesn't show duplicate options", () => {
+  test("doesn't show duplicate download options", () => {
     const bookWithDuplicateFormat = makeBook({
       openAccessLinks: [
         ...fixtures.book.openAccessLinks,
         {
           type: "application/pdf",
           url: "/pdf-open-access-link-2"
+        },
+        {
+          type: "application/pdf",
+          url: "/pdf-open-access-link-3"
         }
       ]
     });
     const node = render(<FulfillmentCard book={bookWithDuplicateFormat} />);
-    const typeSelector = node.getByLabelText("TYPE");
-    expect(typeSelector).toHaveValue("application/epub+zip");
-    expect(within(typeSelector).getAllByText("PDF")).toHaveLength(1);
+    const downloadButton = node.getAllByText("Download PDF");
+    expect(downloadButton).toHaveLength(1);
   });
 });
-
-describe("borrowable closed-access", () => {
+describe("available to borrow", () => {
   const closedAccessBook = makeBook({
     openAccessLinks: [],
     copies: {
@@ -74,19 +77,21 @@ describe("borrowable closed-access", () => {
       available: 10
     }
   });
+  test("correct title and subtitle", () => {
+    const node = render(<FulfillmentCard book={closedAccessBook} />);
+    expect(
+      node.getByText("This book is available to borrow!")
+    ).toBeInTheDocument();
+    expect(node.getByText("10 out of 13 copies available."));
+  });
   test("displays borrow button", () => {
     const node = render(<FulfillmentCard book={closedAccessBook} />);
     const borrowButton = node.getByText("Borrow");
     expect(borrowButton).toBeInTheDocument();
   });
-  test("displays number available", () => {
-    const node = render(<FulfillmentCard book={closedAccessBook} />);
-    expect(node.getByText("10 of 13 copies available.")).toBeInTheDocument();
-  });
+
   test("shows loading state when borrowing, borrows, and refetches loans", async () => {
-    /**
-     * we will mock the actions.updateBook
-     */
+    // mock the actions.updateBook
     const updateBookSpy = jest
       .spyOn(actions, "updateBook")
       .mockImplementation(_url => _dispatch =>
@@ -96,7 +101,7 @@ describe("borrowable closed-access", () => {
           }, 200);
         })
       );
-    // we also spy on fetchLoans
+    // also spy on fetchLoans
     const fetchLoansSpy = jest.spyOn(actions, "fetchLoans");
     const node = render(<FulfillmentCard book={closedAccessBook} />, {
       initialState: merge<State>(fixtures.initialState, {
@@ -106,10 +111,15 @@ describe("borrowable closed-access", () => {
         }
       })
     });
+    // click borrow
     userEvent.click(node.getByText("Borrow"));
     expect(updateBookSpy).toHaveBeenCalledTimes(1);
     expect(updateBookSpy).toHaveBeenCalledWith("borrow url");
-    expect(await node.findByText("Loading...")).toBeInTheDocument();
+    const borrowButton = await node.findByRole("button", {
+      name: "Borrowing..."
+    });
+    expect(borrowButton).toBeInTheDocument();
+    expect(borrowButton).toBeDisabled();
     // we should refetch the loans after borrowing
     await waitFor(() => expect(fetchLoansSpy).toHaveBeenCalledTimes(1));
   });
@@ -127,52 +137,94 @@ describe("borrowable closed-access", () => {
         }
       })
     });
-    expect(node.getByText("10 of 13 copies available.")).toBeInTheDocument();
+    expect(
+      node.getByText("10 out of 13 copies available.")
+    ).toBeInTheDocument();
     expect(
       node.getByText("Error: cannot loan more than 3 documents.")
     ).toBeInTheDocument();
   });
 });
 
-describe("none available", () => {
-  describe("not reserved", () => {
-    const unavailableBook = makeBook({
+describe("available to reserve", () => {
+  const unavailableBook = makeBook({
+    openAccessLinks: [],
+    copies: {
+      total: 13,
+      available: 0
+    }
+  });
+
+  test("correct title and subtitle", () => {
+    const node = render(<FulfillmentCard book={unavailableBook} />);
+    expect(
+      node.getByText("This book is currently unavailable.")
+    ).toBeInTheDocument();
+    expect(node.getByText("0 out of 13 copies available.")).toBeInTheDocument();
+  });
+
+  test("displays reserve button", () => {
+    const node = render(<FulfillmentCard book={unavailableBook} />);
+    const reserveButton = node.getByRole("button", { name: "Reserve" });
+    expect(reserveButton).toBeInTheDocument();
+  });
+
+  test("shows number of patrons in queue when holds info present", () => {
+    const bookWithQueue = makeBook({
       openAccessLinks: [],
       copies: {
         total: 13,
         available: 0
+      },
+      holds: {
+        total: 4
       }
     });
-
-    test("displays reserve button", () => {
-      const node = render(<FulfillmentCard book={unavailableBook} />);
-      const reserveButton = node.getByText("Reserve");
-      expect(reserveButton).toBeInTheDocument();
-    });
-
-    test("shows number of patrons in queue when holds info present", () => {
-      const bookWithQueue = makeBook({
-        openAccessLinks: [],
-        copies: {
-          total: 13,
-          available: 0
-        },
-        holds: {
-          total: 4
-        }
-      });
-      const node = render(<FulfillmentCard book={bookWithQueue} />);
-      expect(node.getByText("0 of 13 copies available. 4 patrons in queue."));
-    });
-
-    test("doesn't show patrons in queue when holds info no present", () => {
-      const node = render(<FulfillmentCard book={unavailableBook} />);
-      expect(node.getByText("0 of 13 copies available."));
-    });
+    const node = render(<FulfillmentCard book={bookWithQueue} />);
+    expect(
+      node.getByText("0 out of 13 copies available. 4 patrons in the queue.")
+    );
   });
 
-  describe("reserved", () => {
-    const reservedBook = makeBook({
+  test("doesn't show patrons in queue when holds info no present", () => {
+    const node = render(<FulfillmentCard book={unavailableBook} />);
+    expect(node.getByText("0 out of 13 copies available.")).toBeInTheDocument();
+  });
+
+  test("handles unknown availability numbers", () => {
+    const bookWithQueue = makeBook({
+      openAccessLinks: [],
+      copies: undefined
+    });
+    // this is currently failing because the getFulfillmentState is returning error
+    // since we expect to always have the availability numbers otherwise we don't know
+    // if the book is available or not, unless there is some other way to tell that state.
+    const node = render(<FulfillmentCard book={bookWithQueue} />);
+    expect(node.getByText("Number of books available is unknown."));
+  });
+});
+
+describe("reserved", () => {
+  const reservedBook = makeBook({
+    availability: {
+      status: "reserved"
+    },
+    openAccessLinks: [],
+    copies: {
+      total: 13,
+      available: 0
+    }
+  });
+
+  test("displays disabled reserve button", () => {
+    const node = render(<FulfillmentCard book={reservedBook} />);
+    const reserveButton = node.getByText("Reserved");
+    expect(reserveButton).toBeInTheDocument();
+    expect(reserveButton).toBeDisabled();
+  });
+
+  test("displays number of patrons in queue and your position", () => {
+    const reservedBookWithQueue = makeBook({
       availability: {
         status: "reserved"
       },
@@ -180,38 +232,14 @@ describe("none available", () => {
       copies: {
         total: 13,
         available: 0
+      },
+      holds: {
+        total: 23,
+        position: 5
       }
     });
-
-    test("displays disabled reserve button", () => {
-      const node = render(<FulfillmentCard book={reservedBook} />);
-      const reserveButton = node.getByText("Reserved");
-      expect(reserveButton).toBeInTheDocument();
-      expect(reserveButton).toBeDisabled();
-    });
-
-    test("displays number of patrons in queue and your position", () => {
-      const reservedBookWithQueue = makeBook({
-        availability: {
-          status: "reserved"
-        },
-        openAccessLinks: [],
-        copies: {
-          total: 13,
-          available: 0
-        },
-        holds: {
-          total: 23,
-          position: 5
-        }
-      });
-      const node = render(<FulfillmentCard book={reservedBookWithQueue} />);
-      expect(
-        node.getByText(
-          "0 of 13 copies available. 23 patrons in queue. Your hold position: 5."
-        )
-      ).toBeInTheDocument;
-    });
+    const node = render(<FulfillmentCard book={reservedBookWithQueue} />);
+    expect(node.getByText("Your hold position is: 5.")).toBeInTheDocument;
   });
 
   describe("borrowed", () => {
