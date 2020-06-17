@@ -17,21 +17,28 @@ export default function useBorrow(book: BookData) {
   const holds = book.holds?.total;
 
   const title =
-    fulfillmentState === "availableToBorrow"
+    fulfillmentState === "AVAILABLE_TO_BORROW"
       ? "This book is available to borrow!"
       : "This book is currently unavailable.";
 
-  const subtitle =
+  const availability =
     typeof availableCopies === "number" && typeof totalCopies === "number"
-      ? `${availableCopies} out of ${totalCopies} copies available.${
-          typeof holds === "number" ? ` ${holds} patrons in the queue.` : ""
-        }`
+      ? `${availableCopies} out of ${totalCopies} copies available.`
       : "Number of books available is unknown.";
 
+  const queueStatus =
+    typeof holds === "number" && fulfillmentState === "AVAILABLE_TO_RESERVE"
+      ? `${holds} patrons in the queue.`
+      : "";
+
+  const subtitle = availability + " " + queueStatus;
+
   const buttonLabel =
-    fulfillmentState === "availableToBorrow" ? "Borrow" : "Reserve";
+    fulfillmentState === "AVAILABLE_TO_BORROW" ? "Borrow" : "Reserve";
   const buttonLoadingText =
-    fulfillmentState === "availableToBorrow" ? "Borrowing..." : "Reserving...";
+    fulfillmentState === "AVAILABLE_TO_BORROW"
+      ? "Borrowing..."
+      : "Reserving...";
 
   const borrowOrReserve = async () => {
     if (book.borrowUrl) {

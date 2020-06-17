@@ -13,7 +13,6 @@ import { bookIsOpenAccess } from "opds-web-client/lib/utils/book";
 import Button, { AnchorButton } from "../Button";
 import useDownloadButton from "opds-web-client/lib/hooks/useDownloadButton";
 import { withErrorBoundary } from "../ErrorBoundary";
-import Select, { Label } from "../Select";
 import useBorrow from "../../hooks/useBorrow";
 import Stack from "components/Stack";
 import { Text } from "components/Text";
@@ -41,91 +40,156 @@ const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
   );
 };
 
+function availabilityString(book: BookData) {
+  const availableCopies = book.copies?.available;
+  const totalCopies = book.copies?.total;
+  return typeof availableCopies === "number" && typeof totalCopies === "number"
+    ? `${availableCopies} out of ${totalCopies} copies available.`
+    : "Number of books available is unknown.";
+}
+
+function queueString(book: BookData) {
+  const holds = book.holds?.total;
+  return typeof holds === "number" ? `${holds} patrons in the queue.` : "";
+}
+
 const FulfillmentContent: React.FC<{ book: BookData }> = ({ book }) => {
-  book.fulfillmentLinks = [
-    {
-      url: "/epub-open-access-link",
-      type: "application/epub+zip",
-      indirectType: "indirectType"
-    },
-    {
-      url: "/pdf-open-access-link",
-      type: "application/pdf",
-      indirectType: "indirectType"
-    }
-  ];
   const fulfillmentState = getFulfillmentState(book);
 
+  console.log(fulfillmentState);
+
   switch (fulfillmentState) {
-    case "openAccess":
+    case "OPEN_ACCESS":
+      if (!book.openAccessLinks)
+        throw new Error("This open-access book is missing open access links");
       return <DownloadCard links={book.openAccessLinks} book={book} />;
-    case "availableToBorrow":
-      return <BorrowOrReserve book={book} />;
-    case "availableToReserve":
-      return <BorrowOrReserve book={book} />;
-    case "reserved":
+
+    case "AVAILABLE_TO_BORROW": {
+      return (
+        <BorrowOrReserve
+          title="This book is available to borrow!"
+          subtitle={
+            <>
+              <MediumIcon book={book} sx={{ mr: 1 }} />{" "}
+              {availabilityString(book)}
+            </>
+          }
+          book={book}
+          buttonLabel="Borrow"
+          buttonLoadingText="Borrowing..."
+        />
+      );
+    }
+
+    case "AVAILABLE_TO_RESERVE": {
+      return (
+        <BorrowOrReserve
+          book={book}
+          title="This book is currently unavailable."
+          subtitle={
+            <>
+              <MediumIcon book={book} sx={{ mr: 1 }} />{" "}
+              {availabilityString(book)}
+            </>
+          }
+          buttonLabel="Reserve"
+          buttonLoadingText="Reserving..."
+        />
+      );
+    }
+
+    case "RESERVED":
       return <Reserved book={book} />;
-    case "borrowed/protected":
+
+    case "READY_TO_BORROW": {
+      const availableUntil = book.availability?.until
+        ? new Date(book.availability.until).toDateString()
+        : "NaN";
+
+      const title = "You can now borrow this book!";
+      const subtitle =
+        availableUntil !== "NaN"
+          ? `Your hold will expire on ${availableUntil}. ${queueString(book)}`
+          : "You must borrow the book before your loan expires.";
+      return (
+        <BorrowOrReserve
+          book={book}
+          title={title}
+          subtitle={subtitle}
+          buttonLabel="Borrow"
+          buttonLoadingText="Borrowing..."
+        />
+      );
+    }
+
+    case "AVAILABLE_TO_ACCESS":
+      if (!book.fulfillmentLinks)
+        throw new Error(
+          "This available-to-access book is missing fulfillment links."
+        );
       return <DownloadCard links={book.fulfillmentLinks} book={book} />;
-    case "error":
+
+    case "FULFILLMENT_STATE_ERROR":
       return <ErrorCard />;
   }
 };
 
-const OpenAccess: React.FC<{ book: BookData }> = ({ book }) => {
-  const links = dedupeLinks(book.openAccessLinks ?? []);
-  return (
-    <>
-      <Stack sx={{ alignItems: "center" }}>
-        <SvgPhone sx={{ fontSize: 64 }} />
-        <Stack direction="column">
-          <Text variant="text.callouts.bold">
-            You&apos;re ready to read this book in SimplyE!
-          </Text>
-          <Text>This open-access book is available to keep forever.</Text>
-        </Stack>
-      </Stack>
-      <Stack direction="column" sx={{ mt: 3 }}>
-        <Text variant="text.body.italic">
-          If you would rather read on your computer, you can:
-        </Text>
-        <Stack sx={{ justifyContent: "center" }}>
-          {links.map(link => (
-            <AnchorButton
-              key={link.url}
-              variant="link"
-              color="ui.black"
-              newTab
-              href={link.url}
-            >
-              <SvgDownload sx={{ mr: 1 }} /> Download {typeMap[link.type].name}
-            </AnchorButton>
-          ))}
-        </Stack>
-      </Stack>
-    </>
-  );
-};
+// const OpenAccess: React.FC<{ book: BookData }> = ({ book }) => {
+//   const links = dedupeLinks(book.openAccessLinks ?? []);
+//   return (
+//     <>
+//       <Stack sx={{ alignItems: "center" }}>
+//         <SvgPhone sx={{ fontSize: 64 }} />
+//         <Stack direction="column">
+//           <Text variant="text.callouts.bold">
+//             You&apos;re ready to read this book in SimplyE!
+//           </Text>
+//           <Text>This open-access book is available to keep forever.</Text>
+//         </Stack>
+//       </Stack>
+//       <Stack direction="column" sx={{ mt: 3 }}>
+//         <Text variant="text.body.italic">
+//           If you would rather read on your computer, you can:
+//         </Text>
+//         <Stack sx={{ justifyContent: "center" }}>
+//           {links.map(link => (
+//             <AnchorButton
+//               key={link.url}
+//               variant="link"
+//               color="ui.black"
+//               newTab
+//               href={link.url}
+//             >
+//               <SvgDownload sx={{ mr: 1 }} /> Download {typeMap[link.type].name}
+//             </AnchorButton>
+//           ))}
+//         </Stack>
+//       </Stack>
+//     </>
+//   );
+// };
 
-const BorrowOrReserve: React.FC<{ book: BookData }> = ({ book }) => {
-  const {
-    title,
-    subtitle,
-    buttonLabel,
-    buttonLoadingText,
-    isLoading,
-    borrowOrReserve,
-    errorMsg
-  } = useBorrow(book);
+const BorrowOrReserve: React.FC<{
+  book: BookData;
+  title: string;
+  subtitle: React.ReactNode;
+  buttonLabel: string;
+  buttonLoadingText: string;
+}> = ({ book, title, subtitle, buttonLabel, buttonLoadingText }) => {
+  const { isLoading, borrowOrReserve, errorMsg } = useBorrow(book);
 
   return (
     <>
       <Text variant="text.callouts.bold">{title}</Text>
       <Text
         variant="text.body.italic"
-        sx={{ display: "inline-flex", alignItems: "center" }}
+        sx={{
+          display: "inline-flex",
+          alignItems: "center",
+          textAlign: "center"
+        }}
       >
-        <MediumIcon book={book} sx={{ mr: 1 }} /> {subtitle}
+        {subtitle}
       </Text>
       <Button
         size="lg"
@@ -145,7 +209,7 @@ const Reserved: React.FC<{ book: BookData }> = ({ book }) => {
   return (
     <>
       <Text variant="text.callouts.bold">You have this book on hold.</Text>
-      {position && (
+      {!!position && (
         <Text
           variant="text.body.italic"
           sx={{ display: "inline-flex", alignItems: "center" }}

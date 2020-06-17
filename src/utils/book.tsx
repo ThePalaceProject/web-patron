@@ -3,17 +3,10 @@ import {
   BookData,
   FetchErrorData,
   BookMedium,
-  MediaType,
-  MediaLink,
-  FulfillmentLink
+  MediaLink
 } from "opds-web-client/lib/interfaces";
-import moment from "moment";
-import {
-  bookIsOpenAccess,
-  bookIsReserved,
-  bookIsBorrowed,
-  bookIsBorrowable
-} from "opds-web-client/lib/utils/book";
+import { BookFulfillmentState } from "interfaces";
+
 import { Book, Headset } from "../icons";
 
 export function getAuthors(book: BookData, lim?: number): string[] {
@@ -43,32 +36,41 @@ export function dedupeLinks<T extends MediaLink>(links: T[]) {
   }, []);
 }
 
-export type BookFullfillmentState =
-  | "openAccess"
-  | "availableToBorrow"
-  | "availableToReserve"
-  | "reserved"
-  | "borrowed/protected"
-  | "error";
+function hasBorrowRelation(book: BookData) {
+  return typeof book.borrowUrl === "string";
+}
 
-export function getFulfillmentState(book: BookData): BookFullfillmentState {
-  if (bookIsOpenAccess(book)) return "openAccess";
-  if (bookIsBorrowed(book)) return "borrowed/protected";
-  if (bookIsReserved(book)) return "reserved";
+/**
+ * the default assumption is that a book is available. See:
+ * https://github.com/NYPL-Simplified/Simplified/wiki/OPDS-For-Library-Patrons#opdsavailability---describing-resource-availability
+ */
+const DEFAULT_AVAILABILITY = "available";
 
-  const availableCopies = book?.copies?.available;
-  const totalCopies = book?.copies?.total;
+/**
+ * This is mapped from a conversation with Leonard and the OPDS wiki:
+ * https://github.com/NYPL-Simplified/Simplified/wiki/OPDS-For-Library-Patrons#opdsavailability---describing-resource-availability
+ */
+export function getFulfillmentState(book: BookData): BookFulfillmentState {
+  const availabilityStatus = book.availability?.status ?? DEFAULT_AVAILABILITY;
 
-  if (
-    typeof book.borrowUrl === "string" &&
-    typeof availableCopies === "number" &&
-    typeof totalCopies === "number"
-  ) {
-    if (availableCopies > 0) return "availableToBorrow";
-    return "availableToReserve";
-  }
+  if (book.openAccessLinks && book.openAccessLinks.length > 0)
+    return "OPEN_ACCESS";
 
-  return "error";
+  if (availabilityStatus === "available" && book.fulfillmentLinks)
+    return "AVAILABLE_TO_ACCESS";
+
+  if (availabilityStatus === "available" && hasBorrowRelation(book))
+    return "AVAILABLE_TO_BORROW";
+
+  if (availabilityStatus === "ready" && hasBorrowRelation(book))
+    return "READY_TO_BORROW";
+
+  if (availabilityStatus === "unavailable" && hasBorrowRelation(book))
+    return "AVAILABLE_TO_RESERVE";
+
+  if (availabilityStatus === "reserved") return "RESERVED";
+
+  return "FULFILLMENT_STATE_ERROR";
 }
 
 export function getErrorMsg(error: FetchErrorData | null): string | null {
