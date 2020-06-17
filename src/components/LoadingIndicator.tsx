@@ -4,10 +4,11 @@ import * as React from "react";
 import { Spinner } from "theme-ui";
 import { H2 } from "./Text";
 
-const LoadingIndicator: React.FC<React.ComponentProps<
-  typeof Spinner
->> = props => {
-  return <Spinner color="ui.black" {...props} />;
+const LoadingIndicator: React.FC<React.ComponentProps<typeof Spinner>> = ({
+  color = "ui.black",
+  ...props
+}) => {
+  return <Spinner color={color} {...props} />;
 };
 
 export const PageLoader: React.FC = () => {
