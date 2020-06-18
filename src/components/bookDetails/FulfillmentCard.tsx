@@ -151,6 +151,10 @@ const DownloadCard: React.FC<{
   const currentLink = linksByMimetype[selectedType];
   const downloadDetails = useDownloadButton(currentLink, title);
 
+  let readerLink;
+  if (currentLink.type === "application/vnd.librarysimplified.web-epub") {
+    readerLink = `/read/${encodeURIComponent(currentLink.url)}`;
+  }
   if (!downloadDetails) return null;
   return (
     <CardWrapper className={className}>
@@ -195,7 +199,7 @@ const DownloadCard: React.FC<{
           <Styled.a
             target="__blank"
             rel="noopener noreferrer"
-            href={linksByMimetype[selectedType]?.url}
+            href={readerLink ? readerLink : linksByMimetype[selectedType]?.url}
             sx={{ variant: "buttons.accent", px: 2, py: 1 }}
           >
             Download

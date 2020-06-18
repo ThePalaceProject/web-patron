@@ -17,6 +17,7 @@ const getDisplayType = (type: string) =>
     .replace("http://librarysimplified.org/terms/problem/", "")
     .replace(/-/g, " ")
     .split(" ")
+    /* need to fail elegantly for improper error handling*/
     .map(t => t[0].toUpperCase() + t.slice(1))
     .join(" ");
 
