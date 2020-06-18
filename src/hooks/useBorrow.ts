@@ -1,7 +1,7 @@
 import * as React from "react";
 import { BookData } from "opds-web-client/lib/interfaces";
 import useTypedSelector from "./useTypedSelector";
-import { getErrorMsg, getFulfillmentState } from "utils/book";
+import { getErrorMsg } from "utils/book";
 import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
 
 export default function useBorrow(book: BookData) {
@@ -10,35 +10,6 @@ export default function useBorrow(book: BookData) {
   const errorMsg = getErrorMsg(bookError);
   const { actions, dispatch } = useActions();
   const loansUrl = useTypedSelector(state => state.loans.url);
-  const fulfillmentState = getFulfillmentState(book);
-
-  const availableCopies = book.copies?.available;
-  const totalCopies = book.copies?.total;
-  const holds = book.holds?.total;
-
-  const title =
-    fulfillmentState === "AVAILABLE_TO_BORROW"
-      ? "This book is available to borrow!"
-      : "This book is currently unavailable.";
-
-  const availability =
-    typeof availableCopies === "number" && typeof totalCopies === "number"
-      ? `${availableCopies} out of ${totalCopies} copies available.`
-      : "Number of books available is unknown.";
-
-  const queueStatus =
-    typeof holds === "number" && fulfillmentState === "AVAILABLE_TO_RESERVE"
-      ? `${holds} patrons in the queue.`
-      : "";
-
-  const subtitle = availability + " " + queueStatus;
-
-  const buttonLabel =
-    fulfillmentState === "AVAILABLE_TO_BORROW" ? "Borrow" : "Reserve";
-  const buttonLoadingText =
-    fulfillmentState === "AVAILABLE_TO_BORROW"
-      ? "Borrowing..."
-      : "Reserving...";
 
   const borrowOrReserve = async () => {
     if (book.borrowUrl) {
@@ -55,10 +26,6 @@ export default function useBorrow(book: BookData) {
   };
 
   return {
-    title,
-    subtitle,
-    buttonLabel,
-    buttonLoadingText,
     isLoading,
     borrowOrReserve,
     errorMsg

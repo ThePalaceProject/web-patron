@@ -4,12 +4,10 @@ import * as React from "react";
 import { getFulfillmentState, dedupeLinks } from "utils/book";
 import {
   BookData,
-  MediaType,
   MediaLink,
   FulfillmentLink
 } from "opds-web-client/lib/interfaces";
 import { typeMap } from "opds-web-client/lib/utils/file";
-import { bookIsOpenAccess } from "opds-web-client/lib/utils/book";
 import Button, { AnchorButton } from "../Button";
 import useDownloadButton from "opds-web-client/lib/hooks/useDownloadButton";
 import { withErrorBoundary } from "../ErrorBoundary";
@@ -56,13 +54,18 @@ function queueString(book: BookData) {
 const FulfillmentContent: React.FC<{ book: BookData }> = ({ book }) => {
   const fulfillmentState = getFulfillmentState(book);
 
-  console.log(fulfillmentState);
-
   switch (fulfillmentState) {
     case "OPEN_ACCESS":
       if (!book.openAccessLinks)
         throw new Error("This open-access book is missing open access links");
-      return <DownloadCard links={book.openAccessLinks} book={book} />;
+      return (
+        <DownloadCard
+          links={book.openAccessLinks}
+          book={book}
+          subtitle="This open-access book is available to keep forever."
+          isOpenAccess
+        />
+      );
 
     case "AVAILABLE_TO_BORROW": {
       return (
@@ -110,7 +113,7 @@ const FulfillmentContent: React.FC<{ book: BookData }> = ({ book }) => {
       const subtitle =
         availableUntil !== "NaN"
           ? `Your hold will expire on ${availableUntil}. ${queueString(book)}`
-          : "You must borrow the book before your loan expires.";
+          : "You must borrow this book before your loan expires.";
       return (
         <BorrowOrReserve
           book={book}
@@ -122,52 +125,33 @@ const FulfillmentContent: React.FC<{ book: BookData }> = ({ book }) => {
       );
     }
 
-    case "AVAILABLE_TO_ACCESS":
+    case "AVAILABLE_TO_ACCESS": {
       if (!book.fulfillmentLinks)
         throw new Error(
           "This available-to-access book is missing fulfillment links."
         );
-      return <DownloadCard links={book.fulfillmentLinks} book={book} />;
+
+      const availableUntil = book.availability?.until
+        ? new Date(book.availability.until).toDateString()
+        : "NaN";
+
+      const subtitle =
+        availableUntil !== "NaN"
+          ? `You have this book on loan until ${availableUntil}.`
+          : "You have this book on loan.";
+      return (
+        <DownloadCard
+          links={book.fulfillmentLinks}
+          book={book}
+          subtitle={subtitle}
+        />
+      );
+    }
 
     case "FULFILLMENT_STATE_ERROR":
       return <ErrorCard />;
   }
 };
-
-// const OpenAccess: React.FC<{ book: BookData }> = ({ book }) => {
-//   const links = dedupeLinks(book.openAccessLinks ?? []);
-//   return (
-//     <>
-//       <Stack sx={{ alignItems: "center" }}>
-//         <SvgPhone sx={{ fontSize: 64 }} />
-//         <Stack direction="column">
-//           <Text variant="text.callouts.bold">
-//             You&apos;re ready to read this book in SimplyE!
-//           </Text>
-//           <Text>This open-access book is available to keep forever.</Text>
-//         </Stack>
-//       </Stack>
-//       <Stack direction="column" sx={{ mt: 3 }}>
-//         <Text variant="text.body.italic">
-//           If you would rather read on your computer, you can:
-//         </Text>
-//         <Stack sx={{ justifyContent: "center" }}>
-//           {links.map(link => (
-//             <AnchorButton
-//               key={link.url}
-//               variant="link"
-//               color="ui.black"
-//               newTab
-//               href={link.url}
-//             >
-//               <SvgDownload sx={{ mr: 1 }} /> Download {typeMap[link.type].name}
-//             </AnchorButton>
-//           ))}
-//         </Stack>
-//       </Stack>
-//     </>
-//   );
-// };
 
 const BorrowOrReserve: React.FC<{
   book: BookData;
@@ -254,10 +238,13 @@ const ErrorCard: React.FC = () => {
 const DownloadCard: React.FC<{
   book: BookData;
   links: MediaLink[] | FulfillmentLink[];
-}> = ({ book, links }) => {
+  subtitle: string;
+  isOpenAccess?: boolean;
+}> = ({ book, links, subtitle, isOpenAccess = false }) => {
   const { title } = book;
   const dedupedLinks = dedupeLinks(links ?? []);
 
+  console.log(isOpenAccess);
   return (
     <>
       <Stack sx={{ alignItems: "center" }}>
@@ -266,7 +253,7 @@ const DownloadCard: React.FC<{
           <Text variant="text.callouts.bold">
             You&apos;re ready to read this book in SimplyE!
           </Text>
-          <Text>This open-access book is available to keep forever.</Text>
+          <Text>{subtitle}</Text>
         </Stack>
       </Stack>
       <Stack direction="column" sx={{ mt: 3 }}>
@@ -274,9 +261,22 @@ const DownloadCard: React.FC<{
           If you would rather read on your computer, you can:
         </Text>
         <Stack sx={{ justifyContent: "center" }}>
-          {dedupedLinks.map(link => (
-            <DownloadButton key={link.url} link={link} title={title} />
-          ))}
+          {dedupedLinks.map(link =>
+            isOpenAccess ? (
+              <AnchorButton
+                key={link.url}
+                variant="ghost"
+                color="ui.gray.extraDark"
+                newTab
+                href={link.url}
+              >
+                <SvgDownload sx={{ mr: 1 }} /> Download{" "}
+                {typeMap[link.type].name}
+              </AnchorButton>
+            ) : (
+              <DownloadButton key={link.url} link={link} title={title} />
+            )
+          )}
         </Stack>
       </Stack>
     </>
@@ -285,10 +285,9 @@ const DownloadCard: React.FC<{
 
 const DownloadButton: React.FC<{
   link: FulfillmentLink | MediaLink;
-  title;
+  title: string;
 }> = ({ link, title }) => {
-  const { fulfill, downloadLabel, isIndirect } = useDownloadButton(link, title);
-
+  const { fulfill, downloadLabel } = useDownloadButton(link, title);
   return (
     <Button
       onClick={fulfill}

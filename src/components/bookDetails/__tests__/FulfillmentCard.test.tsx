@@ -3,24 +3,16 @@ import {
   render,
   fixtures,
   actions,
-  within,
   waitFor
-} from "../../../test-utils";
+} from "test-utils";
 import merge from "deepmerge";
 import FulfillmentCard from "../FulfillmentCard";
 import {
   BookData,
-  MediaType,
   FetchErrorData
 } from "opds-web-client/lib/interfaces";
 import userEvent from "@testing-library/user-event";
 import { State } from "opds-web-client/lib/state";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import moment from "moment";
-
-jest.mock("moment", () => () => ({
-  fromNow: () => "two days"
-}));
 
 const makeBook = (data: Partial<BookData>) =>
   merge<BookData>(fixtures.book, data, {
@@ -69,6 +61,7 @@ describe("open-access", () => {
     expect(downloadButton).toHaveLength(1);
   });
 });
+
 describe("available to borrow", () => {
   const closedAccessBook = makeBook({
     openAccessLinks: [],
@@ -143,6 +136,83 @@ describe("available to borrow", () => {
     expect(
       node.getByText("Error: cannot loan more than 3 documents.")
     ).toBeInTheDocument();
+  });
+});
+
+describe("ready to borrow", () => {
+  const readyBook = makeBook({
+    openAccessLinks: undefined,
+    fulfillmentLinks: undefined,
+    availability: {
+      status: "ready",
+      until: "2020-06-16"
+    }
+  });
+  test("correct title and subtitle", () => {
+    const node = render(<FulfillmentCard book={readyBook} />);
+    expect(node.getByText("You can now borrow this book!")).toBeInTheDocument();
+    expect(node.getByText("Your hold will expire on Tue Jun 16 2020."));
+  });
+  test("shows loading state when borrowing, borrows, and refetches loans", async () => {
+    // mock the actions.updateBook
+    const updateBookSpy = jest
+      .spyOn(actions, "updateBook")
+      .mockImplementation(_url => _dispatch =>
+        new Promise(resolve => {
+          setTimeout(() => {
+            resolve(fixtures.book);
+          }, 200);
+        })
+      );
+    // also spy on fetchLoans
+    const fetchLoansSpy = jest.spyOn(actions, "fetchLoans");
+    const node = render(<FulfillmentCard book={readyBook} />, {
+      initialState: merge<State>(fixtures.initialState, {
+        loans: {
+          url: "/loans-url",
+          books: []
+        }
+      })
+    });
+    // click borrow
+    userEvent.click(node.getByText("Borrow"));
+    expect(updateBookSpy).toHaveBeenCalledTimes(1);
+    expect(updateBookSpy).toHaveBeenCalledWith("borrow url");
+    const borrowButton = await node.findByRole("button", {
+      name: "Borrowing..."
+    });
+    expect(borrowButton).toBeInTheDocument();
+    expect(borrowButton).toBeDisabled();
+    // we should refetch the loans after borrowing
+    await waitFor(() => expect(fetchLoansSpy).toHaveBeenCalledTimes(1));
+  });
+
+  test("displays error message", () => {
+    const err: FetchErrorData = {
+      response: "cannot loan more than 3 documents.",
+      status: 403,
+      url: "error-url"
+    };
+    const node = render(<FulfillmentCard book={readyBook} />, {
+      initialState: merge(fixtures.initialState, {
+        book: {
+          error: err
+        }
+      })
+    });
+    expect(
+      node.getByText("Error: cannot loan more than 3 documents.")
+    ).toBeInTheDocument();
+  });
+  test("handles lack of availability.until info", () => {
+    const withoutCopies = makeBook({
+      ...readyBook,
+      availability: { status: "ready" }
+    });
+    const node = render(<FulfillmentCard book={withoutCopies} />);
+    expect(
+      node.getByText("You must borrow this book before your loan expires.")
+    );
   });
 });
 
@@ -242,80 +312,122 @@ describe("reserved", () => {
     expect(node.getByText("Your hold position is: 5.")).toBeInTheDocument;
   });
 
-  describe("borrowed", () => {
-    const borrowedBook = makeBook({
-      openAccessLinks: [],
+describe("available to download", () => {
+  const downloadableBook = makeBook({
+    openAccessLinks: undefined,
+    fulfillmentLinks: [
+      {
+        url: "/epub-link",
+        type: "application/epub+zip",
+        indirectType: "indirect"
+      },
+      {
+        url: "/pdf-link",
+        type: "application/pdf",
+        indirectType: "indirect"
+      }
+    ],
+    availability: {
+      status: "available",
+      until: "2020-06-18"
+    }
+  });
+
+  test("correct title and subtitle", () => {
+    const node = render(<FulfillmentCard book={downloadableBook} />);
+    expect(
+      node.getByText("You have this book on loan until Thu Jun 18 2020.")
+    ).toBeInTheDocument();
+    expect(node.getByText("You're ready to read this book in SimplyE!"));
+  });
+
+  test("handles lack of availability info", () => {
+    const withoutAvailability = makeBook({
+      ...downloadableBook,
+      availability: undefined
+    });
+    const node = render(<FulfillmentCard book={withoutAvailability} />);
+    expect(node.getByText("You have this book on loan.")).toBeInTheDocument();
+    expect(node.getByText("You're ready to read this book in SimplyE!"));
+  });
+
+  test("shows download options", () => {
+    const node = render(<FulfillmentCard book={downloadableBook} />);
+    expect(
+      node.getByText("If you would rather read on your computer, you can:")
+    );
+    const downloadButton = node.getByText("Download EPUB");
+    expect(downloadButton).toBeInTheDocument();
+
+    const PDFButton = node.getByText("Download PDF");
+    expect(PDFButton).toBeInTheDocument();
+  });
+
+  test("download button calls fulfillBook", () => {
+    const fulfillBookSpy = jest.spyOn(actions, "fulfillBook");
+
+    const node = render(<FulfillmentCard book={downloadableBook} />);
+    const downloadButton = node.getByText("Download EPUB");
+    expect(downloadButton).toBeInTheDocument();
+
+    userEvent.click(downloadButton);
+
+    expect(fulfillBookSpy).toHaveBeenCalledTimes(1);
+    expect(fulfillBookSpy).toHaveBeenCalledWith("/epub-link");
+  });
+
+  test("download button calls indirect fullfill when book is indirect", () => {
+    const bookWithIndirect = makeBook({
+      ...downloadableBook,
       fulfillmentLinks: [
         {
-          type: "application/pdf" as MediaType,
-          url: "/pdf-fulfillment-link",
-          indirectType: "indirect-type"
-        },
+          url: "/indirect",
+          type: "application/atom+xml;type=entry;profile=opds-catalog",
+          indirectType: "something-indirect"
+        }
+      ]
+    });
+
+    const indirectFulfillSpy = jest.spyOn(actions, "indirectFulfillBook");
+
+    const node = render(<FulfillmentCard book={bookWithIndirect} />);
+    const downloadButton = node.getByText("Download atom");
+    expect(downloadButton).toBeInTheDocument();
+
+    userEvent.click(downloadButton);
+
+    expect(indirectFulfillSpy).toHaveBeenCalledTimes(1);
+    expect(indirectFulfillSpy).toHaveBeenCalledWith(
+      "/indirect",
+      "something-indirect"
+    );
+  });
+
+  test("says read online for streaming media", () => {
+    const bookWithIndirect = makeBook({
+      ...downloadableBook,
+      fulfillmentLinks: [
         {
-          type: "application/epub+zip" as MediaType,
-          url: "/epub-fulfillment-link",
-          indirectType: "indirect-type"
+          url: "/streaming",
+          type: "application/atom+xml;type=entry;profile=opds-catalog",
+          indirectType:
+            "text/html;profile=http://librarysimplified.org/terms/profiles/streaming-media"
         }
-      ],
-      copies: {
-        total: 13,
-        available: 0
-      }
+      ]
     });
 
-    test("download button calls fulfillBook", () => {
-      const fulfillBookSpy = jest.spyOn(actions, "fulfillBook");
+    const indirectFulfillSpy = jest.spyOn(actions, "indirectFulfillBook");
 
-      const node = render(<FulfillmentCard book={borrowedBook} />);
-      const downloadButton = node.getByText("Download");
-      expect(downloadButton).toBeInTheDocument();
+    const node = render(<FulfillmentCard book={bookWithIndirect} />);
+    const downloadButton = node.getByText("Read Online");
+    expect(downloadButton).toBeInTheDocument();
 
-      userEvent.click(downloadButton);
+    userEvent.click(downloadButton);
 
-      expect(fulfillBookSpy).toHaveBeenCalledTimes(1);
-      expect(fulfillBookSpy).toHaveBeenCalledWith("/pdf-fulfillment-link");
-    });
-
-    test("shows time left when possible", () => {
-      const withAvailabilityUntil = makeBook({
-        openAccessLinks: [],
-        fulfillmentLinks: [
-          {
-            type: "application/pdf" as MediaType,
-            url: "/pdf-fulfillment-link",
-            indirectType: "indirect-type"
-          },
-          {
-            type: "application/epub+zip" as MediaType,
-            url: "/epub-fulfillment-link",
-            indirectType: "indirect-type"
-          }
-        ],
-        copies: {
-          total: 13,
-          available: 0
-        },
-        availability: {
-          until: "2020-07-11",
-          status: "borrowed"
-        }
-      });
-      const node = render(<FulfillmentCard book={withAvailabilityUntil} />);
-
-      expect(node.getByText("You have this book on loan for two days"));
-    });
-
-    test("handles no availability.until data", () => {
-      const node = render(<FulfillmentCard book={borrowedBook} />);
-
-      expect(node.getByText("You have this book on loan."));
-    });
-
-    test("allows selecting type", () => {
-      const node = render(<FulfillmentCard book={borrowedBook} />);
-      const typeSelector = node.getByLabelText("TYPE");
-      expect(within(typeSelector).getByText("PDF")).toBeInTheDocument();
-      expect(within(typeSelector).getByText("EPUB")).toBeInTheDocument();
-    });
+    expect(indirectFulfillSpy).toHaveBeenCalledTimes(1);
+    expect(indirectFulfillSpy).toHaveBeenCalledWith(
+      "/streaming",
+      "text/html;profile=http://librarysimplified.org/terms/profiles/streaming-media"
+    );
   });
 });

@@ -56,7 +56,11 @@ export function getFulfillmentState(book: BookData): BookFulfillmentState {
   if (book.openAccessLinks && book.openAccessLinks.length > 0)
     return "OPEN_ACCESS";
 
-  if (availabilityStatus === "available" && book.fulfillmentLinks)
+  if (
+    availabilityStatus === "available" &&
+    book.fulfillmentLinks &&
+    book.fulfillmentLinks.length > 0
+  )
     return "AVAILABLE_TO_ACCESS";
 
   if (availabilityStatus === "available" && hasBorrowRelation(book))
