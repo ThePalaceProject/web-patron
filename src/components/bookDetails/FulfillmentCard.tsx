@@ -258,10 +258,10 @@ const DownloadCard: React.FC<{
         </Stack>
       </Stack>
       <Stack direction="column" sx={{ mt: 3 }}>
-        <Text variant="text.body.italic">
+        <Text variant="text.body.italic" sx={{ textAlign: "center" }}>
           If you would rather read on your computer, you can:
         </Text>
-        <Stack sx={{ justifyContent: "center" }}>
+        <Stack sx={{ justifyContent: "center", flexWrap: "wrap" }}>
           {dedupedLinks.map(link =>
             isOpenAccess ? (
               <AnchorButton

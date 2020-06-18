@@ -28,42 +28,6 @@ import SimplyELogo from "components/SimplyELogo";
 import IosBadge from "components/storeBadges/IosBadge";
 import GooglePlayBadge from "components/storeBadges/GooglePlayBadge";
 
-/**
- * How will I build my grid?
- *  - Margin: 64px (when does this go away / change?). This should change for the whole layout at some point for mobile.
- *  - 12 columns. Each element decides how many columns it takes up...
- *  - Every column except the last gets 32px padding right
- *  - How do you deal with the extra columns on the side?
- */
-
-const Grid: React.FC = ({ children, ...rest }) => (
-  <div
-    sx={{
-      display: "flex",
-      mx: 5,
-      "&>div": {
-        mr: 4
-      },
-      "&>div:last-child": {
-        mr: 0
-      }
-    }}
-    {...rest}
-  >
-    {children}
-  </div>
-);
-
-const Column: React.FC<{ columns: number }> = ({
-  children,
-  columns,
-  ...rest
-}) => (
-  <div sx={{ flex: columns / 12 }} {...rest}>
-    {children}
-  </div>
-);
-
 export const BookDetails: React.FC<{
   setCollectionAndBook: SetCollectionAndBook;
 }> = ({ setCollectionAndBook }) => {
@@ -84,41 +48,47 @@ export const BookDetails: React.FC<{
         <title>{book.title}</title>
       </Head>
       <BreadcrumbBar currentLocation={truncateString(book.title, 60, false)} />
-      <Grid sx={{ my: 4 }}>
-        <Column columns={1} />
-        <Column columns={4}>
-          <BookCover book={book} />
-          {/* download requirements & download links */}
-          <SimplyECallout />
-        </Column>
-        <Column columns={8} aria-label="Book info">
-          <H1 sx={{ m: 0 }}>
-            {book.title}
-            {book.subtitle && `: ${book.subtitle}`}
-          </H1>
-
-          <Text
-            variant="text.callouts.regular"
-            sx={{ color: "brand.secondary" }}
-          >
-            <span sx={{ color: "ui.black" }}>by </span>
-            {book.authors?.join(", ") ?? "Unknown"}
-          </Text>
-          <MediumIndicator book={book} />
-          <div sx={{ mt: 2 }}>
-            <DetailField heading="Publisher" details={book.publisher} />
-            <DetailField heading="Published" details={book.published} />
-            <DetailField
-              heading="Categories"
-              details={book.categories?.join(", ")}
-            />
+      <div sx={{ maxWidth: 1100, mx: "auto" }}>
+        <div
+          sx={{
+            display: "flex",
+            mx: 5,
+            my: 4,
+            flexWrap: ["wrap", "nowrap"]
+          }}
+        >
+          <div sx={{ flex: ["1 1 auto", 0.33], mr: 4 }}>
+            <BookCover book={book} />
+            <SimplyECallout sx={{ display: ["none", "flex"] }} />
           </div>
-          <FulfillmentCard book={book} sx={{ mt: 3 }} />
-          <ReportProblem book={book} />
-          <Summary sx={{ display: ["none", "none", "block"] }} book={book} />
-        </Column>
-        <Column columns={1} />
-      </Grid>
+          <div sx={{ flex: ["1 1 auto", 0.66] }} aria-label="Book info">
+            <H1 sx={{ m: 0 }}>
+              {book.title}
+              {book.subtitle && `: ${book.subtitle}`}
+            </H1>
+
+            <Text
+              variant="text.callouts.regular"
+              sx={{ color: "brand.secondary" }}
+            >
+              <span sx={{ color: "ui.black" }}>by </span>
+              {book.authors?.join(", ") ?? "Unknown"}
+            </Text>
+            <MediumIndicator book={book} />
+            <div sx={{ mt: 2 }}>
+              <DetailField heading="Publisher" details={book.publisher} />
+              <DetailField heading="Published" details={book.published} />
+              <DetailField
+                heading="Categories"
+                details={book.categories?.join(", ")}
+              />
+            </div>
+            <FulfillmentCard book={book} sx={{ mt: 3 }} />
+            <ReportProblem book={book} />
+            <Summary book={book} />
+          </div>
+        </div>
+      </div>
       {/* <Recommendations book={book} /> */}
     </section>
   );
@@ -138,10 +108,10 @@ const Summary: React.FC<{ book: BookData; className?: string }> = ({
   </div>
 );
 
-const SimplyECallout: React.FC = () => {
+const SimplyECallout: React.FC<{ className?: "string" }> = ({ className }) => {
   return (
     <section
-      aria-label="Download requirements"
+      aria-label="Download the SimplyE Mobile App"
       sx={{
         mt: 4,
         bg: "ui.gray.lightWarm",
@@ -150,6 +120,7 @@ const SimplyECallout: React.FC = () => {
         p: 3,
         textAlign: "center"
       }}
+      className={className}
     >
       <SimplyELogo sx={{ m: 3 }} />
       <H3 sx={{ mt: 0 }}>Read Now. Read Everywhere.</H3>
