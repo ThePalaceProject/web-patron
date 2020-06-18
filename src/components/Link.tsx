@@ -15,9 +15,10 @@ type BookLinkProps = {
 type BaseLinkProps = Omit<
   React.ComponentProps<typeof BaseLink>,
   "href" | "as"
-> & {
-  className?: string;
-};
+> &
+  Omit<React.ComponentPropsWithoutRef<"a">, "href"> & {
+    className?: string;
+  };
 
 export type LinkProps = BaseLinkProps &
   (CollectionLinkProps | BookLinkProps | NextLinkConfig);
@@ -54,12 +55,28 @@ const buildLinkFromProps = (props: LinkProps, linkUtils: LinkUtils) => {
  *    - "bookUrl"
  *    - "collectionUrl"
  */
-const Link: React.FC<LinkProps> = React.forwardRef(
-  ({ children, className, ...props }, ref: React.Ref<any>) => {
+const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
+  ({ children, className, ...props }, ref) => {
     const linkUtils = useLinkUtils();
-    const { as, href, ...rest } = buildLinkFromProps(props, linkUtils);
+    const {
+      as,
+      href,
+      prefetch,
+      replace,
+      scroll,
+      shallow,
+      ...rest
+    } = buildLinkFromProps(props, linkUtils);
     return (
-      <BaseLink href={href} as={as} passHref>
+      <BaseLink
+        href={href}
+        as={as}
+        prefetch={prefetch}
+        replace={replace}
+        scroll={scroll}
+        shallow={shallow}
+        passHref
+      >
         <a
           ref={ref}
           sx={{ textDecoration: "none", color: "inherit" }}
