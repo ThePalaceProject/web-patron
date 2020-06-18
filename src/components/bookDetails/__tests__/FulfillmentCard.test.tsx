@@ -1,16 +1,8 @@
 import * as React from "react";
-import {
-  render,
-  fixtures,
-  actions,
-  waitFor
-} from "test-utils";
+import { render, fixtures, actions, waitFor } from "test-utils";
 import merge from "deepmerge";
 import FulfillmentCard from "../FulfillmentCard";
-import {
-  BookData,
-  FetchErrorData
-} from "opds-web-client/lib/interfaces";
+import { BookData, FetchErrorData } from "opds-web-client/lib/interfaces";
 import userEvent from "@testing-library/user-event";
 import { State } from "opds-web-client/lib/state";
 
@@ -311,6 +303,7 @@ describe("reserved", () => {
     const node = render(<FulfillmentCard book={reservedBookWithQueue} />);
     expect(node.getByText("Your hold position is: 5.")).toBeInTheDocument;
   });
+});
 
 describe("available to download", () => {
   const downloadableBook = makeBook({
