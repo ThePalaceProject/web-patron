@@ -210,6 +210,9 @@ describe("ready to borrow", () => {
 
 describe("available to reserve", () => {
   const unavailableBook = makeBook({
+    availability: {
+      status: "unavailable"
+    },
     openAccessLinks: [],
     copies: {
       total: 13,
@@ -233,11 +236,7 @@ describe("available to reserve", () => {
 
   test("shows number of patrons in queue when holds info present", () => {
     const bookWithQueue = makeBook({
-      openAccessLinks: [],
-      copies: {
-        total: 13,
-        available: 0
-      },
+      ...unavailableBook,
       holds: {
         total: 4
       }

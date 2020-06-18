@@ -93,6 +93,8 @@ const FulfillmentContent: React.FC<{ book: BookData }> = ({ book }) => {
             <>
               <MediumIcon book={book} sx={{ mr: 1 }} />{" "}
               {availabilityString(book)}
+              {typeof book.holds?.total === "number" &&
+                ` ${book.holds.total} patrons in the queue.`}
             </>
           }
           buttonLabel="Reserve"
@@ -244,7 +246,6 @@ const DownloadCard: React.FC<{
   const { title } = book;
   const dedupedLinks = dedupeLinks(links ?? []);
 
-  console.log(isOpenAccess);
   return (
     <>
       <Stack sx={{ alignItems: "center" }}>
