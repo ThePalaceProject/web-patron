@@ -2,7 +2,6 @@
 import { jsx } from "theme-ui";
 import * as React from "react";
 import { LaneData, BookData } from "opds-web-client/lib/interfaces";
-import ArrowRight from "../icons/ArrowRight";
 import { Tabbable } from "reakit/Tabbable";
 import Book, { BOOK_HEIGHT } from "./BookCard";
 import { withErrorBoundary } from "./ErrorBoundary";
@@ -39,10 +38,11 @@ const getfilteredBooksAndRefs = (books: BookData[], omitIds?: string[]) => {
  * - scrolls automatically on button clicks
  * - allows the user to free scroll / swipe also
  */
-const Lane: React.FC<{ lane: LaneData; omitIds?: string[] }> = ({
-  omitIds,
-  lane: { title, books, url }
-}) => {
+const Lane: React.FC<{
+  lane: LaneData;
+  omitIds?: string[];
+  titleTag?: React.ReactNode;
+}> = ({ omitIds, titleTag: TitleTag = H2, lane: { title, books, url } }) => {
   /**
    * We compute these values within a useMemo hook so that they don't change
    * on every render
@@ -152,7 +152,7 @@ const Lane: React.FC<{ lane: LaneData; omitIds?: string[] }> = ({
   return (
     <div sx={{ mb: 3 }}>
       <Stack>
-        <H2 sx={{ pl: 5, pr: 4, m: 0, mb: 3 }}>{title}</H2>
+        <TitleTag sx={{ pl: 5, pr: 4, m: 0, mb: 3 }}>{title}</TitleTag>
         <NavButton variant="ghost" collectionUrl={url} iconRight={ArrowForward}>
           See More
         </NavButton>

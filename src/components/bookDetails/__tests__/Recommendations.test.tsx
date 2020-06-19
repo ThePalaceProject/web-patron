@@ -36,9 +36,7 @@ test("shows recommendations loading state", async () => {
     ...fixtures.emptyRecommendationsState,
     isFetching: true
   });
-  await waitFor(() =>
-    expect(node.getByText("Loading recommendations...")).toBeInTheDocument()
-  );
+  await waitFor(() => expect(node.getByText("Loading...")).toBeInTheDocument());
 });
 
 test("fetches the proper url for recommendation collection", () => {
@@ -49,7 +47,12 @@ test("fetches the proper url for recommendation collection", () => {
 
 test("shows recommendation lanes", () => {
   const node = renderWithRecState(<Recommendations book={fixtures.book} />);
-  expect(node.getByText("Jane Austen")).toBeInTheDocument();
+  expect(
+    node.getByRole("heading", { name: "Recommendations" })
+  ).toBeInTheDocument();
+  expect(
+    node.getByRole("heading", { name: "Jane Austen" })
+  ).toBeInTheDocument();
 });
 
 test("doesn't show recommendations if there are none", () => {
@@ -62,8 +65,10 @@ test("doesn't show recommendations if there are none", () => {
 test("recommendations are clickable", () => {
   const node = renderWithRecState(<Recommendations book={fixtures.book} />);
 
-  const recommendation = node.getByText("Recommendation 1");
-  expect(recommendation.closest("a")).toHaveAttribute(
+  const recommendationCover = node.getByRole("link", {
+    name: "View Recommendation 1"
+  });
+  expect(recommendationCover.closest("a")).toHaveAttribute(
     "href",
     "/book/recommendation-1-url"
   );
@@ -71,7 +76,7 @@ test("recommendations are clickable", () => {
 
 test("displays a more button for recommendations", () => {
   const node = renderWithRecState(<Recommendations book={fixtures.book} />);
-  const moreButton = node.getByText("More...");
+  const moreButton = node.getByText("See More");
   expect(moreButton).toHaveAttribute(
     "href",
     "/collection/works%2Fcontributor%2FJane%2520Austen%2Feng"
@@ -122,5 +127,5 @@ test("shows multiple lanes if existing", () => {
   expect(node.getByText("lane 1")).toBeInTheDocument();
   expect(node.getByText("lane 2")).toBeInTheDocument();
 
-  expect(node.getAllByText("More...")).toHaveLength(2);
+  expect(node.getAllByText("See More")).toHaveLength(2);
 });

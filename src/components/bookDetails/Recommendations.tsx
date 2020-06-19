@@ -1,19 +1,13 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { BookData, LaneData } from "opds-web-client/lib/interfaces";
+import { BookData } from "opds-web-client/lib/interfaces";
 import useRecommendationsState from "../context/RecommendationsContext";
-import BookCover from "../BookCover";
 import LoadingIndicator from "../LoadingIndicator";
-import Link from "../Link";
-import { NavButton } from "../Button";
 import { H3, H2 } from "components/Text";
+import Lane from "components/Lane";
 
 const Recommendations: React.FC<{ book: BookData }> = ({ book }) => {
-  /**
-   * TODO
-   * - test multiple lanes
-   */
   const relatedUrl = getRelatedUrl(book);
   const {
     recommendationsState,
@@ -43,86 +37,26 @@ const Recommendations: React.FC<{ book: BookData }> = ({ book }) => {
   // get the lanes data from state
   const lanes = recommendationsState?.data?.lanes ?? [];
   const isFetching = recommendationsState?.isFetching ?? false;
-  if (isFetching) {
-    return (
-      <div
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "column"
-        }}
-      >
-        <LoadingIndicator /> Loading recommendations...
-      </div>
-    );
-  }
+  if (!isFetching && lanes.length === 0) return null;
   return (
-    <React.Fragment>
-      {lanes.map(lane => (
-        <RecommendationsLane key={lane.title} lane={lane} selfId={book.id} />
-      ))}
-    </React.Fragment>
-  );
-};
-
-const RecommendationsLane: React.FC<{ lane: LaneData; selfId: string }> = ({
-  selfId,
-  lane: { title, books, url }
-}) => {
-  // if there are less than two books, show nothing
-  if (books.length < 2) return null;
-
-  return (
-    <div sx={{ variant: "cards.bookDetails", border: "none" }}>
-      <div
+    <section
+      aria-label="Recommendations"
+      sx={{ bg: "ui.gray.lightWarm", py: 4 }}
+    >
+      <H2
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center"
+          px: 5,
+          mt: 0,
+          mb: 3,
+          color: isFetching ? "ui.gray.dark" : "ui.black"
         }}
       >
-        <H2 sx={{ fontSize: 2 }}>{title}</H2>
-        <NavButton collectionUrl={url}>More...</NavButton>
-      </div>
-
-      <div
-        sx={{
-          border: "1px solid",
-          borderColor: "primaries.dark",
-          borderRadius: "card",
-          p: 2,
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "center"
-        }}
-      >
-        {books.map(
-          book =>
-            book.id !== selfId &&
-            book.url && (
-              <Link
-                bookUrl={book.url}
-                key={book.id}
-                sx={{ flex: "1 0 auto", maxWidth: 110, m: 2 }}
-              >
-                <BookCover book={book} sx={{ m: 2, width: 100 }} />
-                <H3
-                  sx={{
-                    variant: "text.bookTitle",
-                    textAlign: "center",
-                    fontSize: 2,
-                    mt: 2,
-                    mb: 0
-                  }}
-                >
-                  {book.title}
-                </H3>
-              </Link>
-            )
-        )}
-      </div>
-    </div>
+        Recommendations{" "}
+        {isFetching && <LoadingIndicator size="1.75rem" color="ui.gray.dark" />}
+      </H2>
+      {!isFetching &&
+        lanes.map(lane => <Lane key={lane.title} lane={lane} titleTag={H3} />)}
+    </section>
   );
 };
 

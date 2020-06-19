@@ -179,7 +179,10 @@ describe("book details page", () => {
         initialState: makeStateWithBook()
       }
     );
-    expect(node.getByText("Jane Austen")).toBeInTheDocument();
+    expect(node.getByText("Recommendations")).toBeInTheDocument();
+    expect(
+      node.getByRole("heading", { name: "Jane Austen" })
+    ).toBeInTheDocument();
   });
 });
 

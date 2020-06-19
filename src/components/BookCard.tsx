@@ -38,7 +38,7 @@ const BookCard = React.forwardRef<
         mx: 2
       }}
     >
-      <Link bookUrl={book.url}>
+      <Link bookUrl={book.url} aria-label={`View ${book.title}`}>
         <BookCover book={book} sx={{ mx: 40 - 16 }} />
       </Link>
       <div sx={{ flex: "1 1 auto" }} />

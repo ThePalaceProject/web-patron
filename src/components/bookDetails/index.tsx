@@ -59,7 +59,7 @@ export const BookDetails: React.FC<{
         >
           <div sx={{ flex: ["1 1 auto", 0.33], mr: 4 }}>
             <BookCover book={book} />
-            <SimplyECallout sx={{ display: ["none", "flex"] }} />
+            <SimplyECallout />
           </div>
           <div sx={{ flex: ["1 1 auto", 0.66] }} aria-label="Book info">
             <H1 sx={{ m: 0 }}>
@@ -89,7 +89,7 @@ export const BookDetails: React.FC<{
           </div>
         </div>
       </div>
-      {/* <Recommendations book={book} /> */}
+      <Recommendations book={book} />
     </section>
   );
 };
