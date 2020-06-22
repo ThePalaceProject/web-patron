@@ -5,7 +5,7 @@ import { BookData } from "opds-web-client/lib/interfaces";
 import { getAuthors } from "../utils/book";
 import Link from "./Link";
 import BookCover from "./BookCover";
-import truncateString from "../utils/truncate";
+import { truncateString } from "../utils/string";
 import { Text, H3 } from "./Text";
 import BookMediumIndicator from "./MediumIndicator";
 

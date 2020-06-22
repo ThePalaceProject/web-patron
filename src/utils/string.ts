@@ -3,11 +3,11 @@
  * if you select useWordBoundary, it will only
  * truncate at whole words
  */
-const truncateString = (
+export function truncateString(
   str: string,
   length: number,
   useWordBoundary = true
-) => {
+) {
   // if the string is empty, just return it
   if (str === "") return str;
 
@@ -21,6 +21,8 @@ const truncateString = (
   if (finalTruncation === "") return truncateString(str, length, false);
 
   return finalTruncation + "...";
-};
+}
 
-export default truncateString;
+export function stripHTML(str: string) {
+  return str.replace(/(<([^>]+)>)/gi, "");
+}

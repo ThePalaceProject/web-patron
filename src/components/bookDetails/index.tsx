@@ -15,7 +15,7 @@ import useSetCollectionAndBook from "../../hooks/useSetCollectionAndBook";
 import { PageLoader } from "../LoadingIndicator";
 import FulfillmentCard from "./FulfillmentCard";
 import BreadcrumbBar from "../BreadcrumbBar";
-import truncateString from "../../utils/truncate";
+import { truncateString } from "../../utils/string";
 import useNormalizedBook from "../../hooks/useNormalizedBook";
 import DetailField from "../BookMetaDetail";
 import ReportProblem from "./ReportProblem";

@@ -2,16 +2,13 @@
 import { jsx } from "theme-ui";
 import * as React from "react";
 import { BookData, LaneData } from "opds-web-client/lib/interfaces";
-import BookCover from "./BookCover";
-import truncateString from "../utils/truncate";
+import { truncateString } from "../utils/string";
 import {
   getAuthors,
   getFulfillmentState,
   availabilityString
 } from "../utils/book";
 import Lane from "./Lane";
-import Link from "./Link";
-import DetailField from "./BookMetaDetail";
 import useBorrow from "../hooks/useBorrow";
 import Button, { NavButton } from "./Button";
 import LoadingIndicator from "./LoadingIndicator";
@@ -96,7 +93,7 @@ const BookListItem: React.FC<{ book: BookData }> = ({ book }) => {
           <Text variant="callouts.italic">{book.subtitle}</Text>
         )}
         by <Text sx={{ color: "brand.secondary" }}>{getAuthors(book)}</Text>
-        <MediumIndicator book={book} />
+        <MediumIndicator book={book} sx={{ color: "ui.gray.dark" }} />
         <div sx={{ mt: 3 }}>
           <Text
             variant="text.body.italic"
