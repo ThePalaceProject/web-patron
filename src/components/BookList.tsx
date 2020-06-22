@@ -14,7 +14,7 @@ import Button, { NavButton } from "./Button";
 import LoadingIndicator from "./LoadingIndicator";
 import useInfiniteScroll from "../hooks/useInfiniteScroll";
 import { H2, Text } from "./Text";
-import { Image, Card } from "@nypl/design-system-react-components";
+import * as DS from "@nypl/design-system-react-components";
 import MediumIndicator from "components/MediumIndicator";
 import { ArrowForward } from "icons";
 
@@ -62,6 +62,7 @@ export const ListView: React.FC<{
 const BookListItem: React.FC<{ book: BookData }> = ({ book }) => {
   // if there is no book url, it doesn't make sense to display it.
   if (!book.url) return null;
+
   return (
     <li
       sx={{
@@ -69,9 +70,9 @@ const BookListItem: React.FC<{ book: BookData }> = ({ book }) => {
       }}
       aria-label={`Book: ${book.title}`}
     >
-      <Card
+      <DS.Card
         sx={{ bg: "ui.white" }}
-        image={<Image src={book.imageUrl ?? ""} isDecorative />}
+        image={<DS.Image src={book.imageUrl ?? ""} isDecorative />}
         ctas={
           <div
             sx={{
@@ -102,7 +103,7 @@ const BookListItem: React.FC<{ book: BookData }> = ({ book }) => {
             }}
           ></Text>
         </div>
-      </Card>
+      </DS.Card>
     </li>
   );
 };

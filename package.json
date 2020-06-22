@@ -23,7 +23,7 @@
     "@csstools/normalize.css": "^10.1.0",
     "@emotion/core": "^10.0.28",
     "@emotion/styled": "^10.0.27",
-    "@nypl/design-system-react-components": "github:NYPL/nypl-design-system",
+    "@nypl/design-system-react-components": "github:NYPL/nypl-design-system#add-he",
     "@theme-ui/color": "^0.3.1",
     "@theme-ui/components": "^0.3.1",
     "@theme-ui/match-media": "^0.3.1",

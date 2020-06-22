@@ -15,6 +15,10 @@ import useTypedSelector from "../hooks/useTypedSelector";
 import { ListView } from "./BookList";
 import { PageLoader } from "./LoadingIndicator";
 import Head from "next/head";
+import BreadcrumbBar from "./BreadcrumbBar";
+import { H3 } from "./Text";
+import { BookData } from "opds-web-client/lib/interfaces";
+import PageTitle from "./PageTitle";
 
 export const MyBooks: React.FC<{
   setCollectionAndBook: SetCollectionAndBook;
@@ -24,63 +28,86 @@ export const MyBooks: React.FC<{
   useSetCollectionAndBook(setCollectionAndBook, "loans");
   const collection = useTypedSelector(state => state.collection);
 
-  const { isSignedIn, signOutAndGoHome } = useAuth();
+  const { isSignedIn } = useAuth();
 
-  if (collection.isFetching) {
-    return <PageLoader />;
-  }
-  if (!isSignedIn)
-    return (
-      <div
-        sx={{
-          flex: 1,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "column"
-        }}
-      >
-        <Head>
-          <title>My Books</title>
-        </Head>
-        <h4>You need to be signed in to view this page.</h4>
-      </div>
-    );
-  if (collection.data?.books && collection.data.books.length > 0) {
-    const signOutButton = (
-      <Button aria-label="Sign out and go home" onClick={signOutAndGoHome}>
-        Sign out
-      </Button>
-    );
-    return (
-      <React.Fragment>
-        <Head>
-          <title>My Books</title>
-        </Head>
-        <ListView books={collection.data?.books} breadcrumb={signOutButton} />
-      </React.Fragment>
-    );
-  }
+  const books =
+    collection.data?.books &&
+    collection.data.books.length > 0 &&
+    collection.data.books;
 
-  // otherwise you have no loans / holds
+  return (
+    <div sx={{ bg: "ui.gray.lightWarm", flex: 1 }}>
+      <Head>
+        <title>My Books</title>
+      </Head>
+      <BreadcrumbBar currentLocation="My Books" />
+      <PageTitle>My Books</PageTitle>
+      {collection.isFetching ? (
+        <PageLoader />
+      ) : !isSignedIn ? (
+        <Unauthorized />
+      ) : books ? (
+        <LoansContent books={books} />
+      ) : (
+        <Empty />
+      )}
+    </div>
+  );
+};
+
+const LoansContent: React.FC<{ books: BookData[] }> = ({ books }) => {
+  const { signOutAndGoHome } = useAuth();
+
+  const signOutButton = (
+    <Button aria-label="Sign out and go home" onClick={signOutAndGoHome}>
+      Sign out
+    </Button>
+  );
+  return (
+    <React.Fragment>
+      <ListView books={books} breadcrumb={signOutButton} />
+    </React.Fragment>
+  );
+};
+
+const Unauthorized = () => {
   return (
     <div
       sx={{
         flex: 1,
         display: "flex",
-        alignItems: "center",
         justifyContent: "center",
+        alignItems: "center",
         flexDirection: "column"
       }}
     >
       <Head>
         <title>My Books</title>
       </Head>
-      <h3 sx={{ color: "primaries.medium" }}>
-        Your books will show up here when you have any loaned or on hold.
-      </h3>
-      <Button onClick={signOutAndGoHome}>Sign Out</Button>
+      <h4>You need to be signed in to view this page.</h4>
     </div>
+  );
+};
+
+const Empty = () => {
+  const { signOutAndGoHome } = useAuth();
+
+  return (
+    <>
+      <div
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column"
+        }}
+      >
+        <H3>
+          Your books will show up here when you have any loaned or on hold.
+        </H3>
+        <Button onClick={signOutAndGoHome}>Sign Out</Button>
+      </div>
+    </>
   );
 };
 
