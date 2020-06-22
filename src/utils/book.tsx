@@ -26,6 +26,19 @@ export function getAuthors(book: BookData, lim?: number): string[] {
   return allAuth;
 }
 
+export function availabilityString(book: BookData) {
+  const availableCopies = book.copies?.available;
+  const totalCopies = book.copies?.total;
+  return typeof availableCopies === "number" && typeof totalCopies === "number"
+    ? `${availableCopies} out of ${totalCopies} copies available.`
+    : "Number of books available is unknown.";
+}
+
+export function queueString(book: BookData) {
+  const holds = book.holds?.total;
+  return typeof holds === "number" ? `${holds} patrons in the queue.` : "";
+}
+
 export function dedupeLinks<T extends MediaLink>(links: T[]) {
   return links.reduce<T[]>((uniqueArr, current) => {
     const isDup = uniqueArr.find(

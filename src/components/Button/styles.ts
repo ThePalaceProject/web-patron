@@ -49,7 +49,8 @@ export const styleProps = (
         color: "white",
         fill: "white",
         "&:focus,&:hover": {
-          bg: darken(color, 0.05)
+          bg: darken(color, 0.05),
+          color: "white"
         },
         "&:active": {
           bg: darken(color, 0.1)
@@ -71,7 +72,8 @@ export const styleProps = (
         color: color,
         fill: color,
         "&:focus,&:hover": {
-          bg: lightness(color, 0.85)
+          bg: lightness(color, 0.85),
+          color: color
         },
         "&:active": {
           // bg: darken(color, 0.1)
@@ -84,7 +86,10 @@ export const styleProps = (
         variant: "text.textLink",
         p: 0,
         color,
-        fill: color
+        fill: color,
+        "&:hover": {
+          color
+        }
       };
 
     default:

@@ -1,7 +1,12 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { getFulfillmentState, dedupeLinks } from "utils/book";
+import {
+  getFulfillmentState,
+  dedupeLinks,
+  availabilityString,
+  queueString
+} from "utils/book";
 import {
   BookData,
   MediaLink,
@@ -37,19 +42,6 @@ const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
     </Stack>
   );
 };
-
-function availabilityString(book: BookData) {
-  const availableCopies = book.copies?.available;
-  const totalCopies = book.copies?.total;
-  return typeof availableCopies === "number" && typeof totalCopies === "number"
-    ? `${availableCopies} out of ${totalCopies} copies available.`
-    : "Number of books available is unknown.";
-}
-
-function queueString(book: BookData) {
-  const holds = book.holds?.total;
-  return typeof holds === "number" ? `${holds} patrons in the queue.` : "";
-}
 
 const FulfillmentContent: React.FC<{ book: BookData }> = ({ book }) => {
   const fulfillmentState = getFulfillmentState(book);

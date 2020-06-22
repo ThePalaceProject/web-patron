@@ -27,6 +27,7 @@ import { ParsedUrlQuery } from "querystring";
 import enableAxe from "utils/axe";
 import "system-font-css";
 import { Config } from "dataflow/LibraryDataCache";
+import "@nypl/design-system-react-components/dist/styles.css";
 
 type NotFoundProps = {
   statusCode: number;

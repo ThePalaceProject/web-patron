@@ -4,7 +4,7 @@ import * as React from "react";
 import { VisuallyHidden } from "reakit";
 import { AnchorButton } from "./Button";
 
-const ExternalLink: React.FC<React.ComponentProps<"a">> = ({
+const ExternalLink: React.FC<React.ComponentPropsWithoutRef<"a">> = ({
   children,
   ...props
 }) => (

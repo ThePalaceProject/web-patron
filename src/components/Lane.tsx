@@ -41,7 +41,7 @@ const getfilteredBooksAndRefs = (books: BookData[], omitIds?: string[]) => {
 const Lane: React.FC<{
   lane: LaneData;
   omitIds?: string[];
-  titleTag?: React.ReactNode;
+  titleTag?: React.ComponentType;
 }> = ({ omitIds, titleTag: TitleTag = H2, lane: { title, books, url } }) => {
   /**
    * We compute these values within a useMemo hook so that they don't change

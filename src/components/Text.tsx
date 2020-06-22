@@ -5,7 +5,7 @@ import * as React from "react";
 type NativeComponent<
   T extends keyof JSX.IntrinsicElements | React.JSXElementConstructor<any>,
   P = {}
-> = React.FC<React.ComponentProps<T>> & P;
+> = React.FC<React.ComponentProps<T> & P>;
 
 export const H1: NativeComponent<"h1"> = ({ children, ...rest }) => {
   return (
@@ -31,11 +31,10 @@ export const H3: NativeComponent<"h3"> = ({ children, ...rest }) => {
   );
 };
 
-export const Text: React.FC<{ variant?: string; className?: string }> = ({
-  variant = "text.body.regular",
-  children,
-  ...rest
-}) => (
+export const Text: NativeComponent<
+  "span",
+  { variant?: string; className?: string }
+> = ({ variant = "text.body.regular", children, ...rest }) => (
   <span sx={{ variant }} {...rest}>
     {children}
   </span>

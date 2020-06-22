@@ -4,15 +4,22 @@ import * as React from "react";
 import { BookData, LaneData } from "opds-web-client/lib/interfaces";
 import BookCover from "./BookCover";
 import truncateString from "../utils/truncate";
-import { getAuthors } from "../utils/book";
+import {
+  getAuthors,
+  getFulfillmentState,
+  availabilityString
+} from "../utils/book";
 import Lane from "./Lane";
 import Link from "./Link";
 import DetailField from "./BookMetaDetail";
 import useBorrow from "../hooks/useBorrow";
-import Button from "./Button";
+import Button, { NavButton } from "./Button";
 import LoadingIndicator from "./LoadingIndicator";
 import useInfiniteScroll from "../hooks/useInfiniteScroll";
-import { H2 } from "./Text";
+import { H2, Text } from "./Text";
+import { Image, Card } from "@nypl/design-system-react-components";
+import MediumIndicator from "components/MediumIndicator";
+import { ArrowForward } from "icons";
 
 /**
  * In a collection you can:
@@ -45,7 +52,7 @@ export const ListView: React.FC<{
 
   return (
     <React.Fragment>
-      <ul ref={listRef} sx={{ p: 0, m: 0 }} data-testid="listview-list">
+      <ul ref={listRef} sx={{ px: 5 }} data-testid="listview-list">
         {books.map(book => (
           <BookListItem key={book.id} book={book} />
         ))}
@@ -56,79 +63,230 @@ export const ListView: React.FC<{
 };
 
 const BookListItem: React.FC<{ book: BookData }> = ({ book }) => {
-  const {
-    borrowOrReserve,
-    label,
-    isBorrowed,
-    isReserved,
-    isBorrowable
-  } = useBorrow(book);
   // if there is no book url, it doesn't make sense to display it.
   if (!book.url) return null;
   return (
     <li
       sx={{
-        listStyle: "none",
-        border: "1px solid",
-        borderColor: "primaries.dark",
-        borderRadius: "card",
-        height: 140,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        flexWrap: ["wrap", "nowrap"],
-        p: 3,
-        m: 3
+        listStyle: "none"
       }}
       aria-label={`Book: ${book.title}`}
     >
-      <div sx={{ mx: 1, flex: "0 1 40%", display: "flex" }}>
-        <BookCover book={book} sx={{ width: 70, height: 105 }} />
-        <div sx={{ ml: 3 }}>
-          <Link bookUrl={book.url}>
-            <H2 sx={{ my: 2, variant: "text.bookTitle" }}>
-              {truncateString(book.title, 50, true)}
-            </H2>
-          </Link>
-          <span sx={{ color: "primary", fontSize: 2 }}>
-            {getAuthors(book, 2).join(", ")}
-          </span>
-        </div>
-      </div>
-      <div
-        sx={{
-          mx: 3,
-          flex: "0 1 40%",
-          display: "flex"
-        }}
-        aria-label="Book metadata"
+      <Card
+        sx={{ bg: "ui.white" }}
+        image={
+          book.imageUrl ? <Image src={book.imageUrl} isDecorative /> : undefined
+        }
+        ctas={
+          <div
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              height: "100%",
+              textAlign: "center"
+            }}
+          >
+            <BookListCTA book={book} />
+          </div>
+        }
       >
-        <div>
-          <DetailField heading="Publisher" details={book.publisher} />
-          <DetailField heading="Published" details={book.published} />
-          <DetailField
-            heading="Categories"
-            details={book.categories?.join(", ")}
-          />
+        <H2 sx={{ mb: 0 }}>{book.title}</H2>
+        {book.subtitle && (
+          <Text variant="callouts.italic">{book.subtitle}</Text>
+        )}
+        by <Text sx={{ color: "brand.secondary" }}>{getAuthors(book)}</Text>
+        <MediumIndicator book={book} />
+        <div sx={{ mt: 3 }}>
+          <Text
+            variant="text.body.italic"
+            dangerouslySetInnerHTML={{
+              __html: truncateString(book.summary ?? "", 200)
+            }}
+          ></Text>
         </div>
-      </div>
-      <div
-        sx={{
-          mx: 3,
-          flex: "0 1 20%",
-          display: "flex",
-          justifyContent: "flex-end"
-        }}
-      >
-        <Button
-          disabled={isBorrowed || isReserved || !isBorrowable}
-          onClick={borrowOrReserve}
-        >
-          {label}
-        </Button>
-      </div>
+      </Card>
     </li>
   );
+};
+
+const BookListCTA: React.FC<{ book: BookData }> = ({ book }) => {
+  const fulfillmentState = getFulfillmentState(book);
+  const { borrowOrReserve, isLoading } = useBorrow(book);
+
+  switch (fulfillmentState) {
+    case "OPEN_ACCESS":
+      return (
+        <>
+          <NavButton
+            variant="ghost"
+            bookUrl={book.url ?? ""}
+            iconRight={ArrowForward}
+          >
+            View Book
+          </NavButton>
+          <Text
+            variant="text.body.italic"
+            sx={{ fontSize: "-1", color: "ui.gray.dark", mt: 1 }}
+          >
+            This open-access book is available to keep.
+          </Text>
+        </>
+      );
+
+    case "AVAILABLE_TO_BORROW":
+      return (
+        <>
+          <Button
+            onClick={borrowOrReserve}
+            color="ui.black"
+            loading={isLoading}
+            loadingText="Borrowing..."
+          >
+            Borrow
+          </Button>
+          <Text
+            variant="text.body.italic"
+            sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
+          >
+            {availabilityString(book)}
+          </Text>
+          <NavButton
+            variant="ghost"
+            bookUrl={book.url ?? ""}
+            iconRight={ArrowForward}
+          >
+            View Book Details
+          </NavButton>
+        </>
+      );
+
+    case "AVAILABLE_TO_RESERVE":
+      return (
+        <>
+          <Button
+            onClick={borrowOrReserve}
+            color="ui.black"
+            loading={isLoading}
+            loadingText="Reserving..."
+          >
+            Reserve
+          </Button>
+          <Text
+            variant="text.body.italic"
+            sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
+          >
+            {availabilityString(book)}
+          </Text>
+          <NavButton
+            variant="ghost"
+            bookUrl={book.url ?? ""}
+            iconRight={ArrowForward}
+          >
+            View Book Details
+          </NavButton>
+        </>
+      );
+
+    case "RESERVED": {
+      const position = book.holds?.position;
+      console.log(position, typeof position);
+      return (
+        <>
+          <Button disabled color="ui.black">
+            Reserved
+          </Button>
+          <Text
+            variant="text.body.italic"
+            sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
+          >
+            You have this book on hold.{" "}
+            {typeof position === "number" &&
+              !isNaN(position) &&
+              `Position: ${position}`}
+          </Text>
+          <NavButton
+            variant="ghost"
+            bookUrl={book.url ?? ""}
+            iconRight={ArrowForward}
+          >
+            View Book Details
+          </NavButton>
+        </>
+      );
+    }
+
+    case "READY_TO_BORROW": {
+      return (
+        <>
+          <Button
+            onClick={borrowOrReserve}
+            color="ui.black"
+            loading={isLoading}
+            loadingText="Borrowing..."
+          >
+            Borrow
+          </Button>
+          <Text
+            variant="text.body.italic"
+            sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
+          >
+            You can now borrow this book!
+          </Text>
+          <NavButton
+            variant="ghost"
+            bookUrl={book.url ?? ""}
+            iconRight={ArrowForward}
+          >
+            View Book Details
+          </NavButton>
+        </>
+      );
+    }
+
+    case "AVAILABLE_TO_ACCESS": {
+      const availableUntil = book.availability?.until
+        ? new Date(book.availability.until).toDateString()
+        : "NaN";
+
+      const subtitle =
+        availableUntil !== "NaN"
+          ? `You have this book on loan until ${availableUntil}.`
+          : "You have this book on loan.";
+
+      return (
+        <>
+          <Text
+            variant="text.body.italic"
+            sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
+          >
+            {subtitle}
+          </Text>
+          <NavButton
+            variant="ghost"
+            bookUrl={book.url ?? ""}
+            iconRight={ArrowForward}
+          >
+            View Book Details
+          </NavButton>
+        </>
+      );
+    }
+
+    case "FULFILLMENT_STATE_ERROR":
+      return (
+        <NavButton
+          variant="ghost"
+          bookUrl={book.url ?? ""}
+          iconRight={ArrowForward}
+        >
+          View Book Details
+        </NavButton>
+      );
+
+    default:
+      return null;
+  }
 };
 
 export const LanesView: React.FC<{ lanes: LaneData[] }> = ({ lanes }) => {
