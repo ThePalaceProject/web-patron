@@ -2,7 +2,7 @@
 import { jsx } from "theme-ui";
 import * as React from "react";
 import { BookData, LaneData } from "opds-web-client/lib/interfaces";
-import { truncateString } from "../utils/string";
+import { truncateString, stripHTML } from "../utils/string";
 import {
   getAuthors,
   getFulfillmentState,
@@ -71,9 +71,7 @@ const BookListItem: React.FC<{ book: BookData }> = ({ book }) => {
     >
       <Card
         sx={{ bg: "ui.white" }}
-        image={
-          book.imageUrl ? <Image src={book.imageUrl} isDecorative /> : undefined
-        }
+        image={<Image src={book.imageUrl ?? ""} isDecorative />}
         ctas={
           <div
             sx={{
@@ -88,9 +86,11 @@ const BookListItem: React.FC<{ book: BookData }> = ({ book }) => {
           </div>
         }
       >
-        <H2 sx={{ mb: 0 }}>{book.title}</H2>
+        <H2 sx={{ mb: 0 }}>{truncateString(book.title, 50)}</H2>
         {book.subtitle && (
-          <Text variant="callouts.italic">{book.subtitle}</Text>
+          <Text variant="callouts.italic">
+            {truncateString(book.subtitle, 50)}
+          </Text>
         )}
         by <Text sx={{ color: "brand.secondary" }}>{getAuthors(book)}</Text>
         <MediumIndicator book={book} sx={{ color: "ui.gray.dark" }} />
@@ -98,7 +98,7 @@ const BookListItem: React.FC<{ book: BookData }> = ({ book }) => {
           <Text
             variant="text.body.italic"
             dangerouslySetInnerHTML={{
-              __html: truncateString(book.summary ?? "", 200)
+              __html: truncateString(stripHTML(book.summary ?? ""), 200)
             }}
           ></Text>
         </div>
@@ -115,19 +115,19 @@ const BookListCTA: React.FC<{ book: BookData }> = ({ book }) => {
     case "OPEN_ACCESS":
       return (
         <>
+          <Text
+            variant="text.body.italic"
+            sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
+          >
+            This open-access book is available to keep.
+          </Text>
           <NavButton
             variant="ghost"
             bookUrl={book.url ?? ""}
             iconRight={ArrowForward}
           >
-            View Book
+            View Book Details
           </NavButton>
-          <Text
-            variant="text.body.italic"
-            sx={{ fontSize: "-1", color: "ui.gray.dark", mt: 1 }}
-          >
-            This open-access book is available to keep.
-          </Text>
         </>
       );
 
