@@ -36,7 +36,7 @@ export const MyBooks: React.FC<{
     collection.data.books;
 
   return (
-    <div sx={{ bg: "ui.gray.lightWarm", flex: 1 }}>
+    <div sx={{ bg: "ui.gray.lightWarm", flex: 1, pb: 4 }}>
       <Head>
         <title>My Books</title>
       </Head>
