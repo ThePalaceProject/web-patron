@@ -50,7 +50,8 @@ export const styleProps = (
         fill: "white",
         "&:focus,&:hover": {
           bg: darken(color, 0.05),
-          color: "white"
+          color: "white",
+          textDecoration: "none"
         },
         "&:active": {
           bg: darken(color, 0.1)
@@ -73,7 +74,8 @@ export const styleProps = (
         fill: color,
         "&:focus,&:hover": {
           bg: lightness(color, 0.85),
-          color: color
+          color: color,
+          textDecoration: "none"
         },
         "&:active": {
           // bg: darken(color, 0.1)

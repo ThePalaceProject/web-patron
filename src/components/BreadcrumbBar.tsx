@@ -38,9 +38,8 @@ const BreadcrumbBar: React.FC<{
             breadcrumb.text &&
             breadcrumb.url && (
               <ListItem key={breadcrumb.url}>
-                <Link collectionUrl={breadcrumb.url}>
-                  {breadcrumb.text} /&nbsp;
-                </Link>
+                <Link collectionUrl={breadcrumb.url}>{breadcrumb.text}</Link>
+                &nbsp;/&nbsp;
               </ListItem>
             )
         )}

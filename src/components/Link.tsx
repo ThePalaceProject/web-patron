@@ -79,7 +79,11 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
       >
         <a
           ref={ref}
-          sx={{ textDecoration: "none", color: "inherit" }}
+          sx={{
+            textDecoration: "none",
+            color: "inherit",
+            "&:hover": { color: "inherit", textDecoration: "underline" }
+          }}
           className={className}
           {...rest}
         >
