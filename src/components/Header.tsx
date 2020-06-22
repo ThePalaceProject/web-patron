@@ -4,11 +4,12 @@ import * as React from "react";
 import { NavigateContext } from "opds-web-client/lib/interfaces";
 import { LibraryData } from "../interfaces";
 import Search from "./Search";
-import { NavButton, AnchorButton } from "./Button";
+import Button, { NavButton, AnchorButton } from "./Button";
 import Link from "./Link";
 import BookIcon from "../icons/Book";
 import useLibraryContext from "./context/LibraryContext";
 import { Text } from "./Text";
+import useAuth from "hooks/useAuth";
 
 export interface HeaderContext extends NavigateContext {
   library: LibraryData;
@@ -68,6 +69,8 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
 const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
   const { helpWebsite, libraryWebsite } = library.libraryLinks;
   const libraryName = library.catalogName;
+  const { signOutAndGoHome, isSignedIn } = useAuth();
+
   return (
     <div sx={{ display: "flex", m: 2, mr: 0 }}>
       {library?.headerLinks?.map(link => (
@@ -110,7 +113,13 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
       >
         My Books
       </NavButton>
-      <NavButton href="/loans">Sign In</NavButton>
+      {isSignedIn ? (
+        <Button color="ui.black" onClick={signOutAndGoHome}>
+          Sign Out
+        </Button>
+      ) : (
+        <NavButton href="/loans">Sign In</NavButton>
+      )}
     </div>
   );
 };
