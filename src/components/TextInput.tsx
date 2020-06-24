@@ -14,6 +14,7 @@ const styles = {
   py: 1,
   fontSize: "0",
   variant: "text.body.regular",
+  width: "100%",
   "&::placeholder": {
     fontStyle: "italic",
     color: "ui.gray.dark",

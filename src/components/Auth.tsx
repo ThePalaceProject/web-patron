@@ -46,8 +46,9 @@ const Auth: React.FC = ({ children }) => {
           hide={cancel ?? undefined}
           label="Sign In"
           dialog={dialog}
+          sx={{ p: 5 }}
         >
-          <div sx={{ textAlign: "center" }}>
+          <div sx={{ textAlign: "center", p: 0 }}>
             <H2>{library.catalogName}</H2>
             <h4>Login</h4>
           </div>
