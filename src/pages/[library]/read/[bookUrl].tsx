@@ -7,8 +7,9 @@ const BookPage = () => {
   const { bookUrl } = router.query;
 
   /*This can be updated to point to an external manifest.json */
-  const bookManifestUrl = `/${bookUrl}/manifest.json`;
+  const bookManifestUrl = `/${bookUrl}/OEBPS/package.opf`;
 
+  console.log("MANIFEST URL", bookManifestUrl);
   if (typeof window !== "undefined") {
     reader(bookManifestUrl);
   }

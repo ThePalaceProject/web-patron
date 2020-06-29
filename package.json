@@ -77,7 +77,7 @@
     "fetch-mock-jest": "^1.2.4",
     "jest": "^25.3.0",
     "jest-emotion": "^10.0.32",
-    "library-simplified-webpub-viewer": "https://github.com/NYPL-Simplified/webpub-viewer#NOREF_convert_to_es6",
+    "library-simplified-webpub-viewer": "https://github.com/NYPL-Simplified/webpub-viewer#testingExplodedEPubs",
     "prettier": "2.0.5",
     "react-axe": "^3.4.1",
     "react-test-renderer": "^16.13.1",
