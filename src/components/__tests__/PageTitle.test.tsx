@@ -52,7 +52,7 @@ const stateWithFacets: State = merge<State>(fixtures.initialState, {
   }
 });
 
-describe.only("Format filters", () => {
+describe("Format filters", () => {
   test("Format filters not rendered when not in state", () => {
     const node = render(<PageTitle>Child</PageTitle>);
     expect(node.queryByLabelText("Format filters")).toBeFalsy();
