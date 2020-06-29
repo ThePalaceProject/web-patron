@@ -131,7 +131,7 @@ describe("book details page", () => {
     expect(pdfDownload).toHaveAttribute("href", "/pdf-open-access-link");
   });
 
-  test("shows simplyE callout", () => {
+  test("shows simplyE callout", async () => {
     const node = render(
       <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
       {
@@ -148,7 +148,8 @@ describe("book details page", () => {
     ).toBeInTheDocument();
 
     const iosBadge = node.getByRole("link", {
-      name: "Download SimplyE on the Apple App Store"
+      name: "Download SimplyE on the Apple App Store",
+      hidden: true // it is initially hidden by a media query, only displayed on desktop
     });
     expect(iosBadge).toBeInTheDocument();
     expect(iosBadge).toHaveAttribute(
@@ -157,7 +158,8 @@ describe("book details page", () => {
     );
 
     const googleBadge = node.getByRole("link", {
-      name: "Get SimplyE on the Google Play Store"
+      name: "Get SimplyE on the Google Play Store",
+      hidden: true // hidden initially on mobile
     });
     expect(googleBadge).toBeInTheDocument();
     expect(googleBadge).toHaveAttribute(
