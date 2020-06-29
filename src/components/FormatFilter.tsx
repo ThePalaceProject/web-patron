@@ -54,7 +54,6 @@ const FormatFilter: React.FC = () => {
   const value = [allFacet, ebookFacet, audiobookFacet].find(
     facet => facet?.active
   )?.href;
-  console.log(value);
   return (
     <FormField
       sx={{

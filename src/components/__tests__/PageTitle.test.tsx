@@ -77,7 +77,6 @@ describe("Format filters", () => {
     const select = node.getByRole("combobox", {
       name: "Format"
     }) as HTMLSelectElement;
-    console.log(prettyDOM(select));
     // all is selected
     expect(select.value).toBe("/ebooks");
 
