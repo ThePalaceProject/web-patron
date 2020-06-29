@@ -1,7 +1,11 @@
 import * as React from "react";
-import { render, fixtures, actions } from "../../test-utils";
+import { render, fixtures, prettyDOM } from "../../test-utils";
 import merge from "deepmerge";
-import { FacetGroupData } from "opds-web-client/lib/interfaces";
+import { FacetGroupData, CollectionData } from "opds-web-client/lib/interfaces";
+import PageTitle from "components/PageTitle";
+import { State } from "opds-web-client/lib/state";
+import userEvent from "@testing-library/user-event";
+import { mockPush } from "test-utils/mockNextRouter";
 
 const formatsFacet: FacetGroupData = {
   label: "Formats",
@@ -24,82 +28,65 @@ const formatsFacet: FacetGroupData = {
   ]
 };
 
-test.todo("Format Filter tests");
+const collectionData: CollectionData = {
+  ...fixtures.initialState.collection.data,
+  facetGroups: [formatsFacet],
+  title: "my lane",
+  url: "/link-to-lane",
+  id: "collection-id",
+  books: [],
+  navigationLinks: [],
+  lanes: [
+    {
+      title: "my lane",
+      url: "/link-to-lane",
+      books: fixtures.makeBooks(10)
+    }
+  ]
+};
 
-// describe.skip("Format filters", () => {
-//   test("Format filters not rendered when showFormatFilter not provided", () => {
-//     const node = render(<Layout>Child</Layout>, {
-//       initialState: stateWithFacets
-//     });
-//     expect(node.queryByLabelText("Format filters")).toBeFalsy();
-//     expect(node.queryByText("All")).toBeFalsy();
-//     expect(node.queryByLabelText("Books")).toBeFalsy();
-//     expect(node.queryByLabelText("Audiobooks")).toBeFalsy();
-//   });
-//   test("Format filters are visible on home w/ facets", () => {
-//     const node = render(<Layout showFormatFilter>Child</Layout>, {
-//       initialState: stateWithFacets
-//     });
-//     expect(node.getByText("ALL")).toBeTruthy();
-//     expect(node.getByLabelText("Books")).toBeTruthy();
-//     expect(node.getByLabelText("Audiobooks")).toBeTruthy();
-//   });
+const stateWithFacets: State = merge<State>(fixtures.initialState, {
+  collection: {
+    ...fixtures.initialState.collection,
+    data: collectionData
+  }
+});
 
-//   test("format filters are visible on collection w/ facets present", () => {
-//     const node = render(<Layout showFormatFilter>Child</Layout>, {
-//       initialState: stateWithFacets
-//     });
-//     expect(node.getByText("ALL")).toBeTruthy();
-//     expect(node.getByLabelText("Books")).toBeTruthy();
-//     expect(node.getByLabelText("Audiobooks")).toBeTruthy();
-//   });
+describe.only("Format filters", () => {
+  test("Format filters not rendered when not in state", () => {
+    const node = render(<PageTitle>Child</PageTitle>);
+    expect(node.queryByLabelText("Format filters")).toBeFalsy();
+    expect(node.queryByText("All")).toBeFalsy();
+    expect(node.queryByLabelText("Books")).toBeFalsy();
+    expect(node.queryByLabelText("Audiobooks")).toBeFalsy();
+  });
+  test("Format filters are visible in PageTitle w/ facets", () => {
+    const node = render(<PageTitle>Child</PageTitle>, {
+      initialState: stateWithFacets
+    });
+    expect(node.getByRole("option", { name: "All" })).toBeTruthy();
+    expect(node.getByRole("option", { name: "eBooks" })).toBeTruthy();
+    expect(node.getByRole("option", { name: "Audiobooks" })).toBeTruthy();
+  });
 
-//   test("format filters are not visible if facets arent present", () => {
-//     const node = render(<Layout showFormatFilter>Child</Layout>, {
-//       // should render collection.data = null
-//       initialState: undefined
-//     });
+  test("format filters navigate to respective urls", async () => {
+    const node = render(<PageTitle>Child</PageTitle>, {
+      initialState: stateWithFacets
+    });
 
-//     expect(node.queryByText("ALL")).toBeNull();
-//     expect(node.queryByLabelText("Books")).toBeNull();
-//     expect(node.queryByLabelText("Audiobooks")).toBeNull();
-//   });
+    const select = node.getByRole("combobox", {
+      name: "Format"
+    }) as HTMLSelectElement;
+    console.log(prettyDOM(select));
+    // all is selected
+    expect(select.value).toBe("/ebooks");
 
-//   test("format filters navigate to respective urls", () => {
-//     const node = render(<Layout showFormatFilter>Child</Layout>, {
-//       initialState: stateWithFacets
-//     });
-
-//     expect(node.queryByText("ALL")?.closest("a")).toHaveAttribute(
-//       "href",
-//       "/collection/all"
-//     );
-//     expect(node.queryByLabelText("Books")?.closest("a")).toHaveAttribute(
-//       "href",
-//       "/collection/ebooks"
-//     );
-//     expect(node.queryByLabelText("Audiobooks")?.closest("a")).toHaveAttribute(
-//       "href",
-//       "/collection/audiobooks"
-//     );
-//   });
-
-//   test("format filter has aria-current", () => {
-//     const node = render(<Layout showFormatFilter>Child</Layout>, {
-//       initialState: stateWithFacets
-//     });
-//     // need to test both visual and aria here
-//     expect(node.queryByText("ALL")?.closest("a")).toHaveAttribute(
-//       "aria-current",
-//       "false"
-//     );
-//     expect(node.queryByLabelText("Books")?.closest("a")).toHaveAttribute(
-//       "aria-current",
-//       "true"
-//     );
-//     expect(node.queryByLabelText("Audiobooks")?.closest("a")).toHaveAttribute(
-//       "aria-current",
-//       "false"
-//     );
-//   });
-// });
+    // click works
+    userEvent.selectOptions(select, "/all");
+    expect(mockPush).toHaveBeenCalledTimes(1);
+    expect(mockPush).toHaveBeenCalledWith(
+      "/collection/[collectionUrl]",
+      "/collection/all"
+    );
+  });
+});
