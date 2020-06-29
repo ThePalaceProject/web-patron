@@ -198,7 +198,7 @@ describe("AVAILABLE_TO_RESERVE", () => {
         new Promise(resolve => {
           setTimeout(() => {
             resolve(fixtures.book);
-          }, 200);
+          }, 1000);
         })
       );
     // also spy on fetchLoans
