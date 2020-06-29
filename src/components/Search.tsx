@@ -7,7 +7,6 @@ import { useActions } from "opds-web-client/lib/components/context/ActionsContex
 import Router from "next/router";
 import useTypedSelector from "../hooks/useTypedSelector";
 import useLinkUtils from "./context/LinkUtilsContext";
-import FormLabel from "./form/FormLabel";
 import SvgSearch from "icons/Search";
 
 interface SearchProps extends React.InputHTMLAttributes<HTMLInputElement> {}

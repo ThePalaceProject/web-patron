@@ -2,9 +2,7 @@
 import { jsx } from "theme-ui";
 import { H1 } from "./Text";
 import { Config } from "dataflow/LibraryDataCache";
-import Link from "next/link";
 import Router from "next/router";
-import Button from "./Button";
 import { SystemStyleObject } from "@styled-system/css";
 
 const statusCodes: { [code: number]: string } = {
