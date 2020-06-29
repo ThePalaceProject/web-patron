@@ -41,6 +41,9 @@ exports[`LinkButton renders correct element 1`] = `
 .emotion-0:focus,
 .emotion-0:hover {
   background-color: #306e79;
+  color: white;
+  -webkit-text-decoration: none;
+  text-decoration: none;
 }
 
 .emotion-0:active {
@@ -102,9 +105,18 @@ exports[`NavButton renders correct element 1`] = `
   fill: white;
 }
 
+.emotion-0:hover {
+  color: inherit;
+  -webkit-text-decoration: underline;
+  text-decoration: underline;
+}
+
 .emotion-0:focus,
 .emotion-0:hover {
   background-color: #306e79;
+  color: white;
+  -webkit-text-decoration: none;
+  text-decoration: none;
 }
 
 .emotion-0:active {
@@ -166,6 +178,9 @@ exports[`variants filled (default) 1`] = `
 .emotion-0:focus,
 .emotion-0:hover {
   background-color: #306e79;
+  color: white;
+  -webkit-text-decoration: none;
+  text-decoration: none;
 }
 
 .emotion-0:active {
@@ -227,6 +242,9 @@ exports[`variants ghost 1`] = `
 .emotion-0:focus,
 .emotion-0:hover {
   background-color: #c8e5e9;
+  color: var(--theme-ui-colors-brand-primary,#377F8B);
+  -webkit-text-decoration: none;
+  text-decoration: none;
 }
 
 <button
@@ -272,6 +290,10 @@ exports[`variants link 1`] = `
   color: var(--theme-ui-colors-brand-primary,#377F8B);
   padding: 0;
   fill: var(--theme-ui-colors-brand-primary,#377F8B);
+}
+
+.emotion-0:hover {
+  color: var(--theme-ui-colors-brand-primary,#377F8B);
 }
 
 <button

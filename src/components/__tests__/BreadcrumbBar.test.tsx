@@ -59,13 +59,13 @@ test("shows clicklable breadcrumbs", () => {
     initialState: stateWithCrumbs
   });
 
-  const allBooks = node.getByText("All Books /");
+  const allBooks = node.getByText("All Books");
   expect(allBooks.closest("a")).toHaveAttribute(
     "href",
     "/collection/url-allbooks"
   );
 
-  const libraryCrumb = node.getByText("lib /");
+  const libraryCrumb = node.getByText("lib");
   expect(libraryCrumb.closest("a")).toHaveAttribute(
     "href",
     "/collection/url-lib"
@@ -83,7 +83,7 @@ test("adds current location", () => {
     initialState: stateWithCrumbs
   });
 
-  const lastItem = node.getByText("Last Item /");
+  const lastItem = node.getByText("Last Item");
   expect(lastItem.closest("a")).toHaveAttribute("href", "/collection/last-url");
 
   const currentLoc = node.getByText("We are here");

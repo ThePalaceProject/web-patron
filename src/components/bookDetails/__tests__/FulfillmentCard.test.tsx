@@ -1,15 +1,11 @@
 import * as React from "react";
 import { render, fixtures, actions, waitFor } from "test-utils";
+import { mergeBook } from "test-utils/fixtures";
 import merge from "deepmerge";
 import FulfillmentCard from "../FulfillmentCard";
-import { BookData, FetchErrorData } from "opds-web-client/lib/interfaces";
+import { FetchErrorData } from "opds-web-client/lib/interfaces";
 import userEvent from "@testing-library/user-event";
 import { State } from "opds-web-client/lib/state";
-
-const makeBook = (data: Partial<BookData>) =>
-  merge<BookData>(fixtures.book, data, {
-    arrayMerge: (_a, b) => b
-  });
 
 describe("open-access", () => {
   test("correct title and subtitle", () => {
@@ -35,7 +31,7 @@ describe("open-access", () => {
     expect(PDFButton).toHaveAttribute("href", "/pdf-open-access-link");
   });
   test("doesn't show duplicate download options", () => {
-    const bookWithDuplicateFormat = makeBook({
+    const bookWithDuplicateFormat = mergeBook({
       openAccessLinks: [
         ...fixtures.book.openAccessLinks,
         {
@@ -55,7 +51,7 @@ describe("open-access", () => {
 });
 
 describe("available to borrow", () => {
-  const closedAccessBook = makeBook({
+  const closedAccessBook = mergeBook({
     openAccessLinks: [],
     copies: {
       total: 13,
@@ -83,7 +79,7 @@ describe("available to borrow", () => {
         new Promise(resolve => {
           setTimeout(() => {
             resolve(fixtures.book);
-          }, 200);
+          }, 1000);
         })
       );
     // also spy on fetchLoans
@@ -104,7 +100,7 @@ describe("available to borrow", () => {
       name: "Borrowing..."
     });
     expect(borrowButton).toBeInTheDocument();
-    expect(borrowButton).toBeDisabled();
+    expect(borrowButton).toHaveAttribute("disabled", "");
     // we should refetch the loans after borrowing
     await waitFor(() => expect(fetchLoansSpy).toHaveBeenCalledTimes(1));
   });
@@ -132,7 +128,7 @@ describe("available to borrow", () => {
 });
 
 describe("ready to borrow", () => {
-  const readyBook = makeBook({
+  const readyBook = mergeBook({
     openAccessLinks: undefined,
     fulfillmentLinks: undefined,
     availability: {
@@ -197,7 +193,7 @@ describe("ready to borrow", () => {
     ).toBeInTheDocument();
   });
   test("handles lack of availability.until info", () => {
-    const withoutCopies = makeBook({
+    const withoutCopies = mergeBook({
       ...readyBook,
       availability: { status: "ready" }
     });
@@ -209,7 +205,7 @@ describe("ready to borrow", () => {
 });
 
 describe("available to reserve", () => {
-  const unavailableBook = makeBook({
+  const unavailableBook = mergeBook({
     availability: {
       status: "unavailable"
     },
@@ -235,7 +231,7 @@ describe("available to reserve", () => {
   });
 
   test("shows number of patrons in queue when holds info present", () => {
-    const bookWithQueue = makeBook({
+    const bookWithQueue = mergeBook({
       ...unavailableBook,
       holds: {
         total: 4
@@ -253,7 +249,7 @@ describe("available to reserve", () => {
   });
 
   test("handles unknown availability numbers", () => {
-    const bookWithQueue = makeBook({
+    const bookWithQueue = mergeBook({
       openAccessLinks: [],
       copies: undefined
     });
@@ -263,10 +259,44 @@ describe("available to reserve", () => {
     const node = render(<FulfillmentCard book={bookWithQueue} />);
     expect(node.getByText("Number of books available is unknown."));
   });
+
+  test("shows loading state when reserving, reserves, and refetches loans", async () => {
+    // mock the actions.updateBook
+    const updateBookSpy = jest
+      .spyOn(actions, "updateBook")
+      .mockImplementation(_url => _dispatch =>
+        new Promise(resolve => {
+          setTimeout(() => {
+            resolve(fixtures.book);
+          }, 200);
+        })
+      );
+    // also spy on fetchLoans
+    const fetchLoansSpy = jest.spyOn(actions, "fetchLoans");
+    const node = render(<FulfillmentCard book={unavailableBook} />, {
+      initialState: merge<State>(fixtures.initialState, {
+        loans: {
+          url: "/loans-url",
+          books: []
+        }
+      })
+    });
+    // click reserve
+    userEvent.click(node.getByText("Reserve"));
+    expect(updateBookSpy).toHaveBeenCalledTimes(1);
+    expect(updateBookSpy).toHaveBeenCalledWith("borrow url");
+    const reserveButton = await node.findByRole("button", {
+      name: "Reserving..."
+    });
+    expect(reserveButton).toBeInTheDocument();
+    expect(reserveButton).toHaveAttribute("disabled", "");
+    // we should refetch the loans after borrowing
+    await waitFor(() => expect(fetchLoansSpy).toHaveBeenCalledTimes(1));
+  });
 });
 
 describe("reserved", () => {
-  const reservedBook = makeBook({
+  const reservedBook = mergeBook({
     availability: {
       status: "reserved"
     },
@@ -285,7 +315,7 @@ describe("reserved", () => {
   });
 
   test("displays number of patrons in queue and your position", () => {
-    const reservedBookWithQueue = makeBook({
+    const reservedBookWithQueue = mergeBook({
       availability: {
         status: "reserved"
       },
@@ -305,7 +335,7 @@ describe("reserved", () => {
 });
 
 describe("available to download", () => {
-  const downloadableBook = makeBook({
+  const downloadableBook = mergeBook({
     openAccessLinks: undefined,
     fulfillmentLinks: [
       {
@@ -334,7 +364,7 @@ describe("available to download", () => {
   });
 
   test("handles lack of availability info", () => {
-    const withoutAvailability = makeBook({
+    const withoutAvailability = mergeBook({
       ...downloadableBook,
       availability: undefined
     });
@@ -369,7 +399,7 @@ describe("available to download", () => {
   });
 
   test("download button calls indirect fullfill when book is indirect", () => {
-    const bookWithIndirect = makeBook({
+    const bookWithIndirect = mergeBook({
       ...downloadableBook,
       fulfillmentLinks: [
         {
@@ -396,7 +426,7 @@ describe("available to download", () => {
   });
 
   test("says read online for streaming media", () => {
-    const bookWithIndirect = makeBook({
+    const bookWithIndirect = mergeBook({
       ...downloadableBook,
       fulfillmentLinks: [
         {

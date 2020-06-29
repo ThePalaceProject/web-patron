@@ -7,7 +7,7 @@ import { styleProps } from "./styles";
 import LoadingIndicator from "components/LoadingIndicator";
 import { Text } from "components/Text";
 
-export type ButtonVariant = "filled" | "outline" | "ghost" | "link";
+export type ButtonVariant = "filled" | "ghost" | "link";
 export type ButtonSize = "sm" | "md" | "lg";
 type ButtonOwnProps = {
   variant?: ButtonVariant;

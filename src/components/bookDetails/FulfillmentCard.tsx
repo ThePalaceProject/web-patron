@@ -155,7 +155,6 @@ const BorrowOrReserve: React.FC<{
   buttonLoadingText: string;
 }> = ({ book, title, subtitle, buttonLabel, buttonLoadingText }) => {
   const { isLoading, borrowOrReserve, errorMsg } = useBorrow(book);
-
   return (
     <>
       <Text variant="text.callouts.bold">{title}</Text>

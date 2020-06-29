@@ -59,7 +59,7 @@ export const ListView: React.FC<{
   );
 };
 
-const BookListItem: React.FC<{ book: BookData }> = ({ book }) => {
+export const BookListItem: React.FC<{ book: BookData }> = ({ book }) => {
   // if there is no book url, it doesn't make sense to display it.
   if (!book.url) return null;
 
@@ -93,7 +93,13 @@ const BookListItem: React.FC<{ book: BookData }> = ({ book }) => {
             {truncateString(book.subtitle, 50)}
           </Text>
         )}
-        by <Text sx={{ color: "brand.secondary" }}>{getAuthors(book)}</Text>
+        by{" "}
+        <Text sx={{ color: "brand.secondary" }}>
+          {getAuthors(book, 2).join(", ")}
+          {book.authors?.length &&
+            book.authors.length > 2 &&
+            ` & ${book.authors?.length - 2} more`}
+        </Text>
         <MediumIndicator book={book} sx={{ color: "ui.gray.dark" }} />
         <div sx={{ mt: 3 }}>
           <Text
@@ -110,7 +116,7 @@ const BookListItem: React.FC<{ book: BookData }> = ({ book }) => {
 
 const BookListCTA: React.FC<{ book: BookData }> = ({ book }) => {
   const fulfillmentState = getFulfillmentState(book);
-  const { borrowOrReserve, isLoading } = useBorrow(book);
+  const { borrowOrReserve, isLoading, errorMsg } = useBorrow(book);
 
   switch (fulfillmentState) {
     case "OPEN_ACCESS":
@@ -143,12 +149,16 @@ const BookListCTA: React.FC<{ book: BookData }> = ({ book }) => {
           >
             Borrow
           </Button>
-          <Text
-            variant="text.body.italic"
-            sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
-          >
-            {availabilityString(book)}
-          </Text>
+          {errorMsg ? (
+            <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>
+          ) : (
+            <Text
+              variant="text.body.italic"
+              sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
+            >
+              {availabilityString(book)}
+            </Text>
+          )}
           <NavButton
             variant="ghost"
             bookUrl={book.url ?? ""}
@@ -188,7 +198,6 @@ const BookListCTA: React.FC<{ book: BookData }> = ({ book }) => {
 
     case "RESERVED": {
       const position = book.holds?.position;
-      console.log(position, typeof position);
       return (
         <>
           <Button disabled color="ui.black">
@@ -225,12 +234,17 @@ const BookListCTA: React.FC<{ book: BookData }> = ({ book }) => {
           >
             Borrow
           </Button>
-          <Text
-            variant="text.body.italic"
-            sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
-          >
-            You can now borrow this book!
-          </Text>
+
+          {errorMsg ? (
+            <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>
+          ) : (
+            <Text
+              variant="text.body.italic"
+              sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
+            >
+              You can now borrow this book!
+            </Text>
+          )}
           <NavButton
             variant="ghost"
             bookUrl={book.url ?? ""}

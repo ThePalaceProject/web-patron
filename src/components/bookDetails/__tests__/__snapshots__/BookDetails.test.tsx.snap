@@ -71,9 +71,18 @@ exports[`book details page handles error state 1`] = `
   margin-top: 16px;
 }
 
+.emotion-2:hover {
+  color: inherit;
+  -webkit-text-decoration: underline;
+  text-decoration: underline;
+}
+
 .emotion-2:focus,
 .emotion-2:hover {
   background-color: #306e79;
+  color: white;
+  -webkit-text-decoration: none;
+  text-decoration: none;
 }
 
 .emotion-2:active {

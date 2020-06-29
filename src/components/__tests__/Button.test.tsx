@@ -18,12 +18,6 @@ describe("variants", () => {
     const button = node.getByText("child");
     expect(button).toMatchSnapshot();
   });
-  // TODO: newvariants
-  // test("outline", () => {
-  //   const node = render(<Button variant="outline">child</Button>);
-  //   const button = node.getByText("child");
-  //   expect(button).toMatchSnapshot();
-  // });
 });
 test("NavButton renders correct element", () => {
   const node = render(<NavButton href="/somewhere">child</NavButton>);

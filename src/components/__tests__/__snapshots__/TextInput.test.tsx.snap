@@ -12,6 +12,7 @@ exports[`TextInput renders properly and passes styles through 1`] = `
   font-family: -apple-system,BlinkMacSystemFont,system-ui,sans-serif;
   font-weight: 300;
   line-height: 1.5;
+  width: 100%;
   color: red;
 }
 
@@ -57,6 +58,7 @@ exports[`type textarea renders properly and passes styles throug 1`] = `
   font-family: -apple-system,BlinkMacSystemFont,system-ui,sans-serif;
   font-weight: 300;
   line-height: 1.5;
+  width: 100%;
   color: maroon;
 }
 
