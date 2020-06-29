@@ -1,3 +1,9 @@
+const withTM = require("next-transpile-modules")([
+  "library-simplified-webpub-viewer"
+]); // pass the modules you would like to see transpiled
+
+//module.exports = withTM();
+
 const config = {
   env: {
     SIMPLIFIED_CATALOG_BASE: process.env.SIMPLIFIED_CATALOG_BASE,
@@ -26,4 +32,9 @@ const config = {
 const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true"
 });
-module.exports = withBundleAnalyzer(config);
+module.exports = withTM(withBundleAnalyzer(config));
+
+// const withTM = require("next-transpile-modules")([
+//   "library-simplified-webpub-viewer"
+// ]);
+// pass the modules you would like to see transpiled
