@@ -19,7 +19,7 @@ interface SearchProps extends React.InputHTMLAttributes<HTMLInputElement> {}
  * 1. fetchSearchDescription whenever the url changes to get searchData
  * 2. use searchData to populate the title and placeholder
  */
-const Search: React.FC<SearchProps> = ({ ...props }) => {
+const Search: React.FC<SearchProps> = ({ className, ...props }) => {
   const [value, setValue] = React.useState("");
   const searchData = useTypedSelector(state => state?.collection?.data?.search);
   const { actions, dispatch } = useActions();
@@ -45,8 +45,9 @@ const Search: React.FC<SearchProps> = ({ ...props }) => {
   return (
     <form
       onSubmit={onSearch}
+      className={className}
       role="search"
-      sx={{ display: "flex", flexDirection: "row", m: 3, mr: 0 }}
+      sx={{ display: "flex", flexDirection: "row" }}
     >
       <TextInput
         id="search-bar"
@@ -60,8 +61,7 @@ const Search: React.FC<SearchProps> = ({ ...props }) => {
         sx={{
           borderRight: "none",
           borderTopRightRadius: 0,
-          borderBottomRightRadius: 0,
-          minWidth: 320
+          borderBottomRightRadius: 0
         }}
         {...props}
       />

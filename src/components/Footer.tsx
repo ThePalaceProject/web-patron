@@ -27,7 +27,7 @@ const Footer: React.FC<{ className?: string }> = ({ className }) => {
     <footer
       sx={{
         bg: "ui.gray.extraLight",
-        px: 5,
+        px: [3, 5],
         pb: 7,
         display: "flex",
         flexWrap: "wrap"

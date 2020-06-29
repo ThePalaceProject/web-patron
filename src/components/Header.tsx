@@ -29,7 +29,7 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
           display: "flex",
           flexDirection: ["column", "column", "row"],
           alignItems: "stretch",
-          px: 5
+          px: [3, 5]
         }}
         className={className}
       >
@@ -40,7 +40,9 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
-            alignItems: "flex-start"
+            alignItems: ["center", "flex-start"],
+            textAlign: "center",
+            p: 3
           }}
         >
           {library.logoUrl ? (
@@ -53,13 +55,13 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
           sx={{
             flexDirection: "column",
             flexWrap: "wrap",
-            alignItems: "flex-end",
+            alignItems: ["stretch", "flex-end"],
             justifyContent: "space-between",
             flex: 1
           }}
         >
           <HeaderLinks library={library} />
-          <Search />
+          <Search sx={{ minWidth: ["initial", 370], m: 3, mr: [3, 0] }} />
         </Flex>
       </header>
     </>
@@ -72,7 +74,15 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
   const { signOutAndGoHome, isSignedIn } = useAuth();
 
   return (
-    <div sx={{ display: "flex", m: 2, mr: 0 }}>
+    <div
+      sx={{
+        display: "flex",
+        m: 2,
+        mr: 0,
+        flexWrap: "wrap",
+        justifyContent: ["center", "flex-end"]
+      }}
+    >
       {library?.headerLinks?.map(link => (
         <AnchorButton
           variant="ghost"

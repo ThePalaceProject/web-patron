@@ -19,7 +19,7 @@ const BreadcrumbBar: React.FC<{
         color: "white",
         m: 0,
         p: 2,
-        px: 5,
+        px: [3, 5],
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between"

@@ -10,10 +10,11 @@ const PageTitle: React.FC = ({ children }) => {
     <Stack
       direction="row"
       sx={{
-        px: 5,
+        px: [3, 5],
         my: 4,
         justifyContent: "space-between",
-        alignItems: "center"
+        alignItems: "center",
+        flexWrap: "wrap"
       }}
     >
       <H1 sx={{ m: 0 }}>{children}</H1>

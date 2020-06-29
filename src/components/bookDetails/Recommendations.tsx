@@ -45,7 +45,7 @@ const Recommendations: React.FC<{ book: BookData }> = ({ book }) => {
     >
       <H2
         sx={{
-          px: 5,
+          px: [3, 5],
           mt: 0,
           mb: 3,
           color: isFetching ? "ui.gray.dark" : "ui.black"

@@ -99,7 +99,8 @@ const Empty = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          flexDirection: "column"
+          flexDirection: "column",
+          px: [3, 5]
         }}
       >
         <H3>

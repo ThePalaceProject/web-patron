@@ -52,16 +52,23 @@ export const BookDetails: React.FC<{
         <div
           sx={{
             display: "flex",
-            mx: 5,
+            mx: [3, 5],
             my: 4,
             flexWrap: ["wrap", "nowrap"]
           }}
         >
-          <div sx={{ flex: ["1 1 auto", 0.33], mr: 4 }}>
-            <BookCover book={book} />
-            <SimplyECallout />
+          <div sx={{ flex: ["1 1 auto", 0.33], mr: [0, 4], mb: [3, 0] }}>
+            <BookCover book={book} sx={{ maxWidth: [180, "initial"] }} />
+            <SimplyECallout sx={{ display: ["none", "block"] }} />
           </div>
-          <div sx={{ flex: ["1 1 auto", 0.66] }} aria-label="Book info">
+          <div
+            sx={{
+              flex: ["1 1 auto", 0.66],
+              display: "flex",
+              flexDirection: "column"
+            }}
+            aria-label="Book info"
+          >
             <H1 sx={{ m: 0 }}>
               {book.title}
               {book.subtitle && `: ${book.subtitle}`}

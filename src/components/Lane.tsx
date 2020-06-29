@@ -151,8 +151,10 @@ const Lane: React.FC<{
 
   return (
     <div sx={{ mb: 3 }}>
-      <Stack>
-        <TitleTag sx={{ pl: 5, pr: 4, m: 0, mb: 3 }}>{title}</TitleTag>
+      <Stack sx={{ justifyContent: ["space-between", "initial"] }}>
+        <TitleTag sx={{ pl: [3, 5], pr: [3, 4], m: 0, mb: 3 }}>
+          {title}
+        </TitleTag>
         <NavButton variant="ghost" collectionUrl={url} iconRight={ArrowForward}>
           See More
         </NavButton>
