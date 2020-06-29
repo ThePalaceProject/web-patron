@@ -20,37 +20,3 @@ exports[`Renders expected styles 1`] = `
   click here
 </a>
 `;
-
-exports[`Renders expected styles: 
-    .emotion-0 {
-      -webkit-text-decoration: none;
-      text-decoration: none;
-      color: inherit;
-    }
-
-    <a
-      class="emotion-0"
-      href="/somewhere"
-    >
-      click here
-    </a>
-   1`] = `
-.emotion-0 {
-  -webkit-text-decoration: none;
-  text-decoration: none;
-  color: inherit;
-}
-
-.emotion-0:hover {
-  color: inherit;
-  -webkit-text-decoration: underline;
-  text-decoration: underline;
-}
-
-<a
-  class="emotion-0"
-  href="/somewhere"
->
-  click here
-</a>
-`;
