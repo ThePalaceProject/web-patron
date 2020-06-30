@@ -32,7 +32,9 @@ const BreadcrumbBar: React.FC<{
           display: "flex",
           alignItems: "center",
           variant: "lists.unstyled",
-          fontSize: "-1"
+          fontSize: "-1",
+          flexWrap: "wrap",
+          whiteSpace: "nowrap"
         }}
       >
         {breadcrumbsWithAtLeastOne.map(
