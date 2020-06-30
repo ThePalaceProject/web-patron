@@ -113,6 +113,7 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
           color="ui.black"
           href={libraryWebsite.href}
           title="help"
+          sx={{ whiteSpace: "initial" }}
         >
           {libraryWebsite.title ?? `${libraryName} Home`}
         </AnchorButton>

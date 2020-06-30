@@ -35,7 +35,7 @@ const Footer: React.FC<{ className?: string }> = ({ className }) => {
       className={className}
     >
       <div sx={{ flex: "0 0 auto", mt: 5 }}>
-        <H3 sx={{ mt: 0, mr: 5 }}>{title}</H3>
+        <H3 sx={{ mt: 0, mr: 5, maxWidth: "100%" }}>{title}</H3>
         <FooterList>
           {libraryWebsite && (
             <ListItem>
@@ -97,7 +97,7 @@ const Footer: React.FC<{ className?: string }> = ({ className }) => {
         </FooterList>
       </div>
       <div sx={{ flex: "1 1 0" }} />
-      <div sx={{ maxWidth: 300, flex: "0 0 auto", mt: 5 }}>
+      <div sx={{ maxWidth: 300, flex: "0 1 auto", mt: 5 }}>
         <H3 sx={{ mt: 0, display: "flex", alignItems: "center" }}>
           <SvgPhone sx={{ mr: 1 }} />
           Download SimplyE
