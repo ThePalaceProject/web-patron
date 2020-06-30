@@ -10,6 +10,8 @@ const BreadcrumbBar: React.FC<{
   currentLocation?: string;
 }> = ({ children, className, currentLocation }) => {
   const breadcrumbs = useBreadCrumbs();
+  const breadcrumbsWithAtLeastOne =
+    breadcrumbs.length > 0 ? breadcrumbs : [{ text: " ", url: " " }];
   const lastItem = currentLocation ?? breadcrumbs.pop()?.text;
   return (
     <div
@@ -33,7 +35,7 @@ const BreadcrumbBar: React.FC<{
           fontSize: "-1"
         }}
       >
-        {breadcrumbs.map(
+        {breadcrumbsWithAtLeastOne.map(
           breadcrumb =>
             breadcrumb.text &&
             breadcrumb.url && (
