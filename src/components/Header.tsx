@@ -71,7 +71,7 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
 const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
   const { helpWebsite, libraryWebsite } = library.libraryLinks;
   const libraryName = library.catalogName;
-  const { signOutAndGoHome, isSignedIn } = useAuth();
+  const { signOutAndGoHome, isSignedIn, signIn } = useAuth();
 
   return (
     <div
@@ -128,7 +128,7 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
           Sign Out
         </Button>
       ) : (
-        <NavButton href="/loans">Sign In</NavButton>
+        <Button onClick={signIn}>Sign In</Button>
       )}
     </div>
   );
