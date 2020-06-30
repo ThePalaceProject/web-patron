@@ -44,7 +44,8 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
             justifyContent: "center",
             alignItems: ["center", "flex-start"],
             textAlign: "center",
-            p: 3
+            p: 3,
+            mb: [1, 0]
           }}
         >
           {library.logoUrl ? (
