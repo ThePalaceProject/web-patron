@@ -10,6 +10,7 @@ import BookIcon from "../icons/Book";
 import useLibraryContext from "./context/LibraryContext";
 import { Text } from "./Text";
 import useAuth from "hooks/useAuth";
+import Stack from "./Stack";
 
 export interface HeaderContext extends NavigateContext {
   library: LibraryData;
@@ -29,7 +30,8 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
           display: "flex",
           flexDirection: ["column", "column", "row"],
           alignItems: "stretch",
-          px: [3, 5]
+          px: [3, 5],
+          py: 3
         }}
         className={className}
       >
@@ -51,18 +53,20 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
             <Text variant="text.headers.primary">{library.catalogName}</Text>
           )}
         </Link>
-        <Flex
+        <Stack
+          direction="column"
+          spacing={4}
           sx={{
-            flexDirection: "column",
-            flexWrap: "wrap",
+            // flexDirection: "column",
+            // flexWrap: "wrap",
             alignItems: ["stretch", "flex-end"],
-            justifyContent: "space-between",
+            // justifyContent: "space-between",
             flex: 1
           }}
         >
           <HeaderLinks library={library} />
-          <Search sx={{ minWidth: ["initial", 370], m: 3, mr: [3, 0] }} />
-        </Flex>
+          <Search sx={{ minWidth: ["initial", 370], mr: [3, 0] }} />
+        </Stack>
       </header>
     </>
   );
@@ -77,8 +81,6 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
     <div
       sx={{
         display: "flex",
-        m: 2,
-        mr: 0,
         flexWrap: "wrap",
         justifyContent: ["center", "flex-end"]
       }}
