@@ -11,15 +11,18 @@ function expectViewDetails(utils: ReturnType<typeof render>) {
   expect(button).toBeInTheDocument();
   expect(button).toHaveAttribute("href", "/book/test-book-url");
 }
-test("OPEN_ACCESS", () => {
-  const utils = render(<BookListItem book={fixtures.book} />);
-  expect(
-    utils.getByText("This open-access book is available to keep.")
-  ).toBeInTheDocument();
-  expectViewDetails(utils);
+
+describe("open access book", () => {
+  test("renders with view details button", () => {
+    const utils = render(<BookListItem book={fixtures.book} />);
+    expect(
+      utils.getByText("This open-access book is available to keep.")
+    ).toBeInTheDocument();
+    expectViewDetails(utils);
+  });
 });
 
-describe("AVAILABLE_TO_BORROW", () => {
+describe("available to borrow book", () => {
   const closedAccessBook = fixtures.mergeBook({
     openAccessLinks: [],
     copies: {
@@ -92,7 +95,7 @@ describe("AVAILABLE_TO_BORROW", () => {
   });
 });
 
-describe("READY_TO_BORROW", () => {
+describe("ready to borrow book", () => {
   const readyBook = fixtures.mergeBook({
     openAccessLinks: undefined,
     fulfillmentLinks: undefined,
@@ -166,7 +169,7 @@ describe("READY_TO_BORROW", () => {
   });
 });
 
-describe("AVAILABLE_TO_RESERVE", () => {
+describe("available to reserve book", () => {
   const unavailableBook = fixtures.mergeBook({
     availability: {
       status: "unavailable"
@@ -178,7 +181,7 @@ describe("AVAILABLE_TO_RESERVE", () => {
     }
   });
 
-  test("correct title and subtitle", () => {
+  test("displays correct title and subtitle", () => {
     const node = render(<BookListItem book={unavailableBook} />);
     expect(node.getByText("0 out of 13 copies available.")).toBeInTheDocument();
     expectViewDetails(node);
@@ -225,7 +228,7 @@ describe("AVAILABLE_TO_RESERVE", () => {
   });
 });
 
-describe("RESERVED", () => {
+describe("reserved book", () => {
   const reservedBook = fixtures.mergeBook({
     availability: {
       status: "reserved"
@@ -268,7 +271,7 @@ describe("RESERVED", () => {
   });
 });
 
-describe("AVAILABLE_TO_ACCESS", () => {
+describe("available to access book", () => {
   const downloadableBook = fixtures.mergeBook({
     openAccessLinks: undefined,
     fulfillmentLinks: [
@@ -289,7 +292,7 @@ describe("AVAILABLE_TO_ACCESS", () => {
     }
   });
 
-  test("correct title and subtitle and view details", () => {
+  test("displays correct title and subtitle and view details", () => {
     const node = render(<BookListItem book={downloadableBook} />);
     expect(
       node.getByText("You have this book on loan until Thu Jun 18 2020.")
