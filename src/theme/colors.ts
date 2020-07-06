@@ -1,29 +1,9 @@
-import { Overloadable } from ".";
-
-/**
- * In CM we want to allow libraries to set:
- *  - Primaries array
- *  - all named colors
- */
-
-const primaries = ["#e1e6f2", "#6899CB", "#0467a6", "#0F2259"] as Overloadable<
-  string[],
-  string
->;
-// helpful aliases
-primaries.dark = primaries[3];
-primaries.primary = primaries[2];
-primaries.medium = primaries[1];
-primaries.light = primaries[0];
-
-const grey = "#B3B9BE";
-
 const ui = {
   black: "#000000",
   white: "#ffffff",
   error: "#97272c",
   link: {
-    primary: "#0071ce",
+    primary: "#0576d3",
     secondary: "#004b98"
   },
   disabled: {
@@ -52,24 +32,6 @@ const colors = {
   text: ui.black,
   // body background color
   background: ui.white,
-  // Primary button and link color
-  primary: brand.primary,
-  // a range of colors based on the primary color
-  primaries,
-  // Secondary color - can be used for hover states
-  secondary: brand.secondary,
-  // A contrast color for emphasizing UI
-  accent: "#D00854",
-  // A gray or subdued color for decorative purposes
-  muted: grey,
-  // a color for when errors appear
-  warn: "#d93025",
-
-  disabled: grey,
-
-  lightGrey: "#f4f4f4",
-  grey,
-
   ui,
   brand
 };
