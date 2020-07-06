@@ -303,10 +303,10 @@ const BookListCTA: React.FC<{ book: BookData }> = ({ book }) => {
 
 export const LanesView: React.FC<{ lanes: LaneData[] }> = ({ lanes }) => {
   return (
-    <React.Fragment>
+    <ul>
       {lanes.map(lane => (
         <Lane key={lane.url} lane={lane} />
       ))}
-    </React.Fragment>
+    </ul>
   );
 };

@@ -54,8 +54,12 @@ const Recommendations: React.FC<{ book: BookData }> = ({ book }) => {
         Recommendations{" "}
         {isFetching && <LoadingIndicator size="1.75rem" color="ui.gray.dark" />}
       </H2>
-      {!isFetching &&
-        lanes.map(lane => <Lane key={lane.title} lane={lane} titleTag={H3} />)}
+      <ul sx={{ listStyle: "none", m: 0, p: 0 }}>
+        {!isFetching &&
+          lanes.map(lane => (
+            <Lane key={lane.title} lane={lane} titleTag={H3} />
+          ))}
+      </ul>
     </section>
   );
 };

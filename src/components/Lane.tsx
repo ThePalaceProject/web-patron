@@ -150,7 +150,7 @@ const Lane: React.FC<{
   };
 
   return (
-    <div sx={{ mb: 3 }}>
+    <li sx={{ m: 0, p: 0, mb: 3, listStyle: "none" }} aria-label={title}>
       <Stack
         sx={{
           justifyContent: ["space-between", "initial"],
@@ -199,7 +199,7 @@ const Lane: React.FC<{
 
         <PrevNextButton onClick={handleRightClick} disabled={isAtEnd} />
       </div>
-    </div>
+    </li>
   );
 };
 
