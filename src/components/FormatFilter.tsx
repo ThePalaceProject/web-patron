@@ -2,7 +2,6 @@
 import { jsx } from "theme-ui";
 import * as React from "react";
 import useTypedSelector from "../hooks/useTypedSelector";
-import FormField from "./form/FormField";
 import FormLabel from "./form/FormLabel";
 import Router from "next/router";
 import useLinkUtils from "./context/LinkUtilsContext";
@@ -55,13 +54,15 @@ const FormatFilter: React.FC = () => {
     facet => facet?.active
   )?.href;
   return (
-    <FormField
+    <div
       sx={{
+        position: "relative",
         display: "flex",
         justifyContent: "flex-end",
         alignItems: "center",
         width: "initial"
       }}
+      role="group"
     >
       <FormLabel htmlFor="formatSelect">Format</FormLabel>
       <Select id="formatSelect" onChange={handleChange} value={value}>
@@ -69,7 +70,7 @@ const FormatFilter: React.FC = () => {
         <option value={ebookFacet.href}>eBooks</option>
         <option value={audiobookFacet.href}>Audiobooks</option>
       </Select>
-    </FormField>
+    </div>
   );
 };
 export default FormatFilter;
