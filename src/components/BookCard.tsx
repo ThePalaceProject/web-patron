@@ -31,22 +31,24 @@ const BookCard = React.forwardRef<
         border: "solid",
         bg: "ui.white",
         borderRadius: "card",
-        p: 3,
         flex: `0 0 ${BOOK_WIDTH}px`,
         height: BOOK_HEIGHT,
-        // width: 215,
         mx: 2
       }}
     >
-      <Link bookUrl={book.url} aria-label={`View ${book.title}`}>
+      <Link
+        bookUrl={book.url}
+        aria-label={`View ${book.title}`}
+        sx={{ p: 3, "&:hover": { textDecoration: "none" } }}
+      >
         <BookCover book={book} sx={{ mx: 40 - 16 }} />
+        <div sx={{ flex: "1 1 auto" }} />
+        <H3 sx={{ m: 0, mt: 2, fontSize: 0 }}>
+          {truncateString(book.title, 39, true)}
+        </H3>
+        <Text>{authors.join(", ")}</Text>
+        <BookMediumIndicator book={book} sx={{ color: "ui.gray.dark" }} />
       </Link>
-      <div sx={{ flex: "1 1 auto" }} />
-      <H3 sx={{ m: 0, mt: 2, fontSize: 0 }}>
-        {truncateString(book.title, 39, true)}
-      </H3>
-      <Text sx={{ color: "brand.secondary" }}>{authors.join(", ")}</Text>
-      <BookMediumIndicator book={book} sx={{ color: "ui.gray.dark" }} />
     </li>
   );
 });
