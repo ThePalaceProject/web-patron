@@ -24,52 +24,50 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
   const library = useLibraryContext();
 
   return (
-    <>
-      <header
+    <header
+      sx={{
+        display: "flex",
+        flexDirection: ["column", "column", "row"],
+        alignItems: "stretch",
+        px: [3, 5],
+        py: 3
+      }}
+      className={className}
+    >
+      <Link
+        href="/"
+        aria-label="Library catalog, back to homepage"
         sx={{
           display: "flex",
-          flexDirection: ["column", "column", "row"],
-          alignItems: "stretch",
-          px: [3, 5],
-          py: 3
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: ["center", "flex-start"],
+          textAlign: "center",
+          p: 3,
+          mb: [1, 0]
         }}
-        className={className}
       >
-        <Link
-          href="/"
-          aria-label="Library catalog, back to homepage"
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: ["center", "flex-start"],
-            textAlign: "center",
-            p: 3,
-            mb: [1, 0]
-          }}
-        >
-          {library.logoUrl ? (
-            <img src={library.logoUrl} alt={`${library.catalogName} Logo`} />
-          ) : (
-            <Text variant="text.headers.primary">{library.catalogName}</Text>
-          )}
-        </Link>
-        <Stack
-          direction="column"
-          spacing={4}
-          sx={{
-            // flexDirection: "column",
-            // flexWrap: "wrap",
-            alignItems: ["stretch", "flex-end"],
-            // justifyContent: "space-between",
-            flex: 1
-          }}
-        >
-          <HeaderLinks library={library} />
-          <Search sx={{ minWidth: ["initial", 370], mr: [3, 0] }} />
-        </Stack>
-      </header>
-    </>
+        {library.logoUrl ? (
+          <img src={library.logoUrl} alt={`${library.catalogName} Logo`} />
+        ) : (
+          <Text variant="text.headers.primary">{library.catalogName}</Text>
+        )}
+      </Link>
+      <Stack
+        direction="column"
+        spacing={4}
+        sx={{
+          // flexDirection: "column",
+          // flexWrap: "wrap",
+          alignItems: ["stretch", "flex-end"],
+          // justifyContent: "space-between",
+          flex: 1
+        }}
+      >
+        <HeaderLinks library={library} />
+        <Search sx={{ minWidth: ["initial", 370], mr: [3, 0] }} />
+      </Stack>
+    </header>
   );
 };
 
