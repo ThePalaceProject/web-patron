@@ -93,8 +93,8 @@ export const BookListItem: React.FC<{ book: BookData }> = ({ book }) => {
             {truncateString(book.subtitle, 50)}
           </Text>
         )}
-        by{" "}
-        <Text sx={{ color: "brand.secondary" }}>
+        by&nbsp;
+        <Text>
           {getAuthors(book, 2).join(", ")}
           {book.authors?.length &&
             book.authors.length > 2 &&

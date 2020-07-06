@@ -74,11 +74,8 @@ export const BookDetails: React.FC<{
               {book.subtitle && `: ${book.subtitle}`}
             </H1>
 
-            <Text
-              variant="text.callouts.regular"
-              sx={{ color: "brand.secondary" }}
-            >
-              <span sx={{ color: "ui.black" }}>by </span>
+            <Text variant="text.callouts.regular">
+              by&nbsp;
               {book.authors?.join(", ") ?? "Unknown"}
             </Text>
             <MediumIndicator book={book} />
