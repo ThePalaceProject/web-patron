@@ -19,7 +19,7 @@ const BookCover: React.FC<{ book: BookData; className?: string }> = ({
       className={className}
       sx={{
         borderRadius: 3,
-        backgroundColor: "primaries.light",
+        backgroundColor: "ui.gray.extraLight",
         overflow: "hidden",
         position: "relative"
       }}
@@ -37,7 +37,7 @@ const BookCover: React.FC<{ book: BookData; className?: string }> = ({
           width: "100%",
           height: "100%",
           "::before": {
-            backgroundColor: "grey.extraLight",
+            backgroundColor: "ui.gray.extraLight",
             content: '"Book cover image failed to load."',
             p: 1,
             position: "absolute",
