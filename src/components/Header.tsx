@@ -1,15 +1,16 @@
 /** @jsx jsx */
-import { jsx, Styled, Flex } from "theme-ui";
+import { jsx, Flex } from "theme-ui";
 import * as React from "react";
 import { NavigateContext } from "opds-web-client/lib/interfaces";
 import { LibraryData } from "../interfaces";
 import Search from "./Search";
-import { NavButton as NavButtonBase } from "./Button";
+import Button, { NavButton, AnchorButton } from "./Button";
 import Link from "./Link";
 import BookIcon from "../icons/Book";
 import useLibraryContext from "./context/LibraryContext";
-import FormatFilter from "./FormatFilter";
-import ViewSelector from "./ViewSelector";
+import { Text } from "./Text";
+import useAuth from "hooks/useAuth";
+import Stack from "./Stack";
 
 export interface HeaderContext extends NavigateContext {
   library: LibraryData;
@@ -19,10 +20,7 @@ export interface HeaderContext extends NavigateContext {
  * will get the data it needs directly from context/
  * redux store instead of relying on OPDS web client to provide it
  */
-const HeaderFC: React.FC<{ className?: string; showFormatFilter: boolean }> = ({
-  className,
-  showFormatFilter
-}) => {
+const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
   const library = useLibraryContext();
 
   return (
@@ -30,117 +28,112 @@ const HeaderFC: React.FC<{ className?: string; showFormatFilter: boolean }> = ({
       sx={{
         display: "flex",
         flexDirection: ["column", "column", "row"],
-        alignItems: ["stretch", "stretch", "flex-end"]
+        alignItems: "stretch",
+        px: [3, 5],
+        py: 3
       }}
       className={className}
     >
       <Link
-        sx={{
-          display: "block",
-          bg: "primary",
-          color: "white",
-          py: 2,
-          textAlign: "center",
-          padding: [2, 4]
-        }}
         href="/"
-      >
-        <Styled.h2
-          sx={{
-            m: 0,
-            mb: 1,
-            fontSize: [2, 3]
-          }}
-        >
-          {library.catalogName}
-        </Styled.h2>
-        <span
-          sx={{
-            fontSize: [0, 1],
-            textTransform: "uppercase",
-            letterSpacing: "0.05em"
-          }}
-        >
-          Library System
-        </span>
-      </Link>
-      <Flex
+        aria-label="Library catalog, back to homepage"
         sx={{
-          flexDirection: ["column", "row"],
-          flexWrap: "wrap",
-          alignItems: ["center", "flex-end"],
-          justifyContent: "space-between",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: ["center", "flex-start"],
+          textAlign: "center",
+          p: 3,
+          mb: [1, 0]
+        }}
+      >
+        {library.logoUrl ? (
+          <img src={library.logoUrl} alt={`${library.catalogName} Logo`} />
+        ) : (
+          <Text variant="text.headers.primary">{library.catalogName}</Text>
+        )}
+      </Link>
+      <Stack
+        direction="column"
+        spacing={4}
+        sx={{
+          // flexDirection: "column",
+          // flexWrap: "wrap",
+          alignItems: ["stretch", "flex-end"],
+          // justifyContent: "space-between",
           flex: 1
         }}
       >
-        <Flex
-          sx={{
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            flex: 1,
-            p: [2, 0]
-          }}
-        >
-          <NavButton sx={{ m: 1, mb: [1, 0] }} variant="primary" href="/loans">
-            <BookIcon sx={{ fontSize: 5 }} /> My Books
-          </NavButton>
-          {/* uncomment to enable a settings button */}
-          {/* <NavButton
-            sx={{ m: 1, mb: [1, 0] }}
-            variant="primary"
-            href={"/settings"}
-          >
-            <SettingsIcon sx={{ fontSize: 5 }} /> Settings
-          </NavButton> */}
-
-          {/* uncomment to include links from the CM */}
-          {/* <CMDefinedHeaderLinks library={library} /> */}
-        </Flex>
-        {showFormatFilter && <FormatFilter />}
-        <ViewSelector />
-        <Flex sx={{ justifyContent: "center", p: 2 }}>
-          <Search />
-        </Flex>
-      </Flex>
+        <HeaderLinks library={library} />
+        <Search sx={{ minWidth: ["initial", 370], mr: [3, 0] }} />
+      </Stack>
     </header>
   );
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const CMDefinedHeaderLinks: React.FC<{ library: LibraryData }> = ({
-  library
-}) => {
+const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
+  const { helpWebsite, libraryWebsite } = library.libraryLinks;
+  const libraryName = library.catalogName;
+  const { signOutAndGoHome, isSignedIn, signIn } = useAuth();
+
   return (
-    <Flex
-      as="ol"
-      sx={{ flexDirection: "row", alignItems: "center", p: 0, m: 1 }}
+    <div
+      sx={{
+        display: "flex",
+        flexWrap: "wrap",
+        justifyContent: ["center", "flex-end"]
+      }}
     >
       {library?.headerLinks?.map(link => (
-        <li sx={{ listStyle: "none" }} key={link.href}>
-          <a href={link.href} title={link.title}>
-            {link.title}
-          </a>
-        </li>
+        <AnchorButton
+          variant="ghost"
+          color="ui.black"
+          href={link.href}
+          title={link.title}
+          key={link.href}
+        >
+          {link.title}
+        </AnchorButton>
       ))}
-    </Flex>
+      {helpWebsite && (
+        <AnchorButton
+          variant="ghost"
+          color="ui.black"
+          href={helpWebsite.href}
+          title="help"
+        >
+          Help
+        </AnchorButton>
+      )}
+      {libraryWebsite && (
+        <AnchorButton
+          variant="ghost"
+          color="ui.black"
+          href={libraryWebsite.href}
+          title="help"
+          sx={{ whiteSpace: "initial" }}
+        >
+          {libraryWebsite.title ?? `${libraryName} Home`}
+        </AnchorButton>
+      )}
+      <NavButton
+        variant="ghost"
+        color="ui.black"
+        href="/loans"
+        iconLeft={BookIcon}
+        sx={{ mr: 1 }}
+      >
+        My Books
+      </NavButton>
+      {isSignedIn ? (
+        <Button color="ui.black" onClick={signOutAndGoHome}>
+          Sign Out
+        </Button>
+      ) : (
+        <Button onClick={signIn}>Sign In</Button>
+      )}
+    </div>
   );
 };
 
 export default HeaderFC;
-
-type ButtonProps = React.ComponentProps<typeof NavButtonBase>;
-const NavButton: React.FC<ButtonProps> = ({
-  children,
-  className,
-  ...props
-}) => {
-  return (
-    <NavButtonBase
-      sx={{ borderBottomRightRadius: 0, borderBottomLeftRadius: 0 }}
-      className={className}
-      {...props}
-    >
-      {children}
-    </NavButtonBase>
-  );
-};

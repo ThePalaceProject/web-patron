@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx, Styled } from "theme-ui";
+import { jsx } from "theme-ui";
 import * as React from "react";
 import useSetCollectionAndBook from "../hooks/useSetCollectionAndBook";
 import { connect } from "react-redux";
@@ -12,10 +12,13 @@ import { SetCollectionAndBook } from "../interfaces";
 import useAuth from "../hooks/useAuth";
 import Button from "./Button";
 import useTypedSelector from "../hooks/useTypedSelector";
-import { ListView, GalleryView } from "./BookList";
+import { ListView } from "./BookList";
 import { PageLoader } from "./LoadingIndicator";
-import useView from "./context/ViewContext";
 import Head from "next/head";
+import BreadcrumbBar from "./BreadcrumbBar";
+import { H3 } from "./Text";
+import { BookData } from "opds-web-client/lib/interfaces";
+import PageTitle from "./PageTitle";
 
 export const MyBooks: React.FC<{
   setCollectionAndBook: SetCollectionAndBook;
@@ -25,77 +28,87 @@ export const MyBooks: React.FC<{
   useSetCollectionAndBook(setCollectionAndBook, "loans");
   const collection = useTypedSelector(state => state.collection);
 
-  const { view } = useView();
+  const { isSignedIn } = useAuth();
 
-  const { isSignedIn, signOutAndGoHome } = useAuth();
+  const books =
+    collection.data?.books &&
+    collection.data.books.length > 0 &&
+    collection.data.books;
 
-  if (collection.isFetching) {
-    return <PageLoader />;
-  }
-  if (!isSignedIn)
-    return (
-      <div
-        sx={{
-          flex: 1,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "column"
-        }}
-      >
-        <Head>
-          <title>My Books</title>
-        </Head>
-        <Styled.h4>You need to be signed in to view this page.</Styled.h4>
-      </div>
-    );
-  if (collection.data?.books && collection.data.books.length > 0) {
-    const signOutButton = (
-      <Button aria-label="Sign out and go home" onClick={signOutAndGoHome}>
-        Sign out
-      </Button>
-    );
-    return (
-      <React.Fragment>
-        <Head>
-          <title>My Books</title>
-        </Head>
-        {view === "LIST" ? (
-          <ListView
-            books={collection.data?.books}
-            showBorrowButton
-            breadcrumb={signOutButton}
-          />
-        ) : (
-          <GalleryView
-            books={collection.data.books}
-            showBorrowButton
-            breadcrumb={signOutButton}
-          />
-        )}
-      </React.Fragment>
-    );
-  }
+  return (
+    <div sx={{ bg: "ui.gray.lightWarm", flex: 1, pb: 4 }}>
+      <Head>
+        <title>My Books</title>
+      </Head>
+      <BreadcrumbBar currentLocation="My Books" />
+      <PageTitle>My Books</PageTitle>
+      {collection.isFetching ? (
+        <PageLoader />
+      ) : !isSignedIn ? (
+        <Unauthorized />
+      ) : books ? (
+        <LoansContent books={books} />
+      ) : (
+        <Empty />
+      )}
+    </div>
+  );
+};
 
-  // otherwise you have no loans / holds
+const LoansContent: React.FC<{ books: BookData[] }> = ({ books }) => {
+  const { signOutAndGoHome } = useAuth();
+
+  const signOutButton = (
+    <Button aria-label="Sign out and go home" onClick={signOutAndGoHome}>
+      Sign out
+    </Button>
+  );
+  return (
+    <React.Fragment>
+      <ListView books={books} breadcrumb={signOutButton} />
+    </React.Fragment>
+  );
+};
+
+const Unauthorized = () => {
   return (
     <div
       sx={{
         flex: 1,
         display: "flex",
-        alignItems: "center",
         justifyContent: "center",
+        alignItems: "center",
         flexDirection: "column"
       }}
     >
       <Head>
         <title>My Books</title>
       </Head>
-      <Styled.h3 sx={{ color: "primaries.medium" }}>
-        Your books will show up here when you have any loaned or on hold.
-      </Styled.h3>
-      <Button onClick={signOutAndGoHome}>Sign Out</Button>
+      <h4>You need to be signed in to view this page.</h4>
     </div>
+  );
+};
+
+const Empty = () => {
+  const { signOutAndGoHome } = useAuth();
+
+  return (
+    <>
+      <div
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          px: [3, 5]
+        }}
+      >
+        <H3>
+          Your books will show up here when you have any loaned or on hold.
+        </H3>
+        <Button onClick={signOutAndGoHome}>Sign Out</Button>
+      </div>
+    </>
   );
 };
 

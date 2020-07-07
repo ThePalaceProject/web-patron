@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx, Styled } from "theme-ui";
+import { jsx } from "theme-ui";
 import * as React from "react";
 import BaseLink from "next/link";
 import useLinkUtils, { LinkUtils } from "./context/LinkUtilsContext";
@@ -15,9 +15,10 @@ type BookLinkProps = {
 type BaseLinkProps = Omit<
   React.ComponentProps<typeof BaseLink>,
   "href" | "as"
-> & {
-  className?: string;
-};
+> &
+  Omit<React.ComponentPropsWithoutRef<"a">, "href"> & {
+    className?: string;
+  };
 
 export type LinkProps = BaseLinkProps &
   (CollectionLinkProps | BookLinkProps | NextLinkConfig);
@@ -36,10 +37,14 @@ const buildLinkFromProps = (props: LinkProps, linkUtils: LinkUtils) => {
     const { collectionUrl, ...rest } = props;
     return { ...linkUtils.buildCollectionLink(collectionUrl), ...rest };
   }
-  return linkUtils.buildMultiLibraryLink({
-    as: props.as,
-    href: props.href
-  });
+  const { as, href, ...rest } = props;
+  return {
+    ...linkUtils.buildMultiLibraryLink({
+      as: props.as,
+      href: props.href
+    }),
+    ...rest
+  };
 };
 /**
  * Extends next/Link to:
@@ -50,20 +55,40 @@ const buildLinkFromProps = (props: LinkProps, linkUtils: LinkUtils) => {
  *    - "bookUrl"
  *    - "collectionUrl"
  */
-const Link: React.FC<LinkProps> = React.forwardRef(
-  ({ children, className, ...props }, ref: React.Ref<any>) => {
+const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
+  ({ children, className, ...props }, ref) => {
     const linkUtils = useLinkUtils();
-    const { as, href, ...rest } = buildLinkFromProps(props, linkUtils);
+    const {
+      as,
+      href,
+      prefetch,
+      replace,
+      scroll,
+      shallow,
+      ...rest
+    } = buildLinkFromProps(props, linkUtils);
     return (
-      <BaseLink href={href} as={as} passHref>
-        <Styled.a
+      <BaseLink
+        href={href}
+        as={as}
+        prefetch={prefetch}
+        replace={replace}
+        scroll={scroll}
+        shallow={shallow}
+        passHref
+      >
+        <a
           ref={ref}
-          sx={{ textDecoration: "none", color: "inherit" }}
+          sx={{
+            textDecoration: "none",
+            color: "inherit",
+            "&:hover": { color: "inherit", textDecoration: "underline" }
+          }}
           className={className}
           {...rest}
         >
           {children}
-        </Styled.a>
+        </a>
       </BaseLink>
     );
   }

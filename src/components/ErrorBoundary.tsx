@@ -31,7 +31,7 @@ export const DefaultFallback: React.FC<{
         maxWidth: "100vw",
         textAlign: "center",
         backgroundColor: "warn",
-        color: "white",
+        color: "ui.white",
         cursor: "help",
         borderRadius: "card"
       }}

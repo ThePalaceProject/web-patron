@@ -31,3 +31,4 @@ yalc.lock
 wallaby.js
 config/
 .vscode/
+.vercel

@@ -24,13 +24,13 @@
   },
   "exclude": [
     "node_modules",
-    "config/srv"
+    "config/srv",
   ],
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     ".eslintrc.js",
     "**/*.tsx",
-    "next.config.js"
+    "next.config.js",
   ]
 }

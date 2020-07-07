@@ -44,7 +44,9 @@ describe("book details page", () => {
         })
       }
     );
-    expect(node.getByText("Loading...")).toBeInTheDocument();
+    expect(
+      node.getByRole("heading", { name: "Loading..." })
+    ).toBeInTheDocument();
   });
 
   test("handles error state", () => {
@@ -109,7 +111,7 @@ describe("book details page", () => {
     expect(node.getByText("Publisher:")).toBeInTheDocument();
   });
 
-  test("shows fulfillment card", () => {
+  test("shows fulfillment card in open-access state", () => {
     const node = render(
       <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
       {
@@ -117,13 +119,19 @@ describe("book details page", () => {
       }
     );
 
-    // there are two download buttons in the document becuase we change
-    // which is displayed with media queries. But both are always rendered.
-    const downloadButtons = node.getAllByText("Download");
-    expect(downloadButtons).toHaveLength(2);
+    expect(
+      node.getByText("This open-access book is available to keep forever.")
+    );
+    const epubDownload = node.getByRole("link", { name: "Download EPUB" });
+    expect(epubDownload).toBeInTheDocument();
+    expect(epubDownload).toHaveAttribute("href", "/epub-open-access-link");
+
+    const pdfDownload = node.getByRole("link", { name: "Download PDF" });
+    expect(pdfDownload).toBeInTheDocument();
+    expect(pdfDownload).toHaveAttribute("href", "/pdf-open-access-link");
   });
 
-  test("shows download requirements", () => {
+  test("shows simplyE callout", async () => {
     const node = render(
       <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
       {
@@ -131,11 +139,33 @@ describe("book details page", () => {
       }
     );
 
-    /**
-     * There are two download requirement cards in the document
-     * because we display a different one depending on screen width
-     */
-    expect(node.getAllByText("Download Requirements:")).toHaveLength(2);
+    expect(node.getByText("Read Now. Read Everywhere.")).toBeInTheDocument();
+    expect(node.getByLabelText("SimplyE Logo")).toBeInTheDocument();
+    expect(
+      node.getByText(
+        "Browse and read our collection of eBooks and Audiobooks right from your phone."
+      )
+    ).toBeInTheDocument();
+
+    const iosBadge = node.getByRole("link", {
+      name: "Download SimplyE on the Apple App Store",
+      hidden: true // it is initially hidden by a media query, only displayed on desktop
+    });
+    expect(iosBadge).toBeInTheDocument();
+    expect(iosBadge).toHaveAttribute(
+      "href",
+      "https://apps.apple.com/us/app/simplye/id1046583900"
+    );
+
+    const googleBadge = node.getByRole("link", {
+      name: "Get SimplyE on the Google Play Store",
+      hidden: true // hidden initially on mobile
+    });
+    expect(googleBadge).toBeInTheDocument();
+    expect(googleBadge).toHaveAttribute(
+      "href",
+      "https://play.google.com/store/apps/details?id=org.nypl.simplified.simplye&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1"
+    );
   });
 
   test("shows recommendation lanes", () => {
@@ -151,7 +181,10 @@ describe("book details page", () => {
         initialState: makeStateWithBook()
       }
     );
-    expect(node.getByText("Jane Austen")).toBeInTheDocument();
+    expect(node.getByText("Recommendations")).toBeInTheDocument();
+    expect(
+      node.getByRole("heading", { name: "Jane Austen" })
+    ).toBeInTheDocument();
   });
 });
 

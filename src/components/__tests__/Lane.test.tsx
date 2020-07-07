@@ -68,7 +68,7 @@ test("filters books", () => {
 test("more button navigates to the right link", () => {
   const node = render(<Lane lane={laneData} />);
 
-  const moreButton = node.getByText("View all my lane").closest("a");
+  const moreButton = node.getByText("See More").closest("a");
 
   expect(moreButton).toHaveAttribute("href", "/collection/link-to-lane");
 });

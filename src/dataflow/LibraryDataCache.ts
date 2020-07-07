@@ -28,7 +28,7 @@ export interface CacheEntry {
   timestamp: number;
 }
 
-type Config = { [key: string]: string };
+export type Config = { [key: string]: string };
 export default class LibraryDataCache {
   // An in-memory cache of registry entries and authentication documents.
   // Registry entries don't change very often, and it's fine to fetch them
@@ -271,5 +271,9 @@ export default class LibraryDataCache {
         "Could not get authentication document at " + authDocLink
       );
     }
+  }
+
+  getConfig(): Config | undefined {
+    return this.config;
   }
 }
