@@ -18,7 +18,7 @@ const BreadcrumbBar: React.FC<{
       className={className}
       sx={{
         backgroundColor: "brand.primary",
-        color: "white",
+        color: "ui.white",
         m: 0,
         p: 2,
         px: [3, 5],

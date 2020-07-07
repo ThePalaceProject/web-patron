@@ -44,7 +44,7 @@ const BasicAuthForm: React.FC<AuthFormProps<BasicAuthMethod>> = ({
       onSubmit={handleSubmit(onSubmit)}
       sx={{ display: "flex", flexDirection: "column" }}
     >
-      <span sx={{ color: "warn" }}>
+      <span sx={{ color: "ui.error" }}>
         {serverError && `Error: ${serverError}`}
       </span>
       <FormInput

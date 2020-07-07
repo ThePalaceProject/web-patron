@@ -92,7 +92,7 @@ const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
             {errors.type && (
               <span
                 id="complaint-type-error"
-                sx={{ color: "warn", fontStyle: "italic" }}
+                sx={{ color: "ui.error", fontStyle: "italic" }}
               >
                 Error: {errors.type.message}
               </span>
@@ -110,7 +110,7 @@ const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
             {errors.detail && (
               <span
                 id="complaint-body-error"
-                sx={{ color: "warn", fontStyle: "italic" }}
+                sx={{ color: "ui.error", fontStyle: "italic" }}
               >
                 Error: {errors.detail.message}
               </span>
