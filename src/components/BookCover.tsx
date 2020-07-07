@@ -37,8 +37,9 @@ const BookCover: React.FC<{ book: BookData; className?: string }> = ({
           width: "100%",
           height: "100%",
           "::before": {
-            backgroundColor: "primaries.light",
+            backgroundColor: "grey.extraLight",
             content: '"Book cover image failed to load."',
+            p: 1,
             position: "absolute",
             display: "flex",
             justifyContent: "center",
