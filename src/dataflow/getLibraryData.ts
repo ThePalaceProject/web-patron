@@ -28,12 +28,10 @@ async function setupCache() {
     );
   }
   if (REGISTRY_BASE) {
-    console.log("Running with Library Registry at: ", REGISTRY_BASE);
     return new LibraryDataCache(REGISTRY_BASE, CACHE_EXPIRATION_SECONDS);
   }
 
   if (CONFIG_FILE) {
-    console.log("Running with Config file at: ", CONFIG_FILE);
     let configText: string | null;
     const config = {};
     // it is a remote config file.
@@ -59,10 +57,6 @@ async function setupCache() {
   }
 
   if (CIRCULATION_MANAGER_BASE) {
-    console.log(
-      "Running with Circulation Manager Base at: ",
-      CIRCULATION_MANAGER_BASE
-    );
     // when running with a single circ manager, you pass no library
     // registry and an empty config object.
     return new LibraryDataCache(undefined, CACHE_EXPIRATION_SECONDS, {});

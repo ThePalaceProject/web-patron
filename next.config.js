@@ -10,7 +10,8 @@ const config = {
     SHORTEN_URLS: process.env.SHORTEN_URLS,
     CONFIG_FILE: process.env.CONFIG_FILE,
     REACT_AXE: process.env.REACT_AXE,
-    CACHE_EXPIRATION_SECONDS: process.env.CACHE_EXPIRATION_SECONDS
+    CACHE_EXPIRATION_SECONDS: process.env.CACHE_EXPIRATION_SECONDS,
+    AXIS_NOW_DECRYPT: process.env.AXIS_NOW_DECRYPT,
   },
   webpack: (config, { _buildId, _dev, isServer, _defaultLoaders, webpack }) => {
     // Note: we provide webpack above so you should not `require` it
