@@ -21,6 +21,7 @@ import useNormalizedBook from "../../hooks/useNormalizedBook";
 import DetailField from "../BookMetaDetail";
 import ReportProblem from "./ReportProblem";
 import useTypedSelector from "../../hooks/useTypedSelector";
+import { getReportUrl } from "../../hooks/useComplaints";
 import { NavButton } from "../Button";
 import Head from "next/head";
 
@@ -39,6 +40,8 @@ export const BookDetails: React.FC<BookDetailsPropsNew> = ({
   const book = useNormalizedBook();
 
   const error = useTypedSelector(state => state.book.error);
+
+  const reportUrl = getReportUrl(book && book.raw);
 
   if (error) {
     return <Error error={error} />;
@@ -102,7 +105,8 @@ export const BookDetails: React.FC<BookDetailsPropsNew> = ({
               heading="Categories"
               details={book.categories?.join(", ")}
             />
-            <ReportProblem book={book} />
+            {reportUrl && <ReportProblem book={book} />}
+
             <Summary sx={{ display: ["none", "none", "block"] }} book={book} />
           </section>
         </div>
