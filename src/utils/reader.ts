@@ -14,10 +14,36 @@ import {
   ScrollingBookView
 } from "library-simplified-webpub-viewer";
 
-export default function (bookManifestUrl: string) {
+export default async function (bookUrl: string) {
   const element = document.getElementById("viewer");
-  const webpubManifestUrl = new URL(bookManifestUrl, window.location.href);
-  initBookSettings(element, webpubManifestUrl);
+  const webpubBookUrl = new URL(bookUrl, window.location.href);
+  const containerHref = webpubBookUrl.href.endsWith("container.xml")
+    ? webpubBookUrl.href
+    : "";
+  function webpubManifestUrl() {
+    return new Promise((resolve, reject) => {
+      window
+        .fetch(containerHref)
+        .then(response => response.text())
+        .then(text => new window.DOMParser().parseFromString(text, "text/html"))
+        .then(xml =>
+          xml.getElementsByTagName("rootfile")[0]
+            ? xml.getElementsByTagName("rootfile")[0].getAttribute("full-path")
+            : ""
+        )
+        .then(rootfile => {
+          const url = containerHref.replace(
+            "META-INF/container.xml",
+            rootfile || ""
+          );
+
+          return resolve(rootfile ? new URL(url) : webpubBookUrl);
+        })
+        .catch(err => reject(err));
+    });
+  }
+
+  webpubManifestUrl().then(url => initBookSettings(element, url));
 }
 
 function initBookSettings(element, webpubManifestUrl) {

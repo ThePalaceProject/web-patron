@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 const BookPage = () => {
   const router = useRouter();
   const { bookUrl } = router.query;
-  const bookManifestUrl = `${bookUrl}OEBPS/package.opf`;
+  const bookManifestUrl = `${bookUrl}/META-INF/container.xml`;
 
   if (typeof window !== "undefined") {
     reader(bookManifestUrl);
@@ -14,7 +14,6 @@ const BookPage = () => {
   return (
     <>
       <div id="viewer" />
-
       <style global jsx>{`
         :root {
           -webkit-text-size-adjust: 100%;
