@@ -259,8 +259,13 @@ const DownloadCard: React.FC<{
           <Stack sx={{ justifyContent: "center", flexWrap: "wrap" }}>
             {dedupedLinks.map(link => {
               let hasReaderLink = false;
-              // @ts-ignore
-              if (link.type === "application/vnd.librarysimplified.web-epub") {
+
+              if (
+                // @ts-ignore
+                link.type === "application/vnd.librarysimplified.web-epub" ||
+                // @ts-ignore
+                link.type === "application/vnd.librarysimplified.axisnow+json"
+              ) {
                 hasReaderLink = true;
                 link.url = `/read/${encodeURIComponent(link.url)}`;
               }
