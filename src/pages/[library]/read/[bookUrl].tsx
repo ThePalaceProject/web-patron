@@ -3,13 +3,15 @@ import reader from "utils/reader";
 import { useRouter } from "next/router";
 
 const BookPage = () => {
+  const library = useLibraryContext();
   const router = useRouter();
   const { bookUrl } = router.query;
-
   const bookManifestUrl = `${bookUrl}/META-INF/container.xml`;
 
+  const { catalogName } = library;
+
   if (typeof window !== "undefined") {
-    reader(bookManifestUrl);
+    reader(bookManifestUrl, catalogName);
   }
 
   return (

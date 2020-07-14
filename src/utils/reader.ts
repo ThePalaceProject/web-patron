@@ -14,7 +14,7 @@ import {
   ScrollingBookView
 } from "library-simplified-webpub-viewer";
 
-export default async function (bookUrl: string) {
+export default async function (bookUrl: string, catalogName: string) {
   const element = document.getElementById("viewer");
   const webpubBookUrl = new URL(bookUrl, window.location.href);
   const containerHref = webpubBookUrl.href.endsWith("container.xml")
@@ -43,10 +43,10 @@ export default async function (bookUrl: string) {
     });
   }
 
-  webpubManifestUrl().then(url => initBookSettings(element, url));
+  webpubManifestUrl().then(url => initBookSettings(element, url, catalogName));
 }
 
-function initBookSettings(element, webpubManifestUrl) {
+function initBookSettings(element, webpubManifestUrl, catalogName) {
   const store = new LocalStorageStore({
     prefix: webpubManifestUrl.href
   });
@@ -71,7 +71,7 @@ function initBookSettings(element, webpubManifestUrl) {
   });
   const upLink = {
     url: new URL("https://github.com/NYPL-Simplified/webpub-viewer"),
-    label: "My Library",
+    label: catalogName,
     ariaLabel: "Go back to the Github repository"
   };
   const publisher = new PublisherFont();
