@@ -261,9 +261,9 @@ const DownloadCard: React.FC<{
               let hasReaderLink = false;
 
               if (
-                // @ts-ignore
-                link.type === "application/vnd.librarysimplified.web-epub" ||
-                // @ts-ignore
+                /* web-epub is currently used in test-server.
+                 to-do: remove the below commented out check */
+                // link.type === "application/vnd.librarysimplified.web-epub" ||
                 link.type === "application/vnd.librarysimplified.axisnow+json"
               ) {
                 hasReaderLink = true;
