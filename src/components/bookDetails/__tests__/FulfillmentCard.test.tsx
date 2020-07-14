@@ -512,7 +512,9 @@ describe("available to download", () => {
 
   test("constructs link to viewer for OpenAxis Books", () => {
     const utils = render(<FulfillmentCard book={viewableAxisNowBook} />);
-    const readerLink = utils.getByTestId("reader-link") as HTMLLinkElement;
+    const readerLink = utils.getByRole("link", {
+      name: /download/i
+    }) as HTMLLinkElement;
     expect(readerLink.href).toBe("http://test-domain.com/read/%2Fepub-link");
   });
 

@@ -1,0 +1,3 @@
+brazoria|https://simplye.amigos.org/txbrazoria
+xyzlib|http://simplye-dev-cm.amigos.org/xyzlib
+feed|https://www.crummy.com/axis/feed.opds

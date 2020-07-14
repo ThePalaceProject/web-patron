@@ -39,7 +39,7 @@ export const BookDetails: React.FC<{
 
   const error = useTypedSelector(state => state.book.error);
 
-  const reportUrl = getReportUrl(book && book.raw);
+  const reportUrl = getReportUrl(book?.raw);
 
   if (error) {
     return <Error error={error} />;

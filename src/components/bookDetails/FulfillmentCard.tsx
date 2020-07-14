@@ -13,14 +13,14 @@ import {
   MediaLink,
   FulfillmentLink
 } from "opds-web-client/lib/interfaces";
-import Link from "../Link";
-import Button from "../Button";
+import Button, { NavButton } from "../Button";
 import useDownloadButton from "opds-web-client/lib/hooks/useDownloadButton";
 import { withErrorBoundary } from "../ErrorBoundary";
 import useBorrow from "../../hooks/useBorrow";
 import Stack from "components/Stack";
 import { Text } from "components/Text";
 import { MediumIcon } from "components/MediumIndicator";
+import SvgExternalLink from "icons/ExternalOpen";
 import SvgDownload from "icons/Download";
 import SvgPhone from "icons/Phone";
 import useIsBorrowed from "hooks/useIsBorrowed";
@@ -258,26 +258,8 @@ const DownloadCard: React.FC<{
           </Text>
           <Stack sx={{ justifyContent: "center", flexWrap: "wrap" }}>
             {dedupedLinks.map(link => {
-              let hasReaderLink = false;
-
-              if (
-                /* web-epub is currently used in test-server.
-                 to-do: remove the below commented out check */
-                // link.type === "application/vnd.librarysimplified.web-epub" ||
-                link.type === "application/vnd.librarysimplified.axisnow+json"
-              ) {
-                hasReaderLink = true;
-                link.url = `/read/${encodeURIComponent(link.url)}`;
-              }
               return (
-                <>
-                  <DownloadButton
-                    key={link.url}
-                    link={link}
-                    title={title}
-                    hasReaderLink={hasReaderLink}
-                  />
-                </>
+                <DownloadButton key={link.url} link={link} title={title} />
               );
             })}
           </Stack>
@@ -290,21 +272,31 @@ const DownloadCard: React.FC<{
 const DownloadButton: React.FC<{
   link: FulfillmentLink | MediaLink;
   title: string;
-  hasReaderLink?: boolean;
-}> = ({ link, title, hasReaderLink }) => {
+}> = ({ link, title }) => {
   const { fulfill, downloadLabel } = useDownloadButton(link, title);
+
+  let hasReaderLink = false;
+
+  if (
+    /* web-epub is currently used in test-server.
+                 to-do: remove the below commented out check */
+    // link.type === "application/vnd.librarysimplified.web-epub" ||
+    link.type === "application/vnd.librarysimplified.axisnow+json"
+  ) {
+    hasReaderLink = true;
+    link.url = `/read/${encodeURIComponent(link.url)}`;
+  }
 
   if (hasReaderLink) {
     return (
-      <Link href={link.url} data-testid="reader-link">
-        <Button
-          variant="ghost"
-          color="ui.gray.extraDark"
-          iconLeft={SvgDownload}
-        >
-          {downloadLabel}
-        </Button>
-      </Link>
+      <NavButton
+        variant="ghost"
+        color="ui.gray.extraDark"
+        iconLeft={SvgExternalLink}
+        href={link.url}
+      >
+        {downloadLabel}
+      </NavButton>
     );
   } else {
     return (

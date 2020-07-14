@@ -1,7 +1,7 @@
 import React from "react";
 import reader from "utils/reader";
 import { useRouter } from "next/router";
-import useLibraryContext from "../../components/context/LibraryContext";
+import useLibraryContext from "../../../components/context/LibraryContext";
 
 const BookPage = () => {
   const library = useLibraryContext();
