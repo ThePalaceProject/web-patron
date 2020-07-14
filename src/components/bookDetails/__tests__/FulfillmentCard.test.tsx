@@ -500,7 +500,8 @@ describe("available to download", () => {
     fulfillmentLinks: [
       {
         url: "/epub-link",
-        type: "application/vnd.librarysimplified.axisnow+json"
+        type: "application/vnd.librarysimplified.axisnow+json",
+        indirectType: "something-indirect"
       }
     ],
     availability: {
