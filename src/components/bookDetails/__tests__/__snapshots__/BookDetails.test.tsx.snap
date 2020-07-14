@@ -31,59 +31,67 @@ exports[`book details page handles error state 1`] = `
 }
 
 .emotion-2 {
-  cursor: pointer;
-  -webkit-text-decoration: none;
-  text-decoration: none;
   -webkit-text-decoration: none;
   text-decoration: none;
   color: inherit;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
+  font-family: -apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  font-size: 0.875rem;
+  font-weight: 300;
+  line-height: 1.5;
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
   display: inline-flex;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
   text-align: center;
-  line-height: inherit;
-  -webkit-text-decoration: none;
-  text-decoration: none;
-  font-size: inherit;
-  font-weight: 700;
-  margin: 0;
+  white-space: nowrap;
+  vertical-align: middle;
   padding-left: 16px;
   padding-right: 16px;
-  padding-top: 4px;
-  padding-bottom: 4px;
   border: 0;
-  border-radius: 4px;
+  border-radius: 2px;
   cursor: pointer;
-  text-transform: uppercase;
-  -webkit-letter-spacing: 0.05em;
-  -moz-letter-spacing: 0.05em;
-  -ms-letter-spacing: 0.05em;
-  letter-spacing: 0.05em;
-  background-color: var(--theme-ui-colors-primary,#0467a6);
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  background-color: var(--theme-ui-colors-brand-primary,#377F8B);
+  height: 32px;
+  min-width: 32px;
   color: white;
   fill: white;
   margin-top: 16px;
 }
 
+.emotion-2:hover {
+  color: inherit;
+  -webkit-text-decoration: underline;
+  text-decoration: underline;
+}
+
 .emotion-2:focus,
 .emotion-2:hover {
-  background-color: #03588d;
+  background-color: #306e79;
+  color: white;
+  -webkit-text-decoration: none;
+  text-decoration: none;
 }
 
 .emotion-2:active {
-  background-color: #034874;
+  background-color: #295e66;
 }
 
 .emotion-2:disabled {
-  background-color: var(--theme-ui-colors-disabled,#B3B9BE);
+  background-color: var(--theme-ui-colors-ui-gray-light,#e0e0e0);
+  color: var(--theme-ui-colors-ui-gray-extraDark,#424242);
   cursor: default;
 }
 

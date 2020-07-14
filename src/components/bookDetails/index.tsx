@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx, Styled } from "theme-ui";
+import { jsx } from "theme-ui";
 import * as React from "react";
 import { SetCollectionAndBook } from "../../interfaces";
 import BookCover from "../BookCover";
@@ -11,12 +11,11 @@ import {
 } from "opds-web-client/lib/components/mergeRootProps";
 import { BookData, FetchErrorData } from "opds-web-client/lib/interfaces";
 import { connect } from "react-redux";
-import ExternalLink from "../ExternalLink";
 import useSetCollectionAndBook from "../../hooks/useSetCollectionAndBook";
 import { PageLoader } from "../LoadingIndicator";
 import FulfillmentCard from "./FulfillmentCard";
 import BreadcrumbBar from "../BreadcrumbBar";
-import truncateString from "../../utils/truncate";
+import { truncateString } from "../../utils/string";
 import useNormalizedBook from "../../hooks/useNormalizedBook";
 import DetailField from "../BookMetaDetail";
 import ReportProblem from "./ReportProblem";
@@ -24,16 +23,15 @@ import useTypedSelector from "../../hooks/useTypedSelector";
 import { getReportUrl } from "../../hooks/useComplaints";
 import { NavButton } from "../Button";
 import Head from "next/head";
+import { H3, Text, H1 } from "components/Text";
+import MediumIndicator from "components/MediumIndicator";
+import SimplyELogo from "components/SimplyELogo";
+import IosBadge from "components/storeBadges/IosBadge";
+import GooglePlayBadge from "components/storeBadges/GooglePlayBadge";
 
-export interface BookDetailsPropsNew {
+export const BookDetails: React.FC<{
   setCollectionAndBook: SetCollectionAndBook;
-}
-
-export const sidebarWidth = 200;
-
-export const BookDetails: React.FC<BookDetailsPropsNew> = ({
-  setCollectionAndBook
-}) => {
+}> = ({ setCollectionAndBook }) => {
   // set the collection and book
   useSetCollectionAndBook(setCollectionAndBook);
 
@@ -52,76 +50,50 @@ export const BookDetails: React.FC<BookDetailsPropsNew> = ({
       <Head>
         <title>{book.title}</title>
       </Head>
-      <BreadcrumbBar currentLocation={truncateString(book.title, 20, false)} />
-      <div
-        sx={{
-          variant: "cards.bookDetails",
-          border: "1px solid",
-          borderColor: "primaries.dark",
-          borderRadius: "card",
-          p: [2, 4]
-        }}
-      >
-        <div id="top" sx={{ display: "flex" }}>
-          {/* side bar */}
-          <div
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              flex: 1,
-              maxWidth: sidebarWidth
-            }}
-          >
-            <BookCover book={book} sx={{ m: 2 }} />
-            {/* download requirements & download links */}
-            <div
-              sx={{
-                display: ["none", "none", "block"]
-              }}
-            >
-              <FulfillmentCard sx={{ m: 2 }} book={book} />
-              <DownloadRequirements sx={{ m: 2 }} />
-            </div>
-          </div>
-
-          {/* title, details, summary */}
-          <section aria-label="Book Info" sx={{ flex: 2, m: 2 }}>
-            <Styled.h2
-              sx={{
-                variant: "text.bookTitle",
-                my: [3],
-                fontSize: [3, 3, 4]
-              }}
-            >
-              {book.title}
-              {book.subtitle && `: ${book.subtitle}`}
-            </Styled.h2>
-            <Styled.h3 sx={{ color: "primary", fontSize: [2, 2, 3] }}>
-              By {book.authors?.join(", ") ?? "Unknown"}
-            </Styled.h3>
-            <DetailField heading="Publisher" details={book.publisher} />
-            <DetailField heading="Published" details={book.published} />
-            <DetailField
-              heading="Categories"
-              details={book.categories?.join(", ")}
-            />
-            {reportUrl && <ReportProblem book={book} />}
-
-            <Summary sx={{ display: ["none", "none", "block"] }} book={book} />
-          </section>
-        </div>
-        {/* the summary is displayed below when on small screens */}
-        <Summary book={book} sx={{ display: ["block", "block", "none"] }} />
-        {/* the download requirements are displayed below on small screens */}
+      <BreadcrumbBar currentLocation={truncateString(book.title, 60, false)} />
+      <div sx={{ maxWidth: 1100, mx: "auto" }}>
         <div
           sx={{
-            display: ["flex", "flex", "none"],
-            flexWrap: "wrap",
-            justifyContent: "center"
+            display: "flex",
+            mx: [3, 5],
+            my: 4,
+            flexWrap: ["wrap", "nowrap"]
           }}
         >
-          <DownloadRequirements sx={{ m: 2 }} />
-          <FulfillmentCard book={book} />
+          <div sx={{ flex: ["1 1 auto", 0.33], mr: [0, 4], mb: [3, 0] }}>
+            <BookCover book={book} sx={{ maxWidth: [180, "initial"] }} />
+            <SimplyECallout sx={{ display: ["none", "block"] }} />
+          </div>
+          <div
+            sx={{
+              flex: ["1 1 auto", 0.66],
+              display: "flex",
+              flexDirection: "column"
+            }}
+            aria-label="Book info"
+          >
+            <H1 sx={{ m: 0 }}>
+              {book.title}
+              {book.subtitle && `: ${book.subtitle}`}
+            </H1>
+
+            <Text variant="text.callouts.regular">
+              by&nbsp;
+              {book.authors?.join(", ") ?? "Unknown"}
+            </Text>
+            <MediumIndicator book={book} />
+            <div sx={{ mt: 2 }}>
+              <DetailField heading="Publisher" details={book.publisher} />
+              <DetailField heading="Published" details={book.published} />
+              <DetailField
+                heading="Categories"
+                details={book.categories?.join(", ")}
+              />
+            </div>
+            <FulfillmentCard book={book} sx={{ mt: 3 }} />
+            {reportUrl && <ReportProblem book={book} />}
+            <Summary book={book} />
+          </div>
         </div>
       </div>
       <Recommendations book={book} />
@@ -134,68 +106,39 @@ const Summary: React.FC<{ book: BookData; className?: string }> = ({
   className
 }) => (
   <div sx={{ my: 2 }} className={className} aria-label="Book summary">
-    <Styled.h3 sx={{ mb: 3, fontSize: 4 }}>Summary</Styled.h3>
+    <H3 sx={{ mb: 2 }}>Summary</H3>
     <div
       dangerouslySetInnerHTML={{
         __html: book.summary ?? "Summary not provided."
-      }}
-      sx={{
-        maxHeight: "50vh",
-        overflowY: "scroll",
-        "&>p": {
-          m: 0
-        }
       }}
     />
   </div>
 );
 
-const DownloadRequirements: React.FC<{ className?: string }> = ({
-  className
-}) => {
+const SimplyECallout: React.FC<{ className?: "string" }> = ({ className }) => {
   return (
     <section
-      aria-label="Download requirements"
+      aria-label="Download the SimplyE Mobile App"
       sx={{
-        border: "1px solid",
-        borderColor: "primary",
-        backgroundColor: "lightGrey",
-        borderRadius: "card",
+        mt: 4,
+        bg: "ui.gray.lightWarm",
         display: "flex",
         flexDirection: "column",
-        // alignItems: "center",
-        py: 2,
-        px: 3,
-        maxWidth: sidebarWidth
+        p: 3,
+        textAlign: "center"
       }}
       className={className}
     >
-      <Styled.h3 id="requirements-header" sx={{ fontSize: 2, m: 0, mb: 2 }}>
-        Download Requirements:
-      </Styled.h3>
-      <ol
-        sx={{ m: 0, p: 0, pl: 3, fontSize: 1 }}
-        aria-labelledby="requirements-header"
-      >
-        <li>
-          <ExternalLink href="https://accounts.adobe.com/">
-            Create Adobe ID
-          </ExternalLink>
-        </li>
-        <li>
-          Install an eBook Reader:
-          <br />
-          <ExternalLink href="https://www.adobe.com/solutions/ebook/digital-editions/download.html">
-            Adobe Digital Editions
-          </ExternalLink>
-          <br />
-          <ExternalLink href="http://www.bluefirereader.com/bluefire-reader.html">
-            Bluefire Reader
-          </ExternalLink>
-          <br />
-          <span>* Or another Adobe-compatible application</span>
-        </li>
-      </ol>
+      <SimplyELogo sx={{ m: 3 }} />
+      <H3 sx={{ mt: 0 }}>Read Now. Read Everywhere.</H3>
+      <Text>
+        Browse and read our collection of eBooks and Audiobooks right from your
+        phone.
+      </Text>
+      <div sx={{ maxWidth: 140, mx: "auto", mt: 3 }}>
+        <IosBadge sx={{ m: "6%" }} />
+        <GooglePlayBadge />
+      </div>
     </section>
   );
 };

@@ -4,7 +4,7 @@ import Collection from "../../components/Collection";
 
 const CollectionPage = () => {
   return (
-    <Layout showFormatFilter>
+    <Layout>
       <Collection />
     </Layout>
   );

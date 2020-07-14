@@ -7,6 +7,7 @@ import { useActions } from "opds-web-client/lib/components/context/ActionsContex
 import Router from "next/router";
 import useTypedSelector from "../hooks/useTypedSelector";
 import useLinkUtils from "./context/LinkUtilsContext";
+import SvgSearch from "icons/Search";
 
 interface SearchProps extends React.InputHTMLAttributes<HTMLInputElement> {}
 
@@ -18,7 +19,7 @@ interface SearchProps extends React.InputHTMLAttributes<HTMLInputElement> {}
  * 1. fetchSearchDescription whenever the url changes to get searchData
  * 2. use searchData to populate the title and placeholder
  */
-const Search: React.FC<SearchProps> = ({ ...props }) => {
+const Search: React.FC<SearchProps> = ({ className, ...props }) => {
   const [value, setValue] = React.useState("");
   const searchData = useTypedSelector(state => state?.collection?.data?.search);
   const { actions, dispatch } = useActions();
@@ -43,23 +44,36 @@ const Search: React.FC<SearchProps> = ({ ...props }) => {
 
   return (
     <form
-      sx={{
-        display: "inline-block"
-      }}
       onSubmit={onSearch}
+      className={className}
       role="search"
+      sx={{ display: "flex", flexDirection: "row" }}
     >
       <TextInput
+        id="search-bar"
         type="search"
         name="search"
         title={searchData?.searchData?.shortName}
-        placeholder={searchData?.searchData?.shortName}
+        placeholder="Enter an author, keyword, etc..."
         aria-label="Enter search keyword or keywords"
         value={value}
         onChange={e => setValue(e.target.value)}
+        sx={{
+          borderRight: "none",
+          borderTopRightRadius: 0,
+          borderBottomRightRadius: 0
+        }}
         {...props}
       />
-      <Button type="submit" sx={{ m: 1 }}>
+      <Button
+        type="submit"
+        color="ui.black"
+        sx={{
+          height: "initial",
+          flex: "1 0 auto"
+        }}
+        iconLeft={SvgSearch}
+      >
         Search
       </Button>
     </form>

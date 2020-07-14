@@ -5,7 +5,7 @@ import Layout from "components/Layout";
 
 const LibraryHome: NextPage = () => {
   return (
-    <Layout showFormatFilter>
+    <Layout>
       <Collection />
     </Layout>
   );

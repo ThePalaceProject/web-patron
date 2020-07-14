@@ -8,7 +8,6 @@ import OPDSStore from "opds-web-client/lib/components/context/StoreContext";
 import { RecommendationsProvider } from "./RecommendationsContext";
 import { ActionsProvider } from "opds-web-client/lib/components/context/ActionsContext";
 import { Provider as ReakitProvider } from "reakit";
-import { ViewProvider } from "./ViewContext";
 import { State } from "opds-web-client/lib/state";
 import { Store } from "redux";
 import DataFetcher from "opds-web-client/lib/DataFetcher";
@@ -62,7 +61,7 @@ const AppContextProvider: React.FC<ProviderProps> = ({
                     library={library}
                     urlShortener={urlShortener}
                   >
-                    <ViewProvider>{children}</ViewProvider>
+                    {children}
                   </LinkUtilsProvider>
                 </LibraryProvider>
               </ActionsProvider>

@@ -19,6 +19,19 @@ export interface Link {
   role?: string;
 }
 
+/**
+ * FYI: READY_TO_BORROW indicates the book was on hold and now should
+ * be borrowed before the hold expires, or else you lose your spot.
+ */
+export type BookFulfillmentState =
+  | "AVAILABLE_OPEN_ACCESS"
+  | "AVAILABLE_TO_BORROW"
+  | "READY_TO_BORROW"
+  | "AVAILABLE_TO_RESERVE"
+  | "RESERVED"
+  | "AVAILABLE_TO_ACCESS"
+  | "FULFILLMENT_STATE_ERROR";
+
 export type LibraryLinks = {
   helpWebsite?: Link;
   helpEmail?: Link;
@@ -65,7 +78,7 @@ export interface WebpackAssets {
 export type RecommendationsState = CollectionState;
 export type { ComplaintsState } from "./hooks/useComplaints/reducer";
 
-export type { Theme, ButtonVariants, TextVariants } from "./theme";
+export type { Theme } from "./theme";
 // helper for theme variant prop types
 export type VariantProp<VType> = Exclude<keyof VType, keyof {}>;
 

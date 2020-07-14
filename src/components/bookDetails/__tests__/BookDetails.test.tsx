@@ -31,7 +31,7 @@ const makeStateWithBook = (book: BookData = fixtures.book): State =>
 
 describe("book details page", () => {
   test("shows loading state", () => {
-    const node = render(
+    const utils = render(
       <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
       {
         initialState: merge<State>(fixtures.initialState, {
@@ -44,11 +44,13 @@ describe("book details page", () => {
         })
       }
     );
-    expect(node.getByText("Loading...")).toBeInTheDocument();
+    expect(
+      utils.getByRole("heading", { name: "Loading..." })
+    ).toBeInTheDocument();
   });
 
   test("handles error state", () => {
-    const node = render(
+    const utils = render(
       <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
       {
         initialState: merge<State>(fixtures.initialState, {
@@ -68,36 +70,36 @@ describe("book details page", () => {
     /**
      * We will snapshot test this component because it isn't complicated and should prettymuch remain the same.
      */
-    expect(node.container).toMatchSnapshot();
+    expect(utils.container).toMatchSnapshot();
   });
 
   test("shows categories", () => {
-    const node = render(
+    const utils = render(
       <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
       {
         initialState: makeStateWithBook()
       }
     );
     const categories = fixtures.book.categories?.join(", ") as string;
-    expect(node.getByText(categories));
-    expect(node.getByText("Categories:"));
+    expect(utils.getByText(categories));
+    expect(utils.getByText("Categories:"));
   });
 
   test("doesn't show categories when there aren't any", () => {
     const bookWithoutCategories: BookData = merge(fixtures.book, {
       categories: null
     });
-    const node = render(
+    const utils = render(
       <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
       {
         initialState: makeStateWithBook(bookWithoutCategories)
       }
     );
-    expect(node.queryByText("Categories:")).toBeFalsy();
+    expect(utils.queryByText("Categories:")).toBeFalsy();
   });
 
   test("shows publisher", () => {
-    const node = render(
+    const utils = render(
       <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
       {
         initialState: makeStateWithBook()
@@ -105,41 +107,63 @@ describe("book details page", () => {
     );
     const publisher = fixtures.book.publisher as string;
 
-    expect(node.getByText(publisher)).toBeInTheDocument();
-    expect(node.getByText("Publisher:")).toBeInTheDocument();
+    expect(utils.getByText(publisher)).toBeInTheDocument();
+    expect(utils.getByText("Publisher:")).toBeInTheDocument();
   });
 
-  test("shows fulfillment card", () => {
-    const node = render(
+  test("shows fulfillment card in open-access state", () => {
+    const utils = render(
       <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
       {
         initialState: makeStateWithBook()
       }
     );
 
-    // there are two download buttons in the document becuase we change
-    // which is displayed with media queries. But both are always rendered.
-    const downloadButtons = node.getAllByText("Download");
-    expect(downloadButtons).toHaveLength(2);
+    expect(
+      utils.getByText("This open-access book is available to keep forever.")
+    );
+    expect(utils.getByRole("button", { name: "Borrow" })).toBeInTheDocument();
   });
 
-  test("shows download requirements", () => {
-    const node = render(
+  test("shows simplyE callout", async () => {
+    const utils = render(
       <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
       {
         initialState: makeStateWithBook()
       }
     );
 
-    /**
-     * There are two download requirement cards in the document
-     * because we display a different one depending on screen width
-     */
-    expect(node.getAllByText("Download Requirements:")).toHaveLength(2);
+    expect(utils.getByText("Read Now. Read Everywhere.")).toBeInTheDocument();
+    expect(utils.getByLabelText("SimplyE Logo")).toBeInTheDocument();
+    expect(
+      utils.getByText(
+        "Browse and read our collection of eBooks and Audiobooks right from your phone."
+      )
+    ).toBeInTheDocument();
+
+    const iosBadge = utils.getByRole("link", {
+      name: "Download SimplyE on the Apple App Store",
+      hidden: true // it is initially hidden by a media query, only displayed on desktop
+    });
+    expect(iosBadge).toBeInTheDocument();
+    expect(iosBadge).toHaveAttribute(
+      "href",
+      "https://apps.apple.com/us/app/simplye/id1046583900"
+    );
+
+    const googleBadge = utils.getByRole("link", {
+      name: "Get SimplyE on the Google Play Store",
+      hidden: true // hidden initially on mobile
+    });
+    expect(googleBadge).toBeInTheDocument();
+    expect(googleBadge).toHaveAttribute(
+      "href",
+      "https://play.google.com/store/apps/details?id=org.nypl.simplified.simplye&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1"
+    );
   });
 
   test("shows recommendation lanes", () => {
-    const node = render(
+    const utils = render(
       <RecommendationsStateContext.Provider
         value={{
           ...fixtures.recommendationsState
@@ -151,7 +175,10 @@ describe("book details page", () => {
         initialState: makeStateWithBook()
       }
     );
-    expect(node.getByText("Jane Austen")).toBeInTheDocument();
+    expect(utils.getByText("Recommendations")).toBeInTheDocument();
+    expect(
+      utils.getByRole("heading", { name: "Jane Austen" })
+    ).toBeInTheDocument();
   });
 });
 
@@ -185,37 +212,37 @@ const bookWithReportUrl = merge<BookData>(fixtures.book, {
 
 describe("report problem", () => {
   test("shows report problem link", () => {
-    const node = render(
+    const utils = render(
       <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
       {
         initialState: makeStateWithBook()
       }
     );
 
-    const reportProblemLink = node.getByTestId("report-problem-link");
+    const reportProblemLink = utils.getByTestId("report-problem-link");
     expect(reportProblemLink).toBeInTheDocument();
   });
 
   test("shows form (only) when clicked", async () => {
-    const node = render(
+    const utils = render(
       <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
       {
         initialState: makeStateWithBook()
       }
     );
     // make sure it's not visible at first
-    expect(node.getByLabelText("Complaint Type")).not.toBeVisible();
+    expect(utils.getByLabelText("Complaint Type")).not.toBeVisible();
 
-    const reportProblemLink = node.getByTestId("report-problem-link");
+    const reportProblemLink = utils.getByTestId("report-problem-link");
     userEvent.click(reportProblemLink);
 
     // one for the original report problem button, one for the form
-    expect(node.getAllByText("Report a problem")).toHaveLength(2);
-    expect(node.getByLabelText("Complaint Type")).toBeVisible();
-    expect(node.getByLabelText("Details")).toBeVisible();
-    expect(node.getByText("Cancel")).toBeVisible();
-    expect(node.getByText("Submit")).toBeVisible();
-    expect(node.getByText("Submit")).toHaveAttribute("type", "submit");
+    expect(utils.getAllByText("Report a problem")).toHaveLength(2);
+    expect(utils.getByLabelText("Complaint Type")).toBeVisible();
+    expect(utils.getByLabelText("Details")).toBeVisible();
+    expect(utils.getByText("Cancel")).toBeVisible();
+    expect(utils.getByText("Submit")).toBeVisible();
+    expect(utils.getByText("Submit")).toHaveAttribute("type", "submit");
   });
 
   test("fetches complaint types", async () => {
@@ -245,24 +272,24 @@ describe("report problem", () => {
     const mockBoundPostComplaint = jest.fn().mockResolvedValue(["some-string"]);
     postComplaintSpy.mockReturnValue(_url => mockBoundPostComplaint);
 
-    const node = render(
+    const utils = render(
       <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
       {
         initialState: makeStateWithBook(bookWithReportUrl)
       }
     );
     // open the form
-    const reportProblemLink = node.getByTestId("report-problem-link");
+    const reportProblemLink = utils.getByTestId("report-problem-link");
     userEvent.click(reportProblemLink);
 
     // fill the form
     userEvent.selectOptions(
-      node.getByLabelText("Complaint Type"),
+      utils.getByLabelText("Complaint Type"),
       "complaint-type-b"
     );
-    userEvent.type(node.getByLabelText("Details"), "Some issue happened.");
+    userEvent.type(utils.getByLabelText("Details"), "Some issue happened.");
     // submit the form
-    userEvent.click(node.getByText("Submit"));
+    userEvent.click(utils.getByText("Submit"));
 
     // actually posted the complaint
     await waitFor(() =>
@@ -290,56 +317,56 @@ describe("report problem", () => {
       return Promise.resolve(["some string"]);
     });
 
-    const node = render(
+    const utils = render(
       <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
       {
         initialState: makeStateWithBook(bookWithReportUrl)
       }
     );
     // open the form
-    const reportProblemLink = node.getByTestId("report-problem-link");
+    const reportProblemLink = utils.getByTestId("report-problem-link");
     userEvent.click(reportProblemLink);
 
     // fill the form
     userEvent.selectOptions(
-      node.getByLabelText("Complaint Type"),
+      utils.getByLabelText("Complaint Type"),
       "complaint-type-b"
     );
-    userEvent.type(node.getByLabelText("Details"), "Some issue happened.");
+    userEvent.type(utils.getByLabelText("Details"), "Some issue happened.");
     // submit the form
-    userEvent.click(node.getByText("Submit"));
+    userEvent.click(utils.getByText("Submit"));
 
     // shows thank you message
     expect(
-      await node.findByText("Your problem was reported. Thank you!")
+      await utils.findByText("Your problem was reported. Thank you!")
     ).toBeInTheDocument();
-    expect(await node.findByText("Done")).toBeInTheDocument();
+    expect(await utils.findByText("Done")).toBeInTheDocument();
 
     // can close the form
-    userEvent.click(node.getByText("Done"));
-    expect(node.getByText("Complaint Type")).not.toBeVisible();
+    userEvent.click(utils.getByText("Done"));
+    expect(utils.getByText("Complaint Type")).not.toBeVisible();
   });
 
   test("displays client error when unfilled", async () => {
     const mockBoundPostComplaint = jest.fn().mockResolvedValue(["some-string"]);
     postComplaintSpy.mockReturnValue(_url => mockBoundPostComplaint);
 
-    const node = render(<ReportProblem book={fixtures.book} />, {
+    const utils = render(<ReportProblem book={fixtures.book} />, {
       initialState: makeStateWithBook(bookWithReportUrl)
     });
     // open the form
-    const reportProblemLink = node.getByTestId("report-problem-link");
+    const reportProblemLink = utils.getByTestId("report-problem-link");
     userEvent.click(reportProblemLink);
 
     // don't fill the form
     // submit the form
-    userEvent.click(node.getByText("Submit"));
+    userEvent.click(utils.getByText("Submit"));
 
     expect(
-      await node.findByText("Error: Please choose a type")
+      await utils.findByText("Error: Please choose a type")
     ).toBeInTheDocument();
     expect(
-      await node.findByText("Error: Please enter details about the problem.")
+      await utils.findByText("Error: Please enter details about the problem.")
     ).toBeInTheDocument();
 
     expect(mockBoundPostComplaint).toHaveBeenCalledTimes(0);

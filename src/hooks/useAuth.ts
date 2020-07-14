@@ -14,7 +14,7 @@ function useAuth() {
   const authState = useTypedSelector(state => state.auth);
   const isSignedIn = !!authState?.credentials;
   const { fetcher, actions, dispatch } = useActions();
-  const { buildMultiLibraryLink } = useLinkUtils();
+  const { buildMultiLibraryLink, urlShortener } = useLinkUtils();
 
   const signOut = () => dispatch(actions.clearAuthCredentials());
   const signOutAndGoHome = () => {
@@ -22,6 +22,11 @@ function useAuth() {
     const link = buildMultiLibraryLink({ href: "/" });
     router.push(link.href, link.as);
   };
+
+  const loansUrl = decodeURIComponent(
+    urlShortener.expandCollectionUrl("loans")
+  );
+  const signIn = () => dispatch(actions.fetchLoans(loansUrl));
   /**
    * On mount, we need to check for auth data in cookies. This used
    * to be done in componentWillMount of Root in OPDS
@@ -35,7 +40,7 @@ function useAuth() {
     }
   }, [dispatch, actions, fetcher]);
 
-  return { isSignedIn, signOut, signOutAndGoHome, ...authState };
+  return { isSignedIn, signIn, signOut, signOutAndGoHome, ...authState };
 }
 
 export default useAuth;

@@ -1,251 +1,318 @@
 /** @jsx jsx */
-import { jsx, Styled } from "theme-ui";
+import { jsx } from "theme-ui";
 import * as React from "react";
-import { getAvailabilityString } from "../../utils/book";
-import { sidebarWidth } from "./index";
+import {
+  getFulfillmentState,
+  dedupeLinks,
+  availabilityString,
+  queueString,
+  bookIsAudiobook
+} from "utils/book";
 import {
   BookData,
-  MediaType,
   MediaLink,
   FulfillmentLink
 } from "opds-web-client/lib/interfaces";
-import { typeMap } from "opds-web-client/lib/utils/file";
-import { RequiredKeys } from "../../interfaces";
-import {
-  bookIsBorrowed,
-  bookIsOpenAccess,
-  bookIsBorrowable
-} from "opds-web-client/lib/utils/book";
+import Link from "../Link";
 import Button from "../Button";
 import useDownloadButton from "opds-web-client/lib/hooks/useDownloadButton";
 import { withErrorBoundary } from "../ErrorBoundary";
-import Select, { Label } from "../Select";
 import useBorrow from "../../hooks/useBorrow";
+import Stack from "components/Stack";
+import { Text } from "components/Text";
+import { MediumIcon } from "components/MediumIndicator";
+import SvgDownload from "icons/Download";
+import SvgPhone from "icons/Phone";
+import useIsBorrowed from "hooks/useIsBorrowed";
 
-/**
- * This card will handle logic to download books. There are a few cases
- *  1.  It is open access, in which case show download button for different
- *      formats.
- *
- *  2.  It is not open-access. We need to first borrow the book then allow
- *      patrons to download in different formats.
- *
- *      - It is not borrowed
- *        - It is not on hold
- *          - It is available to be on hold
- *          - It is not available
- *        - It is on hold
- *      - It is borrowed
- *
- * Maybe this would be better as a state map... where you have an object that
- * maps states to a display?
- */
-const FulfillmentCard: React.FC<{ book: BookData; className?: string }> = ({
-  book,
-  className
-}) => {
-  /**
-   * If there are openAccessLinks, we display those and nothing else.
-   * Otherwise, patrons need to borrow the book before downloading.
-   */
-  if (bookIsOpenAccess(book)) {
-    const availability = getAvailabilityString(book);
-    return (
-      <DownloadCard
-        className={className}
-        links={book.openAccessLinks}
-        availability={availability}
-        title={book.title}
-        isOpenAccess={true}
-      />
-    );
-  }
-  // if the book is borrowed already, show download options
-  if (bookIsBorrowed(book)) {
-    const availability = getAvailabilityString(book);
-    return (
-      <DownloadCard
-        className={className}
-        links={book.fulfillmentLinks}
-        availability={availability}
-        title={book.title}
-      />
-    );
-  }
-  // if the book either on hold, available, or reservable
-  if (bookIsBorrowable(book)) {
-    return <BorrowCard className={className} book={book} />;
-  }
-  // the book cannot be borrowed, something likely went wrong
-  console.error("Something went wrong in the FulfillmentCard");
-  return null;
-};
-
-/**
- *  Specifically handles the case where it has yet to be borrowed.
- */
-const BorrowCard: React.FC<{
-  book: RequiredKeys<BookData, "borrowUrl">;
-  className?: string;
-}> = ({ book, className }) => {
-  const {
-    availability,
-    borrowOrReserve,
-    isReserved,
-    errorMsg,
-    label,
-    isLoading
-  } = useBorrow(book);
+const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
   return (
-    <CardWrapper
-      className={className}
+    <Stack
+      direction="column"
+      aria-label="Borrow and download card"
       sx={{
+        bg: "ui.gray.lightWarm",
+        p: 3,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        textAlign: "center",
-        px: 2,
-        py: 3
+        color: "ui.gray.extraDark",
+        my: 3
       }}
     >
-      {availability}
-      {errorMsg && <p sx={{ color: "warn" }}>Error: {errorMsg}</p>}
-      <Button
-        onClick={borrowOrReserve}
-        disabled={isReserved || isLoading}
-        sx={{ my: 3 }}
-      >
-        {label}
-      </Button>
-    </CardWrapper>
+      <FulfillmentContent book={book} />
+    </Stack>
   );
 };
 
-type MimetypeToLinkMap = {
-  [key in MediaType]?: MediaLink | FulfillmentLink;
+const FulfillmentContent: React.FC<{
+  book: BookData;
+}> = ({ book }) => {
+  const isBorrowed = useIsBorrowed(book);
+  const fulfillmentState = getFulfillmentState(book, isBorrowed);
+
+  switch (fulfillmentState) {
+    case "AVAILABLE_OPEN_ACCESS":
+      if (!book.openAccessLinks)
+        throw new Error("This open-access book is missing open access links");
+      return (
+        <DownloadCard
+          links={book.openAccessLinks}
+          book={book}
+          subtitle="This open-access book is available to keep forever."
+        />
+      );
+
+    case "AVAILABLE_TO_BORROW": {
+      return (
+        <BorrowOrReserve
+          title="This book is available to borrow!"
+          subtitle={
+            <>
+              <MediumIcon book={book} sx={{ mr: 1 }} />{" "}
+              {availabilityString(book)}
+            </>
+          }
+          book={book}
+          buttonLabel="Borrow"
+          buttonLoadingText="Borrowing..."
+        />
+      );
+    }
+
+    case "AVAILABLE_TO_RESERVE": {
+      return (
+        <BorrowOrReserve
+          book={book}
+          title="This book is currently unavailable."
+          subtitle={
+            <>
+              <MediumIcon book={book} sx={{ mr: 1 }} />{" "}
+              {availabilityString(book)}
+              {typeof book.holds?.total === "number" &&
+                ` ${book.holds.total} patrons in the queue.`}
+            </>
+          }
+          buttonLabel="Reserve"
+          buttonLoadingText="Reserving..."
+        />
+      );
+    }
+
+    case "RESERVED":
+      return <Reserved book={book} />;
+
+    case "READY_TO_BORROW": {
+      const availableUntil = book.availability?.until
+        ? new Date(book.availability.until).toDateString()
+        : "NaN";
+
+      const title = "You can now borrow this book!";
+      const subtitle =
+        availableUntil !== "NaN"
+          ? `Your hold will expire on ${availableUntil}. ${queueString(book)}`
+          : "You must borrow this book before your loan expires.";
+      return (
+        <BorrowOrReserve
+          book={book}
+          title={title}
+          subtitle={subtitle}
+          buttonLabel="Borrow"
+          buttonLoadingText="Borrowing..."
+        />
+      );
+    }
+
+    case "AVAILABLE_TO_ACCESS": {
+      if (!book.fulfillmentLinks)
+        throw new Error(
+          "This available-to-access book is missing fulfillment links."
+        );
+
+      const availableUntil = book.availability?.until
+        ? new Date(book.availability.until).toDateString()
+        : "NaN";
+
+      const subtitle =
+        availableUntil !== "NaN"
+          ? `You have this book on loan until ${availableUntil}.`
+          : "You have this book on loan.";
+      return (
+        <DownloadCard
+          links={book.fulfillmentLinks}
+          book={book}
+          subtitle={subtitle}
+        />
+      );
+    }
+
+    case "FULFILLMENT_STATE_ERROR":
+      return <ErrorCard />;
+  }
 };
+
+const BorrowOrReserve: React.FC<{
+  book: BookData;
+  title: string;
+  subtitle: React.ReactNode;
+  buttonLabel: string;
+  buttonLoadingText: string;
+}> = ({ book, title, subtitle, buttonLabel, buttonLoadingText }) => {
+  const { isLoading, borrowOrReserve, errorMsg } = useBorrow(book);
+  return (
+    <>
+      <Text variant="text.callouts.bold">{title}</Text>
+      <Text
+        variant="text.body.italic"
+        sx={{
+          display: "inline-flex",
+          alignItems: "center",
+          textAlign: "center"
+        }}
+      >
+        {subtitle}
+      </Text>
+      <Button
+        size="lg"
+        onClick={borrowOrReserve}
+        loading={isLoading}
+        loadingText={buttonLoadingText}
+      >
+        <Text variant="text.body.bold">{buttonLabel}</Text>
+      </Button>
+      {errorMsg && <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>}
+    </>
+  );
+};
+
+const Reserved: React.FC<{ book: BookData }> = ({ book }) => {
+  const position = book.holds?.position;
+  return (
+    <>
+      <Text variant="text.callouts.bold">You have this book on hold.</Text>
+      {!!position && (
+        <Text
+          variant="text.body.italic"
+          sx={{ display: "inline-flex", alignItems: "center" }}
+        >
+          <MediumIcon book={book} sx={{ mr: 1 }} />
+          Your hold position is: {position}.
+        </Text>
+      )}
+      <Button size="lg" disabled>
+        <Text variant="text.body.bold">Reserved</Text>
+      </Button>
+      {/* {errorMsg && <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>} */}
+    </>
+  );
+};
+
+const ErrorCard: React.FC = () => {
+  return (
+    <>
+      <Text variant="text.callouts.bold">
+        There was an error processing this book.
+      </Text>
+      <Text
+        variant="text.body.italic"
+        sx={{
+          display: "inline-flex",
+          alignItems: "center",
+          textAlign: "center"
+        }}
+      >
+        We are unable to show you the book&apos;s availability. Try refreshing
+        your page. If the problem persists, please contact library support.
+      </Text>
+    </>
+  );
+};
+
 /**
  * Handles the case where it is ready for download either via openAccessLink or
  * via fulfillmentLink.
  */
 const DownloadCard: React.FC<{
+  book: BookData;
   links: MediaLink[] | FulfillmentLink[];
-  availability: string;
+  subtitle: string;
+}> = ({ book, links, subtitle }) => {
+  const { title } = book;
+  const dedupedLinks = dedupeLinks(links ?? []);
+  const isAudiobook = bookIsAudiobook(book);
+  return (
+    <>
+      <Stack sx={{ alignItems: "center" }}>
+        <SvgPhone sx={{ fontSize: 64 }} />
+        <Stack direction="column">
+          <Text variant="text.callouts.bold">
+            You&apos;re ready to read this book in SimplyE!
+          </Text>
+          <Text>{subtitle}</Text>
+        </Stack>
+      </Stack>
+      {!isAudiobook && (
+        <Stack direction="column" sx={{ mt: 3 }}>
+          <Text variant="text.body.italic" sx={{ textAlign: "center" }}>
+            If you would rather read on your computer, you can:
+          </Text>
+          <Stack sx={{ justifyContent: "center", flexWrap: "wrap" }}>
+            {dedupedLinks.map(link => {
+              let hasReaderLink = false;
+              // @ts-ignore
+              if (link.type === "application/vnd.librarysimplified.web-epub") {
+                hasReaderLink = true;
+                link.url = `/read/${encodeURIComponent(link.url)}`;
+              }
+              return (
+                <>
+                  <DownloadButton
+                    key={link.url}
+                    link={link}
+                    title={title}
+                    hasReaderLink={hasReaderLink}
+                  />
+                </>
+              );
+            })}
+          </Stack>
+        </Stack>
+      )}
+    </>
+  );
+};
+
+const DownloadButton: React.FC<{
+  link: FulfillmentLink | MediaLink;
   title: string;
-  isOpenAccess?: boolean;
-  className?: string;
-}> = ({ links, availability, title, isOpenAccess = false, className }) => {
-  // for some reason there are duplicate links. Dedupe them w a map by mimeType
-  const linksByMimetype: MimetypeToLinkMap = {};
-  links.forEach(link => (linksByMimetype[link.type] = link));
+  hasReaderLink?: boolean;
+}> = ({ link, title, hasReaderLink }) => {
+  const { fulfill, downloadLabel } = useDownloadButton(link, title);
 
-  const defaultType = links[0].type;
-  const [selectedType, setSelectedType] = React.useState<MediaType>(
-    defaultType
-  );
-
-  const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedType(e.currentTarget.value as MediaType);
-  };
-
-  const currentLink = linksByMimetype[selectedType];
-  const downloadDetails = useDownloadButton(currentLink, title);
-
-  let readerLink;
-  if (currentLink.type === "application/vnd.librarysimplified.web-epub") {
-    readerLink = `/read/${encodeURIComponent(currentLink.url)}`;
-  }
-  if (!downloadDetails) return null;
-  return (
-    <CardWrapper className={className}>
-      <div
-        sx={{
-          px: 2,
-          py: 3,
-          borderBottom: "1px solid",
-          borderColor: "primary"
-        }}
-      >
-        <div
-          sx={{ fontWeight: "semibold", display: "flex", alignItems: "center" }}
+  if (hasReaderLink) {
+    return (
+      <Link href={link.url}>
+        <Button
+          variant="ghost"
+          color="ui.gray.extraDark"
+          iconLeft={SvgDownload}
         >
-          <Label htmlFor="format-select">TYPE</Label>
-          <Select
-            id="format-select"
-            value={selectedType}
-            onBlur={handleTypeChange}
-            onChange={handleTypeChange}
-            sx={{ ml: 2 }}
-          >
-            {Object.keys(linksByMimetype).map(mediaType => (
-              <option key={mediaType} value={mediaType}>
-                {typeMap[mediaType]?.name ?? mediaType}
-              </option>
-            ))}
-          </Select>
-        </div>
-      </div>
-      <div
-        sx={{
-          px: 2,
-          py: 2,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center"
-        }}
+          {downloadLabel}
+        </Button>
+      </Link>
+    );
+  } else {
+    return (
+      <Button
+        onClick={fulfill}
+        variant="ghost"
+        color="ui.gray.extraDark"
+        iconLeft={SvgDownload}
       >
-        <div sx={{ mb: 2, textAlign: "center" }}>{availability}</div>
-        {isOpenAccess ? (
-          <Styled.a
-            target="__blank"
-            rel="noopener noreferrer"
-            href={readerLink ? readerLink : linksByMimetype[selectedType]?.url}
-            sx={{ variant: "buttons.accent", px: 2, py: 1 }}
-          >
-            Download
-          </Styled.a>
-        ) : (
-          <Button onClick={downloadDetails.fulfill}>Download</Button>
-        )}
-      </div>
-    </CardWrapper>
-  );
+        {downloadLabel}
+      </Button>
+    );
+  }
 };
 
-const CardWrapper: React.FC<{ className?: string }> = ({
-  children,
-  className
-}) => {
-  return (
-    <div
-      aria-label="Borrow and download card"
-      className={className}
-      sx={{
-        border: "1px solid",
-        borderColor: "primary",
-        borderRadius: "card",
-        maxWidth: sidebarWidth,
-        m: 2
-      }}
-    >
-      {children}
-    </div>
-  );
-};
-
-const ErrorFallback: React.FC<{ message: string }> = ({ message }) => {
-  return (
-    <CardWrapper
-      sx={{
-        textAlign: "center",
-        backgroundColor: "warn",
-        color: "white",
-        p: 2
-      }}
-    >
-      <p>{message}</p>
-    </CardWrapper>
-  );
-};
-
-export default withErrorBoundary(FulfillmentCard, ErrorFallback);
+export default withErrorBoundary(FulfillmentCard, ErrorCard);
