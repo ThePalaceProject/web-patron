@@ -495,6 +495,48 @@ describe("available to download", () => {
     }
   });
 
+  const viewableAxisNowBook = mergeBook({
+    openAccessLinks: undefined,
+    fulfillmentLinks: [
+      {
+        url: "/epub-link",
+        // @ts-ignore
+        type: "application/vnd.librarysimplified.axisnow+json"
+      }
+    ],
+    availability: {
+      status: "available",
+      until: "2020-06-18"
+    }
+  });
+
+  const viewableWebEPubBook = mergeBook({
+    openAccessLinks: undefined,
+    fulfillmentLinks: [
+      {
+        url: "/epub-link",
+        // @ts-ignore
+        type: "application/vnd.librarysimplified.web-epub"
+      }
+    ],
+    availability: {
+      status: "available",
+      until: "2020-06-18"
+    }
+  });
+
+  test("constructs link to viewer for Web EPub Books", () => {
+    const utils = render(<FulfillmentCard book={viewableWebEPubBook} />);
+    const readerLink = utils.getByTestId("reader-link") as HTMLLinkElement;
+    expect(readerLink.href).toBe("http://test-domain.com/read/%2Fepub-link");
+  });
+
+  test("constructs link to viewer for OpenAxis Books", () => {
+    const utils = render(<FulfillmentCard book={viewableAxisNowBook} />);
+    const readerLink = utils.getByTestId("reader-link") as HTMLLinkElement;
+    expect(readerLink.href).toBe("http://test-domain.com/read/%2Fepub-link");
+  });
+
   test("correct title and subtitle", () => {
     const utils = render(<FulfillmentCard book={downloadableBook} />);
     expect(

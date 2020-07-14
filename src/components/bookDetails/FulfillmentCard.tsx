@@ -296,7 +296,7 @@ const DownloadButton: React.FC<{
 
   if (hasReaderLink) {
     return (
-      <Link href={link.url}>
+      <Link href={link.url} data-testid="reader-link">
         <Button
           variant="ghost"
           color="ui.gray.extraDark"
