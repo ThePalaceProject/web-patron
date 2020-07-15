@@ -12,6 +12,7 @@ import { ComplaintData } from "../../interfaces";
 import LoadingIndicator from "../LoadingIndicator";
 import Select, { Label } from "../Select";
 import { H1 } from "components/Text";
+import { getReportUrl } from "utils/libraryLinks";
 
 const getDisplayType = (type: string) =>
   type
@@ -26,6 +27,7 @@ type ComplaintFormData = Required<ComplaintData>;
 const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
   const { state, dialog, dispatch, postComplaint } = useComplaints(book);
 
+  const hasReportUrl = Boolean(getReportUrl(book.raw));
   const handleClick = () => dispatch({ type: "REPORT_PROBLEM" });
 
   const { register, handleSubmit, errors, reset } = useForm<
@@ -40,10 +42,6 @@ const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
     postComplaint({ type, detail });
   });
 
-  const { types } = state;
-  if (types.length === 0) {
-    return null;
-  }
   return (
     <React.Fragment>
       <Modal
@@ -130,17 +128,19 @@ const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
           </form>
         )}
       </Modal>
-      <DialogDisclosure
-        {...dialog}
-        onClick={handleClick}
-        as={Button}
-        data-testid="report-problem-link"
-        variant="link"
-        color="ui.gray.extraDark"
-        sx={{ fontStyle: "italic" }}
-      >
-        Report a problem
-      </DialogDisclosure>
+      {hasReportUrl && (
+        <DialogDisclosure
+          {...dialog}
+          onClick={handleClick}
+          as={Button}
+          data-testid="report-problem-link"
+          variant="link"
+          color="ui.gray.extraDark"
+          sx={{ fontStyle: "italic" }}
+        >
+          Report a problem
+        </DialogDisclosure>
+      )}
     </React.Fragment>
   );
 };

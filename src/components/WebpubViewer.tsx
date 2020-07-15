@@ -11,9 +11,11 @@ const BookPage = () => {
 
   const { catalogName } = library;
 
-  if (typeof window !== "undefined") {
-    reader(bookManifestUrl, catalogName);
-  }
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      reader(bookManifestUrl, catalogName);
+    }
+  });
 
   return (
     <>
