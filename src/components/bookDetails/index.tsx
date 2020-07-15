@@ -20,7 +20,7 @@ import useNormalizedBook from "../../hooks/useNormalizedBook";
 import DetailField from "../BookMetaDetail";
 import ReportProblem from "./ReportProblem";
 import useTypedSelector from "../../hooks/useTypedSelector";
-import { getReportUrl } from "../../hooks/useComplaints";
+import { getReportUrl } from "../../utils/libraryLinks";
 import { NavButton } from "../Button";
 import Head from "next/head";
 import { H3, Text, H1 } from "components/Text";
