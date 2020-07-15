@@ -18,13 +18,14 @@ const getDisplayType = (type: string) =>
     .replace("http://librarysimplified.org/terms/problem/", "")
     .replace(/-/g, " ")
     .split(" ")
-    .map(t => t[0].toUpperCase() + t.slice(1))
+    .map(t => (t ? t[0].toUpperCase() + t.slice(1) : ""))
     .join(" ");
 
 type ComplaintFormData = Required<ComplaintData>;
 
 const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
   const { state, dialog, dispatch, postComplaint } = useComplaints(book);
+
   const handleClick = () => dispatch({ type: "REPORT_PROBLEM" });
 
   const { register, handleSubmit, errors, reset } = useForm<
@@ -38,6 +39,11 @@ const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
   const onSubmit = handleSubmit(({ type, detail }) => {
     postComplaint({ type, detail });
   });
+
+  const { types } = state;
+  if (types.length === 0) {
+    return null;
+  }
   return (
     <React.Fragment>
       <Modal

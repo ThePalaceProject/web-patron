@@ -20,7 +20,6 @@ import useNormalizedBook from "../../hooks/useNormalizedBook";
 import DetailField from "../BookMetaDetail";
 import ReportProblem from "./ReportProblem";
 import useTypedSelector from "../../hooks/useTypedSelector";
-import { getReportUrl } from "../../utils/libraryLinks";
 import { NavButton } from "../Button";
 import Head from "next/head";
 import { H3, Text, H1 } from "components/Text";
@@ -39,11 +38,10 @@ export const BookDetails: React.FC<{
 
   const error = useTypedSelector(state => state.book.error);
 
-  const reportUrl = getReportUrl(book?.raw);
-
   if (error) {
     return <Error error={error} />;
   }
+
   if (!book) return <PageLoader />;
   return (
     <section aria-label="Book details">
@@ -91,7 +89,7 @@ export const BookDetails: React.FC<{
               />
             </div>
             <FulfillmentCard book={book} sx={{ mt: 3 }} />
-            {reportUrl && <ReportProblem book={book} />}
+            <ReportProblem book={book} />
             <Summary book={book} />
           </div>
         </div>
