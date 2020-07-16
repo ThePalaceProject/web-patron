@@ -275,19 +275,14 @@ const DownloadButton: React.FC<{
 }> = ({ link, title }) => {
   const { fulfill, downloadLabel } = useDownloadButton(link, title);
 
-  let hasReaderLink = false;
-
-  if (
-    /* web-epub is currently used in test-server.
+  /* web-epub is currently used in test-server.
                  to-do: remove the below commented out check */
+  const hasReaderLink =
     // link.type === "application/vnd.librarysimplified.web-epub" ||
-    link.type === "application/vnd.librarysimplified.axisnow+json"
-  ) {
-    hasReaderLink = true;
-    link.url = `/read/${encodeURIComponent(link.url)}`;
-  }
+    link.type === "application/vnd.librarysimplified.axisnow+json";
 
   if (hasReaderLink) {
+    link.url = `/read/${encodeURIComponent(link.url)}`;
     return (
       <NavButton
         variant="ghost"

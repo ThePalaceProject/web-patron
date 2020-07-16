@@ -20,19 +20,16 @@ export default async function (bookUrl: string, catalogName: string) {
   const containerHref = webpubBookUrl.href.endsWith("container.xml")
     ? webpubBookUrl.href
     : "";
-  async function webpubManifestUrl() {
-    const response = await fetch(containerHref);
-    const text = await response.text();
-    const xml = await new window.DOMParser().parseFromString(text, "text/html");
-    const rootfile = xml.getElementsByTagName("rootfile")[0]
-      ? xml.getElementsByTagName("rootfile")[0].getAttribute("full-path")
-      : "";
-    const url = containerHref.replace("META-INF/container.xml", rootfile || "");
+  const response = await fetch(containerHref);
+  const text = await response.text();
+  const xml = new window.DOMParser().parseFromString(text, "text/html");
+  const rootfile = xml.getElementsByTagName("rootfile")[0]
+    ? xml.getElementsByTagName("rootfile")[0].getAttribute("full-path")
+    : "";
+  const url = containerHref.replace("META-INF/container.xml", rootfile || "");
+  const finalUrl = rootfile ? new URL(url) : webpubBookUrl;
 
-    return Promise.resolve(rootfile ? new URL(url) : webpubBookUrl);
-  }
-
-  webpubManifestUrl().then(url => initBookSettings(element, url, catalogName));
+  initBookSettings(element, finalUrl, catalogName);
 }
 
 function initBookSettings(element, webpubManifestUrl, catalogName) {

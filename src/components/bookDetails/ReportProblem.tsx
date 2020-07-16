@@ -42,6 +42,10 @@ const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
     postComplaint({ type, detail });
   });
 
+  if (!hasReportUrl) {
+    return null;
+  }
+
   return (
     <React.Fragment>
       <Modal
@@ -128,19 +132,18 @@ const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
           </form>
         )}
       </Modal>
-      {hasReportUrl && (
-        <DialogDisclosure
-          {...dialog}
-          onClick={handleClick}
-          as={Button}
-          data-testid="report-problem-link"
-          variant="link"
-          color="ui.gray.extraDark"
-          sx={{ fontStyle: "italic" }}
-        >
-          Report a problem
-        </DialogDisclosure>
-      )}
+
+      <DialogDisclosure
+        {...dialog}
+        onClick={handleClick}
+        as={Button}
+        data-testid="report-problem-link"
+        variant="link"
+        color="ui.gray.extraDark"
+        sx={{ fontStyle: "italic" }}
+      >
+        Report a problem
+      </DialogDisclosure>
     </React.Fragment>
   );
 };
