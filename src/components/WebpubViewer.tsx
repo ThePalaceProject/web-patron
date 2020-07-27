@@ -474,6 +474,10 @@ const BookPage = () => {
           top: 0.3125rem;
         }
 
+        [data-viewer-theme="sepia"] .page-container {
+          background-color: #f6ecd9;
+        }
+
         [data-viewer-theme="sepia"] {
           background-color: #f6ecd9;
         }
@@ -545,7 +549,9 @@ const BookPage = () => {
             #f6ecd9
           );
         }
-
+        [data-viewer-theme="night"] .page-container {
+          background-color: #111;
+        }
         [data-viewer-theme="night"] {
           background-color: #111;
           color: #fff;
