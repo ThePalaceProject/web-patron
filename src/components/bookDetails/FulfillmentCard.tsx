@@ -56,7 +56,7 @@ const FulfillmentContent: React.FC<{
       if (!book.openAccessLinks)
         throw new Error("This open-access book is missing open access links");
       return (
-        <DownloadCard
+        <AccessCard
           links={book.openAccessLinks}
           book={book}
           subtitle="This open-access book is available to keep forever."
@@ -138,7 +138,7 @@ const FulfillmentContent: React.FC<{
           ? `You have this book on loan until ${availableUntil}.`
           : "You have this book on loan.";
       return (
-        <DownloadCard
+        <AccessCard
           links={book.fulfillmentLinks}
           book={book}
           subtitle={subtitle}
@@ -232,7 +232,7 @@ const ErrorCard: React.FC = () => {
  * Handles the case where it is ready for download either via openAccessLink or
  * via fulfillmentLink.
  */
-const DownloadCard: React.FC<{
+const AccessCard: React.FC<{
   book: BookData;
   links: MediaLink[] | FulfillmentLink[];
   subtitle: string;
