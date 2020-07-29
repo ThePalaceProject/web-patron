@@ -19,7 +19,10 @@
     "baseUrl": "src"
   },
   "excludedFiles": "*.test.js",
-  "exclude": ["node_modules", "config/srv"],
+  "exclude": [
+    "node_modules",
+    "config/srv",
+  ],
   "include": [
     "next-env.d.ts",
     "**/*.ts",

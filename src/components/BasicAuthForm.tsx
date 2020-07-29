@@ -44,7 +44,7 @@ const BasicAuthForm: React.FC<AuthFormProps<BasicAuthMethod>> = ({
       onSubmit={handleSubmit(onSubmit)}
       sx={{ display: "flex", flexDirection: "column" }}
     >
-      <span sx={{ color: "warn" }}>
+      <span sx={{ color: "ui.error" }}>
         {serverError && `Error: ${serverError}`}
       </span>
       <FormInput
@@ -69,7 +69,10 @@ const BasicAuthForm: React.FC<AuthFormProps<BasicAuthMethod>> = ({
           `Your ${provider.method.labels.password} is required.`
         }
       />
-      <Button type="submit" sx={{ alignSelf: "flex-end", m: 2 }}>
+      <Button
+        type="submit"
+        sx={{ alignSelf: "flex-end", m: 2, mr: 0, flex: "1 0 auto" }}
+      >
         Login
       </Button>
     </form>

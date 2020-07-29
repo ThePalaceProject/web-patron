@@ -11,14 +11,6 @@ export type Overloadable<T, K> = T & {
   [overload: string]: K;
 };
 
-export type ButtonVariants = {
-  primary: SystemStyleObject;
-  flat: SystemStyleObject;
-  accent: SystemStyleObject;
-};
-
-export type TextVariants = {};
-
 export type CardVariants = {
   bookDetails: SystemStyleObject;
 };

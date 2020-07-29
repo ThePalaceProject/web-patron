@@ -1,5 +1,26 @@
 ## CHANGELOG
 
+## UNRELEASED CHANGES
+
+- Fix: Don't show search bar if collection does not include search data.
+- Fix: Fetch loans on page load when auth credentials are detected so that if you navigate directly to a book you have checked out, it will properly show checked out state.
+- Fix: Make BookCover show a better image fallback on image load failure. Also show medium icon on load, and fade image in once it is done loading.
+
+## 2.2.1
+
+- Fix: Only show download options for open-access books once they have been borrowed and are present in a user's loans. Download options should still be shown for open-access books in libraries that do not have any auth enabled.
+- Fix: Don't perform state update on unmounted `BorrowCard`. 
+- Refactor: Rename `node` in tests to `utils`, as it is more accurate.
+- Fix: Don't show download options for audiobooks since there is no way to play them on desktop. Only show SimplyE callout instead.
+- Fix: Update `opds-web-client` dependency to fix browser caching of unwanted Authorization headers.
+
+## 2.2.0
+
+- Redesign: the whole app received a new design based on NYPL Design System.
+- Import and use the Card component from NYPL/design-system-react-components.
+- Removed the grid view as it seemed redundant with the list view (for now).
+- Refactor Buttton to not be polymorphic (ie NavButton and Button and AnchorButton are now completely separate components).
+
 ### 2.1.0
 
 - Refactor: Update build configuration and server code to use [Next.js](https://nextjs.org/).

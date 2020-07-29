@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx, Styled } from "theme-ui";
+import { jsx } from "theme-ui";
 import * as React from "react";
 import { useDialogState, DialogDisclosure } from "reakit/Dialog";
 import useLibraryContext from "./context/LibraryContext";
@@ -7,6 +7,7 @@ import useAuth from "../hooks/useAuth";
 import { getBasicAuthProvider } from "../utils/auth";
 import Modal from "./Modal";
 import ClientOnly from "./ClientOnly";
+import { H2 } from "./Text";
 
 /**
  *  - makes sure auth state is loaded from cookies
@@ -45,10 +46,11 @@ const Auth: React.FC = ({ children }) => {
           hide={cancel ?? undefined}
           label="Sign In"
           dialog={dialog}
+          sx={{ p: 5 }}
         >
-          <div sx={{ textAlign: "center" }}>
-            <Styled.h2>{library.catalogName}</Styled.h2>
-            <Styled.h4>Login</Styled.h4>
+          <div sx={{ textAlign: "center", p: 0 }}>
+            <H2>{library.catalogName}</H2>
+            <h4>Login</h4>
           </div>
           {/* Here we render the auth plugins  */}
           {/* if you would like to enable alternative auth plugins */}

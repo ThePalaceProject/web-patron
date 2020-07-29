@@ -74,6 +74,7 @@ Set one of the following environment variables when running the application:
 
 The following environment variables can also be set to further configure the application.
 
+- Set `NEXT_PUBLIC_COMPANION_APP=openebooks` to display OpenE Books Branding (default displays SimplyE Branding).
 - Set `SHORTEN_URLS=false` to stop the app from removing common parts of the circulation manager URLs from the web app's URLs.
 - Set `CACHE_EXPIRATION_SECONDS` to control how often the app will check for changes to registry entries and circ manager authentication documents.
 - Set `AXE_TEST=true` to run the application with `react-axe` enabled (only works when `NODE_ENV` is "development").
@@ -155,20 +156,20 @@ test("fetches search description", async () => {
     "fetchSearchDescription"
   );
   /**
-   * node will contain
+   * utils will contain
    *  - the result of render
    *  - the redux store
    *  - the history object
    *  - the spied on dispatch function
    */
-  const node = render(<Search />, {
+  const utils = render(<Search />, {
     initialState
   });
 
   expect(mockedFetchSearchDescription).toHaveBeenCalledTimes(1);
   expect(mockedFetchSearchDescription).toHaveBeenCalledWith("/search-url");
   // we can assert on the app's dispatch like this
-  expect(node.dispatch).toHaveBeenCalledTimes(1);
+  expect(utils.dispatch).toHaveBeenCalledTimes(1);
 });
 ```
 

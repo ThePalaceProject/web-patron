@@ -35,3 +35,4 @@ config/
 lib/
 
 config.txt
+.vercel

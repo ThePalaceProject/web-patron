@@ -1,12 +1,12 @@
 /** @jsx jsx */
-import { jsx, Styled } from "theme-ui";
+import { jsx } from "theme-ui";
 import { CONTENT_ID } from "./Layout";
 
 /**
  * Renders a link that is hidden until focused to skip to main content
  */
 const SkipNavigation = props => (
-  <Styled.a
+  <a
     {...props}
     href={`#${CONTENT_ID}`}
     sx={{
@@ -35,7 +35,7 @@ const SkipNavigation = props => (
     }}
   >
     Skip to content
-  </Styled.a>
+  </a>
 );
 
 export default SkipNavigation;
