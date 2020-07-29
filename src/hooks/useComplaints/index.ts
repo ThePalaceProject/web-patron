@@ -3,7 +3,7 @@ import complaints, { initState } from "./reducer";
 import { fetchComplaintTypes, postComplaint } from "./actions";
 import { useDialogState } from "reakit";
 import { BookData } from "opds-web-client/lib/interfaces";
-
+import { getReportUrl } from "../../utils/libraryLinks";
 /**
  * We are using react useReducer instead of redux. The only real difference
  * here is that instead of using redux-thunk, we import the thunk actions
@@ -20,11 +20,7 @@ export default function useComplaints(book: BookData) {
   const [state, dispatch] = React.useReducer(complaints, initState);
   const dialog = useDialogState();
 
-  // const reportUrl = getReportUrl(book.raw);
-  // TODO - make this optional
-  const reportUrl =
-    "http://simplye-dev-cm.amigos.org/xyzlib/works/URI/https://standardebooks.org/ebooks/edith-wharton/the-age-of-innocence/report"; //getReportUrl(book.raw);
-  // console.log("the report url is", reportUrl);
+  const reportUrl = getReportUrl(book.raw);
 
   // when the hook mounts, fetch the complaint types
   React.useEffect(() => {
@@ -38,16 +34,4 @@ export default function useComplaints(book: BookData) {
     postComplaint: postComplaint(dispatch)(reportUrl),
     dialog
   };
-}
-
-function getReportUrl(raw: any) {
-  const reportLink = raw?.link?.find?.(
-    link => link?.["$"]?.["rel"]?.["value"] === "issues"
-  );
-
-  if (!reportLink) {
-    return null;
-  }
-
-  return reportLink?.["$"]?.["href"]?.["value"];
 }

@@ -18,19 +18,12 @@
     "importHelpers": true,
     "baseUrl": "src"
   },
-  "excludedFiles": "*.test.js",
-  "exclude": [
-    "node_modules",
-    "config/srv",
-  ],
+  "exclude": ["node_modules", "config/srv"],
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     ".eslintrc.js",
     "**/*.tsx",
-    "next.config.js",
-    "src/utils/require.js",
-    "src/utils/fetch.js",
-    "src/webpub-viewer"
+    "next.config.js"
   ]
 }

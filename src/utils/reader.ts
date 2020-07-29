@@ -15,17 +15,25 @@ import {
   ScrollingBookView
 } from "library-simplified-webpub-viewer";
 
-const test_link =
-  "https://qa-circulation.openebooks.us/USOEI/works/114136/fulfill/15";
-
-export default function (bookManifestUrl: string) {
-  console.log("bookManifestUrl", bookManifestUrl);
+export default async function (bookUrl: string, catalogName: string) {
   const element = document.getElementById("viewer");
-  const webpubManifestUrl = new URL(bookManifestUrl, window.location.href);
-  initBookSettings(element, webpubManifestUrl);
+  const webpubBookUrl = new URL(bookUrl, window.location.href);
+  const containerHref = webpubBookUrl.href.endsWith("container.xml")
+    ? webpubBookUrl.href
+    : "";
+  const response = await fetch(containerHref);
+  const text = await response.text();
+  const xml = new window.DOMParser().parseFromString(text, "text/html");
+  const rootfile = xml.getElementsByTagName("rootfile")[0]
+    ? xml.getElementsByTagName("rootfile")[0].getAttribute("full-path")
+    : "";
+  const url = containerHref.replace("META-INF/container.xml", rootfile || "");
+  const finalUrl = rootfile ? new URL(url) : webpubBookUrl;
+
+  initBookSettings(element, finalUrl, catalogName);
 }
 
-async function initBookSettings(element, webpubManifestUrl) {
+async function initBookSettings(element, webpubManifestUrl, catalogName) {
   const store = new LocalStorageStore({
     prefix: webpubManifestUrl.href
   });
@@ -49,9 +57,9 @@ async function initBookSettings(element, webpubManifestUrl) {
     prefix: "webpub-viewer"
   });
   const upLink = {
-    url: new URL("https://github.com/NYPL-Simplified/webpub-viewer"),
-    label: "My Library",
-    ariaLabel: "Go back to the Github repository"
+    url: new URL(document.referrer || window.location.origin),
+    label: `Return to ${catalogName}`,
+    ariaLabel: `Return to ${catalogName}`
   };
   const publisher = new PublisherFont();
   const serif = new SerifFont();
