@@ -78,9 +78,8 @@ async function initBookSettings(element, webpubManifestUrl, catalogName) {
   let decryptor = Decryptor
     ? await Decryptor.default.createDecryptor(webpubManifestUrl)
     : undefined;
-  console.log("decryptor", decryptor);
+
   const entryUrl:string = decryptor ? decryptor.getEntryUrl() : webpubManifestUrl;
-  console.log("entryUrl", entryUrl);
 
   const bookSettings = await BookSettings.create({
     store: settingsStore,

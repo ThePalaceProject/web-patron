@@ -1,3 +1,5 @@
+import { AXIS_NOW_DECRYPT } from "../utils/env";
+
 import React from "react";
 import reader from "utils/reader";
 import { useRouter } from "next/router";
@@ -7,7 +9,10 @@ const BookPage = () => {
   const library = useLibraryContext();
   const router = useRouter();
   const { bookUrl } = router.query;
-  const bookManifestUrl = `${bookUrl}/META-INF/container.xml`;
+
+  //TODO: 
+  // How to know from bookUrl whether or not the book is encrypted?  
+  const bookManifestUrl = AXIS_NOW_DECRYPT ? `${bookUrl}` : `${bookUrl}/META-INF/container.xml`;
 
   const { catalogName } = library;
 
