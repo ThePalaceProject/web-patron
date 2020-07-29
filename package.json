@@ -10,7 +10,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "postinstall": "if test \"$AXIS_NOW_DECRYPT\" = \"true\" ; then cd axisnow-access-control-web && npm install ; fi ",
-    "dev": "node server.js",
+    "dev": "node dev-server.js",
     "dev:axe": "REACT_AXE=true npm run dev",
     "build": "next build",
     "start": "next start",
