@@ -1,3 +1,5 @@
+import { AXIS_NOW_DECRYPT } from "../../utils/env";
+
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
@@ -50,7 +52,6 @@ const FulfillmentContent: React.FC<{
 }> = ({ book }) => {
   const isBorrowed = useIsBorrowed(book);
   const fulfillmentState = getFulfillmentState(book, isBorrowed);
-
   switch (fulfillmentState) {
     case "AVAILABLE_OPEN_ACCESS":
       if (!book.openAccessLinks)
@@ -158,7 +159,10 @@ const BorrowOrReserve: React.FC<{
   buttonLabel: string;
   buttonLoadingText: string;
 }> = ({ book, title, subtitle, buttonLabel, buttonLoadingText }) => {
-  const { isLoading, borrowOrReserve, errorMsg } = useBorrow(book);
+  const { isLoading, borrowOrReserve, allBorrowLinks, errorMsg } = useBorrow(
+    book
+  );
+  console.log("book", book);
   return (
     <>
       <Text variant="text.callouts.bold">{title}</Text>
@@ -172,14 +176,24 @@ const BorrowOrReserve: React.FC<{
       >
         {subtitle}
       </Text>
-      <Button
-        size="lg"
-        onClick={borrowOrReserve}
-        loading={isLoading}
-        loadingText={buttonLoadingText}
-      >
-        <Text variant="text.body.bold">{buttonLabel}</Text>
-      </Button>
+      {allBorrowLinks!.map(borrowLink => {
+        let fullButtonLabel =
+          borrowLink.indirectAcquisitions[0].type ===
+          "application/vnd.librarysimplified.axisnow+json"
+            ? buttonLabel + " to read online"
+            : buttonLabel + " to read on a mobile device";
+        return (
+          <Button
+            key={borrowLink.href}
+            size="lg"
+            onClick={() => borrowOrReserve(borrowLink.href)}
+            loading={isLoading}
+            loadingText={buttonLoadingText}
+          >
+            <Text variant="text.body.bold">{fullButtonLabel}</Text>
+          </Button>
+        );
+      })}
       {errorMsg && <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>}
     </>
   );
@@ -240,17 +254,23 @@ const AccessCard: React.FC<{
   const { title } = book;
   const dedupedLinks = dedupeLinks(links ?? []);
   const isAudiobook = bookIsAudiobook(book);
+  console.log("access card links", links);
+  const hasMobile = dedupedLinks.filter(link => {
+    return link.type !== "application/vnd.librarysimplified.axisnow+json";
+  });
   return (
     <>
-      <Stack sx={{ alignItems: "center" }}>
-        <SvgPhone sx={{ fontSize: 64 }} />
-        <Stack direction="column">
-          <Text variant="text.callouts.bold">
-            You&apos;re ready to read this book in SimplyE!
-          </Text>
-          <Text>{subtitle}</Text>
+      {hasMobile && (
+        <Stack sx={{ alignItems: "center" }}>
+          <SvgPhone sx={{ fontSize: 64 }} />
+          <Stack direction="column">
+            <Text variant="text.callouts.bold">
+              You&apos;re ready to read this book in SimplyE!
+            </Text>
+            <Text>{subtitle}</Text>
+          </Stack>
         </Stack>
-      </Stack>
+      )}
       {!isAudiobook && (
         <Stack direction="column" sx={{ mt: 3 }}>
           <Text variant="text.body.italic" sx={{ textAlign: "center" }}>
@@ -282,13 +302,13 @@ const DownloadButton: React.FC<{
     link.type === "application/vnd.librarysimplified.axisnow+json";
 
   if (hasReaderLink) {
-    link.url = `/read/${encodeURIComponent(link.url)}`;
+    const readerLink = `/read/${encodeURIComponent(link.url)}`;
     return (
       <NavButton
         variant="ghost"
         color="ui.gray.extraDark"
         iconLeft={SvgExternalLink}
-        href={link.url}
+        href={readerLink}
       >
         {downloadLabel}
       </NavButton>

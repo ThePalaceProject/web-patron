@@ -4,22 +4,40 @@ import React from "react";
 import reader from "utils/reader";
 import { useRouter } from "next/router";
 import useLibraryContext from "./context/LibraryContext";
+import { useActions } from 'opds-web-client/lib/components/context/ActionsContext';
+
+const loadDecryptor = async(fetcher, webpubManifestUrl) => {
+  let Decryptor = await import("../../axisnow-access-control-web/src/index");
+  if(Decryptor) {
+    try {
+      const fulfillmentData = await fetcher.fetch(webpubManifestUrl);
+      return await fulfillmentData.json();
+    } catch (err) {
+      throw new Error("Could not fetch decryptor entry link" + err);
+    }
+  }
+}
+
+const initializeReader = async(entryUrl, catalogName, useDecryptor: boolean, fetcher?) => {
+    let decryptorParams = useDecryptor ? await loadDecryptor(fetcher, entryUrl) : undefined;
+    return await reader(entryUrl, catalogName, decryptorParams);
+}
 
 const BookPage = () => {
   const library = useLibraryContext();
   const router = useRouter();
   const { bookUrl } = router.query;
-
   //TODO: 
-  // How to know from bookUrl whether or not the book is encrypted?  
+  // Is this necessary anymore?
   const bookManifestUrl = AXIS_NOW_DECRYPT ? `${bookUrl}` : `${bookUrl}/META-INF/container.xml`;
 
   const { catalogName } = library;
+  const { fetcher } = useActions();
 
   React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      reader(bookManifestUrl, catalogName);
-    }
+      if (typeof window !== "undefined") {
+        initializeReader(bookManifestUrl, catalogName, !!AXIS_NOW_DECRYPT, fetcher);
+      }
   });
 
   return (

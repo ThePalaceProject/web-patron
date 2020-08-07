@@ -129,7 +129,9 @@ export const BookListItem: React.FC<{ book: BookData }> = ({ book }) => {
 const BookListCTA: React.FC<{ book: BookData }> = ({ book }) => {
   const isBorrowed = useIsBorrowed(book);
   const fulfillmentState = getFulfillmentState(book, isBorrowed);
-  const { borrowOrReserve, isLoading, errorMsg } = useBorrow(book);
+  const { borrowOrReserve, allBorrowLinks, isLoading, errorMsg } = useBorrow(
+    book
+  );
 
   switch (fulfillmentState) {
     case "AVAILABLE_OPEN_ACCESS":
@@ -154,14 +156,24 @@ const BookListCTA: React.FC<{ book: BookData }> = ({ book }) => {
     case "AVAILABLE_TO_BORROW":
       return (
         <>
-          <Button
-            onClick={borrowOrReserve}
-            color="ui.black"
-            loading={isLoading}
-            loadingText="Borrowing..."
-          >
-            Borrow
-          </Button>
+          {allBorrowLinks!.map(borrowLink => {
+            let fullButtonLabel =
+              borrowLink.indirectAcquisitions[0].type ===
+              "application/vnd.librarysimplified.axisnow+json"
+                ? "Borrow to read online"
+                : "Borrow to read on a mobile device";
+            return (
+              <Button
+                onClick={borrowOrReserve}
+                color="ui.black"
+                loading={isLoading}
+                loadingText="Borrowing..."
+              >
+                {fullButtonLabel}
+              </Button>
+            );
+          })}
+
           {errorMsg ? (
             <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>
           ) : (
@@ -239,14 +251,23 @@ const BookListCTA: React.FC<{ book: BookData }> = ({ book }) => {
     case "READY_TO_BORROW": {
       return (
         <>
-          <Button
-            onClick={borrowOrReserve}
-            color="ui.black"
-            loading={isLoading}
-            loadingText="Borrowing..."
-          >
-            Borrow
-          </Button>
+          {allBorrowLinks!.map(borrowLink => {
+            let fullButtonLabel =
+              borrowLink.indirectAcquisitions[0].type ===
+              "application/vnd.librarysimplified.axisnow+json"
+                ? "Borrow to read online"
+                : "Borrow to read on a mobile device";
+            return (
+              <Button
+                onClick={borrowOrReserve}
+                color="ui.black"
+                loading={isLoading}
+                loadingText="Borrowing..."
+              >
+                {fullButtonLabel}
+              </Button>
+            );
+          })}
 
           {errorMsg ? (
             <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>

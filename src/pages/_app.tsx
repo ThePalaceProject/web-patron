@@ -143,7 +143,6 @@ MyApp.getInitialProps = async ({ ctx, _err }) => {
    * the store on client side with pre-filled data from ssr
    */
   const initialState = store.getState();
-
   return {
     initialState,
     SHORTEN_URLS,

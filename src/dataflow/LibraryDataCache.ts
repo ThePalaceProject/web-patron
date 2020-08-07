@@ -191,7 +191,6 @@ export default class LibraryDataCache {
 
       let catalog = currentEntry && currentEntry.catalog;
       catalog = await this.getCatalog(catalogUrl);
-
       let authDocument = currentEntry && currentEntry.authDocument;
       try {
         authDocument = await this.getAuthDocument(catalog);

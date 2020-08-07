@@ -1,4 +1,5 @@
 import { AXIS_NOW_DECRYPT } from "../utils/env";
+
 import {
   SepiaTheme,
   SerifFont,
@@ -15,7 +16,8 @@ import {
   ScrollingBookView
 } from "library-simplified-webpub-viewer";
 
-export default async function (bookUrl: string, catalogName: string) {
+export default async function (bookUrl: string, catalogName: string, decryptorParams?: any) {
+  console.log("decryptorParams", decryptorParams);
   const element = document.getElementById("viewer");
   const webpubBookUrl = new URL(bookUrl, window.location.href);
   const containerHref = webpubBookUrl.href.endsWith("container.xml")
@@ -30,10 +32,10 @@ export default async function (bookUrl: string, catalogName: string) {
   const url = containerHref.replace("META-INF/container.xml", rootfile || "");
   const finalUrl = rootfile ? new URL(url) : webpubBookUrl;
 
-  initBookSettings(element, finalUrl, catalogName);
+  initBookSettings(element, finalUrl, catalogName, decryptorParams);
 }
 
-async function initBookSettings(element, webpubManifestUrl, catalogName) {
+async function initBookSettings(element, webpubManifestUrl, catalogName, decryptorParams?) {
   const store = new LocalStorageStore({
     prefix: webpubManifestUrl.href
   });
@@ -70,14 +72,15 @@ async function initBookSettings(element, webpubManifestUrl, catalogName) {
   const paginator = new ColumnsPaginatedBookView();
   const scroller = new ScrollingBookView();
 
-  //TODO: Check that the book is of type application/vnd.librarysimplified.axisnow+json
   let Decryptor = AXIS_NOW_DECRYPT
     ? await import("../../axisnow-access-control-web/src/index")
     : undefined;
-
-  let decryptor = Decryptor
-    ? await Decryptor.default.createDecryptor(webpubManifestUrl)
+  let decryptor;
+  if(Decryptor) {
+    decryptor = Decryptor
+    ? await Decryptor.default.createDecryptor(decryptorParams)
     : undefined;
+  }
 
   const entryUrl:string = decryptor ? decryptor.getEntryUrl() : webpubManifestUrl;
 
