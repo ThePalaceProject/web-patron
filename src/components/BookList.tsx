@@ -1,7 +1,11 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { BookData, LaneData } from "opds-web-client/lib/interfaces";
+import {
+  BookData,
+  LaneData,
+  RequiredKeys
+} from "opds-web-client/lib/interfaces";
 import { truncateString, stripHTML } from "../utils/string";
 import {
   getAuthors,
@@ -42,9 +46,11 @@ const ListLoadingIndicator = () => (
   </div>
 );
 
+type BookWithUrl = RequiredKeys<BookData, "url">;
+const hasUrl = (book: BookData): book is BookWithUrl => !!book.url;
+
 export const ListView: React.FC<{
   books: BookData[];
-  breadcrumb?: React.ReactNode;
 }> = ({ books }) => {
   // this hook will refetch the page when we reach the bottom of the screen
   const { listRef, isFetchingPage } = useInfiniteScroll();
@@ -61,9 +67,11 @@ export const ListView: React.FC<{
   );
 };
 
-export const BookListItem: React.FC<{ book: BookData }> = ({ book }) => {
+export const BookListItem: React.FC<{
+  book: BookData;
+}> = ({ book }) => {
   // if there is no book url, it doesn't make sense to display it.
-  if (!book.url) return null;
+  if (!hasUrl(book)) return null;
 
   return (
     <li
@@ -126,7 +134,7 @@ export const BookListItem: React.FC<{ book: BookData }> = ({ book }) => {
   );
 };
 
-const BookListCTA: React.FC<{ book: BookData }> = ({ book }) => {
+const BookListCTA: React.FC<{ book: BookWithUrl }> = ({ book }) => {
   const isBorrowed = useIsBorrowed(book);
   const fulfillmentState = getFulfillmentState(book, isBorrowed);
   const { borrowOrReserve, allBorrowLinks, isLoading, errorMsg } = useBorrow(
@@ -145,7 +153,7 @@ const BookListCTA: React.FC<{ book: BookData }> = ({ book }) => {
           </Text>
           <NavButton
             variant="ghost"
-            bookUrl={book.url ?? ""}
+            bookUrl={book.url}
             iconRight={ArrowForward}
           >
             View Book Details
@@ -157,6 +165,7 @@ const BookListCTA: React.FC<{ book: BookData }> = ({ book }) => {
       return (
         <>
           {allBorrowLinks!.map(borrowLink => {
+            console.log("borrowLink", borrowLink);
             let fullButtonLabel =
               borrowLink.indirectType ===
               "application/vnd.librarysimplified.axisnow+json"
@@ -187,7 +196,7 @@ const BookListCTA: React.FC<{ book: BookData }> = ({ book }) => {
           )}
           <NavButton
             variant="ghost"
-            bookUrl={book.url ?? ""}
+            bookUrl={book.url}
             iconRight={ArrowForward}
           >
             View Book Details
@@ -214,7 +223,7 @@ const BookListCTA: React.FC<{ book: BookData }> = ({ book }) => {
           </Text>
           <NavButton
             variant="ghost"
-            bookUrl={book.url ?? ""}
+            bookUrl={book.url}
             iconRight={ArrowForward}
           >
             View Book Details
@@ -240,7 +249,7 @@ const BookListCTA: React.FC<{ book: BookData }> = ({ book }) => {
           </Text>
           <NavButton
             variant="ghost"
-            bookUrl={book.url ?? ""}
+            bookUrl={book.url}
             iconRight={ArrowForward}
           >
             View Book Details
@@ -282,7 +291,7 @@ const BookListCTA: React.FC<{ book: BookData }> = ({ book }) => {
           )}
           <NavButton
             variant="ghost"
-            bookUrl={book.url ?? ""}
+            bookUrl={book.url}
             iconRight={ArrowForward}
           >
             View Book Details
@@ -311,7 +320,7 @@ const BookListCTA: React.FC<{ book: BookData }> = ({ book }) => {
           </Text>
           <NavButton
             variant="ghost"
-            bookUrl={book.url ?? ""}
+            bookUrl={book.url}
             iconRight={ArrowForward}
           >
             View Book Details
@@ -322,11 +331,7 @@ const BookListCTA: React.FC<{ book: BookData }> = ({ book }) => {
 
     case "FULFILLMENT_STATE_ERROR":
       return (
-        <NavButton
-          variant="ghost"
-          bookUrl={book.url ?? ""}
-          iconRight={ArrowForward}
-        >
+        <NavButton variant="ghost" bookUrl={book.url} iconRight={ArrowForward}>
           View Book Details
         </NavButton>
       );

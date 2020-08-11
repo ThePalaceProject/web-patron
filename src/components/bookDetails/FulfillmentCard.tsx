@@ -26,6 +26,7 @@ import SvgExternalLink from "icons/ExternalOpen";
 import SvgDownload from "icons/Download";
 import SvgPhone from "icons/Phone";
 import useIsBorrowed from "hooks/useIsBorrowed";
+import { NEXT_PUBLIC_COMPANION_APP } from "../../utils/env";
 
 const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
   return (
@@ -212,7 +213,7 @@ const Reserved: React.FC<{ book: BookData }> = ({ book }) => {
           Your hold position is: {position}.
         </Text>
       )}
-      <Button size="lg" disabled>
+      <Button size="lg" disabled aria-label="Reserved" role="button">
         <Text variant="text.body.bold">Reserved</Text>
       </Button>
       {/* {errorMsg && <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>} */}
@@ -255,8 +256,11 @@ const AccessCard: React.FC<{
   const isAudiobook = bookIsAudiobook(book);
   console.log("access card links", links);
   const hasMobile = dedupedLinks.filter(link => {
-      return (link as FulfillmentLink).indirectType !== "application/vnd.librarysimplified.axisnow+json";
+      return link.type !== "application/vnd.librarysimplified.axisnow+json";
   });
+  const companionApp =
+    NEXT_PUBLIC_COMPANION_APP === "openebooks" ? "Open eBooks" : "SimplyE";
+
   return (
     <>
       {hasMobile && (
@@ -264,7 +268,7 @@ const AccessCard: React.FC<{
           <SvgPhone sx={{ fontSize: 64 }} />
           <Stack direction="column">
             <Text variant="text.callouts.bold">
-              You&apos;re ready to read this book in SimplyE!
+              You&apos;re ready to read this book in {companionApp}!
             </Text>
             <Text>{subtitle}</Text>
           </Stack>
@@ -292,12 +296,14 @@ const DownloadButton: React.FC<{
   link: MediaLink;
   title: string;
 }> = ({ link, title }) => {
+  console.log("using download button link", link);
   const { fulfill, downloadLabel } = useDownloadButton(link, title);
 
   const hasReaderLink =
     (link as FulfillmentLink).indirectType === "application/vnd.librarysimplified.axisnow+json";
 
   if (hasReaderLink) {
+    console.log("has readerlink");
     const readerLink = `/read/${encodeURIComponent(link.url)}`;
     return (
       <NavButton

@@ -1,6 +1,6 @@
 import * as React from "react";
-import { PathFor, PreloadedData } from "../../interfaces";
-import UrlShortener from "../../UrlShortener";
+import { PathFor, PreloadedData } from "interfaces";
+import UrlShortener from "UrlShortener";
 import { LibraryProvider } from "./LibraryContext";
 import PathForProvider from "opds-web-client/lib/components/context/PathForContext";
 import { RouterProvider } from "./RouterContext";
@@ -13,8 +13,9 @@ import { Store } from "redux";
 import DataFetcher from "opds-web-client/lib/DataFetcher";
 import ActionsCreator from "opds-web-client/lib/actions";
 import { adapter } from "opds-web-client/lib/OPDSDataAdapter";
-import basicAuthPlugin from "../../auth/basicAuthPlugin";
-import getPathFor from "../../utils/getPathFor";
+import basicAuthPlugin from "auth/basicAuthPlugin";
+import samlAuthPlugin from "auth/samlAuthPlugin";
+import getPathFor from "utils/getPathFor";
 import { LinkUtilsProvider } from "./LinkUtilsContext";
 
 type ProviderProps = PreloadedData & {
@@ -39,8 +40,14 @@ const AppContextProvider: React.FC<ProviderProps> = ({
   const libraryId = library.id;
   const urlShortener = new UrlShortener(library.catalogUrl, shortenUrls);
   const pathFor: PathFor = getPathFor(urlShortener, libraryId);
-  const computedFetcher = fetcher ?? new DataFetcher({ adapter });
-  const computedActions = actions ?? new ActionsCreator(computedFetcher);
+  const computedFetcher = React.useMemo(
+    () => fetcher ?? new DataFetcher({ adapter }),
+    [fetcher]
+  );
+  const computedActions = React.useMemo(
+    () => actions ?? new ActionsCreator(computedFetcher),
+    [actions, computedFetcher]
+  );
 
   return (
     <ReakitProvider>
@@ -49,7 +56,7 @@ const AppContextProvider: React.FC<ProviderProps> = ({
           <OPDSStore
             initialState={initialState}
             store={store}
-            authPlugins={[basicAuthPlugin]}
+            authPlugins={[basicAuthPlugin, samlAuthPlugin]}
           >
             <RecommendationsProvider>
               <ActionsProvider

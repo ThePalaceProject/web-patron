@@ -4,10 +4,13 @@ import * as React from "react";
 import { useDialogState, DialogDisclosure } from "reakit/Dialog";
 import useLibraryContext from "./context/LibraryContext";
 import useAuth from "../hooks/useAuth";
-import { getBasicAuthProvider } from "../utils/auth";
 import Modal from "./Modal";
 import ClientOnly from "./ClientOnly";
 import { H2 } from "./Text";
+import Select from "./Select";
+import FormLabel from "./form/FormLabel";
+import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
+import useTypedSelector from "hooks/useTypedSelector";
 
 /**
  *  - makes sure auth state is loaded from cookies
@@ -15,36 +18,49 @@ import { H2 } from "./Text";
  *  - uses the AuthPlugin system to render the auth form
  */
 const Auth: React.FC = ({ children }) => {
-  /**
-   * Get the auth providers from the redux store.
-   * If you want to support multiple auth providers,
-   * you should make this selectable
-   *
-   * this hook also makes sure that the credentials are loaded
-   * from cookies, at least for basic auth
-   */
   const { showForm, cancel, providers } = useAuth();
-  /**
-   * We only support BasicAuth currently, but if you want to support more
-   * then you should allow a user to choose one of these auth providers
-   */
-  const basicAuthProvider = getBasicAuthProvider(providers);
-  const BasicAuthComponent = basicAuthProvider?.plugin?.formComponent;
-
-  // we use some properties from this hook,
-  // but the visibility is in redux state
   const dialog = useDialogState();
   const library = useLibraryContext();
+  const [authProvider, setAuthProvider] = React.useState(providers?.[0]);
+  const { fetcher, actions, dispatch } = useActions();
+
+  /**
+   * This component is responsible for fetching loans whenever the
+   * auth credentials change
+   */
+  const { provider: currentProvider, credentials } =
+    fetcher.getAuthCredentials() ?? {};
+  const loansUrl = useTypedSelector(state => state.loans.url);
+  React.useEffect(() => {
+    if (currentProvider && credentials) {
+      dispatch(
+        actions.saveAuthCredentials({ provider: currentProvider, credentials })
+      );
+      if (loansUrl) dispatch(actions.fetchLoans(loansUrl));
+    }
+  }, [currentProvider, credentials, loansUrl, actions, dispatch]);
+
+  // the providers get set when the form is shown, so
+  // it's initially undefined. We need to update when they get set
+  React.useEffect(() => {
+    if (!authProvider) setAuthProvider(providers?.[0]);
+  }, [authProvider, providers]);
+
+  const handleChangeProvider: React.ChangeEventHandler<HTMLSelectElement> = e => {
+    setAuthProvider(
+      providers?.find(provider => provider.id === e.target.value)
+    );
+  };
+
+  const hasMultipleProviders = providers?.length !== 1;
+
   return (
     <React.Fragment>
-      {/* <DialogDisclosure {...dialog} visible={isVisible} toggle={toggle}>
-        Open dialog
-      </DialogDisclosure> */}
       <ClientOnly>
         <Modal
           isVisible={showForm}
           hide={cancel ?? undefined}
-          label="Sign In"
+          label="Sign In Form"
           dialog={dialog}
           sx={{ p: 5 }}
         >
@@ -52,13 +68,22 @@ const Auth: React.FC = ({ children }) => {
             <H2>{library.catalogName}</H2>
             <h4>Login</h4>
           </div>
-          {/* Here we render the auth plugins  */}
-          {/* if you would like to enable alternative auth plugins */}
-          {/* you should render them (or some way to choose one) here */}
-          {BasicAuthComponent && basicAuthProvider && showForm ? (
-            <BasicAuthComponent provider={basicAuthProvider} />
+          {hasMultipleProviders && (
+            <div sx={{ mb: 2 }}>
+              <FormLabel htmlFor="login-method-select">Login Method</FormLabel>
+              <Select id="login-method-select" onChange={handleChangeProvider}>
+                {providers?.map(provider => (
+                  <option key={provider.id} value={provider.id}>
+                    {provider.method.description}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          )}
+          {authProvider && authProvider.plugin.formComponent ? (
+            <authProvider.plugin.formComponent provider={authProvider} />
           ) : (
-            "Basic auth provider is missing."
+            "There is no Auth Plugin configured for the selected Auth Provider."
           )}
         </Modal>
       </ClientOnly>

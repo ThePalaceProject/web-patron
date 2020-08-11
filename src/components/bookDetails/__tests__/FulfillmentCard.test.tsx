@@ -3,7 +3,6 @@ import {
   render,
   fixtures,
   actions,
-  waitFor,
   waitForElementToBeRemoved
 } from "test-utils";
 import { mergeBook } from "test-utils/fixtures";
@@ -14,6 +13,8 @@ import userEvent from "@testing-library/user-event";
 import { State } from "opds-web-client/lib/state";
 import * as useBorrow from "hooks/useBorrow";
 import _download from "opds-web-client/lib/components/download";
+
+import * as env from "../../../utils/env";
 
 jest.mock("opds-web-client/lib/components/download");
 window.open = jest.fn();
@@ -31,7 +32,7 @@ describe("open-access", () => {
     expect(
       utils.getByText("This open-access book is available to keep forever.")
     ).toBeInTheDocument();
-    expect(utils.getByRole("button", { name: "Borrow" })).toBeInTheDocument();
+    expect(utils.getByRole("button", { name: /Borrow/i })).toBeInTheDocument();
   });
 
   test("correct title and subtitle when loaned", () => {
@@ -157,13 +158,13 @@ describe("available to borrow", () => {
     });
 
     const borrowButton = await utils.findByRole("button", {
-      name: "Borrowing..."
+      name: /Borrowing.../i
     });
     expect(borrowButton).toBeInTheDocument();
     expect(borrowButton).toHaveAttribute("disabled", "");
   });
 
-  test("calls fetch loans after borrowing", async () => {
+  test("doesn't refetch loans after borrowing", async () => {
     const fetchLoansSpy = jest.spyOn(actions, "fetchLoans");
     const _updateBookSpy = jest
       .spyOn(actions, "updateBook")
@@ -182,7 +183,7 @@ describe("available to borrow", () => {
     userEvent.click(utils.getByText("Borrow"));
 
     await waitForElementToBeRemoved(() => utils.getByText("Borrowing..."));
-    await waitFor(() => expect(fetchLoansSpy).toHaveBeenCalledTimes(1));
+    expect(fetchLoansSpy).toHaveBeenCalledTimes(0);
   });
 
   test("displays error message", () => {
@@ -262,13 +263,13 @@ describe("ready to borrow", () => {
     });
 
     const borrowButton = await utils.findByRole("button", {
-      name: "Borrowing..."
+      name: /Borrowing.../i
     });
     expect(borrowButton).toBeInTheDocument();
     expect(borrowButton).toHaveAttribute("disabled", "");
   });
 
-  test("refetches loans after borrowing", async () => {
+  test("doesn't refetch loans after borrowing", async () => {
     const fetchLoansSpy = jest.spyOn(actions, "fetchLoans");
     const _updateBookSpy = jest
       .spyOn(actions, "updateBook")
@@ -286,7 +287,7 @@ describe("ready to borrow", () => {
     userEvent.click(utils.getByText("Borrow"));
     // the borrow button should be gone now
     await waitForElementToBeRemoved(() => utils.getByText("Borrowing..."));
-    await waitFor(() => expect(fetchLoansSpy).toHaveBeenCalledTimes(1));
+    expect(fetchLoansSpy).toHaveBeenCalledTimes(0);
   });
 
   test("displays error message", () => {
@@ -342,7 +343,9 @@ describe("available to reserve", () => {
 
   test("displays reserve button", () => {
     const utils = render(<FulfillmentCard book={unavailableBook} />);
-    const reserveButton = utils.getByRole("button", { name: "Reserve" });
+    const reserveButton = utils.getByRole("button", {
+      name: /Reserve/i
+    });
     expect(reserveButton).toBeInTheDocument();
   });
 
@@ -409,13 +412,13 @@ describe("available to reserve", () => {
         }
       })
     });
-    const reserveButton = await utils.findByRole("button", {
-      name: "Reserving..."
+    const reserveButton = utils.getByRole("button", {
+      name: /Reserving.../i
     });
     expect(reserveButton).toBeInTheDocument();
     expect(reserveButton).toHaveAttribute("disabled", "");
   });
-  test("refetches loans after reserving", async () => {
+  test("doesn't refetch loans after reserving", async () => {
     const fetchLoansSpy = jest.spyOn(actions, "fetchLoans");
     const _updateBookSpy = jest
       .spyOn(actions, "updateBook")
@@ -431,7 +434,7 @@ describe("available to reserve", () => {
       })
     });
     userEvent.click(utils.getByText("Reserve"));
-    await waitFor(() => expect(fetchLoansSpy).toHaveBeenCalledTimes(1));
+    expect(fetchLoansSpy).toHaveBeenCalledTimes(0);
   });
 });
 
@@ -475,6 +478,8 @@ describe("reserved", () => {
 });
 
 describe("available to download", () => {
+  beforeEach(() => ((env.NEXT_PUBLIC_COMPANION_APP as string) = "simplye"));
+
   const downloadableBook = mergeBook({
     openAccessLinks: undefined,
     fulfillmentLinks: [
@@ -524,6 +529,17 @@ describe("available to download", () => {
       utils.getByText("You have this book on loan until Thu Jun 18 2020.")
     ).toBeInTheDocument();
     expect(utils.getByText("You're ready to read this book in SimplyE!"));
+  });
+
+  test("correct title and subtitle when COMPANION_APP is set to openebooks", () => {
+    (env.NEXT_PUBLIC_COMPANION_APP as string) = "openebooks";
+    const utils = render(<FulfillmentCard book={downloadableBook} />);
+    expect(
+      utils.getByText("You have this book on loan until Thu Jun 18 2020.")
+    ).toBeInTheDocument();
+    expect(
+      utils.getByText("You're ready to read this book in Open eBooks!")
+    ).toBeInTheDocument();
   });
 
   test("handles lack of availability info", () => {

@@ -27,9 +27,8 @@ const BookPage = () => {
   const library = useLibraryContext();
   const router = useRouter();
   const { bookUrl } = router.query;
-  //TODO: 
-  // Is this necessary anymore?
-  const bookManifestUrl = AXIS_NOW_DECRYPT ? `${bookUrl}` : `${bookUrl}/META-INF/container.xml`;
+
+  const bookManifestUrl = `${bookUrl}`;
 
   const { catalogName } = library;
   const { fetcher } = useActions();

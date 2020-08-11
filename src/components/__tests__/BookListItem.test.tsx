@@ -1,5 +1,5 @@
 import * as React from "react";
-import { render, fixtures, actions, waitFor } from "test-utils";
+import { render, fixtures, actions } from "test-utils";
 import merge from "deepmerge";
 import { BookListItem } from "components/BookList";
 import { State } from "opds-web-client/lib/state";
@@ -52,6 +52,17 @@ describe("open access book", () => {
     expect(utils.queryByText("Borrow to read on a mobile device")).toBeNull();
     expectViewDetails(utils);
   });
+
+  test("renders subtitle if provided", () => {
+    const bookWithSubtitle = fixtures.mergeBook({
+      subtitle:
+        "Book subtitle that is quite long-winded and will break the ux if not truncated"
+    });
+    const utils = render(<BookListItem book={bookWithSubtitle} />);
+    expect(
+      utils.getByText("Book subtitle that is quite long-winded and will...")
+    ).toBeInTheDocument();
+  });
 });
 
 describe("available to borrow book", () => {
@@ -71,7 +82,7 @@ describe("available to borrow book", () => {
     ).toBeInTheDocument();
   });
 
-  test("shows loading state when borrowing, borrows, and refetches loans", async () => {
+  test("shows loading state when borrowing, borrows, and doesn't refetch loans", async () => {
     // mock the actions.updateBook
     const updateBookSpy = jest
       .spyOn(actions, "updateBook")
@@ -97,12 +108,12 @@ describe("available to borrow book", () => {
     expect(updateBookSpy).toHaveBeenCalledTimes(1);
     expect(updateBookSpy).toHaveBeenCalledWith("borrow url");
     const borrowButton = await utils.findByRole("button", {
-      name: "Borrowing..."
+      name: /Borrowing.../i
     });
     expect(borrowButton).toBeInTheDocument();
     expect(borrowButton).toHaveAttribute("disabled", "");
-    // we should refetch the loans after borrowing
-    await waitFor(() => expect(fetchLoansSpy).toHaveBeenCalledTimes(1));
+    // we only fetch loans on app start
+    expect(fetchLoansSpy).toHaveBeenCalledTimes(0);
   });
 
   test("displays error message", () => {
@@ -145,7 +156,7 @@ describe("ready to borrow book", () => {
     ).toBeInTheDocument();
   });
 
-  test("shows loading state when borrowing, borrows, and refetches loans", async () => {
+  test("shows loading state when borrowing, borrows, and doesn't refetch loans", async () => {
     // mock the actions.updateBook
     const updateBookSpy = jest
       .spyOn(actions, "updateBook")
@@ -170,13 +181,12 @@ describe("ready to borrow book", () => {
     userEvent.click(utils.getByText("Borrow to read on a mobile device"));
     expect(updateBookSpy).toHaveBeenCalledTimes(1);
     expect(updateBookSpy).toHaveBeenCalledWith("borrow url");
-    const borrowButton = await utils.findByRole("button", {
-      name: "Borrowing..."
+    const borrowButton = utils.getByRole("button", {
+      name: /Borrowing.../i
     });
     expect(borrowButton).toBeInTheDocument();
     expect(borrowButton).toHaveAttribute("disabled", "");
-    // we should refetch the loans after borrowing
-    await waitFor(() => expect(fetchLoansSpy).toHaveBeenCalledTimes(1));
+    expect(fetchLoansSpy).toHaveBeenCalledTimes(0);
   });
 
   test("displays error message", () => {
@@ -319,7 +329,7 @@ describe("available to reserve book", () => {
     expect(reserveButton).toBeInTheDocument();
   });
 
-  test("shows loading state when reserving, reserves, and refetches loans", async () => {
+  test("shows loading state when reserving, reserves, and doesn't refetch loans", async () => {
     // mock the actions.updateBook
     const updateBookSpy = jest
       .spyOn(actions, "updateBook")
@@ -344,13 +354,12 @@ describe("available to reserve book", () => {
     userEvent.click(utils.getByText("Reserve"));
     expect(updateBookSpy).toHaveBeenCalledTimes(1);
     expect(updateBookSpy).toHaveBeenCalledWith("borrow url");
-    const reserveButton = await utils.findByRole("button", {
-      name: "Reserving..."
+    const reserveButton = utils.getByRole("button", {
+      name: /Reserving.../i
     });
     expect(reserveButton).toBeInTheDocument();
     expect(reserveButton).toHaveAttribute("disabled", "");
-    // we should refetch the loans after borrowing
-    await waitFor(() => expect(fetchLoansSpy).toHaveBeenCalledTimes(1));
+    expect(fetchLoansSpy).toHaveBeenCalledTimes(0);
   });
 });
 
