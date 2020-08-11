@@ -162,7 +162,6 @@ const BorrowOrReserve: React.FC<{
   const { isLoading, borrowOrReserve, allBorrowLinks, errorMsg } = useBorrow(
     book
   );
-  console.log("book", book);
   return (
     <>
       <Text variant="text.callouts.bold">{title}</Text>
@@ -178,15 +177,15 @@ const BorrowOrReserve: React.FC<{
       </Text>
       {allBorrowLinks!.map(borrowLink => {
         let fullButtonLabel =
-          borrowLink.indirectAcquisitions[0].type ===
+          borrowLink.indirectType ===
           "application/vnd.librarysimplified.axisnow+json"
             ? buttonLabel + " to read online"
             : buttonLabel + " to read on a mobile device";
         return (
           <Button
-            key={borrowLink.href}
+            key={borrowLink.url}
             size="lg"
-            onClick={() => borrowOrReserve(borrowLink.href)}
+            onClick={() => borrowOrReserve(borrowLink.url)}
             loading={isLoading}
             loadingText={buttonLoadingText}
           >
@@ -248,15 +247,15 @@ const ErrorCard: React.FC = () => {
  */
 const AccessCard: React.FC<{
   book: BookData;
-  links: MediaLink[] | FulfillmentLink[];
+  links: MediaLink[];
   subtitle: string;
 }> = ({ book, links, subtitle }) => {
   const { title } = book;
-  const dedupedLinks = dedupeLinks(links ?? []);
+  const dedupedLinks = dedupeLinks(links);
   const isAudiobook = bookIsAudiobook(book);
   console.log("access card links", links);
   const hasMobile = dedupedLinks.filter(link => {
-    return link.type !== "application/vnd.librarysimplified.axisnow+json";
+      return (link as FulfillmentLink).indirectType !== "application/vnd.librarysimplified.axisnow+json";
   });
   return (
     <>
@@ -290,16 +289,13 @@ const AccessCard: React.FC<{
 };
 
 const DownloadButton: React.FC<{
-  link: FulfillmentLink | MediaLink;
+  link: MediaLink;
   title: string;
 }> = ({ link, title }) => {
   const { fulfill, downloadLabel } = useDownloadButton(link, title);
 
-  /* web-epub is currently used in test-server.
-                 to-do: remove the below commented out check */
   const hasReaderLink =
-    // link.type === "application/vnd.librarysimplified.web-epub" ||
-    link.type === "application/vnd.librarysimplified.axisnow+json";
+    (link as FulfillmentLink).indirectType === "application/vnd.librarysimplified.axisnow+json";
 
   if (hasReaderLink) {
     const readerLink = `/read/${encodeURIComponent(link.url)}`;

@@ -1,9 +1,8 @@
 import * as React from "react";
-import { BookData, MediaLink } from "opds-web-client/lib/interfaces";
+import { BookData } from "opds-web-client/lib/interfaces";
 import useTypedSelector from "./useTypedSelector";
 import { getErrorMsg } from "utils/book";
 import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
-import { OPDSAcquisitionLink } from 'opds-feed-parser';
 
 export default function useBorrow(book: BookData) {
   const isUnmounted = React.useRef(false);

@@ -158,12 +158,13 @@ const BookListCTA: React.FC<{ book: BookData }> = ({ book }) => {
         <>
           {allBorrowLinks!.map(borrowLink => {
             let fullButtonLabel =
-              borrowLink.indirectAcquisitions[0].type ===
+              borrowLink.indirectType ===
               "application/vnd.librarysimplified.axisnow+json"
                 ? "Borrow to read online"
                 : "Borrow to read on a mobile device";
             return (
               <Button
+                key = {borrowLink.url}
                 onClick={borrowOrReserve}
                 color="ui.black"
                 loading={isLoading}
@@ -253,7 +254,7 @@ const BookListCTA: React.FC<{ book: BookData }> = ({ book }) => {
         <>
           {allBorrowLinks!.map(borrowLink => {
             let fullButtonLabel =
-              borrowLink.indirectAcquisitions[0].type ===
+              borrowLink.indirectType ===
               "application/vnd.librarysimplified.axisnow+json"
                 ? "Borrow to read online"
                 : "Borrow to read on a mobile device";
