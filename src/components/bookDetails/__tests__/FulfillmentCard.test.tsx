@@ -128,11 +128,11 @@ describe("available to borrow", () => {
       .mockImplementation(_url => _dispatch => Promise.resolve(fixtures.book));
 
     const utils = render(<FulfillmentCard book={closedAccessBook} />);
-    const borrowButton = utils.getByText("Borrow");
+    const borrowButton = utils.getByText("Borrow to read on a mobile device");
     expect(borrowButton).toBeInTheDocument();
 
     // click borrow
-    userEvent.click(utils.getByText("Borrow"));
+    userEvent.click(utils.getByText("Borrow to read on a mobile device"));
     expect(updateBookSpy).toHaveBeenCalledTimes(1);
     expect(updateBookSpy).toHaveBeenCalledWith("borrow url");
 
@@ -144,6 +144,13 @@ describe("available to borrow", () => {
     const _useBorrowSpy = jest.spyOn(useBorrow, "default").mockReturnValueOnce({
       isLoading: true,
       borrowOrReserve: jest.fn(),
+      allBorrowLinks: [
+        {
+          url: "borrow url",
+          type: "application/atom+xml;type=entry;profile=opds-catalog",
+          indirectType: "indirect-type"
+        }
+      ],
       errorMsg: null
     });
 
@@ -180,7 +187,7 @@ describe("available to borrow", () => {
         }
       })
     });
-    userEvent.click(utils.getByText("Borrow"));
+    userEvent.click(utils.getByText("Borrow to read on a mobile device"));
 
     await waitForElementToBeRemoved(() => utils.getByText("Borrowing..."));
     expect(fetchLoansSpy).toHaveBeenCalledTimes(0);
@@ -238,7 +245,7 @@ describe("ready to borrow", () => {
       })
     });
     // click borrow
-    userEvent.click(utils.getByText("Borrow"));
+    userEvent.click(utils.getByText("Borrow to read on a mobile device"));
     expect(updateBookSpy).toHaveBeenCalledTimes(1);
     expect(updateBookSpy).toHaveBeenCalledWith("borrow url");
 
@@ -250,6 +257,13 @@ describe("ready to borrow", () => {
     const _useBorrowSpy = jest.spyOn(useBorrow, "default").mockReturnValueOnce({
       isLoading: true,
       borrowOrReserve: jest.fn(),
+      allBorrowLinks: [
+        {
+          url: "borrow url",
+          type: "application/atom+xml;type=entry;profile=opds-catalog",
+          indirectType: "indirect-type"
+        }
+      ],
       errorMsg: null
     });
 
@@ -284,7 +298,7 @@ describe("ready to borrow", () => {
         }
       })
     });
-    userEvent.click(utils.getByText("Borrow"));
+    userEvent.click(utils.getByText("Borrow to read on a mobile device"));
     // the borrow button should be gone now
     await waitForElementToBeRemoved(() => utils.getByText("Borrowing..."));
     expect(fetchLoansSpy).toHaveBeenCalledTimes(0);
@@ -402,6 +416,13 @@ describe("available to reserve", () => {
     const _useBorrowSpy = jest.spyOn(useBorrow, "default").mockReturnValueOnce({
       isLoading: true,
       borrowOrReserve: jest.fn(),
+      allBorrowLinks: [
+        {
+          url: "borrow url",
+          type: "application/atom+xml;type=entry;profile=opds-catalog",
+          indirectType: "indirect-type"
+        }
+      ],
       errorMsg: null
     });
     const utils = render(<FulfillmentCard book={unavailableBook} />, {

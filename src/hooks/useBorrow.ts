@@ -12,7 +12,7 @@ export default function useBorrow(book: BookData) {
   const { actions, dispatch } = useActions();
   const allBorrowLinks = book.allBorrowLinks;
 
-  const borrowOrReserve = async (url) => {
+  const borrowOrReserve = async url => {
     if (url) {
       setLoading(true);
       await dispatch(actions.updateBook(url));

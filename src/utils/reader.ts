@@ -16,7 +16,11 @@ import {
   ScrollingBookView
 } from "library-simplified-webpub-viewer";
 
-export default async function (bookUrl: string, catalogName: string, decryptorParams?: any) {
+export default async function (
+  bookUrl: string,
+  catalogName: string,
+  decryptorParams?: any
+) {
   console.log("decryptorParams", decryptorParams);
   const element = document.getElementById("viewer");
   const webpubBookUrl = new URL(bookUrl, window.location.href);
@@ -35,7 +39,12 @@ export default async function (bookUrl: string, catalogName: string, decryptorPa
   initBookSettings(element, finalUrl, catalogName, decryptorParams);
 }
 
-async function initBookSettings(element, webpubManifestUrl, catalogName, decryptorParams?) {
+async function initBookSettings(
+  element,
+  webpubManifestUrl,
+  catalogName,
+  decryptorParams?
+) {
   const store = new LocalStorageStore({
     prefix: webpubManifestUrl.href
   });
@@ -72,17 +81,19 @@ async function initBookSettings(element, webpubManifestUrl, catalogName, decrypt
   const paginator = new ColumnsPaginatedBookView();
   const scroller = new ScrollingBookView();
 
-  let Decryptor = AXIS_NOW_DECRYPT
-    ? await import("../../axisnow-access-control-web/src/index")
+  const Decryptor = AXIS_NOW_DECRYPT
+    ? await import("../../axisnow-access-control-web/src/decryptor")
     : undefined;
   let decryptor;
-  if(Decryptor) {
+  if (Decryptor) {
     decryptor = Decryptor
-    ? await Decryptor.default.createDecryptor(decryptorParams)
-    : undefined;
+      ? await Decryptor.default.createDecryptor(decryptorParams)
+      : undefined;
   }
 
-  const entryUrl:string = decryptor ? decryptor.getEntryUrl() : webpubManifestUrl;
+  const entryUrl: string = decryptor
+    ? decryptor.getEntryUrl()
+    : webpubManifestUrl;
 
   const bookSettings = await BookSettings.create({
     store: settingsStore,

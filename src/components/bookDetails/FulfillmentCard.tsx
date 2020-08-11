@@ -1,5 +1,3 @@
-import { AXIS_NOW_DECRYPT } from "../../utils/env";
-
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
@@ -10,11 +8,7 @@ import {
   queueString,
   bookIsAudiobook
 } from "utils/book";
-import {
-  BookData,
-  MediaLink,
-  FulfillmentLink
-} from "opds-web-client/lib/interfaces";
+import { BookData, MediaLink } from "opds-web-client/lib/interfaces";
 import Button, { NavButton } from "../Button";
 import useDownloadButton from "opds-web-client/lib/hooks/useDownloadButton";
 import { withErrorBoundary } from "../ErrorBoundary";
@@ -177,7 +171,7 @@ const BorrowOrReserve: React.FC<{
         {subtitle}
       </Text>
       {allBorrowLinks!.map(borrowLink => {
-        let fullButtonLabel =
+        const fullButtonLabel =
           borrowLink.indirectType ===
           "application/vnd.librarysimplified.axisnow+json"
             ? buttonLabel + " to read online"
@@ -243,7 +237,7 @@ const ErrorCard: React.FC = () => {
 };
 
 /**
- * Handles the case where it is ready for download either via openAccessLink or
+ * Handles the case where it is ready for access either via openAccessLink or
  * via fulfillmentLink.
  */
 const AccessCard: React.FC<{
@@ -254,26 +248,21 @@ const AccessCard: React.FC<{
   const { title } = book;
   const dedupedLinks = dedupeLinks(links);
   const isAudiobook = bookIsAudiobook(book);
-  console.log("access card links", links);
-  const hasMobile = dedupedLinks.filter(link => {
-      return link.type !== "application/vnd.librarysimplified.axisnow+json";
-  });
   const companionApp =
     NEXT_PUBLIC_COMPANION_APP === "openebooks" ? "Open eBooks" : "SimplyE";
+  console.log("access card links", links, companionApp);
 
   return (
     <>
-      {hasMobile && (
-        <Stack sx={{ alignItems: "center" }}>
-          <SvgPhone sx={{ fontSize: 64 }} />
-          <Stack direction="column">
-            <Text variant="text.callouts.bold">
-              You&apos;re ready to read this book in {companionApp}!
-            </Text>
-            <Text>{subtitle}</Text>
-          </Stack>
+      <Stack sx={{ alignItems: "center" }}>
+        <SvgPhone sx={{ fontSize: 64 }} />
+        <Stack direction="column">
+          <Text variant="text.callouts.bold">
+            You&apos;re ready to read this book in {companionApp}!
+          </Text>
+          <Text>{subtitle}</Text>
         </Stack>
-      )}
+      </Stack>
       {!isAudiobook && (
         <Stack direction="column" sx={{ mt: 3 }}>
           <Text variant="text.body.italic" sx={{ textAlign: "center" }}>
@@ -281,6 +270,12 @@ const AccessCard: React.FC<{
           </Text>
           <Stack sx={{ justifyContent: "center", flexWrap: "wrap" }}>
             {dedupedLinks.map(link => {
+              if (
+                NEXT_PUBLIC_COMPANION_APP === "openebooks" &&
+                link.type === "application/vnd.librarysimplified.axisnow+json"
+              ) {
+                return <ReadOnlineButton key={link.url} link={link} />;
+              }
               return (
                 <DownloadButton key={link.url} link={link} title={title} />
               );
@@ -292,41 +287,37 @@ const AccessCard: React.FC<{
   );
 };
 
+const ReadOnlineButton: React.FC<{
+  link: MediaLink;
+}> = ({ link }) => {
+  const readerLink = `/read/${encodeURIComponent(link.url)}`;
+  return (
+    <NavButton
+      variant="ghost"
+      color="ui.gray.extraDark"
+      iconLeft={SvgExternalLink}
+      href={readerLink}
+    >
+      Read Online
+    </NavButton>
+  );
+};
+
 const DownloadButton: React.FC<{
   link: MediaLink;
   title: string;
 }> = ({ link, title }) => {
-  console.log("using download button link", link);
   const { fulfill, downloadLabel } = useDownloadButton(link, title);
-
-  const hasReaderLink =
-    (link as FulfillmentLink).indirectType === "application/vnd.librarysimplified.axisnow+json";
-
-  if (hasReaderLink) {
-    console.log("has readerlink");
-    const readerLink = `/read/${encodeURIComponent(link.url)}`;
-    return (
-      <NavButton
-        variant="ghost"
-        color="ui.gray.extraDark"
-        iconLeft={SvgExternalLink}
-        href={readerLink}
-      >
-        {downloadLabel}
-      </NavButton>
-    );
-  } else {
-    return (
-      <Button
-        onClick={fulfill}
-        variant="ghost"
-        color="ui.gray.extraDark"
-        iconLeft={SvgDownload}
-      >
-        {downloadLabel}
-      </Button>
-    );
-  }
+  return (
+    <Button
+      onClick={fulfill}
+      variant="ghost"
+      color="ui.gray.extraDark"
+      iconLeft={SvgDownload}
+    >
+      {downloadLabel}
+    </Button>
+  );
 };
 
 export default withErrorBoundary(FulfillmentCard, ErrorCard);

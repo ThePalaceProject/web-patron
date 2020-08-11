@@ -10,7 +10,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "postinstall": "if test \"$AXIS_NOW_DECRYPT\" = \"true\" ; then cd axisnow-access-control-web && npm install ; fi ",
-    "testing": "SIMPLIFIED_CATALOG_BASE=https://qa-circulation.openebooks.us/USOEI/groups SHORTEN_URLS=false npm run dev",
+    "testing": "NEXT_PUBLIC_COMPANION_APP=openebooks AXISNOW_DECRYPT=true SIMPLIFIED_CATALOG_BASE=https://qa-circulation.openebooks.us/USOEI/groups SHORTEN_URLS=false npm run dev",
     "dev": "node dev-server.js",
     "dev:axe": "REACT_AXE=true npm run dev",
     "build": "next build",

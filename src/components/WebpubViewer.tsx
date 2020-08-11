@@ -4,11 +4,13 @@ import React from "react";
 import reader from "utils/reader";
 import { useRouter } from "next/router";
 import useLibraryContext from "./context/LibraryContext";
-import { useActions } from 'opds-web-client/lib/components/context/ActionsContext';
+import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
 
-const loadDecryptor = async(fetcher, webpubManifestUrl) => {
-  let Decryptor = await import("../../axisnow-access-control-web/src/index");
-  if(Decryptor) {
+const loadDecryptor = async (fetcher, webpubManifestUrl) => {
+  const Decryptor = await import(
+    "../../axisnow-access-control-web/src/decryptor"
+  );
+  if (Decryptor) {
     try {
       const fulfillmentData = await fetcher.fetch(webpubManifestUrl);
       return await fulfillmentData.json();
@@ -16,12 +18,19 @@ const loadDecryptor = async(fetcher, webpubManifestUrl) => {
       throw new Error("Could not fetch decryptor entry link" + err);
     }
   }
-}
+};
 
-const initializeReader = async(entryUrl, catalogName, useDecryptor: boolean, fetcher?) => {
-    let decryptorParams = useDecryptor ? await loadDecryptor(fetcher, entryUrl) : undefined;
-    return await reader(entryUrl, catalogName, decryptorParams);
-}
+const initializeReader = async (
+  entryUrl,
+  catalogName,
+  useDecryptor: boolean,
+  fetcher?
+) => {
+  const decryptorParams = useDecryptor
+    ? await loadDecryptor(fetcher, entryUrl)
+    : undefined;
+  return await reader(entryUrl, catalogName, decryptorParams);
+};
 
 const BookPage = () => {
   const library = useLibraryContext();
@@ -34,9 +43,14 @@ const BookPage = () => {
   const { fetcher } = useActions();
 
   React.useEffect(() => {
-      if (typeof window !== "undefined") {
-        initializeReader(bookManifestUrl, catalogName, !!AXIS_NOW_DECRYPT, fetcher);
-      }
+    if (typeof window !== "undefined") {
+      initializeReader(
+        bookManifestUrl,
+        catalogName,
+        !!AXIS_NOW_DECRYPT,
+        fetcher
+      );
+    }
   });
 
   return (
