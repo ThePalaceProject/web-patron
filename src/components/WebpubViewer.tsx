@@ -6,29 +6,30 @@ import { useRouter } from "next/router";
 import useLibraryContext from "./context/LibraryContext";
 import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
 
-const loadDecryptor = async (fetcher, webpubManifestUrl) => {
-  const Decryptor = await import(
-    "../../axisnow-access-control-web/src/decryptor"
-  );
-  if (Decryptor) {
-    try {
-      const fulfillmentData = await fetcher.fetch(webpubManifestUrl);
-      return await fulfillmentData.json();
-    } catch (err) {
-      throw new Error("Could not fetch decryptor entry link" + err);
-    }
-  }
-};
-
 const initializeReader = async (
   entryUrl,
   catalogName,
   useDecryptor: boolean,
   fetcher?
 ) => {
-  const decryptorParams = useDecryptor
-    ? await loadDecryptor(fetcher, entryUrl)
-    : undefined;
+  let decryptorParams = undefined;
+  if (useDecryptor) {
+    const loadDecryptor = async (fetcher, webpubManifestUrl) => {
+      const Decryptor = await import(
+        "../../axisnow-access-control-web/src/decryptor"
+      );
+      if (Decryptor) {
+        try {
+          const fulfillmentData = await fetcher.fetch(webpubManifestUrl);
+          return await fulfillmentData.json();
+        } catch (err) {
+          throw new Error("Could not fetch decryptor entry link" + err);
+        }
+      }
+    };
+
+    decryptorParams = await loadDecryptor(fetcher, entryUrl);
+  }
   return await reader(entryUrl, catalogName, decryptorParams);
 };
 
