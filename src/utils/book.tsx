@@ -139,3 +139,5 @@ export const bookMediumMap: {
   "http://schema.org/EBook": { name: "eBook", icon: Book },
   "http://schema.org/Book": { name: "Book", icon: Book }
 };
+
+export type BorrowButtonType = "Borrow" | "Reserve";

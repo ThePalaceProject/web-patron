@@ -6,7 +6,8 @@ import {
   dedupeLinks,
   availabilityString,
   queueString,
-  bookIsAudiobook
+  bookIsAudiobook,
+  BorrowButtonType
 } from "utils/book";
 import {
   BookData,
@@ -49,10 +50,9 @@ const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
 const FulfillmentContent: React.FC<{
   book: BookData;
 }> = ({ book }) => {
-  type ButtonType = "Borrow" | "Reserve";
   const isBorrowed = useIsBorrowed(book);
   const fulfillmentState = getFulfillmentState(book, isBorrowed);
-  const getButtons = (buttonType: ButtonType) => {
+  const getButtons = (buttonType: BorrowButtonType) => {
     const isBorrow = buttonType === "Borrow";
     const loadingText = isBorrow ? "Borrowing..." : "Reserving...";
     return book.allBorrowLinks?.map(link => {

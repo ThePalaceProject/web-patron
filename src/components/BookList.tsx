@@ -10,7 +10,8 @@ import { truncateString, stripHTML } from "../utils/string";
 import {
   getAuthors,
   getFulfillmentState,
-  availabilityString
+  availabilityString,
+  BorrowButtonType
 } from "../utils/book";
 import Lane from "./Lane";
 import useBorrow from "../hooks/useBorrow";
@@ -138,7 +139,7 @@ const BookListCTA: React.FC<{ book: BookWithUrl }> = ({ book }) => {
   const isBorrowed = useIsBorrowed(book);
   const fulfillmentState = getFulfillmentState(book, isBorrowed);
   const { borrowOrReserve, isLoading, errorMsg } = useBorrow();
-  const getButtons = (buttonType: ButtonType) => {
+  const getButtons = (buttonType: BorrowButtonType) => {
     const isBorrow = buttonType === "Borrow";
     const loadingText = isBorrow ? "Borrowing..." : "Reserving...";
     return book.allBorrowLinks?.map(link => {
