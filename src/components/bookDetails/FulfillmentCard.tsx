@@ -8,7 +8,11 @@ import {
   queueString,
   bookIsAudiobook
 } from "utils/book";
-import { BookData, MediaLink } from "opds-web-client/lib/interfaces";
+import {
+  BookData,
+  MediaLink,
+  FulfillmentLink
+} from "opds-web-client/lib/interfaces";
 import Button, { NavButton } from "../Button";
 import useDownloadButton from "opds-web-client/lib/hooks/useDownloadButton";
 import { withErrorBoundary } from "../ErrorBoundary";
@@ -45,8 +49,33 @@ const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
 const FulfillmentContent: React.FC<{
   book: BookData;
 }> = ({ book }) => {
+  type ButtonType = "Borrow" | "Reserve";
   const isBorrowed = useIsBorrowed(book);
   const fulfillmentState = getFulfillmentState(book, isBorrowed);
+  const getButtons = (buttonType: ButtonType) => {
+    const isBorrow = buttonType === "Borrow";
+    const loadingText = isBorrow ? "Borrowing..." : "Reserving...";
+    return book.allBorrowLinks?.map(link => {
+      let label: string;
+      if (isBorrow) {
+        label =
+          link.indirectType === "application/vnd.librarysimplified.axisnow+json"
+            ? "Borrow to read online"
+            : "Borrow to read on a mobile device";
+      } else {
+        label = "Reserve";
+      }
+      return (
+        <BorrowOrReserve
+          key={link.url}
+          borrowLink={link}
+          buttonLabel={label}
+          buttonLoadingText={loadingText}
+          book={book}
+        ></BorrowOrReserve>
+      );
+    });
+  };
   switch (fulfillmentState) {
     case "AVAILABLE_OPEN_ACCESS":
       if (!book.openAccessLinks)
@@ -61,7 +90,7 @@ const FulfillmentContent: React.FC<{
 
     case "AVAILABLE_TO_BORROW": {
       return (
-        <BorrowOrReserve
+        <CTAPanel
           title="This book is available to borrow!"
           subtitle={
             <>
@@ -69,17 +98,14 @@ const FulfillmentContent: React.FC<{
               {availabilityString(book)}
             </>
           }
-          book={book}
-          buttonLabel="Borrow"
-          buttonLoadingText="Borrowing..."
+          buttons={getButtons("Borrow")}
         />
       );
     }
 
     case "AVAILABLE_TO_RESERVE": {
       return (
-        <BorrowOrReserve
-          book={book}
+        <CTAPanel
           title="This book is currently unavailable."
           subtitle={
             <>
@@ -89,8 +115,7 @@ const FulfillmentContent: React.FC<{
                 ` ${book.holds.total} patrons in the queue.`}
             </>
           }
-          buttonLabel="Reserve"
-          buttonLoadingText="Reserving..."
+          buttons={getButtons("Reserve")}
         />
       );
     }
@@ -108,13 +133,12 @@ const FulfillmentContent: React.FC<{
         availableUntil !== "NaN"
           ? `Your hold will expire on ${availableUntil}. ${queueString(book)}`
           : "You must borrow this book before your loan expires.";
+
       return (
-        <BorrowOrReserve
-          book={book}
+        <CTAPanel
           title={title}
           subtitle={subtitle}
-          buttonLabel="Borrow"
-          buttonLoadingText="Borrowing..."
+          buttons={getButtons("Borrow")}
         />
       );
     }
@@ -149,14 +173,29 @@ const FulfillmentContent: React.FC<{
 
 const BorrowOrReserve: React.FC<{
   book: BookData;
-  title: string;
-  subtitle: React.ReactNode;
+  borrowLink: FulfillmentLink;
   buttonLabel: string;
   buttonLoadingText: string;
-}> = ({ book, title, subtitle, buttonLabel, buttonLoadingText }) => {
-  const { isLoading, borrowOrReserve, allBorrowLinks, errorMsg } = useBorrow(
-    book
+}> = ({ borrowLink, buttonLabel, buttonLoadingText }) => {
+  const { isLoading, borrowOrReserve } = useBorrow();
+  return (
+    <Button
+      size="lg"
+      onClick={() => borrowOrReserve(borrowLink.url)}
+      loading={isLoading}
+      loadingText={buttonLoadingText}
+    >
+      <Text variant="text.body.bold">{buttonLabel}</Text>
+    </Button>
   );
+};
+
+const CTAPanel: React.FC<{
+  title: string;
+  subtitle: React.ReactNode;
+  buttons?: JSX.Element[];
+}> = ({ title, subtitle, buttons }) => {
+  const { errorMsg } = useBorrow();
   return (
     <>
       <Text variant="text.callouts.bold">{title}</Text>
@@ -170,24 +209,7 @@ const BorrowOrReserve: React.FC<{
       >
         {subtitle}
       </Text>
-      {allBorrowLinks!.map(borrowLink => {
-        const fullButtonLabel =
-          borrowLink.indirectType ===
-          "application/vnd.librarysimplified.axisnow+json"
-            ? buttonLabel + " to read online"
-            : buttonLabel + " to read on a mobile device";
-        return (
-          <Button
-            key={borrowLink.url}
-            size="lg"
-            onClick={() => borrowOrReserve(borrowLink.url)}
-            loading={isLoading}
-            loadingText={buttonLoadingText}
-          >
-            <Text variant="text.body.bold">{fullButtonLabel}</Text>
-          </Button>
-        );
-      })}
+      {buttons}
       {errorMsg && <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>}
     </>
   );
@@ -250,7 +272,6 @@ const AccessCard: React.FC<{
   const isAudiobook = bookIsAudiobook(book);
   const companionApp =
     NEXT_PUBLIC_COMPANION_APP === "openebooks" ? "Open eBooks" : "SimplyE";
-  console.log("access card links", links, companionApp);
 
   return (
     <>

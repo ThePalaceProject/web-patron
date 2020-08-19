@@ -137,9 +137,33 @@ export const BookListItem: React.FC<{
 const BookListCTA: React.FC<{ book: BookWithUrl }> = ({ book }) => {
   const isBorrowed = useIsBorrowed(book);
   const fulfillmentState = getFulfillmentState(book, isBorrowed);
-  const { borrowOrReserve, allBorrowLinks, isLoading, errorMsg } = useBorrow(
-    book
-  );
+  const { borrowOrReserve, isLoading, errorMsg } = useBorrow();
+  const getButtons = (buttonType: ButtonType) => {
+    const isBorrow = buttonType === "Borrow";
+    const loadingText = isBorrow ? "Borrowing..." : "Reserving...";
+    return book.allBorrowLinks?.map(link => {
+      let label: string;
+      if (isBorrow) {
+        label =
+          link.indirectType === "application/vnd.librarysimplified.axisnow+json"
+            ? "Borrow to read online"
+            : "Borrow to read on a mobile device";
+      } else {
+        label = "Reserve";
+      }
+      return (
+        <Button
+          key={link.url}
+          onClick={() => borrowOrReserve(link.url)}
+          color="ui.black"
+          loading={isLoading}
+          loadingText={loadingText}
+        >
+          {label}
+        </Button>
+      );
+    });
+  };
 
   switch (fulfillmentState) {
     case "AVAILABLE_OPEN_ACCESS":
@@ -164,25 +188,7 @@ const BookListCTA: React.FC<{ book: BookWithUrl }> = ({ book }) => {
     case "AVAILABLE_TO_BORROW":
       return (
         <>
-          {allBorrowLinks!.map(borrowLink => {
-            console.log("borrowLink", borrowLink);
-            const fullButtonLabel =
-              borrowLink.indirectType ===
-              "application/vnd.librarysimplified.axisnow+json"
-                ? "Borrow to read online"
-                : "Borrow to read on a mobile device";
-            return (
-              <Button
-                key={borrowLink.url}
-                onClick={borrowOrReserve}
-                color="ui.black"
-                loading={isLoading}
-                loadingText="Borrowing..."
-              >
-                {fullButtonLabel}
-              </Button>
-            );
-          })}
+          {getButtons("Borrow")}
 
           {errorMsg ? (
             <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>
@@ -207,14 +213,8 @@ const BookListCTA: React.FC<{ book: BookWithUrl }> = ({ book }) => {
     case "AVAILABLE_TO_RESERVE":
       return (
         <>
-          <Button
-            onClick={borrowOrReserve}
-            color="ui.black"
-            loading={isLoading}
-            loadingText="Reserving..."
-          >
-            Reserve
-          </Button>
+          {getButtons("Reserve")}
+
           <Text
             variant="text.body.italic"
             sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
@@ -261,24 +261,7 @@ const BookListCTA: React.FC<{ book: BookWithUrl }> = ({ book }) => {
     case "READY_TO_BORROW": {
       return (
         <>
-          {allBorrowLinks!.map(borrowLink => {
-            const fullButtonLabel =
-              borrowLink.indirectType ===
-              "application/vnd.librarysimplified.axisnow+json"
-                ? "Borrow to read online"
-                : "Borrow to read on a mobile device";
-            return (
-              <Button
-                key={borrowLink.url}
-                onClick={borrowOrReserve}
-                color="ui.black"
-                loading={isLoading}
-                loadingText="Borrowing..."
-              >
-                {fullButtonLabel}
-              </Button>
-            );
-          })}
+          {getButtons("Borrow")}
 
           {errorMsg ? (
             <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>

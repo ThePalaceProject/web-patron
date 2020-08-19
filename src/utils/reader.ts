@@ -21,7 +21,6 @@ export default async function (
   catalogName: string,
   decryptorParams?: any
 ) {
-  console.log("decryptorParams", decryptorParams);
   const element = document.getElementById("viewer");
   const webpubBookUrl = new URL(bookUrl, window.location.href);
   const containerHref = webpubBookUrl.href.endsWith("container.xml")

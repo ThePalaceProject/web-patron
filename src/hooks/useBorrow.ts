@@ -1,16 +1,14 @@
 import * as React from "react";
-import { BookData } from "opds-web-client/lib/interfaces";
 import useTypedSelector from "./useTypedSelector";
 import { getErrorMsg } from "utils/book";
 import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
 
-export default function useBorrow(book: BookData) {
+export default function useBorrow() {
   const isUnmounted = React.useRef(false);
   const [isLoading, setLoading] = React.useState(false);
   const bookError = useTypedSelector(state => state.book?.error);
   const errorMsg = getErrorMsg(bookError);
   const { actions, dispatch } = useActions();
-  const allBorrowLinks = book.allBorrowLinks;
 
   const borrowOrReserve = async url => {
     if (url) {
@@ -32,7 +30,6 @@ export default function useBorrow(book: BookData) {
   return {
     isLoading,
     borrowOrReserve,
-    allBorrowLinks,
     errorMsg
   };
 }

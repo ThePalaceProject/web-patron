@@ -108,7 +108,7 @@ describe("available to borrow book", () => {
     // click borrow
     userEvent.click(utils.getByText("Borrow to read on a mobile device"));
     expect(updateBookSpy).toHaveBeenCalledTimes(1);
-    expect(updateBookSpy).toHaveBeenCalledWith("borrow url");
+    expect(updateBookSpy).toHaveBeenCalledWith("/epub-borrow-link");
     const borrowButton = await utils.findByRole("button", {
       name: /Borrowing.../i
     });
@@ -182,7 +182,7 @@ describe("ready to borrow book", () => {
     // click borrow
     userEvent.click(utils.getByText("Borrow to read on a mobile device"));
     expect(updateBookSpy).toHaveBeenCalledTimes(1);
-    expect(updateBookSpy).toHaveBeenCalledWith("borrow url");
+    expect(updateBookSpy).toHaveBeenCalledWith("/epub-borrow-link");
     const borrowButton = utils.getByRole("button", {
       name: /Borrowing.../i
     });
@@ -269,14 +269,14 @@ describe("ready to borrow book with multiple borrowUrls", () => {
     // click borrow
     userEvent.click(utils.getByText("Borrow to read on a mobile device"));
     expect(updateBookSpy).toHaveBeenCalledTimes(1);
-    expect(updateBookSpy).toHaveBeenCalledWith("borrow url");
-    const borrowButtons = await utils.findAllByRole("button", {
-      name: "Borrowing..."
-    });
+    expect(updateBookSpy).toHaveBeenCalledWith("/adobe-borrow-link");
+    const borrowButtons = await utils.findAllByRole("button");
     // Both buttons have the "Borrowing..." text and are disabled
     expect(borrowButtons.length).toBe(2);
-    expect(borrowButtons).toBeInTheDocument();
-    expect(borrowButtons).toHaveAttribute("disabled", "");
+    borrowButtons.forEach(button => {
+      expect(button).toBeInTheDocument();
+      expect(button).toHaveAttribute("disabled", "");
+    });
     expect(fetchLoansSpy).toHaveBeenCalledTimes(0);
   });
 });
@@ -331,7 +331,7 @@ describe("available to reserve book", () => {
     // click reserve
     userEvent.click(utils.getByText("Reserve"));
     expect(updateBookSpy).toHaveBeenCalledTimes(1);
-    expect(updateBookSpy).toHaveBeenCalledWith("borrow url");
+    expect(updateBookSpy).toHaveBeenCalledWith("/epub-borrow-link");
     const reserveButton = utils.getByRole("button", {
       name: /Reserving.../i
     });
