@@ -10,7 +10,7 @@ export default function useBorrow() {
   const errorMsg = getErrorMsg(bookError);
   const { actions, dispatch } = useActions();
 
-  const borrowOrReserve = async url => {
+  const borrowOrReserve = async (url: string | undefined) => {
     if (url) {
       setLoading(true);
       await dispatch(actions.updateBook(url));

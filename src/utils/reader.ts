@@ -39,10 +39,10 @@ export default async function (
 }
 
 async function initBookSettings(
-  element,
-  webpubManifestUrl,
-  catalogName,
-  decryptorParams?
+  element: HTMLElement | null,
+  webpubManifestUrl: URL,
+  catalogName: string,
+  decryptorParams?: any
 ) {
   const store = new LocalStorageStore({
     prefix: webpubManifestUrl.href
@@ -83,15 +83,12 @@ async function initBookSettings(
   const Decryptor = AXIS_NOW_DECRYPT
     ? await import("../../axisnow-access-control-web/src/decryptor")
     : undefined;
-  let decryptor;
-  if (Decryptor) {
-    decryptor = Decryptor
-      ? await Decryptor.default.createDecryptor(decryptorParams)
-      : undefined;
-  }
+  const decryptor = Decryptor
+    ? await Decryptor.default.createDecryptor(decryptorParams)
+    : undefined;
 
-  const entryUrl: string = decryptor
-    ? decryptor.getEntryUrl()
+  const entryUrl: URL = decryptor
+    ? new URL(decryptor.getEntryUrl())
     : webpubManifestUrl;
 
   const bookSettings = await BookSettings.create({
@@ -104,7 +101,7 @@ async function initBookSettings(
   IFrameNavigator.create({
     decryptor,
     element: element,
-    entryUrl: new URL(entryUrl),
+    entryUrl: entryUrl,
     store: store,
     cacher: cacher,
     settings: bookSettings,

@@ -32,6 +32,7 @@ async function setupCache() {
   }
 
   if (CONFIG_FILE) {
+    console.log("CONFIG_FILE", CONFIG_FILE);
     let configText: string | null;
     const config = {};
     // it is a remote config file.

@@ -3,12 +3,17 @@ import {
   BookData,
   FetchErrorData,
   BookMedium,
-  MediaLink
+  MediaLink,
+  FulfillmentLink
 } from "opds-web-client/lib/interfaces";
 import { BookFulfillmentState } from "interfaces";
 
 import { Book, Headset } from "../icons";
 import { getMedium } from "opds-web-client/lib/utils/book";
+import useBorrow from "hooks/useBorrow";
+
+import Button from "../components/Button";
+import { Text } from "../components/Text";
 
 export function getAuthors(book: BookData, lim?: number): string[] {
   // select contributors if the authors array is undefined or empty.
@@ -139,5 +144,3 @@ export const bookMediumMap: {
   "http://schema.org/EBook": { name: "eBook", icon: Book },
   "http://schema.org/Book": { name: "Book", icon: Book }
 };
-
-export type BorrowButtonType = "Borrow" | "Reserve";

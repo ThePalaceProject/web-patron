@@ -270,13 +270,14 @@ describe("ready to borrow book with multiple borrowUrls", () => {
     userEvent.click(utils.getByText("Borrow to read on a mobile device"));
     expect(updateBookSpy).toHaveBeenCalledTimes(1);
     expect(updateBookSpy).toHaveBeenCalledWith("/adobe-borrow-link");
-    const borrowButtons = await utils.findAllByRole("button");
-    // Both buttons have the "Borrowing..." text and are disabled
-    expect(borrowButtons.length).toBe(2);
-    borrowButtons.forEach(button => {
-      expect(button).toBeInTheDocument();
-      expect(button).toHaveAttribute("disabled", "");
+
+    // One button says "Borrowing..."
+    const borrowButton = await utils.findByRole("button", {
+      name: /Borrowing.../i
     });
+    expect(borrowButton).toBeInTheDocument();
+    expect(borrowButton).toHaveAttribute("disabled", "");
+
     expect(fetchLoansSpy).toHaveBeenCalledTimes(0);
   });
 });

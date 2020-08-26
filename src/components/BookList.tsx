@@ -4,14 +4,14 @@ import * as React from "react";
 import {
   BookData,
   LaneData,
-  RequiredKeys
+  RequiredKeys,
+  FulfillmentLink
 } from "opds-web-client/lib/interfaces";
 import { truncateString, stripHTML } from "../utils/string";
 import {
   getAuthors,
   getFulfillmentState,
-  availabilityString,
-  BorrowButtonType
+  availabilityString
 } from "../utils/book";
 import Lane from "./Lane";
 import useBorrow from "../hooks/useBorrow";
@@ -138,34 +138,15 @@ export const BookListItem: React.FC<{
 const BookListCTA: React.FC<{ book: BookWithUrl }> = ({ book }) => {
   const isBorrowed = useIsBorrowed(book);
   const fulfillmentState = getFulfillmentState(book, isBorrowed);
-  const { borrowOrReserve, isLoading, errorMsg } = useBorrow();
-  const getButtons = (buttonType: BorrowButtonType) => {
-    const isBorrow = buttonType === "Borrow";
-    const loadingText = isBorrow ? "Borrowing..." : "Reserving...";
+  const getCtaButtons = (isBorrow: boolean) => {
     return book.allBorrowLinks?.map(link => {
-      let label: string;
-      if (isBorrow) {
-        label =
-          link.indirectType === "application/vnd.librarysimplified.axisnow+json"
-            ? "Borrow to read online"
-            : "Borrow to read on a mobile device";
-      } else {
-        label = "Reserve";
-      }
       return (
-        <Button
-          key={link.url}
-          onClick={() => borrowOrReserve(link.url)}
-          color="ui.black"
-          loading={isLoading}
-          loadingText={loadingText}
-        >
-          {label}
-        </Button>
+        <BorrowOrReserve key={link.url} borrowLink={link} isBorrow={isBorrow} />
       );
     });
   };
 
+  const { errorMsg } = useBorrow();
   switch (fulfillmentState) {
     case "AVAILABLE_OPEN_ACCESS":
       return (
@@ -189,7 +170,7 @@ const BookListCTA: React.FC<{ book: BookWithUrl }> = ({ book }) => {
     case "AVAILABLE_TO_BORROW":
       return (
         <>
-          {getButtons("Borrow")}
+          {getCtaButtons(true)}
 
           {errorMsg ? (
             <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>
@@ -214,7 +195,7 @@ const BookListCTA: React.FC<{ book: BookWithUrl }> = ({ book }) => {
     case "AVAILABLE_TO_RESERVE":
       return (
         <>
-          {getButtons("Reserve")}
+          {getCtaButtons(false)}
 
           <Text
             variant="text.body.italic"
@@ -262,7 +243,7 @@ const BookListCTA: React.FC<{ book: BookWithUrl }> = ({ book }) => {
     case "READY_TO_BORROW": {
       return (
         <>
-          {getButtons("Borrow")}
+          {getCtaButtons(true)}
 
           {errorMsg ? (
             <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>
@@ -333,5 +314,29 @@ export const LanesView: React.FC<{ lanes: LaneData[] }> = ({ lanes }) => {
         <Lane key={lane.url} lane={lane} />
       ))}
     </ul>
+  );
+};
+
+export const BorrowOrReserve: React.FC<{
+  isBorrow: boolean;
+  borrowLink: FulfillmentLink;
+}> = ({ isBorrow, borrowLink }) => {
+  const { isLoading, borrowOrReserve } = useBorrow();
+  const loadingText = isBorrow ? "Borrowing..." : "Reserving...";
+  const buttonLabel = isBorrow
+    ? borrowLink.indirectType ===
+      "application/vnd.librarysimplified.axisnow+json"
+      ? "Borrow to read online"
+      : "Borrow to read on a mobile device"
+    : "Reserve";
+  return (
+    <Button
+      size="lg"
+      onClick={() => borrowOrReserve(borrowLink.url)}
+      loading={isLoading}
+      loadingText={loadingText}
+    >
+      <Text variant="text.body.bold">{buttonLabel}</Text>
+    </Button>
   );
 };
