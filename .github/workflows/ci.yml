@@ -39,7 +39,6 @@ jobs:
         with:
           submodules: true
           ssh-key: ${{ secrets.AXIS_NOW_SSH_KEY }}
-          submodules: true
           node-version: 13.x
       - name: Cache and install node modules
         uses: bahmutov/npm-install@v1
