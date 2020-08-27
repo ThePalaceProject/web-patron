@@ -38,16 +38,9 @@ jobs:
         uses: actions/setup-node@v1
         with:
           submodules: true
-          node-version: 13.x
-      - name: clone submodule
-        uses: actions/checkout@v2
-        with:
+          ssh-key: ${{ secrets.AXIS_NOW_SSH_KEY }}
           submodules: true
-          repository: NYPL/axisnow-access-control-web
-          path: axisnow-access-control-web
-          ref: v2
-          ssh-key: ${{ secrets.SUBMODULE_SSH_KEY }}
-          persist-credentials: false
+          node-version: 13.x
       - name: Cache and install node modules
         uses: bahmutov/npm-install@v1
       - name: Typecheck
