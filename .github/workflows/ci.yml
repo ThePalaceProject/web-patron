@@ -41,6 +41,7 @@ jobs:
       - name: clone submodule
         uses: actions/checkout@v2
         with:
+          submodules: true
           repository: NYPL/axisnow-access-control-web
           path: axisnow-access-control-web
           ref: v2
