@@ -18,12 +18,13 @@ jobs:
       CI: true
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: true
+          ssh-key: ${{ secrets.AXIS_NOW_SSH_KEY }}
       - name: Use Node.js 13.x
         uses: actions/setup-node@v1
         with:
           node-version: 13.x
-          submodules: true
-          ssh-key: ${{ secrets.AXIS_NOW_SSH_KEY }}
       - name: Cache and install node modules
         uses: bahmutov/npm-install@v1
       - name: Lint
@@ -39,9 +40,10 @@ jobs:
         with:
           submodules: true
           ssh-key: ${{ secrets.AXIS_NOW_SSH_KEY }}
-          node-version: 13.x
       - name: Use Node.js 13.x
         uses: actions/setup-node@v1
+        with:
+          node-version: 13.x
       - name: Cache and install node modules
         uses: bahmutov/npm-install@v1
       - name: Typecheck
@@ -54,12 +56,13 @@ jobs:
       CI: true
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: true
+          ssh-key: ${{ secrets.AXIS_NOW_SSH_KEY }}
       - name: Use Node.js 13.x
         uses: actions/setup-node@v1
         with:
           node-version: 13.x
-          submodules: true
-          ssh-key: ${{ secrets.AXIS_NOW_SSH_KEY }}
       - name: Cache and install node modules
         uses: bahmutov/npm-install@v1
       - name: Test
