@@ -13,7 +13,6 @@ const initializeReader = async (
   useDecryptor: boolean,
   fetcher?: DataFetcher
 ) => {
-  let decryptorParams = undefined;
   if (useDecryptor) {
     const loadDecryptor = async (
       fetcher: DataFetcher,
@@ -26,7 +25,6 @@ const initializeReader = async (
         try {
           const fulfillmentData = await fetcher.fetch(webpubManifestUrl);
           const data = await fulfillmentData.json();
-          console.log("data", data);
           //If a status thrown, there is an error
           if (data.status) {
             throw new Error(data.detail);
@@ -38,9 +36,11 @@ const initializeReader = async (
       }
     };
 
-    decryptorParams = await loadDecryptor(fetcher, entryUrl);
+    const decryptorParams = await loadDecryptor(fetcher, entryUrl);
+    return await reader(entryUrl, catalogName, decryptorParams);
   }
-  return await reader(entryUrl, catalogName, decryptorParams);
+
+  return await reader(entryUrl, catalogName);
 };
 
 const BookPage = () => {
@@ -52,9 +52,7 @@ const BookPage = () => {
   const { fetcher } = useActions();
 
   React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      initializeReader(`${bookUrl}`, catalogName, !!AXIS_NOW_DECRYPT, fetcher);
-    }
+    initializeReader(`${bookUrl}`, catalogName, !!AXIS_NOW_DECRYPT, fetcher);
   });
 
   return (

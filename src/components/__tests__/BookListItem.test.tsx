@@ -133,7 +133,7 @@ describe("available to borrow book", () => {
     });
     expect(
       utils.queryByText("10 out of 13 copies available.")
-    ).not.toBeInTheDocument();
+    ).toBeInTheDocument();
     expect(
       utils.getByText("Error: cannot loan more than 3 documents.")
     ).toBeInTheDocument();
@@ -206,7 +206,7 @@ describe("ready to borrow book", () => {
     });
     expect(
       utils.queryByText("You can now borrow this book!")
-    ).not.toBeInTheDocument();
+    ).toBeInTheDocument();
     expect(
       utils.getByText("Error: cannot loan more than 3 documents.")
     ).toBeInTheDocument();

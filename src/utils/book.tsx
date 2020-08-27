@@ -3,17 +3,12 @@ import {
   BookData,
   FetchErrorData,
   BookMedium,
-  MediaLink,
-  FulfillmentLink
+  MediaLink
 } from "opds-web-client/lib/interfaces";
 import { BookFulfillmentState } from "interfaces";
 
 import { Book, Headset } from "../icons";
 import { getMedium } from "opds-web-client/lib/utils/book";
-import useBorrow from "hooks/useBorrow";
-
-import Button from "../components/Button";
-import { Text } from "../components/Text";
 
 export function getAuthors(book: BookData, lim?: number): string[] {
   // select contributors if the authors array is undefined or empty.

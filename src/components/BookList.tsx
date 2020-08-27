@@ -24,6 +24,7 @@ import MediumIndicator from "components/MediumIndicator";
 import { ArrowForward } from "icons";
 import useIsBorrowed from "hooks/useIsBorrowed";
 import BookCover from "./BookCover";
+import Stack from "./Stack";
 
 /**
  * In a collection you can:
@@ -82,7 +83,7 @@ export const BookListItem: React.FC<{
       aria-label={`Book: ${book.title}`}
     >
       <DS.Card
-        sx={{ bg: "ui.white" }}
+        sx={{ ".card__ctas": { margin: "auto" }, bg: "ui.white" }}
         image={
           <BookCover
             book={book}
@@ -141,12 +142,21 @@ const BookListCTA: React.FC<{ book: BookWithUrl }> = ({ book }) => {
   const getCtaButtons = (isBorrow: boolean) => {
     return book.allBorrowLinks?.map(link => {
       return (
-        <BorrowOrReserve key={link.url} borrowLink={link} isBorrow={isBorrow} />
+        <Stack
+          direction={"column"}
+          sx={{
+            mt: 2
+          }}
+        >
+          <BorrowOrReserve
+            key={link.url}
+            borrowLink={link}
+            isBorrow={isBorrow}
+          />
+        </Stack>
       );
     });
   };
-
-  const { errorMsg } = useBorrow();
   switch (fulfillmentState) {
     case "AVAILABLE_OPEN_ACCESS":
       return (
@@ -172,16 +182,13 @@ const BookListCTA: React.FC<{ book: BookWithUrl }> = ({ book }) => {
         <>
           {getCtaButtons(true)}
 
-          {errorMsg ? (
-            <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>
-          ) : (
-            <Text
-              variant="text.body.italic"
-              sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
-            >
-              {availabilityString(book)}
-            </Text>
-          )}
+          <Text
+            variant="text.body.italic"
+            sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
+          >
+            {availabilityString(book)}
+          </Text>
+
           <NavButton
             variant="ghost"
             bookUrl={book.url}
@@ -244,17 +251,12 @@ const BookListCTA: React.FC<{ book: BookWithUrl }> = ({ book }) => {
       return (
         <>
           {getCtaButtons(true)}
-
-          {errorMsg ? (
-            <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>
-          ) : (
-            <Text
-              variant="text.body.italic"
-              sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
-            >
-              You can now borrow this book!
-            </Text>
-          )}
+          <Text
+            variant="text.body.italic"
+            sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
+          >
+            You can now borrow this book!
+          </Text>
           <NavButton
             variant="ghost"
             bookUrl={book.url}
@@ -321,7 +323,7 @@ export const BorrowOrReserve: React.FC<{
   isBorrow: boolean;
   borrowLink: FulfillmentLink;
 }> = ({ isBorrow, borrowLink }) => {
-  const { isLoading, borrowOrReserve } = useBorrow();
+  const { isLoading, borrowOrReserve, errorMsg } = useBorrow();
   const loadingText = isBorrow ? "Borrowing..." : "Reserving...";
   const buttonLabel = isBorrow
     ? borrowLink.indirectType ===
@@ -330,13 +332,16 @@ export const BorrowOrReserve: React.FC<{
       : "Borrow to read on a mobile device"
     : "Reserve";
   return (
-    <Button
-      size="lg"
-      onClick={() => borrowOrReserve(borrowLink.url)}
-      loading={isLoading}
-      loadingText={loadingText}
-    >
-      <Text variant="text.body.bold">{buttonLabel}</Text>
-    </Button>
+    <>
+      <Button
+        size="lg"
+        onClick={() => borrowOrReserve(borrowLink.url)}
+        loading={isLoading}
+        loadingText={loadingText}
+      >
+        <Text variant="text.body.bold">{buttonLabel}</Text>
+      </Button>
+      {errorMsg && <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>}
+    </>
   );
 };

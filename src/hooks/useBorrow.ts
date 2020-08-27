@@ -6,7 +6,9 @@ import { useActions } from "opds-web-client/lib/components/context/ActionsContex
 export default function useBorrow() {
   const isUnmounted = React.useRef(false);
   const [isLoading, setLoading] = React.useState(false);
-  const bookError = useTypedSelector(state => state.book?.error);
+  const bookError = useTypedSelector(state => {
+    return state.book?.error;
+  });
   const errorMsg = getErrorMsg(bookError);
   const { actions, dispatch } = useActions();
 

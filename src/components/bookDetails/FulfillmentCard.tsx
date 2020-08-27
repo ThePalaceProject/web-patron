@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx, Link } from "theme-ui";
+import { jsx } from "theme-ui";
 import * as React from "react";
 import {
   getFulfillmentState,
@@ -157,7 +157,6 @@ const CTAPanel: React.FC<{
   isBorrow: boolean;
   borrowLinks: FulfillmentLink[] | undefined;
 }> = ({ title, subtitle, isBorrow, borrowLinks }) => {
-  const { errorMsg } = useBorrow();
   return (
     <>
       <Text variant="text.callouts.bold">{title}</Text>
@@ -180,7 +179,6 @@ const CTAPanel: React.FC<{
           />
         );
       })}
-      {errorMsg && <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>}
     </>
   );
 };

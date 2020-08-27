@@ -150,7 +150,6 @@ describe("available to borrow", () => {
   test("shows loading state when borrowing", async () => {
     const _useBorrowSpy = jest
       .spyOn(useBorrow, "default")
-      .mockReturnValueOnce(loadingBorrowState)
       .mockReturnValueOnce(loadingBorrowState);
 
     // set it up into the loading state
@@ -167,7 +166,7 @@ describe("available to borrow", () => {
       name: /Borrowing.../i
     });
 
-    expect(_useBorrowSpy).toHaveBeenCalledTimes(2);
+    expect(_useBorrowSpy).toHaveBeenCalledTimes(1);
 
     expect(borrowButton).toBeInTheDocument();
     expect(borrowButton).toHaveAttribute("disabled", "");
@@ -258,7 +257,6 @@ describe("ready to borrow", () => {
   test("shows loading state when borrowing", async () => {
     const _useBorrowSpy = jest
       .spyOn(useBorrow, "default")
-      .mockReturnValueOnce(loadingBorrowState)
       .mockReturnValueOnce(loadingBorrowState);
 
     const utils = render(<FulfillmentCard book={readyBook} />, {
@@ -274,7 +272,7 @@ describe("ready to borrow", () => {
       name: /Borrowing.../i
     });
 
-    expect(_useBorrowSpy).toHaveBeenCalledTimes(2);
+    expect(_useBorrowSpy).toHaveBeenCalledTimes(1);
 
     expect(borrowButton).toBeInTheDocument();
     expect(borrowButton).toHaveAttribute("disabled", "");
@@ -385,12 +383,10 @@ describe("ready to borrow (two links)", () => {
     await waitForElementToBeRemoved(() => utils.getByText("Borrowing..."));
   });
 
-  test("shows loading state on both buttons when borrowing", async () => {
-    //This gets called once for setup, once for each of the buttons
+  test("shows loading state on one of the buttons when borrowing", async () => {
+    //This gets called once for setup, once for the borrow button
     const _useBorrowSpy = jest
       .spyOn(useBorrow, "default")
-      .mockReturnValueOnce(loadingBorrowState)
-      .mockReturnValueOnce(loadingBorrowState)
       .mockReturnValueOnce(loadingBorrowState);
 
     const utils = render(
@@ -405,14 +401,17 @@ describe("ready to borrow (two links)", () => {
       }
     );
 
-    const borrowButtons = await utils.findAllByRole("button", {
+    // One button says "Borrowing..."
+    const borrowButton = await utils.findByRole("button", {
       name: /Borrowing.../i
     });
-    expect(borrowButtons.length).toBe(2);
-    borrowButtons.forEach(button => {
-      expect(button).toBeInTheDocument();
-      expect(button).toHaveAttribute("disabled", "");
-    });
+    expect(borrowButton).toBeInTheDocument();
+    expect(borrowButton).toHaveAttribute("disabled", "");
+
+    const unClickedBorrowButton = await utils.getByText(
+      "Borrow to read online"
+    );
+    expect(unClickedBorrowButton).toBeInTheDocument();
   });
 
   test("doesn't refetch loans after borrowing", async () => {
@@ -522,7 +521,6 @@ describe("available to reserve", () => {
   test("shows loading state when reserving", async () => {
     const _useBorrowSpy = jest
       .spyOn(useBorrow, "default")
-      .mockReturnValueOnce(loadingBorrowState)
       .mockReturnValueOnce(loadingBorrowState);
 
     const utils = render(<FulfillmentCard book={unavailableBook} />, {
@@ -537,7 +535,7 @@ describe("available to reserve", () => {
       name: /Reserving.../i
     });
 
-    expect(_useBorrowSpy).toHaveBeenCalledTimes(2);
+    expect(_useBorrowSpy).toHaveBeenCalledTimes(1);
 
     expect(reserveButton).toBeInTheDocument();
     expect(reserveButton).toHaveAttribute("disabled", "");
