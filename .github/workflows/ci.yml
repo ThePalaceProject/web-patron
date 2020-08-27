@@ -22,6 +22,8 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 13.x
+          submodules: true
+          ssh-key: ${{ secrets.AXIS_NOW_SSH_KEY }}
       - name: Cache and install node modules
         uses: bahmutov/npm-install@v1
       - name: Lint
@@ -58,6 +60,8 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 13.x
+          submodules: true
+          ssh-key: ${{ secrets.AXIS_NOW_SSH_KEY }}
       - name: Cache and install node modules
         uses: bahmutov/npm-install@v1
       - name: Test
