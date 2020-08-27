@@ -46,8 +46,6 @@ jobs:
         uses: bahmutov/npm-install@v1
       - name: Typecheck
         run: tsc --noEmit
-        with:
-          ssh-key: ${{ secrets.AXIS_NOW_SSH_KEY }}
 
   test:
     name: Test & Coverage
