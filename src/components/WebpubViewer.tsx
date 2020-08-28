@@ -11,7 +11,7 @@ const initializeReader = async (
   entryUrl: string,
   catalogName: string,
   useDecryptor: boolean,
-  fetcher?: DataFetcher
+  fetcher: DataFetcher
 ) => {
   if (useDecryptor) {
     const loadDecryptor = async (
