@@ -46,7 +46,7 @@
     "react-hot-loader": "^4.12.20",
     "react-redux": "^7.2.1",
     "reakit": "^1.0.0-rc.2",
-    "redux": "^4.0.5",
+    "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
     "request": "^2.88.2",
     "styled-system": "^5.1.2",
