@@ -143,16 +143,13 @@ const BookListCTA: React.FC<{ book: BookWithUrl }> = ({ book }) => {
     return book.allBorrowLinks?.map(link => {
       return (
         <Stack
+          key={link.url}
           direction={"column"}
           sx={{
             mt: 2
           }}
         >
-          <BorrowOrReserve
-            key={link.url}
-            borrowLink={link}
-            isBorrow={isBorrow}
-          />
+          <BorrowOrReserve borrowLink={link} isBorrow={isBorrow} />
         </Stack>
       );
     });

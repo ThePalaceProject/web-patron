@@ -24,6 +24,7 @@ type MakeContextConfig = {
   shortenUrls?: boolean;
 };
 
+// eslint-disable-next-line react/display-name
 const makeContextWrapper = (config: MakeContextConfig = {}) => ({
   children
 }) => {
