@@ -16,7 +16,6 @@ import {
 import Button, { NavButton } from "../Button";
 import useDownloadButton from "opds-web-client/lib/hooks/useDownloadButton";
 import { withErrorBoundary } from "../ErrorBoundary";
-import useBorrow from "../../hooks/useBorrow";
 import Stack from "components/Stack";
 import { Text } from "components/Text";
 import { MediumIcon } from "components/MediumIndicator";

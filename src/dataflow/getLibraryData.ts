@@ -28,6 +28,7 @@ async function setupCache() {
     );
   }
   if (REGISTRY_BASE) {
+    console.log("Running with Library Registry at: ", REGISTRY_BASE);
     return new LibraryDataCache(REGISTRY_BASE, CACHE_EXPIRATION_SECONDS);
   }
 
