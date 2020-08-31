@@ -146,6 +146,7 @@ export async function getCatalogRootUrl(librarySlug?: string): Promise<string> {
     "Application must be run with one of SIMPLIFIED_CATALOG_BASE, CONFIG_FILE or REGISTRY_BASE."
   );
 }
+
 /**
  * Fetches an auth document from the supplied url and returns it
  * as a parsed AuthDocument

@@ -37,6 +37,7 @@ export const BookDetails: React.FC<{
   useSetCollectionAndBook(setCollectionAndBook);
 
   const book = useNormalizedBook();
+
   const error = useTypedSelector(state => state.book.error);
 
   if (error) {
