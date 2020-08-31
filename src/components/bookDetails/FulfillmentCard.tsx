@@ -8,11 +8,7 @@ import {
   queueString,
   bookIsAudiobook
 } from "utils/book";
-import {
-  BookData,
-  MediaLink,
-  FulfillmentLink
-} from "opds-web-client/lib/interfaces";
+import { BookData, MediaLink } from "opds-web-client/lib/interfaces";
 import Button, { NavButton } from "../Button";
 import useDownloadButton from "opds-web-client/lib/hooks/useDownloadButton";
 import { withErrorBoundary } from "../ErrorBoundary";
@@ -74,7 +70,7 @@ const FulfillmentContent: React.FC<{
               {availabilityString(book)}
             </>
           }
-          borrowLinks={book.allBorrowLinks}
+          book={book}
           isBorrow={true}
         />
       );
@@ -92,7 +88,7 @@ const FulfillmentContent: React.FC<{
                 ` ${book.holds.total} patrons in the queue.`}
             </>
           }
-          borrowLinks={book.allBorrowLinks}
+          book={book}
           isBorrow={false}
         />
       );
@@ -116,7 +112,7 @@ const FulfillmentContent: React.FC<{
         <CTAPanel
           title={title}
           subtitle={subtitle}
-          borrowLinks={book.allBorrowLinks}
+          book={book}
           isBorrow={true}
         />
       );
@@ -154,8 +150,8 @@ const CTAPanel: React.FC<{
   title: string;
   subtitle: React.ReactNode;
   isBorrow: boolean;
-  borrowLinks: FulfillmentLink[] | undefined;
-}> = ({ title, subtitle, isBorrow, borrowLinks }) => {
+  book: BookData;
+}> = ({ title, subtitle, isBorrow, book }) => {
   return (
     <>
       <Text variant="text.callouts.bold">{title}</Text>
@@ -169,9 +165,10 @@ const CTAPanel: React.FC<{
       >
         {subtitle}
       </Text>
-      {borrowLinks?.map(link => {
+      {book.allBorrowLinks?.map(link => {
         return (
           <BorrowOrReserve
+            book={book}
             key={link.url}
             borrowLink={link}
             isBorrow={isBorrow}
@@ -183,6 +180,7 @@ const CTAPanel: React.FC<{
 };
 
 const Reserved: React.FC<{ book: BookData }> = ({ book }) => {
+  console.log("reserved called");
   const position = book.holds?.position;
   return (
     <>

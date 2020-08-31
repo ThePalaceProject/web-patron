@@ -2,8 +2,9 @@ import * as React from "react";
 import useTypedSelector from "./useTypedSelector";
 import { getErrorMsg } from "utils/book";
 import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
+import { BookData } from "opds-web-client/lib/interfaces";
 
-export default function useBorrow() {
+export default function useBorrow(book: BookData) {
   const isUnmounted = React.useRef(false);
   const [isLoading, setLoading] = React.useState(false);
   const bookError = useTypedSelector(state => state.book?.error);

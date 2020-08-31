@@ -149,11 +149,12 @@ const BookListCTA: React.FC<{ book: BookWithUrl }> = ({ book }) => {
             mt: 2
           }}
         >
-          <BorrowOrReserve borrowLink={link} isBorrow={isBorrow} />
+          <BorrowOrReserve book={book} borrowLink={link} isBorrow={isBorrow} />
         </Stack>
       );
     });
   };
+
   switch (fulfillmentState) {
     case "AVAILABLE_OPEN_ACCESS":
       return (
@@ -317,10 +318,11 @@ export const LanesView: React.FC<{ lanes: LaneData[] }> = ({ lanes }) => {
 };
 
 export const BorrowOrReserve: React.FC<{
+  book: BookData;
   isBorrow: boolean;
   borrowLink: FulfillmentLink;
-}> = ({ isBorrow, borrowLink }) => {
-  const { isLoading, borrowOrReserve, errorMsg } = useBorrow();
+}> = ({ book, isBorrow, borrowLink }) => {
+  const { isLoading, borrowOrReserve, errorMsg } = useBorrow(book);
   const loadingText = isBorrow ? "Borrowing..." : "Reserving...";
   const buttonLabel = isBorrow
     ? borrowLink.indirectType ===

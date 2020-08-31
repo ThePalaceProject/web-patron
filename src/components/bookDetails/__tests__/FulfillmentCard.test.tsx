@@ -574,7 +574,7 @@ describe("reserved", () => {
 
   test("displays disabled reserve button", () => {
     const utils = render(<FulfillmentCard book={reservedBook} />);
-    const reserveButton = utils.getByText("Reserved");
+    const reserveButton = utils.getByRole("button", { name: "Reserved" });
     expect(reserveButton).toBeInTheDocument();
     expect(reserveButton).toBeDisabled();
   });
