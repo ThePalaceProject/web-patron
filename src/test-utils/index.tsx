@@ -19,10 +19,13 @@ import serializer from "jest-emotion";
 import { MockNextRouterContextProvider } from "./mockNextRouter";
 import { NextRouter } from "next/router";
 import makeTheme from "../theme";
+import { enableFetchMocks } from "jest-fetch-mock";
+import setEnv from "./setEnv";
 
+enableFetchMocks();
 expect.addSnapshotSerializer(serializer);
 
-export { fixtures };
+export { fixtures, setEnv };
 
 // configure the enzyme adapter
 configure({ adapter: new Adapter() });
@@ -75,9 +78,6 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
         <ThemeProvider theme={theme}>
           <ContextProvider
             library={options?.library ?? library}
-            shortenUrls
-            helmetContext={{}}
-            initialState={options?.initialState}
             store={store}
             fetcher={fetcher}
             actions={actions}

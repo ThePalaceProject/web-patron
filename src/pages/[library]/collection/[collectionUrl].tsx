@@ -1,11 +1,17 @@
 import * as React from "react";
+import Collection from "components/Collection";
+import { NextPage, GetServerSideProps } from "next";
+import Page from "components/Page";
+import withAppProps, { AppProps } from "dataflow/withAppProps";
 
-import Collection from "../../../components/Collection";
-import Layout from "../../../components/Layout";
-import ErrorPage from "../../404";
-
-const CollectionPage = ({ statusCode }: { statusCode?: number }) => {
-  return <Layout>{statusCode === 404 ? <ErrorPage /> : <Collection />}</Layout>;
+const CollectionPage: NextPage<AppProps> = ({ library, error }) => {
+  return (
+    <Page library={library} error={error}>
+      <Collection />
+    </Page>
+  );
 };
+
+export const getServerSideProps: GetServerSideProps = withAppProps();
 
 export default CollectionPage;
