@@ -96,6 +96,8 @@ function findCatalogRootUrl(catalog: OPDS2.CatalogEntry) {
  * Interprets the env vars to return the catalog root url.
  */
 export async function getCatalogRootUrl(librarySlug?: string): Promise<string> {
+  console.log("CONFIG_FILE", CONFIG_FILE);
+  console.log("REGISTRY", REGISTRY_BASE);
   if (CIRCULATION_MANAGER_BASE) {
     if (librarySlug) {
       throw new PageNotFoundError(

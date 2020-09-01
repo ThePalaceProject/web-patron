@@ -180,7 +180,6 @@ const CTAPanel: React.FC<{
 };
 
 const Reserved: React.FC<{ book: BookData }> = ({ book }) => {
-  console.log("reserved called");
   const position = book.holds?.position;
   return (
     <>
