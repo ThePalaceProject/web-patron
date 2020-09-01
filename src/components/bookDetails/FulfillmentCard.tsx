@@ -19,7 +19,7 @@ import SvgExternalLink from "icons/ExternalOpen";
 import SvgDownload from "icons/Download";
 import SvgPhone from "icons/Phone";
 import useIsBorrowed from "hooks/useIsBorrowed";
-import { NEXT_PUBLIC_COMPANION_APP } from "../../utils/env";
+import { NEXT_PUBLIC_COMPANION_APP, AXIS_NOW_DECRYPT } from "../../utils/env";
 import { BorrowOrReserve } from "components/BookList";
 
 const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
@@ -255,8 +255,10 @@ const AccessCard: React.FC<{
           </Text>
           <Stack sx={{ justifyContent: "center", flexWrap: "wrap" }}>
             {dedupedLinks.map(link => {
+              //Only AxisNow files can be read online, and all of those are encrypted.
               if (
                 NEXT_PUBLIC_COMPANION_APP === "openebooks" &&
+                AXIS_NOW_DECRYPT === "true" &&
                 link.type === "application/vnd.librarysimplified.axisnow+json"
               ) {
                 return <ReadOnlineButton key={link.url} link={link} />;

@@ -639,6 +639,7 @@ describe("available to download", () => {
 
   test("constructs link to viewer for OpenAxis Books", () => {
     (env.NEXT_PUBLIC_COMPANION_APP as string) = "openebooks";
+    (env.AXIS_NOW_DECRYPT as string) = "true";
     const utils = render(<FulfillmentCard book={viewableAxisNowBook} />);
     const readerLink = utils.getByRole("link", {
       name: /Read Online/i
