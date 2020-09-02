@@ -80,7 +80,7 @@ The following environment variables can also be set to further configure the app
 - Set `CACHE_EXPIRATION_SECONDS` to control how often the app will check for changes to registry entries and circ manager authentication documents.
 - Set `AXE_TEST=true` to run the application with `react-axe` enabled (only works when `NODE_ENV` is "development").
 - Set `ANALYZE=true` to generate bundle analysis files inside `.next/analyze` which will show bundle sizes for server and client, as well as composition.
-- Set `AXIS_NOW_DECRYPT=true` to run with AxisNow decryption. See [Running with Decryption](#Running-with-Decryption) for more details
+- Set `NEXT_PUBLIC_AXIS_NOW_DECRYPT=true` to run with AxisNow decryption. See [Running with Decryption](#Running-with-Decryption) for more details
 
 #### Using a `.env` file
 
@@ -95,7 +95,7 @@ When building for production using `npm run build`, the env vars are set at buil
 Circulation-Patron-Web supports read online for encrypted books only in the AxisNow format, and if you have access to the [Decryptor](https://github.com/NYPL-Simplified/axisnow-access-control-web)
 
 To run with decryption:  
-- Set `AXIS_NOW_DECRYPT=true`
+- Set `NEXT_PUBLIC_AXIS_NOW_DECRYPT=true`
 - Run `git submodule update`
 - Verify that `axisnow-access-control-web` folder exists.  
 - Run `npm install` as normal.

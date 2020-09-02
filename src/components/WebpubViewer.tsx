@@ -1,4 +1,4 @@
-import { AXIS_NOW_DECRYPT } from "../utils/env";
+import { NEXT_PUBLIC_AXIS_NOW_DECRYPT } from "../utils/env";
 
 import React from "react";
 import reader from "utils/reader";
@@ -52,7 +52,12 @@ const BookPage = () => {
   const { fetcher } = useActions();
 
   React.useEffect(() => {
-    initializeReader(`${bookUrl}`, catalogName, !!AXIS_NOW_DECRYPT, fetcher);
+    initializeReader(
+      `${bookUrl}`,
+      catalogName,
+      !!NEXT_PUBLIC_AXIS_NOW_DECRYPT,
+      fetcher
+    );
   });
 
   return (

@@ -22,7 +22,9 @@ window.open = jest.fn();
 const loadingBorrowState = {
   isLoading: true,
   borrowOrReserve: jest.fn(),
-  errorMsg: null
+  errorMsg: null,
+  buttonLabel: "Button Label",
+  loadingText: "Loading Label"
 };
 
 describe("open-access", () => {
@@ -163,7 +165,7 @@ describe("available to borrow", () => {
     });
 
     const borrowButton = await utils.findByRole("button", {
-      name: /Borrowing.../i
+      name: /Loading Label/i
     });
 
     expect(_useBorrowSpy).toHaveBeenCalledTimes(1);
@@ -269,7 +271,7 @@ describe("ready to borrow", () => {
     });
 
     const borrowButton = await utils.findByRole("button", {
-      name: /Borrowing.../i
+      name: /Loading Label/i
     });
 
     expect(_useBorrowSpy).toHaveBeenCalledTimes(1);
@@ -403,7 +405,7 @@ describe("ready to borrow (two links)", () => {
 
     // One button says "Borrowing..."
     const borrowButton = await utils.findByRole("button", {
-      name: /Borrowing.../i
+      name: /Loading Label/i
     });
     expect(borrowButton).toBeInTheDocument();
     expect(borrowButton).toHaveAttribute("disabled", "");
@@ -532,7 +534,7 @@ describe("available to reserve", () => {
       })
     });
     const reserveButton = utils.getByRole("button", {
-      name: /Reserving.../i
+      name: /Loading Label/i
     });
 
     expect(_useBorrowSpy).toHaveBeenCalledTimes(1);
@@ -639,7 +641,7 @@ describe("available to download", () => {
 
   test("constructs link to viewer for OpenAxis Books", () => {
     (env.NEXT_PUBLIC_COMPANION_APP as string) = "openebooks";
-    (env.AXIS_NOW_DECRYPT as string) = "true";
+    (env.NEXT_PUBLIC_AXIS_NOW_DECRYPT as string) = "true";
     const utils = render(<FulfillmentCard book={viewableAxisNowBook} />);
     const readerLink = utils.getByRole("link", {
       name: /Read Online/i

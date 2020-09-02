@@ -4,8 +4,7 @@ import * as React from "react";
 import {
   BookData,
   LaneData,
-  RequiredKeys,
-  FulfillmentLink
+  RequiredKeys
 } from "opds-web-client/lib/interfaces";
 import { truncateString, stripHTML } from "../utils/string";
 import {
@@ -14,7 +13,6 @@ import {
   availabilityString
 } from "../utils/book";
 import Lane from "./Lane";
-import useBorrow from "../hooks/useBorrow";
 import Button, { NavButton } from "./Button";
 import LoadingIndicator from "./LoadingIndicator";
 import useInfiniteScroll from "../hooks/useInfiniteScroll";
@@ -25,6 +23,7 @@ import { ArrowForward } from "icons";
 import useIsBorrowed from "hooks/useIsBorrowed";
 import BookCover from "./BookCover";
 import Stack from "./Stack";
+import BorrowOrReserve from "./BorrowOrReserve";
 
 /**
  * In a collection you can:
@@ -140,19 +139,25 @@ const BookListCTA: React.FC<{ book: BookWithUrl }> = ({ book }) => {
   const isBorrowed = useIsBorrowed(book);
   const fulfillmentState = getFulfillmentState(book, isBorrowed);
   const getCtaButtons = (isBorrow: boolean) => {
-    return book.allBorrowLinks?.map(link => {
-      return (
-        <Stack
-          key={link.url}
-          direction={"column"}
-          sx={{
-            mt: 2
-          }}
-        >
-          <BorrowOrReserve book={book} borrowLink={link} isBorrow={isBorrow} />
-        </Stack>
-      );
-    });
+    return (
+      <Stack
+        direction={"column"}
+        sx={{
+          mt: 2
+        }}
+      >
+        {book.allBorrowLinks?.map(link => {
+          return (
+            <BorrowOrReserve
+              key={link.url}
+              book={book}
+              borrowLink={link}
+              isBorrow={isBorrow}
+            />
+          );
+        })}
+      </Stack>
+    );
   };
 
   switch (fulfillmentState) {
@@ -314,33 +319,5 @@ export const LanesView: React.FC<{ lanes: LaneData[] }> = ({ lanes }) => {
         <Lane key={lane.url} lane={lane} />
       ))}
     </ul>
-  );
-};
-
-export const BorrowOrReserve: React.FC<{
-  book: BookData;
-  isBorrow: boolean;
-  borrowLink: FulfillmentLink;
-}> = ({ book, isBorrow, borrowLink }) => {
-  const { isLoading, borrowOrReserve, errorMsg } = useBorrow(book);
-  const loadingText = isBorrow ? "Borrowing..." : "Reserving...";
-  const buttonLabel = isBorrow
-    ? borrowLink.indirectType ===
-      "application/vnd.librarysimplified.axisnow+json"
-      ? "Borrow to read online"
-      : "Borrow to read on a mobile device"
-    : "Reserve";
-  return (
-    <>
-      <Button
-        size="lg"
-        onClick={() => borrowOrReserve(borrowLink.url)}
-        loading={isLoading}
-        loadingText={loadingText}
-      >
-        <Text variant="text.body.bold">{buttonLabel}</Text>
-      </Button>
-      {errorMsg && <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>}
-    </>
   );
 };

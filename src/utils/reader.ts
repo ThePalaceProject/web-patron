@@ -1,4 +1,4 @@
-import { AXIS_NOW_DECRYPT } from "../utils/env";
+import { NEXT_PUBLIC_AXIS_NOW_DECRYPT } from "../utils/env";
 
 import {
   SepiaTheme,
@@ -80,7 +80,7 @@ async function initBookSettings(
   const paginator = new ColumnsPaginatedBookView();
   const scroller = new ScrollingBookView();
 
-  const Decryptor = AXIS_NOW_DECRYPT
+  const Decryptor = NEXT_PUBLIC_AXIS_NOW_DECRYPT
     ? await import("../../axisnow-access-control-web/src/decryptor")
     : undefined;
   const decryptor = Decryptor
@@ -90,7 +90,6 @@ async function initBookSettings(
   const entryUrl: URL = decryptor
     ? new URL(decryptor.getEntryUrl())
     : webpubManifestUrl;
-
   const bookSettings = await BookSettings.create({
     store: settingsStore,
     bookFonts: [publisher, serif, sans],
@@ -98,7 +97,7 @@ async function initBookSettings(
     bookThemes: [day, sepia, night],
     bookViews: [paginator, scroller]
   });
-  IFrameNavigator.create({
+  await IFrameNavigator.create({
     decryptor,
     element: element,
     entryUrl: entryUrl,
