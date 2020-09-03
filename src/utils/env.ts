@@ -19,8 +19,9 @@ export const CACHE_EXPIRATION_SECONDS = parseInt(
   process.env.CACHE_EXPIRATION_SECONDS ?? "10",
   10
 );
-export const NEXT_PUBLIC_AXIS_NOW_DECRYPT =
-  process.env.NEXT_PUBLIC_AXIS_NOW_DECRYPT;
+export const NEXT_PUBLIC_AXIS_NOW_DECRYPT = !(
+  process.env.NEXT_PUBLIC_AXIS_NOW_DECRYPT === "false"
+);
 export const IS_DEVELOPMENT = process.env.NODE_ENV === "development";
 export const IS_SERVER = typeof window === "undefined";
 

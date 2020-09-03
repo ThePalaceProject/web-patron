@@ -261,7 +261,7 @@ const AccessCard: React.FC<{
               //Only AxisNow files can be read online, and all of those are encrypted.
               if (
                 NEXT_PUBLIC_COMPANION_APP === "openebooks" &&
-                NEXT_PUBLIC_AXIS_NOW_DECRYPT === "true" &&
+                NEXT_PUBLIC_AXIS_NOW_DECRYPT &&
                 link.type === "application/vnd.librarysimplified.axisnow+json"
               ) {
                 return <ReadOnlineButton key={link.url} link={link} />;

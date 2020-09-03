@@ -55,7 +55,7 @@ const BookPage = () => {
     initializeReader(
       `${bookUrl}`,
       catalogName,
-      !!NEXT_PUBLIC_AXIS_NOW_DECRYPT,
+      NEXT_PUBLIC_AXIS_NOW_DECRYPT,
       fetcher
     );
   });
