@@ -4,6 +4,7 @@
 
 - Feature: Add support for Clever auth providers.
 - Redesign: in Auth Modal display AuthProvider logos as selectable buttons when there are 2-4 AuthProviders instead of Combobox
+- Feature: Add support for tracking app events via Google Tag Manager.
 
 # 2.3.0
 

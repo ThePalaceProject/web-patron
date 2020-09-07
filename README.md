@@ -80,7 +80,7 @@ The following environment variables can also be set to further configure the app
 - Set `CACHE_EXPIRATION_SECONDS` to control how often the app will check for changes to registry entries and circ manager authentication documents.
 - Set `AXE_TEST=true` to run the application with `react-axe` enabled (only works when `NODE_ENV` is "development").
 - Set `ANALYZE=true` to generate bundle analysis files inside `.next/analyze` which will show bundle sizes for server and client, as well as composition.
-- Set `NEXT_PUBLIC_GA_ID` to track various metrics via Google Analytics. 
+- Set `NEXT_PUBLIC_GTM_ID` to send events and data to Google Tag Manager. 
 
 #### Using a `.env` file
 
