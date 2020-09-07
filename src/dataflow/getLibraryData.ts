@@ -1,158 +1,258 @@
-/* eslint-disable no-underscore-dangle */
-import { LibraryData } from "./../interfaces";
-import LibraryDataCache from "./LibraryDataCache";
 import {
-  IS_SERVER,
-  __LIBRARY_DATA__,
-  CACHE_EXPIRATION_SECONDS,
-  REGISTRY_BASE,
+  OPDS2,
+  LibraryData,
+  LibraryLinks,
+  AuthDocument,
+  HTMLMediaType,
+  AuthDocumentLink,
+  AuthDocLinkRelation
+} from "interfaces";
+import OPDSParser, { OPDSFeed } from "opds-feed-parser";
+import {
   CIRCULATION_MANAGER_BASE,
+  REGISTRY_BASE,
   CONFIG_FILE
-} from "../utils/env";
-import fs from "fs";
+} from "utils/env";
+import getConfigFile from "./getConfigFile";
+import ApplicationError, { PageNotFoundError, AppSetupError } from "errors";
+import { CatalogEntry } from "types/opds2";
 
-async function setupCache() {
-  // we don't want this to be run on the client
-  if (!IS_SERVER) return Promise.resolve(null);
+/**
+ * Fetches an OPDSFeed with a given catalogUrl. Parses it into an OPDSFeed and
+ * returns it.
+ */
+export async function fetchCatalog(catalogUrl: string): Promise<OPDSFeed> {
+  try {
+    const catalogResponse = await fetch(catalogUrl);
+    const rawCatalog = await catalogResponse.text();
+    const parser = new OPDSParser();
+    const parsedCatalog = await parser.parse(rawCatalog);
+    return parsedCatalog as OPDSFeed;
+  } catch (e) {
+    throw new ApplicationError("Could not fetch catalog at: " + catalogUrl, e);
+  }
+}
 
-  if (
-    (REGISTRY_BASE && CIRCULATION_MANAGER_BASE) ||
-    (REGISTRY_BASE && CONFIG_FILE) ||
-    (CIRCULATION_MANAGER_BASE && CONFIG_FILE)
-  ) {
-    console.error(
-      "Only one of REGISTRY_BASE, SIMPLIFIED_CATALOG_BASE, and CONFIG_FILE should be used.",
-      REGISTRY_BASE,
-      CIRCULATION_MANAGER_BASE,
-      CONFIG_FILE
+/**
+ * Returns a function to construct a registry catalog link, which leads to a
+ * LibraryRegistryFeed containing a single CatalogEntry.
+ */
+async function fetchCatalogLinkBuilder(
+  registryBase: string
+): Promise<(uuid: string) => string> {
+  try {
+    const response = await fetch(registryBase);
+    const registryCatalog = (await response.json()) as OPDS2.LibraryRegistryFeed;
+    const templateUrl = registryCatalog?.links.find(
+      link => link.rel === OPDS2.CatalogLinkTemplateRelation
+    )?.href;
+    if (!templateUrl) {
+      throw new ApplicationError(
+        `Template not present in response from: ${registryBase}`
+      );
+    }
+    return uuid => templateUrl.replace("{uuid}", uuid);
+  } catch (e) {
+    throw new ApplicationError(
+      `Could not fetch the library template at: ${registryBase}`,
+      e
     );
   }
-  if (REGISTRY_BASE) {
-    console.log("Running with Library Registry at: ", REGISTRY_BASE);
-    return new LibraryDataCache(REGISTRY_BASE, CACHE_EXPIRATION_SECONDS);
-  }
+}
 
-  if (CONFIG_FILE) {
-    console.log("Running with Config file at: ", CONFIG_FILE);
-    let configText: string | null;
-    const config = {};
-    // it is a remote config file.
-    if (CONFIG_FILE.startsWith("http")) {
-      try {
-        const configResponse = await fetch(CONFIG_FILE);
-        configText = await configResponse.text();
-      } catch (configUrlError) {
-        throw "Could not read config file at " + CONFIG_FILE;
-      }
-      // it is a local config file.
-    } else {
-      configText = fs.readFileSync(CONFIG_FILE, "utf8");
-    }
-    // read the entries.
-    for (const entry of configText.split("\n")) {
-      if (entry && entry.charAt(0) !== "#") {
-        const [path, circManagerUrl] = entry.split("|");
-        config[path] = circManagerUrl;
-      }
-    }
-    return new LibraryDataCache(undefined, CACHE_EXPIRATION_SECONDS, config);
+/**
+ * Fetches a CatalogEntry from a library registry given an identifier
+ * for the library.
+ */
+async function fetchCatalogEntry(
+  librarySlug: string,
+  registryBase: string
+): Promise<CatalogEntry> {
+  const linkBuilder = await fetchCatalogLinkBuilder(registryBase);
+  const catalogFeedUrl = linkBuilder(librarySlug);
+  try {
+    const response = await fetch(catalogFeedUrl);
+    const catalogFeed = (await response.json()) as OPDS2.LibraryRegistryFeed;
+    const catalogEntry = catalogFeed?.catalogs?.[0];
+    if (!catalogEntry)
+      throw new ApplicationError(
+        `LibraryRegistryFeed returned by ${catalogFeedUrl} does not contain a CatalogEntry.`
+      );
+    return catalogEntry;
+  } catch (e) {
+    throw new ApplicationError(
+      `Could not fetch catalog entry for library: ${librarySlug} at ${registryBase}`,
+      e
+    );
   }
+}
 
+function findCatalogRootUrl(catalog: OPDS2.CatalogEntry) {
+  return catalog.links.find(link => link.rel === OPDS2.CatalogRootRelation)
+    ?.href;
+}
+
+/**
+ * Interprets the env vars to return the catalog root url.
+ */
+export async function getCatalogRootUrl(librarySlug?: string): Promise<string> {
   if (CIRCULATION_MANAGER_BASE) {
-    console.log(
-      "Running with Circulation Manager Base at: ",
-      CIRCULATION_MANAGER_BASE
-    );
-    // when running with a single circ manager, you pass no library
-    // registry and an empty config object.
-    return new LibraryDataCache(undefined, CACHE_EXPIRATION_SECONDS, {});
+    if (librarySlug) {
+      throw new PageNotFoundError(
+        "App is running with a single Circ Manager, but you're trying to access a multi-library route: " +
+          librarySlug
+      );
+    }
+    if (CONFIG_FILE || REGISTRY_BASE) {
+      throw new AppSetupError(
+        "App is set up with SIMPLIFIED_CATALOG_BASE and either CONFIG_FILE or REGISTRY. You should only have one defined."
+      );
+    }
+    return CIRCULATION_MANAGER_BASE;
   }
 
-  console.log(
-    "No env vars found, setting registry base to http://localhost:7000"
-  );
-  return new LibraryDataCache(
-    "http://localhost:7000",
-    CACHE_EXPIRATION_SECONDS
+  // otherwise we are running with multiple libraries.
+  if (CONFIG_FILE || REGISTRY_BASE) {
+    if (!librarySlug)
+      throw new PageNotFoundError(
+        "Library slug must be provided when running with multiple libraries."
+      );
+
+    if (CONFIG_FILE) {
+      if (REGISTRY_BASE) {
+        throw new AppSetupError(
+          "You can only have one of SIMPLIFIED_CATALOG_BASE and REGISTRTY_BASE defined at one time."
+        );
+      }
+      const configFile = await getConfigFile(CONFIG_FILE);
+      const configEntry = configFile[librarySlug];
+      if (configEntry) return configEntry;
+      throw new PageNotFoundError(
+        "No CONFIG_FILE entry for library: " + librarySlug
+      );
+    }
+
+    if (REGISTRY_BASE) {
+      const catalogEntry = await fetchCatalogEntry(librarySlug, REGISTRY_BASE);
+      const catalogRootUrl = findCatalogRootUrl(catalogEntry);
+      if (!catalogRootUrl)
+        throw new ApplicationError(
+          `CatalogEntry did not contain a Catalog Root Url. Library UUID: ${librarySlug}`
+        );
+      return catalogRootUrl;
+    }
+  }
+  throw new AppSetupError(
+    "Application must be run with one of SIMPLIFIED_CATALOG_BASE, CONFIG_FILE or REGISTRY_BASE."
   );
 }
 
-// the cache should only be created once per server instance.
-const cachePromise = setupCache();
+/**
+ * Fetches an auth document from the supplied url and returns it
+ * as a parsed AuthDocument
+ */
+export async function fetchAuthDocument(url: string): Promise<AuthDocument> {
+  try {
+    const response = await fetch(url);
+    const json = await response.json();
+    return json;
+  } catch (e) {
+    throw new ApplicationError(
+      "Could not fetch auth document at url: " + url,
+      e
+    );
+  }
+}
 
 /**
- * 1. First page load:
- *  - on server: fetch library data, pass it down tree and render.
- *  - on client: receive library data from server, set it on window and render
- * 2. On following client route transitions:
- *  - on client: _app rerenders and calls getInitialProps again. we don't
- *    want to fetch libraryData on every page transition, so we reuse the
- *    info that was previously saved on window.
+ * Constructs the internal LibraryData state from an auth document,
+ * catalog url, and library slug.
  */
-export const setLibraryData = (library: LibraryData) => {
-  if (IS_SERVER) return;
-  window[__LIBRARY_DATA__] = library;
-};
+export function buildLibraryData(
+  authDoc: AuthDocument,
+  catalogUrl: string,
+  librarySlug: string | undefined
+): LibraryData {
+  const logoUrl = authDoc.links.find(link => link.rel === "logo")?.href;
+  const headerLinks = authDoc.links.filter(link => link.rel === "navigation");
+  const libraryLinks = parseLinks(authDoc.links);
+  return {
+    slug: librarySlug ?? null,
+    catalogUrl,
+    catalogName: authDoc.title,
+    logoUrl: logoUrl ?? null,
+    colors:
+      authDoc.web_color_scheme?.primary && authDoc.web_color_scheme.secondary
+        ? {
+            primary: authDoc.web_color_scheme.primary,
+            secondary: authDoc.web_color_scheme.secondary
+          }
+        : null,
+    headerLinks,
+    libraryLinks
+  };
+}
 
 /**
- * Get the library data from the window when we are
- * on the client, otherwise fetch it via the api
+ * Extracts the href of an auth document from the links in an OPDSFeed.
  */
-const getLibraryData = async (
-  library?: string
-): Promise<LibraryData | null> => {
-  if (IS_SERVER) {
-    return await fetchLibraryData(library);
-  }
-  /**
-   * we are on the client and library data should be available
-   * on the window. If it is not, something has gone wrong and we should
-   * trigger a re-render from the server or display an error page.
-   * We cannot fetch library data on client because it depends on
-   * reading the config file on server with "fs" module.
-   */
-  return Promise.resolve(window[__LIBRARY_DATA__]);
-};
+export function getAuthDocHref(catalog: OPDSFeed) {
+  const link = catalog.links.find(link => link.rel === AuthDocLinkRelation);
+  if (!link)
+    throw new ApplicationError(
+      "OPDS Catalog did not contain an auth document link."
+    );
+  return link.href;
+}
 
 /**
- * uses the datacache to get library data
- * handles the logic around config files and env vars
+ * Parses the links array in an auth document into an object of links.
  */
-const fetchLibraryData = async (
-  library?: string
-): Promise<LibraryData | null> => {
-  // first make sure the cache is ready
-  const cache = await cachePromise;
+function parseLinks(links: AuthDocumentLink[]): LibraryLinks {
+  const parsed = links.reduce((links, link) => {
+    switch (link.rel) {
+      case "about":
+        return { ...links, about: link };
+      case "alternate":
+        return { ...links, libraryWebsite: link };
+      case "privacy-policy":
+        return { ...links, privacyPolicy: link };
+      case "terms-of-service":
+        return { ...links, tos: link };
+      case "help":
+        if (link.type === HTMLMediaType) return { ...links, helpWebsite: link };
+        return { ...links, helpEmail: link };
+      case "register":
+      case "logo":
+      case "navigation":
+        return links;
+      default:
+        return links;
+    }
+  }, {});
+  return parsed;
+}
 
-  // if the cache is not loaded, we are client side and can't proceed.
-  if (!cache) {
-    throw new Error("Cannot fetch library data on client");
+/**
+ * Attempts to create an array of all the libraries available with the
+ * current env settings.
+ */
+export async function getLibrarySlugs() {
+  if (CIRCULATION_MANAGER_BASE) return [];
+
+  if (CONFIG_FILE) {
+    const configFile = await getConfigFile(CONFIG_FILE);
+    const slugs = Object.keys(configFile);
+    return slugs;
   }
 
-  if (CIRCULATION_MANAGER_BASE) {
-    // We're using a single circ manager library instead of a registry.
-    const catalog = await cache.getCatalog(CIRCULATION_MANAGER_BASE);
-    const authDocument = await cache.getAuthDocument(catalog);
-    const libraryData = {
-      onlyLibrary: true,
-      catalogUrl: CIRCULATION_MANAGER_BASE,
-      ...cache.getDataFromAuthDocumentAndCatalog(authDocument, catalog)
-    };
-
-    return libraryData;
+  if (REGISTRY_BASE) {
+    /**
+     * We don't do any static generation when running with a
+     * library registry. Therefore, we return an empty array
+     */
+    return [];
   }
-  // otherwise we are using a config file or registry.
-  if (library) {
-    return await cache.getLibraryData(library);
-  }
-  console.error("Running with multiple libraries and no library was provided!");
-  // otherwise there was no library provided, return null
-  return null;
-};
 
-export const getConfig = async () => {
-  if (!IS_SERVER) return;
-  return (await cachePromise)?.getConfig();
-};
-
-export default getLibraryData;
+  throw new ApplicationError("Unable to get library slugs for current setup.");
+}

@@ -2,7 +2,6 @@ import * as React from "react";
 import { shallow } from "enzyme";
 import { renderHook } from "@testing-library/react-hooks";
 import AppContextProvider from "../ContextProvider";
-import buildStore from "opds-web-client/lib/store";
 import { usePathFor } from "opds-web-client/lib/components/context/PathForContext";
 import { LibraryData } from "../../../interfaces";
 import { State } from "opds-web-client/lib/state";
@@ -12,10 +11,13 @@ import { MockNextRouterContextProvider } from "../../../test-utils/mockNextRoute
 const TestComponent: React.FC = () => <div>test child</div>;
 
 const testLibrary: LibraryData = {
-  id: "TEST",
+  slug: "TEST",
   catalogUrl: "http://example.com/home",
   catalogName: "Example",
-  libraryLinks: {}
+  libraryLinks: {},
+  logoUrl: null,
+  colors: null,
+  headerLinks: []
 };
 
 type MakeContextConfig = {
@@ -27,16 +29,10 @@ type MakeContextConfig = {
 const makeContextWrapper = (config: MakeContextConfig = {}) => ({
   children
 }) => {
-  const { library = testLibrary, initialState, shortenUrls = false } = config;
+  const { library = testLibrary } = config;
   return (
     <MockNextRouterContextProvider>
-      <AppContextProvider
-        library={library}
-        initialState={initialState}
-        shortenUrls={shortenUrls}
-      >
-        {children}
-      </AppContextProvider>
+      <AppContextProvider library={library}>{children}</AppContextProvider>
     </MockNextRouterContextProvider>
   );
 };
@@ -58,13 +54,8 @@ describe("ContextProvider", () => {
   });
 
   test("renders child", () => {
-    const store = buildStore();
     const wrapper = shallow(
-      <AppContextProvider
-        library={testLibrary}
-        initialState={store.getState()}
-        shortenUrls
-      >
+      <AppContextProvider library={testLibrary}>
         <TestComponent />
       </AppContextProvider>
     );
@@ -113,9 +104,12 @@ describe("ContextProvider", () => {
     test("returns a path with no collection or book and no library id", () => {
       const libraryWithoutId: LibraryData = {
         libraryLinks: {},
-        id: undefined,
         catalogUrl: "http://example.com/home",
-        catalogName: "Example"
+        catalogName: "Example",
+        slug: null,
+        logoUrl: null,
+        colors: null,
+        headerLinks: []
       };
       const { result } = renderHook(() => usePathFor(), {
         wrapper: makeContextWrapper({ library: libraryWithoutId })

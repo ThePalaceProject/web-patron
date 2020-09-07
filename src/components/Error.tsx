@@ -1,9 +1,9 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import { H1 } from "./Text";
-import { Config } from "dataflow/LibraryDataCache";
 import Router from "next/router";
 import { SystemStyleObject } from "@styled-system/css";
+import { AppConfigFile } from "interfaces";
 
 const statusCodes: { [code: number]: string } = {
   400: "Bad Request",
@@ -18,13 +18,16 @@ const ErrorComponent = ({
   detail,
   configFile
 }: {
-  statusCode?: number;
+  statusCode?: number | null;
   title?: string;
   detail?: string;
-  configFile?: Config;
+  configFile?: AppConfigFile | null;
 }) => {
-  const errorTitle =
-    title || statusCodes[statusCode] || "An unexpected error has occurred";
+  const errorTitle = title
+    ? title
+    : statusCode
+    ? statusCodes[statusCode]
+    : "An unexpected error has occurred";
   return (
     <>
       <H1 sx={{ fontSize: 3, textAlign: `center` }}>
@@ -60,7 +63,9 @@ const buttonBase: SystemStyleObject = {
   bg: "transparent"
 };
 
-const LibraryList: React.FC<{ configFile: Config }> = ({ configFile }) => {
+const LibraryList: React.FC<{ configFile: AppConfigFile }> = ({
+  configFile
+}) => {
   const libraries = Object.keys(configFile);
 
   const loadPage = async (lib: string) => {
