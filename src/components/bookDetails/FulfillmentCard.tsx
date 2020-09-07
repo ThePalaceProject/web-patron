@@ -25,6 +25,7 @@ import SvgDownload from "icons/Download";
 import SvgPhone from "icons/Phone";
 import useIsBorrowed from "hooks/useIsBorrowed";
 import { NEXT_PUBLIC_COMPANION_APP } from "../../utils/env";
+import { userEvent } from "analytics/track";
 
 const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
   return (
@@ -298,9 +299,13 @@ const DownloadButton: React.FC<{
       </NavButton>
     );
   } else {
+    const trackAndFulfill = () => {
+      trackDownload(link, title);
+      fulfill();
+    };
     return (
       <Button
-        onClick={fulfill}
+        onClick={trackAndFulfill}
         variant="ghost"
         color="ui.gray.extraDark"
         iconLeft={SvgDownload}
@@ -310,5 +315,15 @@ const DownloadButton: React.FC<{
     );
   }
 };
+
+export function trackDownload(
+  link: MediaLink | FulfillmentLink,
+  title: string
+) {
+  userEvent("fulfilled_book", {
+    acquisitionLink: link,
+    title
+  });
+}
 
 export default withErrorBoundary(FulfillmentCard, ErrorCard);

@@ -3,6 +3,7 @@ import { BookData } from "opds-web-client/lib/interfaces";
 import useTypedSelector from "./useTypedSelector";
 import { getErrorMsg } from "utils/book";
 import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
+import { userEvent } from "analytics/track";
 
 export default function useBorrow(book: BookData) {
   const isUnmounted = React.useRef(false);
@@ -14,6 +15,7 @@ export default function useBorrow(book: BookData) {
   const borrowOrReserve = async () => {
     if (book.borrowUrl) {
       setLoading(true);
+      trackBorrowOrReserve(book);
       await dispatch(actions.updateBook(book.borrowUrl));
       if (!isUnmounted.current) setLoading(false);
     } else {
@@ -33,4 +35,18 @@ export default function useBorrow(book: BookData) {
     borrowOrReserve,
     errorMsg
   };
+}
+
+function trackBorrowOrReserve(book: BookData) {
+  userEvent("borrowed_or_reserved_book", {
+    title: book.title,
+    authors: book.authors,
+    availability: book.availability,
+    borrowUrl: book.borrowUrl,
+    url: book.url,
+    publisher: book.publisher,
+    published: book.published,
+    categories: book.categories,
+    language: book.language
+  });
 }

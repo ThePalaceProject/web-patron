@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 /* eslint-disable @typescript-eslint/camelcase */
 import { NextWebVitalsMetric } from "next/app";
+import { BookData } from "opds-web-client/lib/interfaces";
 
 export function updateDataLayer(data: any) {
   window?.dataLayer?.push(data);
@@ -13,7 +14,11 @@ function event(name: string, data: any) {
   });
 }
 
-type UserEvent = "searched" | "borrowed_book" | "downloaded_book" | "pageview";
+type UserEvent =
+  | "searched"
+  | "borrowed_or_reserved_book"
+  | "fulfilled_book"
+  | "pageview";
 export function userEvent(name: UserEvent, data: any) {
   event(name, { eventCategory: "User Event", ...data });
 }
