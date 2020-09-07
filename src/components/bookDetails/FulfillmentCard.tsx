@@ -76,8 +76,7 @@ const FulfillmentContent: React.FC<{
             </>
           }
           book={book}
-          buttonLabel="Borrow"
-          buttonLoadingText="Borrowing..."
+          type="borrow"
         />
       );
     }
@@ -95,8 +94,7 @@ const FulfillmentContent: React.FC<{
                 ` ${book.holds.total} patrons in the queue.`}
             </>
           }
-          buttonLabel="Reserve"
-          buttonLoadingText="Reserving..."
+          type="reserve"
         />
       );
     }
@@ -119,8 +117,7 @@ const FulfillmentContent: React.FC<{
           book={book}
           title={title}
           subtitle={subtitle}
-          buttonLabel="Borrow"
-          buttonLoadingText="Borrowing..."
+          type="borrow"
         />
       );
     }
@@ -157,10 +154,9 @@ const BorrowOrReserve: React.FC<{
   book: BookData;
   title: string;
   subtitle: React.ReactNode;
-  buttonLabel: string;
-  buttonLoadingText: string;
-}> = ({ book, title, subtitle, buttonLabel, buttonLoadingText }) => {
-  const { isLoading, borrowOrReserve, errorMsg } = useBorrow(book);
+  type: "borrow" | "reserve";
+}> = ({ book, title, subtitle, type }) => {
+  const { isLoading, borrowOrReserve, errorMsg } = useBorrow(book, type);
   return (
     <>
       <Text variant="text.callouts.bold">{title}</Text>
@@ -178,9 +174,11 @@ const BorrowOrReserve: React.FC<{
         size="lg"
         onClick={borrowOrReserve}
         loading={isLoading}
-        loadingText={buttonLoadingText}
+        loadingText={type === "borrow" ? "Borrowing..." : "Reserving..."}
       >
-        <Text variant="text.body.bold">{buttonLabel}</Text>
+        <Text variant="text.body.bold">
+          {type === "borrow" ? "Borrow" : "Reserve"}
+        </Text>
       </Button>
       {errorMsg && <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>}
     </>

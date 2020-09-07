@@ -5,7 +5,7 @@ import { getErrorMsg } from "utils/book";
 import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
 import { userEvent } from "analytics/track";
 
-export default function useBorrow(book: BookData) {
+export default function useBorrow(book: BookData, type: "borrow" | "reserve") {
   const isUnmounted = React.useRef(false);
   const [isLoading, setLoading] = React.useState(false);
   const bookError = useTypedSelector(state => state.book?.error);
@@ -15,7 +15,7 @@ export default function useBorrow(book: BookData) {
   const borrowOrReserve = async () => {
     if (book.borrowUrl) {
       setLoading(true);
-      trackBorrowOrReserve(book);
+      trackBorrowOrReserve(book, type);
       await dispatch(actions.updateBook(book.borrowUrl));
       if (!isUnmounted.current) setLoading(false);
     } else {
@@ -37,8 +37,8 @@ export default function useBorrow(book: BookData) {
   };
 }
 
-function trackBorrowOrReserve(book: BookData) {
-  userEvent("borrowed_or_reserved_book", {
+function trackBorrowOrReserve(book: BookData, type: "borrow" | "reserve") {
+  userEvent(type === "borrow" ? "borrowed_book" : "reserved_book", {
     title: book.title,
     authors: book.authors,
     availability: book.availability,

@@ -16,7 +16,8 @@ function event(name: string, data: any) {
 
 type UserEvent =
   | "searched"
-  | "borrowed_or_reserved_book"
+  | "borrowed_book"
+  | "reserved_book"
   | "fulfilled_book"
   | "pageview";
 export function userEvent(name: UserEvent, data: any) {
