@@ -137,7 +137,12 @@ export const BookListItem: React.FC<{
 const BookListCTA: React.FC<{ book: BookWithUrl }> = ({ book }) => {
   const isBorrowed = useIsBorrowed(book);
   const fulfillmentState = getFulfillmentState(book, isBorrowed);
-  const { borrowOrReserve, isLoading, errorMsg } = useBorrow(book);
+  const isBorrow =
+    fulfillmentState === "AVAILABLE_TO_BORROW" || "READY_TO_BORROW";
+  const { borrowOrReserve, isLoading, errorMsg } = useBorrow(
+    book,
+    isBorrow ? "borrow" : "reserve"
+  );
 
   switch (fulfillmentState) {
     case "AVAILABLE_OPEN_ACCESS":
