@@ -29,7 +29,6 @@ import { Config } from "dataflow/LibraryDataCache";
 import "@nypl/design-system-react-components/dist/styles.css";
 import "css-overrides.css";
 import makeTheme from "../theme";
-import usePageview from "analytics/usePageview";
 import { trackWebVitals } from "analytics/track";
 
 type NotFoundProps = {
@@ -49,8 +48,6 @@ function is404(props: MyAppProps): props is NotFoundProps {
 }
 
 const MyApp = (props: MyAppProps & AppProps) => {
-  // track page views
-  usePageview();
   /**
    * If there was no library or initialState provided, render the error page
    */

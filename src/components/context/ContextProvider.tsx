@@ -18,6 +18,7 @@ import samlAuthPlugin from "auth/samlAuthPlugin";
 import CleverAuthPlugin from "auth/cleverAuthPlugin";
 import getPathFor from "utils/getPathFor";
 import { LinkUtilsProvider } from "./LinkUtilsContext";
+import PageviewTracker from "analytics/PageviewTracker";
 
 type ProviderProps = PreloadedData & {
   // we allow custom store and actions
@@ -69,7 +70,7 @@ const AppContextProvider: React.FC<ProviderProps> = ({
                     library={library}
                     urlShortener={urlShortener}
                   >
-                    {children}
+                    <PageviewTracker>{children}</PageviewTracker>
                   </LinkUtilsProvider>
                 </LibraryProvider>
               </ActionsProvider>
