@@ -8,6 +8,7 @@ import Router from "next/router";
 import useTypedSelector from "../hooks/useTypedSelector";
 import useLinkUtils from "./context/LinkUtilsContext";
 import SvgSearch from "icons/Search";
+import { userEvent } from "analytics/track";
 
 interface SearchProps extends React.InputHTMLAttributes<HTMLInputElement> {}
 
@@ -41,6 +42,7 @@ const Search: React.FC<SearchProps> = ({ className, ...props }) => {
     const searchTerms = encodeURIComponent(value);
     const url = searchData?.searchData?.template(searchTerms);
     if (!url) return;
+    trackSearch(value);
     const link = linkUtils.buildCollectionLink(url);
     Router.push(link.href, link.as);
   };
@@ -82,5 +84,11 @@ const Search: React.FC<SearchProps> = ({ className, ...props }) => {
     </form>
   );
 };
+
+function trackSearch(query: string) {
+  userEvent("searched", {
+    searchQuery: query
+  });
+}
 
 export default Search;
