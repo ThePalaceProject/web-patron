@@ -8,15 +8,10 @@ import {
   queueString,
   bookIsAudiobook
 } from "utils/book";
-import {
-  BookData,
-  MediaLink,
-  FulfillmentLink
-} from "opds-web-client/lib/interfaces";
+import { BookData, MediaLink } from "opds-web-client/lib/interfaces";
 import Button, { NavButton } from "../Button";
 import useDownloadButton from "opds-web-client/lib/hooks/useDownloadButton";
 import { withErrorBoundary } from "../ErrorBoundary";
-import useBorrow from "../../hooks/useBorrow";
 import Stack from "components/Stack";
 import { Text } from "components/Text";
 import { MediumIcon } from "components/MediumIndicator";
@@ -24,7 +19,11 @@ import SvgExternalLink from "icons/ExternalOpen";
 import SvgDownload from "icons/Download";
 import SvgPhone from "icons/Phone";
 import useIsBorrowed from "hooks/useIsBorrowed";
-import { NEXT_PUBLIC_COMPANION_APP } from "../../utils/env";
+import {
+  NEXT_PUBLIC_COMPANION_APP,
+  NEXT_PUBLIC_AXIS_NOW_DECRYPT
+} from "../../utils/env";
+import BorrowOrReserve from "components/BorrowOrReserve";
 import { userEvent } from "analytics/track";
 
 const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
@@ -67,7 +66,7 @@ const FulfillmentContent: React.FC<{
 
     case "AVAILABLE_TO_BORROW": {
       return (
-        <BorrowOrReserve
+        <CTAPanel
           title="This book is available to borrow!"
           subtitle={
             <>
@@ -76,15 +75,14 @@ const FulfillmentContent: React.FC<{
             </>
           }
           book={book}
-          type="borrow"
+          isBorrow={true}
         />
       );
     }
 
     case "AVAILABLE_TO_RESERVE": {
       return (
-        <BorrowOrReserve
-          book={book}
+        <CTAPanel
           title="This book is currently unavailable."
           subtitle={
             <>
@@ -94,7 +92,8 @@ const FulfillmentContent: React.FC<{
                 ` ${book.holds.total} patrons in the queue.`}
             </>
           }
-          type="reserve"
+          book={book}
+          isBorrow={false}
         />
       );
     }
@@ -112,12 +111,13 @@ const FulfillmentContent: React.FC<{
         availableUntil !== "NaN"
           ? `Your hold will expire on ${availableUntil}. ${queueString(book)}`
           : "You must borrow this book before your loan expires.";
+
       return (
-        <BorrowOrReserve
-          book={book}
+        <CTAPanel
           title={title}
           subtitle={subtitle}
-          type="borrow"
+          book={book}
+          isBorrow={true}
         />
       );
     }
@@ -150,13 +150,12 @@ const FulfillmentContent: React.FC<{
   }
 };
 
-const BorrowOrReserve: React.FC<{
-  book: BookData;
+const CTAPanel: React.FC<{
   title: string;
   subtitle: React.ReactNode;
-  type: "borrow" | "reserve";
-}> = ({ book, title, subtitle, type }) => {
-  const { isLoading, borrowOrReserve, errorMsg } = useBorrow(book, type);
+  isBorrow: boolean;
+  book: BookData;
+}> = ({ title, subtitle, isBorrow, book }) => {
   return (
     <>
       <Text variant="text.callouts.bold">{title}</Text>
@@ -170,17 +169,16 @@ const BorrowOrReserve: React.FC<{
       >
         {subtitle}
       </Text>
-      <Button
-        size="lg"
-        onClick={borrowOrReserve}
-        loading={isLoading}
-        loadingText={type === "borrow" ? "Borrowing..." : "Reserving..."}
-      >
-        <Text variant="text.body.bold">
-          {type === "borrow" ? "Borrow" : "Reserve"}
-        </Text>
-      </Button>
-      {errorMsg && <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>}
+      {book.allBorrowLinks?.map(link => {
+        return (
+          <BorrowOrReserve
+            book={book}
+            key={link.url}
+            borrowLink={link}
+            isBorrow={isBorrow}
+          />
+        );
+      })}
     </>
   );
 };
@@ -229,16 +227,16 @@ const ErrorCard: React.FC = () => {
 };
 
 /**
- * Handles the case where it is ready for download either via openAccessLink or
+ * Handles the case where it is ready for access either via openAccessLink or
  * via fulfillmentLink.
  */
 const AccessCard: React.FC<{
   book: BookData;
-  links: MediaLink[] | FulfillmentLink[];
+  links: MediaLink[];
   subtitle: string;
 }> = ({ book, links, subtitle }) => {
   const { title } = book;
-  const dedupedLinks = dedupeLinks(links ?? []);
+  const dedupedLinks = dedupeLinks(links);
   const isAudiobook = bookIsAudiobook(book);
   const companionApp =
     NEXT_PUBLIC_COMPANION_APP === "openebooks" ? "Open eBooks" : "SimplyE";
@@ -261,6 +259,14 @@ const AccessCard: React.FC<{
           </Text>
           <Stack sx={{ justifyContent: "center", flexWrap: "wrap" }}>
             {dedupedLinks.map(link => {
+              //Only AxisNow files can be read online, and all of those are encrypted.
+              if (
+                NEXT_PUBLIC_COMPANION_APP === "openebooks" &&
+                NEXT_PUBLIC_AXIS_NOW_DECRYPT &&
+                link.type === "application/vnd.librarysimplified.axisnow+json"
+              ) {
+                return <ReadOnlineButton key={link.url} link={link} />;
+              }
               return (
                 <DownloadButton key={link.url} link={link} title={title} />
               );
@@ -272,52 +278,40 @@ const AccessCard: React.FC<{
   );
 };
 
+const ReadOnlineButton: React.FC<{
+  link: MediaLink;
+}> = ({ link }) => {
+  const readerLink = `/read/${encodeURIComponent(link.url)}`;
+  return (
+    <NavButton
+      variant="ghost"
+      color="ui.gray.extraDark"
+      iconLeft={SvgExternalLink}
+      href={readerLink}
+    >
+      Read Online
+    </NavButton>
+  );
+};
+
 const DownloadButton: React.FC<{
-  link: FulfillmentLink | MediaLink;
+  link: MediaLink;
   title: string;
 }> = ({ link, title }) => {
   const { fulfill, downloadLabel } = useDownloadButton(link, title);
-
-  /* web-epub is currently used in test-server.
-                 to-do: remove the below commented out check */
-  const hasReaderLink =
-    // link.type === "application/vnd.librarysimplified.web-epub" ||
-    link.type === "application/vnd.librarysimplified.axisnow+json";
-
-  if (hasReaderLink) {
-    const readerLink = `/read/${encodeURIComponent(link.url)}`;
-    return (
-      <NavButton
-        variant="ghost"
-        color="ui.gray.extraDark"
-        iconLeft={SvgExternalLink}
-        href={readerLink}
-      >
-        {downloadLabel}
-      </NavButton>
-    );
-  } else {
-    const trackAndFulfill = () => {
-      trackDownload(link, title);
-      fulfill();
-    };
-    return (
-      <Button
-        onClick={trackAndFulfill}
-        variant="ghost"
-        color="ui.gray.extraDark"
-        iconLeft={SvgDownload}
-      >
-        {downloadLabel}
-      </Button>
-    );
-  }
+  return (
+    <Button
+      onClick={fulfill}
+      variant="ghost"
+      color="ui.gray.extraDark"
+      iconLeft={SvgDownload}
+    >
+      {downloadLabel}
+    </Button>
+  );
 };
 
-export function trackDownload(
-  link: MediaLink | FulfillmentLink,
-  title: string
-) {
+export function trackDownload(link: MediaLink, title: string) {
   userEvent("fulfilled_book", {
     acquisitionLink: link,
     title

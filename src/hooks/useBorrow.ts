@@ -1,11 +1,15 @@
 import * as React from "react";
-import { BookData } from "opds-web-client/lib/interfaces";
 import useTypedSelector from "./useTypedSelector";
 import { getErrorMsg } from "utils/book";
 import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
+import { BookData, FulfillmentLink } from "opds-web-client/lib/interfaces";
 import { userEvent } from "analytics/track";
 
-export default function useBorrow(book: BookData, type: "borrow" | "reserve") {
+export default function useBorrow(
+  book: BookData,
+  isBorrow: boolean,
+  borrowLink: FulfillmentLink
+) {
   const isUnmounted = React.useRef(false);
   const [isLoading, setLoading] = React.useState(false);
   const bookError = useTypedSelector(state => state.book?.error);
@@ -15,16 +19,19 @@ export default function useBorrow(book: BookData, type: "borrow" | "reserve") {
       ? errorStr
       : undefined;
   const { actions, dispatch } = useActions();
+  const loadingText = isBorrow ? "Borrowing..." : "Reserving...";
+  const buttonLabel = isBorrow
+    ? borrowLink.indirectType ===
+      "application/vnd.librarysimplified.axisnow+json"
+      ? "Borrow to read online"
+      : "Borrow to read on a mobile device"
+    : "Reserve";
 
-  const borrowOrReserve = async () => {
-    if (book.borrowUrl) {
-      setLoading(true);
-      trackBorrowOrReserve(book, type);
-      await dispatch(actions.updateBook(book.borrowUrl));
-      if (!isUnmounted.current) setLoading(false);
-    } else {
-      throw Error("No borrow url present for book");
-    }
+  const borrowOrReserve = async (url: string) => {
+    setLoading(true);
+    trackBorrowOrReserve(book, isBorrow);
+    await dispatch(actions.updateBook(url));
+    if (!isUnmounted.current) setLoading(false);
   };
 
   React.useEffect(
@@ -36,13 +43,15 @@ export default function useBorrow(book: BookData, type: "borrow" | "reserve") {
 
   return {
     isLoading,
+    loadingText,
+    buttonLabel,
     borrowOrReserve,
     errorMsg
   };
 }
 
-function trackBorrowOrReserve(book: BookData, type: "borrow" | "reserve") {
-  userEvent(type === "borrow" ? "borrowed_book" : "reserved_book", {
+function trackBorrowOrReserve(book: BookData, isBorrow: boolean) {
+  userEvent(isBorrow ? "borrowed_book" : "reserved_book", {
     title: book.title,
     authors: book.authors,
     availability: book.availability,
