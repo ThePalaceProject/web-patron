@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 /* eslint-disable @typescript-eslint/camelcase */
 import { NextWebVitalsMetric } from "next/app";
-import { BookData } from "opds-web-client/lib/interfaces";
 
 export function updateDataLayer(data: any) {
   window?.dataLayer?.push(data);
