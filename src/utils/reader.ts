@@ -80,9 +80,9 @@ async function initBookSettings(
   const paginator = new ColumnsPaginatedBookView();
   const scroller = new ScrollingBookView();
 
-  const decryptorModule = "axisnow-access-control-web";
+  // const decryptorModule = "axisnow-access-control-web";
   const Decryptor = NEXT_PUBLIC_AXIS_NOW_DECRYPT
-    ? await import(`../../${decryptorModule}/src/decryptor`)
+    ? await import(`../../axisnow-access-control-web/src/decryptor`)
     : undefined;
   const decryptor = Decryptor
     ? await Decryptor.default.createDecryptor(decryptorParams)
