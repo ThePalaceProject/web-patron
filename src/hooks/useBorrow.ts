@@ -3,7 +3,7 @@ import useTypedSelector from "./useTypedSelector";
 import { getErrorMsg } from "utils/book";
 import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
 import { BookData, FulfillmentLink } from "opds-web-client/lib/interfaces";
-import { userEvent } from "analytics/track";
+import { bookEvent } from "analytics/track";
 
 export default function useBorrow(
   book: BookData,
@@ -29,7 +29,7 @@ export default function useBorrow(
 
   const borrowOrReserve = async (url: string) => {
     setLoading(true);
-    trackBorrowOrReserve(book, isBorrow);
+    trackBorrowOrReserve(book, isBorrow, url);
     await dispatch(actions.updateBook(url));
     if (!isUnmounted.current) setLoading(false);
   };
@@ -50,16 +50,8 @@ export default function useBorrow(
   };
 }
 
-function trackBorrowOrReserve(book: BookData, isBorrow: boolean) {
-  userEvent(isBorrow ? "borrowed_book" : "reserved_book", {
-    title: book.title,
-    authors: book.authors,
-    availability: book.availability,
-    borrowUrl: book.borrowUrl,
-    url: book.url,
-    publisher: book.publisher,
-    published: book.published,
-    categories: book.categories,
-    language: book.language
+function trackBorrowOrReserve(book: BookData, isBorrow: boolean, url: string) {
+  bookEvent(isBorrow ? "book_borrowed" : "book_reserved", book, {
+    borrowUrlUsed: url
   });
 }

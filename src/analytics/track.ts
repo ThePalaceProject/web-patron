@@ -1,36 +1,74 @@
 /* eslint-disable camelcase */
-/* eslint-disable @typescript-eslint/camelcase */
 import { NextWebVitalsMetric } from "next/app";
+import { BookData } from "opds-web-client/lib/interfaces";
+import { getMedium } from "opds-web-client/lib/utils/book";
 
-export function updateDataLayer(data: any) {
-  window?.dataLayer?.push(data);
-}
+type AnyEvent = BookEvent | OtherEvent;
 
-type AnyEvent = ApplicationEvent | UserEvent;
-
-function event(name: AnyEvent, data: any) {
+function event(name: AnyEvent, data: Record<string, unknown>) {
   window?.dataLayer?.push({
     event: name,
     ...data
   });
 }
 
-type UserEvent =
-  | "search_performed"
+// these come from here: https://wiki.lyrasis.org/display/SIM/SimplyE+Circulation+Analytics
+type BookAnalyticsData = {
+  id: string;
+  title: string;
+  authors?: string[];
+  categories?: string[];
+  fiction?: boolean;
+  openAccess: boolean;
+  publisher?: string;
+  language?: string;
+  medium: string;
+  // library: string;
+
+  // for the future
+  audience?: string;
+  targetAge?: string;
+  genre?: string;
+  distributor?: string;
+};
+
+type BookEvent =
   | "book_borrowed"
   | "book_reserved"
   | "book_fulfilled"
-  | "pageview";
-export function userEvent(name: UserEvent, data: any) {
-  event(name, { event_category: "User Event", ...data });
+  | "book_loaded";
+
+export function bookEvent(
+  name: BookEvent,
+  book: BookData,
+  additionalData?: Record<string, unknown>
+) {
+  const bookForAnalytics: BookAnalyticsData = {
+    id: book.id,
+    title: book.title,
+    authors: book.authors,
+    categories: book.categories,
+    fiction: book.categories?.includes("Fiction"),
+    publisher: book.publisher,
+    language: book.language,
+    medium: getMedium(book),
+    openAccess:
+      (book.openAccessLinks && book.openAccessLinks.length > 0) ?? false
+  };
+  event(name, {
+    event_category: "Book Event",
+    book: bookForAnalytics,
+    ...additionalData
+  });
 }
 
-type ApplicationEvent =
+type OtherEvent =
+  | "search_performed"
   | "collection_loaded"
-  | "book_loaded"
+  | "pageview"
   | "performance_metric_recorded";
-export function appEvent(name: ApplicationEvent, data: any) {
-  event(name, { event_category: "Application Event", ...data });
+export function appEvent(name: OtherEvent, data: any) {
+  event(name, { event_category: "Other Event", ...data });
 }
 
 // allows us to track performance using web vitals reports

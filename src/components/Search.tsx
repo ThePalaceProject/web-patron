@@ -8,7 +8,7 @@ import Router from "next/router";
 import useTypedSelector from "../hooks/useTypedSelector";
 import useLinkUtils from "./context/LinkUtilsContext";
 import SvgSearch from "icons/Search";
-import { userEvent } from "analytics/track";
+import { appEvent } from "analytics/track";
 
 interface SearchProps extends React.InputHTMLAttributes<HTMLInputElement> {}
 
@@ -86,7 +86,7 @@ const Search: React.FC<SearchProps> = ({ className, ...props }) => {
 };
 
 function trackSearch(query: string) {
-  userEvent("searched", {
+  appEvent("search_performed", {
     searchQuery: query
   });
 }

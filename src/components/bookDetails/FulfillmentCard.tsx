@@ -24,7 +24,7 @@ import {
   NEXT_PUBLIC_AXIS_NOW_DECRYPT
 } from "../../utils/env";
 import BorrowOrReserve from "components/BorrowOrReserve";
-import { userEvent } from "analytics/track";
+import { bookEvent } from "analytics/track";
 
 const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
   return (
@@ -241,6 +241,10 @@ const AccessCard: React.FC<{
   const companionApp =
     NEXT_PUBLIC_COMPANION_APP === "openebooks" ? "Open eBooks" : "SimplyE";
 
+  function trackDownload(link: MediaLink) {
+    bookEvent("book_fulfilled", book, { fulfilledLink: link });
+  }
+
   return (
     <>
       <Stack sx={{ alignItems: "center" }}>
@@ -268,7 +272,12 @@ const AccessCard: React.FC<{
                 return <ReadOnlineButton key={link.url} link={link} />;
               }
               return (
-                <DownloadButton key={link.url} link={link} title={title} />
+                <DownloadButton
+                  key={link.url}
+                  link={link}
+                  title={title}
+                  trackDownload={trackDownload}
+                />
               );
             })}
           </Stack>
@@ -297,11 +306,16 @@ const ReadOnlineButton: React.FC<{
 const DownloadButton: React.FC<{
   link: MediaLink;
   title: string;
-}> = ({ link, title }) => {
+  trackDownload: (link: MediaLink) => void;
+}> = ({ link, title, trackDownload }) => {
   const { fulfill, downloadLabel } = useDownloadButton(link, title);
+  function trackAndFulfill() {
+    trackDownload(link);
+    fulfill();
+  }
   return (
     <Button
-      onClick={fulfill}
+      onClick={trackAndFulfill}
       variant="ghost"
       color="ui.gray.extraDark"
       iconLeft={SvgDownload}
@@ -310,12 +324,5 @@ const DownloadButton: React.FC<{
     </Button>
   );
 };
-
-export function trackDownload(link: MediaLink, title: string) {
-  userEvent("fulfilled_book", {
-    acquisitionLink: link,
-    title
-  });
-}
 
 export default withErrorBoundary(FulfillmentCard, ErrorCard);

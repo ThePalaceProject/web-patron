@@ -2,7 +2,7 @@ import * as React from "react";
 import { useRouter } from "next/router";
 import * as env from "utils/env";
 import useLinkUtils from "components/context/LinkUtilsContext";
-import { userEvent, appEvent } from "analytics/track";
+import { appEvent, bookEvent } from "analytics/track";
 import useTypedSelector from "hooks/useTypedSelector";
 
 const PageviewTracker: React.FC = ({ children }) => {
@@ -18,10 +18,11 @@ const PageviewTracker: React.FC = ({ children }) => {
       ? urlShortener.expandBookUrl(bookUrl)
       : undefined;
 
+  const collectionId = useTypedSelector(state => state.collection?.data?.id);
   const collectionTitle = useTypedSelector(
     state => state.collection?.data?.title
   );
-  const bookTitle = useTypedSelector(state => state.book.data?.title);
+  const book = useTypedSelector(state => state.book.data);
   /**
    * We update the dataLayere whenever we change pages.
    */
@@ -34,21 +35,27 @@ const PageviewTracker: React.FC = ({ children }) => {
       collectionUrl: fullCollectionUrl,
       bookUrl: fullBookUrl
     };
-    userEvent("pageview", data);
+    appEvent("pageview", { page: data });
   }, [fullCollectionUrl, fullBookUrl, library, asPath, pathname]);
 
-  // add the book and collection titles whenever we can
+  /**
+   * Add the book and collection to data layer when they load.
+   * We memoize these so the hooks only get called if the id changes.
+   */
   React.useEffect(() => {
-    appEvent("loaded_book", {
-      bookTitle
-    });
-  }, [bookTitle]);
+    if (book) bookEvent("book_loaded", book);
+  }, [book]);
 
   React.useEffect(() => {
-    appEvent("loaded_collection", {
-      collectionTitle
-    });
-  });
+    if (collectionId && collectionUrl)
+      appEvent("collection_loaded", {
+        collection: {
+          title: collectionTitle,
+          id: collectionId,
+          url: collectionUrl
+        }
+      });
+  }, [collectionUrl, collectionTitle, collectionId]);
   return <>{children}</>;
 };
 
