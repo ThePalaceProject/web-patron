@@ -19,6 +19,8 @@ const initializeReader = async (
       webpubManifestUrl: any
     ) => {
       const Decryptor = await import(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         "../../axisnow-access-control-web/src/decryptor"
       );
       if (Decryptor) {

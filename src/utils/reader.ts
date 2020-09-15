@@ -81,7 +81,9 @@ async function initBookSettings(
   const scroller = new ScrollingBookView();
 
   const Decryptor = NEXT_PUBLIC_AXIS_NOW_DECRYPT
-    ? await import("../../axisnow-access-control-web/src/decryptor")
+    ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      await import("../../axisnow-access-control-web/src/decryptor")
     : undefined;
   const decryptor = Decryptor
     ? await Decryptor.default.createDecryptor(decryptorParams)
