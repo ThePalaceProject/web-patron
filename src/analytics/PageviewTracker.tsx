@@ -2,8 +2,8 @@ import * as React from "react";
 import { useRouter } from "next/router";
 import * as env from "utils/env";
 import useLinkUtils from "components/context/LinkUtilsContext";
-import { appEvent, bookEvent } from "analytics/track";
 import useTypedSelector from "hooks/useTypedSelector";
+import track from "analytics/track";
 
 const PageviewTracker: React.FC = ({ children }) => {
   const { asPath, pathname, query } = useRouter();
@@ -24,18 +24,19 @@ const PageviewTracker: React.FC = ({ children }) => {
   );
   const book = useTypedSelector(state => state.book.data);
   /**
-   * We update the dataLayere whenever we change pages.
+   * We update the dataLayer whenever we change pages.
    */
   React.useEffect(() => {
-    const data = {
-      path: asPath,
-      codePath: pathname,
-      appEnvironment: env,
-      library,
-      collectionUrl: fullCollectionUrl,
-      bookUrl: fullBookUrl
-    };
-    appEvent("pageview", { page: data });
+    track.page({
+      page: {
+        path: asPath,
+        codePath: pathname,
+        appEnvironment: env,
+        library,
+        collectionUrl: fullCollectionUrl,
+        bookUrl: fullBookUrl
+      }
+    });
   }, [fullCollectionUrl, fullBookUrl, library, asPath, pathname]);
 
   /**
@@ -43,17 +44,15 @@ const PageviewTracker: React.FC = ({ children }) => {
    * We memoize these so the hooks only get called if the id changes.
    */
   React.useEffect(() => {
-    if (book) bookEvent("book_loaded", book);
+    if (book) track.bookLoaded(book);
   }, [book]);
 
   React.useEffect(() => {
-    if (collectionId && collectionUrl)
-      appEvent("collection_loaded", {
-        collection: {
-          title: collectionTitle,
-          id: collectionId,
-          url: collectionUrl
-        }
+    if (collectionId && typeof collectionUrl === "string")
+      track.collectionLoaded({
+        title: collectionTitle,
+        id: collectionId,
+        url: collectionUrl
       });
   }, [collectionUrl, collectionTitle, collectionId]);
   return <>{children}</>;

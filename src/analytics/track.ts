@@ -1,14 +1,43 @@
 /* eslint-disable camelcase */
 import { NextWebVitalsMetric } from "next/app";
-import { BookData } from "opds-web-client/lib/interfaces";
+import { BookData, MediaLink } from "opds-web-client/lib/interfaces";
 import { getMedium } from "opds-web-client/lib/utils/book";
 
-type AnyEvent = BookEvent | OtherEvent;
-
-function event(name: AnyEvent, data: Record<string, unknown>) {
+/** Event constructors */
+function event(name: string, data: Record<string, unknown>) {
   window?.dataLayer?.push({
     event: name,
     ...data
+  });
+}
+// doesn't track an event, just updates the data layer for the page
+function page(data: Record<string, unknown>) {
+  window?.dataLayer?.push(data);
+}
+function appEvent(name: string, data: any) {
+  event(name, { event_category: "Other Event", ...data });
+}
+function bookEvent(
+  name: string,
+  book: BookData,
+  additionalData?: Record<string, unknown>
+) {
+  const bookForAnalytics: BookAnalyticsData = {
+    id: book.id,
+    title: book.title,
+    authors: book.authors,
+    categories: book.categories,
+    fiction: book.categories?.includes("Fiction"),
+    publisher: book.publisher,
+    language: book.language,
+    medium: getMedium(book),
+    openAccess:
+      (book.openAccessLinks && book.openAccessLinks.length > 0) ?? false
+  };
+  event(name, {
+    event_category: "Book Event",
+    book: bookForAnalytics,
+    ...additionalData
   });
 }
 
@@ -32,53 +61,44 @@ type BookAnalyticsData = {
   distributor?: string;
 };
 
-type BookEvent =
-  | "book_borrowed"
-  | "book_reserved"
-  | "book_fulfilled"
-  | "book_loaded";
+/**
+ * Tracking functions
+ */
 
-export function bookEvent(
-  name: BookEvent,
-  book: BookData,
-  additionalData?: Record<string, unknown>
-) {
-  const bookForAnalytics: BookAnalyticsData = {
-    id: book.id,
-    title: book.title,
-    authors: book.authors,
-    categories: book.categories,
-    fiction: book.categories?.includes("Fiction"),
-    publisher: book.publisher,
-    language: book.language,
-    medium: getMedium(book),
-    openAccess:
-      (book.openAccessLinks && book.openAccessLinks.length > 0) ?? false
-  };
-  event(name, {
-    event_category: "Book Event",
-    book: bookForAnalytics,
-    ...additionalData
+function bookBorrowed(url: string, book: BookData) {
+  bookEvent("book_borrowed", book, { borrowUrlUsed: url });
+}
+function bookReserved(url: string, book: BookData) {
+  bookEvent("book_reserved", book, { reserveUrlUsed: url });
+}
+function bookFulfilled(link: MediaLink, book: BookData) {
+  bookEvent("book_fulfilled", book, { fulfilledLink: link });
+}
+function bookLoaded(book: BookData) {
+  bookEvent("book_loaded", book);
+}
+
+function collectionLoaded(collectionData: {
+  title?: string;
+  id: string;
+  url: string;
+}) {
+  appEvent("collection_loaded", {
+    collection: collectionData
   });
 }
 
-type OtherEvent =
-  | "search_performed"
-  | "collection_loaded"
-  | "pageview"
-  | "performance_metric_recorded";
-export function appEvent(name: OtherEvent, data: any) {
-  event(name, { event_category: "Other Event", ...data });
+function searchPerformed(data: { searchQuery: string }) {
+  appEvent("search_performed", data);
+}
+
+function signedIn(data: { loansId: string }) {
+  appEvent("signed_in", data);
 }
 
 // allows us to track performance using web vitals reports
 // https://nextjs.org/docs/advanced-features/measuring-performance
-export function trackWebVitals({
-  id,
-  name,
-  value,
-  label
-}: NextWebVitalsMetric) {
+function webVitals({ id, name, value, label }: NextWebVitalsMetric) {
   appEvent("performance_metric_recorded", {
     metric_name: name,
     metric_category:
@@ -87,3 +107,15 @@ export function trackWebVitals({
     metric_id: id // id unique to current page load
   });
 }
+
+export default {
+  webVitals,
+  signedIn,
+  searchPerformed,
+  collectionLoaded,
+  bookLoaded,
+  bookBorrowed,
+  bookReserved,
+  bookFulfilled,
+  page
+};

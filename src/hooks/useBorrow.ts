@@ -3,7 +3,7 @@ import useTypedSelector from "./useTypedSelector";
 import { getErrorMsg } from "utils/book";
 import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
 import { BookData, FulfillmentLink } from "opds-web-client/lib/interfaces";
-import { bookEvent } from "analytics/track";
+import track from "analytics/track";
 
 export default function useBorrow(
   book: BookData,
@@ -51,7 +51,5 @@ export default function useBorrow(
 }
 
 function trackBorrowOrReserve(book: BookData, isBorrow: boolean, url: string) {
-  bookEvent(isBorrow ? "book_borrowed" : "book_reserved", book, {
-    borrowUrlUsed: url
-  });
+  isBorrow ? track.bookBorrowed(url, book) : track.bookReserved(url, book);
 }

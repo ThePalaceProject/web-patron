@@ -6,7 +6,7 @@ import enableAxe from "utils/axe";
 import "system-font-css";
 import "@nypl/design-system-react-components/dist/styles.css";
 import "css-overrides.css";
-import { trackWebVitals } from "analytics/track";
+import track from "analytics/track";
 
 const MyApp = (props: AppProps) => {
   const { Component, pageProps } = props;
@@ -31,7 +31,7 @@ const AppErrorFallback: React.FC<{ message: string }> = ({ message }) => {
 };
 
 export function reportWebVitals(metric: NextWebVitalsMetric) {
-  trackWebVitals(metric);
+  track.webVitals(metric);
 }
 
 export default MyApp;

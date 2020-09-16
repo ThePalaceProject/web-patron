@@ -24,7 +24,7 @@ import {
   NEXT_PUBLIC_AXIS_NOW_DECRYPT
 } from "../../utils/env";
 import BorrowOrReserve from "components/BorrowOrReserve";
-import { bookEvent } from "analytics/track";
+import track from "analytics/track";
 
 const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
   return (
@@ -242,7 +242,7 @@ const AccessCard: React.FC<{
     NEXT_PUBLIC_COMPANION_APP === "openebooks" ? "Open eBooks" : "SimplyE";
 
   function trackDownload(link: MediaLink) {
-    bookEvent("book_fulfilled", book, { fulfilledLink: link });
+    track.bookFulfilled(link, book);
   }
 
   return (
