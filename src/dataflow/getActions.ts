@@ -1,6 +1,6 @@
-import DataFetcher from "opds-web-client/lib/DataFetcher";
-import ActionsCreator from "opds-web-client/lib/actions";
-import { adapter } from "opds-web-client/lib/OPDSDataAdapter";
+import DataFetcher from "owc/DataFetcher";
+import ActionsCreator from "owc/actions";
+import { adapter } from "owc/OPDSDataAdapter";
 
 export default function getActions() {
   const fetcher = new DataFetcher({ adapter });

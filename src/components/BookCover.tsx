@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { BookData } from "opds-web-client/lib/interfaces";
+import { BookData } from "owc/interfaces";
 import { AspectRatio } from "@theme-ui/components";
 import { MediumIcon } from "./MediumIndicator";
 /**

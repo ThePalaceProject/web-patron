@@ -1,4 +1,4 @@
-import AuthPlugin from "opds-web-client/lib/AuthPlugin";
+import AuthPlugin from "owc/AuthPlugin";
 import BasicAuthForm from "./BasicAuthForm";
 import AuthButton from "./AuthButton";
 

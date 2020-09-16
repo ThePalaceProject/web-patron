@@ -3,7 +3,7 @@ import { jsx } from "theme-ui";
 import * as React from "react";
 import TextInput from "./TextInput";
 import Button from "./Button";
-import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
+import { useActions } from "owc/ActionsContext";
 import Router from "next/router";
 import useTypedSelector from "../hooks/useTypedSelector";
 import useLinkUtils from "./context/LinkUtilsContext";

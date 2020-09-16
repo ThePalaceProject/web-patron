@@ -1,4 +1,4 @@
-import { PathFor } from "opds-web-client/lib/interfaces";
+import { PathFor } from "owc/interfaces";
 import UrlShortener from "../UrlShortener";
 
 const getPathFor = (

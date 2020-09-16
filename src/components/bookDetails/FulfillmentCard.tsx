@@ -8,9 +8,9 @@ import {
   queueString,
   bookIsAudiobook
 } from "utils/book";
-import { BookData, MediaLink } from "opds-web-client/lib/interfaces";
+import { BookData, MediaLink } from "owc/interfaces";
 import Button, { NavButton } from "../Button";
-import useDownloadButton from "opds-web-client/lib/hooks/useDownloadButton";
+import useDownloadButton from "owc/hooks/useDownloadButton";
 import { withErrorBoundary } from "../ErrorBoundary";
 import Stack from "components/Stack";
 import { Text } from "components/Text";
@@ -297,7 +297,9 @@ const DownloadButton: React.FC<{
   link: MediaLink;
   title: string;
 }> = ({ link, title }) => {
-  const { fulfill, downloadLabel } = useDownloadButton(link, title);
+  const downloadDetails = useDownloadButton(link, title);
+  if (!downloadDetails) return null;
+  const { fulfill, downloadLabel } = downloadDetails;
   return (
     <Button
       onClick={fulfill}

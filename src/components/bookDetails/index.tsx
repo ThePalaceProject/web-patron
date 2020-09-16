@@ -8,8 +8,8 @@ import {
   mapDispatchToProps,
   mapStateToProps,
   mergeRootProps
-} from "opds-web-client/lib/components/mergeRootProps";
-import { BookData, FetchErrorData } from "opds-web-client/lib/interfaces";
+} from "owc/mergeRootProps";
+import { BookData, FetchErrorData } from "owc/interfaces";
 import { connect } from "react-redux";
 import useSetCollectionAndBook from "../../hooks/useSetCollectionAndBook";
 import { PageLoader } from "../LoadingIndicator";

@@ -1,5 +1,5 @@
 import useTypedSelector from "./useTypedSelector";
-import { collectionDataWithLoans } from "opds-web-client/lib/utils";
+import { collectionDataWithLoans } from "owc/utils";
 
 /**
  * A hook to give you the book state that has been updated with

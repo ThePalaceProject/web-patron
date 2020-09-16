@@ -1,4 +1,4 @@
-import AuthPlugin from "opds-web-client/lib/AuthPlugin";
+import AuthPlugin from "owc/AuthPlugin";
 import CleverButton from "./cleverAuthButton";
 
 export const CleverAuthPlugin: AuthPlugin = {

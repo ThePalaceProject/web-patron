@@ -2,9 +2,9 @@
 import { jsx } from "theme-ui";
 import * as React from "react";
 import Button from "components/Button";
-import { ClientSamlMethod } from "opds-web-client/lib/interfaces";
-import { AuthFormProps } from "opds-web-client/lib/components/AuthProviderSelectionForm";
+import { ClientSamlMethod } from "owc/interfaces";
 import { modalButtonStyles } from "../components/Modal";
+import { AuthFormProps } from "owc/AuthPlugin";
 /**
  * Auth form
  */

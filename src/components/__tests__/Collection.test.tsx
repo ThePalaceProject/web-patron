@@ -2,8 +2,8 @@ import * as React from "react";
 import { render, fixtures } from "../../test-utils";
 import { Collection } from "../Collection";
 import merge from "deepmerge";
-import { State } from "opds-web-client/lib/state";
-import { LaneData } from "opds-web-client/lib/interfaces";
+import { State } from "owc/state";
+import { LaneData } from "owc/interfaces";
 
 const setCollectionAndBook = jest.fn().mockResolvedValue({});
 

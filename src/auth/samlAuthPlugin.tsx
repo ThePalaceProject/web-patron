@@ -1,7 +1,7 @@
-import AuthPlugin from "opds-web-client/lib/AuthPlugin";
+import AuthPlugin from "owc/AuthPlugin";
 import SamlAuthForm from "./SamlAuthForm";
 import AuthButton from "./AuthButton";
-import { ClientSamlMethod } from "opds-web-client/lib/interfaces";
+import { ClientSamlMethod } from "owc/interfaces";
 
 const samlAuthPlugin: AuthPlugin<ClientSamlMethod> = {
   buttonComponent: AuthButton,

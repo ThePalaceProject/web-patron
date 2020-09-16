@@ -1,10 +1,10 @@
 /* eslint-disable no-underscore-dangle */
-import { State } from "opds-web-client/lib/state";
-import buildStore from "opds-web-client/lib/store";
+import { State } from "owc/state";
+import buildStore from "owc/store";
 import BasicAuthPlugin from "../auth/basicAuthPlugin";
 import samlAuthPlugin from "auth/samlAuthPlugin";
 import CleverAuthPlugin from "auth/cleverAuthPlugin";
-import { PathFor } from "opds-web-client/lib/interfaces";
+import { PathFor } from "owc/interfaces";
 import { IS_SERVER, __NEXT_REDUX_STORE__ } from "../utils/env";
 /**
  * This function is for use in getInitialProps of the _app component

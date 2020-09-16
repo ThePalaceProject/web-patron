@@ -6,16 +6,16 @@ import {
   mapStateToProps,
   mapDispatchToProps,
   mergeRootProps
-} from "opds-web-client/lib/components/mergeRootProps";
+} from "owc/mergeRootProps";
 import useAuth from "../hooks/useAuth";
 import useTypedSelector from "../hooks/useTypedSelector";
-import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
+import { useActions } from "owc/ActionsContext";
 import { ListView } from "./BookList";
 
 import Head from "next/head";
 import BreadcrumbBar from "./BreadcrumbBar";
 import { H3 } from "./Text";
-import { BookData } from "opds-web-client/lib/interfaces";
+import { BookData } from "owc/interfaces";
 import PageTitle from "./PageTitle";
 import SignOut from "./SignOut";
 

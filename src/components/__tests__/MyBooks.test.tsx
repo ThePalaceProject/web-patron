@@ -1,9 +1,9 @@
 import * as React from "react";
 import { render, fixtures, fireEvent } from "../../test-utils";
 import { MyBooks } from "../MyBooks";
-import { AuthCredentials } from "opds-web-client/lib/interfaces";
+import { AuthCredentials } from "owc/interfaces";
 import merge from "deepmerge";
-import { State } from "opds-web-client/lib/state";
+import { State } from "owc/state";
 import { mockPush } from "../../test-utils/mockNextRouter";
 import { actions } from "../../test-utils";
 

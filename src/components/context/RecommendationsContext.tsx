@@ -2,9 +2,9 @@ import * as React from "react";
 import collection, {
   initialState,
   CollectionState
-} from "opds-web-client/lib/reducers/collection";
+} from "owc/reducers/collection";
 import useThunkReducer from "../../hooks/useThunkReducer";
-import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
+import { useActions } from "owc/ActionsContext";
 
 /**
  * The recommendations state is somewhat confusing. It is no longer stored

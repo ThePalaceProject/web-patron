@@ -1,8 +1,8 @@
 import * as React from "react";
 import useTypedSelector from "./useTypedSelector";
 import { getErrorMsg } from "utils/book";
-import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
-import { BookData, FulfillmentLink } from "opds-web-client/lib/interfaces";
+import { useActions } from "owc/ActionsContext";
+import { BookData, FulfillmentLink } from "owc/interfaces";
 
 export default function useBorrow(
   book: BookData,

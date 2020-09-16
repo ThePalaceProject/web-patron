@@ -1,4 +1,4 @@
-import { BookData } from "opds-web-client/lib/interfaces";
+import { BookData } from "owc/interfaces";
 import useTypedSelector from "./useTypedSelector";
 
 /**

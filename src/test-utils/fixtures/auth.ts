@@ -3,13 +3,13 @@ import {
   BasicAuthMethod,
   ClientSamlMethod,
   AuthMethod
-} from "opds-web-client/lib/interfaces";
+} from "owc/interfaces";
 
 import CleverButton from "auth/cleverAuthButton";
 import AuthButton from "auth/AuthButton";
 
 import BasicAuthForm from "auth/BasicAuthForm";
-import { AuthState } from "opds-web-client/lib/reducers/auth";
+import { AuthState } from "owc/reducers/auth";
 import SamlAuthForm from "auth/SamlAuthForm";
 
 export const cleverAuthId =

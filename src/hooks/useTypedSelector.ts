@@ -1,5 +1,5 @@
 import { TypedUseSelectorHook, useSelector } from "react-redux";
-import { State } from "opds-web-client/lib/state";
+import { State } from "owc/state";
 
 /**
  * A hook to access redux data that is properly typed with the

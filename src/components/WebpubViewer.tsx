@@ -4,8 +4,8 @@ import React from "react";
 import reader from "utils/reader";
 import { useRouter } from "next/router";
 import useLibraryContext from "./context/LibraryContext";
-import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
-import DataFetcher from "opds-web-client/lib/DataFetcher";
+import { useActions } from "owc/ActionsContext";
+import DataFetcher from "owc/DataFetcher";
 
 const initializeReader = async (
   entryUrl: string,

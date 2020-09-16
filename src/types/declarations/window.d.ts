@@ -1,5 +1,5 @@
 import { Store, AnyAction } from "redux";
-import { State } from "opds-web-client/lib/state";
+import { State } from "owc/state";
 
 declare global {
   interface Window {

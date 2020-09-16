@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { NavigateContext } from "opds-web-client/lib/interfaces";
+import { NavigateContext } from "owc/interfaces";
 import { LibraryData } from "../interfaces";
 import Search from "./Search";
 import Button, { NavButton, AnchorButton } from "./Button";

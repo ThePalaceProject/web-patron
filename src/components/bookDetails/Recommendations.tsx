@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { BookData } from "opds-web-client/lib/interfaces";
+import { BookData } from "owc/interfaces";
 import useRecommendationsState from "../context/RecommendationsContext";
 import LoadingIndicator from "../LoadingIndicator";
 import { H3, H2 } from "components/Text";
