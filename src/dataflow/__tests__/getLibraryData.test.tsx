@@ -12,7 +12,7 @@ import fetchMock from "jest-fetch-mock";
 import ApplicationError, { PageNotFoundError, AppSetupError } from "errors";
 import rawCatalog from "test-utils/fixtures/raw-opds-feed";
 import { fixtures, setEnv } from "test-utils";
-import { AuthDocumentLink, OPDS2 } from "interfaces";
+import { OPDS1, OPDS2 } from "interfaces";
 
 describe("fetchCatalog", () => {
   test("calls fetch with catalog url", async () => {
@@ -298,7 +298,7 @@ describe("buildLibraryData", () => {
   });
 
   test("correctly parses links", () => {
-    const links: AuthDocumentLink[] = [
+    const links: OPDS1.AuthDocumentLink[] = [
       {
         rel: "about",
         href: "/about"

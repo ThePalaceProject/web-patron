@@ -1,12 +1,4 @@
-import {
-  OPDS2,
-  LibraryData,
-  LibraryLinks,
-  AuthDocument,
-  HTMLMediaType,
-  AuthDocumentLink,
-  AuthDocLinkRelation
-} from "interfaces";
+import { OPDS2, OPDS1, LibraryData, LibraryLinks } from "interfaces";
 import OPDSParser, { OPDSFeed } from "opds-feed-parser";
 import {
   CIRCULATION_MANAGER_BASE,
@@ -151,7 +143,9 @@ export async function getCatalogRootUrl(librarySlug?: string): Promise<string> {
  * Fetches an auth document from the supplied url and returns it
  * as a parsed AuthDocument
  */
-export async function fetchAuthDocument(url: string): Promise<AuthDocument> {
+export async function fetchAuthDocument(
+  url: string
+): Promise<OPDS1.AuthDocument> {
   try {
     const response = await fetch(url);
     const json = await response.json();
@@ -169,13 +163,14 @@ export async function fetchAuthDocument(url: string): Promise<AuthDocument> {
  * catalog url, and library slug.
  */
 export function buildLibraryData(
-  authDoc: AuthDocument,
+  authDoc: OPDS1.AuthDocument,
   catalogUrl: string,
   librarySlug: string | undefined
 ): LibraryData {
-  const logoUrl = authDoc.links.find(link => link.rel === "logo")?.href;
-  const headerLinks = authDoc.links.filter(link => link.rel === "navigation");
-  const libraryLinks = parseLinks(authDoc.links);
+  const logoUrl = authDoc.links?.find(link => link.rel === "logo")?.href;
+  const headerLinks =
+    authDoc.links?.filter(link => link.rel === "navigation") ?? [];
+  const libraryLinks = parseLinks(authDoc.links ?? []);
   return {
     slug: librarySlug ?? null,
     catalogUrl,
@@ -197,7 +192,9 @@ export function buildLibraryData(
  * Extracts the href of an auth document from the links in an OPDSFeed.
  */
 export function getAuthDocHref(catalog: OPDSFeed) {
-  const link = catalog.links.find(link => link.rel === AuthDocLinkRelation);
+  const link = catalog.links.find(
+    link => link.rel === OPDS1.AuthDocLinkRelation
+  );
   if (!link)
     throw new ApplicationError(
       "OPDS Catalog did not contain an auth document link."
@@ -208,7 +205,7 @@ export function getAuthDocHref(catalog: OPDSFeed) {
 /**
  * Parses the links array in an auth document into an object of links.
  */
-function parseLinks(links: AuthDocumentLink[]): LibraryLinks {
+function parseLinks(links: OPDS1.AuthDocumentLink[]): LibraryLinks {
   const parsed = links.reduce((links, link) => {
     switch (link.rel) {
       case "about":
@@ -220,7 +217,8 @@ function parseLinks(links: AuthDocumentLink[]): LibraryLinks {
       case "terms-of-service":
         return { ...links, tos: link };
       case "help":
-        if (link.type === HTMLMediaType) return { ...links, helpWebsite: link };
+        if (link.type === OPDS1.HTMLMediaType)
+          return { ...links, helpWebsite: link };
         return { ...links, helpEmail: link };
       case "register":
       case "logo":
