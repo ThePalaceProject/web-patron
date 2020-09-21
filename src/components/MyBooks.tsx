@@ -18,6 +18,7 @@ import { H3 } from "./Text";
 import { BookData } from "opds-web-client/lib/interfaces";
 import PageTitle from "./PageTitle";
 import SignOut from "./SignOut";
+import track from "analytics/track";
 
 const availableUntil = (book: BookData) =>
   book.availability?.until ? new Date(book.availability.until) : "NaN";
@@ -46,7 +47,11 @@ export const MyBooks: React.FC = () => {
   });
 
   React.useEffect(() => {
-    if (loansUrl) dispatch(actions.fetchLoans(loansUrl));
+    if (loansUrl) {
+      dispatch(actions.fetchLoans(loansUrl)).then(() => {
+        track.loansLoaded();
+      });
+    }
   }, [loansUrl, actions, dispatch]);
 
   return (

@@ -23,7 +23,7 @@ type PageData = {
 function page(page: PageData) {
   window?.dataLayer?.push({ page });
 }
-function appEvent(name: string, data: any) {
+function appEvent(name: string, data: Record<string, unknown>) {
   event(name, { event_category: "Other Event", ...data });
 }
 function bookEvent(
@@ -90,11 +90,15 @@ function bookLoaded(book: BookData) {
 function collectionLoaded(collectionData: {
   title?: string;
   id: string;
-  url: string;
+  url?: string;
 }) {
   appEvent("collection_loaded", {
     collection: collectionData
   });
+}
+
+function loansLoaded() {
+  appEvent("loans_loaded", {});
 }
 
 function searchPerformed(data: { searchQuery: string }) {
@@ -126,5 +130,6 @@ export default {
   bookBorrowed,
   bookReserved,
   bookFulfilled,
-  page
+  page,
+  loansLoaded
 };

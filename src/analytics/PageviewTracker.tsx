@@ -47,7 +47,11 @@ const PageviewTracker: React.FC = ({ children }) => {
   }, [book]);
 
   React.useEffect(() => {
-    if (collectionId && typeof collectionUrl === "string")
+    if (
+      collectionId &&
+      (typeof collectionUrl === "string" ||
+        typeof collectionUrl === "undefined")
+    )
       track.collectionLoaded({
         title: collectionTitle,
         id: collectionId,
