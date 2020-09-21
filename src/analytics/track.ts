@@ -10,9 +10,18 @@ function event(name: string, data: Record<string, unknown>) {
     ...data
   });
 }
+
+type PageData = {
+  path: string;
+  codePath: string;
+  appEnvironment: Record<string, unknown>;
+  library?: string;
+  collectionUrl?: string;
+  bookUrl?: string;
+};
 // doesn't track an event, just updates the data layer for the page
-function page(data: Record<string, unknown>) {
-  window?.dataLayer?.push(data);
+function page(page: PageData) {
+  window?.dataLayer?.push({ page });
 }
 function appEvent(name: string, data: any) {
   event(name, { event_category: "Other Event", ...data });

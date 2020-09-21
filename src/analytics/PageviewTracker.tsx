@@ -9,6 +9,7 @@ const PageviewTracker: React.FC = ({ children }) => {
   const { asPath, pathname, query } = useRouter();
   const { urlShortener } = useLinkUtils();
   const { collectionUrl, bookUrl, library } = query;
+  const stringLibrary = typeof library === "string" ? library : undefined;
   const fullCollectionUrl =
     typeof collectionUrl === "string"
       ? urlShortener.expandCollectionUrl(collectionUrl)
@@ -28,16 +29,14 @@ const PageviewTracker: React.FC = ({ children }) => {
    */
   React.useEffect(() => {
     track.page({
-      page: {
-        path: asPath,
-        codePath: pathname,
-        appEnvironment: env,
-        library,
-        collectionUrl: fullCollectionUrl,
-        bookUrl: fullBookUrl
-      }
+      path: asPath,
+      codePath: pathname,
+      appEnvironment: env,
+      library: stringLibrary,
+      collectionUrl: fullCollectionUrl,
+      bookUrl: fullBookUrl
     });
-  }, [fullCollectionUrl, fullBookUrl, library, asPath, pathname]);
+  }, [fullCollectionUrl, fullBookUrl, stringLibrary, asPath, pathname]);
 
   /**
    * Add the book and collection to data layer when they load.
