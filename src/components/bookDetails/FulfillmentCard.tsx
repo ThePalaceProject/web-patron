@@ -309,9 +309,9 @@ const DownloadButton: React.FC<{
   trackDownload: (link: MediaLink) => void;
 }> = ({ link, title, trackDownload }) => {
   const { fulfill, downloadLabel } = useDownloadButton(link, title);
-  function trackAndFulfill() {
+  async function trackAndFulfill() {
+    await fulfill();
     trackDownload(link);
-    fulfill();
   }
   return (
     <Button
