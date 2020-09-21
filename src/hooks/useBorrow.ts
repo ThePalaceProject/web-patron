@@ -29,8 +29,8 @@ export default function useBorrow(
 
   const borrowOrReserve = async (url: string) => {
     setLoading(true);
-    trackBorrowOrReserve(book, isBorrow, url);
     await dispatch(actions.updateBook(url));
+    trackBorrowOrReserve(book, isBorrow, url);
     if (!isUnmounted.current) setLoading(false);
   };
 
