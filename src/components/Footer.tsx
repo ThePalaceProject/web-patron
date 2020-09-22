@@ -9,10 +9,7 @@ import { NavButton } from "./Button";
 import SvgPhone from "icons/Phone";
 import IosBadge from "./storeBadges/IosBadge";
 import GooglePlayBadge from "./storeBadges/GooglePlayBadge";
-import {
-  CIRCULATION_MANAGER_BASE,
-  NEXT_PUBLIC_COMPANION_APP
-} from "../utils/env";
+import { NEXT_PUBLIC_COMPANION_APP } from "../utils/env";
 
 const Footer: React.FC<{ className?: string }> = ({ className }) => {
   const library = useLibraryContext();
@@ -26,6 +23,7 @@ const Footer: React.FC<{ className?: string }> = ({ className }) => {
     libraryWebsite
   } = library.libraryLinks;
   const title = library.catalogName;
+
   return (
     <footer
       sx={{

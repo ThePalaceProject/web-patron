@@ -239,6 +239,7 @@ const AccessCard: React.FC<{
   const isAudiobook = bookIsAudiobook(book);
   const companionApp =
     NEXT_PUBLIC_COMPANION_APP === "openebooks" ? "Open eBooks" : "SimplyE";
+
   return (
     <>
       <Stack sx={{ alignItems: "center" }}>
