@@ -12,6 +12,9 @@ const config = {
     REACT_AXE: process.env.REACT_AXE,
     CACHE_EXPIRATION_SECONDS: process.env.CACHE_EXPIRATION_SECONDS
   },
+  env: {
+    SIMPLIFIED_CATALOG_BASE: process.env.SIMPLIFIED_CATALOG_BASE
+  },
   webpack: (config, { _buildId, _dev, isServer, _defaultLoaders, webpack }) => {
     // Note: we provide webpack above so you should not `require` it
     // Perform customizations to webpack config

@@ -78,8 +78,10 @@ jobs:
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
   publish_beta:
-    name: Publish beta image to Docker Hub
+    name: Publish beta image to Docker Hub	
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

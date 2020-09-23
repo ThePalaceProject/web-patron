@@ -1,10 +1,12 @@
-import getConfig from "next/config";
 /* eslint-disable no-underscore-dangle */
+import getConfig from "next/config";
+
 /**
  * Simply exporting processed env vars
  */
 const { publicRuntimeConfig } = getConfig();
 console.log("publicRuntimeConfig", publicRuntimeConfig);
+console.log("catalog base", publicRuntimeConfig.SIMPLIFIED_CATALOG_BASE);
 export const NEXT_PUBLIC_COMPANION_APP =
   publicRuntimeConfig.NEXT_PUBLIC_COMPANION_APP === "openebooks"
     ? "openebooks"

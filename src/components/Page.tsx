@@ -9,10 +9,11 @@ import ErrorBoundary from "../components/ErrorBoundary";
 import Head from "next/head";
 import Error from "components/Error";
 import { AppProps } from "dataflow/withAppProps";
+import { NextPage } from "next";
 
 /* Page without Header and Footer should wrap pages that should not have sitewide navigation */
 
-const Page: React.FC<AppProps> = props => {
+const Page: NextPage<AppProps> = props => {
   /**
    * If there was no library or initialState provided, render the error page
    */
@@ -43,6 +44,11 @@ const Page: React.FC<AppProps> = props => {
       </ContextProvider>
     </ErrorBoundary>
   );
+};
+
+Page.getInitialProps = async () => {
+  const initialProps: AppProps = {};
+  return initialProps;
 };
 
 const AppErrorFallback: React.FC<{ message: string }> = ({ message }) => {
