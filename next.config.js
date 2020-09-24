@@ -6,13 +6,12 @@ const config = {
   publicRuntimeConfig: {
     NEXT_PUBLIC_AXIS_NOW_DECRYPT: process.env.NEXT_PUBLIC_AXIS_NOW_DECRYPT,
     NEXT_PUBLIC_COMPANION_APP: process.env.NEXT_PUBLIC_COMPANION_APP,
+    TEST_VAR: "HELLO FROM TEST",
+    TEST_RUNTIME_VAR: process.env.TEST_RUNTIME_VAR,
     SIMPLIFIED_CATALOG_BASE: process.env.SIMPLIFIED_CATALOG_BASE,
     CONFIG_FILE: process.env.CONFIG_FILE,
     REACT_AXE: process.env.REACT_AXE,
     CACHE_EXPIRATION_SECONDS: process.env.CACHE_EXPIRATION_SECONDS
-  },
-  env: {
-    SIMPLIFIED_CATALOG_BASE: process.env.SIMPLIFIED_CATALOG_BASE
   },
   webpack: (config, { _buildId, _dev, isServer, _defaultLoaders, webpack }) => {
     // Note: we provide webpack above so you should not `require` it

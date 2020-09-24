@@ -9,8 +9,11 @@ import { NavButton } from "./Button";
 import SvgPhone from "icons/Phone";
 import IosBadge from "./storeBadges/IosBadge";
 import GooglePlayBadge from "./storeBadges/GooglePlayBadge";
-import { NEXT_PUBLIC_COMPANION_APP } from "../utils/env";
+import getConfig from "next/config";
 
+const { publicRuntimeConfig } = getConfig();
+
+console.log("publicRuntimeConfig", publicRuntimeConfig);
 const Footer: React.FC<{ className?: string }> = ({ className }) => {
   const library = useLibraryContext();
   const {
@@ -98,7 +101,9 @@ const Footer: React.FC<{ className?: string }> = ({ className }) => {
         </FooterList>
       </div>
       <div sx={{ flex: "1 1 0" }} />
-      {NEXT_PUBLIC_COMPANION_APP === "simplye" && <DownloadSimplyECallout />}
+      {publicRuntimeConfig.NEXT_PUBLIC_COMPANION_APP === "simplye" && (
+        <DownloadSimplyECallout />
+      )}
     </footer>
   );
 };
