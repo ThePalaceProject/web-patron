@@ -12,12 +12,19 @@ export const NEXT_PUBLIC_COMPANION_APP =
     ? "openebooks"
     : "simplye";
 
+<<<<<<< HEAD
 export const SHORTEN_URLS = !(publicRuntimeConfig.SHORTEN_URLS === "false");
 export const REGISTRY_BASE = publicRuntimeConfig.REGISTRY_BASE;
 export const CIRCULATION_MANAGER_BASE =
   publicRuntimeConfig.SIMPLIFIED_CATALOG_BASE;
 export const CONFIG_FILE = publicRuntimeConfig.CONFIG_FILE;
 export const REACT_AXE = publicRuntimeConfig.REACT_AXE;
+=======
+export const REGISTRY_BASE = process.env.REGISTRY_BASE;
+export const CIRCULATION_MANAGER_BASE = process.env.SIMPLIFIED_CATALOG_BASE;
+export const CONFIG_FILE = process.env.CONFIG_FILE;
+export const REACT_AXE = process.env.REACT_AXE;
+>>>>>>> a0d4d36... Remove url shortener (#135)
 // if there is not circ manager base, we are using multi library routes
 export const IS_MULTI_LIBRARY = !CIRCULATION_MANAGER_BASE;
 export const CACHE_EXPIRATION_SECONDS = parseInt(
