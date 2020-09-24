@@ -1,5 +1,3 @@
-import BasicAuthPlugin from "auth/basicAuthPlugin";
-import AuthPlugin from "owc/AuthPlugin";
 import { State } from "owc/state";
 import buildStore from "owc/store";
 import * as React from "react";
@@ -9,7 +7,6 @@ import { PathForContext } from "./PathForContext";
 
 export type OPDSStoreProps = {
   initialState?: State;
-  authPlugins?: AuthPlugin[];
   children: React.ReactNode;
   // we allow custom redux store to be passed in
   // so we can mock it during testing
@@ -22,19 +19,14 @@ export type OPDSStoreProps = {
  */
 export default class OPDSStore extends React.Component<OPDSStoreProps> {
   static contextType = PathForContext;
-  declare context: React.ContextType<typeof PathForContext>;
+  context: React.ContextType<typeof PathForContext>;
 
   store: Redux.Store<State>;
 
-  constructor(props: any, pathFor: any) {
+  constructor(props: any) {
     super(props);
     this.store =
-      props.store ??
-      buildStore(
-        this.props.initialState || undefined,
-        this.props.authPlugins || [BasicAuthPlugin],
-        pathFor
-      );
+      props.store ?? buildStore(this.props.initialState || undefined);
   }
 
   render() {

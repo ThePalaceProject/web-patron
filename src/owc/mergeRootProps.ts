@@ -1,9 +1,8 @@
-import { AuthCredentials } from "hooks/useAuth";
 import DataFetcher from "owc/DataFetcher";
-import { AuthCallback } from "owc/interfaces";
+import { CollectionData, BookData } from "interfaces";
 import { adapter } from "owc/OPDSDataAdapter";
 import ActionsCreator from "owc/actions";
-import { BookData, CollectionData } from "interfaces";
+import { State } from "owc/state";
 
 export function findBookInCollection(
   collection: CollectionData | null,
@@ -20,7 +19,7 @@ export function findBookInCollection(
   }
 }
 
-export function mapStateToProps(state: any, ownProps: any) {
+export function mapStateToProps(state: State, ownProps: any) {
   return {
     collectionData: state.collection.data || ownProps.collectionData,
     isFetchingCollection: state.collection.isFetching,
@@ -33,10 +32,6 @@ export function mapStateToProps(state: any, ownProps: any) {
     loadedBookUrl: state.book.url,
     collectionUrl: ownProps.collectionUrl,
     bookUrl: ownProps.bookUrl,
-    loansUrl: state.loans.url,
-    loans: state.loans.books,
-    auth: state.auth,
-    isSignedIn: !!state.auth.credentials,
     preferences: state.preferences
   };
 }
@@ -57,22 +52,9 @@ export function mapDispatchToProps(dispatch: any) {
         fetchSearchDescription: (url: string) =>
           dispatch(actions.fetchSearchDescription(url)),
         closeError: () => dispatch(actions.closeError()),
-        updateBook: (url: string) => dispatch(actions.updateBook(url)),
         fulfillBook: (url: string) => dispatch(actions.fulfillBook(url)),
         indirectFulfillBook: (url: string, type: string) =>
           dispatch(actions.indirectFulfillBook(url, type)),
-        fetchLoans: (url: string) => dispatch(actions.fetchLoans(url)),
-        saveAuthCredentials: (credentials: AuthCredentials) =>
-          dispatch(actions.saveAuthCredentials(credentials)),
-        clearAuthCredentials: () => dispatch(actions.clearAuthCredentials()),
-        showAuthForm: (
-          callback: AuthCallback,
-          cancel: () => void,
-          providers: any,
-          title: string
-        ) => dispatch(actions.showAuthForm(callback, cancel, providers, title)),
-        closeErrorAndHideAuthForm: () =>
-          dispatch(actions.closeErrorAndHideAuthForm()),
         setPreference: (key: string, value: string) =>
           dispatch(actions.setPreference(key, value))
       };
@@ -139,7 +121,7 @@ export function fetchCollectionAndBook({
 }
 
 export function mergeRootProps(
-  stateProps: any,
+  stateProps: ReturnType<typeof mapStateToProps>,
   createDispatchProps: any,
   componentProps: any
 ) {
@@ -148,7 +130,6 @@ export function mergeRootProps(
     adapter: adapter
   });
   const dispatchProps = createDispatchProps.createDispatchProps(fetcher);
-  const authCredentials = fetcher.getAuthCredentials();
 
   const setCollection = (
     url: string | null
@@ -217,18 +198,7 @@ export function mergeRootProps(
 
   const { fetchCollection, fetchBook } = dispatchProps;
 
-  const updateBook = (url: string) => {
-    return dispatchProps.updateBook(url).then((data: any) => {
-      if (stateProps.loansUrl) {
-        dispatchProps.fetchLoans(stateProps.loansUrl);
-      }
-
-      return data;
-    });
-  };
-
   return Object.assign({}, componentProps, stateProps, dispatchProps, {
-    authCredentials: authCredentials,
     setCollection: setCollection,
     setBook: setBook,
     setCollectionAndBook: setCollectionAndBook,
@@ -254,7 +224,6 @@ export function mergeRootProps(
     },
     clearBook: () => {
       setBook(null);
-    },
-    updateBook: updateBook
+    }
   });
 }

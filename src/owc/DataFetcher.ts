@@ -1,8 +1,5 @@
 import OPDSParser, { OPDSFeed, OPDSEntry } from "opds-feed-parser";
 import OpenSearchDescriptionParser from "./OpenSearchDescriptionParser";
-import { AuthCredentials } from "./interfaces";
-const Cookie = require("js-cookie");
-require("isomorphic-fetch");
 
 export interface RequestError {
   status: number | null;
@@ -141,31 +138,11 @@ export default class DataFetcher {
     return fetch(url, options);
   }
 
-  setAuthCredentials(credentials?: AuthCredentials): void {
-    if (credentials) {
-      Cookie.set(this.authKey, JSON.stringify(credentials));
-    }
-  }
-
-  getAuthCredentials(): AuthCredentials | undefined {
-    const credentials = Cookie.get(this.authKey);
-    if (credentials) {
-      return JSON.parse(credentials);
-    }
-  }
-
-  clearAuthCredentials(): void {
-    Cookie.remove(this.authKey);
-  }
-
   prepareAuthHeaders(headers: any = {}): any {
     // server needs to know request came from JS in order to omit
     // 'Www-Authenticate: Basic' header, which triggers browser's
     // ugly basic auth popup
     headers["X-Requested-With"] = "XMLHttpRequest";
-
-    const credentials = this.getAuthCredentials();
-    headers["Authorization"] = credentials?.credentials ?? "";
 
     return headers;
   }

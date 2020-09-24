@@ -1,29 +1,18 @@
 import * as React from "react";
-import { render, fixtures, actions, waitFor } from "../../test-utils";
+import { render, fixtures, actions, waitFor } from "test-utils";
 import merge from "deepmerge";
 import BasicAuthForm from "auth/BasicAuthForm";
-import { AuthProvider, BasicAuthMethod } from "owc/interfaces";
-import { AuthState } from "owc/reducers/auth";
-import { State } from "owc/state";
+import { OPDS1 } from "interfaces";
 import userEvent from "@testing-library/user-event";
-import * as authDep from "owc/utils/auth";
+import { AuthState } from "owc/reducers/auth";
 
-const provider: AuthProvider<BasicAuthMethod> = {
-  id: "provider-id",
-  plugin: {
-    type: "basic-auth-type",
-    formComponent: BasicAuthForm,
-    buttonComponent: jest.fn(),
-    lookForCredentials: jest.fn()
+const method: OPDS1.BasicAuthMethod = {
+  labels: {
+    login: "Barcode",
+    password: "Pin"
   },
-  method: {
-    labels: {
-      login: "Barcode",
-      password: "Pin"
-    },
-    type: "basic-auth-type",
-    description: "Library Barcode"
-  }
+  type: OPDS1.BasicAuthType,
+  description: "Library Barcode"
 };
 
 const authCallback = jest.fn();

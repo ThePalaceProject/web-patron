@@ -1,48 +1,28 @@
 import * as React from "react";
-import { AuthMethod, AuthProvider } from "owc/interfaces";
-import { useActions } from "owc/ActionsContext";
-import Button from "components/Button";
+import Button, { AnchorButton } from "components/Button";
 
 import { modalButtonStyles } from "components/Modal";
-import { AuthButtonProps } from "owc/AuthPlugin";
+import { OPDS1 } from "interfaces";
 
-export function getAuthUrl(
-  provider: AuthProvider<AuthMethod>,
-  currentUrl: string
-) {
-  // double encoding is required for unshortened book urls to be redirected to properly
-
-  return `${
-    (provider?.method.links || []).find(link => link.rel === "authenticate")
-      ?.href
-  }&redirect_uri=${encodeURIComponent(encodeURIComponent(currentUrl))}`;
-}
-
-export const CleverButton: React.FC<AuthButtonProps<AuthMethod>> = ({
-  provider
+const CleverButton: React.FC<{ method: OPDS1.CleverAuthMethod }> = ({
+  method
 }) => {
-  const { actions, dispatch } = useActions();
-
   const currentUrl = window.location.origin + window.location.pathname;
+  const imageUrl = method.links?.find(link => link.rel === "logo")?.href;
 
-  const imageUrl = (provider?.method.links || []).find(
-    link => link.rel === "logo"
+  const authenticateHref = method.links?.find(
+    link => link.rel === "authenticate"
   )?.href;
-
-  const authUrl =
-    provider && currentUrl ? getAuthUrl(provider, currentUrl) : null;
+  // double encoding is required for unshortened book urls to be redirected to properly
+  const authUrl = authenticateHref
+    ? `${authenticateHref}&redirect_uri=${encodeURIComponent(
+        encodeURIComponent(currentUrl)
+      )}`
+    : undefined;
 
   return authUrl ? (
-    <Button
-      onClick={() => {
-        dispatch(
-          actions.saveAuthCredentials({
-            provider: "Clever",
-            credentials: ""
-          })
-        );
-        window.location.href = authUrl;
-      }}
+    <AnchorButton
+      href={authUrl}
       type="submit"
       sx={{
         ...modalButtonStyles,
@@ -53,7 +33,7 @@ export const CleverButton: React.FC<AuthButtonProps<AuthMethod>> = ({
       aria-label="Log In with Clever"
     >
       {!imageUrl ? "Log In With Clever" : ""}
-    </Button>
+    </AnchorButton>
   ) : null;
 };
 

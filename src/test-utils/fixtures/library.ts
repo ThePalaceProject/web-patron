@@ -1,3 +1,8 @@
+import {
+  basicAuthMethod,
+  cleverAuthMethod,
+  createSamlMethod
+} from "test-utils/fixtures/auth";
 import { LibraryData } from "../../interfaces";
 
 /**
@@ -21,7 +26,9 @@ export const libraryData: LibraryData = {
       role: "navigation"
     }
   ],
-  libraryLinks: {}
+  libraryLinks: {},
+  shelfUrl: "/shelf-url",
+  authMethods: [basicAuthMethod, createSamlMethod(0), cleverAuthMethod]
 };
 
 export default libraryData;

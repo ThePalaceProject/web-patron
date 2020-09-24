@@ -1,7 +1,6 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-
 import useBorrow from "hooks/useBorrow";
 import Button from "./Button";
 import { Text } from "./Text";

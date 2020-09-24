@@ -57,6 +57,7 @@ export interface ClientSamlMethod
   href: string;
 }
 
+// auth methods once they have been processed for the app
 export type AppAuthMethod =
   | OPDS1.CleverAuthMethod
   | OPDS1.BasicAuthMethod
@@ -78,6 +79,8 @@ export interface LibraryData {
   } | null;
   headerLinks: OPDS1.Link[];
   libraryLinks: LibraryLinks;
+  authMethods: AppAuthMethod[];
+  shelfUrl: string | null;
 }
 
 /**

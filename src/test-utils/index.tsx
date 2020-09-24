@@ -5,7 +5,6 @@ import ContextProvider from "../components/context/ContextProvider";
 import Adapter from "enzyme-adapter-react-16";
 import { configure } from "enzyme";
 import library from "./fixtures/library";
-import BasicAuthPlugin from "../auth/basicAuthPlugin";
 import buildStore from "owc/store";
 import { State } from "owc/state";
 import { LibraryData } from "../interfaces";
@@ -51,13 +50,7 @@ type CustomRenderOptions = Parameters<typeof render>[1] & {
   colors?: { primary: string; secondary: string };
 };
 const customRender = (ui: any, options?: CustomRenderOptions) => {
-  const pathFor = jest
-    .fn()
-    .mockImplementation((collectionUrl?: string, bookUrl?: string) =>
-      `/${collectionUrl}` + bookUrl ? `/${bookUrl}` : ""
-    );
-
-  const store = buildStore(options?.initialState, [BasicAuthPlugin], pathFor);
+  const store = buildStore(options?.initialState);
 
   // spy on dispatch by default
   const origDispatch = store.dispatch;

@@ -1,3 +1,5 @@
+import { OPDS1 } from "interfaces";
+
 export default class ApplicationError extends Error {
   readonly statusCode: number | null = null;
 
@@ -33,5 +35,49 @@ export class AppSetupError extends ApplicationError {
     super(`${m}${baseError ? baseError.message : ""}`);
     Object.setPrototypeOf(this, AppSetupError.prototype);
     this.name = "App Setup Error";
+  }
+}
+
+type ProblemDocument = {
+  detail: string;
+  title: string;
+  type?: string;
+};
+
+function isProblemDocument(
+  details: ProblemDocument | OPDS1.AuthDocument
+): details is ProblemDocument {
+  return !(typeof (details as OPDS1.AuthDocument).id === "string");
+}
+export class ServerError extends ApplicationError {
+  // a default problem document
+  url: string;
+  status: number;
+  info: ProblemDocument = {
+    detail: "An unknown error server occurred.",
+    title: "Server Error"
+  };
+  authDocument?: OPDS1.AuthDocument;
+
+  constructor(
+    url: string,
+    status: number,
+    details: ProblemDocument | OPDS1.AuthDocument
+  ) {
+    super("Server Error");
+    this.url = url;
+    this.status = status;
+    Object.setPrototypeOf(this, ServerError.prototype);
+    if (status === 401 && !isProblemDocument(details)) {
+      // 401 errors return auth document instead of problem document
+      // we will construct our own problem document.
+      this.info = {
+        title: "No Authorized",
+        detail: "You are not authorized for the requested resource."
+      };
+      this.authDocument = details;
+    } else if (isProblemDocument(details)) {
+      this.info = details;
+    }
   }
 }

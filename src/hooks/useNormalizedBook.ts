@@ -1,3 +1,4 @@
+import useUser from "components/context/UserContext";
 import { BookData } from "interfaces";
 import useTypedSelector from "./useTypedSelector";
 
@@ -8,11 +9,11 @@ import useTypedSelector from "./useTypedSelector";
 
 export default function useNormalizedBook(): BookData | null {
   const book = useTypedSelector(state => state.book.data);
-  const loans = useTypedSelector(state => state.loans.books);
+  const { loans } = useUser();
 
   if (!book) return book;
 
-  const loan = loans.find(loanedBook => book.id === loanedBook.id);
+  const loan = loans?.find(loanedBook => book.id === loanedBook.id);
 
   return loan ?? book;
 }

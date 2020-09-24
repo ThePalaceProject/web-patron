@@ -5,12 +5,12 @@ import {
   getCatalogRootUrl,
   fetchCatalog,
   fetchAuthDocument,
-  buildLibraryData,
-  getAuthDocHref
+  buildLibraryData
 } from "dataflow/getLibraryData";
 import ApplicationError from "errors";
 import getConfigFile from "./getConfigFile";
 import { CONFIG_FILE } from "utils/env";
+import { getAuthDocHref } from "utils/auth";
 
 const getLibraryFromParams = (
   query: ParsedUrlQuery | undefined
@@ -48,7 +48,12 @@ export default function withAppProps(
       const catalog = await fetchCatalog(catalogUrl);
       const authDocHref = getAuthDocHref(catalog);
       const authDocument = await fetchAuthDocument(authDocHref);
-      const library = buildLibraryData(authDocument, catalogUrl, librarySlug);
+      const library = buildLibraryData(
+        authDocument,
+        catalogUrl,
+        librarySlug,
+        catalog
+      );
       // fetch the static props for the page
       const pageResult = (await pageGetServerSideProps?.(ctx)) ?? { props: {} };
       return {

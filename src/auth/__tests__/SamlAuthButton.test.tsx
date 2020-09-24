@@ -1,10 +1,8 @@
 import * as React from "react";
-import { render, fixtures, waitFor } from "../../test-utils";
+import { render, fixtures, waitFor } from "test-utils";
 import merge from "deepmerge";
-import { AuthState } from "owc/reducers/auth";
-import { State } from "owc/state";
 import userEvent from "@testing-library/user-event";
-import SamlAuthForm from "auth/SamlAuthForm";
+import SamlAuthForm from "auth/SamlAuthButton";
 
 const authCallback = jest.fn();
 const cancel = jest.fn();

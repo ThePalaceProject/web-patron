@@ -2,9 +2,6 @@ import { createStore, applyMiddleware, Store } from "redux";
 import reducers from "./reducers/index";
 import { State } from "./state";
 const thunk = require("redux-thunk").default;
-import createAuthMiddleware from "./authMiddleware";
-import AuthPlugin from "./AuthPlugin";
-import { PathFor } from "./interfaces";
 import { composeWithDevTools } from "redux-devtools-extension";
 
 let persistState: any = null;
@@ -20,15 +17,8 @@ try {
 
 /** Builds the Redux store. If any auth plugins are passed in, it will add auth middleware.
     If localStorage is available, it will persist the preferences state only. */
-export default function buildStore(
-  initialState?: State,
-  authPlugins?: AuthPlugin[],
-  pathFor?: PathFor
-): Store<State> {
-  const middlewares =
-    authPlugins && authPlugins.length
-      ? [createAuthMiddleware(authPlugins, pathFor), thunk]
-      : [thunk];
+export default function buildStore(initialState?: State): Store<State> {
+  const middlewares = [thunk];
   const composeArgs = [applyMiddleware(...middlewares)];
   if (persistState) {
     composeArgs.push(persistState("preferences"));

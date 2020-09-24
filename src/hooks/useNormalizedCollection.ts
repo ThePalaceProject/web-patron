@@ -1,5 +1,6 @@
 import useTypedSelector from "./useTypedSelector";
 import { collectionDataWithLoans } from "owc/utils";
+import useUser from "components/context/UserContext";
 
 /**
  * A hook to give you the book state that has been updated with
@@ -8,7 +9,7 @@ import { collectionDataWithLoans } from "owc/utils";
 
 export default function useNormalizedCollection() {
   const collectionData = useTypedSelector(state => state.collection.data);
-  const loans = useTypedSelector(state => state.loans.books);
+  const { loans } = useUser();
 
   return collectionDataWithLoans(collectionData, loans);
 }

@@ -1,5 +1,5 @@
-import { OPDS2, OPDS1, LibraryData, LibraryLinks } from "interfaces";
-import OPDSParser, { OPDSFeed } from "opds-feed-parser";
+import { OPDS2, LibraryData, LibraryLinks, OPDS1 } from "interfaces";
+import OPDSParser, { OPDSFeed, OPDSShelfLink } from "opds-feed-parser";
 import {
   CIRCULATION_MANAGER_BASE,
   REGISTRY_BASE,
@@ -7,7 +7,7 @@ import {
 } from "utils/env";
 import getConfigFile from "./getConfigFile";
 import ApplicationError, { PageNotFoundError, AppSetupError } from "errors";
-import { CatalogEntry } from "types/opds2";
+import { flattenSamlMethod } from "utils/auth";
 
 /**
  * Fetches an OPDSFeed with a given catalogUrl. Parses it into an OPDSFeed and
@@ -59,7 +59,7 @@ async function fetchCatalogLinkBuilder(
 async function fetchCatalogEntry(
   librarySlug: string,
   registryBase: string
-): Promise<CatalogEntry> {
+): Promise<OPDS2.CatalogEntry> {
   const linkBuilder = await fetchCatalogLinkBuilder(registryBase);
   const catalogFeedUrl = linkBuilder(librarySlug);
   try {
@@ -159,21 +159,36 @@ export async function fetchAuthDocument(
 }
 
 /**
+ * Extracts the loans url from a catalog root
+ */
+function getShelfUrl(catalog: OPDSFeed): string | null {
+  return (
+    catalog.links.find(link => {
+      return link instanceof OPDSShelfLink;
+    })?.href ?? null
+  );
+}
+
+/**
  * Constructs the internal LibraryData state from an auth document,
  * catalog url, and library slug.
  */
 export function buildLibraryData(
   authDoc: OPDS1.AuthDocument,
   catalogUrl: string,
-  librarySlug: string | undefined
+  librarySlug: string | undefined,
+  catalog: OPDSFeed
 ): LibraryData {
   const logoUrl = authDoc.links?.find(link => link.rel === "logo")?.href;
   const headerLinks =
     authDoc.links?.filter(link => link.rel === "navigation") ?? [];
-  const libraryLinks = parseLinks(authDoc.links ?? []);
+  const libraryLinks = parseLinks(authDoc.links);
+  const authMethods = flattenSamlMethod(authDoc);
+  const shelfUrl = getShelfUrl(catalog);
   return {
     slug: librarySlug ?? null,
     catalogUrl,
+    shelfUrl: shelfUrl ?? null,
     catalogName: authDoc.title,
     logoUrl: logoUrl ?? null,
     colors:
@@ -184,28 +199,16 @@ export function buildLibraryData(
           }
         : null,
     headerLinks,
-    libraryLinks
+    libraryLinks,
+    authMethods
   };
-}
-
-/**
- * Extracts the href of an auth document from the links in an OPDSFeed.
- */
-export function getAuthDocHref(catalog: OPDSFeed) {
-  const link = catalog.links.find(
-    link => link.rel === OPDS1.AuthDocLinkRelation
-  );
-  if (!link)
-    throw new ApplicationError(
-      "OPDS Catalog did not contain an auth document link."
-    );
-  return link.href;
 }
 
 /**
  * Parses the links array in an auth document into an object of links.
  */
-function parseLinks(links: OPDS1.AuthDocumentLink[]): LibraryLinks {
+function parseLinks(links: OPDS1.AuthDocumentLink[] | undefined): LibraryLinks {
+  if (!links) return {};
   const parsed = links.reduce((links, link) => {
     switch (link.rel) {
       case "about":
