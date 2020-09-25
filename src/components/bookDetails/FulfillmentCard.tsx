@@ -10,7 +10,7 @@ import {
 } from "utils/book";
 import Button, { NavButton } from "../Button";
 import useDownloadButton from "owc/hooks/useDownloadButton";
-import { withErrorBoundary } from "../ErrorBoundary";
+import withErrorBoundary from "../ErrorBoundary";
 import Stack from "components/Stack";
 import { Text } from "components/Text";
 import { MediumIcon } from "components/MediumIndicator";

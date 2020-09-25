@@ -1,7 +1,6 @@
 import * as React from "react";
 import ContextProvider from "../components/context/ContextProvider";
 import getOrCreateStore from "../dataflow/getOrCreateStore";
-import ErrorBoundary from "../components/ErrorBoundary";
 import Head from "next/head";
 import Error from "components/Error";
 import { AppProps } from "dataflow/withAppProps";
@@ -28,7 +27,7 @@ const Page: React.FC<AppProps> = props => {
   const store = getOrCreateStore();
 
   return (
-    <ErrorBoundary fallback={AppErrorFallback}>
+    <>
       <Head>
         {/* define the default title */}
         <title>{library.catalogName}</title>
@@ -36,15 +35,7 @@ const Page: React.FC<AppProps> = props => {
       <ContextProvider library={library} store={store}>
         <AuthForm>{children}</AuthForm>
       </ContextProvider>
-    </ErrorBoundary>
-  );
-};
-
-const AppErrorFallback: React.FC<{ message: string }> = ({ message }) => {
-  return (
-    <div>
-      <p sx={{ textAlign: "center" }}>{message}</p>
-    </div>
+    </>
   );
 };
 
