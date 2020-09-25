@@ -6,11 +6,10 @@ import Auth from "../components/Auth";
 import Head from "next/head";
 import Error from "components/Error";
 import { AppProps } from "dataflow/withAppProps";
-import { NextPage } from "next";
 
 /* Page without Header and Footer should wrap pages that should not have sitewide navigation */
 
-const Page: NextPage<AppProps> = props => {
+const Page: React.FC<AppProps> = props => {
   /**
    * If there was no library or initialState provided, render the error page
    */

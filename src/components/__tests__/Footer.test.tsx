@@ -3,6 +3,7 @@ import { render, fixtures } from "../../test-utils";
 import merge from "deepmerge";
 import Footer from "components/Footer";
 import { LibraryData, OPDSLink } from "../../interfaces";
+import * as env from "../../utils/env";
 
 const link: OPDSLink = {
   href: "/wherever",
@@ -47,9 +48,8 @@ test("shows external links when present in state w/ apropriate attributes", () =
 
 describe("toggling SimplyE Branding", () => {
   test("does not show simplyE callout when NEXT_PUBLIC_COMPANION_APP is 'openebooks'", () => {
-    jest.mock("next/config", () => () => ({
-      publicRuntimeConfig: { NEXT_PUBLIC_COMPANION_APP: "openebooks" }
-    }));
+    (env.NEXT_PUBLIC_COMPANION_APP as string) = "openebooks";
+
     const utils = render(<Footer />);
 
     expect(utils.queryByText(/download simplye/i)).not.toBeInTheDocument();
@@ -78,49 +78,47 @@ describe("toggling SimplyE Branding", () => {
     expect(myBooks).toHaveAttribute("href", "/loans");
   });
 
-  // test("shows simplyE callout when NEXT_PUBLIC_COMPANION_APP is 'simplye'", () => {
-  //   jest.mock("next/config", () => () => ({
-  //     publicRuntimeConfig: { NEXT_PUBLIC_COMPANION_APP: "simplye" }
-  //   }));
+  test("shows simplyE callout when NEXT_PUBLIC_COMPANION_APP is 'simplye'", () => {
+    (env.NEXT_PUBLIC_COMPANION_APP as string) = "simplye";
 
-  //   const utils = render(<Footer />);
+    const utils = render(<Footer />);
 
-  //   expect(
-  //     utils.getByRole("heading", {
-  //       name: /download simplye/i
-  //     })
-  //   ).toBeInTheDocument();
+    expect(
+      utils.getByRole("heading", {
+        name: /download simplye/i
+      })
+    ).toBeInTheDocument();
 
-  //   expect(
-  //     utils.getByText(
-  //       "Our mobile app lets you browse, borrow and read from our whole collection of eBooks and Audiobooks right on your phone!"
-  //     )
-  //   ).toBeInTheDocument();
+    expect(
+      utils.getByText(
+        "Our mobile app lets you browse, borrow and read from our whole collection of eBooks and Audiobooks right on your phone!"
+      )
+    ).toBeInTheDocument();
 
-  //   // badges
-  //   const iosbadge = utils.getByRole("link", {
-  //     name: /download simplye on the apple app store/i
-  //   });
-  //   expect(iosbadge).toBeInTheDocument();
-  //   expect(iosbadge).toHaveAttribute(
-  //     "href",
-  //     "https://apps.apple.com/us/app/simplye/id1046583900"
-  //   );
+    // badges
+    const iosbadge = utils.getByRole("link", {
+      name: /download simplye on the apple app store/i
+    });
+    expect(iosbadge).toBeInTheDocument();
+    expect(iosbadge).toHaveAttribute(
+      "href",
+      "https://apps.apple.com/us/app/simplye/id1046583900"
+    );
 
-  //   const googleBadge = utils.getByRole("link", {
-  //     name: /get simplye on the google play store/i
-  //   });
-  //   expect(googleBadge).toBeInTheDocument();
-  //   expect(googleBadge).toHaveAttribute(
-  //     "href",
-  //     "https://play.google.com/store/apps/details?id=org.nypl.simplified.simplye&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1"
-  //   );
+    const googleBadge = utils.getByRole("link", {
+      name: /get simplye on the google play store/i
+    });
+    expect(googleBadge).toBeInTheDocument();
+    expect(googleBadge).toHaveAttribute(
+      "href",
+      "https://play.google.com/store/apps/details?id=org.nypl.simplified.simplye&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1"
+    );
 
-  //   // my books nav link
-  //   const myBooks = utils.getByRole("link", {
-  //     name: /my books/i
-  //   });
-  //   expect(myBooks).toBeInTheDocument();
-  //   expect(myBooks).toHaveAttribute("href", "/loans");
-  // });
+    // my books nav link
+    const myBooks = utils.getByRole("link", {
+      name: /my books/i
+    });
+    expect(myBooks).toBeInTheDocument();
+    expect(myBooks).toHaveAttribute("href", "/loans");
+  });
 });
