@@ -14,6 +14,7 @@ export const NEXT_PUBLIC_COMPANION_APP =
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 export const SHORTEN_URLS = !(publicRuntimeConfig.SHORTEN_URLS === "false");
 export const REGISTRY_BASE = publicRuntimeConfig.REGISTRY_BASE;
 export const CIRCULATION_MANAGER_BASE =
@@ -23,6 +24,8 @@ export const REACT_AXE = publicRuntimeConfig.REACT_AXE;
 =======
 =======
 >>>>>>> d7c61b8... I swear if its this
+=======
+>>>>>>> origin/beta
 export const REGISTRY_BASE = process.env.REGISTRY_BASE;
 export const CIRCULATION_MANAGER_BASE = process.env.SIMPLIFIED_CATALOG_BASE;
 export const CONFIG_FILE = process.env.CONFIG_FILE;
