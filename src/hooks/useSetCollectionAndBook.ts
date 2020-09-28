@@ -30,7 +30,6 @@ const useSetCollectionAndBook = (
   const fullBookUrl = stringBookUrl;
   // set the collection and book whenever the urls change
   React.useEffect(() => {
-    console.log("Calling use", fullCollectionUrl);
     setCollectionAndBook(fullCollectionUrl, fullBookUrl);
     /**
      * We will explicitly not have exhaustive deps here because
