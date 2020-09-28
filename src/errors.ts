@@ -38,22 +38,16 @@ export class AppSetupError extends ApplicationError {
   }
 }
 
-type ProblemDocument = {
-  detail: string;
-  title: string;
-  type?: string;
-};
-
 function isProblemDocument(
-  details: ProblemDocument | OPDS1.AuthDocument
-): details is ProblemDocument {
+  details: OPDS1.ProblemDocument | OPDS1.AuthDocument
+): details is OPDS1.ProblemDocument {
   return !(typeof (details as OPDS1.AuthDocument).id === "string");
 }
 export class ServerError extends ApplicationError {
   // a default problem document
   url: string;
   status: number;
-  info: ProblemDocument = {
+  info: OPDS1.ProblemDocument = {
     detail: "An unknown error server occurred.",
     title: "Server Error"
   };
@@ -62,7 +56,7 @@ export class ServerError extends ApplicationError {
   constructor(
     url: string,
     status: number,
-    details: ProblemDocument | OPDS1.AuthDocument
+    details: OPDS1.ProblemDocument | OPDS1.AuthDocument
   ) {
     super("Server Error");
     this.url = url;
@@ -73,7 +67,8 @@ export class ServerError extends ApplicationError {
       // we will construct our own problem document.
       this.info = {
         title: "No Authorized",
-        detail: "You are not authorized for the requested resource."
+        detail: "You are not authorized for the requested resource.",
+        status: 401
       };
       this.authDocument = details;
     } else if (isProblemDocument(details)) {

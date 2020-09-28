@@ -1,5 +1,6 @@
-import { ClientSamlMethod } from "interfaces";
+import { ClientSamlMethod, CollectionData } from "interfaces";
 import { OPDS1 } from "interfaces";
+import { makeBook } from "test-utils/fixtures/book";
 
 export const basicAuthId = "http://opds-spec.org/auth/basic";
 export const samlAuthId = "http://librarysimplified.org/authtype/SAML-2.0";
@@ -54,3 +55,12 @@ export function createSamlMethod(num: number): ClientSamlMethod {
     ]
   };
 }
+
+export const loans: CollectionData = {
+  id: "loans-id",
+  url: "/loans-url",
+  title: "My Loans",
+  lanes: [],
+  books: [makeBook(1)],
+  navigationLinks: []
+};

@@ -1,33 +1,14 @@
 import * as React from "react";
 import { render, fixtures, waitFor } from "test-utils";
-import merge from "deepmerge";
 import userEvent from "@testing-library/user-event";
-import SamlAuthForm from "auth/SamlAuthButton";
-
-const authCallback = jest.fn();
-const cancel = jest.fn();
-const authState: AuthState = {
-  showForm: true,
-  callback: authCallback,
-  cancel: cancel,
-  credentials: {
-    provider: "auth-provider",
-    credentials: "auth-cred"
-  },
-  title: "auth-title",
-  error: null,
-  attemptedProvider: null,
-  providers: [fixtures.samlAuthProvider]
-};
+import SamlAuthButton from "auth/SamlAuthButton";
 
 test("displays button", () => {
-  const utils = render(<SamlAuthForm provider={fixtures.samlAuthProvider} />, {
-    initialState: merge<State>(fixtures.initialState, {
-      auth: authState
-    })
-  });
+  const utils = render(
+    <SamlAuthButton method={fixtures.createSamlMethod(0)} />
+  );
   expect(
-    utils.getByRole("button", { name: "Login with SAML IdP" })
+    utils.getByRole("button", { name: "Login with SAML IdP 0" })
   ).toBeInTheDocument();
   expect(utils.queryByLabelText("Pin")).not.toBeInTheDocument();
 });
@@ -38,15 +19,13 @@ test("displays button", () => {
 window.open = jest.fn();
 
 test("redirects to idp", async () => {
-  const utils = render(<SamlAuthForm provider={fixtures.samlAuthProvider} />, {
-    initialState: merge<State>(fixtures.initialState, {
-      auth: authState
-    })
-  });
+  const utils = render(
+    <SamlAuthButton method={fixtures.createSamlMethod(0)} />
+  );
 
   // act
   const loginButton = utils.getByRole("button", {
-    name: "Login with SAML IdP"
+    name: "Login with SAML IdP 0"
   });
   userEvent.click(loginButton);
 
@@ -56,7 +35,7 @@ test("redirects to idp", async () => {
   await waitFor(() => {
     expect(window.open).toHaveBeenCalledTimes(1);
     expect(window.open).toHaveBeenCalledWith(
-      "/saml-auth-url&redirect_uri=http%3A%2F%2Ftest-domain.com%2F",
+      "/saml-auth-url/0&redirect_uri=http%3A%2F%2Ftest-domain.com%2F",
       "_self"
     );
   });

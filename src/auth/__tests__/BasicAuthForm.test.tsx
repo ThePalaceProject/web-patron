@@ -1,11 +1,13 @@
 import * as React from "react";
-import { render, fixtures, actions, waitFor } from "test-utils";
-import merge from "deepmerge";
+import { fixtures, render, waitFor } from "test-utils";
 import BasicAuthForm from "auth/BasicAuthForm";
 import { OPDS1 } from "interfaces";
 import userEvent from "@testing-library/user-event";
-import { AuthState } from "owc/reducers/auth";
+import fetchMock from "jest-fetch-mock";
+import Cookie from "js-cookie";
+import { generateCredentials } from "utils/auth";
 
+const mockCookie = Cookie as any;
 const method: OPDS1.BasicAuthMethod = {
   labels: {
     login: "Barcode",
@@ -15,28 +17,10 @@ const method: OPDS1.BasicAuthMethod = {
   description: "Library Barcode"
 };
 
-const authCallback = jest.fn();
-const cancel = jest.fn();
-const authState: AuthState = {
-  showForm: true,
-  callback: authCallback,
-  cancel: cancel,
-  credentials: {
-    provider: "auth-provider",
-    credentials: "auth-cred"
-  },
-  title: "auth-title",
-  error: null,
-  attemptedProvider: null,
-  providers: [provider]
-};
+beforeEach(() => fetchMock.resetMocks());
 
 test("displays form", () => {
-  const utils = render(<BasicAuthForm provider={provider} />, {
-    initialState: merge<State>(fixtures.initialState, {
-      auth: authState
-    })
-  });
+  const utils = render(<BasicAuthForm method={method} />);
 
   const barcode = utils.getByLabelText("Barcode input");
   const pin = utils.getByLabelText("Pin input");
@@ -51,21 +35,15 @@ test("displays form", () => {
   expect(pin).toHaveValue("pinpin");
 });
 
-/**
- * Mock generate-credentials here so we can test this properly
- */
-const mockedGenerateCredentials = jest
-  .spyOn(authDep, "generateCredentials")
-  .mockReturnValue("generated-credentials");
-
 test("sumbits", async () => {
-  const mockSaveAuthCredentials = jest.spyOn(actions, "saveAuthCredentials");
-
-  const utils = render(<BasicAuthForm provider={provider} />, {
-    initialState: merge<State>(fixtures.initialState, {
-      auth: authState
-    })
-  });
+  // give the mock a delay to allow loading state to appear
+  fetchMock.mockResponseOnce(
+    () =>
+      new Promise(resolve =>
+        setTimeout(() => resolve(JSON.stringify(fixtures.loans)), 100)
+      )
+  );
+  const utils = render(<BasicAuthForm method={method} />);
 
   // act
   const barcode = utils.getByLabelText("Barcode input");
@@ -75,27 +53,37 @@ test("sumbits", async () => {
   const loginButton = utils.getByRole("button", { name: "Login" });
   userEvent.click(loginButton);
 
+  const token = generateCredentials("1234", "pinpin");
+
+  // shows a loading state
+  const loadingButton = await utils.findByLabelText("Signing in...");
+  expect(loadingButton).toBeInTheDocument();
+  expect(loadingButton).toBeDisabled();
+
   // assert
   // we wrap this in waitFor because the handleSubmit from react-hook-form has
   // async code in it
   await waitFor(() => {
-    expect(utils.dispatch).toHaveBeenCalledTimes(1);
-    expect(mockedGenerateCredentials).toHaveBeenCalledTimes(1);
-    expect(mockedGenerateCredentials).toHaveBeenCalledWith("1234", "pinpin");
-    expect(mockSaveAuthCredentials).toHaveBeenCalledWith({
-      provider: "provider-id",
-      credentials: "generated-credentials"
+    // we set the cookie
+    expect(Cookie.set).toHaveBeenCalledTimes(1);
+    expect(Cookie.set).toHaveBeenCalledWith(
+      // the library slug is null because we are only running with one library
+      "CPW_AUTH_COOKIE/null",
+      JSON.stringify({
+        token,
+        methodType: OPDS1.BasicAuthType
+      })
+    );
+
+    // we also trigger a loans request with the cookie
+    expect(fetchMock).toHaveBeenCalledWith("/shelf-url", {
+      headers: { Authorization: token, "X-Requested-With": "XMLHttpRequest" }
     });
-    expect(authCallback).toHaveBeenCalledTimes(1);
   });
 });
 
-test("displays client error when unfilled", async () => {
-  const utils = render(<BasicAuthForm provider={provider} />, {
-    initialState: merge<State>(fixtures.initialState, {
-      auth: authState
-    })
-  });
+test("displays client error when inputs are unfilled", async () => {
+  const utils = render(<BasicAuthForm method={method} />);
 
   // don't fill form, but click login
   const loginButton = utils.getByRole("button", { name: "Login" });
@@ -104,72 +92,46 @@ test("displays client error when unfilled", async () => {
   // assert
   await utils.findByText("Your Barcode is required.");
   await utils.findByText("Your Pin is required.");
-  expect(utils.dispatch).toHaveBeenCalledTimes(0);
-  expect(mockedGenerateCredentials).toHaveBeenCalledTimes(0);
-  expect(authCallback).toHaveBeenCalledTimes(0);
+  expect(fetchMock).toHaveBeenCalledTimes(0);
 });
 
-const authStateWithError: AuthState = {
-  showForm: true,
-  callback: authCallback,
-  cancel: cancel,
-  credentials: {
-    provider: "auth-provider",
-    credentials: "auth-cred"
-  },
-  title: "auth-title",
-  error: "Server error string",
-  attemptedProvider: null,
-  providers: [provider]
-};
 test("displays server error", async () => {
-  const utils = render(<BasicAuthForm provider={provider} />, {
-    initialState: merge<State>(fixtures.initialState, {
-      auth: authStateWithError
-    })
+  // set fake credentials in the cookie to trigger a fetch
+  mockCookie.get.mockReturnValueOnce(
+    JSON.stringify({ token: "token", methodType: "/type" })
+  );
+  const problemdoc: OPDS1.ProblemDocument = {
+    detail: "Wrong username.",
+    title: "Invalid Credentials",
+    type: "/invalid-creds"
+  };
+  fetchMock.mockResponseOnce(JSON.stringify(problemdoc), {
+    status: 401
   });
+  const utils = render(<BasicAuthForm method={method} />);
 
-  const serverError = utils.getByText("Error: Server error string");
+  expect(fetchMock).toHaveBeenCalledWith("/shelf-url", {
+    headers: {
+      Authorization: "token",
+      "X-Requested-With": "XMLHttpRequest"
+    }
+  });
+  const serverError = await utils.findByText(
+    "Invalid Credentials: Wrong username."
+  );
   expect(serverError).toBeInTheDocument();
 });
 
 test("accepts different input labels", async () => {
-  const providerWithLabel: AuthProvider<BasicAuthMethod> = {
-    id: "provider-id",
-    plugin: {
-      type: "basic-auth-type",
-      formComponent: BasicAuthForm,
-      buttonComponent: jest.fn(),
-      lookForCredentials: jest.fn()
-    },
-    method: {
-      labels: {
-        login: "Username",
-        password: "Password"
-      },
-      type: "basic-auth-type",
-      description: "Library Barcode"
+  fetchMock.mockResponseOnce(JSON.stringify(fixtures.loans));
+  const methodWithLabels: OPDS1.BasicAuthMethod = {
+    ...fixtures.basicAuthMethod,
+    labels: {
+      login: "Username",
+      password: "Password"
     }
   };
-  const authStateWithLabel: AuthState = {
-    showForm: true,
-    callback: authCallback,
-    cancel: cancel,
-    credentials: {
-      provider: "auth-provider",
-      credentials: "auth-cred"
-    },
-    title: "auth-title",
-    error: null,
-    attemptedProvider: null,
-    providers: [providerWithLabel]
-  };
-  const stateWithLabels = merge<State>(fixtures.initialState, {
-    auth: authStateWithLabel
-  });
-  const utils = render(<BasicAuthForm provider={providerWithLabel} />, {
-    initialState: stateWithLabels
-  });
+  const utils = render(<BasicAuthForm method={methodWithLabels} />);
 
   expect(utils.getByLabelText("Username input")).toBeInTheDocument();
   expect(utils.getByLabelText("Password input")).toBeInTheDocument();

@@ -185,3 +185,12 @@ export type SamlIdp = {
   rel: "authenticate";
   information_urls: [];
 };
+
+/**
+ * Circ Manager
+ */
+export type ProblemDocument = {
+  detail: string;
+  title: string;
+  type?: string;
+};

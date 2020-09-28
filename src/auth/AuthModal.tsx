@@ -12,10 +12,9 @@ import Stack from "../components/Stack";
 import { AppAuthMethod, OPDS1 } from "interfaces";
 import BasicAuthForm from "auth/BasicAuthForm";
 import SamlAuthButton from "auth/SamlAuthButton";
-import CleverButton from "auth/cleverAuthButton";
-import { AuthFormProvider } from "auth/AuthFormCotext";
+import CleverButton from "auth/CleverAuthButton";
+import { AuthModalProvider } from "auth/AuthModalContext";
 import useUser from "components/context/UserContext";
-import LoadingIndicator from "components/LoadingIndicator";
 import Button from "components/Button";
 import ExternalLink from "components/ExternalLink";
 
@@ -24,7 +23,6 @@ const AuthForm: React.FC = ({ children }) => {
   const { hide } = dialog;
   const { catalogName, authMethods } = useLibraryContext();
   const { isAuthenticated } = useUser();
-
   /**
    * If the user becomes authenticated, we can hide the form
    */
@@ -77,7 +75,7 @@ const AuthForm: React.FC = ({ children }) => {
           even though we don't open the dialog with a button
       */}
       <DialogDisclosure sx={{ display: "none" }} {...dialog} />
-      <AuthFormProvider showForm={dialog.show}>{children}</AuthFormProvider>
+      <AuthModalProvider showModal={dialog.show}>{children}</AuthModalProvider>
     </React.Fragment>
   );
 };
@@ -113,7 +111,11 @@ const NoAuth: React.FC = () => {
           <Text>
             If this is an error, please contact your site administrator via
             email at:{" "}
-            <ExternalLink href={helpEmail.href}>
+            <ExternalLink
+              role="link"
+              href={helpEmail.href}
+              aria-label="Send email to help desk"
+            >
               {helpEmail.href.replace("mailto:", "")}
             </ExternalLink>
             .
@@ -145,7 +147,7 @@ const Buttons: React.FC<{
   const cancelSelection = () => setSelectedMethod(undefined);
 
   return (
-    <Stack direction="column">
+    <Stack direction="column" aria-label="Available authentication methods">
       {!selectedMethod &&
         authMethods.map(method => {
           switch (method.type) {
@@ -194,8 +196,8 @@ const Combobox: React.FC<{
     authMethods[0]
   );
 
-  const handleChangeMethod = (type: string) => {
-    const method = authMethods.find(method => method.type === type);
+  const handleChangeMethod = (id: string) => {
+    const method = getMethodForId(authMethods, id);
     if (method) setSelectedMethod(method);
   };
 
@@ -203,11 +205,12 @@ const Combobox: React.FC<{
     <div sx={{ mb: 2 }}>
       <FormLabel htmlFor="login-method-select">Login Method</FormLabel>
       <Select
+        aria-label="Choose login method"
         id="login-method-select"
         onChange={e => handleChangeMethod(e.target.value)}
       >
         {authMethods?.map(method => (
-          <option key={method.type} value={method.type}>
+          <option key={method.type} value={getIdForMethod(method)}>
             {method.description}
           </option>
         ))}
@@ -216,5 +219,17 @@ const Combobox: React.FC<{
     </div>
   );
 };
+
+// there is no id on auth methods, so we have to use the type
+// or the href if it's saml
+function getIdForMethod(method: AppAuthMethod) {
+  return method.type === OPDS1.SamlAuthType ? method.href : method.type;
+}
+function getMethodForId(
+  authMethods: AppAuthMethod[],
+  id: string
+): AppAuthMethod | undefined {
+  return authMethods.find(method => method.type === id || method.href === id);
+}
 
 export default AuthForm;

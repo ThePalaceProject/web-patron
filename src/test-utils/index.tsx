@@ -73,7 +73,6 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
       </MockNextRouterContextProvider>
     );
   };
-
   return {
     ...render(ui, { wrapper: AllTheProviders, ...options }),
     // we pass our mocks along so they can be used in assertions

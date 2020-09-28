@@ -14,7 +14,6 @@ import { NextRouter, useRouter } from "next/router";
  *    if finds a token, it extracts it and sets it as the current
  *    credentials.
  */
-
 export default function useCredentials(slug: string | null) {
   const router = useRouter();
   const [credentialsState, setCredentialsState] = React.useState<
@@ -33,7 +32,7 @@ export default function useCredentials(slug: string | null) {
       setCredentialsState(creds);
       setCredentialsCookie(slug, creds);
     },
-    [setCredentialsState, slug]
+    [slug]
   );
 
   // clear both cookie and state credentials
@@ -45,6 +44,7 @@ export default function useCredentials(slug: string | null) {
   // use credentials from browser url if they exist
   const { token: urlToken, methodType: urlMethodType } =
     getUrlCredentials(router) ?? {};
+
   React.useEffect(() => {
     if (urlToken && urlMethodType) {
       setCredentials({ token: urlToken, methodType: urlMethodType });
@@ -100,11 +100,13 @@ function getUrlCredentials(router: NextRouter) {
   /* TODO: throw error if samlAccessToken and cleverAccessToken exist at the same time as this is an invalid state that shouldn't be reached */
   return IS_SERVER
     ? undefined
-    : lookForCleverCredentials() ?? lookForSamlCredentials(router);
+    : lookForCleverCredentials(router) ?? lookForSamlCredentials(router);
 }
 
 // check for clever credentials
-function lookForCleverCredentials(): AuthCredentials | undefined {
+function lookForCleverCredentials(
+  router: NextRouter
+): AuthCredentials | undefined {
   if (!IS_SERVER) {
     const accessTokenKey = "access_token=";
     if (window?.location?.hash) {
@@ -115,6 +117,14 @@ function lookForCleverCredentials(): AuthCredentials | undefined {
           .slice(accessTokenStart + accessTokenKey.length)
           .split("&")[0];
         const token = `Bearer ${accessToken}`;
+
+        // clear the url hash
+        router.replace(
+          window.location.href.replace(window.location.hash, ""),
+          undefined,
+          { shallow: true }
+        );
+
         return { token, methodType: OPDS1.CleverAuthType };
       }
     }
