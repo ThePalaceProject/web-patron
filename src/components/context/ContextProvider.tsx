@@ -1,6 +1,5 @@
 import * as React from "react";
 import { LibraryData } from "interfaces";
-import UrlShortener from "UrlShortener";
 import { LibraryProvider } from "./LibraryContext";
 import PathForProvider from "opds-web-client/lib/components/context/PathForContext";
 import { RouterProvider } from "./RouterContext";
@@ -41,8 +40,7 @@ const AppContextProvider: React.FC<ProviderProps> = ({
   fetcher
 }) => {
   const librarySlug = library.slug;
-  const urlShortener = new UrlShortener(library.catalogUrl, SHORTEN_URLS);
-  const pathFor: PathFor = getPathFor(urlShortener, librarySlug);
+  const pathFor: PathFor = getPathFor(librarySlug);
   const computedFetcher = React.useMemo(
     () => fetcher ?? new DataFetcher({ adapter }),
     [fetcher]
@@ -71,7 +69,6 @@ const AppContextProvider: React.FC<ProviderProps> = ({
                   <LibraryProvider library={library}>
                     <LinkUtilsProvider
                       library={library}
-                      urlShortener={urlShortener}
                     >
                       <PageviewTracker>{children}</PageviewTracker>
                     </LinkUtilsProvider>

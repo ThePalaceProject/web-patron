@@ -1,11 +1,8 @@
 import * as React from "react";
 import ContextProvider from "../components/context/ContextProvider";
-import { SHORTEN_URLS } from "../utils/env";
 import getPathFor from "../utils/getPathFor";
-import UrlShortener from "../UrlShortener";
 import getOrCreateStore from "../dataflow/getOrCreateStore";
 import Auth from "../components/Auth";
-import ErrorBoundary from "../components/ErrorBoundary";
 import Head from "next/head";
 import Error from "components/Error";
 import { AppProps } from "dataflow/withAppProps";
@@ -28,12 +25,11 @@ const Page: React.FC<AppProps> = props => {
   }
 
   const { library, children } = props;
-  const urlShortener = new UrlShortener(library.catalogUrl, SHORTEN_URLS);
-  const pathFor = getPathFor(urlShortener, library.slug);
+  const pathFor = getPathFor(library.slug);
   const store = getOrCreateStore(pathFor);
 
   return (
-    <ErrorBoundary fallback={AppErrorFallback}>
+    <>
       <Head>
         {/* define the default title */}
         <title>{library.catalogName}</title>
@@ -41,15 +37,7 @@ const Page: React.FC<AppProps> = props => {
       <ContextProvider library={library} store={store}>
         <Auth>{children}</Auth>
       </ContextProvider>
-    </ErrorBoundary>
-  );
-};
-
-const AppErrorFallback: React.FC<{ message: string }> = ({ message }) => {
-  return (
-    <div>
-      <p sx={{ textAlign: "center" }}>{message}</p>
-    </div>
+    </>
   );
 };
 

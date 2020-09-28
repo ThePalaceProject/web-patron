@@ -8,7 +8,6 @@ export const NEXT_PUBLIC_COMPANION_APP =
     ? "openebooks"
     : "simplye";
 
-export const SHORTEN_URLS = !(process.env.SHORTEN_URLS === "false");
 export const REGISTRY_BASE = process.env.REGISTRY_BASE;
 export const CIRCULATION_MANAGER_BASE = process.env.SIMPLIFIED_CATALOG_BASE;
 export const CONFIG_FILE = process.env.CONFIG_FILE;
@@ -30,3 +29,5 @@ export const __NEXT_REDUX_STORE__ = "__NEXT_REDUX_STORE__";
 export const __LIBRARY_DATA__ = "__LIBRARY_DATA__";
 
 export const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
+export const BUGSNAG_API_KEY = process.env.NEXT_PUBLIC_BUGSNAG_API_KEY;
+export const APP_VERSION = process.env.APP_VERSION;
