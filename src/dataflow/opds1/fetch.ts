@@ -1,7 +1,8 @@
 import OPDSParser, { OPDSFeed, OPDSEntry } from "opds-feed-parser";
 import ApplicationError, { ServerError } from "errors";
-import { CollectionData } from "interfaces";
+import { BookData, CollectionData } from "interfaces";
 import { feedToCollection } from "dataflow/opds1/parse";
+import { entryToBook } from "owc/OPDSDataAdapter";
 
 const parser = new OPDSParser();
 /**
@@ -78,6 +79,19 @@ export async function fetchCollection(
   const feed = await fetchFeed(url, token);
   const collection = feedToCollection(feed, url);
   return collection;
+}
+
+/**
+ * A function to fetch an entry and convert it to a book
+ */
+export async function fetchBook(
+  url: string,
+  catalogUrl: string,
+  token?: string
+): Promise<BookData> {
+  const entry = await fetchEntry(url, token);
+  const book = entryToBook(entry, catalogUrl);
+  return book;
 }
 
 /**

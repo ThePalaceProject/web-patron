@@ -250,47 +250,6 @@ export default class ActionCreator {
     return this.clear(ActionCreator.BOOK);
   }
 
-  updateBook(url: string): (dispatch: any) => Promise<BookData> {
-    return this.fetchOPDS<BookData>(ActionCreator.UPDATE_BOOK, url);
-  }
-
-  fulfillBook(url: string): (dispatch: any) => Promise<Blob> {
-    return this.fetchBlob(ActionCreator.FULFILL_BOOK, url);
-  }
-
-  indirectFulfillBook(
-    url: string,
-    type?: string
-  ): (dispatch: any) => Promise<string> {
-    return dispatch => {
-      return new Promise<string>((resolve, reject) => {
-        dispatch(this.request(ActionCreator.FULFILL_BOOK, url));
-        this.fetcher
-          .fetchOPDSData(url)
-          .then((book: any) => {
-            const link = book.fulfillmentLinks?.find(
-              (link: any) => link.type === type
-            );
-
-            if (link) {
-              dispatch(this.success(ActionCreator.FULFILL_BOOK));
-              resolve(link.url);
-            } else {
-              throw {
-                status: 200,
-                response: "Couldn't fulfill book",
-                url: url
-              };
-            }
-          })
-          .catch(err => {
-            dispatch(this.failure(ActionCreator.FULFILL_BOOK, err));
-            reject(err);
-          });
-      });
-    };
-  }
-
   setPreference(key: string, value: string) {
     return { type: ActionCreator.SET_PREFERENCE, key: key, value: value };
   }

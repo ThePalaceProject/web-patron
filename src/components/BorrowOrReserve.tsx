@@ -16,7 +16,7 @@ const BorrowOrReserve: React.FC<{
     loadingText,
     buttonLabel,
     borrowOrReserve,
-    errorMsg
+    error
   } = useBorrow(book, isBorrow, borrowLink);
   return (
     <>
@@ -28,7 +28,7 @@ const BorrowOrReserve: React.FC<{
       >
         <Text variant="text.body.bold">{buttonLabel}</Text>
       </Button>
-      {errorMsg && <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>}
+      {error && <Text sx={{ color: "ui.error" }}>Error: {error}</Text>}
     </>
   );
 };

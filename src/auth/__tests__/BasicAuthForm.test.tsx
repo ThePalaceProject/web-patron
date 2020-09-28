@@ -135,5 +135,4 @@ test("accepts different input labels", async () => {
 
   expect(utils.getByLabelText("Username input")).toBeInTheDocument();
   expect(utils.getByLabelText("Password input")).toBeInTheDocument();
-  expect(utils.getByText("Login")).toBeInTheDocument();
 });

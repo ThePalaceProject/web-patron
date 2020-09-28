@@ -49,7 +49,8 @@ export class ServerError extends ApplicationError {
   status: number;
   info: OPDS1.ProblemDocument = {
     detail: "An unknown error server occurred.",
-    title: "Server Error"
+    title: "Server Error",
+    status: 418
   };
   authDocument?: OPDS1.AuthDocument;
 

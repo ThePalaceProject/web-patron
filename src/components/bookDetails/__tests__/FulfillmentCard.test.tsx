@@ -13,10 +13,9 @@ import userEvent from "@testing-library/user-event";
 import { State } from "owc/state";
 import * as useBorrow from "hooks/useBorrow";
 import _download from "downloadjs";
+import * as env from "utils/env";
 
-import * as env from "../../../utils/env";
-
-jest.mock("owc/components/download");
+jest.mock("downloadjs");
 window.open = jest.fn();
 
 const loadingBorrowState = {
@@ -28,13 +27,6 @@ const loadingBorrowState = {
 };
 
 describe("open-access", () => {
-  const stateWithLoanedBook = merge<State>(fixtures.initialState, {
-    loans: {
-      url: "/loans",
-      books: [fixtures.book]
-    }
-  });
-
   test("correct title and subtitle when not loaned", () => {
     const utils = render(<FulfillmentCard book={fixtures.book} />);
     expect(
@@ -44,9 +36,7 @@ describe("open-access", () => {
   });
 
   test("correct title and subtitle when loaned", () => {
-    const utils = render(<FulfillmentCard book={fixtures.book} />, {
-      initialState: stateWithLoanedBook
-    });
+    const utils = render(<FulfillmentCard book={fixtures.book} />);
     expect(
       utils.getByText("This open-access book is available to keep forever.")
     ).toBeInTheDocument();
@@ -56,9 +46,7 @@ describe("open-access", () => {
   });
 
   test("shows download options if loaned", () => {
-    const utils = render(<FulfillmentCard book={fixtures.book} />, {
-      initialState: stateWithLoanedBook
-    });
+    const utils = render(<FulfillmentCard book={fixtures.book} />);
 
     expect(
       utils.getByText("If you would rather read on your computer, you can:")
@@ -74,9 +62,7 @@ describe("open-access", () => {
   test("clicking download calls fulfill book", () => {
     const fulfillBookSpy = jest.spyOn(actions, "fulfillBook");
 
-    const utils = render(<FulfillmentCard book={fixtures.book} />, {
-      initialState: stateWithLoanedBook
-    });
+    const utils = render(<FulfillmentCard book={fixtures.book} />);
     const downloadButton = utils.getByText("Download EPUB");
     expect(downloadButton).toBeInTheDocument();
 

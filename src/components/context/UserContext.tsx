@@ -12,12 +12,12 @@ type UserState = {
   status: Status;
   isAuthenticated: boolean;
   isLoading: boolean;
-  refetch: () => void;
+  refetchLoans: () => void;
   signIn: (token: string, method: AppAuthMethod) => void;
   signOut: () => void;
-  // manually sets a book in the loans. For use after borrowing.
   setBook: (book: BookData) => void;
   error: any;
+  token?: string;
 };
 
 const UserContext = React.createContext<UserState | undefined>(undefined);
@@ -39,7 +39,7 @@ export const UserProvider: React.FC = ({ children }) => {
     credentials
       ? [shelfUrl, credentials?.token, credentials?.methodType]
       : null,
-    fetchCollection,
+    fetchLoans,
     {
       shouldRetryOnError: false,
       revalidateOnFocus: false,
@@ -61,24 +61,11 @@ export const UserProvider: React.FC = ({ children }) => {
     clearCredentials();
     mutate();
   }
+
   function setBook(book: BookData) {
-    /**
-     * If there is already some loan data, add the new checked out
-     * book to the cache manually, and don't refetch loans.
-     * If there is no loan data yet, just call mutate to trigger a
-     * fresh refetch
-     */
-    if (data) {
-      mutate(
-        {
-          ...data,
-          books: [...data?.books, book]
-        },
-        false
-      );
-    } else {
-      mutate();
-    }
+    const existing = data ?? [];
+    const newData: BookData[] = [...existing, book];
+    mutate(newData);
   }
 
   /**
@@ -97,12 +84,13 @@ export const UserProvider: React.FC = ({ children }) => {
     status,
     isAuthenticated,
     isLoading,
-    loans: isAuthenticated ? data?.books ?? [] : undefined,
-    refetch: mutate,
+    loans: isAuthenticated ? data ?? [] : undefined,
+    refetchLoans: mutate,
     signIn,
     signOut,
     setBook,
-    error
+    error,
+    token: credentials?.token
   };
   return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
 };
@@ -113,4 +101,11 @@ export default function useUser() {
     throw new Error("useUser must be used within a UserProvider");
   }
   return context;
+}
+
+// we only need the books out of a collection for loans,
+// so this is a utility to extract those.
+async function fetchLoans(url: string, token: string) {
+  const collection = await fetchCollection(url, token);
+  return collection.books;
 }

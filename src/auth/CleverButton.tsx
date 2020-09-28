@@ -1,5 +1,5 @@
 import * as React from "react";
-import Button, { AnchorButton } from "components/Button";
+import { AnchorButton } from "components/Button";
 
 import { modalButtonStyles } from "components/Modal";
 import { OPDS1 } from "interfaces";

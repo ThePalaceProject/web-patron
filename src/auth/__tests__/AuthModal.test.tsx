@@ -1,4 +1,3 @@
-import AuthModal from "auth/AuthModal";
 import { AppAuthMethod, OPDS1 } from "interfaces";
 import * as React from "react";
 import { render, fixtures } from "test-utils";
@@ -18,14 +17,20 @@ useDialogSpy.mockReturnValue({
   hide: mockHide
 } as any);
 
+/**
+ * We don't have to directly render the auth form because it is already
+ * rendered in the ContextProvider, which our custom `render`
+ * already wraps everything with.
+ */
+
 test("renders header and subheader", () => {
-  const utils = render(<AuthModal>child</AuthModal>);
+  const utils = render(<div>child</div>);
   expect(utils.getByText("Login")).toBeInTheDocument();
   expect(utils.getByText("XYZ Public Library")).toBeInTheDocument();
 });
 
 test("shows warning if there is no auth method configured", async () => {
-  const utils = render(<AuthModal>child</AuthModal>, {
+  const utils = render(<div>child</div>, {
     library: {
       ...fixtures.libraryData,
       libraryLinks: {
@@ -46,7 +51,7 @@ test("shows warning if there is no auth method configured", async () => {
 const oneAuthMethod: AppAuthMethod[] = [fixtures.basicAuthMethod];
 
 test("shows form when only one auth method configured", () => {
-  const utils = render(<AuthModal>child</AuthModal>, {
+  const utils = render(<div>child</div>, {
     library: {
       ...fixtures.libraryData,
       authMethods: oneAuthMethod
@@ -65,7 +70,7 @@ const fourAuthMethods: AppAuthMethod[] = [
   fixtures.createSamlMethod(1)
 ];
 test("shows buttons with four auth methods configured", async () => {
-  const utils = render(<AuthModal>child</AuthModal>, {
+  const utils = render(<div>child</div>, {
     library: {
       ...fixtures.libraryData,
       authMethods: fourAuthMethods
@@ -110,7 +115,7 @@ test("shows buttons with four auth methods configured", async () => {
 });
 
 test("shows combobox with five auth methods configured", () => {
-  const utils = render(<AuthModal>child</AuthModal>, {
+  const utils = render(<div>child</div>, {
     library: {
       ...fixtures.libraryData,
       authMethods: [...fourAuthMethods, fixtures.createSamlMethod(2)]
@@ -145,7 +150,7 @@ test("shows combobox with five auth methods configured", () => {
 });
 
 test("hides form when user becomes authenticated", async () => {
-  const utils = render(<AuthModal>child</AuthModal>, {
+  const utils = render(<div>child</div>, {
     library: {
       ...fixtures.libraryData,
       authMethods: [fixtures.cleverAuthMethod]
@@ -158,7 +163,7 @@ test("hides form when user becomes authenticated", async () => {
   expect(mockHide).toHaveBeenCalledTimes(0);
 
   useUserSpy.mockReturnValueOnce({ isAuthenticated: true } as any);
-  utils.rerender(<AuthModal>child</AuthModal>);
+  utils.rerender(<div>child</div>);
   // hide gets called
   expect(mockHide).toHaveBeenCalledTimes(1);
 });
