@@ -103,7 +103,8 @@ test("displays server error", async () => {
   const problemdoc: OPDS1.ProblemDocument = {
     detail: "Wrong username.",
     title: "Invalid Credentials",
-    type: "/invalid-creds"
+    type: "/invalid-creds",
+    status: 401
   };
   fetchMock.mockResponseOnce(JSON.stringify(problemdoc), {
     status: 401

@@ -7,6 +7,11 @@ import { State } from "owc/state";
 import useLibraryContext from "../LibraryContext";
 import { MockNextRouterContextProvider } from "../../../test-utils/mockNextRouter";
 import { usePathFor } from "owc/PathForContext";
+import * as modal from "components/Modal";
+
+// react portals not supported by hooks testing library
+const mockModal = jest.spyOn(modal, "default");
+mockModal.mockReturnValue(<div>modal</div>);
 
 const TestComponent: React.FC = () => <div>test child</div>;
 
@@ -17,7 +22,9 @@ const testLibrary: LibraryData = {
   libraryLinks: {},
   logoUrl: null,
   colors: null,
-  headerLinks: []
+  headerLinks: [],
+  authMethods: [],
+  shelfUrl: "/shelf"
 };
 
 type MakeContextConfig = {
@@ -41,14 +48,6 @@ const makeContextWrapper = (config: MakeContextConfig = {}) => ({
 };
 
 describe("ContextProvider", () => {
-  test("provides pathFor in context", () => {
-    const { result } = renderHook(() => usePathFor(), {
-      wrapper: makeContextWrapper()
-    });
-
-    expect(typeof result.current).toBe("function");
-  });
-
   test("provides library in context", () => {
     const { result } = renderHook(() => useLibraryContext(), {
       wrapper: makeContextWrapper()
@@ -112,7 +111,9 @@ describe("ContextProvider", () => {
         slug: null,
         logoUrl: null,
         colors: null,
-        headerLinks: []
+        headerLinks: [],
+        authMethods: [],
+        shelfUrl: "/shelf"
       };
       const { result } = renderHook(() => usePathFor(), {
         wrapper: makeContextWrapper({ library: libraryWithoutId })

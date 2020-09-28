@@ -5,9 +5,8 @@ import { act, fixtures, render, waitFor } from "test-utils";
 import Cookie from "js-cookie";
 import * as router from "next/router";
 import useUser from "components/context/UserContext";
-import * as fetch from "dataflow/opds1/fetch";
-import { creds } from "test-utils/mockAuthState";
-import mockAuthenticatedOnce from "test-utils/mockAuthState";
+import mockAuthenticatedOnce, { creds } from "test-utils/mockAuthState";
+import { mockedFetchCollection } from "test-utils/mockLoans";
 /**
  * This file tests both UserContext and useCredentials, as
  * the latter is only used within the former. It doesn't have
@@ -15,13 +14,8 @@ import mockAuthenticatedOnce from "test-utils/mockAuthState";
  * render wraps everything with our ContextProvider already (see text-utils/index)
  */
 
-(fetch as any).fetchCollection = jest.fn();
-const mockedFetchCollection = fetch.fetchCollection as jest.MockedFunction<
-  typeof fetch.fetchCollection
->;
-
 function expectFetchWithToken(token: string) {
-  expect(fetch.fetchCollection).toHaveBeenCalledWith("/shelf-url", token);
+  expect(mockedFetchCollection).toHaveBeenCalledWith("/shelf-url", token);
 }
 
 const str = JSON.stringify;
@@ -49,7 +43,7 @@ test("fetches loans when credentials are present", () => {
   mockAuthenticatedOnce();
   renderUserContext();
 
-  expect(fetch.fetchCollection).toHaveBeenCalledTimes(1);
+  expect(mockedFetchCollection).toHaveBeenCalledTimes(1);
   expectFetchWithToken(creds.token);
 });
 
@@ -74,7 +68,7 @@ test("extracts clever tokens from the url", () => {
     "CPW_AUTH_COOKIE/null",
     str({ token: "Bearer fry6H3", methodType: OPDS1.CleverAuthType })
   );
-  expect(fetch.fetchCollection).toHaveBeenCalledTimes(1);
+  expect(mockedFetchCollection).toHaveBeenCalledTimes(1);
   expectFetchWithToken("Bearer fry6H3");
 
   // mock the router
@@ -99,8 +93,9 @@ test("extracts SAML tokens from the url", () => {
     str({ token: "Bearer saml-token", methodType: OPDS1.SamlAuthType })
   );
 
-  expect(fetch.fetchCollection).toHaveBeenCalledTimes(1);
+  expect(mockedFetchCollection).toHaveBeenCalledTimes(1);
   expectFetchWithToken("Bearer saml-token");
+
   expect(mockReplace).toHaveBeenCalledWith(
     "http://test-domain.com/",
     undefined,
@@ -122,7 +117,7 @@ test("sign out clears cookies and data", async () => {
   render(<Extractor />);
 
   // make sure fetch was called and you have the right data
-  expect(fetch.fetchCollection).toHaveBeenCalledTimes(1);
+  expect(mockedFetchCollection).toHaveBeenCalledTimes(1);
   expectFetchWithToken(creds.token);
   await waitFor(() => expect(extractedLoans).toHaveLength(1));
 

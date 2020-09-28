@@ -134,6 +134,7 @@ export const BookListItem: React.FC<{
 const BookListCTA: React.FC<{ book: BookWithUrl }> = ({ book }) => {
   const isBorrowed = useIsBorrowed(book);
   const fulfillmentState = getFulfillmentState(book, isBorrowed);
+
   const getCtaButtons = (isBorrow: boolean) => {
     return (
       <Stack

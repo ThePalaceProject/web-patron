@@ -1,5 +1,5 @@
 import computeBreadcrumbs from "../computeBreadcrumbs";
-import { LinkData } from "owc/interfaces";
+import { LinkData } from "interfaces";
 
 describe("computeBreadcrumbs", () => {
   const collection = {

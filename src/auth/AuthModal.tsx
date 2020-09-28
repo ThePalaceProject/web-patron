@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { useDialogState, DialogDisclosure } from "reakit/Dialog";
+import { useDialogState } from "reakit/Dialog";
 import useLibraryContext from "../components/context/LibraryContext";
 import Modal, { modalButtonStyles } from "../components/Modal";
 import ClientOnly from "../components/ClientOnly";
@@ -74,7 +74,7 @@ const AuthForm: React.FC = ({ children }) => {
       {/* We render this to provide the dialog a focus target after it closes
           even though we don't open the dialog with a button
       */}
-      <DialogDisclosure sx={{ display: "none" }} {...dialog} />
+      {/* <DialogDisclosure sx={{ display: "none" }} {...dialog} /> */}
       <AuthModalProvider showModal={dialog.show}>{children}</AuthModalProvider>
     </React.Fragment>
   );
@@ -229,7 +229,11 @@ function getMethodForId(
   authMethods: AppAuthMethod[],
   id: string
 ): AppAuthMethod | undefined {
-  return authMethods.find(method => method.type === id || method.href === id);
+  return authMethods.find(
+    method =>
+      method.type === id ||
+      (method.type === OPDS1.SamlAuthType && method.href === id)
+  );
 }
 
 export default AuthForm;

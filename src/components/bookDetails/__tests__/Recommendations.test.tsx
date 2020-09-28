@@ -1,7 +1,7 @@
 import * as React from "react";
-import { render, fixtures, actions, waitFor } from "../../../test-utils";
-import { CollectionData } from "owc/interfaces";
-import { RecommendationsStateContext } from "../../context/RecommendationsContext";
+import { render, fixtures, actions, waitFor } from "test-utils";
+import { CollectionData } from "interfaces";
+import { RecommendationsStateContext } from "components/context/RecommendationsContext";
 import Recommendations from "../Recommendations";
 import { RecommendationsState } from "interfaces";
 

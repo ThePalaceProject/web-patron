@@ -1,14 +1,14 @@
 import * as React from "react";
-import { render, fixtures, actions, waitFor } from "../../../test-utils";
+import { render, fixtures, actions, waitFor } from "test-utils";
 import merge from "deepmerge";
 import { BookDetails } from "../index";
 import { State } from "owc/state";
-import { BookData, CollectionData } from "owc/interfaces";
-import * as complaintActions from "../../../hooks/useComplaints/actions";
-import { RecommendationsStateContext } from "../../context/RecommendationsContext";
+import { BookData, CollectionData } from "interfaces";
+import * as complaintActions from "hooks/useComplaints/actions";
+import { RecommendationsStateContext } from "components/context/RecommendationsContext";
 import userEvent from "@testing-library/user-event";
 import ReportProblem from "../ReportProblem";
-import * as env from "../../../utils/env";
+import * as env from "utils/env";
 
 const mockSetCollectionAndBook = jest.fn().mockResolvedValue({});
 

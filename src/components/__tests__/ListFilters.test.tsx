@@ -2,7 +2,7 @@ import * as React from "react";
 import { render, fixtures } from "test-utils";
 import ListFilters from "../ListFilters";
 import merge from "deepmerge";
-import { FacetGroupData } from "owc/interfaces";
+import { FacetGroupData } from "interfaces";
 import { State } from "owc/state";
 import userEvent from "@testing-library/user-event";
 import mockedRouter from "test-utils/mockNextRouter";

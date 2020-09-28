@@ -1,9 +1,9 @@
 import * as React from "react";
-import { render, fixtures } from "../../test-utils";
+import { render, fixtures } from "test-utils";
 import BreadcrumbBar from "../BreadcrumbBar";
 import merge from "deepmerge";
 import { State } from "owc/state";
-import { CollectionData } from "owc/interfaces";
+import { CollectionData } from "interfaces";
 import computeBreadcrumbs from "../../computeBreadcrumbs";
 
 const collectionData: CollectionData = {

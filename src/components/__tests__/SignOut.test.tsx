@@ -1,8 +1,10 @@
 import * as React from "react";
-import { render, actions } from "../../test-utils";
+import { render } from "../../test-utils";
 import SignOut from "components/SignOut";
 import userEvent from "@testing-library/user-event";
+import Cookie from "js-cookie";
 
+// const mockCookie
 test("Shows button", () => {
   const utils = render(<SignOut />);
   expect(utils.getByRole("button", { name: "Sign Out" })).toBeInTheDocument();
@@ -42,7 +44,6 @@ test("hides dialog on cancel", () => {
 });
 
 test("signs out on click signout", () => {
-  const clearAuthMock = jest.spyOn(actions, "clearAuthCredentials");
   const utils = render(<SignOut />);
   const signOut = utils.getByRole("button", { name: "Sign Out" });
 
@@ -51,7 +52,7 @@ test("signs out on click signout", () => {
     name: "Confirm Sign Out"
   });
 
-  expect(clearAuthMock).toHaveBeenCalledTimes(0);
+  expect(Cookie.remove).toHaveBeenCalledTimes(0);
   userEvent.click(signOutForReal);
-  expect(clearAuthMock).toHaveBeenCalledTimes(1);
+  expect(Cookie.remove).toHaveBeenCalledWith("CPW_AUTH_COOKIE/null");
 });

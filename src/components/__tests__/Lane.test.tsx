@@ -1,7 +1,7 @@
 import * as React from "react";
 import { render, fixtures } from "../../test-utils";
 import Lane from "../Lane";
-import { LaneData } from "owc/interfaces";
+import { LaneData } from "interfaces";
 /**
  * Lane
 

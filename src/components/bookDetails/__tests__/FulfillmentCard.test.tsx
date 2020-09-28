@@ -8,23 +8,14 @@ import {
 import { mergeBook } from "test-utils/fixtures";
 import merge from "deepmerge";
 import FulfillmentCard from "../FulfillmentCard";
-import { FetchErrorData } from "owc/interfaces";
 import userEvent from "@testing-library/user-event";
-import { State } from "owc/state";
-import * as useBorrow from "hooks/useBorrow";
 import _download from "downloadjs";
 import * as env from "utils/env";
+import { mockAuthenticated } from "test-utils/mockAuthState";
+import mockUser from "test-utils/mockUser";
 
 jest.mock("downloadjs");
 window.open = jest.fn();
-
-const loadingBorrowState = {
-  isLoading: true,
-  borrowOrReserve: jest.fn(),
-  errorMsg: null,
-  buttonLabel: "Button Label",
-  loadingText: "Loading Label"
-};
 
 describe("open-access", () => {
   test("correct title and subtitle when not loaned", () => {
@@ -117,90 +108,30 @@ describe("available to borrow", () => {
     ).toBeInTheDocument();
     expect(utils.getByText("10 out of 13 copies available."));
   });
-  test("displays borrow button which calls updateBook correctly", async () => {
-    const updateBookSpy = jest
-      .spyOn(actions, "updateBook")
-      .mockImplementation(_url => _dispatch => Promise.resolve(fixtures.book));
 
+  test("displays borrow button which fetches book when clicked", async () => {
+    mockAuthenticated();
+    mockUser();
     const utils = render(<FulfillmentCard book={closedAccessBook} />);
     const borrowButton = utils.getByText("Borrow to read on a mobile device");
     expect(borrowButton).toBeInTheDocument();
 
     // click borrow
     userEvent.click(utils.getByText("Borrow to read on a mobile device"));
-    expect(updateBookSpy).toHaveBeenCalledTimes(1);
-    expect(updateBookSpy).toHaveBeenCalledWith("/epub-borrow-link");
+    // the first call is to loans in UserContext
+    expect(fetchMock).toHaveBeenNthCalledWith(2, "/epub-borrow-link", {
+      headers: {
+        Authorization: "user-token",
+        "X-Requested-With": "XMLHttpRequest"
+      }
+    });
 
     // the borrow button should be gone now
     await waitForElementToBeRemoved(() => utils.getByText("Borrowing..."));
-  });
-
-  test("shows loading state when borrowing", async () => {
-    const _useBorrowSpy = jest
-      .spyOn(useBorrow, "default")
-      .mockReturnValueOnce(loadingBorrowState);
-
-    // set it up into the loading state
-    const utils = render(<FulfillmentCard book={closedAccessBook} />, {
-      initialState: merge<State>(fixtures.initialState, {
-        loans: {
-          url: "/loans-url",
-          books: []
-        }
-      })
-    });
-
-    const borrowButton = await utils.findByRole("button", {
-      name: /Loading Label/i
-    });
-
-    expect(_useBorrowSpy).toHaveBeenCalledTimes(1);
-
-    expect(borrowButton).toBeInTheDocument();
-    expect(borrowButton).toHaveAttribute("disabled", "");
-  });
-
-  test("doesn't refetch loans after borrowing", async () => {
-    const fetchLoansSpy = jest.spyOn(actions, "fetchLoans");
-    const _updateBookSpy = jest
-      .spyOn(actions, "updateBook")
-      .mockImplementationOnce(_url => _dispatch =>
-        new Promise(resolve => resolve(fixtures.book))
-      );
-
-    const utils = render(<FulfillmentCard book={closedAccessBook} />, {
-      initialState: merge<State>(fixtures.initialState, {
-        loans: {
-          url: "/loans-url",
-          books: []
-        }
-      })
-    });
-    userEvent.click(utils.getByText("Borrow to read on a mobile device"));
-
-    await waitForElementToBeRemoved(() => utils.getByText("Borrowing..."));
-    expect(fetchLoansSpy).toHaveBeenCalledTimes(0);
-  });
-
-  test("displays error message", () => {
-    const err: FetchErrorData = {
-      response: "cannot loan more than 3 documents.",
-      status: 403,
-      url: "http://test-book-url/error-url"
-    };
-    const utils = render(<FulfillmentCard book={closedAccessBook} />, {
-      initialState: merge(fixtures.initialState, {
-        book: {
-          error: err
-        }
-      })
-    });
+    // there is an error because we didn't mock fetch to return something
     expect(
-      utils.getByText("10 out of 13 copies available.")
-    ).toBeInTheDocument();
-    expect(
-      utils.getByText("Error: cannot loan more than 3 documents.")
-    ).toBeInTheDocument();
+      utils.getByText("Error: An error occurred while borrowing this book.")
+    );
   });
 });
 
@@ -222,88 +153,31 @@ describe("ready to borrow", () => {
     expect(utils.getByText("Your hold will expire on Tue Jun 16 2020."));
   });
 
-  test("displays borrow button which calls updateBook", async () => {
-    const updateBookSpy = jest.spyOn(actions, "updateBook");
+  test("displays borrow button which fetches book when clicked", async () => {
+    mockAuthenticated();
+    mockUser();
+    const utils = render(<FulfillmentCard book={readyBook} />);
+    const borrowButton = utils.getByText("Borrow to read on a mobile device");
+    expect(borrowButton).toBeInTheDocument();
 
-    const utils = render(<FulfillmentCard book={readyBook} />, {
-      initialState: merge<State>(fixtures.initialState, {
-        loans: {
-          url: "/loans-url",
-          books: []
-        }
-      })
-    });
     // click borrow
     userEvent.click(utils.getByText("Borrow to read on a mobile device"));
-    expect(updateBookSpy).toHaveBeenCalledTimes(1);
-    expect(updateBookSpy).toHaveBeenCalledWith("/epub-borrow-link");
+    // the first call is to loans in UserContext
+    expect(fetchMock).toHaveBeenNthCalledWith(2, "/epub-borrow-link", {
+      headers: {
+        Authorization: "user-token",
+        "X-Requested-With": "XMLHttpRequest"
+      }
+    });
 
     // the borrow button should be gone now
     await waitForElementToBeRemoved(() => utils.getByText("Borrowing..."));
-  });
-
-  test("shows loading state when borrowing", async () => {
-    const _useBorrowSpy = jest
-      .spyOn(useBorrow, "default")
-      .mockReturnValueOnce(loadingBorrowState);
-
-    const utils = render(<FulfillmentCard book={readyBook} />, {
-      initialState: merge<State>(fixtures.initialState, {
-        loans: {
-          url: "/loans-url",
-          books: []
-        }
-      })
-    });
-
-    const borrowButton = await utils.findByRole("button", {
-      name: /Loading Label/i
-    });
-
-    expect(_useBorrowSpy).toHaveBeenCalledTimes(1);
-
-    expect(borrowButton).toBeInTheDocument();
-    expect(borrowButton).toHaveAttribute("disabled", "");
-  });
-
-  test("doesn't refetch loans after borrowing", async () => {
-    const fetchLoansSpy = jest.spyOn(actions, "fetchLoans");
-    const _updateBookSpy = jest
-      .spyOn(actions, "updateBook")
-      .mockImplementationOnce(_url => _dispatch =>
-        new Promise(resolve => resolve(fixtures.book))
-      );
-    const utils = render(<FulfillmentCard book={readyBook} />, {
-      initialState: merge<State>(fixtures.initialState, {
-        loans: {
-          url: "/loans-url",
-          books: []
-        }
-      })
-    });
-    userEvent.click(utils.getByText("Borrow to read on a mobile device"));
-    // the borrow button should be gone now
-    await waitForElementToBeRemoved(() => utils.getByText("Borrowing..."));
-    expect(fetchLoansSpy).toHaveBeenCalledTimes(0);
-  });
-
-  test("displays error message", () => {
-    const err: FetchErrorData = {
-      response: "cannot loan more than 3 documents.",
-      status: 403,
-      url: "http://test-book-url/error-url"
-    };
-    const utils = render(<FulfillmentCard book={readyBook} />, {
-      initialState: merge(fixtures.initialState, {
-        book: {
-          error: err
-        }
-      })
-    });
+    // there is an error because we didn't mock fetch to return something
     expect(
-      utils.getByText("Error: cannot loan more than 3 documents.")
-    ).toBeInTheDocument();
+      utils.getByText("Error: An error occurred while borrowing this book.")
+    );
   });
+
   test("handles lack of availability.until info", () => {
     const withoutCopies = mergeBook({
       ...readyBook,
@@ -348,82 +222,31 @@ describe("ready to borrow (two links)", () => {
     expect(utils.getByText("Your hold will expire on Tue Jun 16 2020."));
   });
 
-  test("displays borrow button which calls updateBook", async () => {
-    const updateBookSpy = jest.spyOn(actions, "updateBook");
-
+  test("displays borrow button which fetches book", async () => {
+    mockAuthenticated();
+    mockUser();
     const utils = render(
-      <FulfillmentCard book={readyBookWithTwoBorrowLinks} />,
-      {
-        initialState: merge<State>(fixtures.initialState, {
-          loans: {
-            url: "/loans-url",
-            books: []
-          }
-        })
-      }
+      <FulfillmentCard book={readyBookWithTwoBorrowLinks} />
     );
-    // click borrow
-    userEvent.click(utils.getByText("Borrow to read online"));
-    expect(updateBookSpy).toHaveBeenCalledTimes(1);
-    expect(updateBookSpy).toHaveBeenCalledWith("/axis-borrow-link");
-
-    // the borrow button should be gone now
-    await waitForElementToBeRemoved(() => utils.getByText("Borrowing..."));
-  });
-
-  test("shows loading state on one of the buttons when borrowing", async () => {
-    //This gets called once for setup, once for the borrow button
-    const _useBorrowSpy = jest
-      .spyOn(useBorrow, "default")
-      .mockReturnValueOnce(loadingBorrowState);
-
-    const utils = render(
-      <FulfillmentCard book={readyBookWithTwoBorrowLinks} />,
-      {
-        initialState: merge<State>(fixtures.initialState, {
-          loans: {
-            url: "/loans-url",
-            books: []
-          }
-        })
-      }
-    );
-
-    // One button says "Borrowing..."
-    const borrowButton = await utils.findByRole("button", {
-      name: /Loading Label/i
-    });
+    const borrowButton = utils.getByText("Borrow to read on a mobile device");
     expect(borrowButton).toBeInTheDocument();
-    expect(borrowButton).toHaveAttribute("disabled", "");
 
-    const unClickedBorrowButton = await utils.getByText(
-      "Borrow to read online"
-    );
-    expect(unClickedBorrowButton).toBeInTheDocument();
-  });
-
-  test("doesn't refetch loans after borrowing", async () => {
-    const fetchLoansSpy = jest.spyOn(actions, "fetchLoans");
-    const _updateBookSpy = jest
-      .spyOn(actions, "updateBook")
-      .mockImplementationOnce(_url => _dispatch =>
-        new Promise(resolve => resolve(fixtures.book))
-      );
-    const utils = render(
-      <FulfillmentCard book={readyBookWithTwoBorrowLinks} />,
-      {
-        initialState: merge<State>(fixtures.initialState, {
-          loans: {
-            url: "/loans-url",
-            books: []
-          }
-        })
+    // click borrow
+    userEvent.click(utils.getByText("Borrow to read on a mobile device"));
+    // the first call is to loans in UserContext
+    expect(fetchMock).toHaveBeenNthCalledWith(2, "/epub-borrow-link", {
+      headers: {
+        Authorization: "user-token",
+        "X-Requested-With": "XMLHttpRequest"
       }
-    );
-    userEvent.click(utils.getByText("Borrow to read online"));
+    });
+
     // the borrow button should be gone now
     await waitForElementToBeRemoved(() => utils.getByText("Borrowing..."));
-    expect(fetchLoansSpy).toHaveBeenCalledTimes(0);
+    // there is an error because we didn't mock fetch to return something
+    expect(
+      utils.getByText("Error: An error occurred while borrowing this book.")
+    );
   });
 });
 
@@ -489,62 +312,29 @@ describe("available to reserve", () => {
     expect(utils.getByText("Number of books available is unknown."));
   });
 
-  test("shows reserve button which calls updateBook", async () => {
-    const updateBookSpy = jest.spyOn(actions, "updateBook");
-    const utils = render(<FulfillmentCard book={unavailableBook} />, {
-      initialState: merge<State>(fixtures.initialState, {
-        loans: {
-          url: "/loans-url",
-          books: []
-        }
-      })
-    });
-    userEvent.click(utils.getByText("Reserve"));
-    expect(updateBookSpy).toHaveBeenCalledTimes(1);
-    expect(updateBookSpy).toHaveBeenCalledWith("/epub-borrow-link");
-
-    // the reserve button should be gone now
-    await waitForElementToBeRemoved(() => utils.getByText("Reserving..."));
-  });
-  test("shows loading state when reserving", async () => {
-    const _useBorrowSpy = jest
-      .spyOn(useBorrow, "default")
-      .mockReturnValueOnce(loadingBorrowState);
-
-    const utils = render(<FulfillmentCard book={unavailableBook} />, {
-      initialState: merge<State>(fixtures.initialState, {
-        loans: {
-          url: "/loans-url",
-          books: []
-        }
-      })
-    });
-    const reserveButton = utils.getByRole("button", {
-      name: /Loading Label/i
-    });
-
-    expect(_useBorrowSpy).toHaveBeenCalledTimes(1);
-
+  test("shows reserve button which fetches book", async () => {
+    mockAuthenticated();
+    mockUser();
+    const utils = render(<FulfillmentCard book={unavailableBook} />);
+    const reserveButton = utils.getByText("Reserve");
     expect(reserveButton).toBeInTheDocument();
-    expect(reserveButton).toHaveAttribute("disabled", "");
-  });
-  test("doesn't refetch loans after reserving", async () => {
-    const fetchLoansSpy = jest.spyOn(actions, "fetchLoans");
-    const _updateBookSpy = jest
-      .spyOn(actions, "updateBook")
-      .mockImplementationOnce(_url => _dispatch =>
-        new Promise(resolve => resolve(fixtures.book))
-      );
-    const utils = render(<FulfillmentCard book={unavailableBook} />, {
-      initialState: merge<State>(fixtures.initialState, {
-        loans: {
-          url: "/loans-url",
-          books: []
-        }
-      })
-    });
+
+    // click borrow
     userEvent.click(utils.getByText("Reserve"));
-    expect(fetchLoansSpy).toHaveBeenCalledTimes(0);
+    // the first call is to loans in UserContext
+    expect(fetchMock).toHaveBeenNthCalledWith(2, "/epub-borrow-link", {
+      headers: {
+        Authorization: "user-token",
+        "X-Requested-With": "XMLHttpRequest"
+      }
+    });
+
+    // the borrow button should be gone now
+    await waitForElementToBeRemoved(() => utils.getByText("Reserving..."));
+    // there is an error because we didn't mock fetch to return something
+    expect(
+      utils.getByText("Error: An error occurred while borrowing this book.")
+    );
   });
 });
 

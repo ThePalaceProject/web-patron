@@ -38,7 +38,6 @@ export default function useBorrow(
     }
     try {
       const book = await fetchBook(url, catalogUrl, token);
-      console.log("calling set book");
       setBook(book);
     } catch (e) {
       // TODO: Report error to bug catcher here.
