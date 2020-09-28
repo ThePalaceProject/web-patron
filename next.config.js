@@ -9,10 +9,9 @@ const {
 const APP_VERSION = require("./package.json").version;
 
 const config = {
-  publicRuntimeConfig: {
+  env: {
     NEXT_PUBLIC_AXIS_NOW_DECRYPT: process.env.NEXT_PUBLIC_AXIS_NOW_DECRYPT,
     NEXT_PUBLIC_COMPANION_APP: process.env.NEXT_PUBLIC_COMPANION_APP,
-    TEST_VAR: "HELLO FROM TEST",
     TEST_RUNTIME_VAR: process.env.TEST_RUNTIME_VAR,
     SIMPLIFIED_CATALOG_BASE: process.env.SIMPLIFIED_CATALOG_BASE,
     CONFIG_FILE: process.env.CONFIG_FILE,
