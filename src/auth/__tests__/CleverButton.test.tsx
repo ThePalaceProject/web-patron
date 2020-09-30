@@ -1,6 +1,9 @@
 import * as React from "react";
-import { render } from "test-utils";
+import { fixtures } from "test-utils";
 import CleverButton from "../CleverButton";
+
+// we import the unwrapped render here because we don't need the context providers
+import { render } from "@testing-library/react";
 
 describe("CleverButton", () => {
   test("constructs proper authUrl", () => {

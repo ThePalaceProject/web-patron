@@ -22,6 +22,7 @@ type RouterContextProps = {
 export default class RouterProvider extends React.Component<
   RouterContextProps
 > {
+  // eslint-disable-next-line @typescript-eslint/ban-types
   static childContextTypes: React.ValidationMap<{}> = {
     router: PropTypes.object.isRequired
   };

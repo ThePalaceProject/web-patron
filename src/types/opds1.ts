@@ -32,21 +32,42 @@ export const HTMLMediaType = "text/html";
 export const AuthDocMediaType = "application/opds-authentication+json";
 
 /**
- * Book media types
+ * Indirect Acquisition Types
  */
 
+/**
+ * This type indicates that you must fetch the associated href, which will
+ * return an OPDS entry that will contain a direct link for the next type
+ * in the chain.
+ */
+export const OPDSEntryMediaType =
+  "application/atom+xml;type=entry;profile=opds-catalog";
+/**
+ * This means the content is encrypted with Adobe DRM. These files can't be
+ * decrypted by us, so just download them and let the user open it in an app
+ * that can deal with it.
+ */
+export const AdeptMediaType = "application/vnd.adobe.adept+xml";
+// there was an issue with incorrect Adept media types being sent.
+export const IncorrectAdeptMediaType = "vnd.adobe/adept+xml";
+
+export type IndirectAcquisitionType =
+  | typeof OPDSEntryMediaType
+  | typeof AdeptMediaType
+  | typeof IncorrectAdeptMediaType;
+
+/**
+ * Direct Acquisition Types
+ * These are the final types that resources can be.
+ */
 export const EpubMediaType = "application/epub+zip";
 export const KepubMediaType = "application/kepub+zip";
 export const PdfMediaType = "application/pdf";
-export const AdeptMediaType = "application/vnd.adobe.adept+xml";
-export const IncorrectAdeptMediaType = "vnd.adobe/adept+xml";
 export const MobiPocketMediaType = "application/x-mobipocket-ebook";
 export const Mobi8Mediatype = "application/x-mobi8-ebook";
 export const AudiobookMediaType = "application/audiobook+json";
-export const AtomMediaType =
+export const ExternalReaderMediaType =
   'text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"';
-export const AtomXmlMediaType =
-  "application/atom+xml;type=entry;profile=opds-catalog";
 export const OverdriveAudiobookMediaType =
   "application/vnd.overdrive.circulation.api+json;profile=audiobook";
 export const OverdriveEbookMediaType =
@@ -55,22 +76,20 @@ export const AxisNowWebpubMediaType =
   "application/vnd.librarysimplified.axisnow+json";
 
 export type ReadOnlineMediaType =
-  | typeof AtomMediaType
-  | typeof AxisNowWebpubMediaType;
+  | typeof ExternalReaderMediaType
+  | typeof AxisNowWebpubMediaType
+  | typeof OverdriveEbookMediaType;
 
-export type AnyBookMediaType =
-  | ReadOnlineMediaType
+export type DownloadMediaType =
   | typeof EpubMediaType
   | typeof KepubMediaType
   | typeof PdfMediaType
-  | typeof AdeptMediaType
-  | typeof IncorrectAdeptMediaType
   | typeof MobiPocketMediaType
   | typeof Mobi8Mediatype
   | typeof AudiobookMediaType
-  | typeof AtomXmlMediaType
-  | typeof OverdriveAudiobookMediaType
-  | typeof OverdriveEbookMediaType;
+  | typeof OverdriveAudiobookMediaType;
+
+export type AnyBookMediaType = ReadOnlineMediaType | DownloadMediaType;
 
 export type AnyMediaType =
   | AnyBookMediaType

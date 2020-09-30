@@ -1,16 +1,15 @@
 import * as React from "react";
 import { render, fixtures, waitFor } from "test-utils";
 import BorrowOrReserve from "components/BorrowOrReserve";
-import { FulfillmentLink } from "interfaces";
+import { MediaLink } from "interfaces";
 import userEvent from "@testing-library/user-event";
 import * as fetch from "dataflow/opds1/fetch";
 import mockAuthenticatedOnce from "test-utils/mockAuthState";
 import { ServerError } from "errors";
 
-const borrowLink: FulfillmentLink = {
+const borrowLink: MediaLink = {
   url: "/epub-borrow-link",
-  type: "application/atom+xml;type=entry;profile=opds-catalog",
-  indirectType: "application/vnd.adobe.adept+xml"
+  type: "application/atom+xml;type=entry;profile=opds-catalog"
 };
 test("shows correct button for borrowable book", () => {
   const utils = render(
@@ -22,7 +21,7 @@ test("shows correct button for borrowable book", () => {
 });
 
 test("shows correct button for axisnow borrowable book", () => {
-  const axisnow: FulfillmentLink = {
+  const axisnow: MediaLink = {
     url: "/epub-borrow-link",
     type: "application/atom+xml;type=entry;profile=opds-catalog",
     indirectType: "application/vnd.librarysimplified.axisnow+json"

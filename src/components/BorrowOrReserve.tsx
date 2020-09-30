@@ -4,12 +4,12 @@ import * as React from "react";
 import useBorrow from "hooks/useBorrow";
 import Button from "./Button";
 import { Text } from "./Text";
-import { BookData, FulfillmentLink } from "interfaces";
+import { BookData, MediaLink } from "interfaces";
 
 const BorrowOrReserve: React.FC<{
   book: BookData;
   isBorrow: boolean;
-  borrowLink: FulfillmentLink;
+  borrowLink: MediaLink;
 }> = ({ book, isBorrow, borrowLink }) => {
   const {
     isLoading,

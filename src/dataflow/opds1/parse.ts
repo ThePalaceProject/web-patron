@@ -19,9 +19,9 @@ import {
   LinkData,
   FacetGroupData,
   SearchData,
-  FulfillmentLink,
   BookAvailability,
-  OPDS1
+  OPDS1,
+  MediaLink
 } from "interfaces";
 
 /**
@@ -61,14 +61,14 @@ const resolve = (base: string, relative: string) =>
   new URL(relative, base).toString();
 
 function buildFulfillmentLink(feedUrl: string) {
-  return (link: OPDSAcquisitionLink): FulfillmentLink | undefined => {
+  return (link: OPDSAcquisitionLink): MediaLink | undefined => {
     const indirects = link.indirectAcquisitions;
     const first = indirects[0];
-    const indirectType = first?.type as string | undefined;
+    const indirectType = first?.type as OPDS1.AnyBookMediaType | undefined;
     // it is possible that it doesn't exist in the array of indirects
     return {
       url: resolve(feedUrl, link.href),
-      type: link.type as OPDS1.AnyBookMediaType,
+      type: link.type as OPDS1.AnyBookMediaType | OPDS1.IndirectAcquisitionType,
       indirectType
     };
   };
@@ -157,7 +157,7 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
     ? resolve(feedUrl, borrowLink.href)
     : undefined;
 
-  const allBorrowLinks: FulfillmentLink[] = entry.links
+  const allBorrowLinks: MediaLink[] = entry.links
     .filter(isAcquisitionLink)
     .filter(link => {
       return link.rel === OPDSAcquisitionLink.BORROW_REL;

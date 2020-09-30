@@ -52,9 +52,6 @@ export function mapDispatchToProps(dispatch: any) {
         fetchSearchDescription: (url: string) =>
           dispatch(actions.fetchSearchDescription(url)),
         closeError: () => dispatch(actions.closeError()),
-        fulfillBook: (url: string) => dispatch(actions.fulfillBook(url)),
-        indirectFulfillBook: (url: string, type: string) =>
-          dispatch(actions.indirectFulfillBook(url, type)),
         setPreference: (key: string, value: string) =>
           dispatch(actions.setPreference(key, value))
       };

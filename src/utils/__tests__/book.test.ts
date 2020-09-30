@@ -76,8 +76,7 @@ describe("getFulfillmentState", () => {
           fulfillmentLinks: [
             {
               url: "/pdf-link",
-              type: "application/pdf",
-              indirectType: "indirect"
+              type: "application/pdf"
             }
           ]
         },

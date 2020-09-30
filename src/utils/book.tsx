@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BookData, FetchErrorData, BookMedium, MediaLink } from "interfaces";
+import { BookData, FetchErrorData, BookMedium } from "interfaces";
 import { BookFulfillmentState } from "interfaces";
 
 import { Book, Headset } from "../icons";
@@ -36,16 +36,6 @@ export function availabilityString(book: BookData) {
 export function queueString(book: BookData) {
   const holds = book.holds?.total;
   return typeof holds === "number" ? `${holds} patrons in the queue.` : "";
-}
-
-export function dedupeLinks<T extends MediaLink>(links: T[]) {
-  return links.reduce<T[]>((uniqueArr, current) => {
-    const isDup = uniqueArr.find(
-      uniqueLink => uniqueLink.type === current.type
-    );
-
-    return isDup ? uniqueArr : [...uniqueArr, current];
-  }, []);
 }
 
 function hasBorrowRelation(book: BookData) {

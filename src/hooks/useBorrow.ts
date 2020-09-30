@@ -1,19 +1,19 @@
 import * as React from "react";
-import { BookData, FulfillmentLink } from "interfaces";
+import { BookData, MediaLink } from "interfaces";
 import { fetchBook } from "dataflow/opds1/fetch";
 import useUser from "components/context/UserContext";
 import useLibraryContext from "components/context/LibraryContext";
 import { ServerError } from "errors";
-import useAuthFormContext from "auth/AuthFormCotext";
+import useAuthModalContext from "auth/AuthModalContext";
 
 export default function useBorrow(
   book: BookData,
   isBorrow: boolean,
-  borrowLink: FulfillmentLink
+  borrowLink: MediaLink
 ) {
   const { catalogUrl } = useLibraryContext();
   const { setBook, token } = useUser();
-  const { showForm } = useAuthFormContext();
+  const { showModal } = useAuthModalContext();
   const isUnmounted = React.useRef(false);
   const [isLoading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | undefined>();
@@ -31,7 +31,7 @@ export default function useBorrow(
     setError(undefined);
     if (!token) {
       // TODO: register a callback to call if the sign in works
-      showForm();
+      showModal();
       setError("You must be signed in to borrow this book.");
       setLoading(false);
       return;

@@ -46,7 +46,7 @@ export const book: BookData = {
     {
       url: "/epub-borrow-link",
       type: "application/atom+xml;type=entry;profile=opds-catalog",
-      indirectType: "application/vnd.adobe.adept+xml"
+      indirectType: "application/epub+zip"
     }
   ],
   openAccessLinks: [

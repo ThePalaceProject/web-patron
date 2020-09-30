@@ -205,7 +205,7 @@ describe("ready to borrow book with multiple borrowUrls", () => {
       {
         url: "/adobe-borrow-link",
         type: "application/atom+xml;type=entry;profile=opds-catalog",
-        indirectType: "application/vnd.adobe.adept+xml"
+        indirectType: "application/kepub+zip"
       },
       {
         url: "/axis-borrow-link",
@@ -374,13 +374,11 @@ describe("available to access book", () => {
     fulfillmentLinks: [
       {
         url: "/epub-link",
-        type: "application/epub+zip",
-        indirectType: "indirect"
+        type: "application/epub+zip"
       },
       {
         url: "/pdf-link",
-        type: "application/pdf",
-        indirectType: "indirect"
+        type: "application/pdf"
       }
     ],
     availability: {

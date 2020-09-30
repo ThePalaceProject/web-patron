@@ -3,6 +3,7 @@ import ApplicationError, { ServerError } from "errors";
 import { BookData, CollectionData } from "interfaces";
 import { feedToCollection } from "dataflow/opds1/parse";
 import { entryToBook } from "owc/OPDSDataAdapter";
+import fetchWithHeaders from "dataflow/fetch";
 
 const parser = new OPDSParser();
 /**
@@ -13,10 +14,7 @@ async function fetchOPDS(
   url: string,
   token?: string
 ): Promise<OPDSEntry | OPDSFeed> {
-  const headers = prepareHeaders(token);
-  const response = await fetch(url, {
-    headers
-  });
+  const response = await fetchWithHeaders(url, token);
   // If the status code is not in the range 200-299,
   // we still try to parse and throw it.
   if (!response.ok) {
@@ -111,16 +109,4 @@ export function createBookUrl(catalogUrl: string, bookUrl: string) {
 
 export function stripUndefined(json: any) {
   return JSON.parse(JSON.stringify(json));
-}
-
-function prepareHeaders(token?: string) {
-  const headers: {
-    [key: string]: string;
-  } = {
-    "X-Requested-With": "XMLHttpRequest"
-  };
-  if (token) {
-    headers["Authorization"] = token;
-  }
-  return headers;
 }

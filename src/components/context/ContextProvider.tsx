@@ -18,7 +18,7 @@ import { PathFor } from "owc/interfaces";
 import PathForProvider from "owc/PathForContext";
 import OPDSStore from "owc/StoreContext";
 import { UserProvider } from "components/context/UserContext";
-import AuthForm from "auth/AuthForm";
+import AuthModal from "auth/AuthModal";
 
 type ProviderProps = {
   library: LibraryData;
@@ -63,7 +63,7 @@ const AppContextProvider: React.FC<ProviderProps> = ({
                   <LibraryProvider library={library}>
                     <LinkUtilsProvider library={library}>
                       <UserProvider>
-                        <AuthForm>{children}</AuthForm>
+                        <AuthModal>{children}</AuthModal>
                       </UserProvider>
                     </LinkUtilsProvider>
                   </LibraryProvider>

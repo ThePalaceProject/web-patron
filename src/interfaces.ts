@@ -88,11 +88,8 @@ export interface LibraryData {
  */
 export interface MediaLink {
   url: string;
-  type: OPDS1.AnyBookMediaType;
-}
-
-export interface FulfillmentLink extends MediaLink {
-  indirectType?: string;
+  type: OPDS1.AnyBookMediaType | OPDS1.IndirectAcquisitionType;
+  indirectType?: OPDS1.AnyBookMediaType;
 }
 
 export type BookMedium =
@@ -119,8 +116,8 @@ export interface BookData {
   imageUrl?: string;
   openAccessLinks?: MediaLink[];
   borrowUrl?: string;
-  fulfillmentLinks?: FulfillmentLink[];
-  allBorrowLinks?: FulfillmentLink[];
+  fulfillmentLinks?: MediaLink[];
+  allBorrowLinks?: MediaLink[];
   availability?: {
     status: BookAvailability;
     since?: string;
@@ -245,4 +242,8 @@ export type RequiredKeys<T, K extends keyof T> = Omit<T, K> &
 export type NextLinkConfig = {
   href: string;
   as?: string;
+};
+
+export type EmptyObject = {
+  [k in any]: never;
 };

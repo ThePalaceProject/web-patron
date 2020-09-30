@@ -1,10 +1,5 @@
 import * as React from "react";
-import {
-  render,
-  fixtures,
-  actions,
-  waitForElementToBeRemoved
-} from "test-utils";
+import { render, fixtures, waitForElementToBeRemoved } from "test-utils";
 import { mergeBook } from "test-utils/fixtures";
 import merge from "deepmerge";
 import FulfillmentCard from "../FulfillmentCard";
@@ -27,6 +22,10 @@ describe("open-access", () => {
   });
 
   test("correct title and subtitle when loaned", () => {
+    mockUser({
+      loans: [fixtures.book],
+      isAuthenticated: true
+    });
     const utils = render(<FulfillmentCard book={fixtures.book} />);
     expect(
       utils.getByText("This open-access book is available to keep forever.")
@@ -37,6 +36,10 @@ describe("open-access", () => {
   });
 
   test("shows download options if loaned", () => {
+    mockUser({
+      loans: [fixtures.book],
+      isAuthenticated: true
+    });
     const utils = render(<FulfillmentCard book={fixtures.book} />);
 
     expect(
@@ -50,17 +53,25 @@ describe("open-access", () => {
     expect(PDFButton).toBeInTheDocument();
   });
 
-  test("clicking download calls fulfill book", () => {
-    const fulfillBookSpy = jest.spyOn(actions, "fulfillBook");
+  test("clicking download fetches book", () => {
+    mockUser({
+      loans: [fixtures.book],
+      isAuthenticated: true
+    });
 
     const utils = render(<FulfillmentCard book={fixtures.book} />);
+
     const downloadButton = utils.getByText("Download EPUB");
     expect(downloadButton).toBeInTheDocument();
 
     userEvent.click(downloadButton);
 
-    expect(fulfillBookSpy).toHaveBeenCalledTimes(1);
-    expect(fulfillBookSpy).toHaveBeenCalledWith("/epub-open-access-link");
+    expect(fetchMock).toHaveBeenCalledWith("/epub-open-access-link", {
+      headers: {
+        Authorization: "user-token",
+        "X-Requested-With": "XMLHttpRequest"
+      }
+    });
   });
 
   test("doesn't show duplicate download options", () => {
@@ -197,8 +208,7 @@ describe("ready to borrow (two links)", () => {
     allBorrowLinks: [
       {
         url: "/epub-borrow-link",
-        type: "application/atom+xml;type=entry;profile=opds-catalog",
-        indirectType: "application/vnd.adobe.adept+xml"
+        type: "application/atom+xml;type=entry;profile=opds-catalog"
       },
       {
         indirectType: "application/vnd.librarysimplified.axisnow+json",
@@ -385,13 +395,11 @@ describe("available to download", () => {
     fulfillmentLinks: [
       {
         url: "/epub-link",
-        type: "application/epub+zip",
-        indirectType: "indirect"
+        type: "application/epub+zip"
       },
       {
         url: "/pdf-link",
-        type: "application/pdf",
-        indirectType: "indirect"
+        type: "application/pdf"
       }
     ],
     availability: {
@@ -405,8 +413,7 @@ describe("available to download", () => {
     fulfillmentLinks: [
       {
         url: "/epub-link",
-        type: "application/vnd.librarysimplified.axisnow+json",
-        indirectType: "something-indirect"
+        type: "application/vnd.librarysimplified.axisnow+json"
       }
     ],
     availability: {
@@ -466,20 +473,23 @@ describe("available to download", () => {
     expect(PDFButton).toBeInTheDocument();
   });
 
-  test("download button calls fulfillBook", () => {
-    const fulfillBookSpy = jest.spyOn(actions, "fulfillBook");
-
+  test("download button fetches book", () => {
+    mockUser();
     const utils = render(<FulfillmentCard book={downloadableBook} />);
     const downloadButton = utils.getByText("Download EPUB");
     expect(downloadButton).toBeInTheDocument();
 
     userEvent.click(downloadButton);
 
-    expect(fulfillBookSpy).toHaveBeenCalledTimes(1);
-    expect(fulfillBookSpy).toHaveBeenCalledWith("/epub-link");
+    expect(fetchMock).toHaveBeenCalledWith("/epub-link", {
+      headers: {
+        Authorization: "user-token",
+        "X-Requested-With": "XMLHttpRequest"
+      }
+    });
   });
 
-  test("download button calls indirect fullfill when book is indirect with a type that is readable online", () => {
+  test("download button fetches opds entry to indirectly fulfill book", () => {
     const bookWithIndirect = mergeBook({
       ...downloadableBook,
       fulfillmentLinks: [
@@ -492,71 +502,47 @@ describe("available to download", () => {
       ]
     });
 
-    const indirectFulfillSpy = jest.spyOn(actions, "indirectFulfillBook");
+    mockUser();
 
     const utils = render(<FulfillmentCard book={bookWithIndirect} />);
-    const downloadButton = utils.getByText("Read Online");
+    const downloadButton = utils.getByText("Read on Overdrive");
     expect(downloadButton).toBeInTheDocument();
 
     userEvent.click(downloadButton);
 
-    expect(indirectFulfillSpy).toHaveBeenCalledTimes(1);
-    expect(indirectFulfillSpy).toHaveBeenCalledWith(
-      "/indirect",
-      'text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"'
-    );
+    // you fetch the opds entry which should then return you a book with the correct link
+    expect(fetchMock).toHaveBeenCalledWith("/indirect", {
+      headers: {
+        Authorization: "user-token",
+        "X-Requested-With": "XMLHttpRequest"
+      }
+    });
   });
 
-  test("download button says download type when book is indirect with a type that is not readable online", () => {
+  test("download button says download Adobe Epub when book has adobe type", () => {
     const bookWithIndirect = mergeBook({
       ...downloadableBook,
       fulfillmentLinks: [
         {
           url: "/indirect",
-          type: "application/atom+xml;type=entry;profile=opds-catalog",
-          indirectType: "indirect-link"
+          type: "application/vnd.adobe.adept+xml",
+          indirectType: "application/epub+zip"
         }
       ]
     });
 
-    const fulfillBookSpy = jest.spyOn(actions, "fulfillBook");
-
     const utils = render(<FulfillmentCard book={bookWithIndirect} />);
-    const downloadButton = utils.getByText("Download atom");
+    const downloadButton = utils.getByText("Download Adobe EPUB");
     expect(downloadButton).toBeInTheDocument();
 
     userEvent.click(downloadButton);
 
-    expect(fulfillBookSpy).toHaveBeenCalledTimes(1);
-    expect(fulfillBookSpy).toHaveBeenCalledWith("/indirect");
-  });
-
-  test("says read online for streaming media", () => {
-    const bookWithIndirect = mergeBook({
-      ...downloadableBook,
-      fulfillmentLinks: [
-        {
-          url: "/streaming",
-          type: "application/atom+xml;type=entry;profile=opds-catalog",
-          indirectType:
-            'text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"'
-        }
-      ]
+    expect(fetchMock).toHaveBeenCalledWith("/indirect", {
+      headers: {
+        Authorization: "user-token",
+        "X-Requested-With": "XMLHttpRequest"
+      }
     });
-
-    const indirectFulfillSpy = jest.spyOn(actions, "indirectFulfillBook");
-
-    const utils = render(<FulfillmentCard book={bookWithIndirect} />);
-    const downloadButton = utils.getByText("Read Online");
-    expect(downloadButton).toBeInTheDocument();
-
-    userEvent.click(downloadButton);
-
-    expect(indirectFulfillSpy).toHaveBeenCalledTimes(1);
-    expect(indirectFulfillSpy).toHaveBeenCalledWith(
-      "/streaming",
-      'text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"'
-    );
   });
 
   test("does not show download links for audiobooks", () => {
