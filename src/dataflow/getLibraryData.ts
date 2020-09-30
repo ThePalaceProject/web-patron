@@ -1,4 +1,10 @@
-import { OPDS2, LibraryData, LibraryLinks, OPDS1 } from "interfaces";
+import {
+  OPDS2,
+  LibraryData,
+  LibraryLinks,
+  OPDS1,
+  SearchData
+} from "interfaces";
 import OPDSParser, { OPDSFeed, OPDSShelfLink } from "opds-feed-parser";
 import {
   CIRCULATION_MANAGER_BASE,
@@ -177,7 +183,8 @@ export function buildLibraryData(
   authDoc: OPDS1.AuthDocument,
   catalogUrl: string,
   librarySlug: string | undefined,
-  catalog: OPDSFeed
+  catalog: OPDSFeed,
+  searchData?: SearchData
 ): LibraryData {
   const logoUrl = authDoc.links?.find(link => link.rel === "logo")?.href;
   const headerLinks =
@@ -200,7 +207,8 @@ export function buildLibraryData(
         : null,
     headerLinks,
     libraryLinks,
-    authMethods
+    authMethods,
+    searchData: searchData ?? null
   };
 }
 

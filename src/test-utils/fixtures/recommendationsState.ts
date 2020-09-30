@@ -1135,9 +1135,6 @@ export const recommendationsState: RecommendationsState = {
     navigationLinks: [],
     books: [],
     facetGroups: [],
-    search: {
-      url: "http://test-cm.com/catalogUrl/search/"
-    },
     catalogRootLink: {
       url: "http://test-cm.com/catalogUrl/groups/",
       text: "All Books",

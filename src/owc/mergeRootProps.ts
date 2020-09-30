@@ -49,8 +49,6 @@ export function mapDispatchToProps(dispatch: any) {
           dispatch(actions.loadBook(book, url)),
         clearCollection: () => dispatch(actions.clearCollection()),
         clearBook: () => dispatch(actions.clearBook()),
-        fetchSearchDescription: (url: string) =>
-          dispatch(actions.fetchSearchDescription(url)),
         closeError: () => dispatch(actions.closeError()),
         setPreference: (key: string, value: string) =>
           dispatch(actions.setPreference(key, value))

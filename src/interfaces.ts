@@ -81,6 +81,7 @@ export interface LibraryData {
   libraryLinks: LibraryLinks;
   authMethods: AppAuthMethod[];
   shelfUrl: string | null;
+  searchData: SearchData | null;
 }
 
 /**
@@ -167,7 +168,6 @@ export interface CollectionData {
   books: BookData[];
   navigationLinks: LinkData[];
   facetGroups?: FacetGroupData[];
-  search?: SearchData;
   nextPageUrl?: string;
   catalogRootLink?: LinkData | null;
   parentLink?: LinkData | null;
@@ -177,12 +177,10 @@ export interface CollectionData {
 }
 
 export interface SearchData {
-  url?: string;
-  searchData?: {
-    description: string;
-    shortName: string;
-    template: (searchTerms: string) => string;
-  };
+  url: string;
+  description: string;
+  shortName: string;
+  template: string;
 }
 
 export interface LinkData {

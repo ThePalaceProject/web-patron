@@ -1,5 +1,4 @@
 import OPDSParser, { OPDSFeed, OPDSEntry } from "opds-feed-parser";
-import OpenSearchDescriptionParser from "./OpenSearchDescriptionParser";
 
 export interface RequestError {
   status: number | null;
@@ -84,39 +83,6 @@ export default class DataFetcher {
             });
         })
         .catch(error => reject(error));
-    });
-  }
-
-  fetchSearchDescriptionData(searchDescriptionUrl: string) {
-    const parser = new OpenSearchDescriptionParser();
-
-    return new Promise((resolve, reject: RequestRejector) => {
-      this.fetch(searchDescriptionUrl)
-        .then(response => {
-          response.text().then(text => {
-            if (this.isErrorCode(response.status)) {
-              reject({
-                status: response.status,
-                response: text,
-                url: searchDescriptionUrl
-              });
-            }
-
-            parser
-              .parse(text, searchDescriptionUrl)
-              .then(openSearchDescription => {
-                resolve(openSearchDescription);
-              })
-              .catch(_err => {
-                reject({
-                  status: null,
-                  response: "Failed to parse OPDS data",
-                  url: searchDescriptionUrl
-                });
-              });
-          });
-        })
-        .catch(reject);
     });
   }
 

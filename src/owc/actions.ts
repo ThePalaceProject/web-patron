@@ -1,11 +1,6 @@
 import DataFetcher from "./DataFetcher";
 import { RequestError } from "./DataFetcher";
-import {
-  CollectionData,
-  BookData,
-  SearchData,
-  FetchErrorData
-} from "interfaces";
+import { CollectionData, BookData, FetchErrorData } from "interfaces";
 
 export interface LoadAction<T> {
   type: string;
@@ -216,22 +211,6 @@ export default class ActionCreator {
 
   fetchBook(url: string) {
     return this.fetchOPDS<BookData>(ActionCreator.BOOK, url);
-  }
-
-  fetchSearchDescription(url: string) {
-    return (dispatch: any) => {
-      return new Promise<SearchData>((resolve, reject) => {
-        this.fetcher
-          .fetchSearchDescriptionData(url)
-          .then((data: any) => {
-            dispatch(
-              this.load<SearchData>(ActionCreator.SEARCH_DESCRIPTION, data, url)
-            );
-            resolve(data);
-          })
-          .catch(err => reject(err));
-      });
-    };
   }
 
   clearCollection() {

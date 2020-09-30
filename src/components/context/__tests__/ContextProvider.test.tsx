@@ -24,7 +24,8 @@ const testLibrary: LibraryData = {
   colors: null,
   headerLinks: [],
   authMethods: [],
-  shelfUrl: "/shelf"
+  shelfUrl: "/shelf",
+  searchData: null
 };
 
 type MakeContextConfig = {
@@ -113,7 +114,8 @@ describe("ContextProvider", () => {
         colors: null,
         headerLinks: [],
         authMethods: [],
-        shelfUrl: "/shelf"
+        shelfUrl: "/shelf",
+        searchData: null
       };
       const { result } = renderHook(() => usePathFor(), {
         wrapper: makeContextWrapper({ library: libraryWithoutId })

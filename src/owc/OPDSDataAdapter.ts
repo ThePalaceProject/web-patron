@@ -6,7 +6,6 @@ import {
   OPDSCollectionLink,
   OPDSFacetLink,
   OPDSLink,
-  SearchLink,
   CompleteEntryLink,
   OPDSCatalogRootLink,
   OPDSAcquisitionLink,
@@ -306,7 +305,6 @@ export function feedToCollection(
     books: BookData[];
   }[] = [];
   let facetGroups: FacetGroupData[] = [];
-  let search: SearchData | undefined = undefined;
   let nextPageUrl: string | undefined = undefined;
   let catalogRootLink: OPDSLink | undefined;
   let parentLink: OPDSLink | undefined;
@@ -352,13 +350,6 @@ export function feedToCollection(
   let facetLinks: OPDSFacetLink[] = [];
   if (feed.links) {
     facetLinks = feed.links.filter(isFacetLink);
-
-    const searchLink = feed.links.find(link => {
-      return link instanceof SearchLink;
-    });
-    if (searchLink) {
-      search = { url: resolve(feedUrl, searchLink.href) };
-    }
 
     const nextPageLink = feed.links.find(link => {
       return link.rel === "next";
@@ -409,7 +400,6 @@ export function feedToCollection(
   collection.navigationLinks = navigationLinks;
   collection.books = dedupeBooks(books);
   collection.facetGroups = facetGroups;
-  collection.search = search;
   collection.nextPageUrl = nextPageUrl;
   collection.catalogRootLink = OPDSLinkToLinkData(feedUrl, catalogRootLink);
   collection.parentLink = OPDSLinkToLinkData(feedUrl, parentLink);

@@ -3,11 +3,10 @@ import { jsx } from "theme-ui";
 import * as React from "react";
 import TextInput from "./TextInput";
 import Button from "./Button";
-import { useActions } from "owc/ActionsContext";
 import Router from "next/router";
-import useTypedSelector from "../hooks/useTypedSelector";
 import useLinkUtils from "./context/LinkUtilsContext";
 import SvgSearch from "icons/Search";
+import useLibraryContext from "components/context/LibraryContext";
 
 interface SearchProps extends React.InputHTMLAttributes<HTMLInputElement> {}
 
@@ -21,16 +20,8 @@ interface SearchProps extends React.InputHTMLAttributes<HTMLInputElement> {}
  */
 const Search: React.FC<SearchProps> = ({ className, ...props }) => {
   const [value, setValue] = React.useState("");
-  const searchData = useTypedSelector(state => state?.collection?.data?.search);
-  const { actions, dispatch } = useActions();
+  const { searchData } = useLibraryContext();
   const linkUtils = useLinkUtils();
-
-  React.useEffect(() => {
-    // fetch the search description
-    if (searchData?.url) {
-      dispatch(actions.fetchSearchDescription(searchData?.url));
-    }
-  }, [actions, dispatch, searchData]);
 
   // show no searchbar if we cannot perform a search
   if (!searchData) return null;
@@ -39,7 +30,11 @@ const Search: React.FC<SearchProps> = ({ className, ...props }) => {
   const onSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const searchTerms = encodeURIComponent(value);
-    const url = searchData?.searchData?.template(searchTerms);
+    const url = createSearchUrl(
+      searchData.template,
+      searchData.url,
+      searchTerms
+    );
     if (!url) return;
     const link = linkUtils.buildCollectionLink(url);
     Router.push(link.href, link.as);
@@ -56,7 +51,7 @@ const Search: React.FC<SearchProps> = ({ className, ...props }) => {
         id="search-bar"
         type="search"
         name="search"
-        title={searchData?.searchData?.shortName}
+        title={searchData?.shortName}
         placeholder="Enter an author, keyword, etc..."
         aria-label="Enter search keyword or keywords"
         value={value}
@@ -82,5 +77,16 @@ const Search: React.FC<SearchProps> = ({ className, ...props }) => {
     </form>
   );
 };
+
+function createSearchUrl(
+  templateString: string,
+  searchUrl: string,
+  query: string
+) {
+  return new URL(
+    templateString.replace("{searchTerms}", query),
+    searchUrl
+  ).toString();
+}
 
 export default Search;
