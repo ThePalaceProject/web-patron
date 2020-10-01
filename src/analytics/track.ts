@@ -34,12 +34,13 @@ function bookEvent(
   const bookForAnalytics: BookAnalyticsData = {
     id: book.id,
     title: book.title,
-    authors: book.authors,
+    authors: book.authors?.join(", "),
     categories: book.categories,
-    fiction: book.categories?.includes("Fiction"),
+    fiction: book.categories?.includes("Fiction") ? "fiction" : "nonfiction",
     publisher: book.publisher,
     language: book.language,
-    medium: getMedium(book),
+    medium:
+      getMedium(book) === "http://bib.schema.org/Audiobook" ? "audio" : "book",
     openAccess:
       (book.openAccessLinks && book.openAccessLinks.length > 0) ?? false
   };
@@ -54,9 +55,9 @@ function bookEvent(
 type BookAnalyticsData = {
   id: string;
   title: string;
-  authors?: string[];
+  authors?: string;
   categories?: string[];
-  fiction?: boolean;
+  fiction?: "fiction" | "nonfiction";
   openAccess: boolean;
   publisher?: string;
   language?: string;
