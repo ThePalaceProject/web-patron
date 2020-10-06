@@ -13,10 +13,6 @@ import SignOut from "./SignOut";
 import useUser from "components/context/UserContext";
 import useAuthModalContext from "auth/AuthModalContext";
 
-/**
- * will get the data it needs directly from context/
- * redux store instead of relying on OPDS web client to provide it
- */
 const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
   const library = useLibraryContext();
 
