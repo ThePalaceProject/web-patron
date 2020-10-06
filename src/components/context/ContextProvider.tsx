@@ -1,81 +1,44 @@
 import * as React from "react";
 import { LibraryData } from "interfaces";
 import { LibraryProvider } from "./LibraryContext";
-import PathForProvider from "opds-web-client/lib/components/context/PathForContext";
-import { RouterProvider } from "./RouterContext";
-import OPDSStore from "opds-web-client/lib/components/context/StoreContext";
-import { RecommendationsProvider } from "./RecommendationsContext";
-import { ActionsProvider } from "opds-web-client/lib/components/context/ActionsContext";
 import { Provider as ReakitProvider } from "reakit";
-import { State } from "opds-web-client/lib/state";
-import { Store } from "redux";
 import { ThemeProvider } from "theme-ui";
 import makeTheme from "../../theme";
-import DataFetcher from "opds-web-client/lib/DataFetcher";
-import ActionsCreator from "opds-web-client/lib/actions";
-import { adapter } from "opds-web-client/lib/OPDSDataAdapter";
-import basicAuthPlugin from "auth/basicAuthPlugin";
-import samlAuthPlugin from "auth/samlAuthPlugin";
-import CleverAuthPlugin from "auth/cleverAuthPlugin";
-import getPathFor from "utils/getPathFor";
 import { LinkUtilsProvider } from "./LinkUtilsContext";
-import { PathFor } from "opds-web-client/lib/interfaces";
+import { UserProvider } from "components/context/UserContext";
+import AuthModal from "auth/AuthModal";
+import { ConfigInterface, SWRConfig } from "swr";
 
 type ProviderProps = {
   library: LibraryData;
-  store?: Store<State>;
-  actions?: ActionsCreator;
-  fetcher?: DataFetcher;
+};
+
+const swrOptions: ConfigInterface = {
+  // we don't generally need to revalidate our data very often
+  revalidateOnFocus: false,
+  revalidateOnReconnect: false,
+  dedupingInterval: 2000
 };
 /**
  * Combines all of the apps context provider into a single component for simplicity
  */
-const AppContextProvider: React.FC<ProviderProps> = ({
-  children,
-  library,
-  store,
-  actions,
-  fetcher
-}) => {
-  const librarySlug = library.slug;
-  const pathFor: PathFor = getPathFor(librarySlug);
-  const computedFetcher = React.useMemo(
-    () => fetcher ?? new DataFetcher({ adapter }),
-    [fetcher]
-  );
-  const computedActions = React.useMemo(
-    () => actions ?? new ActionsCreator(computedFetcher),
-    [actions, computedFetcher]
-  );
-
+const AppContextProvider: React.FC<ProviderProps> = ({ children, library }) => {
   const theme = makeTheme(library.colors);
 
   return (
-    <ThemeProvider theme={theme}>
-      <ReakitProvider>
-        <RouterProvider>
-          <PathForProvider pathFor={pathFor}>
-            <OPDSStore
-              store={store}
-              authPlugins={[basicAuthPlugin, samlAuthPlugin, CleverAuthPlugin]}
-            >
-              <RecommendationsProvider>
-                <ActionsProvider
-                  actions={computedActions}
-                  fetcher={computedFetcher}
-                >
-                  <LibraryProvider library={library}>
-                    <LinkUtilsProvider library={library}>
-                      {children}
-                    </LinkUtilsProvider>
-                  </LibraryProvider>
-                </ActionsProvider>
-              </RecommendationsProvider>
-            </OPDSStore>
-          </PathForProvider>
-        </RouterProvider>
-      </ReakitProvider>
-    </ThemeProvider>
+    <SWRConfig value={swrOptions}>
+      <ThemeProvider theme={theme}>
+        <ReakitProvider>
+          <LibraryProvider library={library}>
+            <LinkUtilsProvider library={library}>
+              <UserProvider>
+                <AuthModal>{children}</AuthModal>
+              </UserProvider>
+            </LinkUtilsProvider>
+          </LibraryProvider>
+        </ReakitProvider>
+      </ThemeProvider>
+    </SWRConfig>
   );
 };
 

@@ -1,14 +1,7 @@
 import * as React from "react";
-import {
-  BookData,
-  FetchErrorData,
-  BookMedium,
-  MediaLink
-} from "opds-web-client/lib/interfaces";
+import { BookData, BookMedium } from "interfaces";
 import { BookFulfillmentState } from "interfaces";
-
 import { Book, Headset } from "../icons";
-import { getMedium } from "opds-web-client/lib/utils/book";
 
 export function getAuthors(book: BookData, lim?: number): string[] {
   // select contributors if the authors array is undefined or empty.
@@ -41,16 +34,6 @@ export function availabilityString(book: BookData) {
 export function queueString(book: BookData) {
   const holds = book.holds?.total;
   return typeof holds === "number" ? `${holds} patrons in the queue.` : "";
-}
-
-export function dedupeLinks<T extends MediaLink>(links: T[]) {
-  return links.reduce<T[]>((uniqueArr, current) => {
-    const isDup = uniqueArr.find(
-      uniqueLink => uniqueLink.type === current.type
-    );
-
-    return isDup ? uniqueArr : [...uniqueArr, current];
-  }, []);
 }
 
 function hasBorrowRelation(book: BookData) {
@@ -105,23 +88,6 @@ export function getFulfillmentState(
   return "FULFILLMENT_STATE_ERROR";
 }
 
-export function getErrorMsg(error: FetchErrorData | null): string | null {
-  const response = error?.response;
-  if (response) {
-    try {
-      const responseObj = JSON.parse(response);
-      // try to get the debug_message but otherwise just return
-      // the full response as a string.
-      // eslint-disable-next-line camelcase
-      return responseObj?.debug_message ?? response;
-    } catch {
-      // it's not valid json. Just return it.
-      return response;
-    }
-  }
-  return null;
-}
-
 export function bookIsAudiobook(book: BookData): boolean {
   if (getMedium(book) === "http://bib.schema.org/Audiobook") {
     return true;
@@ -142,3 +108,13 @@ export const bookMediumMap: {
   "http://schema.org/EBook": { name: "eBook", icon: Book },
   "http://schema.org/Book": { name: "Book", icon: Book }
 };
+
+export function getMedium(book: BookData): BookMedium | "" {
+  if (!book.raw || !book.raw["$"] || !book.raw["$"]["schema:additionalType"]) {
+    return "";
+  }
+
+  return book.raw["$"]["schema:additionalType"].value
+    ? book.raw["$"]["schema:additionalType"].value
+    : "";
+}

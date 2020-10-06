@@ -82,7 +82,7 @@ export default function withErrorBoundary<T>(
     if (!BugsnagErrorBoundary) {
       return (
         <DefaultErrorBoundary FallbackComponent={Fallback}>
-          <Component {...props} />;
+          <Component {...props} />
         </DefaultErrorBoundary>
       );
     }

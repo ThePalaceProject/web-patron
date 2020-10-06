@@ -1,34 +1,21 @@
-import {
-  AuthProvider,
-  BasicAuthMethod,
-  ClientSamlMethod,
-  AuthMethod
-} from "opds-web-client/lib/interfaces";
-
-import CleverButton from "auth/cleverAuthButton";
-import AuthButton from "auth/AuthButton";
-
-import BasicAuthForm from "auth/BasicAuthForm";
-import { AuthState } from "opds-web-client/lib/reducers/auth";
-import SamlAuthForm from "auth/SamlAuthForm";
-
-export const cleverAuthId =
-  "http://librarysimplified.org/authtype/OAuth-with-intermediary";
+import { ClientSamlMethod, CollectionData } from "interfaces";
+import { OPDS1 } from "interfaces";
+import { makeBook } from "test-utils/fixtures/book";
 
 export const basicAuthId = "http://opds-spec.org/auth/basic";
 export const samlAuthId = "http://librarysimplified.org/authtype/SAML-2.0";
 
-export const basicAuthMethod = {
+export const basicAuthMethod: OPDS1.BasicAuthMethod = {
   labels: {
     login: "Barcode",
     password: "Pin"
   },
   type: basicAuthId,
   description: "Library Barcode",
-  inputs: {
-    login: { keyboard: "Default" },
-    password: { keyboard: "Default" }
-  },
+  // inputs: {
+  //   login: { keyboard: "Default" },
+  //   password: { keyboard: "Default" }
+  // },
   links: [
     {
       href: "https://example.com/LoginButton280.png",
@@ -37,70 +24,43 @@ export const basicAuthMethod = {
   ]
 };
 
-export const cleverAuthProvider: AuthProvider<AuthMethod> = {
-  id: cleverAuthId,
-  plugin: {
-    formComponent: undefined,
-    buttonComponent: CleverButton,
-    lookForCredentials: jest.fn(),
-    type: cleverAuthId
-  },
-  method: {
-    description: "Clever",
-    links: [
-      {
-        href: "https://example.com/oauth_authenticate?provider=Clever",
-        rel: "authenticate"
-      },
-      {
-        href: "https://example.com/CleverLoginButton280.png",
-        rel: "logo"
-      }
-    ],
-    type: cleverAuthId
-  }
-};
-
-export const basicAuthProvider: AuthProvider<BasicAuthMethod> = {
-  id: basicAuthId,
-  plugin: {
-    type: basicAuthId,
-    formComponent: BasicAuthForm,
-    buttonComponent: AuthButton,
-    lookForCredentials: jest.fn()
-  },
-  method: basicAuthMethod
+export const cleverAuthMethod: OPDS1.CleverAuthMethod = {
+  description: "Clever",
+  links: [
+    {
+      href: "https://example.com/oauth_authenticate?provider=Clever",
+      rel: "authenticate"
+    },
+    {
+      href: "https://example.com/CleverLoginButton280.png",
+      rel: "logo"
+    }
+  ],
+  type: OPDS1.CleverAuthType
 };
 
 export const samlAuthHref = "/saml-auth-url";
-export const samlAuthProvider: AuthProvider<ClientSamlMethod> = {
-  id: samlAuthHref,
-  plugin: {
-    type: samlAuthId,
-    formComponent: SamlAuthForm,
-    buttonComponent: AuthButton,
-    lookForCredentials: jest.fn()
-  },
-  method: {
-    href: samlAuthHref,
-    type: samlAuthId,
-    description: "SAML IdP",
+export const clientSamlMethod: ClientSamlMethod = createSamlMethod(0);
+
+export function createSamlMethod(num: number): ClientSamlMethod {
+  return {
+    href: `/saml-auth-url/${num}`,
+    type: OPDS1.SamlAuthType,
+    description: `SAML IdP ${num}`,
     links: [
       {
         href: "https://example.com/LoginButton280.png",
         rel: "logo"
       }
     ]
-  }
-};
+  };
+}
 
-export const unauthenticatedAuthState: AuthState = {
-  showForm: false,
-  callback: null,
-  cancel: null,
-  credentials: null,
-  title: null,
-  error: null,
-  attemptedProvider: null,
-  providers: [basicAuthProvider]
+export const loans: CollectionData = {
+  id: "loans-id",
+  url: "/loans-url",
+  title: "My Loans",
+  lanes: [],
+  books: [makeBook(1)],
+  navigationLinks: []
 };

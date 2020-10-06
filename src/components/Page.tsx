@@ -1,8 +1,5 @@
 import * as React from "react";
 import ContextProvider from "../components/context/ContextProvider";
-import getPathFor from "../utils/getPathFor";
-import getOrCreateStore from "../dataflow/getOrCreateStore";
-import Auth from "../components/Auth";
 import Head from "next/head";
 import Error from "components/Error";
 import { AppProps } from "dataflow/withAppProps";
@@ -25,8 +22,6 @@ const Page: React.FC<AppProps> = props => {
   }
 
   const { library, children } = props;
-  const pathFor = getPathFor(library.slug);
-  const store = getOrCreateStore(pathFor);
 
   return (
     <>
@@ -34,9 +29,7 @@ const Page: React.FC<AppProps> = props => {
         {/* define the default title */}
         <title>{library.catalogName}</title>
       </Head>
-      <ContextProvider library={library} store={store}>
-        <Auth>{children}</Auth>
-      </ContextProvider>
+      <ContextProvider library={library}>{children}</ContextProvider>
     </>
   );
 };

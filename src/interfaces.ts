@@ -1,84 +1,16 @@
 /* eslint-disable camelcase */
-import { CollectionState } from "opds-web-client/lib/reducers/collection";
-import {
-  CollectionData,
-  BookData,
-  MediaType
-} from "opds-web-client/lib/interfaces";
 
 /**
  * OPDS 2.0 DATA TYPES
  * Currently only used for support of a Library Registry, which is
  * an OPDS 2 Feed of OPDS 2 Catalogs from which we extract the catalog root url
  */
-
 export * as OPDS2 from "types/opds2";
-
 /**
- * OPDS1.2 DATA TYPES
+ * OPDS 1.x DATA TYPES
  */
-export const AuthDocLinkRelation = "http://opds-spec.org/auth/document";
-export type OPDSLinkRelation =
-  | typeof AuthDocLinkRelation
-  | AuthDocLinkRelations
-  | "related";
-
-export type OPDSLinkRole = string;
-
-export const BaseDocumentMediaType =
-  "application/atom+xml;profile=opds-catalog;kind=acquisition";
-export const HTMLMediaType = "text/html";
-export type CPWMediaType =
-  | typeof HTMLMediaType
-  | typeof BaseDocumentMediaType
-  | MediaType;
-
-export interface OPDSLink {
-  href: string;
-  rel?: OPDSLinkRelation;
-  title?: string;
-  type?: CPWMediaType;
-  role?: OPDSLinkRole;
-}
-
-/**
- * Auth Document
- */
-type AuthDocLinkRelations =
-  | "navigation"
-  | "logo"
-  | "register"
-  | "help"
-  | "privacy-policy"
-  | "terms-of-service"
-  | "about"
-  | "alternate";
-
-export interface AuthDocumentLink extends Omit<OPDSLink, "role"> {
-  rel: AuthDocLinkRelations;
-}
-
-export interface OPDSAuthProvider {}
-
-export interface Announcement {
-  id: string;
-  content: string;
-}
-
-export interface AuthDocument {
-  id: string;
-  title: string;
-  // used to display text prompt to authenticating user
-  description: string;
-  links: AuthDocumentLink[];
-  authentication: OPDSAuthProvider[];
-
-  announcements?: Announcement[];
-  web_color_scheme?: {
-    primary?: string;
-    secondary?: string;
-  };
-}
+import * as OPDS1 from "types/opds1";
+export { OPDS1 };
 
 /**
  * INTERNAL APP MODEL
@@ -107,14 +39,34 @@ export type BookFulfillmentState =
   | "FULFILLMENT_STATE_ERROR";
 
 export type LibraryLinks = {
-  helpWebsite?: OPDSLink;
-  helpEmail?: OPDSLink;
-  libraryWebsite?: OPDSLink;
-  tos?: OPDSLink;
-  about?: OPDSLink;
-  privacyPolicy?: OPDSLink;
-  registration?: OPDSLink;
+  helpWebsite?: OPDS1.Link;
+  helpEmail?: OPDS1.Link;
+  libraryWebsite?: OPDS1.Link;
+  tos?: OPDS1.Link;
+  about?: OPDS1.Link;
+  privacyPolicy?: OPDS1.Link;
+  registration?: OPDS1.Link;
 };
+
+/**
+ * The server representation has multiple IDPs nested into the one.
+ * We will flatten that out before placing into LibraryData.
+ */
+export interface ClientSamlMethod
+  extends OPDS1.AuthMethod<typeof OPDS1.SamlAuthType> {
+  href: string;
+}
+
+// auth methods once they have been processed for the app
+export type AppAuthMethod =
+  | OPDS1.CleverAuthMethod
+  | OPDS1.BasicAuthMethod
+  | ClientSamlMethod;
+
+export interface AuthCredentials {
+  methodType: AppAuthMethod["type"];
+  token: string;
+}
 
 export interface LibraryData {
   slug: string | null;
@@ -125,14 +77,124 @@ export interface LibraryData {
     primary: string;
     secondary: string;
   } | null;
-  headerLinks: OPDSLink[];
+  headerLinks: OPDS1.Link[];
   libraryLinks: LibraryLinks;
+  authMethods: AppAuthMethod[];
+  shelfUrl: string | null;
+  searchData: SearchData | null;
 }
 
 /**
- * Recommendations and Complaints
+ * INTERNAL BOOK MODEL
  */
-export type RecommendationsState = CollectionState;
+export interface MediaLink {
+  url: string;
+  type: OPDS1.AnyBookMediaType | OPDS1.IndirectAcquisitionType;
+  indirectType?: OPDS1.AnyBookMediaType;
+}
+
+export type BookMedium =
+  | "http://bib.schema.org/Audiobook"
+  | "http://schema.org/EBook"
+  | "http://schema.org/Book";
+
+export type BookAvailability =
+  | "available"
+  | "unavailable"
+  | "reserved"
+  | "ready";
+export interface BookData {
+  id: string;
+  title: string;
+  series?: {
+    name: string;
+    position?: number;
+  } | null;
+  authors?: string[];
+  contributors?: string[];
+  subtitle?: string;
+  summary?: string;
+  imageUrl?: string;
+  openAccessLinks?: MediaLink[];
+  borrowUrl?: string;
+  fulfillmentLinks?: MediaLink[];
+  allBorrowLinks?: MediaLink[];
+  availability?: {
+    status: BookAvailability;
+    since?: string;
+    until?: string;
+  };
+  holds?: {
+    total: number;
+    position?: number;
+  } | null;
+  copies?: {
+    total: number;
+    available: number;
+  } | null;
+  url?: string;
+  publisher?: string;
+  published?: string;
+  categories?: string[];
+  language?: string;
+  relatedUrl: string | null;
+  raw?: any;
+}
+
+/**
+ * INTERNAL COLLECTION MODEL
+ */
+export interface LaneData {
+  title: string;
+  url: string;
+  books: BookData[];
+}
+
+export interface FacetData {
+  label: string;
+  href: string;
+  active: boolean;
+}
+
+export interface FacetGroupData {
+  label: string;
+  facets: FacetData[];
+}
+
+export interface CollectionData {
+  id: string;
+  url: string;
+  title: string;
+  lanes: LaneData[];
+  books: BookData[];
+  navigationLinks: LinkData[];
+  facetGroups?: FacetGroupData[];
+  nextPageUrl?: string;
+  catalogRootLink?: LinkData | null;
+  parentLink?: LinkData | null;
+  shelfUrl?: string;
+  links?: LinkData[] | null;
+  raw?: any;
+}
+
+export interface SearchData {
+  url: string;
+  description: string;
+  shortName: string;
+  template: string;
+}
+
+export interface LinkData {
+  text?: string;
+  url: string;
+  id?: string | null;
+  type?: string;
+}
+
+/**
+ * Complaints
+ */
+
 export type { ComplaintsState } from "./hooks/useComplaints/reducer";
 
 /**
@@ -148,13 +210,6 @@ export type VariantProp<VType> = Exclude<
 /**
  * Utils
  */
-export type SetCollectionAndBook = (
-  collectionUrl: string,
-  bookUrl: string | undefined
-) => Promise<{
-  collectionData: CollectionData;
-  bookData: BookData;
-}>;
 
 type PickAndRequire<T, K extends keyof T> = { [P in K]-?: NonNullable<T[P]> };
 
@@ -165,4 +220,8 @@ export type RequiredKeys<T, K extends keyof T> = Omit<T, K> &
 export type NextLinkConfig = {
   href: string;
   as?: string;
+};
+
+export type EmptyObject = {
+  [k in any]: never;
 };

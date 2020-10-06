@@ -1,7 +1,6 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { NavigateContext } from "opds-web-client/lib/interfaces";
 import { LibraryData } from "../interfaces";
 import Search from "./Search";
 import Button, { NavButton, AnchorButton } from "./Button";
@@ -9,18 +8,11 @@ import Link from "./Link";
 import BookIcon from "../icons/Book";
 import useLibraryContext from "./context/LibraryContext";
 import { Text } from "./Text";
-import useAuth from "hooks/useAuth";
 import Stack from "./Stack";
 import SignOut from "./SignOut";
+import useUser from "components/context/UserContext";
+import useAuthModalContext from "auth/AuthModalContext";
 
-export interface HeaderContext extends NavigateContext {
-  library: LibraryData;
-}
-
-/**
- * will get the data it needs directly from context/
- * redux store instead of relying on OPDS web client to provide it
- */
 const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
   const library = useLibraryContext();
 
@@ -75,8 +67,8 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
 const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
   const { helpWebsite, libraryWebsite } = library.libraryLinks;
   const libraryName = library.catalogName;
-  const { isSignedIn, signIn } = useAuth();
-
+  const { isAuthenticated, isLoading } = useUser();
+  const { showModalAndReset } = useAuthModalContext();
   return (
     <div
       sx={{
@@ -126,7 +118,13 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
       >
         My Books
       </NavButton>
-      {isSignedIn ? <SignOut /> : <Button onClick={signIn}>Sign In</Button>}
+      {isAuthenticated ? (
+        <SignOut />
+      ) : (
+        <Button onClick={showModalAndReset} loading={isLoading}>
+          Sign In
+        </Button>
+      )}
     </div>
   );
 };

@@ -4,8 +4,12 @@ import * as React from "react";
 import { H1 } from "./Text";
 import Stack from "./Stack";
 import FormatFilter from "./FormatFilter";
+import { CollectionData } from "interfaces";
 
-const PageTitle: React.FC = ({ children }) => {
+const PageTitle: React.FC<{ collection?: CollectionData }> = ({
+  children,
+  collection
+}) => {
   return (
     <Stack
       direction="row"
@@ -18,7 +22,7 @@ const PageTitle: React.FC = ({ children }) => {
       }}
     >
       <H1 sx={{ m: 0 }}>{children}</H1>
-      <FormatFilter />
+      {collection && <FormatFilter collection={collection} />}
     </Stack>
   );
 };

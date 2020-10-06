@@ -1,10 +1,8 @@
 import * as React from "react";
-import { render, fixtures, actions } from "test-utils";
-import merge from "deepmerge";
+import { render, fixtures, waitFor } from "test-utils";
 import { BookListItem } from "components/BookList";
-import { State } from "opds-web-client/lib/state";
 import userEvent from "@testing-library/user-event";
-import { FetchErrorData } from "opds-web-client/lib/interfaces";
+import * as fetch from "dataflow/opds1/fetch";
 
 function expectViewDetails(utils: ReturnType<typeof render>) {
   const button = utils.getByRole("link", { name: "View Book Details" });
@@ -28,18 +26,26 @@ describe("open access book", () => {
     ).toBeInTheDocument();
   });
 
-  test("shows no borrow button when book is loaned", () => {
-    const stateWithLoans = merge<State>(fixtures.initialState, {
-      loans: {
-        url: "/loans",
-        books: [fixtures.book]
-      }
-    });
-    const utils = render(<BookListItem book={fixtures.book} />, {
-      initialState: stateWithLoans
-    });
+  test("shows no borrow button when book is loaned", async () => {
+    const utils = render(
+      <BookListItem
+        book={{
+          ...fixtures.book,
+          fulfillmentLinks: [
+            {
+              type: "application/atom+xml;type=entry;profile=opds-catalog",
+              url: "/download"
+            }
+          ]
+        }}
+      />
+    );
 
-    expect(utils.queryByText("Borrow to read on a mobile device")).toBeNull();
+    await waitFor(() =>
+      expect(
+        utils.queryByText("Borrow to read on a mobile device")
+      ).not.toBeInTheDocument()
+    );
     expectViewDetails(utils);
   });
 
@@ -67,6 +73,11 @@ describe("open access book", () => {
   });
 });
 
+(fetch as any).fetchBook = jest.fn();
+const mockFetchBook = fetch.fetchBook as jest.MockedFunction<
+  typeof fetch.fetchBook
+>;
+
 describe("available to borrow book", () => {
   const closedAccessBook = fixtures.mergeBook({
     openAccessLinks: [],
@@ -84,59 +95,35 @@ describe("available to borrow book", () => {
     ).toBeInTheDocument();
   });
 
-  test("shows loading state when borrowing, borrows, and doesn't refetch loans", async () => {
-    // mock the actions.updateBook
-    const updateBookSpy = jest
-      .spyOn(actions, "updateBook")
-      .mockImplementation(_url => _dispatch =>
-        new Promise(resolve => {
-          setTimeout(() => {
-            resolve(fixtures.book);
-          }, 1000);
-        })
-      );
-    // also spy on fetchLoans
-    const fetchLoansSpy = jest.spyOn(actions, "fetchLoans");
+  test("shows loading state when borrowing, borrows, and revalidates loans", async () => {
+    const mockSetBook = jest.fn();
+    mockFetchBook.mockResolvedValue(closedAccessBook);
     const utils = render(<BookListItem book={closedAccessBook} />, {
-      initialState: merge<State>(fixtures.initialState, {
-        loans: {
-          url: "/loans-url",
-          books: []
-        }
-      })
+      user: {
+        setBook: mockSetBook,
+        isAuthenticated: true,
+        loans: fixtures.loans.books
+      }
     });
+
     // click borrow
     userEvent.click(utils.getByText("Borrow to read on a mobile device"));
-    expect(updateBookSpy).toHaveBeenCalledTimes(1);
-    expect(updateBookSpy).toHaveBeenCalledWith("/epub-borrow-link");
-    const borrowButton = await utils.findByRole("button", {
+    expect(mockFetchBook).toHaveBeenCalledTimes(1);
+    expect(mockFetchBook).toHaveBeenCalledWith(
+      "/epub-borrow-link",
+      "http://test-cm.com/catalogUrl",
+      "user-token"
+    );
+    const borrowButton = utils.getByRole("button", {
       name: /Borrowing.../i
     });
     expect(borrowButton).toBeInTheDocument();
     expect(borrowButton).toHaveAttribute("disabled", "");
-    // we only fetch loans on app start
-    expect(fetchLoansSpy).toHaveBeenCalledTimes(0);
-  });
 
-  test("displays error message", () => {
-    const err: FetchErrorData = {
-      response: "cannot loan more than 3 documents.",
-      status: 403,
-      url: "http://test-book-url/error-url"
-    };
-    const utils = render(<BookListItem book={closedAccessBook} />, {
-      initialState: merge(fixtures.initialState, {
-        book: {
-          error: err
-        }
-      })
-    });
-    expect(
-      utils.queryByText("10 out of 13 copies available.")
-    ).toBeInTheDocument();
-    expect(
-      utils.getByText("Error: cannot loan more than 3 documents.")
-    ).toBeInTheDocument();
+    // we revalidate the loans
+    await waitFor(() =>
+      expect(mockSetBook).toHaveBeenCalledWith(closedAccessBook)
+    );
   });
 });
 
@@ -158,58 +145,34 @@ describe("ready to borrow book", () => {
     ).toBeInTheDocument();
   });
 
-  test("shows loading state when borrowing, borrows, and doesn't refetch loans", async () => {
-    // mock the actions.updateBook
-    const updateBookSpy = jest
-      .spyOn(actions, "updateBook")
-      .mockImplementation(_url => _dispatch =>
-        new Promise(resolve => {
-          setTimeout(() => {
-            resolve(fixtures.book);
-          }, 1000);
-        })
-      );
-    // also spy on fetchLoans
-    const fetchLoansSpy = jest.spyOn(actions, "fetchLoans");
+  test("shows loading state when borrowing, borrows, and revalidates loans", async () => {
+    const mockSetBook = jest.fn();
+    mockFetchBook.mockResolvedValue(readyBook);
+
     const utils = render(<BookListItem book={readyBook} />, {
-      initialState: merge<State>(fixtures.initialState, {
-        loans: {
-          url: "/loans-url",
-          books: []
-        }
-      })
+      user: {
+        setBook: mockSetBook,
+        isAuthenticated: true,
+        loans: fixtures.loans.books
+      }
     });
+
     // click borrow
     userEvent.click(utils.getByText("Borrow to read on a mobile device"));
-    expect(updateBookSpy).toHaveBeenCalledTimes(1);
-    expect(updateBookSpy).toHaveBeenCalledWith("/epub-borrow-link");
+    expect(mockFetchBook).toHaveBeenCalledTimes(1);
+    expect(mockFetchBook).toHaveBeenCalledWith(
+      "/epub-borrow-link",
+      "http://test-cm.com/catalogUrl",
+      "user-token"
+    );
     const borrowButton = utils.getByRole("button", {
       name: /Borrowing.../i
     });
     expect(borrowButton).toBeInTheDocument();
     expect(borrowButton).toHaveAttribute("disabled", "");
-    expect(fetchLoansSpy).toHaveBeenCalledTimes(0);
-  });
 
-  test("displays error message", () => {
-    const err: FetchErrorData = {
-      response: "cannot loan more than 3 documents.",
-      status: 403,
-      url: "http://test-book-url/error-url"
-    };
-    const utils = render(<BookListItem book={readyBook} />, {
-      initialState: merge(fixtures.initialState, {
-        book: {
-          error: err
-        }
-      })
-    });
-    expect(
-      utils.queryByText("You can now borrow this book!")
-    ).toBeInTheDocument();
-    expect(
-      utils.getByText("Error: cannot loan more than 3 documents.")
-    ).toBeInTheDocument();
+    // we revalidate the loans
+    await waitFor(() => expect(mockSetBook).toHaveBeenCalledWith(readyBook));
   });
 });
 
@@ -225,7 +188,7 @@ describe("ready to borrow book with multiple borrowUrls", () => {
       {
         url: "/adobe-borrow-link",
         type: "application/atom+xml;type=entry;profile=opds-catalog",
-        indirectType: "application/vnd.adobe.adept+xml"
+        indirectType: "application/kepub+zip"
       },
       {
         url: "/axis-borrow-link",
@@ -245,40 +208,34 @@ describe("ready to borrow book with multiple borrowUrls", () => {
     ).toBeInTheDocument();
   });
 
-  test("shows loading state when borrowing, borrows, and doesn't refetch loans", async () => {
-    // mock the actions.updateBook
-    const updateBookSpy = jest
-      .spyOn(actions, "updateBook")
-      .mockImplementation(_url => _dispatch =>
-        new Promise(resolve => {
-          setTimeout(() => {
-            resolve(fixtures.book);
-          }, 1000);
-        })
-      );
-    // also spy on fetchLoans
-    const fetchLoansSpy = jest.spyOn(actions, "fetchLoans");
+  test("shows loading state when borrowing, borrows, and revalidates loans", async () => {
+    const mockSetBook = jest.fn();
+    mockFetchBook.mockResolvedValue(readyBook);
+
     const utils = render(<BookListItem book={readyBook} />, {
-      initialState: merge<State>(fixtures.initialState, {
-        loans: {
-          url: "/loans-url",
-          books: []
-        }
-      })
+      user: {
+        setBook: mockSetBook,
+        isAuthenticated: true,
+        loans: fixtures.loans.books
+      }
     });
+
     // click borrow
     userEvent.click(utils.getByText("Borrow to read on a mobile device"));
-    expect(updateBookSpy).toHaveBeenCalledTimes(1);
-    expect(updateBookSpy).toHaveBeenCalledWith("/adobe-borrow-link");
-
-    // One button says "Borrowing..."
-    const borrowButton = await utils.findByRole("button", {
+    expect(mockFetchBook).toHaveBeenCalledTimes(1);
+    expect(mockFetchBook).toHaveBeenCalledWith(
+      "/adobe-borrow-link",
+      "http://test-cm.com/catalogUrl",
+      "user-token"
+    );
+    const borrowButton = utils.getByRole("button", {
       name: /Borrowing.../i
     });
     expect(borrowButton).toBeInTheDocument();
     expect(borrowButton).toHaveAttribute("disabled", "");
 
-    expect(fetchLoansSpy).toHaveBeenCalledTimes(0);
+    // we revalidate the loans
+    await waitFor(() => expect(mockSetBook).toHaveBeenCalledWith(readyBook));
   });
 });
 
@@ -308,37 +265,36 @@ describe("available to reserve book", () => {
     expect(reserveButton).toBeInTheDocument();
   });
 
-  test("shows loading state when reserving, reserves, and doesn't refetch loans", async () => {
-    // mock the actions.updateBook
-    const updateBookSpy = jest
-      .spyOn(actions, "updateBook")
-      .mockImplementation(_url => _dispatch =>
-        new Promise(resolve => {
-          setTimeout(() => {
-            resolve(fixtures.book);
-          }, 1000);
-        })
-      );
-    // also spy on fetchLoans
-    const fetchLoansSpy = jest.spyOn(actions, "fetchLoans");
+  test("shows loading state when borrowing, borrows, and revalidates loans", async () => {
+    const mockSetBook = jest.fn();
+    mockFetchBook.mockResolvedValue(unavailableBook);
+
     const utils = render(<BookListItem book={unavailableBook} />, {
-      initialState: merge<State>(fixtures.initialState, {
-        loans: {
-          url: "/loans-url",
-          books: []
-        }
-      })
+      user: {
+        setBook: mockSetBook,
+        isAuthenticated: true,
+        loans: fixtures.loans.books
+      }
     });
-    // click reserve
+
+    // click borrow
     userEvent.click(utils.getByText("Reserve"));
-    expect(updateBookSpy).toHaveBeenCalledTimes(1);
-    expect(updateBookSpy).toHaveBeenCalledWith("/epub-borrow-link");
-    const reserveButton = utils.getByRole("button", {
+    expect(mockFetchBook).toHaveBeenCalledTimes(1);
+    expect(mockFetchBook).toHaveBeenCalledWith(
+      "/epub-borrow-link",
+      "http://test-cm.com/catalogUrl",
+      "user-token"
+    );
+    const borrowButton = utils.getByRole("button", {
       name: /Reserving.../i
     });
-    expect(reserveButton).toBeInTheDocument();
-    expect(reserveButton).toHaveAttribute("disabled", "");
-    expect(fetchLoansSpy).toHaveBeenCalledTimes(0);
+    expect(borrowButton).toBeInTheDocument();
+    expect(borrowButton).toHaveAttribute("disabled", "");
+
+    // we revalidate the loans
+    await waitFor(() =>
+      expect(mockSetBook).toHaveBeenCalledWith(unavailableBook)
+    );
   });
 });
 
@@ -391,13 +347,11 @@ describe("available to access book", () => {
     fulfillmentLinks: [
       {
         url: "/epub-link",
-        type: "application/epub+zip",
-        indirectType: "indirect"
+        type: "application/epub+zip"
       },
       {
         url: "/pdf-link",
-        type: "application/pdf",
-        indirectType: "indirect"
+        type: "application/pdf"
       }
     ],
     availability: {

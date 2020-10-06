@@ -4,15 +4,15 @@ import {
   getCatalogRootUrl,
   fetchAuthDocument,
   buildLibraryData,
-  getLibrarySlugs,
-  getAuthDocHref
+  getLibrarySlugs
 } from "../getLibraryData";
 import getConfigFile from "../getConfigFile";
 import fetchMock from "jest-fetch-mock";
 import ApplicationError, { PageNotFoundError, AppSetupError } from "errors";
 import rawCatalog from "test-utils/fixtures/raw-opds-feed";
 import { fixtures, setEnv } from "test-utils";
-import { AuthDocumentLink, OPDS2 } from "interfaces";
+import { OPDS1, OPDS2 } from "interfaces";
+import { getAuthDocHref } from "utils/auth";
 
 describe("fetchCatalog", () => {
   test("calls fetch with catalog url", async () => {
@@ -257,7 +257,8 @@ describe("buildLibraryData", () => {
     const library = buildLibraryData(
       fixtures.authDoc,
       "/catalog-url",
-      "librarySlug"
+      "librarySlug",
+      fixtures.opdsFeed
     );
     expect(library).toEqual({
       slug: "librarySlug",
@@ -266,7 +267,10 @@ describe("buildLibraryData", () => {
       logoUrl: null,
       colors: null,
       headerLinks: [],
-      libraryLinks: {}
+      shelfUrl: null,
+      authMethods: [],
+      libraryLinks: {},
+      searchData: null
     });
   });
 
@@ -274,7 +278,8 @@ describe("buildLibraryData", () => {
     const library = buildLibraryData(
       fixtures.authDoc,
       "/catalog-url",
-      undefined
+      undefined,
+      fixtures.opdsFeed
     );
     expect(library.slug).toBeNull();
   });
@@ -289,7 +294,8 @@ describe("buildLibraryData", () => {
         }
       },
       "/catalog-url",
-      "librarySlug"
+      "librarySlug",
+      fixtures.opdsFeed
     );
     expect(library.colors).toEqual({
       primary: "blue",
@@ -298,7 +304,7 @@ describe("buildLibraryData", () => {
   });
 
   test("correctly parses links", () => {
-    const links: AuthDocumentLink[] = [
+    const links: OPDS1.AuthDocumentLink[] = [
       {
         rel: "about",
         href: "/about"
@@ -348,7 +354,8 @@ describe("buildLibraryData", () => {
         links
       },
       "/catalog-url",
-      "librarySlug"
+      "librarySlug",
+      fixtures.opdsFeed
     );
 
     expect(library.headerLinks).toEqual([

@@ -1,16 +1,15 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import useTypedSelector from "hooks/useTypedSelector";
 import { useForm } from "react-hook-form";
+import { Text } from "components/Text";
 import Button from "components/Button";
 import FormInput from "components/form/FormInput";
-import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
-import { generateCredentials } from "opds-web-client/lib/utils/auth";
-import { BasicAuthMethod } from "opds-web-client/lib/interfaces";
-import { AuthFormProps } from "opds-web-client/lib/components/AuthProviderSelectionForm";
-
-import { modalButtonStyles } from "../components/Modal";
+import { modalButtonStyles } from "components/Modal";
+import { OPDS1 } from "interfaces";
+import { generateToken } from "auth/useCredentials";
+import useUser from "components/context/UserContext";
+import { ServerError } from "errors";
 
 type FormData = {
   [key: string]: string;
@@ -19,43 +18,38 @@ type FormData = {
 /**
  * Auth form
  */
-const BasicAuthForm: React.FC<AuthFormProps<BasicAuthMethod>> = ({
-  provider
+const BasicAuthForm: React.FC<{ method: OPDS1.BasicAuthMethod }> = ({
+  method
 }) => {
-  const authState = useTypedSelector(state => state.auth);
-  const { callback, error: serverError } = authState;
-  const { actions, dispatch } = useActions();
+  const { signIn, error, isLoading } = useUser();
+
   const { register, handleSubmit, errors } = useForm<FormData>();
 
-  const usernameInputName = provider.method.labels.login;
-  const passwordInputName = provider.method.labels.password;
+  const usernameInputName = method.labels.login;
+  const passwordInputName = method.labels.password;
 
   const onSubmit = handleSubmit(async values => {
     const login = values[usernameInputName];
     const password = values[passwordInputName];
-    // create credentials
-    const credentials = generateCredentials(login, password);
-    // save them with redux
-    dispatch(
-      actions.saveAuthCredentials({
-        provider: provider.id,
-        credentials
-      })
-    );
-    // call the callback that was saved when the form was triggered
-    callback?.();
+    // try to login with these credentials
+    const token = generateToken(login, password);
+    signIn(token, method);
   });
+
+  const serverError = error instanceof ServerError ? error : undefined;
+
   return (
     <form
       onSubmit={onSubmit}
       sx={{
         display: "flex",
-        flexDirection: "column"
+        flexDirection: "column",
+        maxWidth: 400
       }}
     >
-      <span sx={{ color: "ui.error" }}>
-        {serverError && `Error: ${serverError}`}
-      </span>
+      <Text sx={{ color: "ui.error", alignItems: "center", display: "flex" }}>
+        {serverError && `${serverError.info.title}: ${serverError.info.detail}`}
+      </Text>
       <FormInput
         name={usernameInputName}
         label={usernameInputName}
@@ -83,6 +77,8 @@ const BasicAuthForm: React.FC<AuthFormProps<BasicAuthMethod>> = ({
         sx={{
           ...modalButtonStyles
         }}
+        loading={isLoading}
+        loadingText="Signing in..."
       >
         Login
       </Button>
