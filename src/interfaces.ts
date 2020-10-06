@@ -137,6 +137,7 @@ export interface BookData {
   published?: string;
   categories?: string[];
   language?: string;
+  relatedUrl: string | null;
   raw?: any;
 }
 
@@ -191,24 +192,10 @@ export interface LinkData {
 }
 
 /**
- * Recommendations and Complaints
+ * Complaints
  */
-export type RecommendationsState = {
-  url: string | null;
-  data?: CollectionData | null;
-  isFetching?: boolean;
-  isFetchingPage: boolean;
-  error?: FetchErrorData | null;
-  history: LinkData[];
-  pageUrl?: string;
-};
-export type { ComplaintsState } from "./hooks/useComplaints/reducer";
 
-export interface FetchErrorData {
-  status: number | null;
-  response: string;
-  url: string;
-}
+export type { ComplaintsState } from "./hooks/useComplaints/reducer";
 
 /**
  * Theme
@@ -223,13 +210,6 @@ export type VariantProp<VType> = Exclude<
 /**
  * Utils
  */
-export type SetCollectionAndBook = (
-  collectionUrl: string,
-  bookUrl: string | undefined
-) => Promise<{
-  collectionData: CollectionData;
-  bookData: BookData;
-}>;
 
 type PickAndRequire<T, K extends keyof T> = { [P in K]-?: NonNullable<T[P]> };
 

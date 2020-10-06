@@ -1,86 +1,72 @@
 import * as React from "react";
-import { render, fixtures, actions, waitFor } from "test-utils";
+import { render, fixtures, waitFor } from "test-utils";
 import merge from "deepmerge";
 import { BookDetails } from "../index";
-import { State } from "owc/state";
-import { BookData, CollectionData } from "interfaces";
+import { BookData } from "interfaces";
 import * as complaintActions from "hooks/useComplaints/actions";
-import { RecommendationsStateContext } from "components/context/RecommendationsContext";
 import userEvent from "@testing-library/user-event";
 import ReportProblem from "../ReportProblem";
 import * as env from "utils/env";
+import { ServerError } from "errors";
+import useSWR from "swr";
 
-const mockSetCollectionAndBook = jest.fn().mockResolvedValue({});
+jest.mock("swr");
 
-/**
- * We need to mock actions.fetchCollection so that
- * ReportProblem doesn't actually fetch anything
- */
-jest
-  .spyOn(actions, "fetchCollection")
-  .mockImplementation(() => () => Promise.resolve({} as CollectionData));
+const mockedSWR = useSWR as jest.MockedFunction<typeof useSWR>;
 
-const makeStateWithBook = (book: BookData = fixtures.book): State =>
-  merge<State>(fixtures.initialState, {
-    book: {
-      isFetching: false,
-      url: "/book",
-      error: null,
-      data: book
-    }
-  });
+function makeSwrResponse(value: Partial<ReturnType<typeof useSWR>>) {
+  return {
+    data: undefined,
+    error: undefined,
+    revalidate: jest.fn(),
+    isValidating: false,
+    mutate: jest.fn(),
+    ...value
+  };
+}
+function mockSwr(value: Partial<ReturnType<typeof useSWR>>) {
+  mockedSWR.mockReturnValue(makeSwrResponse(value));
+}
 
 describe("book details page", () => {
   test("shows loading state", () => {
-    const utils = render(
-      <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
-      {
-        initialState: merge<State>(fixtures.initialState, {
-          book: {
-            isFetching: true,
-            url: "/book",
-            error: null,
-            data: null
-          }
-        })
-      }
-    );
+    mockSwr({ data: undefined });
+
+    const utils = render(<BookDetails />, {
+      router: { query: { bookUrl: "/book-url" } }
+    });
     expect(
       utils.getByRole("heading", { name: "Loading..." })
     ).toBeInTheDocument();
   });
 
-  test("handles error state", () => {
-    const utils = render(
-      <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
-      {
-        initialState: merge<State>(fixtures.initialState, {
-          book: {
-            isFetching: false,
-            url: "/book",
-            error: {
-              response: "Some error",
-              status: 401,
-              url: "/book-error-url"
-            },
-            data: null
-          }
-        })
-      }
-    );
-    /**
-     * We will snapshot test this component because it isn't complicated and should prettymuch remain the same.
-     */
-    expect(utils.container).toMatchSnapshot();
+  test("handles error state", async () => {
+    mockSwr({
+      error: new ServerError("url", 418, {
+        detail: "Something",
+        title: "you messed up",
+        status: 418
+      })
+    });
+
+    const utils = render(<BookDetails />, {
+      router: { query: { bookUrl: "/book-url" } }
+    });
+
+    expect(
+      await utils.findByText(
+        "There was a problem fetching this book. Please refresh the page or return home."
+      )
+    ).toBeInTheDocument();
   });
 
   test("shows categories", () => {
-    const utils = render(
-      <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
-      {
-        initialState: makeStateWithBook()
-      }
-    );
+    mockSwr({
+      data: fixtures.book
+    });
+    const utils = render(<BookDetails />, {
+      router: { query: { bookUrl: "/book-url" } }
+    });
     const categories = fixtures.book.categories?.join(", ") as string;
     expect(utils.getByText(categories));
     expect(utils.getByText("Categories:"));
@@ -90,22 +76,14 @@ describe("book details page", () => {
     const bookWithoutCategories: BookData = merge(fixtures.book, {
       categories: null
     });
-    const utils = render(
-      <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
-      {
-        initialState: makeStateWithBook(bookWithoutCategories)
-      }
-    );
+    mockSwr({ data: bookWithoutCategories });
+    const utils = render(<BookDetails />);
     expect(utils.queryByText("Categories:")).toBeFalsy();
   });
 
   test("shows publisher", () => {
-    const utils = render(
-      <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
-      {
-        initialState: makeStateWithBook()
-      }
-    );
+    mockSwr({ data: fixtures.book });
+    const utils = render(<BookDetails />);
     const publisher = fixtures.book.publisher as string;
 
     expect(utils.getByText(publisher)).toBeInTheDocument();
@@ -113,12 +91,8 @@ describe("book details page", () => {
   });
 
   test("shows fulfillment card in open-access state", () => {
-    const utils = render(
-      <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
-      {
-        initialState: makeStateWithBook()
-      }
-    );
+    mockSwr({ data: fixtures.book });
+    const utils = render(<BookDetails />);
 
     expect(
       utils.getByText("This open-access book is available to keep forever.")
@@ -130,12 +104,8 @@ describe("book details page", () => {
 
   test("does not show simplyE callout when NEXT_PUBLIC_COMPANION_APP is 'openebooks'", () => {
     (env.NEXT_PUBLIC_COMPANION_APP as string) = "openebooks";
-    const utils = render(
-      <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
-      {
-        initialState: makeStateWithBook()
-      }
-    );
+    mockSwr({ data: fixtures.book });
+    const utils = render(<BookDetails />);
 
     expect(
       utils.queryByText("Read Now. Read Everywhere.")
@@ -151,12 +121,8 @@ describe("book details page", () => {
 
   test("shows simplyE callout when NEXT_PUBLIC_COMPANION_APP is 'simplye'", async () => {
     (env.NEXT_PUBLIC_COMPANION_APP as string) = "simplye";
-    const utils = render(
-      <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
-      {
-        initialState: makeStateWithBook()
-      }
-    );
+    mockSwr({ data: fixtures.book });
+    const utils = render(<BookDetails />);
 
     expect(utils.getByText("Read Now. Read Everywhere.")).toBeInTheDocument();
     expect(utils.getByLabelText("SimplyE Logo")).toBeInTheDocument();
@@ -188,18 +154,26 @@ describe("book details page", () => {
   });
 
   test("shows recommendation lanes", () => {
-    const utils = render(
-      <RecommendationsStateContext.Provider
-        value={{
-          ...fixtures.recommendationsState
-        }}
-      >
-        <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />
-      </RecommendationsStateContext.Provider>,
-      {
-        initialState: makeStateWithBook()
+    // we make a special mock so we can differentiate the book request
+    // and the related collection request
+    mockedSWR.mockImplementation((key => {
+      if (key === "/book-url") {
+        return makeSwrResponse({
+          data: {
+            ...fixtures.book,
+            relatedUrl: "/related-url"
+          }
+        });
       }
-    );
+      if (key === "/related-url") {
+        return {
+          data: fixtures.recommendations
+        };
+      }
+    }) as any);
+    const utils = render(<BookDetails />, {
+      router: { query: { bookUrl: "/book-url" } }
+    });
     expect(utils.getByText("Recommendations")).toBeInTheDocument();
     expect(
       utils.getByRole("heading", { name: "Jane Austen" })
@@ -237,24 +211,16 @@ const bookWithReportUrl = merge<BookData>(fixtures.book, {
 
 describe("report problem", () => {
   test("shows report problem link", () => {
-    const utils = render(
-      <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
-      {
-        initialState: makeStateWithBook()
-      }
-    );
+    mockSwr({ data: fixtures.book });
+    const utils = render(<BookDetails />);
 
     const reportProblemLink = utils.getByTestId("report-problem-link");
     expect(reportProblemLink).toBeInTheDocument();
   });
 
   test("shows form (only) when clicked", async () => {
-    const utils = render(
-      <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
-      {
-        initialState: makeStateWithBook()
-      }
-    );
+    mockSwr({ data: fixtures.book });
+    const utils = render(<BookDetails />);
     // make sure it's not visible at first
     expect(utils.getByLabelText("Complaint Type")).not.toBeVisible();
 
@@ -271,9 +237,8 @@ describe("report problem", () => {
   });
 
   test("fetches complaint types", async () => {
-    render(<BookDetails setCollectionAndBook={mockSetCollectionAndBook} />, {
-      initialState: makeStateWithBook(bookWithReportUrl)
-    });
+    mockSwr({ data: fixtures.book });
+    render(<BookDetails />);
     expect(mockBoundFetchComplaintTypes).toHaveBeenCalledTimes(1);
     expect(mockBoundFetchComplaintTypes).toHaveBeenCalledWith("/report-url");
   });
@@ -297,12 +262,8 @@ describe("report problem", () => {
     const mockBoundPostComplaint = jest.fn().mockResolvedValue(["some-string"]);
     postComplaintSpy.mockReturnValue(_url => mockBoundPostComplaint);
 
-    const utils = render(
-      <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
-      {
-        initialState: makeStateWithBook(bookWithReportUrl)
-      }
-    );
+    mockSwr({ data: fixtures.book });
+    const utils = render(<BookDetails />);
     // open the form
     const reportProblemLink = utils.getByTestId("report-problem-link");
     userEvent.click(reportProblemLink);
@@ -342,12 +303,8 @@ describe("report problem", () => {
       return Promise.resolve(["some string"]);
     });
 
-    const utils = render(
-      <BookDetails setCollectionAndBook={mockSetCollectionAndBook} />,
-      {
-        initialState: makeStateWithBook(bookWithReportUrl)
-      }
-    );
+    mockSwr({ data: fixtures.book });
+    const utils = render(<BookDetails />);
     // open the form
     const reportProblemLink = utils.getByTestId("report-problem-link");
     userEvent.click(reportProblemLink);
@@ -376,9 +333,8 @@ describe("report problem", () => {
     const mockBoundPostComplaint = jest.fn().mockResolvedValue(["some-string"]);
     postComplaintSpy.mockReturnValue(_url => mockBoundPostComplaint);
 
-    const utils = render(<ReportProblem book={fixtures.book} />, {
-      initialState: makeStateWithBook(bookWithReportUrl)
-    });
+    mockSwr({ data: bookWithReportUrl });
+    const utils = render(<ReportProblem book={fixtures.book} />);
     // open the form
     const reportProblemLink = utils.getByTestId("report-problem-link");
     userEvent.click(reportProblemLink);

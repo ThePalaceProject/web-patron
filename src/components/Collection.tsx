@@ -1,36 +1,40 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import useTypedSelector from "../hooks/useTypedSelector";
-import { SetCollectionAndBook } from "../interfaces";
-import useSetCollectionAndBook from "../hooks/useSetCollectionAndBook";
-import { connect } from "react-redux";
-import {
-  mapStateToProps,
-  mapDispatchToProps,
-  mergeRootProps
-} from "owc/mergeRootProps";
 import { PageLoader } from "../components/LoadingIndicator";
-import useNormalizedCollection from "../hooks/useNormalizedCollection";
-import { ListView, LanesView } from "./BookList";
+import { InfiniteBookList, LanesView } from "./BookList";
 import Head from "next/head";
 import PageTitle from "./PageTitle";
 import { Text } from "./Text";
 import BreadcrumbBar from "./BreadcrumbBar";
+import computeBreadcrumbs from "computeBreadcrumbs";
+import useLibraryContext from "components/context/LibraryContext";
+import { fetchCollection } from "dataflow/opds1/fetch";
+import extractParam from "dataflow/utils";
+import { useRouter } from "next/router";
+import useSWR from "swr";
 
 export const Collection: React.FC<{
-  setCollectionAndBook: SetCollectionAndBook;
   title?: string;
-}> = ({ setCollectionAndBook, title }) => {
-  useSetCollectionAndBook(setCollectionAndBook);
-  const isFetching = useTypedSelector(state => state.collection.isFetching);
-  const collectionData = useNormalizedCollection();
+}> = ({ title }) => {
+  const { catalogUrl } = useLibraryContext();
+  const { query } = useRouter();
+  const collectionUrlParam = extractParam(query, "collectionUrl");
+  // use catalog url if you're at home
+  const collectionUrl = decodeURIComponent(collectionUrlParam ?? catalogUrl);
 
-  const hasLanes = collectionData?.lanes && collectionData.lanes.length > 0;
-  const hasBooks = collectionData?.books && collectionData.books.length > 0;
+  const { data: collection, isValidating } = useSWR(
+    collectionUrl,
+    fetchCollection
+  );
 
-  const pageTitle = title ?? `Collection: ${collectionData.title ?? ""}`;
+  const isLoading = !collection && isValidating;
 
+  const hasLanes = collection?.lanes && collection.lanes.length > 0;
+  const hasBooks = collection?.books && collection.books.length > 0;
+  const pageTitle = title ?? `Collection: ${collection?.title ?? ""}`;
+
+  const breadcrumbs = computeBreadcrumbs(collection);
   return (
     <div
       sx={{
@@ -43,14 +47,14 @@ export const Collection: React.FC<{
       <Head>
         <title>{pageTitle}</title>
       </Head>
-      <BreadcrumbBar />
-      <PageTitle>{pageTitle}</PageTitle>
-      {isFetching ? (
+      <BreadcrumbBar breadcrumbs={breadcrumbs} />
+      <PageTitle collection={collection}>{pageTitle}</PageTitle>
+      {isLoading ? (
         <PageLoader />
       ) : hasLanes ? (
-        <LanesView lanes={collectionData.lanes ?? []} />
+        <LanesView lanes={collection?.lanes ?? []} />
       ) : hasBooks ? (
-        <ListView books={collectionData.books} />
+        <InfiniteBookList firstPageUrl={collectionUrl} />
       ) : (
         <div
           sx={{
@@ -67,10 +71,4 @@ export const Collection: React.FC<{
   );
 };
 
-const Connected = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-  mergeRootProps
-)(Collection);
-
-export default Connected;
+export default Collection;

@@ -1,7 +1,6 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { NavigateContext } from "owc/interfaces";
 import { LibraryData } from "../interfaces";
 import Search from "./Search";
 import Button, { NavButton, AnchorButton } from "./Button";
@@ -13,10 +12,6 @@ import Stack from "./Stack";
 import SignOut from "./SignOut";
 import useUser from "components/context/UserContext";
 import useAuthModalContext from "auth/AuthModalContext";
-
-export interface HeaderContext extends NavigateContext {
-  library: LibraryData;
-}
 
 /**
  * will get the data it needs directly from context/
@@ -77,7 +72,7 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
   const { helpWebsite, libraryWebsite } = library.libraryLinks;
   const libraryName = library.catalogName;
   const { isAuthenticated, isLoading } = useUser();
-  const { showModal } = useAuthModalContext();
+  const { showModalAndReset } = useAuthModalContext();
   return (
     <div
       sx={{
@@ -130,7 +125,7 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
       {isAuthenticated ? (
         <SignOut />
       ) : (
-        <Button onClick={showModal} loading={isLoading}>
+        <Button onClick={showModalAndReset} loading={isLoading}>
           Sign In
         </Button>
       )}

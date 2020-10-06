@@ -1,5 +1,4 @@
 import computeBreadcrumbs from "../computeBreadcrumbs";
-import { LinkData } from "interfaces";
 
 describe("computeBreadcrumbs", () => {
   const collection = {
@@ -10,7 +9,6 @@ describe("computeBreadcrumbs", () => {
     books: [],
     navigationLinks: []
   };
-  const history: LinkData[] = [];
 
   test("uses breadcrumbs if they're in the raw collection data", () => {
     const raw = {
@@ -32,7 +30,7 @@ describe("computeBreadcrumbs", () => {
       { url: "breadcrumb url", text: "breadcrumb title" },
       { url: collection.url, text: collection.title }
     ];
-    expect(computeBreadcrumbs(data, history)).toEqual(expected);
+    expect(computeBreadcrumbs(data)).toEqual(expected);
   });
 
   test("ignores trailing slashes when using hierarchyComputeBreadcrumbs", () => {
@@ -43,7 +41,7 @@ describe("computeBreadcrumbs", () => {
 
     let data = Object.assign({}, collection, { catalogRootLink });
     let expected = [{ url: collection.url, text: collection.title }];
-    expect(computeBreadcrumbs(data, history)).toEqual(expected);
+    expect(computeBreadcrumbs(data)).toEqual(expected);
 
     catalogRootLink = {
       url: "different url/",
@@ -55,6 +53,6 @@ describe("computeBreadcrumbs", () => {
       catalogRootLink,
       { url: collection.url, text: collection.title }
     ];
-    expect(computeBreadcrumbs(data, history)).toEqual(expected);
+    expect(computeBreadcrumbs(data)).toEqual(expected);
   });
 });

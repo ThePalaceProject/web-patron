@@ -1,7 +1,7 @@
 import { fetchBook } from "dataflow/opds1/fetch";
 import ApplicationError from "errors";
 import { MediaLink, OPDS1 } from "interfaces";
-import { typeMap } from "owc/utils/file";
+import { typeMap } from "utils/file";
 import { NEXT_PUBLIC_AXIS_NOW_DECRYPT } from "utils/env";
 
 /**

@@ -1,6 +1,5 @@
 import { LibraryData, AppConfigFile } from "../interfaces";
 import { GetServerSideProps } from "next";
-import { ParsedUrlQuery } from "querystring";
 import {
   getCatalogRootUrl,
   fetchCatalog,
@@ -13,17 +12,7 @@ import { CONFIG_FILE } from "utils/env";
 import { getAuthDocHref } from "utils/auth";
 import { findSearchLink } from "dataflow/opds1/parse";
 import { fetchSearchData } from "dataflow/opds1/fetch";
-
-const getLibraryFromParams = (
-  query: ParsedUrlQuery | undefined
-): string | undefined => {
-  const libraryQuery: string | string[] | undefined = query?.library;
-  return libraryQuery
-    ? typeof libraryQuery === "string"
-      ? libraryQuery
-      : libraryQuery[0]
-    : undefined;
-};
+import extractParam from "dataflow/utils";
 
 export type AppProps = {
   library?: LibraryData;
@@ -45,7 +34,7 @@ export default function withAppProps(
      * Fetch the auth document provided in it
      */
     try {
-      const librarySlug = getLibraryFromParams(ctx.params);
+      const librarySlug = extractParam(ctx.params, "library");
       const catalogUrl = await getCatalogRootUrl(librarySlug);
       const catalog = await fetchCatalog(catalogUrl);
       const authDocHref = getAuthDocHref(catalog);

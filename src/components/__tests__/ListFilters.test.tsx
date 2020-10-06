@@ -1,9 +1,7 @@
 import * as React from "react";
-import { render, fixtures } from "test-utils";
+import { render } from "test-utils";
 import ListFilters from "../ListFilters";
-import merge from "deepmerge";
-import { FacetGroupData } from "interfaces";
-import { State } from "owc/state";
+import { CollectionData, FacetGroupData } from "interfaces";
 import userEvent from "@testing-library/user-event";
 import mockedRouter from "test-utils/mockNextRouter";
 
@@ -12,14 +10,6 @@ import mockedRouter from "test-utils/mockNextRouter";
  *  - has the right options
  *  - does redirect
  */
-const stateWithFacets = (facets: FacetGroupData[]): State =>
-  merge(fixtures.initialState, {
-    collection: {
-      data: {
-        facetGroups: facets
-      }
-    }
-  });
 
 const sortByFacet: FacetGroupData = {
   label: "Sort by",
@@ -58,10 +48,20 @@ const availabilityFacet: FacetGroupData = {
   ]
 };
 
+const collectionWithFacets = (facets: FacetGroupData[]): CollectionData => ({
+  id: "id",
+  url: "url",
+  title: "with facets",
+  lanes: [],
+  books: [],
+  navigationLinks: [],
+  facetGroups: facets
+});
+
 test("renders sort by select with correct options", () => {
-  const utils = render(<ListFilters />, {
-    initialState: stateWithFacets([sortByFacet])
-  });
+  const utils = render(
+    <ListFilters collection={collectionWithFacets([sortByFacet])} />
+  );
 
   const facet = utils.getByLabelText("Sort by");
   expect(utils.getByText("author")).toBeInTheDocument();
@@ -71,9 +71,9 @@ test("renders sort by select with correct options", () => {
 });
 
 test("renders availability select with correct options", () => {
-  const utils = render(<ListFilters />, {
-    initialState: stateWithFacets([availabilityFacet])
-  });
+  const utils = render(
+    <ListFilters collection={collectionWithFacets([availabilityFacet])} />
+  );
 
   const facet = utils.getByLabelText("Availability");
   expect(utils.getByText("All")).toBeInTheDocument();
@@ -84,9 +84,9 @@ test("renders availability select with correct options", () => {
 });
 
 test("does redirect when selected", () => {
-  const utils = render(<ListFilters />, {
-    initialState: stateWithFacets([sortByFacet])
-  });
+  const utils = render(
+    <ListFilters collection={collectionWithFacets([sortByFacet])} />
+  );
 
   const facet = utils.getByLabelText("Sort by");
 

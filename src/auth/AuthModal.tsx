@@ -3,7 +3,7 @@ import { jsx } from "theme-ui";
 import * as React from "react";
 import { useDialogState } from "reakit/Dialog";
 import useLibraryContext from "../components/context/LibraryContext";
-import Modal, { modalButtonStyles } from "../components/Modal";
+import Modal from "../components/Modal";
 import ClientOnly from "../components/ClientOnly";
 import { H2, Text } from "../components/Text";
 import FormLabel from "../components/form/FormLabel";
@@ -12,23 +12,34 @@ import Stack from "../components/Stack";
 import { AppAuthMethod, OPDS1 } from "interfaces";
 import BasicAuthForm from "auth/BasicAuthForm";
 import SamlAuthButton from "auth/SamlAuthButton";
-import CleverButton from "auth/CleverButton";
+import CleverButton from "auth/CleverAuthButton";
 import { AuthModalProvider } from "auth/AuthModalContext";
 import useUser from "components/context/UserContext";
 import Button from "components/Button";
 import ExternalLink from "components/ExternalLink";
+import BasicAuthButton from "auth/BasicAuthButton";
+import LoadingIndicator from "components/LoadingIndicator";
 
-const AuthForm: React.FC = ({ children }) => {
+const AuthModal: React.FC = ({ children }) => {
   const dialog = useDialogState();
   const { hide } = dialog;
   const { catalogName, authMethods } = useLibraryContext();
-  const { isAuthenticated } = useUser();
+  const { isAuthenticated, clearCredentials, isLoading } = useUser();
   /**
    * If the user becomes authenticated, we can hide the form
    */
   React.useEffect(() => {
     if (isAuthenticated) hide();
   }, [isAuthenticated, hide]);
+
+  const show = dialog.show;
+  /**
+   * When you show the login modal, clear any old credentials from the state
+   */
+  const showModalAndReset = React.useCallback(() => {
+    clearCredentials();
+    show();
+  }, [show, clearCredentials]);
 
   /**
    * The options:
@@ -37,14 +48,15 @@ const AuthForm: React.FC = ({ children }) => {
    *  - There are 1-5 methods. Show a button for each.
    *  - There are >5 methods. Show a combobox selector.
    */
-  const formStatus =
-    authMethods.length === 0
-      ? "no-auth"
-      : authMethods.length === 1
-      ? "single-auth"
-      : authMethods.length < 5
-      ? "buttons"
-      : "combobox";
+  const formStatus = isLoading
+    ? "loading"
+    : authMethods.length === 0
+    ? "no-auth"
+    : authMethods.length === 1
+    ? "single-auth"
+    : authMethods.length < 5
+    ? "buttons"
+    : "combobox";
 
   return (
     <React.Fragment>
@@ -58,9 +70,14 @@ const AuthForm: React.FC = ({ children }) => {
         >
           <div sx={{ textAlign: "center", p: 0 }}>
             <H2>{catalogName}</H2>
-            <h4>Login</h4>
+            {formStatus !== "loading" && <h4>Login</h4>}
           </div>
-          {formStatus === "no-auth" ? (
+          {formStatus === "loading" ? (
+            <Stack direction="column" sx={{ alignItems: "center" }}>
+              <LoadingIndicator />
+              Logging in...
+            </Stack>
+          ) : formStatus === "no-auth" ? (
             <NoAuth />
           ) : formStatus === "single-auth" ? (
             <SignInForm method={authMethods[0]} />
@@ -75,7 +92,12 @@ const AuthForm: React.FC = ({ children }) => {
           even though we don't open the dialog with a button
       */}
       {/* <DialogDisclosure sx={{ display: "none" }} {...dialog} /> */}
-      <AuthModalProvider showModal={dialog.show}>{children}</AuthModalProvider>
+      <AuthModalProvider
+        showModal={dialog.show}
+        showModalAndReset={showModalAndReset}
+      >
+        {children}
+      </AuthModalProvider>
     </React.Fragment>
   );
 };
@@ -153,18 +175,20 @@ const Buttons: React.FC<{
           switch (method.type) {
             case OPDS1.BasicAuthType:
               return (
-                <Button
-                  key={method.type}
-                  sx={{ ...modalButtonStyles }}
+                <BasicAuthButton
+                  key={getIdForMethod(method)}
+                  method={method}
                   onClick={() => handleChangeMethod(OPDS1.BasicAuthType)}
-                >
-                  Login with {method.description ?? "Basic Auth"}
-                </Button>
+                />
               );
             case OPDS1.SamlAuthType:
-              return <SamlAuthButton method={method} key={method.type} />;
+              return (
+                <SamlAuthButton method={method} key={getIdForMethod(method)} />
+              );
             case OPDS1.CleverAuthType:
-              return <CleverButton method={method} key={method.type} />;
+              return (
+                <CleverButton method={method} key={getIdForMethod(method)} />
+              );
             default:
               return null;
           }
@@ -210,7 +234,7 @@ const Combobox: React.FC<{
         onChange={e => handleChangeMethod(e.target.value)}
       >
         {authMethods?.map(method => (
-          <option key={method.type} value={getIdForMethod(method)}>
+          <option key={getIdForMethod(method)} value={getIdForMethod(method)}>
             {method.description}
           </option>
         ))}
@@ -236,4 +260,4 @@ function getMethodForId(
   );
 }
 
-export default AuthForm;
+export default AuthModal;

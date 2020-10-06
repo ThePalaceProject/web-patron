@@ -1,5 +1,4 @@
 import { NEXT_PUBLIC_AXIS_NOW_DECRYPT } from "../utils/env";
-
 import {
   SepiaTheme,
   SerifFont,
@@ -15,9 +14,12 @@ import {
   ColumnsPaginatedBookView,
   ScrollingBookView
 } from "library-simplified-webpub-viewer";
+import fetchWithHeaders from "dataflow/fetch";
+import ApplicationError from "errors";
 
-export default async function (
+export default async function reader(
   bookUrl: string,
+  token: string,
   catalogName: string,
   decryptorParams?: any
 ) {
@@ -26,7 +28,7 @@ export default async function (
   const containerHref = webpubBookUrl.href.endsWith("container.xml")
     ? webpubBookUrl.href
     : "";
-  const response = await fetch(containerHref);
+  const response = await fetchWithHeaders(containerHref, token);
   const text = await response.text();
   const xml = new window.DOMParser().parseFromString(text, "text/html");
   const rootfile = xml.getElementsByTagName("rootfile")[0]
@@ -80,14 +82,23 @@ async function initBookSettings(
   const paginator = new ColumnsPaginatedBookView();
   const scroller = new ScrollingBookView();
 
-  const Decryptor = NEXT_PUBLIC_AXIS_NOW_DECRYPT
-    ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      await import("../../axisnow-access-control-web/src/decryptor")
-    : undefined;
-  const decryptor = Decryptor
-    ? await Decryptor.default.createDecryptor(decryptorParams)
-    : undefined;
+  let decryptor: any = undefined;
+
+  try {
+    const Decryptor = NEXT_PUBLIC_AXIS_NOW_DECRYPT
+      ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        await import("../../axisnow-access-control-web/src/decryptor")
+      : undefined;
+    decryptor = Decryptor
+      ? await Decryptor.default.createDecryptor(decryptorParams)
+      : undefined;
+  } catch (e) {
+    throw new ApplicationError(
+      "The required decryptor for this resource could not be loaded.",
+      e
+    );
+  }
 
   const entryUrl: URL = decryptor
     ? new URL(decryptor.getEntryUrl())

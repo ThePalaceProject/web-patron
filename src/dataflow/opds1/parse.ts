@@ -18,7 +18,6 @@ import {
   BookData,
   LinkData,
   FacetGroupData,
-  SearchData,
   BookAvailability,
   OPDS1,
   MediaLink
@@ -53,6 +52,9 @@ function isSearchLink(link: OPDSLink): link is SearchLink {
 function isDefined<T>(value: T | undefined): value is T {
   return typeof value !== "undefined";
 }
+function isRelatedLink(link: OPDSLink) {
+  return link.rel === "related";
+}
 
 /**
  * Utils
@@ -63,7 +65,7 @@ const resolve = (base: string, relative: string) =>
 function buildFulfillmentLink(feedUrl: string) {
   return (link: OPDSAcquisitionLink): MediaLink | undefined => {
     const indirects = link.indirectAcquisitions;
-    const first = indirects[0];
+    const first = indirects?.[0];
     const indirectType = first?.type as OPDS1.AnyBookMediaType | undefined;
     // it is possible that it doesn't exist in the array of indirects
     return {
@@ -148,6 +150,9 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
       };
     });
 
+  const relatedLinks = entry.links.filter(isRelatedLink);
+  const relatedLink = relatedLinks.length > 0 ? relatedLinks[0] : null;
+
   const borrowLink = entry.links.find(link => {
     return (
       isAcquisitionLink(link) && link.rel === OPDSAcquisitionLink.BORROW_REL
@@ -206,6 +211,7 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
     categories: categories,
     language: entry.language,
     url: detailUrl,
+    relatedUrl: relatedLink?.href ?? null,
     raw: entry.unparsed
   };
 }
@@ -284,7 +290,8 @@ export function feedToCollection(
   const collection = {
     id: feed.id,
     title: feed.title,
-    url: feedUrl
+    url: feedUrl,
+    raw: feed.unparsed
   };
   const books: BookData[] = [];
   const navigationLinks: LinkData[] = [];

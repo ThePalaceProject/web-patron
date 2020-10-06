@@ -1,13 +1,10 @@
 import * as React from "react";
 import { render, fixtures, waitForElementToBeRemoved } from "test-utils";
 import { mergeBook } from "test-utils/fixtures";
-import merge from "deepmerge";
 import FulfillmentCard from "../FulfillmentCard";
 import userEvent from "@testing-library/user-event";
 import _download from "downloadjs";
 import * as env from "utils/env";
-import { mockAuthenticated } from "test-utils/mockAuthState";
-import mockUser from "test-utils/mockUser";
 
 jest.mock("downloadjs");
 window.open = jest.fn();
@@ -22,11 +19,12 @@ describe("open-access", () => {
   });
 
   test("correct title and subtitle when loaned", () => {
-    mockUser({
-      loans: [fixtures.book],
-      isAuthenticated: true
+    const utils = render(<FulfillmentCard book={fixtures.book} />, {
+      user: {
+        loans: [fixtures.book],
+        isAuthenticated: true
+      }
     });
-    const utils = render(<FulfillmentCard book={fixtures.book} />);
     expect(
       utils.getByText("This open-access book is available to keep forever.")
     ).toBeInTheDocument();
@@ -36,11 +34,12 @@ describe("open-access", () => {
   });
 
   test("shows download options if loaned", () => {
-    mockUser({
-      loans: [fixtures.book],
-      isAuthenticated: true
+    const utils = render(<FulfillmentCard book={fixtures.book} />, {
+      user: {
+        loans: [fixtures.book],
+        isAuthenticated: true
+      }
     });
-    const utils = render(<FulfillmentCard book={fixtures.book} />);
 
     expect(
       utils.getByText("If you would rather read on your computer, you can:")
@@ -53,13 +52,13 @@ describe("open-access", () => {
     expect(PDFButton).toBeInTheDocument();
   });
 
-  test("clicking download fetches book", () => {
-    mockUser({
-      loans: [fixtures.book],
-      isAuthenticated: true
+  test("clicking download fetches book", async () => {
+    const utils = render(<FulfillmentCard book={fixtures.book} />, {
+      user: {
+        loans: [fixtures.book],
+        isAuthenticated: true
+      }
     });
-
-    const utils = render(<FulfillmentCard book={fixtures.book} />);
 
     const downloadButton = utils.getByText("Download EPUB");
     expect(downloadButton).toBeInTheDocument();
@@ -72,6 +71,7 @@ describe("open-access", () => {
         "X-Requested-With": "XMLHttpRequest"
       }
     });
+    await waitForElementToBeRemoved(() => utils.getByText("Downloading..."));
   });
 
   test("doesn't show duplicate download options", () => {
@@ -88,14 +88,11 @@ describe("open-access", () => {
         }
       ]
     });
-    const stateWithDuplicateFormatLoan = merge(fixtures.initialState, {
-      loans: {
-        url: "/loans",
-        books: [bookWithDuplicateFormat]
-      }
-    });
+
     const utils = render(<FulfillmentCard book={bookWithDuplicateFormat} />, {
-      initialState: stateWithDuplicateFormatLoan
+      user: {
+        loans: [bookWithDuplicateFormat]
+      }
     });
 
     const downloadButton = utils.getAllByText("Download PDF");
@@ -121,21 +118,14 @@ describe("available to borrow", () => {
   });
 
   test("displays borrow button which fetches book when clicked", async () => {
-    mockAuthenticated();
-    mockUser();
-    const utils = render(<FulfillmentCard book={closedAccessBook} />);
+    const utils = render(<FulfillmentCard book={closedAccessBook} />, {
+      user: { isAuthenticated: true }
+    });
     const borrowButton = utils.getByText("Borrow to read on a mobile device");
     expect(borrowButton).toBeInTheDocument();
 
     // click borrow
     userEvent.click(utils.getByText("Borrow to read on a mobile device"));
-    // the first call is to loans in UserContext
-    expect(fetchMock).toHaveBeenNthCalledWith(2, "/epub-borrow-link", {
-      headers: {
-        Authorization: "user-token",
-        "X-Requested-With": "XMLHttpRequest"
-      }
-    });
 
     // the borrow button should be gone now
     await waitForElementToBeRemoved(() => utils.getByText("Borrowing..."));
@@ -165,21 +155,14 @@ describe("ready to borrow", () => {
   });
 
   test("displays borrow button which fetches book when clicked", async () => {
-    mockAuthenticated();
-    mockUser();
-    const utils = render(<FulfillmentCard book={readyBook} />);
+    const utils = render(<FulfillmentCard book={readyBook} />, {
+      user: { isAuthenticated: true }
+    });
     const borrowButton = utils.getByText("Borrow to read on a mobile device");
     expect(borrowButton).toBeInTheDocument();
 
     // click borrow
     userEvent.click(utils.getByText("Borrow to read on a mobile device"));
-    // the first call is to loans in UserContext
-    expect(fetchMock).toHaveBeenNthCalledWith(2, "/epub-borrow-link", {
-      headers: {
-        Authorization: "user-token",
-        "X-Requested-With": "XMLHttpRequest"
-      }
-    });
 
     // the borrow button should be gone now
     await waitForElementToBeRemoved(() => utils.getByText("Borrowing..."));
@@ -233,23 +216,15 @@ describe("ready to borrow (two links)", () => {
   });
 
   test("displays borrow button which fetches book", async () => {
-    mockAuthenticated();
-    mockUser();
     const utils = render(
-      <FulfillmentCard book={readyBookWithTwoBorrowLinks} />
+      <FulfillmentCard book={readyBookWithTwoBorrowLinks} />,
+      { user: { isAuthenticated: true } }
     );
     const borrowButton = utils.getByText("Borrow to read on a mobile device");
     expect(borrowButton).toBeInTheDocument();
 
     // click borrow
     userEvent.click(utils.getByText("Borrow to read on a mobile device"));
-    // the first call is to loans in UserContext
-    expect(fetchMock).toHaveBeenNthCalledWith(2, "/epub-borrow-link", {
-      headers: {
-        Authorization: "user-token",
-        "X-Requested-With": "XMLHttpRequest"
-      }
-    });
 
     // the borrow button should be gone now
     await waitForElementToBeRemoved(() => utils.getByText("Borrowing..."));
@@ -323,21 +298,14 @@ describe("available to reserve", () => {
   });
 
   test("shows reserve button which fetches book", async () => {
-    mockAuthenticated();
-    mockUser();
-    const utils = render(<FulfillmentCard book={unavailableBook} />);
+    const utils = render(<FulfillmentCard book={unavailableBook} />, {
+      user: { isAuthenticated: true }
+    });
     const reserveButton = utils.getByText("Reserve");
     expect(reserveButton).toBeInTheDocument();
 
     // click borrow
     userEvent.click(utils.getByText("Reserve"));
-    // the first call is to loans in UserContext
-    expect(fetchMock).toHaveBeenNthCalledWith(2, "/epub-borrow-link", {
-      headers: {
-        Authorization: "user-token",
-        "X-Requested-With": "XMLHttpRequest"
-      }
-    });
 
     // the borrow button should be gone now
     await waitForElementToBeRemoved(() => utils.getByText("Reserving..."));
@@ -473,8 +441,7 @@ describe("available to download", () => {
     expect(PDFButton).toBeInTheDocument();
   });
 
-  test("download button fetches book", () => {
-    mockUser();
+  test("download button fetches book", async () => {
     const utils = render(<FulfillmentCard book={downloadableBook} />);
     const downloadButton = utils.getByText("Download EPUB");
     expect(downloadButton).toBeInTheDocument();
@@ -487,9 +454,10 @@ describe("available to download", () => {
         "X-Requested-With": "XMLHttpRequest"
       }
     });
+    await waitForElementToBeRemoved(() => utils.getByText("Downloading..."));
   });
 
-  test("download button fetches opds entry to indirectly fulfill book", () => {
+  test("download button fetches opds entry to indirectly fulfill book", async () => {
     const bookWithIndirect = mergeBook({
       ...downloadableBook,
       fulfillmentLinks: [
@@ -501,8 +469,6 @@ describe("available to download", () => {
         }
       ]
     });
-
-    mockUser();
 
     const utils = render(<FulfillmentCard book={bookWithIndirect} />);
     const downloadButton = utils.getByText("Read on Overdrive");
@@ -517,9 +483,13 @@ describe("available to download", () => {
         "X-Requested-With": "XMLHttpRequest"
       }
     });
+
+    // some error will be shown, and we need to await it or our test will
+    // warn about the unexpected promise.
+    await utils.findByText(/error:/gi);
   });
 
-  test("download button says download Adobe Epub when book has adobe type", () => {
+  test("download button says download Adobe Epub when book has adobe type", async () => {
     const bookWithIndirect = mergeBook({
       ...downloadableBook,
       fulfillmentLinks: [
@@ -543,6 +513,8 @@ describe("available to download", () => {
         "X-Requested-With": "XMLHttpRequest"
       }
     });
+
+    await waitForElementToBeRemoved(() => utils.getByText("Downloading..."));
   });
 
   test("does not show download links for audiobooks", () => {

@@ -2,7 +2,7 @@ import fetchWithHeaders from "dataflow/fetch";
 import download from "downloadjs";
 import { ServerError } from "errors";
 import { OPDS1 } from "interfaces";
-import { generateFilename, typeMap } from "owc/utils/file";
+import { generateFilename, typeMap } from "utils/file";
 
 export default async function downloadFile(
   url: string,

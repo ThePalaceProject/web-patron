@@ -1,8 +1,7 @@
 import OPDSParser, { OPDSFeed, OPDSEntry } from "opds-feed-parser";
 import ApplicationError, { ServerError } from "errors";
 import { BookData, CollectionData } from "interfaces";
-import { feedToCollection } from "dataflow/opds1/parse";
-import { entryToBook } from "owc/OPDSDataAdapter";
+import { entryToBook, feedToCollection } from "dataflow/opds1/parse";
 import fetchWithHeaders from "dataflow/fetch";
 import parseSearchData from "dataflow/opds1/parseSearchData";
 
@@ -11,7 +10,7 @@ const parser = new OPDSParser();
  * Function that will fetch opds and parse it into either
  * a Feed or an Entry
  */
-async function fetchOPDS(
+export async function fetchOPDS(
   url: string,
   token?: string
 ): Promise<OPDSEntry | OPDSFeed> {
@@ -96,17 +95,6 @@ export async function fetchBook(
 /**
  * Utilities
  */
-
-export function createCollectionUrl(
-  catalogUrl: string,
-  collectionUrl: string | undefined
-): string {
-  return `${collectionUrl ?? ""}`;
-}
-
-export function createBookUrl(catalogUrl: string, bookUrl: string) {
-  return `${bookUrl}`;
-}
 
 export function stripUndefined(json: any) {
   return JSON.parse(JSON.stringify(json));

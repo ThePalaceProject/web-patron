@@ -1,6 +1,5 @@
 import * as React from "react";
 import ContextProvider from "../components/context/ContextProvider";
-import getOrCreateStore from "../dataflow/getOrCreateStore";
 import Head from "next/head";
 import Error from "components/Error";
 import { AppProps } from "dataflow/withAppProps";
@@ -23,7 +22,6 @@ const Page: React.FC<AppProps> = props => {
   }
 
   const { library, children } = props;
-  const store = getOrCreateStore();
 
   return (
     <>
@@ -31,9 +29,7 @@ const Page: React.FC<AppProps> = props => {
         {/* define the default title */}
         <title>{library.catalogName}</title>
       </Head>
-      <ContextProvider library={library} store={store}>
-        {children}
-      </ContextProvider>
+      <ContextProvider library={library}>{children}</ContextProvider>
     </>
   );
 };
