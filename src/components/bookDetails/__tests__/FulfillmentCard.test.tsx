@@ -1,10 +1,17 @@
 import * as React from "react";
-import { render, fixtures, waitForElementToBeRemoved } from "test-utils";
+import {
+  render,
+  fixtures,
+  waitForElementToBeRemoved,
+  waitFor,
+  setEnv
+} from "test-utils";
 import { mergeBook } from "test-utils/fixtures";
 import FulfillmentCard from "../FulfillmentCard";
 import userEvent from "@testing-library/user-event";
 import _download from "downloadjs";
 import * as env from "utils/env";
+import fetchMock from "jest-fetch-mock";
 
 jest.mock("downloadjs");
 window.open = jest.fn();
@@ -355,7 +362,7 @@ describe("reserved", () => {
   });
 });
 
-describe("available to download", () => {
+describe("available to access", () => {
   beforeEach(() => ((env.NEXT_PUBLIC_COMPANION_APP as string) = "simplye"));
 
   const downloadableBook = mergeBook({
@@ -398,6 +405,69 @@ describe("available to download", () => {
       name: /Read Online/i
     }) as HTMLLinkElement;
     expect(readerLink.href).toBe("http://test-domain.com/read/%2Fepub-link");
+  });
+
+  test("shows read online button for external read online links", () => {
+    const readOnlineBook = mergeBook({
+      openAccessLinks: undefined,
+      fulfillmentLinks: [
+        {
+          url: "/overdrive-read-online",
+          type: `text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"`
+        }
+      ]
+    });
+    const utils = render(<FulfillmentCard book={readOnlineBook} />);
+
+    const readOnline = utils.getByRole("button", { name: "Read Online" });
+    expect(readOnline).toBeInTheDocument();
+  });
+
+  test("external read online tracks open_book event", async () => {
+    const readOnlineBook = mergeBook({
+      trackOpenBookUrl: "http://track-open-book.com",
+      openAccessLinks: undefined,
+      fulfillmentLinks: [
+        {
+          url: "/overdrive-read-online",
+          type: `text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"`
+        }
+      ]
+    });
+    const utils = render(<FulfillmentCard book={readOnlineBook} />);
+    const readOnline = utils.getByRole("button", { name: "Read Online" });
+
+    // no calls until we click the button
+    expect(fetchMock).toHaveBeenCalledTimes(0);
+    userEvent.click(readOnline);
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith("http://track-open-book.com", {
+        method: "POST"
+      })
+    );
+  });
+
+  test("internal read online button does not send open_book event", async () => {
+    setEnv({
+      NEXT_PUBLIC_AXIS_NOW_DECRYPT: true
+    });
+    const readOnlineBook = mergeBook({
+      trackOpenBookUrl: "http://track-open-book.com",
+      openAccessLinks: undefined,
+      fulfillmentLinks: [
+        {
+          url: "/internal-read-online",
+          type: "application/vnd.librarysimplified.axisnow+json"
+        }
+      ]
+    });
+    const utils = render(<FulfillmentCard book={readOnlineBook} />);
+    const readOnline = utils.getByRole("link", { name: "Read Online" });
+
+    // should not have been called ever
+    expect(fetchMock).toHaveBeenCalledTimes(0);
+    userEvent.click(readOnline);
+    expect(fetchMock).toHaveBeenCalledTimes(0);
   });
 
   test("correct title and subtitle", () => {
@@ -471,7 +541,7 @@ describe("available to download", () => {
     });
 
     const utils = render(<FulfillmentCard book={bookWithIndirect} />);
-    const downloadButton = utils.getByText("Read on Overdrive");
+    const downloadButton = utils.getByText("Read Online");
     expect(downloadButton).toBeInTheDocument();
 
     userEvent.click(downloadButton);
