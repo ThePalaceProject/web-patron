@@ -12,6 +12,7 @@ import userEvent from "@testing-library/user-event";
 import _download from "downloadjs";
 import * as env from "utils/env";
 import fetchMock from "jest-fetch-mock";
+import { mockPush } from "test-utils/mockNextRouter";
 
 jest.mock("downloadjs");
 window.open = jest.fn();
@@ -401,10 +402,13 @@ describe("available to access", () => {
     (env.NEXT_PUBLIC_COMPANION_APP as string) = "openebooks";
     (env.NEXT_PUBLIC_AXIS_NOW_DECRYPT as boolean) = true;
     const utils = render(<FulfillmentCard book={viewableAxisNowBook} />);
-    const readerLink = utils.getByRole("link", {
+    const readerButton = utils.getByRole("button", {
       name: /Read Online/i
     }) as HTMLLinkElement;
-    expect(readerLink.href).toBe("http://test-domain.com/read/%2Fepub-link");
+
+    expect(mockPush).toHaveBeenCalledTimes(0);
+    userEvent.click(readerButton);
+    expect(mockPush).toHaveBeenCalledTimes(1);
   });
 
   test("shows read online button for external read online links", () => {
@@ -447,7 +451,7 @@ describe("available to access", () => {
     );
   });
 
-  test("internal read online button does not send open_book event", async () => {
+  test("internal read online button tracks open_book event", async () => {
     setEnv({
       NEXT_PUBLIC_AXIS_NOW_DECRYPT: true
     });
@@ -462,12 +466,17 @@ describe("available to access", () => {
       ]
     });
     const utils = render(<FulfillmentCard book={readOnlineBook} />);
-    const readOnline = utils.getByRole("link", { name: "Read Online" });
+    const readOnline = utils.getByRole("button", { name: "Read Online" });
 
     // should not have been called ever
     expect(fetchMock).toHaveBeenCalledTimes(0);
     userEvent.click(readOnline);
-    expect(fetchMock).toHaveBeenCalledTimes(0);
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith("http://track-open-book.com", {
+        method: "POST"
+      })
+    );
   });
 
   test("correct title and subtitle", () => {

@@ -28,6 +28,8 @@ import {
 } from "utils/fulfill";
 import useDownloadButton from "hooks/useDownloadButton";
 import useReadOnlineButton from "hooks/useReadOnlineButton";
+import track from "analytics/track";
+import { Router, useRouter } from "next/router";
 
 const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
   return (
@@ -277,7 +279,11 @@ const AccessCard: React.FC<{
                   );
                 case "read-online-internal":
                   return (
-                    <ReadOnlineInternal details={details} key={details.url} />
+                    <ReadOnlineInternal
+                      details={details}
+                      key={details.url}
+                      trackOpenBookUrl={book.trackOpenBookUrl}
+                    />
                   );
                 case "read-online-external":
                   return (
@@ -324,16 +330,19 @@ const ReadOnlineExternal: React.FC<{
 
 const ReadOnlineInternal: React.FC<{
   details: ReadInternalDetails;
-}> = ({ details }) => {
+  trackOpenBookUrl: string | null;
+}> = ({ details, trackOpenBookUrl }) => {
+  const router = useRouter();
+
+  function open() {
+    track.openBook(trackOpenBookUrl);
+    router.push(details.url);
+  }
+
   return (
-    <NavButton
-      variant="ghost"
-      color="ui.gray.extraDark"
-      iconLeft={SvgExternalLink}
-      href={details.url}
-    >
+    <Button variant="ghost" color="ui.gray.extraDark" onClick={open}>
       Read Online
-    </NavButton>
+    </Button>
   );
 };
 
