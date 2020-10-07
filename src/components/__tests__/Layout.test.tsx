@@ -1,7 +1,6 @@
 import * as React from "react";
-import { render, fixtures } from "../../test-utils";
+import { render } from "../../test-utils";
 import Layout from "../Layout";
-import merge from "deepmerge";
 import userEvent from "@testing-library/user-event";
 
 describe("Layout nav + structure", () => {
@@ -16,13 +15,7 @@ describe("Layout nav + structure", () => {
   });
 
   test("my books navigates to /loans", () => {
-    const utils = render(<Layout>Child</Layout>, {
-      initialState: merge(fixtures.initialState, {
-        loans: {
-          url: "/myloans" // this url is not used for navigation, but for fetching loans
-        }
-      })
-    });
+    const utils = render(<Layout>Child</Layout>);
     const myBooks = utils.getAllByRole("link", { name: "My Books" });
     myBooks.forEach(ln => expect(ln).toHaveAttribute("href", "/loans"));
   });

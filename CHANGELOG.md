@@ -12,6 +12,7 @@
 - BREAKING CHANGE: Remove `SHORTEN_URLS` env var. Url parameters will no longer be shortened. We will look for a server solution to pretty urls in the future.
 - Add: Remove books from local storage when a user logs out.
 - Add: Optional error reporting via [Bugsnag](https://www.bugsnag.com/).
+- Refactor: Complete rewrite of the data layer, removing opds-web-client and adding [swr](https://swr.vercel.app/) for data fetching. Includes many UX improvments.
 
 # 2.3.0
 

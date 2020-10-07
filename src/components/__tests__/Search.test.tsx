@@ -1,60 +1,30 @@
 import * as React from "react";
-import { render, fixtures, fireEvent, actions } from "../../test-utils";
+import { render, fixtures, fireEvent } from "test-utils";
 import Search from "../Search";
-import merge from "deepmerge";
 import userEvent from "@testing-library/user-event";
-import { mockPush } from "../../test-utils/mockNextRouter";
+import { mockPush } from "test-utils/mockNextRouter";
 
-test("fetches search description", async () => {
-  const mockedFetchSearchDescription = jest.spyOn(
-    actions,
-    "fetchSearchDescription"
-  );
+test("doesn't render if there is no searchData in the library context", () => {
   const utils = render(<Search />, {
-    initialState: merge(fixtures.initialState, {
-      collection: {
-        data: {
-          search: {
-            url: "/search-url"
-          }
-        }
-      }
-    })
-  });
-
-  expect(mockedFetchSearchDescription).toHaveBeenCalledTimes(1);
-  expect(mockedFetchSearchDescription).toHaveBeenCalledWith("/search-url");
-  expect(utils.dispatch).toHaveBeenCalledTimes(1);
-});
-
-test("doesn't render if there is no searchData in the store", () => {
-  const utils = render(<Search />, {
-    initialState: merge(fixtures.initialState, {
-      collection: {
-        data: {
-          search: undefined
-        }
-      }
-    })
+    library: {
+      ...fixtures.libraryData,
+      searchData: null
+    }
   });
   expect(utils.container).toBeEmptyDOMElement();
 });
 
 test("searching calls history.push with url", async () => {
-  const mockedTemplate = jest.fn().mockReturnValue("templatereturn");
   const utils = render(<Search />, {
-    initialState: merge(fixtures.initialState, {
-      collection: {
-        data: {
-          search: {
-            url: "/search-url",
-            searchData: {
-              template: mockedTemplate
-            }
-          }
-        }
+    library: {
+      ...fixtures.libraryData,
+      searchData: {
+        template: "/search/{searchTerms}",
+        description: "search desc",
+        shortName: "search shortname",
+        url: "http://search-url"
       }
-    })
+    }
   });
   const searchButton = utils.getByText("Search");
   const input = utils.getByLabelText("Enter search keyword or keywords");
@@ -63,11 +33,9 @@ test("searching calls history.push with url", async () => {
   fireEvent.click(searchButton);
 
   // assert
-  expect(mockedTemplate).toHaveBeenCalledTimes(1);
-  expect(mockedTemplate).toHaveBeenCalledWith("my%20search");
   expect(mockPush).toHaveBeenCalledTimes(1);
   expect(mockPush).toHaveBeenCalledWith(
     "/collection/[collectionUrl]",
-    "/collection/templatereturn"
+    "/collection/http%3A%2F%2Fsearch-url%2Fsearch%2Fmy%2520search"
   );
 });

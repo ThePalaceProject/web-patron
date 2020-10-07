@@ -1,4 +1,4 @@
-import { BookData } from "opds-web-client/lib/interfaces";
+import { BookData } from "interfaces";
 import merge from "deepmerge";
 
 export const mergeBook = (input: Partial<BookData>) =>
@@ -13,7 +13,8 @@ export function makeBook(i: number) {
     title: `Book Title ${i}`,
     authors: [`Book ${i} author`],
     publisher: `Book ${i} publisher`,
-    categories: [`Book ${i} cat 1`, `Book ${i} cat 2`]
+    categories: [`Book ${i} cat 1`, `Book ${i} cat 2`],
+    relatedUrl: `/related-url-${i}`
   };
 }
 
@@ -34,6 +35,7 @@ export function makeBooks(
 
 export const book: BookData = {
   id: "urn:librarysimplified.org/terms/id/3M%20ID/crrmnr9",
+  relatedUrl: "http://related-url",
   url: "http://test-book-url",
   title: "The Mayan Secrets",
   authors: ["Clive Cussler", "Thomas Perry"],
@@ -46,7 +48,7 @@ export const book: BookData = {
     {
       url: "/epub-borrow-link",
       type: "application/atom+xml;type=entry;profile=opds-catalog",
-      indirectType: "application/vnd.adobe.adept+xml"
+      indirectType: "application/epub+zip"
     }
   ],
   openAccessLinks: [

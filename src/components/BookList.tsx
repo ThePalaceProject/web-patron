@@ -1,11 +1,6 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import {
-  BookData,
-  LaneData,
-  RequiredKeys
-} from "opds-web-client/lib/interfaces";
 import { truncateString, stripHTML } from "../utils/string";
 import {
   getAuthors,
@@ -15,7 +10,6 @@ import {
 import Lane from "./Lane";
 import Button, { NavButton } from "./Button";
 import LoadingIndicator from "./LoadingIndicator";
-import useInfiniteScroll from "../hooks/useInfiniteScroll";
 import { H2, Text } from "./Text";
 import * as DS from "@nypl/design-system-react-components";
 import MediumIndicator from "components/MediumIndicator";
@@ -24,13 +18,9 @@ import useIsBorrowed from "hooks/useIsBorrowed";
 import BookCover from "./BookCover";
 import Stack from "./Stack";
 import BorrowOrReserve from "./BorrowOrReserve";
-
-/**
- * In a collection you can:
- *  - See lanes view
- *  - See List/Gallery view
- *    - Switch between list and gallery in this case
- */
+import { BookData, CollectionData, LaneData, RequiredKeys } from "interfaces";
+import { fetchCollection } from "dataflow/opds1/fetch";
+import { useSWRInfinite } from "swr";
 
 const ListLoadingIndicator = () => (
   <div
@@ -43,28 +33,72 @@ const ListLoadingIndicator = () => (
       p: 3
     }}
   >
-    <LoadingIndicator /> Loading more books...
+    <LoadingIndicator /> Loading ...
   </div>
 );
 
 type BookWithUrl = RequiredKeys<BookData, "url">;
 const hasUrl = (book: BookData): book is BookWithUrl => !!book.url;
 
-export const ListView: React.FC<{
-  books: BookData[];
-}> = ({ books }) => {
-  // this hook will refetch the page when we reach the bottom of the screen
-  const { listRef, isFetchingPage } = useInfiniteScroll();
+export const InfiniteBookList: React.FC<{ firstPageUrl: string }> = ({
+  firstPageUrl
+}) => {
+  function getKey(pageIndex: number, previousData: CollectionData) {
+    // first page, no previous data
+    if (pageIndex === 0) return firstPageUrl;
+    // reached the end
+    if (!previousData.nextPageUrl) return null;
+    // otherwise return the next page url
+    return previousData.nextPageUrl;
+  }
+  const { data, size, error, setSize } = useSWRInfinite(
+    getKey,
+    fetchCollection
+  );
+
+  const isFetchingInitialData = !data && !error;
+  const lastItem = data && data[data.length - 1];
+  const hasMore = !!lastItem?.nextPageUrl;
+  const isFetchingMore = !!(!error && hasMore && size > (data?.length ?? 0));
+  const isFetching = isFetchingInitialData || isFetchingMore;
+
+  // extract the books from the array of collections in data
+  const books =
+    data?.reduce(
+      (total, current) => [...total, ...(current.books ?? [])],
+      []
+    ) ?? [];
 
   return (
-    <React.Fragment>
-      <ul ref={listRef} sx={{ px: 5 }} data-testid="listview-list">
-        {books.map(book => (
-          <BookListItem key={book.id} book={book} />
-        ))}
-      </ul>
-      {isFetchingPage && <ListLoadingIndicator />}
-    </React.Fragment>
+    <>
+      <BookList books={books} />
+      {isFetching ? (
+        <ListLoadingIndicator />
+      ) : hasMore ? (
+        <div sx={{ display: "flex", justifyContent: "center", p: 3 }}>
+          <Button
+            size="lg"
+            color="brand.primary"
+            onClick={() => setSize(size => size + 1)}
+            sx={{ maxWidth: 300 }}
+          >
+            View more
+          </Button>
+        </div>
+      ) : null}
+    </>
+  );
+};
+
+export const BookList: React.FC<{
+  books: BookData[];
+}> = ({ books }) => {
+  return (
+    <ul sx={{ px: 5 }} data-testid="listview-list">
+      {books.map(book => (
+        <BookListItem key={book.id} book={book} />
+      ))}
+    </ul>
   );
 };
 
@@ -138,6 +172,7 @@ export const BookListItem: React.FC<{
 const BookListCTA: React.FC<{ book: BookWithUrl }> = ({ book }) => {
   const isBorrowed = useIsBorrowed(book);
   const fulfillmentState = getFulfillmentState(book, isBorrowed);
+
   const getCtaButtons = (isBorrow: boolean) => {
     return (
       <Stack

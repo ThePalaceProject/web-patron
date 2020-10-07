@@ -51,6 +51,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function (
       sx={styleProps(color, size, variant)}
       disabled={loading || disabled}
       ref={ref}
+      aria-label={loading && loadingText ? loadingText : undefined}
       {...rest}
     >
       <ButtonContent {...props} />

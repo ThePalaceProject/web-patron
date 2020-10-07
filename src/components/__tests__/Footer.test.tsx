@@ -1,11 +1,11 @@
 import * as React from "react";
-import { render, fixtures } from "../../test-utils";
+import { render, fixtures } from "test-utils";
 import merge from "deepmerge";
 import Footer from "components/Footer";
-import { LibraryData, OPDSLink } from "../../interfaces";
+import { LibraryData, OPDS1 } from "interfaces";
 import * as env from "../../utils/env";
 
-const link: OPDSLink = {
+const link: OPDS1.Link = {
   href: "/wherever",
   rel: "navigation"
 };

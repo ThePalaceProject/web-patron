@@ -4,15 +4,24 @@ import * as React from "react";
 import Modal from "./Modal";
 import { useDialogState, DialogDisclosure } from "reakit/Dialog";
 import Button from "./Button";
-import useAuth from "hooks/useAuth";
 import Stack from "./Stack";
+import useUser from "components/context/UserContext";
 
 export default function SignOut() {
   const dialog = useDialogState();
-  const { signOutAndGoHome } = useAuth();
+  const { signOut, isLoading } = useUser();
+  function signOutAndClose() {
+    signOut();
+    dialog.hide();
+  }
   return (
     <>
-      <DialogDisclosure as={Button} color="ui.black" {...dialog}>
+      <DialogDisclosure
+        as={Button}
+        color="ui.black"
+        loading={isLoading}
+        {...dialog}
+      >
         Sign Out
       </DialogDisclosure>
       <Modal
@@ -21,6 +30,7 @@ export default function SignOut() {
         role="alertdialog"
         hideOnClickOutside
         label="Sign Out"
+        showClose={false}
       >
         <p>Are you sure you want to sign out?</p>
         <Stack sx={{ justifyContent: "center" }}>
@@ -29,7 +39,7 @@ export default function SignOut() {
           </Button>
           <Button
             color="ui.error"
-            onClick={signOutAndGoHome}
+            onClick={signOutAndClose}
             aria-label="Confirm Sign Out"
           >
             Sign out
