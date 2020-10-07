@@ -1025,6 +1025,7 @@ export const recommendations: CollectionData = {
         },
         {
           relatedUrl: null,
+          trackOpenBookUrl: null,
           id: "https://standardebooks.org/ebooks/jane-austen/persuasion",
           title: "Persuasion",
           series: null,
@@ -1064,6 +1065,7 @@ export const recommendations: CollectionData = {
         },
         {
           relatedUrl: null,
+          trackOpenBookUrl: null,
           id: "https://standardebooks.org/ebooks/jane-austen/emma",
           title: "Emma",
           series: null,
