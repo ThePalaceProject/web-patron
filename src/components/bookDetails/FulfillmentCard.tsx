@@ -281,7 +281,11 @@ const AccessCard: React.FC<{
                   );
                 case "read-online-external":
                   return (
-                    <ReadOnlineExternal details={details} key={details.id} />
+                    <ReadOnlineExternal
+                      details={details}
+                      key={details.id}
+                      trackOpenBookUrl={book.trackOpenBookUrl}
+                    />
                   );
               }
             })}
@@ -292,10 +296,14 @@ const AccessCard: React.FC<{
   );
 };
 
-const ReadOnlineExternal: React.FC<{ details: ReadExternalDetails }> = ({
-  details
-}) => {
-  const { open, loading, error } = useReadOnlineButton(details);
+const ReadOnlineExternal: React.FC<{
+  details: ReadExternalDetails;
+  trackOpenBookUrl: string | null;
+}> = ({ details, trackOpenBookUrl }) => {
+  const { open, loading, error } = useReadOnlineButton(
+    details,
+    trackOpenBookUrl
+  );
 
   return (
     <>

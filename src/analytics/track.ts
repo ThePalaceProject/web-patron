@@ -24,6 +24,23 @@ function pageview(page: PageData) {
   });
 }
 
+async function sendServerEvent(url: string | null) {
+  if (url) {
+    try {
+      await fetch(url, { method: "POST" });
+      return true;
+    } catch (e) {
+      console.warn("Error tracking server event");
+      console.warn(e);
+    }
+  }
+  return true;
+}
+
+async function openBook(url: string | null) {
+  return sendServerEvent(url);
+}
+
 // allows us to track performance using web vitals reports
 // https://nextjs.org/docs/advanced-features/measuring-performance
 function webVitals({ id, name, value, label }: NextWebVitalsMetric) {
@@ -38,5 +55,6 @@ function webVitals({ id, name, value, label }: NextWebVitalsMetric) {
 
 export default {
   webVitals,
-  pageview
+  pageview,
+  openBook
 };

@@ -138,6 +138,7 @@ export interface BookData {
   categories?: string[];
   language?: string;
   relatedUrl: string | null;
+  trackOpenBookUrl: string | null;
   raw?: any;
 }
 

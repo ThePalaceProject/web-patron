@@ -1,3 +1,4 @@
+import track from "analytics/track";
 import useLibraryContext from "components/context/LibraryContext";
 import useUser from "components/context/UserContext";
 import { ServerError } from "errors";
@@ -5,7 +6,10 @@ import useIsMounted from "hooks/useIsMounted";
 import * as React from "react";
 import { ReadExternalDetails } from "utils/fulfill";
 
-export default function useReadOnlineButton(details: ReadExternalDetails) {
+export default function useReadOnlineButton(
+  details: ReadExternalDetails,
+  trackOpenBookUrl: string | null
+) {
   const { catalogUrl } = useLibraryContext();
   const isMounted = useIsMounted();
   const { token } = useUser();
@@ -22,6 +26,8 @@ export default function useReadOnlineButton(details: ReadExternalDetails) {
       // the url may be behind indirection, so we fetch it with the
       // provided function
       const url = await details.getUrl(catalogUrl, token);
+      // we are about to open the book, so send a track event
+      track.openBook(trackOpenBookUrl);
       setLoadingIfMounted(false);
       window.open(url, "__blank");
     } catch (e) {

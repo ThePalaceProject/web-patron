@@ -11,8 +11,13 @@
  * Link Relations
  */
 export const AuthDocLinkRelation = "http://opds-spec.org/auth/document";
+// analytics link relation
+export const TrackOpenBookRel =
+  "http://librarysimplified.org/terms/rel/analytics/open-book";
+
 export type AnyLinkRelation =
   | typeof AuthDocLinkRelation
+  | typeof TrackOpenBookRel
   | AuthDocLinkRelations
   | "related";
 
