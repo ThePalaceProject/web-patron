@@ -23,5 +23,4 @@ export function reportWebVitals(metric: NextWebVitalsMetric) {
   track.webVitals(metric);
 }
 
-
 export default MyApp;

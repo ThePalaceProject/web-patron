@@ -2,6 +2,7 @@ import * as React from "react";
 import { GTM_ID } from "utils/env";
 
 export const GTMScript = () => {
+  if (!GTM_ID) return null;
   return (
     <script
       dangerouslySetInnerHTML={{
@@ -17,6 +18,7 @@ export const GTMScript = () => {
 };
 
 export const GTMNoscript = () => {
+  if (!GTM_ID) return null;
   return (
     <noscript
       dangerouslySetInnerHTML={{

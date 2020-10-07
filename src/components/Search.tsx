@@ -36,7 +36,6 @@ const Search: React.FC<SearchProps> = ({ className, ...props }) => {
       searchTerms
     );
     if (!url) return;
-    track.searchPerformed({ searchQuery: value });
     const link = linkUtils.buildCollectionLink(url);
     Router.push(link.href, link.as);
   };
