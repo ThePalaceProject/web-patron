@@ -79,6 +79,7 @@ The following environment variables can also be set to further configure the app
 - Set `CACHE_EXPIRATION_SECONDS` to control how often the app will check for changes to registry entries and circ manager authentication documents.
 - Set `AXE_TEST=true` to run the application with `react-axe` enabled (only works when `NODE_ENV` is "development").
 - Set `ANALYZE=true` to generate bundle analysis files inside `.next/analyze` which will show bundle sizes for server and client, as well as composition.
+- Set `NEXT_PUBLIC_GTM_ID` to send events and data to Google Tag Manager. 
 - Set `NEXT_PUBLIC_AXIS_NOW_DECRYPT=true` to run with AxisNow decryption. See [Running with Decryption](#Running-with-Decryption) for more details
 - Set `NEXT_PUBLIC_BUGSNAG_API_KEY` to configure error tracking with [Bugsnag](https://www.bugsnag.com/).
 

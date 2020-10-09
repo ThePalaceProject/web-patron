@@ -14,7 +14,8 @@ export function makeBook(i: number) {
     authors: [`Book ${i} author`],
     publisher: `Book ${i} publisher`,
     categories: [`Book ${i} cat 1`, `Book ${i} cat 2`],
-    relatedUrl: `/related-url-${i}`
+    relatedUrl: `/related-url-${i}`,
+    trackOpenBookUrl: `/track-open-book-${i}`
   };
 }
 
@@ -36,6 +37,7 @@ export function makeBooks(
 export const book: BookData = {
   id: "urn:librarysimplified.org/terms/id/3M%20ID/crrmnr9",
   relatedUrl: "http://related-url",
+  trackOpenBookUrl: "/track-open-book",
   url: "http://test-book-url",
   title: "The Mayan Secrets",
   authors: ["Clive Cussler", "Thomas Perry"],

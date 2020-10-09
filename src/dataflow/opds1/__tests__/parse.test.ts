@@ -236,6 +236,26 @@ describe("OPDSDataAdapter", () => {
     expect(book.relatedUrl).toBe("/related");
   });
 
+  test("extracts trackOpenBookUrl", () => {
+    const openBookLink = factory.opdsLink({
+      href: "/track-open-book",
+      rel: "http://librarysimplified.org/terms/rel/analytics/open-book"
+    });
+    const entry = factory.entry({
+      id: "some id",
+      authors: [],
+      contributors: [],
+      categories: [],
+      summary: {
+        content: "summary"
+      },
+      links: [openBookLink]
+    });
+
+    const book = entryToBook(entry, "http://test-url.com");
+    expect(book.trackOpenBookUrl).toBe("/track-open-book");
+  });
+
   test("extracts next page url", () => {
     const nextLink = factory.link({
       href: "href",

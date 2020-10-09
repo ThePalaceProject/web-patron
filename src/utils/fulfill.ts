@@ -82,7 +82,7 @@ export function getFulfillmentDetails(link: MediaLink): FulfillmentDetails {
         id: link.url,
         getUrl: getReaderUrl(initialType, contentType, link.url),
         type: "read-online-external",
-        buttonLabel: "Read on Overdrive"
+        buttonLabel: "Read Online"
       };
 
     case OPDS1.AxisNowWebpubMediaType:

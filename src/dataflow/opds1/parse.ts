@@ -22,6 +22,7 @@ import {
   OPDS1,
   MediaLink
 } from "interfaces";
+import { TrackOpenBookRel } from "types/opds1";
 
 /**
  * Parses OPDS 1.x Feed or Entry into a Collection or Book
@@ -54,6 +55,9 @@ function isDefined<T>(value: T | undefined): value is T {
 }
 function isRelatedLink(link: OPDSLink) {
   return link.rel === "related";
+}
+function isTrackOpenBookLink(link: OPDSLink) {
+  return link.rel === TrackOpenBookRel;
 }
 
 /**
@@ -185,6 +189,8 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
   );
   const { availability, holds, copies } = linkWithAvailability ?? {};
 
+  const trackOpenBookLink = entry.links.find(isTrackOpenBookLink);
+
   return {
     id: entry.id,
     title: entry.title,
@@ -212,6 +218,7 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
     language: entry.language,
     url: detailUrl,
     relatedUrl: relatedLink?.href ?? null,
+    trackOpenBookUrl: trackOpenBookLink?.href ?? null,
     raw: entry.unparsed
   };
 }

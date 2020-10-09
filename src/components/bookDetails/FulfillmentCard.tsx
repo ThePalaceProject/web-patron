@@ -7,7 +7,7 @@ import {
   queueString,
   bookIsAudiobook
 } from "utils/book";
-import Button, { NavButton } from "../Button";
+import Button from "../Button";
 import withErrorBoundary from "../ErrorBoundary";
 import Stack from "components/Stack";
 import { Text } from "components/Text";
@@ -28,6 +28,8 @@ import {
 } from "utils/fulfill";
 import useDownloadButton from "hooks/useDownloadButton";
 import useReadOnlineButton from "hooks/useReadOnlineButton";
+import track from "analytics/track";
+import { useRouter } from "next/router";
 
 const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
   return (
@@ -277,11 +279,19 @@ const AccessCard: React.FC<{
                   );
                 case "read-online-internal":
                   return (
-                    <ReadOnlineInternal details={details} key={details.url} />
+                    <ReadOnlineInternal
+                      details={details}
+                      key={details.url}
+                      trackOpenBookUrl={book.trackOpenBookUrl}
+                    />
                   );
                 case "read-online-external":
                   return (
-                    <ReadOnlineExternal details={details} key={details.id} />
+                    <ReadOnlineExternal
+                      details={details}
+                      key={details.id}
+                      trackOpenBookUrl={book.trackOpenBookUrl}
+                    />
                   );
               }
             })}
@@ -292,10 +302,14 @@ const AccessCard: React.FC<{
   );
 };
 
-const ReadOnlineExternal: React.FC<{ details: ReadExternalDetails }> = ({
-  details
-}) => {
-  const { open, loading, error } = useReadOnlineButton(details);
+const ReadOnlineExternal: React.FC<{
+  details: ReadExternalDetails;
+  trackOpenBookUrl: string | null;
+}> = ({ details, trackOpenBookUrl }) => {
+  const { open, loading, error } = useReadOnlineButton(
+    details,
+    trackOpenBookUrl
+  );
 
   return (
     <>
@@ -316,16 +330,19 @@ const ReadOnlineExternal: React.FC<{ details: ReadExternalDetails }> = ({
 
 const ReadOnlineInternal: React.FC<{
   details: ReadInternalDetails;
-}> = ({ details }) => {
+  trackOpenBookUrl: string | null;
+}> = ({ details, trackOpenBookUrl }) => {
+  const router = useRouter();
+
+  function open() {
+    track.openBook(trackOpenBookUrl);
+    router.push(details.url);
+  }
+
   return (
-    <NavButton
-      variant="ghost"
-      color="ui.gray.extraDark"
-      iconLeft={SvgExternalLink}
-      href={details.url}
-    >
+    <Button variant="ghost" color="ui.gray.extraDark" onClick={open}>
       Read Online
-    </NavButton>
+    </Button>
   );
 };
 
@@ -335,7 +352,6 @@ const DownloadButton: React.FC<{
 }> = ({ details, title }) => {
   const { buttonLabel } = details;
   const { download, error, loading } = useDownloadButton(details, title);
-
   return (
     <>
       <Button
