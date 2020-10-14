@@ -22,7 +22,7 @@ describe("variants", () => {
 test("NavButton renders correct element", () => {
   const utils = render(<NavButton href="/somewhere">child</NavButton>);
   const button = utils.getByText("child");
-  expect(button).toHaveAttribute("href", "/somewhere");
+  expect(button).toHaveAttribute("href", "/testlib/somewhere");
   expect(button).toMatchSnapshot();
 });
 test("LinkButton renders correct element", () => {

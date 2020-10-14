@@ -2,7 +2,7 @@ import * as React from "react";
 import complaints, { initState } from "./reducer";
 import { fetchComplaintTypes, postComplaint } from "./actions";
 import { useDialogState } from "reakit";
-import { BookData } from "interfaces";
+import { AnyBook } from "interfaces";
 import { getReportUrl } from "../../utils/libraryLinks";
 /**
  * We are using react useReducer instead of redux. The only real difference
@@ -16,7 +16,7 @@ import { getReportUrl } from "../../utils/libraryLinks";
  * boundDoSomething is a function we can then use in our app:
  * (url) => fetch(url)
  */
-export default function useComplaints(book: BookData) {
+export default function useComplaints(book: AnyBook) {
   const [state, dispatch] = React.useReducer(complaints, initState);
   const dialog = useDialogState();
 

@@ -4,7 +4,7 @@ exports[`fetchCatalog properly parses fetched catalog 1`] = `
 AcquisitionFeed {
   "complete": false,
   "entries": Array [
-    OPDSEntry {
+    PartialOPDSEntry {
       "authors": Array [
         Contributor {
           "name": "Jane Austen",
@@ -59,6 +59,12 @@ AcquisitionFeed {
           "role": undefined,
           "title": "Some link for the test",
           "type": "text/html",
+        },
+        CompleteEntryLink {
+          "href": "entry.xml",
+          "rel": "alternate",
+          "title": "Full entry",
+          "type": "application/atom+xml;type=entry;profile=opds-catalog",
         },
       ],
       "published": "2006-12-28T20:00:54Z",
@@ -316,6 +322,42 @@ Pride And Prejudice, the story of Mrs. Bennet's attempts to marry off her five d
                 "prefix": "",
                 "uri": "",
                 "value": "text/html",
+              },
+            },
+            "$ns": Object {
+              "local": "link",
+              "uri": "http://www.w3.org/2005/Atom",
+            },
+          },
+          Object {
+            "$": Object {
+              "href": Object {
+                "local": "href",
+                "name": "href",
+                "prefix": "",
+                "uri": "",
+                "value": "entry.xml",
+              },
+              "rel": Object {
+                "local": "rel",
+                "name": "rel",
+                "prefix": "",
+                "uri": "",
+                "value": "alternate",
+              },
+              "title": Object {
+                "local": "title",
+                "name": "title",
+                "prefix": "",
+                "uri": "",
+                "value": "Full entry",
+              },
+              "type": Object {
+                "local": "type",
+                "name": "type",
+                "prefix": "",
+                "uri": "",
+                "value": "application/atom+xml;type=entry;profile=opds-catalog",
               },
             },
             "$ns": Object {
@@ -694,7 +736,7 @@ Pride And Prejudice, the story of Mrs. Bennet's attempts to marry off her five d
       },
       "updated": "2012-10-12T17:43:18Z",
     },
-    OPDSEntry {
+    PartialOPDSEntry {
       "authors": Array [
         Contributor {
           "name": "Jane Austen",
@@ -749,6 +791,12 @@ Pride And Prejudice, the story of Mrs. Bennet's attempts to marry off her five d
           "role": undefined,
           "title": "Some link for the test",
           "type": "text/html",
+        },
+        CompleteEntryLink {
+          "href": "entry.xml",
+          "rel": "alternate",
+          "title": "Full entry",
+          "type": "application/atom+xml;type=entry;profile=opds-catalog",
         },
       ],
       "published": "2006-12-28T20:00:54Z",
@@ -993,6 +1041,42 @@ Pride And Prejudice, the story of Mrs. Bennet's attempts to marry off her five d
               "uri": "http://www.w3.org/2005/Atom",
             },
           },
+          Object {
+            "$": Object {
+              "href": Object {
+                "local": "href",
+                "name": "href",
+                "prefix": "",
+                "uri": "",
+                "value": "entry.xml",
+              },
+              "rel": Object {
+                "local": "rel",
+                "name": "rel",
+                "prefix": "",
+                "uri": "",
+                "value": "alternate",
+              },
+              "title": Object {
+                "local": "title",
+                "name": "title",
+                "prefix": "",
+                "uri": "",
+                "value": "Full entry",
+              },
+              "type": Object {
+                "local": "type",
+                "name": "type",
+                "prefix": "",
+                "uri": "",
+                "value": "application/atom+xml;type=entry;profile=opds-catalog",
+              },
+            },
+            "$ns": Object {
+              "local": "link",
+              "uri": "http://www.w3.org/2005/Atom",
+            },
+          },
         ],
         "published": Array [
           Object {
@@ -1046,7 +1130,7 @@ Pride And Prejudice, the story of Mrs. Bennet's attempts to marry off her five d
       },
       "updated": "2012-10-12T17:43:18Z",
     },
-    OPDSEntry {
+    PartialOPDSEntry {
       "authors": Array [
         Contributor {
           "name": "Jane Austen",
@@ -1101,6 +1185,12 @@ Pride And Prejudice, the story of Mrs. Bennet's attempts to marry off her five d
           "role": undefined,
           "title": "Some link for the test",
           "type": "text/html",
+        },
+        CompleteEntryLink {
+          "href": "entry.xml",
+          "rel": "alternate",
+          "title": "Full entry",
+          "type": "application/atom+xml;type=entry;profile=opds-catalog",
         },
       ],
       "published": "2006-12-28T20:00:54Z",
@@ -1365,6 +1455,42 @@ Pride And Prejudice, the story of Mrs. Bennet's attempts to marry off her five d
               "uri": "http://www.w3.org/2005/Atom",
             },
           },
+          Object {
+            "$": Object {
+              "href": Object {
+                "local": "href",
+                "name": "href",
+                "prefix": "",
+                "uri": "",
+                "value": "entry.xml",
+              },
+              "rel": Object {
+                "local": "rel",
+                "name": "rel",
+                "prefix": "",
+                "uri": "",
+                "value": "alternate",
+              },
+              "title": Object {
+                "local": "title",
+                "name": "title",
+                "prefix": "",
+                "uri": "",
+                "value": "Full entry",
+              },
+              "type": Object {
+                "local": "type",
+                "name": "type",
+                "prefix": "",
+                "uri": "",
+                "value": "application/atom+xml;type=entry;profile=opds-catalog",
+              },
+            },
+            "$ns": Object {
+              "local": "link",
+              "uri": "http://www.w3.org/2005/Atom",
+            },
+          },
         ],
         "published": Array [
           Object {
@@ -1418,7 +1544,7 @@ Pride And Prejudice, the story of Mrs. Bennet's attempts to marry off her five d
       },
       "updated": "2012-10-12T17:43:18Z",
     },
-    OPDSEntry {
+    PartialOPDSEntry {
       "authors": Array [],
       "categories": Array [
         Category {
@@ -1473,6 +1599,12 @@ Pride And Prejudice, the story of Mrs. Bennet's attempts to marry off her five d
           "role": undefined,
           "title": "Some link for the test",
           "type": "text/html",
+        },
+        CompleteEntryLink {
+          "href": "entry.xml",
+          "rel": "alternate",
+          "title": "Full entry",
+          "type": "application/atom+xml;type=entry;profile=opds-catalog",
         },
       ],
       "published": "2006-12-28T20:00:54Z",
@@ -1737,6 +1869,42 @@ Pride And Prejudice, the story of Mrs. Bennet's attempts to marry off her five d
               "uri": "http://www.w3.org/2005/Atom",
             },
           },
+          Object {
+            "$": Object {
+              "href": Object {
+                "local": "href",
+                "name": "href",
+                "prefix": "",
+                "uri": "",
+                "value": "entry.xml",
+              },
+              "rel": Object {
+                "local": "rel",
+                "name": "rel",
+                "prefix": "",
+                "uri": "",
+                "value": "alternate",
+              },
+              "title": Object {
+                "local": "title",
+                "name": "title",
+                "prefix": "",
+                "uri": "",
+                "value": "Full entry",
+              },
+              "type": Object {
+                "local": "type",
+                "name": "type",
+                "prefix": "",
+                "uri": "",
+                "value": "application/atom+xml;type=entry;profile=opds-catalog",
+              },
+            },
+            "$ns": Object {
+              "local": "link",
+              "uri": "http://www.w3.org/2005/Atom",
+            },
+          },
         ],
         "published": Array [
           Object {
@@ -1779,7 +1947,7 @@ This work is available for countries where copyright is Life+70 and in the USA.
       },
       "updated": "2012-10-12T17:43:18Z",
     },
-    OPDSEntry {
+    PartialOPDSEntry {
       "authors": Array [
         Contributor {
           "name": "Jane Austen",
@@ -1834,6 +2002,12 @@ This work is available for countries where copyright is Life+70 and in the USA.
           "role": undefined,
           "title": "Some link for the test",
           "type": "text/html",
+        },
+        CompleteEntryLink {
+          "href": "entry.xml",
+          "rel": "alternate",
+          "title": "Full entry",
+          "type": "application/atom+xml;type=entry;profile=opds-catalog",
         },
       ],
       "published": "2006-12-28T20:00:54Z",
@@ -2077,6 +2251,42 @@ Pride And Prejudice, the story of Mrs. Bennet's attempts to marry off her five d
                 "prefix": "",
                 "uri": "",
                 "value": "text/html",
+              },
+            },
+            "$ns": Object {
+              "local": "link",
+              "uri": "http://www.w3.org/2005/Atom",
+            },
+          },
+          Object {
+            "$": Object {
+              "href": Object {
+                "local": "href",
+                "name": "href",
+                "prefix": "",
+                "uri": "",
+                "value": "entry.xml",
+              },
+              "rel": Object {
+                "local": "rel",
+                "name": "rel",
+                "prefix": "",
+                "uri": "",
+                "value": "alternate",
+              },
+              "title": Object {
+                "local": "title",
+                "name": "title",
+                "prefix": "",
+                "uri": "",
+                "value": "Full entry",
+              },
+              "type": Object {
+                "local": "type",
+                "name": "type",
+                "prefix": "",
+                "uri": "",
+                "value": "application/atom+xml;type=entry;profile=opds-catalog",
               },
             },
             "$ns": Object {
@@ -2493,6 +2703,42 @@ Pride And Prejudice, the story of Mrs. Bennet's attempts to marry off her five d
               "uri": "http://www.w3.org/2005/Atom",
             },
           },
+          Object {
+            "$": Object {
+              "href": Object {
+                "local": "href",
+                "name": "href",
+                "prefix": "",
+                "uri": "",
+                "value": "entry.xml",
+              },
+              "rel": Object {
+                "local": "rel",
+                "name": "rel",
+                "prefix": "",
+                "uri": "",
+                "value": "alternate",
+              },
+              "title": Object {
+                "local": "title",
+                "name": "title",
+                "prefix": "",
+                "uri": "",
+                "value": "Full entry",
+              },
+              "type": Object {
+                "local": "type",
+                "name": "type",
+                "prefix": "",
+                "uri": "",
+                "value": "application/atom+xml;type=entry;profile=opds-catalog",
+              },
+            },
+            "$ns": Object {
+              "local": "link",
+              "uri": "http://www.w3.org/2005/Atom",
+            },
+          },
         ],
         "published": Array [
           Object {
@@ -3020,6 +3266,42 @@ Pride And Prejudice, the story of Mrs. Bennet's attempts to marry off her five d
               "uri": "http://www.w3.org/2005/Atom",
             },
           },
+          Object {
+            "$": Object {
+              "href": Object {
+                "local": "href",
+                "name": "href",
+                "prefix": "",
+                "uri": "",
+                "value": "entry.xml",
+              },
+              "rel": Object {
+                "local": "rel",
+                "name": "rel",
+                "prefix": "",
+                "uri": "",
+                "value": "alternate",
+              },
+              "title": Object {
+                "local": "title",
+                "name": "title",
+                "prefix": "",
+                "uri": "",
+                "value": "Full entry",
+              },
+              "type": Object {
+                "local": "type",
+                "name": "type",
+                "prefix": "",
+                "uri": "",
+                "value": "application/atom+xml;type=entry;profile=opds-catalog",
+              },
+            },
+            "$ns": Object {
+              "local": "link",
+              "uri": "http://www.w3.org/2005/Atom",
+            },
+          },
         ],
         "published": Array [
           Object {
@@ -3312,6 +3594,42 @@ Pride And Prejudice, the story of Mrs. Bennet's attempts to marry off her five d
                 "prefix": "",
                 "uri": "",
                 "value": "text/html",
+              },
+            },
+            "$ns": Object {
+              "local": "link",
+              "uri": "http://www.w3.org/2005/Atom",
+            },
+          },
+          Object {
+            "$": Object {
+              "href": Object {
+                "local": "href",
+                "name": "href",
+                "prefix": "",
+                "uri": "",
+                "value": "entry.xml",
+              },
+              "rel": Object {
+                "local": "rel",
+                "name": "rel",
+                "prefix": "",
+                "uri": "",
+                "value": "alternate",
+              },
+              "title": Object {
+                "local": "title",
+                "name": "title",
+                "prefix": "",
+                "uri": "",
+                "value": "Full entry",
+              },
+              "type": Object {
+                "local": "type",
+                "name": "type",
+                "prefix": "",
+                "uri": "",
+                "value": "application/atom+xml;type=entry;profile=opds-catalog",
               },
             },
             "$ns": Object {
@@ -3618,6 +3936,42 @@ Pride And Prejudice, the story of Mrs. Bennet's attempts to marry off her five d
               "uri": "http://www.w3.org/2005/Atom",
             },
           },
+          Object {
+            "$": Object {
+              "href": Object {
+                "local": "href",
+                "name": "href",
+                "prefix": "",
+                "uri": "",
+                "value": "entry.xml",
+              },
+              "rel": Object {
+                "local": "rel",
+                "name": "rel",
+                "prefix": "",
+                "uri": "",
+                "value": "alternate",
+              },
+              "title": Object {
+                "local": "title",
+                "name": "title",
+                "prefix": "",
+                "uri": "",
+                "value": "Full entry",
+              },
+              "type": Object {
+                "local": "type",
+                "name": "type",
+                "prefix": "",
+                "uri": "",
+                "value": "application/atom+xml;type=entry;profile=opds-catalog",
+              },
+            },
+            "$ns": Object {
+              "local": "link",
+              "uri": "http://www.w3.org/2005/Atom",
+            },
+          },
         ],
         "published": Array [
           Object {
@@ -3885,6 +4239,42 @@ Pride And Prejudice, the story of Mrs. Bennet's attempts to marry off her five d
                 "prefix": "",
                 "uri": "",
                 "value": "text/html",
+              },
+            },
+            "$ns": Object {
+              "local": "link",
+              "uri": "http://www.w3.org/2005/Atom",
+            },
+          },
+          Object {
+            "$": Object {
+              "href": Object {
+                "local": "href",
+                "name": "href",
+                "prefix": "",
+                "uri": "",
+                "value": "entry.xml",
+              },
+              "rel": Object {
+                "local": "rel",
+                "name": "rel",
+                "prefix": "",
+                "uri": "",
+                "value": "alternate",
+              },
+              "title": Object {
+                "local": "title",
+                "name": "title",
+                "prefix": "",
+                "uri": "",
+                "value": "Full entry",
+              },
+              "type": Object {
+                "local": "type",
+                "name": "type",
+                "prefix": "",
+                "uri": "",
+                "value": "application/atom+xml;type=entry;profile=opds-catalog",
               },
             },
             "$ns": Object {

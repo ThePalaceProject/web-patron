@@ -4,11 +4,11 @@ import * as React from "react";
 import LoadingIndicator from "../LoadingIndicator";
 import { H3, H2 } from "components/Text";
 import Lane from "components/Lane";
-import { BookData } from "interfaces";
+import { AnyBook } from "interfaces";
 import { fetchCollection } from "dataflow/opds1/fetch";
 import useSWR from "swr";
 
-const Recommendations: React.FC<{ book: BookData }> = ({ book }) => {
+const Recommendations: React.FC<{ book: AnyBook }> = ({ book }) => {
   const relatedUrl = book.relatedUrl;
 
   const { data: recommendations, isValidating } = useSWR(

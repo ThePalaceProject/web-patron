@@ -11,7 +11,6 @@ import { Provider as ReakitProvider } from "reakit";
 import { MockNextRouterContextProvider } from "./mockNextRouter";
 import { NextRouter } from "next/router";
 import { enableFetchMocks } from "jest-fetch-mock";
-import setEnv from "./setEnv";
 import { LibraryProvider } from "components/context/LibraryContext";
 import { LinkUtilsProvider } from "components/context/LinkUtilsContext";
 import { UserContext, UserState } from "components/context/UserContext";
@@ -22,7 +21,7 @@ import { AuthModalProvider } from "auth/AuthModalContext";
 enableFetchMocks();
 expect.addSnapshotSerializer(serializer);
 
-export { fixtures, setEnv };
+export { fixtures };
 
 // configure the enzyme adapter
 configure({ adapter: new Adapter() });

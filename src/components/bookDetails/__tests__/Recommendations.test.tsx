@@ -39,21 +39,21 @@ test("shows recommendations loading state", async () => {
     data: undefined,
     isValidating: true
   });
-  const utils = render(<Recommendations book={fixtures.book} />);
+  const utils = render(<Recommendations book={fixtures.borrowableBook} />);
   await waitFor(() =>
     expect(utils.getByText("Loading...")).toBeInTheDocument()
   );
 });
 
 test("fetches the proper url for recommendation collection", () => {
-  render(<Recommendations book={fixtures.book} />);
+  render(<Recommendations book={fixtures.borrowableBook} />);
   expect(mockedSWR).toHaveBeenCalledTimes(1);
   expect(mockedSWR).toHaveBeenCalledWith("http://related-url", fetchCollection);
 });
 
 test("shows recommendation lanes", () => {
   mockSwr();
-  const utils = render(<Recommendations book={fixtures.book} />);
+  const utils = render(<Recommendations book={fixtures.borrowableBook} />);
   expect(
     utils.getByRole("heading", { name: "Recommendations" })
   ).toBeInTheDocument();
@@ -67,30 +67,30 @@ test("doesn't show recommendations if there are none", () => {
     isValidating: false,
     data: undefined
   });
-  const utils = render(<Recommendations book={fixtures.book} />);
+  const utils = render(<Recommendations book={fixtures.borrowableBook} />);
   expect(utils.container).toBeEmptyDOMElement();
 });
 
 test("recommendations are clickable", () => {
   mockSwr();
-  const utils = render(<Recommendations book={fixtures.book} />);
+  const utils = render(<Recommendations book={fixtures.borrowableBook} />);
 
   const recommendationCover = utils.getByRole("link", {
     name: "View Recommendation 1"
   });
   expect(recommendationCover.closest("a")).toHaveAttribute(
     "href",
-    "/book/http%3A%2F%2Frecommendation-1-url"
+    "/testlib/book/http%3A%2F%2Frecommendation-1-url"
   );
 });
 
 test("displays a more button for recommendations", () => {
   mockSwr();
-  const utils = render(<Recommendations book={fixtures.book} />);
+  const utils = render(<Recommendations book={fixtures.borrowableBook} />);
   const moreButton = utils.getByText("See More");
   expect(moreButton).toHaveAttribute(
     "href",
-    "/collection/http%3A%2F%2Ftest-cm.com%2FcatalogUrl%2Fworks%2Fcontributor%2FJane%2520Austen%2Feng%2F"
+    "/testlib/collection/http%3A%2F%2Ftest-cm.com%2FcatalogUrl%2Fworks%2Fcontributor%2FJane%2520Austen%2Feng%2F"
   );
 });
 
@@ -105,12 +105,12 @@ test("shows multiple lanes if existing", () => {
       {
         title: "lane 1",
         url: "/lane-1",
-        books: fixtures.makeBooks(10)
+        books: fixtures.makeBorrowableBooks(10)
       },
       {
         title: "lane 2",
         url: "/lane-2",
-        books: fixtures.makeBooks(10)
+        books: fixtures.makeBorrowableBooks(10)
       }
     ]
   };
@@ -118,7 +118,7 @@ test("shows multiple lanes if existing", () => {
     isValidating: false,
     data: multipleLanes
   });
-  const utils = render(<Recommendations book={fixtures.book} />);
+  const utils = render(<Recommendations book={fixtures.borrowableBook} />);
 
   expect(utils.getByText("lane 1")).toBeInTheDocument();
   expect(utils.getByText("lane 2")).toBeInTheDocument();

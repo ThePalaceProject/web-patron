@@ -9,7 +9,7 @@ import { H2 } from "./Text";
 import { NavButton } from "./Button";
 import ArrowForward from "icons/ArrowForward";
 import Stack from "./Stack";
-import { BookData, LaneData } from "interfaces";
+import { AnyBook, LaneData } from "interfaces";
 
 type BookRefs = {
   [id: string]: React.RefObject<HTMLLIElement>;
@@ -22,7 +22,7 @@ type CurrentBook = {
   snap: boolean;
 };
 
-const getfilteredBooksAndRefs = (books: BookData[], omitIds?: string[]) => {
+const getfilteredBooksAndRefs = (books: AnyBook[], omitIds?: string[]) => {
   const filteredBooks = books.filter(book => {
     if (!omitIds?.includes(book.id)) return book;
   });
@@ -105,7 +105,7 @@ const Lane: React.FC<{
     const currentIndex = currentBook.index;
     // we explicitly state this can be undefined because the array might be empty
     // and typescript doesn't catch this kind of error
-    const nextBook: BookData | undefined = filteredBooks[currentIndex];
+    const nextBook: AnyBook | undefined = filteredBooks[currentIndex];
     // if the nextBook is undefined, don't do anything
     if (!nextBook) return;
     const nextBookRef = bookRefs[nextBook.id];

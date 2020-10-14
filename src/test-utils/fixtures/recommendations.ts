@@ -18,6 +18,7 @@ export const recommendations: CollectionData = {
       url: "http://test-cm.com/catalogUrl/works/contributor/Jane%20Austen/eng/",
       books: [
         {
+          status: "borrowable",
           relatedUrl: null,
           trackOpenBookUrl: null,
           id:
@@ -30,27 +31,8 @@ export const recommendations: CollectionData = {
             "<p><i>Pride and Prejudice</i> may today be one of Jane Austen’s most enduring novels, having been widely adapted to stage, screen, and other media since its publication in 1813. The novel tells the tale of five unmarried sisters and how their lives change when a wealthy eligible bachelor moves in to their neighborhood.</p>\n\t\t\t<p>This edition removes Austen’s pathological use of period-dashes and many ungrammatical commas to make the reading smoother for modern readers.</p>",
           imageUrl:
             "https://s3.amazonaws.com/open-bookshelf-covers/scaled/300/Standard+Ebooks/URI/https%3A//standardebooks.org/ebooks/jane-austen/pride-and-prejudice/cover.png",
-          openAccessLinks: [
-            {
-              url: "http://test-cm.com/catalogUrl/works/9/fulfill/2",
-              type: "application/kepub+zip"
-            },
-            {
-              url: "http://test-cm.com/catalogUrl/works/9/fulfill/2",
-              type: "application/epub+zip"
-            },
-            {
-              url: "http://test-cm.com/catalogUrl/works/9/fulfill/8",
-              type: "application/kepub+zip"
-            },
-            {
-              url: "http://test-cm.com/catalogUrl/works/9/fulfill/7",
-              type: "application/x-mobi8-ebook"
-            }
-          ],
           borrowUrl:
             "http://test-cm.com/catalogUrl/works/URI/https://standardebooks.org/ebooks/jane-austen/pride-and-prejudice/borrow",
-          fulfillmentLinks: [],
           availability: {
             status: "available"
           },
@@ -968,6 +950,7 @@ export const recommendations: CollectionData = {
           }
         },
         {
+          status: "borrowable",
           relatedUrl: null,
           trackOpenBookUrl: null,
           id:
@@ -980,31 +963,8 @@ export const recommendations: CollectionData = {
             "<p>Elinor and Marianne are two daughters of Mr. Dashwood by his second wife. They have a younger sister, Margaret, and an older half-brother named John. When their father dies, the family estate passes to John and the Dashwood women are left in reduced circumstances. Fortunately, a distant relative offers to rent the women a cottage on his property.\n<br>The novel follows the Dashwood sisters to their new home, where they experience both romance and heartbreak.</p>",
           imageUrl:
             "https://s3.amazonaws.com/open-bookshelf-covers/scaled/300/Standard+Ebooks/URI/https%3A//standardebooks.org/ebooks/jane-austen/sense-and-sensibility/cover.png",
-          openAccessLinks: [
-            {
-              url: "http://test-cm.com/catalogUrl/works/5734/fulfill/6",
-              type: "application/x-mobi8-ebook"
-            },
-            {
-              url: "http://test-cm.com/catalogUrl/works/5734/fulfill/8",
-              type: "application/epub+zip"
-            },
-            {
-              url: "http://test-cm.com/catalogUrl/works/5734/fulfill/2",
-              type: "application/epub+zip"
-            },
-            {
-              url: "http://test-cm.com/catalogUrl/works/5734/fulfill/2",
-              type: "application/epub+zip"
-            },
-            {
-              url: "http://test-cm.com/catalogUrl/works/5734/fulfill/7",
-              type: "application/x-mobi8-ebook"
-            }
-          ],
           borrowUrl:
             "http://test-cm.com/catalogUrl/works/URI/https://standardebooks.org/ebooks/jane-austen/sense-and-sensibility/borrow",
-          fulfillmentLinks: [],
           availability: {
             status: "available"
           },
@@ -1024,6 +984,7 @@ export const recommendations: CollectionData = {
             "http://test-cm.com/catalogUrl/works/URI/https://standardebooks.org/ebooks/jane-austen/sense-and-sensibility"
         },
         {
+          status: "borrowable",
           relatedUrl: null,
           trackOpenBookUrl: null,
           id: "https://standardebooks.org/ebooks/jane-austen/persuasion",
@@ -1035,23 +996,8 @@ export const recommendations: CollectionData = {
             "Persuasion is Jane Austen's last completed novel. She began it soon after she had finishedEmma and completed it in August 1816. She died, aged 41, in 1817; Persuasion was published in December of that year (but dated 1818).<br><br>\nPersuasion is linked to Northanger Abbey not only by the fact that the two books were originally bound up in one volume and published together, but also because both stories are set partly inBath, a fashionable city with which Austen was well acquainted, having lived there from 1801 to 1805.\n<br><br>\nBesides the theme of persuasion, the novel evokes other topics, such as the Royal Navy, in which two of Jane Austen's brothers ultimately rose to the rank of admiral. As in Northanger Abbey, the superficial social life of Bath—well known to Austen, who spent several relatively unhappy and unproductive years there—is portrayed extensively and serves as a setting for the second half of the book. In many respects, Persuasion marks a break with Austen's previous works, both in the more biting, even irritable satire directed at some of the novel's characters and in the regretful, resigned outlook of its otherwise admirable heroine, Anne Elliot, in the first part of the story. Against this is set the energy and appeal of the Royal Navy, which symbolises for Anne and the reader the possibility of a more outgoing, engaged, and fulfilling life, and it is this worldview which triumphs for the most part at the end of the novel.",
           imageUrl:
             "https://s3.amazonaws.com/open-bookshelf-covers/scaled/300/Standard+Ebooks/URI/https%3A//standardebooks.org/ebooks/jane-austen/persuasion/cover.png",
-          openAccessLinks: [
-            {
-              url: "http://test-cm.com/catalogUrl/works/2746/fulfill/2",
-              type: "application/epub+zip"
-            },
-            {
-              url: "http://test-cm.com/catalogUrl/works/2746/fulfill/8",
-              type: "application/kepub+zip"
-            },
-            {
-              url: "http://test-cm.com/catalogUrl/works/2746/fulfill/7",
-              type: "application/x-mobi8-ebook"
-            }
-          ],
           borrowUrl:
             "http://test-cm.com/catalogUrl/works/URI/https://standardebooks.org/ebooks/jane-austen/persuasion/borrow",
-          fulfillmentLinks: [],
           availability: {
             status: "available"
           },
@@ -1064,6 +1010,7 @@ export const recommendations: CollectionData = {
             "http://test-cm.com/catalogUrl/works/URI/https://standardebooks.org/ebooks/jane-austen/persuasion"
         },
         {
+          status: "borrowable",
           relatedUrl: null,
           trackOpenBookUrl: null,
           id: "https://standardebooks.org/ebooks/jane-austen/emma",
@@ -1075,27 +1022,8 @@ export const recommendations: CollectionData = {
             "<p>Emma has lived a pampered, protected life and consequently is somewhat unrealistic in her regard for herself and her own abilities.She befriends Harriet Smith, a young woman of dubious parentage and no money and determines to improve her prospects. As part of this project, Emma decides to become a matchmaker between Harriet and the Reverend Mr. Elton, a vicar in the nearby town. Things, however, do not go as smoothly as she had imagined. Emma provides an insight into the distinctions in the rigid class structure of England in the Regency period, and the social barriers to marriage between persons considered to be of superior and inferior rank.</p>",
           imageUrl:
             "https://s3.amazonaws.com/open-bookshelf-covers/scaled/300/Standard+Ebooks/URI/https%3A//standardebooks.org/ebooks/jane-austen/emma/cover.png",
-          openAccessLinks: [
-            {
-              url: "http://test-cm.com/catalogUrl/works/13/fulfill/7",
-              type: "application/x-mobipocket-ebook"
-            },
-            {
-              url: "http://test-cm.com/catalogUrl/works/13/fulfill/2",
-              type: "application/epub+zip"
-            },
-            {
-              url: "http://test-cm.com/catalogUrl/works/13/fulfill/2",
-              type: "application/epub+zip"
-            },
-            {
-              url: "http://test-cm.com/catalogUrl/works/13/fulfill/6",
-              type: "application/x-mobipocket-ebook"
-            }
-          ],
           borrowUrl:
             "http://test-cm.com/catalogUrl/works/URI/https://standardebooks.org/ebooks/jane-austen/emma/borrow",
-          fulfillmentLinks: [],
           availability: {
             status: "available"
           },

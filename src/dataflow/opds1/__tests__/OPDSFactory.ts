@@ -11,7 +11,8 @@ import {
   Category,
   OPDSEntry,
   AcquisitionFeed,
-  NavigationFeed
+  NavigationFeed,
+  CompleteEntryLink
 } from "opds-feed-parser";
 import { OPDSLinkArgs } from "opds-feed-parser/lib/src/opds_link";
 
@@ -76,4 +77,8 @@ export function category(props: any): Category {
 
 export function opdsLink(props: OPDSLinkArgs): OPDSLink {
   return new OPDSLink(props);
+}
+
+export function completeEntryLink(props: any): CompleteEntryLink {
+  return new CompleteEntryLink(props);
 }

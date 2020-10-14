@@ -11,12 +11,16 @@
  * Link Relations
  */
 export const AuthDocLinkRelation = "http://opds-spec.org/auth/document";
-// analytics link relation
+export const AcquisitionLinkRel = "http://opds-spec.org/acquisition";
+export const BorrowLinkRel = "http://opds-spec.org/acquisition/borrow";
+export const RevokeLinkRel = "http://librarysimplified.org/terms/rel/revoke";
 export const TrackOpenBookRel =
   "http://librarysimplified.org/terms/rel/analytics/open-book";
-
 export type AnyLinkRelation =
   | typeof AuthDocLinkRelation
+  | typeof AcquisitionLinkRel
+  | typeof BorrowLinkRel
+  | typeof RevokeLinkRel
   | typeof TrackOpenBookRel
   | AuthDocLinkRelations
   | "related";
@@ -55,11 +59,15 @@ export const OPDSEntryMediaType =
 export const AdeptMediaType = "application/vnd.adobe.adept+xml";
 // there was an issue with incorrect Adept media types being sent.
 export const IncorrectAdeptMediaType = "vnd.adobe/adept+xml";
+// this is not yet supported, but the description is here:
+// https://github.com/NYPL-Simplified/Simplified/wiki/OPDSForDistributors#bearer-token-propagation
+export const BearerTokenMediaType =
+  "application/vnd.librarysimplified.bearer-token+json";
 
 export type IndirectAcquisitionType =
   | typeof OPDSEntryMediaType
   | typeof AdeptMediaType
-  | typeof IncorrectAdeptMediaType;
+  | typeof BearerTokenMediaType;
 
 /**
  * Direct Acquisition Types
@@ -79,6 +87,8 @@ export const OverdriveEbookMediaType =
   "application/vnd.overdrive.circulation.api+json;profile=ebook";
 export const AxisNowWebpubMediaType =
   "application/vnd.librarysimplified.axisnow+json";
+export const AccessRestrictionAudiobookMediaType =
+  'application/audiobook+json;profile="http://www.feedbooks.com/audiobooks/access-restriction"';
 
 export type ReadOnlineMediaType =
   | typeof ExternalReaderMediaType
@@ -90,11 +100,17 @@ export type DownloadMediaType =
   | typeof KepubMediaType
   | typeof PdfMediaType
   | typeof MobiPocketMediaType
-  | typeof Mobi8Mediatype
+  | typeof Mobi8Mediatype;
+
+export type UnsupportedMediaType =
+  | typeof AccessRestrictionAudiobookMediaType
   | typeof AudiobookMediaType
   | typeof OverdriveAudiobookMediaType;
 
-export type AnyBookMediaType = ReadOnlineMediaType | DownloadMediaType;
+export type AnyBookMediaType =
+  | ReadOnlineMediaType
+  | DownloadMediaType
+  | UnsupportedMediaType;
 
 export type AnyMediaType =
   | AnyBookMediaType

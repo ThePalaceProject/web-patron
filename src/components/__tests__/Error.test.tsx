@@ -1,6 +1,9 @@
 import * as React from "react";
+import mockConfig from "test-utils/mockConfig";
 import { render } from "../../test-utils";
 import Error from "../Error";
+
+mockConfig();
 
 test("renders error message with 404 status code if status code not provided", () => {
   const utils = render(<Error />);

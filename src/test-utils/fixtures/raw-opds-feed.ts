@@ -40,6 +40,7 @@ This work is available for countries where copyright is Life+70 and in the USA.
 		<link type="image/jpeg" rel="http://opds-spec.org/image" href="../larger.jpg"/>
 		<link type="image/jpeg" rel="http://opds-spec.org/image/thumbnail" href="../thumbnail.jpg"/>
 		<link type="text/html" rel="related" href="http://www.feedbooks.com/book/52" title="Some link for the test"/>
+		<link type="application/atom+xml;type=entry;profile=opds-catalog" title="Full entry" rel="alternate" href="entry.xml"/>
 	</entry>
 	<entry>
 		<title>Partial and Full entry</title>
@@ -84,6 +85,7 @@ This work is available for countries where copyright is Life+70 and in the USA.
 		<link type="image/jpeg" rel="http://opds-spec.org/image" href="../larger.jpg"/>
 		<link type="image/jpeg" rel="http://opds-spec.org/image/thumbnail" href="../thumbnail.jpg"/>
 		<link type="text/html" rel="related" href="http://www.feedbooks.com/book/52" title="Some link for the test"/>
+		<link type="application/atom+xml;type=entry;profile=opds-catalog" title="Full entry" rel="alternate" href="entry.xml"/>
 	</entry>
 	<entry>
 		<title>Metadata: Summary vs Description</title>
@@ -111,6 +113,7 @@ This work is available for countries where copyright is Life+70 and in the USA.
 		<link type="image/jpeg" rel="http://opds-spec.org/image" href="../larger.jpg"/>
 		<link type="image/jpeg" rel="http://opds-spec.org/image/thumbnail" href="../thumbnail.jpg"/>
 		<link type="text/html" rel="related" href="http://www.feedbooks.com/book/52" title="Some link for the test"/>
+		<link type="application/atom+xml;type=entry;profile=opds-catalog" title="Full entry" rel="alternate" href="entry.xml"/>
 	</entry>
 	<entry>
 		<title>Metadata: Contributor</title>
@@ -135,6 +138,7 @@ This work is available for countries where copyright is Life+70 and in the USA.
 		<link type="image/jpeg" rel="http://opds-spec.org/image" href="../larger.jpg"/>
 		<link type="image/jpeg" rel="http://opds-spec.org/image/thumbnail" href="../thumbnail.jpg"/>
 		<link type="text/html" rel="related" href="http://www.feedbooks.com/book/52" title="Some link for the test"/>
+		<link type="application/atom+xml;type=entry;profile=opds-catalog" title="Full entry" rel="alternate" href="entry.xml"/>
 	</entry>
 	<entry>
 		<title>Metadata: No Label</title>
@@ -159,6 +163,7 @@ This work is available for countries where copyright is Life+70 and in the USA.
 		<link type="image/jpeg" rel="http://opds-spec.org/image" href="../larger.jpg"/>
 		<link type="image/jpeg" rel="http://opds-spec.org/image/thumbnail" href="../thumbnail.jpg"/>
 		<link type="text/html" rel="related" href="http://www.feedbooks.com/book/52" title="Some link for the test"/>
+		<link type="application/atom+xml;type=entry;profile=opds-catalog" title="Full entry" rel="alternate" href="entry.xml"/>
 	</entry>
 </feed>`;
 

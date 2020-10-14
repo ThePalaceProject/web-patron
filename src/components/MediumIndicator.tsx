@@ -3,9 +3,9 @@ import { jsx } from "theme-ui";
 import * as React from "react";
 import { Text } from "./Text";
 import { bookMediumMap, getMedium } from "utils/book";
-import { BookData } from "interfaces";
+import { AnyBook } from "interfaces";
 
-const MediumIndicator: React.FC<{ book: BookData; className?: string }> = ({
+const MediumIndicator: React.FC<{ book: AnyBook; className?: string }> = ({
   book,
   className
 }) => {
@@ -24,7 +24,7 @@ const MediumIndicator: React.FC<{ book: BookData; className?: string }> = ({
 
 export default MediumIndicator;
 
-export const MediumIcon: React.FC<{ book: BookData; className?: string }> = ({
+export const MediumIcon: React.FC<{ book: AnyBook; className?: string }> = ({
   book,
   className,
   ...rest

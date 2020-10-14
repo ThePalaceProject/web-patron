@@ -1,6 +1,6 @@
 import OPDSParser, { OPDSFeed, OPDSEntry } from "opds-feed-parser";
 import ApplicationError, { ServerError } from "errors";
-import { BookData, CollectionData } from "interfaces";
+import { AnyBook, CollectionData } from "interfaces";
 import { entryToBook, feedToCollection } from "dataflow/opds1/parse";
 import fetchWithHeaders from "dataflow/fetch";
 import parseSearchData from "dataflow/opds1/parseSearchData";
@@ -86,7 +86,7 @@ export async function fetchBook(
   url: string,
   catalogUrl: string,
   token?: string
-): Promise<BookData> {
+): Promise<AnyBook> {
   const entry = await fetchEntry(url, token);
   const book = entryToBook(entry, catalogUrl);
   return book;

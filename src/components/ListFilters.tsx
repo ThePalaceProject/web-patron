@@ -42,8 +42,8 @@ const FacetSelector: React.FC<{
     const facet = facets.find(facet => facet.label === facetLabel);
 
     if (!facet?.href) return;
-    const link = linkUtils.buildCollectionLink(facet.href);
-    Router.push(link.href, link.as);
+    const url = linkUtils.buildCollectionLink(facet.href);
+    Router.push(url);
   };
   return (
     <React.Fragment>

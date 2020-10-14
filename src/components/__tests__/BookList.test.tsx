@@ -2,12 +2,12 @@ import * as React from "react";
 import { render, fixtures } from "test-utils";
 import { BookList, InfiniteBookList } from "../BookList";
 import merge from "deepmerge";
-import { BookData, CollectionData } from "interfaces";
+import { BorrowableBook, CollectionData } from "interfaces";
 import { useSWRInfinite } from "swr";
 import { fetchCollection } from "dataflow/opds1/fetch";
 import userEvent from "@testing-library/user-event";
 
-const books = fixtures.makeBooks(3);
+const books = fixtures.makeBorrowableBooks(3);
 
 test("renders books", () => {
   const utils = render(<BookList books={books} />);
@@ -16,7 +16,7 @@ test("renders books", () => {
     const book = fixtures.makeBook(i);
     expect(utils.getByText(book.title)).toBeInTheDocument();
     // shows details as well
-    expect(utils.getByText(book.authors[0])).toBeInTheDocument();
+    expect(utils.getByText("Book 0 author")).toBeInTheDocument();
   }
 
   expectBook(0);
@@ -25,7 +25,9 @@ test("renders books", () => {
 });
 
 test("truncates long titles", () => {
-  const longBook = merge<BookData>(fixtures.book, {
+  const longBook = merge<BorrowableBook>(fixtures.book, {
+    status: "borrowable",
+    borrowUrl: "/borrow",
     title: "This is an extremely long title it's really way too long"
   });
   const utils = render(<BookList books={[longBook]} />);
@@ -35,9 +37,11 @@ test("truncates long titles", () => {
 });
 
 test("truncates authors", () => {
-  const longBook = merge<BookData>(
+  const longBook = merge<BorrowableBook>(
     fixtures.book,
     {
+      status: "borrowable",
+      borrowUrl: "/borrow",
       authors: ["one", "two", "three", "four", "five"]
     },
     {
@@ -48,20 +52,6 @@ test("truncates authors", () => {
 
   expect(utils.getByText("one, two & 3 more"));
   expect(utils.queryByText("one, two, three")).toBeFalsy();
-});
-
-test("doesn't render book if it has no url", () => {
-  const utils = render(
-    <BookList
-      books={[
-        {
-          ...fixtures.book,
-          url: undefined
-        }
-      ]}
-    />
-  );
-  expect(utils.queryByText("The Mayan Secrets")).not.toBeInTheDocument();
 });
 
 jest.mock("swr");
@@ -92,12 +82,12 @@ describe("infinite loading book list", () => {
     mockCollection([
       {
         ...fixtures.emptyCollection,
-        books: fixtures.makeBooks(2)
+        books: fixtures.makeBorrowableBooks(2)
       },
       {
         ...fixtures.emptyCollection,
         id: "id-2",
-        books: [fixtures.book]
+        books: [fixtures.borrowableBook]
       }
     ]);
     const utils = render(<InfiniteBookList firstPageUrl="/first-page" />);
@@ -115,7 +105,7 @@ describe("infinite loading book list", () => {
 
   test("shows loading indicator when fetching more", () => {
     const notFinalCollection: CollectionData = {
-      books: [fixtures.book],
+      books: [fixtures.borrowableBook],
       id: "id!",
       lanes: [],
       navigationLinks: [],
@@ -135,7 +125,7 @@ describe("infinite loading book list", () => {
 
   test("doesn't show loader when at end of list", () => {
     const finalCollection: CollectionData = {
-      books: [fixtures.book],
+      books: [fixtures.borrowableBook],
       id: "id!",
       lanes: [],
       navigationLinks: [],
@@ -160,7 +150,7 @@ describe("infinite loading book list", () => {
 
   test("shows view more button which loads more books on click", () => {
     const notFinalCollection: CollectionData = {
-      books: [fixtures.book],
+      books: [fixtures.borrowableBook],
       id: "id!",
       lanes: [],
       navigationLinks: [],

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {
   OPDSFeed,
   OPDSEntry,
@@ -10,18 +11,22 @@ import {
   CompleteEntryLink,
   OPDSCatalogRootLink,
   OPDSAcquisitionLink,
-  OPDSShelfLink
+  OPDSShelfLink,
+  OPDSIndirectAcquisition
 } from "opds-feed-parser";
 import {
   CollectionData,
   LaneData,
-  BookData,
+  Book,
   LinkData,
   FacetGroupData,
   BookAvailability,
   OPDS1,
-  MediaLink
+  FulfillmentLink,
+  AnyBook
 } from "interfaces";
+import { IncorrectAdeptMediaType } from "types/opds1";
+import { getAppSupportLevel } from "utils/fulfill";
 import { TrackOpenBookRel } from "types/opds1";
 
 /**
@@ -66,16 +71,50 @@ function isTrackOpenBookLink(link: OPDSLink) {
 const resolve = (base: string, relative: string) =>
   new URL(relative, base).toString();
 
+/**
+ * There is or was an error in the CM where it sent us incorrectly formatted
+ * Adobe media types.
+ */
+export function fixMimeType(
+  mimeType: OPDS1.IndirectAcquisitionType | typeof OPDS1.IncorrectAdeptMediaType
+): OPDS1.IndirectAcquisitionType {
+  return mimeType === IncorrectAdeptMediaType ? OPDS1.AdeptMediaType : mimeType;
+}
+
+function parseFormat(format: OPDSAcquisitionLink | OPDSIndirectAcquisition) {
+  // if the format has an indirect type nested inside, that is the
+  // content type of the format
+  const indirectType = format.indirectAcquisitions?.[0]?.type;
+  const contentType = (indirectType ?? format.type) as OPDS1.AnyBookMediaType;
+  const indirectionType = indirectType
+    ? (format.type as OPDS1.IndirectAcquisitionType)
+    : undefined;
+  return {
+    contentType,
+    indirectionType
+  };
+}
+
+function getFormatSupportLevel(
+  format: OPDSAcquisitionLink | OPDSIndirectAcquisition
+) {
+  const { contentType, indirectionType } = parseFormat(format);
+  return getAppSupportLevel(contentType, indirectionType);
+}
+
 function buildFulfillmentLink(feedUrl: string) {
-  return (link: OPDSAcquisitionLink): MediaLink | undefined => {
-    const indirects = link.indirectAcquisitions;
-    const first = indirects?.[0];
-    const indirectType = first?.type as OPDS1.AnyBookMediaType | undefined;
-    // it is possible that it doesn't exist in the array of indirects
+  return (link: OPDSAcquisitionLink): FulfillmentLink => {
+    const { contentType, indirectionType } = parseFormat(link);
+    const supportLevel = getAppSupportLevel(contentType, indirectionType);
     return {
+      supportLevel,
       url: resolve(feedUrl, link.href),
-      type: link.type as OPDS1.AnyBookMediaType | OPDS1.IndirectAcquisitionType,
-      indirectType
+      contentType: contentType as OPDS1.AnyBookMediaType,
+      indirectionType: fixMimeType(
+        indirectionType as
+          | OPDS1.IndirectAcquisitionType
+          | typeof OPDS1.IncorrectAdeptMediaType
+      )
     };
   };
 }
@@ -106,7 +145,7 @@ if (typeof window === "undefined") {
  * Converters
  */
 
-export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
+export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
   const authors = entry.authors.map(author => {
     return author.name;
   });
@@ -134,64 +173,50 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
   const detailLink = entry.links.find(
     link => link instanceof CompleteEntryLink
   );
-  const detailUrl = detailLink?.href
-    ? resolve(feedUrl, detailLink.href)
-    : undefined;
+  const detailUrl = resolve(feedUrl, detailLink!.href);
 
   const categories = entry.categories
     .filter(category => !!category.label)
     .map(category => category.label);
 
-  const openAccessLinks = entry.links
-    .filter(isAcquisitionLink)
+  const acquisitionLinks = entry.links.filter(isAcquisitionLink);
+
+  const borrowLink = getBorrowLink(acquisitionLinks);
+  const { availability, holds, copies } = borrowLink ?? {};
+
+  const openAccessLinks: FulfillmentLink[] = acquisitionLinks
     .filter(link => {
       return link.rel === OPDSAcquisitionLink.OPEN_ACCESS_REL;
     })
     .map(link => {
+      const supportLevel = getFormatSupportLevel(link);
       return {
         url: resolve(feedUrl, link.href),
-        type: link.type as OPDS1.AnyBookMediaType
+        contentType: link.type as OPDS1.AnyBookMediaType,
+        supportLevel
       };
     });
 
   const relatedLinks = entry.links.filter(isRelatedLink);
   const relatedLink = relatedLinks.length > 0 ? relatedLinks[0] : null;
 
-  const borrowLink = entry.links.find(link => {
-    return (
-      isAcquisitionLink(link) && link.rel === OPDSAcquisitionLink.BORROW_REL
-    );
-  });
-  const borrowUrl = borrowLink?.href
-    ? resolve(feedUrl, borrowLink.href)
-    : undefined;
-
-  const allBorrowLinks: MediaLink[] = entry.links
-    .filter(isAcquisitionLink)
-    .filter(link => {
-      return link.rel === OPDSAcquisitionLink.BORROW_REL;
-    })
-    .map(buildFulfillmentLink(feedUrl))
-    .filter(isDefined);
-
-  const fulfillmentLinks = entry.links
-    .filter(isAcquisitionLink)
+  const fulfillmentLinks = acquisitionLinks
     .filter(link => {
       return link.rel === OPDSAcquisitionLink.GENERIC_REL;
     })
     .map(buildFulfillmentLink(feedUrl))
     .filter(isDefined);
 
-  const linkWithAvailability = entry.links.find(
-    (link): link is OPDSAcquisitionLink => {
-      return link instanceof OPDSAcquisitionLink && !!link.availability;
-    }
+  const supportedFulfillmentLinks = fulfillmentLinks.filter(
+    link => link.supportLevel !== "unsupported"
   );
-  const { availability, holds, copies } = linkWithAvailability ?? {};
+
+  const revokeUrl =
+    entry.links.find(link => link.rel === OPDS1.RevokeLinkRel)?.href ?? null;
 
   const trackOpenBookLink = entry.links.find(isTrackOpenBookLink);
 
-  return {
+  const book: Book = {
     id: entry.id,
     title: entry.title,
     series: entry.series,
@@ -200,10 +225,6 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
     subtitle: entry.subtitle,
     summary: entry.summary.content && sanitizeHtml?.(entry.summary.content),
     imageUrl: imageUrl,
-    openAccessLinks: openAccessLinks,
-    borrowUrl: borrowUrl,
-    allBorrowLinks: allBorrowLinks,
-    fulfillmentLinks: fulfillmentLinks,
     availability: {
       ...availability,
       // we type cast status because our internal types
@@ -221,6 +242,85 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
     trackOpenBookUrl: trackOpenBookLink?.href ?? null,
     raw: entry.unparsed
   };
+
+  // It's fulfillable
+  if (
+    supportedFulfillmentLinks.length > 0 ||
+    (!borrowLink && openAccessLinks.length > 0)
+  ) {
+    // include open access links in the fulfillment links
+    const allFulfillmentLinks = [
+      ...supportedFulfillmentLinks,
+      ...openAccessLinks
+    ];
+    return {
+      ...book,
+      status: "fulfillable",
+      fulfillmentLinks: allFulfillmentLinks,
+      revokeUrl
+    };
+  }
+  // it's a reserved book
+  if (availability?.status === "reserved") {
+    return {
+      ...book,
+      status: "reserved",
+      revokeUrl
+    };
+  }
+  // it's a reservable book
+  if (borrowLink && borrowLink.availability.status === "unavailable") {
+    return {
+      ...book,
+      status: "reservable",
+      reserveUrl: borrowLink.href
+    };
+  }
+
+  // it is on hold and ready to borrow
+  if (borrowLink && borrowLink.availability.status === "ready") {
+    return {
+      ...book,
+      status: "on-hold",
+      borrowUrl: borrowLink.href
+    };
+  }
+
+  // it's a borrowable book
+  if (borrowLink && borrowLink.availability.status === "available") {
+    return {
+      ...book,
+      status: "borrowable",
+      borrowUrl: borrowLink.href
+    };
+  }
+
+  // it is unsupported
+  return {
+    status: "unsupported",
+    ...book
+  };
+}
+
+/**
+ * Extracts the url of the first borrow link that has a supported
+ * format according to the APP_CONFIG.
+ * In the future we hope to support many borrow links, but
+ * this works for now.
+ */
+function getBorrowLink(
+  links: OPDSAcquisitionLink[]
+): OPDSAcquisitionLink | null {
+  const supportedLink = links.find(link => {
+    if (link.rel !== OPDSAcquisitionLink.BORROW_REL) return false;
+    const indirects = link.indirectAcquisitions ?? [];
+    const supportedFormat = indirects.find(
+      format => getFormatSupportLevel(format) !== "unsupported"
+    );
+    if (supportedFormat) return true;
+    return false;
+  });
+  return supportedLink ?? null;
 }
 
 function entryToLink(entry: OPDSEntry, feedUrl: string): LinkData | null {
@@ -240,12 +340,12 @@ function entryToLink(entry: OPDSEntry, feedUrl: string): LinkData | null {
   return null;
 }
 
-function dedupeBooks(books: BookData[]): BookData[] {
+function dedupeBooks(books: AnyBook[]): AnyBook[] {
   // using Map because it preserves key order
   const bookIndex = books.reduce((index, book) => {
     index.set(book.id, book);
     return index;
-  }, new Map<any, BookData>());
+  }, new Map<any, AnyBook>());
 
   return Array.from(bookIndex.values());
 }
@@ -300,14 +400,14 @@ export function feedToCollection(
     url: feedUrl,
     raw: feed.unparsed
   };
-  const books: BookData[] = [];
+  const books: AnyBook[] = [];
   const navigationLinks: LinkData[] = [];
   let lanes: LaneData[] = [];
   const laneTitles: any[] = [];
   const laneIndex: {
     title: any;
     url: string;
-    books: BookData[];
+    books: AnyBook[];
   }[] = [];
   let facetGroups: FacetGroupData[] = [];
   let nextPageUrl: string | undefined = undefined;

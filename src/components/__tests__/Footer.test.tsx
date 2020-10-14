@@ -3,7 +3,7 @@ import { render, fixtures } from "test-utils";
 import merge from "deepmerge";
 import Footer from "components/Footer";
 import { LibraryData, OPDS1 } from "interfaces";
-import * as env from "../../utils/env";
+import mockConfig from "test-utils/mockConfig";
 
 const link: OPDS1.Link = {
   href: "/wherever",
@@ -43,12 +43,12 @@ test("shows external links when present in state w/ apropriate attributes", () =
   // my books nav link
   const myBooks = utils.getByRole("link", { name: /my books/i });
   expect(myBooks).toBeInTheDocument();
-  expect(myBooks).toHaveAttribute("href", "/loans");
+  expect(myBooks).toHaveAttribute("href", "/testlib/loans");
 });
 
 describe("toggling SimplyE Branding", () => {
   test("does not show simplyE callout when NEXT_PUBLIC_COMPANION_APP is 'openebooks'", () => {
-    (env.NEXT_PUBLIC_COMPANION_APP as string) = "openebooks";
+    mockConfig({ companionApp: "openebooks" });
 
     const utils = render(<Footer />);
 
@@ -75,11 +75,11 @@ describe("toggling SimplyE Branding", () => {
     // my books nav link
     const myBooks = utils.queryByText(/my books/i);
     expect(myBooks).toBeInTheDocument();
-    expect(myBooks).toHaveAttribute("href", "/loans");
+    expect(myBooks).toHaveAttribute("href", "/testlib/loans");
   });
 
   test("shows simplyE callout when NEXT_PUBLIC_COMPANION_APP is 'simplye'", () => {
-    (env.NEXT_PUBLIC_COMPANION_APP as string) = "simplye";
+    mockConfig({ companionApp: "simplye" });
 
     const utils = render(<Footer />);
 
@@ -119,6 +119,6 @@ describe("toggling SimplyE Branding", () => {
       name: /my books/i
     });
     expect(myBooks).toBeInTheDocument();
-    expect(myBooks).toHaveAttribute("href", "/loans");
+    expect(myBooks).toHaveAttribute("href", "/testlib/loans");
   });
 });

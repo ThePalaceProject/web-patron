@@ -37,7 +37,7 @@ const collection: CollectionData = {
     {
       title: "my lane",
       url: "/link-to-lane",
-      books: fixtures.makeBooks(10)
+      books: fixtures.makeBorrowableBooks(10)
     }
   ]
 };
@@ -70,8 +70,7 @@ describe("Format filters", () => {
     userEvent.selectOptions(select, "http://all");
     expect(mockPush).toHaveBeenCalledTimes(1);
     expect(mockPush).toHaveBeenCalledWith(
-      "/collection/[collectionUrl]",
-      "/collection/http%3A%2F%2Fall"
+      "/testlib/collection/http%3A%2F%2Fall"
     );
   });
 });

@@ -6,13 +6,13 @@ import {
   buildLibraryData,
   getLibrarySlugs
 } from "../getLibraryData";
-import getConfigFile from "../getConfigFile";
 import fetchMock from "jest-fetch-mock";
-import ApplicationError, { PageNotFoundError, AppSetupError } from "errors";
+import ApplicationError, { PageNotFoundError } from "errors";
 import rawCatalog from "test-utils/fixtures/raw-opds-feed";
-import { fixtures, setEnv } from "test-utils";
+import { fixtures } from "test-utils";
 import { OPDS1, OPDS2 } from "interfaces";
 import { getAuthDocHref } from "utils/auth";
+import mockConfig from "test-utils/mockConfig";
 
 describe("fetchCatalog", () => {
   test("calls fetch with catalog url", async () => {
@@ -46,115 +46,26 @@ describe("fetchCatalog", () => {
   });
 });
 
-jest.mock("../getConfigFile");
-const mockGetConfigFile = getConfigFile as jest.MockedFunction<
-  typeof getConfigFile
->;
-mockGetConfigFile.mockResolvedValue({
-  somelibrary: "somelibraryurl",
-  anotherlib: "anotherliburl"
-});
-
 describe("getCatalogRootUrl", () => {
-  test("throws error if there is a library slug and CIRCULATION_MANAGER_BASE", async () => {
-    setEnv({ CIRCULATION_MANAGER_BASE: "some-base" });
-    const promise = getCatalogRootUrl("some-slug");
-    await expect(promise).rejects.toThrowError(ApplicationError);
-    await expect(promise).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"App is running with a single Circ Manager, but you're trying to access a multi-library route: some-slug"`
-    );
-  });
-
-  test("throws error if there is a CIRCULATION_MANAGER_BASE and REGISTRY_BASE at the same time", async () => {
-    setEnv({
-      CIRCULATION_MANAGER_BASE: "some-base",
-      REGISTRY_BASE: "something"
-    });
-    const promise = getCatalogRootUrl();
-    await expect(promise).rejects.toThrowError(AppSetupError);
-    await expect(promise).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"App is set up with SIMPLIFIED_CATALOG_BASE and either CONFIG_FILE or REGISTRY. You should only have one defined."`
-    );
-  });
-
-  test("throws error if there is a CIRCULATION_MANAGER_BASE and CONFIG_FILE at the same time", async () => {
-    setEnv({
-      CIRCULATION_MANAGER_BASE: "some-base",
-      CONFIG_FILE: "something"
-    });
-    const promise = getCatalogRootUrl();
-    await expect(promise).rejects.toThrowError(AppSetupError);
-    await expect(promise).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"App is set up with SIMPLIFIED_CATALOG_BASE and either CONFIG_FILE or REGISTRY. You should only have one defined."`
-    );
-  });
-
-  test("throws error if there is a CONFIG_FILE and REGISTRY_BASE at the same time", async () => {
-    setEnv({
-      CONFIG_FILE: "something",
-      REGISTRY_BASE: "some base"
-    });
-    const promise = getCatalogRootUrl("slug");
-    await expect(promise).rejects.toThrowError(AppSetupError);
-    await expect(promise).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"You can only have one of SIMPLIFIED_CATALOG_BASE and REGISTRTY_BASE defined at one time."`
-    );
-  });
-  test("throws PageNotFoundError if running multiple libraries and no slug provided", async () => {
-    setEnv({
-      CONFIG_FILE: "config-file"
-    });
-    const promise = getCatalogRootUrl();
-    await expect(promise).rejects.toThrowError(PageNotFoundError);
-    await expect(promise).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"Library slug must be provided when running with multiple libraries."`
-    );
-  });
-
   test("throws PageNotFoundError if no entry found in config file for library", async () => {
-    setEnv({
-      CONFIG_FILE: "config-file"
-    });
+    mockConfig({ libraries: { hello: "what" } });
     const promise = getCatalogRootUrl("not there slug");
     await expect(promise).rejects.toThrowError(PageNotFoundError);
     await expect(promise).rejects.toMatchInlineSnapshot(
-      `[Page Not Found Error: No CONFIG_FILE entry for library: not there slug]`
+      `[Page Not Found Error: No catalog root url is configured for the library: not there slug.]`
     );
   });
 
   test("returns url for existing library in config file", async () => {
-    setEnv({ CONFIG_FILE: "config-file" });
-    const promise = getCatalogRootUrl("anotherlib");
-    await expect(promise).resolves.toBe("anotherliburl");
-  });
+    mockConfig({ libraries: { hello: "http://library.com" } });
 
-  test("works for SIMPLIFIED_CATALOG_BASE", async () => {
-    setEnv({ CIRCULATION_MANAGER_BASE: "hello" });
-    const url = await getCatalogRootUrl();
-    expect(url).toBe("hello");
-  });
-
-  test("Throws AppSetupError if no env var is defined", async () => {
-    setEnv({});
     const promise = getCatalogRootUrl("hello");
-    expect(promise).rejects.toThrowError(AppSetupError);
-    expect(promise).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"Application must be run with one of SIMPLIFIED_CATALOG_BASE, CONFIG_FILE or REGISTRY_BASE."`
-    );
-  });
-
-  test("Throws AppSetupError if no env var is defined and no librarySlug provided", async () => {
-    setEnv({});
-    const promise = getCatalogRootUrl();
-    expect(promise).rejects.toThrowError(AppSetupError);
-    expect(promise).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"Application must be run with one of SIMPLIFIED_CATALOG_BASE, CONFIG_FILE or REGISTRY_BASE."`
-    );
+    await expect(promise).resolves.toBe("http://library.com");
   });
 
   describe("with Registry Base", () => {
     test("Works for Registry Base", async () => {
-      setEnv({ REGISTRY_BASE: "reg-base" });
+      mockConfig({ libraries: "http://reg-base.com" });
       fetchMock.mockResponses(
         JSON.stringify(fixtures.opds2.feedWithoutCatalog),
         JSON.stringify(fixtures.opds2.feedWithCatalog)
@@ -164,7 +75,7 @@ describe("getCatalogRootUrl", () => {
     });
 
     test("Throws ApplicationError if it doesn't find a catalogRootUrl", async () => {
-      setEnv({ REGISTRY_BASE: "reg-base" });
+      mockConfig({ libraries: "reg-base" });
       const missingCatalogRootUrl: OPDS2.LibraryRegistryFeed = {
         ...fixtures.opds2.feedWithCatalog,
         catalogs: [
@@ -187,7 +98,7 @@ describe("getCatalogRootUrl", () => {
     });
 
     test("Throws an ApplicationError if the LibraryRegistryFeed doesn't have a CatalogEntry", async () => {
-      setEnv({ REGISTRY_BASE: "reg-base" });
+      mockConfig({ libraries: "reg-base" });
       fetchMock.mockResponses(
         JSON.stringify(fixtures.opds2.feedWithoutCatalog),
         JSON.stringify(fixtures.opds2.feedWithoutCatalog)
@@ -200,7 +111,7 @@ describe("getCatalogRootUrl", () => {
     });
 
     test("Throws an ApplicationError if it can't fetch the catalog entry", async () => {
-      setEnv({ REGISTRY_BASE: "reg-base" });
+      mockConfig({ libraries: "reg-base" });
       fetchMock.mockResponseOnce(
         JSON.stringify(fixtures.opds2.feedWithoutCatalog)
       );
@@ -212,7 +123,7 @@ describe("getCatalogRootUrl", () => {
     });
 
     test("Throws an ApplicationError if the registry doesn't contain a template link", async () => {
-      setEnv({ REGISTRY_BASE: "reg-base" });
+      mockConfig({ libraries: "reg-base" });
       const missingTemplateLink: OPDS2.LibraryRegistryFeed = {
         ...fixtures.opds2.feedWithoutCatalog,
         links: []
@@ -272,16 +183,6 @@ describe("buildLibraryData", () => {
       libraryLinks: {},
       searchData: null
     });
-  });
-
-  test("works correctly without librarySlug", () => {
-    const library = buildLibraryData(
-      fixtures.authDoc,
-      "/catalog-url",
-      undefined,
-      fixtures.opdsFeed
-    );
-    expect(library.slug).toBeNull();
   });
 
   test("correctly parses web_color_scheme", () => {
@@ -413,27 +314,20 @@ describe("getAuthDocHref", () => {
 });
 
 describe("getLibrarySlugs", () => {
-  test("returns an empty array if running with CIRCULATION_MANAGER_BASE", async () => {
-    setEnv({ CIRCULATION_MANAGER_BASE: "some base" });
-    expect(await getLibrarySlugs()).toEqual([]);
-  });
-
-  test("returns keys of config file", async () => {
-    setEnv({ CONFIG_FILE: "some-config-file" });
+  test("returns keys of libraries in config file", async () => {
+    mockConfig({
+      libraries: {
+        somelibrary: "/somewhere",
+        anotherlib: "/another"
+      }
+    });
     expect(await getLibrarySlugs()).toEqual(["somelibrary", "anotherlib"]);
   });
 
   test("returns an empty array when using a library registry", async () => {
-    setEnv({ REGISTRY_BASE: "some-registry" });
-    expect(await getLibrarySlugs()).toEqual([]);
-  });
-
-  test("throws ApplicationError if env improperly set", async () => {
-    setEnv({});
-    const promise = getLibrarySlugs();
-    expect(promise).rejects.toThrowError(ApplicationError);
-    expect(promise).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"Unable to get library slugs for current setup."`
-    );
+    mockConfig({
+      libraries: "http://reg-base.com"
+    });
+    expect(await getLibrarySlugs()).toEqual(null);
   });
 });

@@ -7,14 +7,14 @@ import BookCover from "./BookCover";
 import { truncateString } from "../utils/string";
 import { Text, H3 } from "./Text";
 import BookMediumIndicator from "./MediumIndicator";
-import { BookData } from "interfaces";
+import { AnyBook } from "interfaces";
 
 export const BOOK_WIDTH = 215;
 export const BOOK_HEIGHT = 330;
 
 const BookCard = React.forwardRef<
   HTMLLIElement,
-  { book: BookData; className?: string }
+  { book: AnyBook; className?: string }
 >(({ book, className }, ref) => {
   const authors = getAuthors(book, 2);
 

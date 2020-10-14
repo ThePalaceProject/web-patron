@@ -11,13 +11,13 @@ describe("Layout nav + structure", () => {
     );
 
     // the home button should navigate to "/"
-    expect(homeButton.closest("a")).toHaveAttribute("href", "/");
+    expect(homeButton.closest("a")).toHaveAttribute("href", "/testlib");
   });
 
   test("my books navigates to /loans", () => {
     const utils = render(<Layout>Child</Layout>);
     const myBooks = utils.getAllByRole("link", { name: "My Books" });
-    myBooks.forEach(ln => expect(ln).toHaveAttribute("href", "/loans"));
+    myBooks.forEach(ln => expect(ln).toHaveAttribute("href", "/testlib/loans"));
   });
 
   test("displays children within main", () => {

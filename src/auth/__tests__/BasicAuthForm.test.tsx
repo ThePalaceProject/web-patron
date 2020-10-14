@@ -73,7 +73,7 @@ test("sumbits", async () => {
     expect(Cookie.set).toHaveBeenCalledTimes(1);
     expect(Cookie.set).toHaveBeenCalledWith(
       // the library slug is null because we are only running with one library
-      "CPW_AUTH_COOKIE/null",
+      "CPW_AUTH_COOKIE/testlib",
       JSON.stringify({
         token,
         methodType: OPDS1.BasicAuthType

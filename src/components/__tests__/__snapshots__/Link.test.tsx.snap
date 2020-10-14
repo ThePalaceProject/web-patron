@@ -15,7 +15,7 @@ exports[`Renders expected styles 1`] = `
 
 <a
   class="emotion-0"
-  href="/somewhere"
+  href="/testlib/somewhere"
 >
   click here
 </a>

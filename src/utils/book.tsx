@@ -1,9 +1,17 @@
 import * as React from "react";
-import { BookData, BookMedium } from "interfaces";
-import { BookFulfillmentState } from "interfaces";
+import {
+  AnyBook,
+  BookMedium,
+  BorrowableBook,
+  FulfillableBook,
+  OnHoldBook,
+  ReservableBook,
+  ReservedBook,
+  UnsupportedBook
+} from "interfaces";
 import { Book, Headset } from "../icons";
 
-export function getAuthors(book: BookData, lim?: number): string[] {
+export function getAuthors(book: AnyBook, lim?: number): string[] {
   // select contributors if the authors array is undefined or empty.
   const allAuth =
     typeof book.authors?.length === "number" && book.authors.length > 0
@@ -20,10 +28,7 @@ export function getAuthors(book: BookData, lim?: number): string[] {
   return allAuth;
 }
 
-export function availabilityString(book: BookData) {
-  if (book.openAccessLinks && book.openAccessLinks.length > 0)
-    return "This open-access book is available to keep forever.";
-
+export function availabilityString(book: AnyBook) {
   const availableCopies = book.copies?.available;
   const totalCopies = book.copies?.total;
   return typeof availableCopies === "number" && typeof totalCopies === "number"
@@ -31,64 +36,38 @@ export function availabilityString(book: BookData) {
     : "Number of books available is unknown.";
 }
 
-export function queueString(book: BookData) {
+export function queueString(book: AnyBook) {
   const holds = book.holds?.total;
-  return typeof holds === "number" ? `${holds} patrons in the queue.` : "";
+  return typeof holds === "number"
+    ? `There are ${holds} other patrons in the queue.`
+    : "";
 }
 
-function hasBorrowRelation(book: BookData) {
-  return typeof book.borrowUrl === "string";
+export function bookIsFulfillable(book: AnyBook): book is FulfillableBook {
+  return book.status === "fulfillable";
 }
 
-/**
- * the default assumption is that a book is available. See:
- * https://github.com/NYPL-Simplified/Simplified/wiki/OPDS-For-Library-Patrons#opdsavailability---describing-resource-availability
- */
-const DEFAULT_AVAILABILITY = "available";
-
-/**
- * This is mapped from a conversation with Leonard and the OPDS wiki:
- * https://github.com/NYPL-Simplified/Simplified/wiki/OPDS-For-Library-Patrons#opdsavailability---describing-resource-availability
- */
-export function getFulfillmentState(
-  book: BookData,
-  isBorrowed: boolean
-): BookFulfillmentState {
-  const availabilityStatus = book.availability?.status ?? DEFAULT_AVAILABILITY;
-
-  // indicates the book is open access and ready to download.
-  // we prefer open access links to fulfillment links, if available.
-  // we can't show OA links unless book is borrowed, however.
-  if (
-    isBorrowed &&
-    availabilityStatus === "available" &&
-    book.openAccessLinks &&
-    book.openAccessLinks.length > 0
-  )
-    return "AVAILABLE_OPEN_ACCESS";
-
-  if (
-    availabilityStatus === "available" &&
-    book.fulfillmentLinks &&
-    book.fulfillmentLinks.length > 0
-  )
-    return "AVAILABLE_TO_ACCESS";
-
-  if (availabilityStatus === "available" && hasBorrowRelation(book))
-    return "AVAILABLE_TO_BORROW";
-
-  if (availabilityStatus === "ready" && hasBorrowRelation(book))
-    return "READY_TO_BORROW";
-
-  if (availabilityStatus === "unavailable" && hasBorrowRelation(book))
-    return "AVAILABLE_TO_RESERVE";
-
-  if (availabilityStatus === "reserved") return "RESERVED";
-
-  return "FULFILLMENT_STATE_ERROR";
+export function bookIsUnsupported(book: AnyBook): book is UnsupportedBook {
+  return book.status === "unsupported";
 }
 
-export function bookIsAudiobook(book: BookData): boolean {
+export function bookIsReserved(book: AnyBook): book is ReservedBook {
+  return book.status === "reserved";
+}
+
+export function bookIsReservable(book: AnyBook): book is ReservableBook {
+  return book.status === "reservable";
+}
+
+export function bookIsOnHold(book: AnyBook): book is OnHoldBook {
+  return book.status === "on-hold";
+}
+
+export function bookIsBorrowable(book: AnyBook): book is BorrowableBook {
+  return book.status === "borrowable";
+}
+
+export function bookIsAudiobook(book: AnyBook): boolean {
   if (getMedium(book) === "http://bib.schema.org/Audiobook") {
     return true;
   }
@@ -109,7 +88,7 @@ export const bookMediumMap: {
   "http://schema.org/Book": { name: "Book", icon: Book }
 };
 
-export function getMedium(book: BookData): BookMedium | "" {
+export function getMedium(book: AnyBook): BookMedium | "" {
   if (!book.raw || !book.raw["$"] || !book.raw["$"]["schema:additionalType"]) {
     return "";
   }

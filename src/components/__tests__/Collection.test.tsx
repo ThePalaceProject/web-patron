@@ -51,7 +51,7 @@ test("displays lanes when present", () => {
   const laneData: LaneData = {
     title: "my lane",
     url: "/link-to-lane",
-    books: fixtures.makeBooks(10)
+    books: fixtures.makeBorrowableBooks(10)
   };
   mockSwr({
     data: {
@@ -69,16 +69,14 @@ test("displays lanes when present", () => {
   const laneTitle = utils.getByText("my lane");
   expect(laneTitle).toBeInTheDocument();
   expect(utils.getByText(fixtures.makeBook(0).title)).toBeInTheDocument();
-  expect(
-    utils.getByText(fixtures.makeBook(0).authors.join(", "))
-  ).toBeInTheDocument();
+  expect(utils.getByText("Book 0 author")).toBeInTheDocument();
 });
 
 test("prefers lanes over books", () => {
   const laneData: LaneData = {
     title: "my lane",
     url: "/link-to-lane",
-    books: fixtures.makeBooks(10)
+    books: fixtures.makeBorrowableBooks(10)
   };
   mockSwr({
     data: {
@@ -86,7 +84,7 @@ test("prefers lanes over books", () => {
       url: "url",
       title: "title",
       navigationLinks: [],
-      books: fixtures.makeBooks(2),
+      books: fixtures.makeBorrowableBooks(2),
       lanes: [laneData]
     }
   });
@@ -106,12 +104,12 @@ test("renders books in list view if no lanes", () => {
       url: "url",
       title: "title",
       navigationLinks: [],
-      books: fixtures.makeBooks(2),
+      books: fixtures.makeBorrowableBooks(2),
       lanes: []
     }
   });
   mockedSWRInfinite.mockReturnValue({
-    data: [{ books: fixtures.makeBooks(2) }],
+    data: [{ books: fixtures.makeBorrowableBooks(2) }],
     isValidating: false
   } as any);
   const utils = render(<Collection />);

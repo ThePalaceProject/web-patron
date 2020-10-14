@@ -1,4 +1,4 @@
-import { LibraryData, AppConfigFile } from "../interfaces";
+import { LibraryData } from "../interfaces";
 import { GetServerSideProps } from "next";
 import {
   getCatalogRootUrl,
@@ -6,9 +6,7 @@ import {
   fetchAuthDocument,
   buildLibraryData
 } from "dataflow/getLibraryData";
-import ApplicationError from "errors";
-import getConfigFile from "./getConfigFile";
-import { CONFIG_FILE } from "utils/env";
+import ApplicationError, { PageNotFoundError } from "errors";
 import { getAuthDocHref } from "utils/auth";
 import { findSearchLink } from "dataflow/opds1/parse";
 import { fetchSearchData } from "dataflow/opds1/fetch";
@@ -21,7 +19,6 @@ export type AppProps = {
     name: string;
     statusCode: number | null;
   };
-  configFile?: AppConfigFile | null;
 };
 
 export default function withAppProps(
@@ -35,6 +32,11 @@ export default function withAppProps(
      */
     try {
       const librarySlug = extractParam(ctx.params, "library");
+      if (!librarySlug)
+        throw new PageNotFoundError(
+          "A library slug is required to be provided in the URL. Eg: https://domain.com/:library"
+        );
+
       const catalogUrl = await getCatalogRootUrl(librarySlug);
       const catalog = await fetchCatalog(catalogUrl);
       const authDocHref = getAuthDocHref(catalog);
@@ -55,20 +57,9 @@ export default function withAppProps(
         props: {
           ...pageResult.props,
           library
-          // catalog
         }
       };
     } catch (e) {
-      // if we are running with a config file, add it to the error
-      let configFile: AppConfigFile | null = null;
-      if (CONFIG_FILE) {
-        try {
-          configFile = await getConfigFile(CONFIG_FILE);
-        } catch {
-          configFile = null;
-        }
-      }
-
       if (e instanceof ApplicationError) {
         return {
           props: {
@@ -76,8 +67,7 @@ export default function withAppProps(
               message: e.message,
               name: e.name,
               statusCode: e.statusCode
-            },
-            configFile
+            }
           }
         };
       }

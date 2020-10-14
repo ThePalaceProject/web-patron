@@ -37,7 +37,7 @@ const Search: React.FC<SearchProps> = ({ className, ...props }) => {
     );
     if (!url) return;
     const link = linkUtils.buildCollectionLink(url);
-    Router.push(link.href, link.as);
+    Router.push(link);
   };
 
   return (

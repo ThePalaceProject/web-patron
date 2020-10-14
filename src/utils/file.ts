@@ -4,10 +4,6 @@ export const typeMap: Record<
   OPDS1.DownloadMediaType,
   { extension: string; name: string }
 > = {
-  "application/vnd.overdrive.circulation.api+json;profile=audiobook": {
-    extension: "",
-    name: "Overdrive Audiobook"
-  },
   "application/epub+zip": {
     extension: ".epub",
     name: "EPUB"
@@ -28,10 +24,6 @@ export const typeMap: Record<
   "application/x-mobi8-ebook": {
     extension: ".azw3",
     name: "Mobi8"
-  },
-  "application/audiobook+json": {
-    extension: ".audiobook",
-    name: "Audiobook"
   }
 };
 

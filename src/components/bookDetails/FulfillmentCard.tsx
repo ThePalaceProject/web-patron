@@ -2,10 +2,14 @@
 import { jsx } from "theme-ui";
 import * as React from "react";
 import {
-  getFulfillmentState,
   availabilityString,
   queueString,
-  bookIsAudiobook
+  bookIsAudiobook,
+  bookIsBorrowable,
+  bookIsReservable,
+  bookIsReserved,
+  bookIsOnHold,
+  bookIsFulfillable
 } from "utils/book";
 import Button from "../Button";
 import withErrorBoundary from "../ErrorBoundary";
@@ -15,179 +19,141 @@ import { MediumIcon } from "components/MediumIndicator";
 import SvgExternalLink from "icons/ExternalOpen";
 import SvgDownload from "icons/Download";
 import SvgPhone from "icons/Phone";
-import useIsBorrowed from "hooks/useIsBorrowed";
-import { NEXT_PUBLIC_COMPANION_APP } from "utils/env";
 import BorrowOrReserve from "components/BorrowOrReserve";
-import { BookData, MediaLink } from "interfaces";
+import {
+  AnyBook,
+  FulfillableBook,
+  FulfillmentLink,
+  ReservedBook
+} from "interfaces";
 import {
   dedupeLinks,
   DownloadDetails,
   getFulfillmentDetails,
   ReadExternalDetails,
-  ReadInternalDetails
+  ReadInternalDetails,
+  shouldRedirectToCompanionApp
 } from "utils/fulfill";
 import useDownloadButton from "hooks/useDownloadButton";
 import useReadOnlineButton from "hooks/useReadOnlineButton";
+import { APP_CONFIG } from "config";
 import track from "analytics/track";
 import { useRouter } from "next/router";
+import useLinkUtils from "components/context/LinkUtilsContext";
 
-const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
+const FulfillmentCard: React.FC<{ book: AnyBook }> = ({ book }) => {
   return (
-    <Stack
-      direction="column"
+    <div
       aria-label="Borrow and download card"
       sx={{
-        bg: "ui.gray.lightWarm",
-        p: 3,
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
-        color: "ui.gray.extraDark",
-        my: 3
+        alignItems: "flex-start",
+        color: "ui.gray.extraDark"
       }}
     >
       <FulfillmentContent book={book} />
-    </Stack>
+    </div>
   );
 };
 
 const FulfillmentContent: React.FC<{
-  book: BookData;
+  book: AnyBook;
 }> = ({ book }) => {
-  const isBorrowed = useIsBorrowed(book);
-  const fulfillmentState = getFulfillmentState(book, isBorrowed);
-  switch (fulfillmentState) {
-    case "AVAILABLE_OPEN_ACCESS":
-      if (!book.openAccessLinks)
-        throw new Error("This open-access book is missing open access links");
-      return (
-        <AccessCard
-          links={book.openAccessLinks}
-          book={book}
-          subtitle="This open-access book is available to keep forever."
-        />
-      );
-
-    case "AVAILABLE_TO_BORROW": {
-      return (
-        <CTAPanel
-          title="This book is available to borrow!"
-          subtitle={
-            <>
-              <MediumIcon book={book} sx={{ mr: 1 }} />{" "}
-              {availabilityString(book)}
-            </>
-          }
-          book={book}
-          isBorrow={true}
-        />
-      );
-    }
-
-    case "AVAILABLE_TO_RESERVE": {
-      return (
-        <CTAPanel
-          title="This book is currently unavailable."
-          subtitle={
-            <>
-              <MediumIcon book={book} sx={{ mr: 1 }} />{" "}
-              {availabilityString(book)}
-              {typeof book.holds?.total === "number" &&
-                ` ${book.holds.total} patrons in the queue.`}
-            </>
-          }
-          book={book}
-          isBorrow={false}
-        />
-      );
-    }
-
-    case "RESERVED":
-      return <Reserved book={book} />;
-
-    case "READY_TO_BORROW": {
-      const availableUntil = book.availability?.until
-        ? new Date(book.availability.until).toDateString()
-        : "NaN";
-
-      const title = "You can now borrow this book!";
-      const subtitle =
-        availableUntil !== "NaN"
-          ? `Your hold will expire on ${availableUntil}. ${queueString(book)}`
-          : "You must borrow this book before your loan expires.";
-
-      return (
-        <CTAPanel
-          title={title}
-          subtitle={subtitle}
-          book={book}
-          isBorrow={true}
-        />
-      );
-    }
-
-    case "AVAILABLE_TO_ACCESS": {
-      if (!book.fulfillmentLinks)
-        throw new Error(
-          "This available-to-access book is missing fulfillment links."
-        );
-
-      const availableUntil = book.availability?.until
-        ? new Date(book.availability.until).toDateString()
-        : "NaN";
-
-      const subtitle =
-        availableUntil !== "NaN"
-          ? `You have this book on loan until ${availableUntil}.`
-          : "You have this book on loan.";
-      return (
-        <AccessCard
-          links={book.fulfillmentLinks}
-          book={book}
-          subtitle={subtitle}
-        />
-      );
-    }
-
-    case "FULFILLMENT_STATE_ERROR":
-      return <ErrorCard />;
+  if (bookIsBorrowable(book)) {
+    return (
+      <BorrowOrReserveBlock
+        title="Available to borrow"
+        subtitle={
+          <>
+            <MediumIcon book={book} sx={{ mr: 1 }} /> {availabilityString(book)}
+          </>
+        }
+        url={book.borrowUrl}
+        isBorrow={true}
+      />
+    );
   }
+
+  if (bookIsReservable(book)) {
+    return (
+      <BorrowOrReserveBlock
+        title="Unavailable"
+        subtitle={
+          <>
+            <MediumIcon book={book} sx={{ mr: 1 }} /> {availabilityString(book)}
+            {typeof book.holds?.total === "number" &&
+              ` ${book.holds.total} patrons in the queue.`}
+          </>
+        }
+        url={book.reserveUrl}
+        isBorrow={false}
+      />
+    );
+  }
+
+  if (bookIsReserved(book)) {
+    return <Reserved book={book} />;
+  }
+
+  if (bookIsOnHold(book)) {
+    const availableUntil = book.availability?.until
+      ? new Date(book.availability.until).toDateString()
+      : "NaN";
+
+    const title = "On Hold";
+    const subtitle =
+      availableUntil !== "NaN"
+        ? `Your hold will expire on ${availableUntil}. ${queueString(book)}`
+        : "You must borrow this book before your loan expires.";
+
+    return (
+      <BorrowOrReserveBlock
+        title={title}
+        subtitle={subtitle}
+        url={book.borrowUrl}
+        isBorrow={true}
+      />
+    );
+  }
+
+  if (bookIsFulfillable(book)) {
+    const availableUntil = book.availability?.until
+      ? new Date(book.availability.until).toDateString()
+      : "NaN";
+
+    const subtitle =
+      availableUntil !== "NaN"
+        ? `You have this book on loan until ${availableUntil}.`
+        : "You have this book on loan.";
+    return (
+      <AccessCard
+        links={book.fulfillmentLinks}
+        book={book}
+        subtitle={subtitle}
+      />
+    );
+  }
+
+  return <Unsupported />;
 };
 
-const CTAPanel: React.FC<{
+const BorrowOrReserveBlock: React.FC<{
   title: string;
   subtitle: React.ReactNode;
   isBorrow: boolean;
-  book: BookData;
-}> = ({ title, subtitle, isBorrow, book }) => {
+  url: string;
+}> = ({ title, subtitle, isBorrow, url }) => {
   return (
-    <>
-      <Text variant="text.callouts.bold">{title}</Text>
-      <Text
-        variant="text.body.italic"
-        sx={{
-          display: "inline-flex",
-          alignItems: "center",
-          textAlign: "center"
-        }}
-      >
-        {subtitle}
-      </Text>
-      {book.allBorrowLinks?.map(link => {
-        return (
-          <BorrowOrReserve
-            book={book}
-            key={link.url}
-            borrowLink={link}
-            isBorrow={isBorrow}
-          />
-        );
-      })}
-    </>
+    <Stack direction="column" spacing={0} sx={{ my: 3 }}>
+      <Text variant="text.body.bold">{title}</Text>
+      <Text>{subtitle}</Text>
+      <BorrowOrReserve url={url} isBorrow={isBorrow} />
+    </Stack>
   );
 };
 
-const Reserved: React.FC<{ book: BookData }> = ({ book }) => {
+const Reserved: React.FC<{ book: ReservedBook }> = ({ book }) => {
   const position = book.holds?.position;
   return (
     <>
@@ -208,24 +174,14 @@ const Reserved: React.FC<{ book: BookData }> = ({ book }) => {
   );
 };
 
-const ErrorCard: React.FC = () => {
+const Unsupported: React.FC = () => {
   return (
-    <>
-      <Text variant="text.callouts.bold">
-        There was an error processing this book.
+    <Stack direction="column" spacing={0} sx={{ my: 3 }}>
+      <Text variant="text.body.bold">Unsupported</Text>
+      <Text>
+        This title is not supported in this application, please try another.
       </Text>
-      <Text
-        variant="text.body.italic"
-        sx={{
-          display: "inline-flex",
-          alignItems: "center",
-          textAlign: "center"
-        }}
-      >
-        We are unable to show you the book&apos;s availability. Try refreshing
-        your page. If the problem persists, please contact library support.
-      </Text>
-    </>
+    </Stack>
   );
 };
 
@@ -234,8 +190,8 @@ const ErrorCard: React.FC = () => {
  * via fulfillmentLink.
  */
 const AccessCard: React.FC<{
-  book: BookData;
-  links: MediaLink[];
+  book: FulfillableBook;
+  links: FulfillmentLink[];
   subtitle: string;
 }> = ({ book, links, subtitle }) => {
   const { title } = book;
@@ -247,26 +203,22 @@ const AccessCard: React.FC<{
   const isFulfillable = fulfillments.length > 0;
 
   const isAudiobook = bookIsAudiobook(book);
-  const companionApp =
-    NEXT_PUBLIC_COMPANION_APP === "openebooks" ? "Open eBooks" : "SimplyE";
+  const redirectUser = shouldRedirectToCompanionApp(links);
 
   return (
-    <>
-      <Stack sx={{ alignItems: "center" }}>
-        <SvgPhone sx={{ fontSize: 64 }} />
-        <Stack direction="column">
-          <Text variant="text.callouts.bold">
-            You&apos;re ready to read this book in {companionApp}!
-          </Text>
-          <Text>{subtitle}</Text>
-        </Stack>
-      </Stack>
+    <Stack direction="column" sx={{ my: 3 }}>
+      <AccessHeading
+        redirectToCompanionApp={redirectUser}
+        subtitle={subtitle}
+      />
       {!isAudiobook && isFulfillable && (
-        <Stack direction="column" sx={{ mt: 3 }}>
-          <Text variant="text.body.italic" sx={{ textAlign: "center" }}>
-            If you would rather read on your computer, you can:
-          </Text>
-          <Stack sx={{ justifyContent: "center", flexWrap: "wrap" }}>
+        <>
+          {redirectUser && (
+            <Text variant="text.body.italic">
+              If you would rather read on your computer, you can:
+            </Text>
+          )}
+          <Stack sx={{ flexWrap: "wrap" }}>
             {fulfillments.map(details => {
               switch (details.type) {
                 case "download":
@@ -274,7 +226,8 @@ const AccessCard: React.FC<{
                     <DownloadButton
                       details={details}
                       title={title}
-                      key={details.url}
+                      key={details.id}
+                      isPrimaryAction={!redirectUser}
                     />
                   );
                 case "read-online-internal":
@@ -282,6 +235,7 @@ const AccessCard: React.FC<{
                     <ReadOnlineInternal
                       details={details}
                       key={details.url}
+                      isPrimaryAction={!redirectUser}
                       trackOpenBookUrl={book.trackOpenBookUrl}
                     />
                   );
@@ -290,22 +244,64 @@ const AccessCard: React.FC<{
                     <ReadOnlineExternal
                       details={details}
                       key={details.id}
+                      isPrimaryAction={!redirectUser}
                       trackOpenBookUrl={book.trackOpenBookUrl}
                     />
                   );
               }
             })}
           </Stack>
-        </Stack>
+        </>
       )}
-    </>
+    </Stack>
   );
 };
 
+const AccessHeading: React.FC<{
+  subtitle: string;
+  redirectToCompanionApp: boolean;
+}> = ({ subtitle, redirectToCompanionApp }) => {
+  const companionApp =
+    APP_CONFIG.companionApp === "openebooks" ? "Open eBooks" : "SimplyE";
+
+  if (redirectToCompanionApp) {
+    return (
+      <Stack direction="column">
+        <Stack>
+          <SvgPhone sx={{ fontSize: 24 }} />
+          <Text variant="text.body.bold">
+            You&apos;re ready to read this book in {companionApp}!
+          </Text>
+        </Stack>
+        <Text>{subtitle}</Text>
+      </Stack>
+    );
+  }
+  return (
+    <Stack spacing={0} direction="column">
+      <Text variant="text.body.bold">Ready to read!</Text>
+      <Text>{subtitle}</Text>
+    </Stack>
+  );
+};
+
+function getButtonStyles(isPrimaryAction: boolean) {
+  return isPrimaryAction
+    ? ({
+        variant: "filled",
+        color: "brand.primary"
+      } as const)
+    : ({
+        variant: "ghost",
+        color: "ui.gray.extraDark"
+      } as const);
+}
+
 const ReadOnlineExternal: React.FC<{
   details: ReadExternalDetails;
+  isPrimaryAction: boolean;
   trackOpenBookUrl: string | null;
-}> = ({ details, trackOpenBookUrl }) => {
+}> = ({ details, isPrimaryAction, trackOpenBookUrl }) => {
   const { open, loading, error } = useReadOnlineButton(
     details,
     trackOpenBookUrl
@@ -314,8 +310,7 @@ const ReadOnlineExternal: React.FC<{
   return (
     <>
       <Button
-        variant="ghost"
-        color="ui.gray.extraDark"
+        {...getButtonStyles(isPrimaryAction)}
         iconLeft={SvgExternalLink}
         onClick={open}
         loading={loading}
@@ -331,17 +326,19 @@ const ReadOnlineExternal: React.FC<{
 const ReadOnlineInternal: React.FC<{
   details: ReadInternalDetails;
   trackOpenBookUrl: string | null;
-}> = ({ details, trackOpenBookUrl }) => {
+  isPrimaryAction: boolean;
+}> = ({ details, isPrimaryAction, trackOpenBookUrl }) => {
   const router = useRouter();
+  const { buildMultiLibraryLink } = useLinkUtils();
 
+  const internalLink = buildMultiLibraryLink(details.url);
   function open() {
     track.openBook(trackOpenBookUrl);
-    router.push(details.url);
+    router.push(internalLink);
   }
-
   return (
-    <Button variant="ghost" color="ui.gray.extraDark" onClick={open}>
-      Read Online
+    <Button {...getButtonStyles(isPrimaryAction)} onClick={open}>
+      Read
     </Button>
   );
 };
@@ -349,15 +346,15 @@ const ReadOnlineInternal: React.FC<{
 const DownloadButton: React.FC<{
   details: DownloadDetails;
   title: string;
-}> = ({ details, title }) => {
+  isPrimaryAction: boolean;
+}> = ({ details, title, isPrimaryAction }) => {
   const { buttonLabel } = details;
   const { download, error, loading } = useDownloadButton(details, title);
   return (
     <>
       <Button
         onClick={download}
-        variant="ghost"
-        color="ui.gray.extraDark"
+        {...getButtonStyles(isPrimaryAction)}
         iconLeft={SvgDownload}
         loading={loading}
         loadingText="Downloading..."
@@ -369,4 +366,4 @@ const DownloadButton: React.FC<{
   );
 };
 
-export default withErrorBoundary(FulfillmentCard, ErrorCard);
+export default withErrorBoundary(FulfillmentCard);

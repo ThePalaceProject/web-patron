@@ -16,14 +16,35 @@ export { OPDS1 };
  * INTERNAL APP MODEL
  */
 
+export type AppConfig = {
+  mediaSupport: MediaSupportConfig;
+  libraries: LibraryRegistryBase | LibrariesConfig;
+  companionApp: "simplye" | "openebooks";
+  bugsnagApiKey: string | null;
+  gtmId: string | null;
+};
+
+export type MediaSupportConfig = DirectMediaSupport & IndirectMediaSupport;
+export type DirectMediaSupport = Partial<
+  Record<OPDS1.AnyBookMediaType, MediaSupportLevel>
+>;
+export type IndirectMediaSupport = Partial<
+  Record<OPDS1.IndirectAcquisitionType, DirectMediaSupport>
+>;
+
+export type MediaSupportLevel =
+  | "show"
+  | "redirect"
+  | "redirect-and-show"
+  | "unsupported";
+
+export type LibraryRegistryBase = string;
+export type LibrariesConfig = Record<string, string | undefined>;
+
 export interface ComplaintData {
   type: string;
   detail?: string;
 }
-
-export type AppConfigFile = {
-  [library: string]: string | undefined;
-};
 
 export type BookFulfillmentState =
   | "AVAILABLE_OPEN_ACCESS"
@@ -69,7 +90,7 @@ export interface AuthCredentials {
 }
 
 export interface LibraryData {
-  slug: string | null;
+  slug: string;
   catalogUrl: string;
   catalogName: string;
   logoUrl: string | null;
@@ -87,11 +108,13 @@ export interface LibraryData {
 /**
  * INTERNAL BOOK MODEL
  */
-export interface MediaLink {
+
+export type FulfillmentLink = {
+  contentType: OPDS1.AnyBookMediaType;
   url: string;
-  type: OPDS1.AnyBookMediaType | OPDS1.IndirectAcquisitionType;
-  indirectType?: OPDS1.AnyBookMediaType;
-}
+  indirectionType?: OPDS1.IndirectAcquisitionType;
+  supportLevel: MediaSupportLevel;
+};
 
 export type BookMedium =
   | "http://bib.schema.org/Audiobook"
@@ -103,44 +126,81 @@ export type BookAvailability =
   | "unavailable"
   | "reserved"
   | "ready";
-export interface BookData {
-  id: string;
-  title: string;
-  series?: {
-    name: string;
-    position?: number;
-  } | null;
-  authors?: string[];
-  contributors?: string[];
-  subtitle?: string;
-  summary?: string;
-  imageUrl?: string;
-  openAccessLinks?: MediaLink[];
-  borrowUrl?: string;
-  fulfillmentLinks?: MediaLink[];
-  allBorrowLinks?: MediaLink[];
-  availability?: {
-    status: BookAvailability;
-    since?: string;
-    until?: string;
-  };
-  holds?: {
-    total: number;
-    position?: number;
-  } | null;
-  copies?: {
-    total: number;
-    available: number;
-  } | null;
-  url?: string;
-  publisher?: string;
-  published?: string;
-  categories?: string[];
-  language?: string;
-  relatedUrl: string | null;
-  trackOpenBookUrl: string | null;
-  raw?: any;
-}
+
+export type Book<Status = EmptyObject> = Readonly<
+  Status & {
+    id: string;
+    title: string;
+    series?: {
+      name: string;
+      position?: number;
+    } | null;
+    authors?: string[];
+    contributors?: string[];
+    subtitle?: string;
+    summary?: string;
+    imageUrl?: string;
+    availability?: {
+      status: BookAvailability;
+      since?: string;
+      until?: string;
+    };
+    holds?: {
+      total: number;
+      position?: number;
+    } | null;
+    copies?: {
+      total: number;
+      available: number;
+    } | null;
+    url: string;
+    publisher?: string;
+    published?: string;
+    categories?: string[];
+    language?: string;
+    relatedUrl: string | null;
+    raw?: any;
+    trackOpenBookUrl: string | null;
+  }
+>;
+
+export type BorrowableBook = Book<{
+  status: "borrowable";
+  borrowUrl: string;
+}>;
+
+export type OnHoldBook = Book<{
+  status: "on-hold";
+  borrowUrl: string;
+}>;
+
+export type ReservableBook = Book<{
+  status: "reservable";
+  reserveUrl: string;
+}>;
+
+export type ReservedBook = Book<{
+  status: "reserved";
+  revokeUrl: string | null;
+}>;
+
+export type FulfillableBook = Book<{
+  status: "fulfillable";
+  fulfillmentLinks: FulfillmentLink[];
+  revokeUrl: string | null;
+}>;
+
+export type UnsupportedBook = Book<{
+  status: "unsupported";
+}>;
+
+export type AnyBook =
+  | BorrowableBook
+  | OnHoldBook
+  | ReservableBook
+  | ReservedBook
+  | FulfillableBook
+  | UnsupportedBook;
 
 /**
  * INTERNAL COLLECTION MODEL
@@ -148,7 +208,7 @@ export interface BookData {
 export interface LaneData {
   title: string;
   url: string;
-  books: BookData[];
+  books: AnyBook[];
 }
 
 export interface FacetData {
@@ -167,7 +227,7 @@ export interface CollectionData {
   url: string;
   title: string;
   lanes: LaneData[];
-  books: BookData[];
+  books: AnyBook[];
   navigationLinks: LinkData[];
   facetGroups?: FacetGroupData[];
   nextPageUrl?: string;
@@ -223,6 +283,4 @@ export type NextLinkConfig = {
   as?: string;
 };
 
-export type EmptyObject = {
-  [k in any]: never;
-};
+export type EmptyObject = Record<never, unknown>;

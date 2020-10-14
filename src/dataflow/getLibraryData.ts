@@ -6,14 +6,9 @@ import {
   SearchData
 } from "interfaces";
 import OPDSParser, { OPDSFeed, OPDSShelfLink } from "opds-feed-parser";
-import {
-  CIRCULATION_MANAGER_BASE,
-  REGISTRY_BASE,
-  CONFIG_FILE
-} from "utils/env";
-import getConfigFile from "./getConfigFile";
-import ApplicationError, { PageNotFoundError, AppSetupError } from "errors";
+import ApplicationError, { PageNotFoundError } from "errors";
 import { flattenSamlMethod } from "utils/auth";
+import { APP_CONFIG } from "config";
 
 /**
  * Fetches an OPDSFeed with a given catalogUrl. Parses it into an OPDSFeed and
@@ -91,58 +86,32 @@ function findCatalogRootUrl(catalog: OPDS2.CatalogEntry) {
 }
 
 /**
- * Interprets the env vars to return the catalog root url.
+ * Interprets the app config to return the catalog root url.
  */
-export async function getCatalogRootUrl(librarySlug?: string): Promise<string> {
-  if (CIRCULATION_MANAGER_BASE) {
-    if (librarySlug) {
-      throw new PageNotFoundError(
-        "App is running with a single Circ Manager, but you're trying to access a multi-library route: " +
-          librarySlug
+export async function getCatalogRootUrl(librarySlug: string): Promise<string> {
+  const libraries = APP_CONFIG.libraries;
+
+  // we have a library registry url
+  if (typeof libraries === "string") {
+    const catalogEntry = await fetchCatalogEntry(librarySlug, libraries);
+    const catalogRootUrl = findCatalogRootUrl(catalogEntry);
+    if (!catalogRootUrl)
+      throw new ApplicationError(
+        `CatalogEntry did not contain a Catalog Root Url. Library UUID: ${librarySlug}`
       );
-    }
-    if (CONFIG_FILE || REGISTRY_BASE) {
-      throw new AppSetupError(
-        "App is set up with SIMPLIFIED_CATALOG_BASE and either CONFIG_FILE or REGISTRY. You should only have one defined."
-      );
-    }
-    return CIRCULATION_MANAGER_BASE;
+    return catalogRootUrl;
   }
+  // we have a dictionary of libraries
+  // just get the url from the dictionary
 
-  // otherwise we are running with multiple libraries.
-  if (CONFIG_FILE || REGISTRY_BASE) {
-    if (!librarySlug)
-      throw new PageNotFoundError(
-        "Library slug must be provided when running with multiple libraries."
-      );
-
-    if (CONFIG_FILE) {
-      if (REGISTRY_BASE) {
-        throw new AppSetupError(
-          "You can only have one of SIMPLIFIED_CATALOG_BASE and REGISTRTY_BASE defined at one time."
-        );
-      }
-      const configFile = await getConfigFile(CONFIG_FILE);
-      const configEntry = configFile[librarySlug];
-      if (configEntry) return configEntry;
-      throw new PageNotFoundError(
-        "No CONFIG_FILE entry for library: " + librarySlug
-      );
-    }
-
-    if (REGISTRY_BASE) {
-      const catalogEntry = await fetchCatalogEntry(librarySlug, REGISTRY_BASE);
-      const catalogRootUrl = findCatalogRootUrl(catalogEntry);
-      if (!catalogRootUrl)
-        throw new ApplicationError(
-          `CatalogEntry did not contain a Catalog Root Url. Library UUID: ${librarySlug}`
-        );
-      return catalogRootUrl;
-    }
+  const catalogRootUrl =
+    librarySlug in libraries ? libraries[librarySlug] : undefined;
+  if (typeof catalogRootUrl !== "string") {
+    throw new PageNotFoundError(
+      `No catalog root url is configured for the library: ${librarySlug}.`
+    );
   }
-  throw new AppSetupError(
-    "Application must be run with one of SIMPLIFIED_CATALOG_BASE, CONFIG_FILE or REGISTRY_BASE."
-  );
+  return catalogRootUrl;
 }
 
 /**
@@ -182,7 +151,7 @@ function getShelfUrl(catalog: OPDSFeed): string | null {
 export function buildLibraryData(
   authDoc: OPDS1.AuthDocument,
   catalogUrl: string,
-  librarySlug: string | undefined,
+  librarySlug: string,
   catalog: OPDSFeed,
   searchData?: SearchData
 ): LibraryData {
@@ -193,7 +162,7 @@ export function buildLibraryData(
   const authMethods = flattenSamlMethod(authDoc);
   const shelfUrl = getShelfUrl(catalog);
   return {
-    slug: librarySlug ?? null,
+    slug: librarySlug,
     catalogUrl,
     shelfUrl: shelfUrl ?? null,
     catalogName: authDoc.title,
@@ -246,22 +215,14 @@ function parseLinks(links: OPDS1.AuthDocumentLink[] | undefined): LibraryLinks {
  * Attempts to create an array of all the libraries available with the
  * current env settings.
  */
-export async function getLibrarySlugs() {
-  if (CIRCULATION_MANAGER_BASE) return [];
-
-  if (CONFIG_FILE) {
-    const configFile = await getConfigFile(CONFIG_FILE);
-    const slugs = Object.keys(configFile);
-    return slugs;
+export function getLibrarySlugs() {
+  const libraries = APP_CONFIG.libraries;
+  if (typeof libraries === "string") {
+    console.warn(
+      "Cannot retrive library slugs for a Library Registry based setup."
+    );
+    return null;
   }
-
-  if (REGISTRY_BASE) {
-    /**
-     * We don't do any static generation when running with a
-     * library registry. Therefore, we return an empty array
-     */
-    return [];
-  }
-
-  throw new ApplicationError("Unable to get library slugs for current setup.");
+  const slugs = Object.keys(libraries);
+  return slugs;
 }

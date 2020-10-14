@@ -1,11 +1,18 @@
+import { APP_CONFIG } from "config";
 import { fetchBook } from "dataflow/opds1/fetch";
 import ApplicationError from "errors";
-import { MediaLink, OPDS1 } from "interfaces";
+import {
+  FulfillableBook,
+  FulfillmentLink,
+  MediaSupportLevel,
+  OPDS1
+} from "interfaces";
+import { AXISNOW_DECRYPT } from "utils/env";
 import { typeMap } from "utils/file";
-import { NEXT_PUBLIC_AXIS_NOW_DECRYPT } from "utils/env";
 
 /**
  * Fulfilling a book requires a couple pieces of information:
+ *  - The configured support type for that combination of indirectionType and contentType
  *  - What UX should be presented to the user
  *  - How to actually go about fulfilling that UX
  *
@@ -19,22 +26,22 @@ import { NEXT_PUBLIC_AXIS_NOW_DECRYPT } from "utils/env";
  */
 
 export type DownloadDetails = {
-  id: string;
   type: "download";
-  mediaType: OPDS1.AnyBookMediaType;
-  url: string;
+  id: string;
+  contentType: OPDS1.AnyBookMediaType;
+  getUrl: GetUrlWithIndirection;
   buttonLabel: string;
 };
 export type ReadInternalDetails = {
-  id: string;
   type: "read-online-internal";
+  id: string;
   url: string;
   buttonLabel: string;
 };
 export type ReadExternalDetails = {
-  id: string;
   type: "read-online-external";
-  getUrl: (catalogUrl: string, token?: string) => Promise<string>;
+  id: string;
+  getUrl: GetUrlWithIndirection;
   buttonLabel: string;
 };
 export type UnsupportedDetails = {
@@ -47,19 +54,19 @@ export type FulfillmentDetails =
   | ReadInternalDetails
   | UnsupportedDetails;
 
-export function getFulfillmentDetails(link: MediaLink): FulfillmentDetails {
-  const contentType = fixMimeType(link.indirectType ?? link.type);
-  // if there is a layer of indirection, we have an initial type
-  const initialType =
-    "indirectType" in link && link.indirectType
-      ? fixMimeType(link.type)
-      : undefined;
+export function getFulfillmentDetails(
+  link: FulfillmentLink
+): FulfillmentDetails {
+  const { contentType, indirectionType, supportLevel } = link;
+
+  // don't show fulfillment option if it is unsupported or only allows
+  // a redirect to the companion app.
+  if (supportLevel === "unsupported" || supportLevel === "redirect") {
+    return { type: "unsupported" };
+  }
 
   // there is no support for books with "Libby" DRM
-  if (
-    contentType === OPDS1.OverdriveEbookMediaType ||
-    initialType === OPDS1.OverdriveEbookMediaType
-  ) {
+  if (contentType === OPDS1.OverdriveEbookMediaType) {
     return { type: "unsupported" };
   }
   switch (contentType) {
@@ -68,57 +75,63 @@ export function getFulfillmentDetails(link: MediaLink): FulfillmentDetails {
     case OPDS1.MobiPocketMediaType:
     case OPDS1.EpubMediaType:
       const typeName = typeMap[contentType].name;
-      const modifier = initialType === OPDS1.AdeptMediaType ? "Adobe " : "";
+      const modifier = indirectionType === OPDS1.AdeptMediaType ? "Adobe " : "";
       return {
         id: link.url,
-        url: link.url,
+        getUrl: constructGetUrl(indirectionType, contentType, link.url),
         type: "download",
         buttonLabel: `Download ${modifier}${typeName}`,
-        mediaType: contentType
+        contentType
       };
 
     case OPDS1.ExternalReaderMediaType:
       return {
         id: link.url,
-        getUrl: getReaderUrl(initialType, contentType, link.url),
         type: "read-online-external",
+        getUrl: constructGetUrl(indirectionType, contentType, link.url),
         buttonLabel: "Read Online"
       };
 
     case OPDS1.AxisNowWebpubMediaType:
       // you can only read these if you can decrypt them.
-      if (!NEXT_PUBLIC_AXIS_NOW_DECRYPT) {
+      if (!AXISNOW_DECRYPT) {
         return { type: "unsupported" };
       }
       return {
+        type: "read-online-internal",
         id: link.url,
         // parse the url into the internal url we need to send the user to
         url: `/read/${encodeURIComponent(link.url)}`,
-        type: "read-online-internal",
         buttonLabel: "Read Online"
       };
   }
+  // TODO: track to bugsnag that we have found an unhandled media type
   return {
     type: "unsupported"
   };
 }
 
-const getReaderUrl = (
-  initialType:
-    | OPDS1.AnyBookMediaType
-    | OPDS1.IndirectAcquisitionType
-    | undefined,
+/**
+ * Constructs a function to be used later to fetch the actual url of the book,
+ * when a user clicks on the fulfillment button
+ */
+type GetUrlWithIndirection = (
+  catalogUrl: string,
+  token?: string
+) => Promise<string>;
+const constructGetUrl = (
+  indirectionType: OPDS1.IndirectAcquisitionType | undefined,
   contentType: OPDS1.AnyBookMediaType,
   url: string
-) => async (catalogUrl: string, token: string) => {
-  if (initialType === OPDS1.OPDSEntryMediaType) {
-    /**
-     * If there is OPDS Entry Indirection, we fetch the actual link
-     * from within an entry
-     */
-    const book = await fetchBook(url, catalogUrl, token);
+): GetUrlWithIndirection => async (catalogUrl: string, token: string) => {
+  /**
+   * If there is OPDS Entry Indirection, we fetch the actual link
+   * from within an entry
+   */
+  if (indirectionType === OPDS1.OPDSEntryMediaType) {
+    const book = (await fetchBook(url, catalogUrl, token)) as FulfillableBook;
     const resolvedUrl = book.fulfillmentLinks?.find(
-      link => link.type === contentType
+      link => link.contentType === contentType
     )?.url;
     if (!resolvedUrl) {
       throw new ApplicationError(
@@ -127,27 +140,46 @@ const getReaderUrl = (
     }
     return resolvedUrl;
   }
+  // otherwise there is no indirection, just return the url.
   return url;
 };
 
-/**
- * There is or was an error in the CM where it sent us incorrectly formatted
- * Adobe media types.
- */
-export function fixMimeType(
-  mimeType: OPDS1.IndirectAcquisitionType | OPDS1.AnyBookMediaType
-) {
-  return mimeType === "vnd.adobe/adept+xml"
-    ? "application/vnd.adobe.adept+xml"
-    : mimeType;
-}
-
-export function dedupeLinks(links: MediaLink[]) {
-  return links.reduce<MediaLink[]>((uniqueArr, current) => {
+export function dedupeLinks(links: FulfillmentLink[]) {
+  return links.reduce<FulfillmentLink[]>((uniqueArr, current) => {
     const isDup = uniqueArr.find(
-      uniqueLink => uniqueLink.type === current.type
+      uniqueLink => uniqueLink.contentType === current.contentType
     );
 
     return isDup ? uniqueArr : [...uniqueArr, current];
   }, []);
+}
+
+export function getAppSupportLevel(
+  contentType: OPDS1.AnyBookMediaType,
+  indirectionType: OPDS1.IndirectAcquisitionType | undefined
+): MediaSupportLevel | "unsupported" {
+  const mediaSupport = APP_CONFIG.mediaSupport;
+
+  // if there is indirection, we search through the dictionary nested inside the
+  // indirectionType
+  if (indirectionType) {
+    const supportLevel = mediaSupport[indirectionType]?.[contentType];
+    return supportLevel ?? "unsupported";
+  }
+
+  return mediaSupport[contentType] ?? "unsupported";
+}
+
+/**
+ * Check if any of the links is redirect or redirect-and-show support level
+ */
+export function shouldRedirectToCompanionApp(links: FulfillmentLink[]) {
+  return links.reduce((prev, link) => {
+    if (prev) return true;
+    const supportLevel = link.supportLevel;
+    if (supportLevel === "redirect" || supportLevel === "redirect-and-show") {
+      return true;
+    }
+    return false;
+  }, false);
 }

@@ -1,16 +1,11 @@
 import * as React from "react";
-import { BookData, MediaLink } from "interfaces";
 import { fetchBook } from "dataflow/opds1/fetch";
 import useUser from "components/context/UserContext";
 import useLibraryContext from "components/context/LibraryContext";
 import { ServerError } from "errors";
 import useAuthModalContext from "auth/AuthModalContext";
 
-export default function useBorrow(
-  book: BookData,
-  isBorrow: boolean,
-  borrowLink: MediaLink
-) {
+export default function useBorrow(isBorrow: boolean) {
   const { catalogUrl } = useLibraryContext();
   const { setBook, token } = useUser();
   const { showModal } = useAuthModalContext();
@@ -19,12 +14,7 @@ export default function useBorrow(
   const [error, setError] = React.useState<string | undefined>();
 
   const loadingText = isBorrow ? "Borrowing..." : "Reserving...";
-  const buttonLabel = isBorrow
-    ? borrowLink.indirectType ===
-      "application/vnd.librarysimplified.axisnow+json"
-      ? "Borrow to read online"
-      : "Borrow to read on a mobile device"
-    : "Reserve";
+  const buttonLabel = isBorrow ? "Borrow" : "Reserve";
 
   const borrowOrReserve = async (url: string) => {
     setLoading(true);

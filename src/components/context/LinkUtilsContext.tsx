@@ -1,9 +1,9 @@
 import useLibraryContext from "components/context/LibraryContext";
 import * as React from "react";
-import { NextLinkConfig, LibraryData } from "../../interfaces";
+import { LibraryData } from "interfaces";
 
-type LinkBuilder = (url: string) => NextLinkConfig;
-type BuildMultiLibraryLink = (config: NextLinkConfig) => NextLinkConfig;
+type LinkBuilder = (url: string) => string;
+type BuildMultiLibraryLink = (href: string) => string;
 
 export type LinkUtils = {
   buildBookLink: LinkBuilder;
@@ -18,15 +18,8 @@ export const LinkUtilsProvider: React.FC<{
   library: LibraryData;
 }> = ({ library, children }) => {
   const { catalogUrl } = useLibraryContext();
-  const buildMultiLibraryLink: BuildMultiLibraryLink = ({ href, as }) => {
-    if (library.slug) {
-      return {
-        // if no as was passed, but you're adding one now, use the href
-        as: `/${library.slug}${as ? as : href}`.replace(trailingSlashRegex, ""),
-        href: `/[library]${href}`.replace(trailingSlashRegex, "")
-      };
-    }
-    return { href, as };
+  const buildMultiLibraryLink: BuildMultiLibraryLink = href => {
+    return `/${library.slug}${href}`.replace(trailingSlashRegex, "");
   };
 
   const buildCollectionLink: LinkBuilder = (collectionUrl: string) => {
@@ -35,22 +28,15 @@ export const LinkUtilsProvider: React.FC<{
       !collectionUrl ||
       collectionUrl.replace(trailingSlashRegex, "") === catalogUrl
     ) {
-      return buildMultiLibraryLink({
-        href: "/",
-        as: "/"
-      });
+      return buildMultiLibraryLink("/");
     }
-    return buildMultiLibraryLink({
-      href: "/collection/[collectionUrl]",
-      as: `/collection/${encodeURIComponent(collectionUrl)}`
-    });
+    return buildMultiLibraryLink(
+      `/collection/${encodeURIComponent(collectionUrl)}`
+    );
   };
 
   const buildBookLink: LinkBuilder = (bookUrl: string) => {
-    return buildMultiLibraryLink({
-      href: "/book/[bookUrl]",
-      as: `/book/${encodeURIComponent(bookUrl)}`
-    });
+    return buildMultiLibraryLink(`/book/${encodeURIComponent(bookUrl)}`);
   };
 
   return (
