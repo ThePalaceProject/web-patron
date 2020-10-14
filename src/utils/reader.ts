@@ -4,6 +4,7 @@ import {
   SerifFont,
   SansFont,
   PublisherFont,
+  DyslexiaFont,
   LocalStorageStore,
   IFrameNavigator,
   DayTheme,
@@ -76,6 +77,7 @@ async function initBookSettings(
   const publisher = new PublisherFont();
   const serif = new SerifFont();
   const sans = new SansFont();
+  const dlFont = new DyslexiaFont();
   const day = new DayTheme();
   const sepia = new SepiaTheme();
   const night = new NightTheme();
@@ -105,7 +107,7 @@ async function initBookSettings(
     : webpubManifestUrl;
   const bookSettings = await BookSettings.create({
     store: settingsStore,
-    bookFonts: [publisher, serif, sans],
+    bookFonts: [publisher, serif, sans, dlFont],
     fontSizesInPixels: fontSizes,
     bookThemes: [day, sepia, night],
     bookViews: [paginator, scroller]
@@ -121,6 +123,7 @@ async function initBookSettings(
     publisher: publisher,
     serif: serif,
     sans: sans,
+    dlFont: dlFont,
     day: day,
     sepia: sepia,
     night: night,
