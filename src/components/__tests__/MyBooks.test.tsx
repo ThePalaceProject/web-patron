@@ -1,7 +1,7 @@
 import * as React from "react";
 import { render, fixtures, fireEvent } from "test-utils";
 import { MyBooks } from "../MyBooks";
-import { BookData } from "interfaces";
+import { FulfillableBook } from "interfaces";
 
 test("shows message and button when not authenticated", () => {
   const utils = render(<MyBooks />);
@@ -52,9 +52,12 @@ test("sign out calls sign out", async () => {
   expect(fixtures.mockSignOut).toHaveBeenCalledTimes(1);
 });
 
-const books: BookData[] = [
-  ...fixtures.makeBooks(10),
-  fixtures.mergeBook({
+const books: FulfillableBook[] = [
+  ...fixtures.makeFulfillableBooks(10),
+  fixtures.mergeBook<FulfillableBook>({
+    status: "fulfillable",
+    fulfillmentLinks: [fixtures.fulfillmentLink],
+    revokeUrl: "/revoke-10",
     id: "book 10",
     title: "Book Title 10",
     availability: {
@@ -62,7 +65,10 @@ const books: BookData[] = [
       status: "available"
     }
   }),
-  fixtures.mergeBook({
+  fixtures.mergeBook<FulfillableBook>({
+    status: "fulfillable",
+    fulfillmentLinks: [fixtures.fulfillmentLink],
+    revokeUrl: "/revoke-11",
     id: "book 11",
     title: "Book Title 11",
     availability: {
@@ -94,9 +100,7 @@ test("displays books when signed in with data", async () => {
     )
   ).toBeFalsy();
 
-  expect(
-    utils.getByText(fixtures.makeBook(0).authors.join(", "))
-  ).toBeInTheDocument();
+  expect(utils.getByText("Book 0 author")).toBeInTheDocument();
 });
 
 test("sorts books", () => {

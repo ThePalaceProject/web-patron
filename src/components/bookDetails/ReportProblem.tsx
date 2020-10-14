@@ -7,7 +7,7 @@ import { DialogDisclosure } from "reakit";
 import { TextArea } from "../TextInput";
 import { useForm } from "react-hook-form";
 import Button from "../Button";
-import { BookData, ComplaintData } from "../../interfaces";
+import { AnyBook, ComplaintData } from "../../interfaces";
 import LoadingIndicator from "../LoadingIndicator";
 import Select, { Label } from "../Select";
 import { H1 } from "components/Text";
@@ -23,7 +23,7 @@ const getDisplayType = (type: string) =>
 
 type ComplaintFormData = Required<ComplaintData>;
 
-const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
+const ReportProblem: React.FC<{ book: AnyBook }> = ({ book }) => {
   const { state, dialog, dispatch, postComplaint } = useComplaints(book);
 
   const hasReportUrl = Boolean(getReportUrl(book.raw));
@@ -139,7 +139,7 @@ const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
         data-testid="report-problem-link"
         variant="link"
         color="ui.gray.extraDark"
-        sx={{ fontStyle: "italic" }}
+        sx={{ fontStyle: "italic", alignSelf: "flex-start", my: 2 }}
       >
         Report a problem
       </DialogDisclosure>

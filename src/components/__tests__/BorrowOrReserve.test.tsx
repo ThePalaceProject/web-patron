@@ -7,46 +7,17 @@ import {
   mockShowAuthModal
 } from "test-utils";
 import BorrowOrReserve from "components/BorrowOrReserve";
-import { MediaLink } from "interfaces";
 import userEvent from "@testing-library/user-event";
 import * as fetch from "dataflow/opds1/fetch";
 import { ServerError } from "errors";
 
-const borrowLink: MediaLink = {
-  url: "/epub-borrow-link",
-  type: "application/atom+xml;type=entry;profile=opds-catalog"
-};
 test("shows correct button for borrowable book", () => {
-  const utils = render(
-    <BorrowOrReserve book={fixtures.book} isBorrow borrowLink={borrowLink} />
-  );
-  expect(
-    utils.getByRole("button", { name: "Borrow to read on a mobile device" })
-  ).toBeInTheDocument();
-});
-
-test("shows correct button for axisnow borrowable book", () => {
-  const axisnow: MediaLink = {
-    url: "/epub-borrow-link",
-    type: "application/atom+xml;type=entry;profile=opds-catalog",
-    indirectType: "application/vnd.librarysimplified.axisnow+json"
-  };
-  const utils = render(
-    <BorrowOrReserve book={fixtures.book} isBorrow borrowLink={axisnow} />
-  );
-  expect(
-    utils.getByRole("button", { name: "Borrow to read online" })
-  ).toBeInTheDocument();
+  const utils = render(<BorrowOrReserve isBorrow url="/url" />);
+  expect(utils.getByRole("button", { name: "Borrow" })).toBeInTheDocument();
 });
 
 test("shows reserve button for reservable book", () => {
-  const utils = render(
-    <BorrowOrReserve
-      book={fixtures.book}
-      isBorrow={false}
-      borrowLink={borrowLink}
-    />
-  );
+  const utils = render(<BorrowOrReserve isBorrow={false} url="/url" />);
   expect(utils.getByRole("button", { name: "Reserve" })).toBeInTheDocument();
 });
 
@@ -60,13 +31,11 @@ const mockedFetchBook = fetch.fetchBook as jest.MockedFunction<
 >;
 
 test("borrowing calls correct url with token", async () => {
-  mockedFetchBook.mockResolvedValueOnce(fixtures.book);
-  const utils = render(
-    <BorrowOrReserve book={fixtures.book} isBorrow borrowLink={borrowLink} />
-  );
+  mockedFetchBook.mockResolvedValueOnce(fixtures.fulfillableBook);
+  const utils = render(<BorrowOrReserve isBorrow url="/url" />);
 
   const button = utils.getByRole("button", {
-    name: "Borrow to read on a mobile device"
+    name: "Borrow"
   });
 
   userEvent.click(button);
@@ -78,7 +47,7 @@ test("borrowing calls correct url with token", async () => {
   // calls borrow
   expect(mockedFetchBook).toHaveBeenCalledTimes(1);
   expect(mockedFetchBook).toHaveBeenCalledWith(
-    "/epub-borrow-link",
+    "/url",
     "http://test-cm.com/catalogUrl",
     "user-token"
   );
@@ -87,15 +56,12 @@ test("borrowing calls correct url with token", async () => {
 });
 
 test("shows auth form and error when not logged in", () => {
-  const utils = render(
-    <BorrowOrReserve book={fixtures.book} isBorrow borrowLink={borrowLink} />,
-    {
-      user: { isAuthenticated: false, token: undefined }
-    }
-  );
+  const utils = render(<BorrowOrReserve isBorrow url="/url" />, {
+    user: { isAuthenticated: false, token: undefined }
+  });
 
   const button = utils.getByRole("button", {
-    name: "Borrow to read on a mobile device"
+    name: "Borrow"
   });
   expect(mockShowAuthModal).toHaveBeenCalledTimes(0);
 
@@ -117,11 +83,9 @@ test("shows auth form and error when not logged in", () => {
 });
 
 test("catches and displays server errors", async () => {
-  const utils = render(
-    <BorrowOrReserve book={fixtures.book} isBorrow borrowLink={borrowLink} />
-  );
+  const utils = render(<BorrowOrReserve isBorrow url="/url" />);
   const button = utils.getByRole("button", {
-    name: "Borrow to read on a mobile device"
+    name: "Borrow"
   });
 
   mockedFetchBook.mockRejectedValueOnce(
@@ -140,18 +104,14 @@ test("catches and displays server errors", async () => {
       utils.getByText("Error: Something happened on the server")
     ).toBeInTheDocument();
     expect(utils.queryByText("Borrowing...")).not.toBeInTheDocument();
-    expect(
-      utils.getByRole("button", { name: "Borrow to read on a mobile device" })
-    ).toBeInTheDocument();
+    expect(utils.getByRole("button", { name: "Borrow" })).toBeInTheDocument();
   });
 });
 
 test("catches unrecognized fetch errors", async () => {
-  const utils = render(
-    <BorrowOrReserve book={fixtures.book} isBorrow borrowLink={borrowLink} />
-  );
+  const utils = render(<BorrowOrReserve isBorrow url="/url" />);
   const button = utils.getByRole("button", {
-    name: "Borrow to read on a mobile device"
+    name: "Borrow"
   });
 
   mockedFetchBook.mockRejectedValueOnce(new Error("You messed up!"));
@@ -164,21 +124,17 @@ test("catches unrecognized fetch errors", async () => {
       utils.getByText("Error: An error occurred while borrowing this book.")
     ).toBeInTheDocument();
     expect(utils.queryByText("Borrowing...")).not.toBeInTheDocument();
-    expect(
-      utils.getByRole("button", { name: "Borrow to read on a mobile device" })
-    ).toBeInTheDocument();
+    expect(utils.getByRole("button", { name: "Borrow" })).toBeInTheDocument();
   });
 });
 
 test("calls set book after borrowing", async () => {
-  const utils = render(
-    <BorrowOrReserve book={fixtures.book} isBorrow borrowLink={borrowLink} />
-  );
+  const utils = render(<BorrowOrReserve isBorrow url="/url" />);
   const button = utils.getByRole("button", {
-    name: "Borrow to read on a mobile device"
+    name: "Borrow"
   });
 
-  mockedFetchBook.mockResolvedValueOnce(fixtures.book);
+  mockedFetchBook.mockResolvedValueOnce(fixtures.fulfillableBook);
   expect(fixtures.mockSetBook).toHaveBeenCalledTimes(0);
 
   userEvent.click(button);

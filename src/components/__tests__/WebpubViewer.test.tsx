@@ -1,14 +1,20 @@
 import * as React from "react";
-import { mockShowAuthModal, render, setEnv } from "test-utils";
+import { mockShowAuthModal, render } from "test-utils";
 import WebpubViewer from "components/WebpubViewer";
 import { PageNotFoundError } from "errors";
+import mockConfig from "test-utils/mockConfig";
 
 jest.mock("utils/reader", () => ({
   __esModule: true,
   default: jest.fn()
 }));
 
+// mock fetch to avoid console errors
+fetchMock.mockResponse(JSON.stringify({ some: "response" }));
+
 test("throws error when url does not include bookUrl", () => {
+  // suppress console warning about error because they're expected for this test
+  jest.spyOn(console, "error").mockImplementation(jest.fn);
   expect(() => render(<WebpubViewer />)).toThrowError(PageNotFoundError);
   expect(() => render(<WebpubViewer />)).toThrow(
     "The requested URL is missing a bookUrl parameter."
@@ -37,10 +43,7 @@ test("renders viewer div", () => {
 });
 
 test("fetches params with token if run with NEXT_PUBLIC_AXIS_NOW_DECRYPT", async () => {
-  setEnv({
-    NEXT_PUBLIC_AXIS_NOW_DECRYPT: true
-  });
-
+  mockConfig({ axisNowDecrypt: true });
   render(<WebpubViewer />, {
     router: { query: { bookUrl: "http://some-book.com" } }
   });

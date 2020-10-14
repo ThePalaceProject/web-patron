@@ -75,7 +75,7 @@ test("extracts clever tokens from the url", () => {
 
   expect(Cookie.set).toHaveBeenCalledTimes(1);
   expect(Cookie.set).toHaveBeenCalledWith(
-    "CPW_AUTH_COOKIE/null",
+    "CPW_AUTH_COOKIE/testlib",
     str({ token: "Bearer fry6H3", methodType: OPDS1.CleverAuthType })
   );
   expect(mockSWR).toHaveBeenCalledWith(
@@ -112,7 +112,7 @@ test("extracts SAML tokens from the url", () => {
 
   expect(Cookie.set).toHaveBeenCalledTimes(1);
   expect(Cookie.set).toHaveBeenCalledWith(
-    "CPW_AUTH_COOKIE/null",
+    "CPW_AUTH_COOKIE/testlib",
     str({ token: "Bearer saml-token", methodType: OPDS1.SamlAuthType })
   );
 
@@ -167,7 +167,7 @@ test("sign out clears cookies and data", async () => {
 
   // should have removed cookie
   expect(Cookie.remove).toHaveBeenCalledTimes(1);
-  expect(Cookie.remove).toHaveBeenCalledWith("CPW_AUTH_COOKIE/null");
+  expect(Cookie.remove).toHaveBeenCalledWith("CPW_AUTH_COOKIE/testlib");
 
   // data should be revalidated
   expect(mutateMock).toHaveBeenCalledTimes(1);
@@ -197,7 +197,7 @@ test("sign in sets cookie", async () => {
 
   expect(mockCookie.set).toHaveBeenCalledTimes(1);
   expect(mockCookie.set).toHaveBeenCalledWith(
-    "CPW_AUTH_COOKIE/null",
+    "CPW_AUTH_COOKIE/testlib",
     str({ token: "a-token", methodType: "type" })
   );
 

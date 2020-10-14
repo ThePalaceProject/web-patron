@@ -1,5 +1,7 @@
+import { APP_CONFIG } from "config";
 import * as React from "react";
-import { GTM_ID } from "utils/env";
+
+const GTM_ID = APP_CONFIG.gtmId;
 
 export const GTMScript = () => {
   if (!GTM_ID) return null;

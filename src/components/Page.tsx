@@ -16,7 +16,6 @@ const Page: React.FC<AppProps> = props => {
       <Error
         statusCode={props.error?.statusCode}
         detail={props.error?.message}
-        configFile={props.configFile}
       />
     );
   }

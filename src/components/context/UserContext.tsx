@@ -1,20 +1,20 @@
 import useCredentials from "auth/useCredentials";
 import useLibraryContext from "components/context/LibraryContext";
 import { fetchCollection } from "dataflow/opds1/fetch";
-import { AppAuthMethod, BookData } from "interfaces";
+import { AppAuthMethod, AnyBook } from "interfaces";
 import * as React from "react";
 import useSWR from "swr";
 
 type Status = "authenticated" | "loading" | "unauthenticated";
 export type UserState = {
-  loans: BookData[] | undefined;
+  loans: AnyBook[] | undefined;
   status: Status;
   isAuthenticated: boolean;
   isLoading: boolean;
   refetchLoans: () => void;
   signIn: (token: string, method: AppAuthMethod) => void;
   signOut: () => void;
-  setBook: (book: BookData) => void;
+  setBook: (book: AnyBook) => void;
   error: any;
   token: string | undefined;
   clearCredentials: () => void;
@@ -64,9 +64,9 @@ export const UserProvider: React.FC = ({ children }) => {
     mutate();
   }
 
-  function setBook(book: BookData) {
+  function setBook(book: AnyBook) {
     const existing = data ?? [];
-    const newData: BookData[] = [...existing, book];
+    const newData: AnyBook[] = [...existing, book];
     mutate(newData);
   }
 

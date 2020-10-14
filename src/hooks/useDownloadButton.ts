@@ -3,6 +3,7 @@ import { DownloadDetails } from "utils/fulfill";
 import useUser from "components/context/UserContext";
 import downloadFile from "dataflow/download";
 import { ServerError } from "errors";
+import useLibraryContext from "components/context/LibraryContext";
 
 export default function useDownloadButton(
   details: DownloadDetails,
@@ -10,13 +11,15 @@ export default function useDownloadButton(
 ) {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const { catalogUrl } = useLibraryContext();
   const { token } = useUser();
 
   async function download() {
     setLoading(true);
     setError(null);
     try {
-      await downloadFile(details.url, title, details.mediaType, token);
+      const url = await details.getUrl(catalogUrl, token);
+      await downloadFile(url, title, details.contentType, token);
     } catch (e) {
       setLoading(false);
       if (e instanceof ServerError) {

@@ -16,7 +16,7 @@
     "strictNullChecks": true,
     "downlevelIteration": true,
     "importHelpers": true,
-    "baseUrl": "src"
+    "baseUrl": "src",
   },
   "exclude": ["node_modules", "config/srv", "jest.config.js"],
   "include": [
@@ -24,6 +24,8 @@
     "**/*.ts",
     ".eslintrc.js",
     "**/*.tsx",
-    "next.config.js"
+    "next.config.js",
+    "src/config/load-config.js",
+    "src/config/fetch-config.js"
   ]
 }

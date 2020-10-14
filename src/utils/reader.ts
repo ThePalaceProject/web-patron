@@ -1,4 +1,3 @@
-import { NEXT_PUBLIC_AXIS_NOW_DECRYPT } from "../utils/env";
 import {
   SepiaTheme,
   SerifFont,
@@ -16,6 +15,7 @@ import {
 } from "library-simplified-webpub-viewer";
 import fetchWithHeaders from "dataflow/fetch";
 import ApplicationError from "errors";
+import { APP_CONFIG } from "config";
 
 export default async function reader(
   bookUrl: string,
@@ -85,7 +85,7 @@ async function initBookSettings(
   let decryptor: any = undefined;
 
   try {
-    const Decryptor = NEXT_PUBLIC_AXIS_NOW_DECRYPT
+    const Decryptor = APP_CONFIG.axisNowDecrypt
       ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         await import("../../axisnow-access-control-web/src/decryptor")

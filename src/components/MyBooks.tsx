@@ -5,17 +5,17 @@ import { BookList } from "./BookList";
 import Head from "next/head";
 import BreadcrumbBar from "./BreadcrumbBar";
 import { H3 } from "./Text";
-import { BookData } from "interfaces";
+import { AnyBook } from "interfaces";
 import PageTitle from "./PageTitle";
 import SignOut from "./SignOut";
 import useUser from "components/context/UserContext";
 import { PageLoader } from "components/LoadingIndicator";
 import useAuthModalContext from "auth/AuthModalContext";
 
-const availableUntil = (book: BookData) =>
+const availableUntil = (book: AnyBook) =>
   book.availability?.until ? new Date(book.availability.until) : "NaN";
 
-function sortBooksByLoanExpirationDate(books: BookData[]) {
+function sortBooksByLoanExpirationDate(books: AnyBook[]) {
   return books.sort((a, b) => {
     const aDate = availableUntil(a);
     const bDate = availableUntil(b);
@@ -59,7 +59,7 @@ export const MyBooks: React.FC = () => {
   );
 };
 
-const LoansContent: React.FC<{ books: BookData[] }> = ({ books }) => {
+const LoansContent: React.FC<{ books: AnyBook[] }> = ({ books }) => {
   return (
     <React.Fragment>
       <BookList books={books} />

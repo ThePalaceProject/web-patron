@@ -94,7 +94,6 @@ test("does redirect when selected", () => {
 
   expect(mockedRouter.push).toHaveBeenCalledTimes(1);
   expect(mockedRouter.push).toHaveBeenCalledWith(
-    "/collection/[collectionUrl]",
-    "/collection/http%3A%2F%2Ftitle"
+    "/testlib/collection/http%3A%2F%2Ftitle"
   );
 });

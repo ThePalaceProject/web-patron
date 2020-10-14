@@ -3,13 +3,15 @@ import { jsx } from "theme-ui";
 import * as React from "react";
 import BaseLink from "next/link";
 import useLinkUtils, { LinkUtils } from "./context/LinkUtilsContext";
-import { NextLinkConfig } from "../interfaces";
 
 type CollectionLinkProps = {
   collectionUrl: string;
 };
 type BookLinkProps = {
   bookUrl: string;
+};
+type OtherLinkProps = {
+  href: string;
 };
 
 type BaseLinkProps = Omit<
@@ -21,7 +23,7 @@ type BaseLinkProps = Omit<
   };
 
 export type LinkProps = BaseLinkProps &
-  (CollectionLinkProps | BookLinkProps | NextLinkConfig);
+  (CollectionLinkProps | BookLinkProps | OtherLinkProps);
 
 /**
  * converts bookUrl and collectionUrl to as/href props
@@ -31,18 +33,15 @@ export type LinkProps = BaseLinkProps &
 const buildLinkFromProps = (props: LinkProps, linkUtils: LinkUtils) => {
   if ("bookUrl" in props) {
     const { bookUrl, ...rest } = props;
-    return { ...linkUtils.buildBookLink(bookUrl), ...rest };
+    return { href: linkUtils.buildBookLink(bookUrl), ...rest };
   }
   if ("collectionUrl" in props) {
     const { collectionUrl, ...rest } = props;
-    return { ...linkUtils.buildCollectionLink(collectionUrl), ...rest };
+    return { href: linkUtils.buildCollectionLink(collectionUrl), ...rest };
   }
-  const { as, href, ...rest } = props;
+  const { href, ...rest } = props;
   return {
-    ...linkUtils.buildMultiLibraryLink({
-      as: props.as,
-      href: props.href
-    }),
+    href: linkUtils.buildMultiLibraryLink(props.href),
     ...rest
   };
 };
@@ -59,7 +58,6 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
   ({ children, className, ...props }, ref) => {
     const linkUtils = useLinkUtils();
     const {
-      as,
       href,
       prefetch,
       replace,
@@ -70,7 +68,6 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
     return (
       <BaseLink
         href={href}
-        as={as}
         prefetch={prefetch}
         replace={replace}
         scroll={scroll}

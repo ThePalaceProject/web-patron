@@ -25,13 +25,13 @@ test("shows clicklable breadcrumbs", () => {
   const allBooks = utils.getByText("All Books");
   expect(allBooks.closest("a")).toHaveAttribute(
     "href",
-    "/collection/url-allbooks"
+    "/testlib/collection/url-allbooks"
   );
 
   const libraryCrumb = utils.getByText("lib");
   expect(libraryCrumb.closest("a")).toHaveAttribute(
     "href",
-    "/collection/url-lib"
+    "/testlib/collection/url-lib"
   );
 
   // the last item isn't a link
@@ -45,7 +45,10 @@ test("adds current location", () => {
   );
 
   const lastItem = utils.getByText("Last Item");
-  expect(lastItem.closest("a")).toHaveAttribute("href", "/collection/last-url");
+  expect(lastItem.closest("a")).toHaveAttribute(
+    "href",
+    "/testlib/collection/last-url"
+  );
 
   const currentLoc = utils.getByText("We are here");
   expect(currentLoc.closest("a")).toBeNull();

@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { BookData } from "interfaces";
+import { AnyBook } from "interfaces";
 import BookCover from "../BookCover";
 import Recommendations from "./Recommendations";
 import { PageLoader } from "../LoadingIndicator";
@@ -17,7 +17,6 @@ import MediumIndicator from "components/MediumIndicator";
 import SimplyELogo from "components/SimplyELogo";
 import IosBadge from "components/storeBadges/IosBadge";
 import GooglePlayBadge from "components/storeBadges/GooglePlayBadge";
-import { NEXT_PUBLIC_COMPANION_APP } from "../../utils/env";
 import { useRouter } from "next/router";
 import extractParam from "dataflow/utils";
 import useSWR from "swr";
@@ -25,6 +24,7 @@ import { fetchBook } from "dataflow/opds1/fetch";
 import useUser from "components/context/UserContext";
 import { ServerError } from "errors";
 import { ProblemDocument } from "types/opds1";
+import { APP_CONFIG } from "config";
 
 export const BookDetails: React.FC = () => {
   const { query } = useRouter();
@@ -61,7 +61,7 @@ export const BookDetails: React.FC = () => {
           <div sx={{ flex: ["1 1 auto", 0.33], mr: [0, 4], mb: [3, 0] }}>
             <BookCover book={book} sx={{ maxWidth: [180, "initial"] }} />
 
-            {NEXT_PUBLIC_COMPANION_APP === "simplye" && (
+            {APP_CONFIG.companionApp === "simplye" && (
               <SimplyECallout sx={{ display: ["none", "block"] }} />
             )}
           </div>
@@ -83,6 +83,8 @@ export const BookDetails: React.FC = () => {
               {book.authors?.join(", ") ?? "Unknown"}
             </Text>
             <MediumIndicator book={book} />
+            <FulfillmentCard book={book} sx={{ mt: 3 }} />
+            <Summary book={book} />
             <div sx={{ mt: 2 }}>
               <DetailField heading="Publisher" details={book.publisher} />
               <DetailField heading="Published" details={book.published} />
@@ -91,9 +93,7 @@ export const BookDetails: React.FC = () => {
                 details={book.categories?.join(", ")}
               />
             </div>
-            <FulfillmentCard book={book} sx={{ mt: 3 }} />
             <ReportProblem book={book} />
-            <Summary book={book} />
           </div>
         </div>
       </div>
@@ -102,7 +102,7 @@ export const BookDetails: React.FC = () => {
   );
 };
 
-const Summary: React.FC<{ book: BookData; className?: string }> = ({
+const Summary: React.FC<{ book: AnyBook; className?: string }> = ({
   book,
   className
 }) => (

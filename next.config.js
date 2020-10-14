@@ -42,6 +42,12 @@ const config = {
       config.plugins.push(new BugsnagSourceMapUploaderPlugin(config));
     }
 
+    // source the app config file and provide it using val-loader
+    config.module.rules.push({
+      test: require.resolve("./src/config/load-config.js"),
+      use: [{ loader: "val-loader" }]
+    });
+
     return config;
   }
 };

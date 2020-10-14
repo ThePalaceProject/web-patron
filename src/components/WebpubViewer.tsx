@@ -1,4 +1,3 @@
-import { NEXT_PUBLIC_AXIS_NOW_DECRYPT } from "../utils/env";
 import React from "react";
 import reader from "utils/reader";
 import { useRouter } from "next/router";
@@ -8,6 +7,7 @@ import fetchWithHeaders from "dataflow/fetch";
 import extractParam from "dataflow/utils";
 import { PageNotFoundError, ServerError } from "errors";
 import useAuthModalContext from "auth/AuthModalContext";
+import { APP_CONFIG } from "config";
 
 const initializeReader = async (
   entryUrl: string,
@@ -15,7 +15,7 @@ const initializeReader = async (
   token: string
 ) => {
   const loadDecryptorParams = async (webpubManifestUrl: any) => {
-    if (!NEXT_PUBLIC_AXIS_NOW_DECRYPT) return;
+    if (!APP_CONFIG.axisNowDecrypt) return;
     const response = await fetchWithHeaders(webpubManifestUrl, token);
     const data = await response.json();
     // there should never be a status code in the json

@@ -2,13 +2,13 @@ import * as React from "react";
 import { render, fixtures, waitFor } from "test-utils";
 import merge from "deepmerge";
 import { BookDetails } from "../index";
-import { BookData } from "interfaces";
+import { AnyBook } from "interfaces";
 import * as complaintActions from "hooks/useComplaints/actions";
 import userEvent from "@testing-library/user-event";
 import ReportProblem from "../ReportProblem";
-import * as env from "utils/env";
 import { ServerError } from "errors";
 import useSWR from "swr";
+import mockConfig from "test-utils/mockConfig";
 
 jest.mock("swr");
 
@@ -73,7 +73,7 @@ describe("book details page", () => {
   });
 
   test("doesn't show categories when there aren't any", () => {
-    const bookWithoutCategories: BookData = merge(fixtures.book, {
+    const bookWithoutCategories: AnyBook = merge(fixtures.book, {
       categories: null
     });
     mockSwr({ data: bookWithoutCategories });
@@ -90,20 +90,8 @@ describe("book details page", () => {
     expect(utils.getByText("Publisher:")).toBeInTheDocument();
   });
 
-  test("shows fulfillment card in open-access state", () => {
-    mockSwr({ data: fixtures.book });
-    const utils = render(<BookDetails />);
-
-    expect(
-      utils.getByText("This open-access book is available to keep forever.")
-    );
-    expect(
-      utils.getByRole("button", { name: "Borrow to read on a mobile device" })
-    ).toBeInTheDocument();
-  });
-
   test("does not show simplyE callout when NEXT_PUBLIC_COMPANION_APP is 'openebooks'", () => {
-    (env.NEXT_PUBLIC_COMPANION_APP as string) = "openebooks";
+    mockConfig({ companionApp: "openebooks" });
     mockSwr({ data: fixtures.book });
     const utils = render(<BookDetails />);
 
@@ -120,7 +108,7 @@ describe("book details page", () => {
   });
 
   test("shows simplyE callout when NEXT_PUBLIC_COMPANION_APP is 'simplye'", async () => {
-    (env.NEXT_PUBLIC_COMPANION_APP as string) = "simplye";
+    mockConfig({ companionApp: "simplye" });
     mockSwr({ data: fixtures.book });
     const utils = render(<BookDetails />);
 
@@ -192,7 +180,7 @@ const fetchComplaintTypesSpy = jest
   .mockReturnValue(mockBoundFetchComplaintTypes);
 const postComplaintSpy = jest.spyOn(complaintActions, "postComplaint");
 
-const bookWithReportUrl = merge<BookData>(fixtures.book, {
+const bookWithReportUrl = merge<AnyBook>(fixtures.book, {
   raw: {
     link: [
       {
@@ -334,7 +322,7 @@ describe("report problem", () => {
     postComplaintSpy.mockReturnValue(_url => mockBoundPostComplaint);
 
     mockSwr({ data: bookWithReportUrl });
-    const utils = render(<ReportProblem book={fixtures.book} />);
+    const utils = render(<ReportProblem book={fixtures.borrowableBook} />);
     // open the form
     const reportProblemLink = utils.getByTestId("report-problem-link");
     userEvent.click(reportProblemLink);

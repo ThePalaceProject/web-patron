@@ -9,7 +9,7 @@ import { LibraryData } from "../../interfaces";
  * Copied via chrome console from sample app.
  */
 export const libraryData: LibraryData = {
-  slug: null,
+  slug: "testlib",
   logoUrl: null,
   catalogUrl: "http://test-cm.com/catalogUrl",
   catalogName: "XYZ Public Library",

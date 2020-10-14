@@ -3,7 +3,7 @@ import { jsx } from "theme-ui";
 import * as React from "react";
 import { AspectRatio } from "@theme-ui/components";
 import { MediumIcon } from "./MediumIndicator";
-import { BookData } from "interfaces";
+import { AnyBook } from "interfaces";
 /**
  * This is meant to be a book cover. Primarily the image and styling,
  * along with possibly extending it to lazy load the images in the future.
@@ -11,7 +11,7 @@ import { BookData } from "interfaces";
 
 type ImageLoadState = "loading" | "error" | "success";
 
-const BookCover: React.FC<{ book: BookData; className?: string }> = ({
+const BookCover: React.FC<{ book: AnyBook; className?: string }> = ({
   book,
   className
 }) => {

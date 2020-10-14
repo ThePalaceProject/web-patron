@@ -139,7 +139,7 @@ exports[`NavButton renders correct element 1`] = `
 
 <a
   class="emotion-0"
-  href="/somewhere"
+  href="/testlib/somewhere"
 >
   child
 </a>

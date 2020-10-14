@@ -2,14 +2,15 @@
 
 ### Unreleased Changes
 
+- BREAKING CHANGE: Config file is now a yml file and can configure media support and other env vars. See readme for more info.
+- BREAKING CHANGE: Remove `SHORTEN_URLS` env var. Url parameters will no longer be shortened. We will look for a server solution to pretty urls in the future.
+- Feature: App now chooses the first borrow link with supported child formats, instead of just the first borrow link to display to user.
 - Feature: Add support for Clever auth providers.
 - Redesign: in Auth Modal display AuthProvider logos as selectable buttons when there are 2-4 AuthProviders instead of Combobox
 - Feature: Add support for tracking app events via Google Tag Manager.
 - Fix: Update CleverAuth button to use AnchorButton for a11y and semantic reasons
-- Fix: Get loans to display on /loans from state.loans instead of state.collection.
 - Fix: Removed site-wide navigation from webpub-viewer pages, as it overlapped with the reader. Created a LayoutPage component to wrap pages that require site-wide navigation and update the Page to be used directly for pages that do not require site-wide navigation.
 - Fix: Environment variables can now be passed into the docker container, because the container is now building and running the app instead of just running it.  
-- BREAKING CHANGE: Remove `SHORTEN_URLS` env var. Url parameters will no longer be shortened. We will look for a server solution to pretty urls in the future.
 - Add: Remove books from local storage when a user logs out.
 - Add: Optional error reporting via [Bugsnag](https://www.bugsnag.com/).
 - Refactor: Complete rewrite of the data layer, removing opds-web-client and adding [swr](https://swr.vercel.app/) for data fetching. Includes many UX improvments.

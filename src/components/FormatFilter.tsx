@@ -44,7 +44,7 @@ const FormatFilter: React.FC<{ collection: CollectionData }> = ({
     const collectionLink = buildCollectionLink(e.target.value);
     // check if value is defined?
     // if all facet isn't defined, go to the base url.
-    Router.push(collectionLink.href, collectionLink.as);
+    Router.push(collectionLink);
   };
 
   const value = [allFacet, ebookFacet, audiobookFacet].find(

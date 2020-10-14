@@ -1,116 +1,37 @@
 import * as React from "react";
-import {
-  render,
-  fixtures,
-  waitForElementToBeRemoved,
-  waitFor,
-  setEnv
-} from "test-utils";
+import { render, waitForElementToBeRemoved, waitFor } from "test-utils";
 import { mergeBook } from "test-utils/fixtures";
 import FulfillmentCard from "../FulfillmentCard";
 import userEvent from "@testing-library/user-event";
 import _download from "downloadjs";
-import * as env from "utils/env";
+import mockConfig from "test-utils/mockConfig";
+import {
+  BorrowableBook,
+  FulfillableBook,
+  OnHoldBook,
+  ReservableBook,
+  ReservedBook
+} from "interfaces";
+import { ProblemDocument } from "types/opds1";
 import fetchMock from "jest-fetch-mock";
 import { mockPush } from "test-utils/mockNextRouter";
 
 jest.mock("downloadjs");
 window.open = jest.fn();
 
-describe("open-access", () => {
-  test("correct title and subtitle when not loaned", () => {
-    const utils = render(<FulfillmentCard book={fixtures.book} />);
-    expect(
-      utils.getByText("This open-access book is available to keep forever.")
-    ).toBeInTheDocument();
-    expect(utils.getByRole("button", { name: /Borrow/i })).toBeInTheDocument();
-  });
+/**
+ * Borrowable
+ * OnHold
+ * Reservable
+ * Reserved
+ * Fulfillable
+ * Unsupported
+ */
 
-  test("correct title and subtitle when loaned", () => {
-    const utils = render(<FulfillmentCard book={fixtures.book} />, {
-      user: {
-        loans: [fixtures.book],
-        isAuthenticated: true
-      }
-    });
-    expect(
-      utils.getByText("This open-access book is available to keep forever.")
-    ).toBeInTheDocument();
-    expect(
-      utils.getByText("You're ready to read this book in SimplyE!")
-    ).toBeInTheDocument();
-  });
-
-  test("shows download options if loaned", () => {
-    const utils = render(<FulfillmentCard book={fixtures.book} />, {
-      user: {
-        loans: [fixtures.book],
-        isAuthenticated: true
-      }
-    });
-
-    expect(
-      utils.getByText("If you would rather read on your computer, you can:")
-    );
-
-    const downloadButton = utils.getByText("Download EPUB");
-    expect(downloadButton).toBeInTheDocument();
-
-    const PDFButton = utils.getByText("Download PDF");
-    expect(PDFButton).toBeInTheDocument();
-  });
-
-  test("clicking download fetches book", async () => {
-    const utils = render(<FulfillmentCard book={fixtures.book} />, {
-      user: {
-        loans: [fixtures.book],
-        isAuthenticated: true
-      }
-    });
-
-    const downloadButton = utils.getByText("Download EPUB");
-    expect(downloadButton).toBeInTheDocument();
-
-    userEvent.click(downloadButton);
-
-    expect(fetchMock).toHaveBeenCalledWith("/epub-open-access-link", {
-      headers: {
-        Authorization: "user-token",
-        "X-Requested-With": "XMLHttpRequest"
-      }
-    });
-    await waitForElementToBeRemoved(() => utils.getByText("Downloading..."));
-  });
-
-  test("doesn't show duplicate download options", () => {
-    const bookWithDuplicateFormat = mergeBook({
-      openAccessLinks: [
-        ...fixtures.book.openAccessLinks,
-        {
-          type: "application/pdf",
-          url: "/pdf-open-access-link-2"
-        },
-        {
-          type: "application/pdf",
-          url: "/pdf-open-access-link-3"
-        }
-      ]
-    });
-
-    const utils = render(<FulfillmentCard book={bookWithDuplicateFormat} />, {
-      user: {
-        loans: [bookWithDuplicateFormat]
-      }
-    });
-
-    const downloadButton = utils.getAllByText("Download PDF");
-    expect(downloadButton).toHaveLength(1);
-  });
-});
-
-describe("available to borrow", () => {
-  const closedAccessBook = mergeBook({
-    openAccessLinks: [],
+describe("BorrowableBook", () => {
+  const borrowableBook = mergeBook<BorrowableBook>({
+    status: "borrowable",
+    borrowUrl: "/borrow",
     copies: {
       total: 13,
       available: 10
@@ -118,22 +39,20 @@ describe("available to borrow", () => {
   });
 
   test("correct title and subtitle", () => {
-    const utils = render(<FulfillmentCard book={closedAccessBook} />);
-    expect(
-      utils.getByText("This book is available to borrow!")
-    ).toBeInTheDocument();
+    const utils = render(<FulfillmentCard book={borrowableBook} />);
+    expect(utils.getByText("Available to borrow")).toBeInTheDocument();
     expect(utils.getByText("10 out of 13 copies available."));
   });
 
-  test("displays borrow button which fetches book when clicked", async () => {
-    const utils = render(<FulfillmentCard book={closedAccessBook} />, {
+  test("borrow button fetches book and displays borrow errors", async () => {
+    const utils = render(<FulfillmentCard book={borrowableBook} />, {
       user: { isAuthenticated: true }
     });
-    const borrowButton = utils.getByText("Borrow to read on a mobile device");
+    const borrowButton = utils.getByRole("button", { name: "Borrow" });
     expect(borrowButton).toBeInTheDocument();
 
     // click borrow
-    userEvent.click(utils.getByText("Borrow to read on a mobile device"));
+    userEvent.click(borrowButton);
 
     // the borrow button should be gone now
     await waitForElementToBeRemoved(() => utils.getByText("Borrowing..."));
@@ -144,10 +63,10 @@ describe("available to borrow", () => {
   });
 });
 
-describe("ready to borrow", () => {
-  const readyBook = mergeBook({
-    openAccessLinks: undefined,
-    fulfillmentLinks: undefined,
+describe("OnHoldBook", () => {
+  const onHoldBook = mergeBook<OnHoldBook>({
+    status: "on-hold",
+    borrowUrl: "/borrow",
     availability: {
       status: "ready",
       until: "2020-06-16"
@@ -155,22 +74,20 @@ describe("ready to borrow", () => {
   });
 
   test("correct title and subtitle", () => {
-    const utils = render(<FulfillmentCard book={readyBook} />);
-    expect(
-      utils.getByText("You can now borrow this book!")
-    ).toBeInTheDocument();
+    const utils = render(<FulfillmentCard book={onHoldBook} />);
+    expect(utils.getByText("On Hold")).toBeInTheDocument();
     expect(utils.getByText("Your hold will expire on Tue Jun 16 2020."));
   });
 
-  test("displays borrow button which fetches book when clicked", async () => {
-    const utils = render(<FulfillmentCard book={readyBook} />, {
+  test("borrow button fetches url and shows error", async () => {
+    const utils = render(<FulfillmentCard book={onHoldBook} />, {
       user: { isAuthenticated: true }
     });
-    const borrowButton = utils.getByText("Borrow to read on a mobile device");
+    const borrowButton = utils.getByText("Borrow");
     expect(borrowButton).toBeInTheDocument();
 
     // click borrow
-    userEvent.click(utils.getByText("Borrow to read on a mobile device"));
+    userEvent.click(borrowButton);
 
     // the borrow button should be gone now
     await waitForElementToBeRemoved(() => utils.getByText("Borrowing..."));
@@ -182,7 +99,7 @@ describe("ready to borrow", () => {
 
   test("handles lack of availability.until info", () => {
     const withoutCopies = mergeBook({
-      ...readyBook,
+      ...onHoldBook,
       availability: { status: "ready" }
     });
     const utils = render(<FulfillmentCard book={withoutCopies} />);
@@ -192,63 +109,13 @@ describe("ready to borrow", () => {
   });
 });
 
-describe("ready to borrow (two links)", () => {
-  const readyBookWithTwoBorrowLinks = mergeBook({
-    openAccessLinks: undefined,
-    fulfillmentLinks: undefined,
-    allBorrowLinks: [
-      {
-        url: "/epub-borrow-link",
-        type: "application/atom+xml;type=entry;profile=opds-catalog"
-      },
-      {
-        indirectType: "application/vnd.librarysimplified.axisnow+json",
-        type: "application/atom+xml;type=entry;profile=opds-catalog",
-        url: "/axis-borrow-link"
-      }
-    ],
-    availability: {
-      status: "ready",
-      until: "2020-06-16"
-    }
-  });
-
-  test("correct title and subtitle", () => {
-    const utils = render(
-      <FulfillmentCard book={readyBookWithTwoBorrowLinks} />
-    );
-    expect(
-      utils.getByText("You can now borrow this book!")
-    ).toBeInTheDocument();
-    expect(utils.getByText("Your hold will expire on Tue Jun 16 2020."));
-  });
-
-  test("displays borrow button which fetches book", async () => {
-    const utils = render(
-      <FulfillmentCard book={readyBookWithTwoBorrowLinks} />,
-      { user: { isAuthenticated: true } }
-    );
-    const borrowButton = utils.getByText("Borrow to read on a mobile device");
-    expect(borrowButton).toBeInTheDocument();
-
-    // click borrow
-    userEvent.click(utils.getByText("Borrow to read on a mobile device"));
-
-    // the borrow button should be gone now
-    await waitForElementToBeRemoved(() => utils.getByText("Borrowing..."));
-    // there is an error because we didn't mock fetch to return something
-    expect(
-      utils.getByText("Error: An error occurred while borrowing this book.")
-    );
-  });
-});
-
-describe("available to reserve", () => {
-  const unavailableBook = mergeBook({
+describe("ReservableBook", () => {
+  const reservableBook = mergeBook<ReservableBook>({
+    status: "reservable",
+    reserveUrl: "/reserve",
     availability: {
       status: "unavailable"
     },
-    openAccessLinks: [],
     copies: {
       total: 13,
       available: 0
@@ -256,17 +123,15 @@ describe("available to reserve", () => {
   });
 
   test("correct title and subtitle", () => {
-    const utils = render(<FulfillmentCard book={unavailableBook} />);
-    expect(
-      utils.getByText("This book is currently unavailable.")
-    ).toBeInTheDocument();
+    const utils = render(<FulfillmentCard book={reservableBook} />);
+    expect(utils.getByText("Unavailable")).toBeInTheDocument();
     expect(
       utils.getByText("0 out of 13 copies available.")
     ).toBeInTheDocument();
   });
 
   test("displays reserve button", () => {
-    const utils = render(<FulfillmentCard book={unavailableBook} />);
+    const utils = render(<FulfillmentCard book={reservableBook} />);
     const reserveButton = utils.getByRole("button", {
       name: /Reserve/i
     });
@@ -275,7 +140,7 @@ describe("available to reserve", () => {
 
   test("shows number of patrons in queue when holds info present", () => {
     const bookWithQueue = mergeBook({
-      ...unavailableBook,
+      ...reservableBook,
       holds: {
         total: 4
       }
@@ -287,15 +152,16 @@ describe("available to reserve", () => {
   });
 
   test("doesn't show patrons in queue when holds info no present", () => {
-    const utils = render(<FulfillmentCard book={unavailableBook} />);
+    const utils = render(<FulfillmentCard book={reservableBook} />);
     expect(
       utils.getByText("0 out of 13 copies available.")
     ).toBeInTheDocument();
   });
 
   test("handles unknown availability numbers", () => {
-    const bookWithQueue = mergeBook({
-      openAccessLinks: [],
+    const bookWithQueue = mergeBook<ReservableBook>({
+      status: "reservable",
+      reserveUrl: "/reserve",
       copies: undefined
     });
     // this is currently failing because the getFulfillmentState is returning error
@@ -306,7 +172,7 @@ describe("available to reserve", () => {
   });
 
   test("shows reserve button which fetches book", async () => {
-    const utils = render(<FulfillmentCard book={unavailableBook} />, {
+    const utils = render(<FulfillmentCard book={reservableBook} />, {
       user: { isAuthenticated: true }
     });
     const reserveButton = utils.getByText("Reserve");
@@ -325,11 +191,12 @@ describe("available to reserve", () => {
 });
 
 describe("reserved", () => {
-  const reservedBook = mergeBook({
+  const reservedBook = mergeBook<ReservedBook>({
+    status: "reserved",
+    revokeUrl: "/revoke",
     availability: {
       status: "reserved"
     },
-    openAccessLinks: [],
     copies: {
       total: 13,
       available: 0
@@ -344,11 +211,12 @@ describe("reserved", () => {
   });
 
   test("displays number of patrons in queue and your position", () => {
-    const reservedBookWithQueue = mergeBook({
+    const reservedBookWithQueue = mergeBook<ReservedBook>({
+      status: "reserved",
+      revokeUrl: "/revoke",
       availability: {
         status: "reserved"
       },
-      openAccessLinks: [],
       copies: {
         total: 13,
         available: 0
@@ -363,19 +231,22 @@ describe("reserved", () => {
   });
 });
 
-describe("available to access", () => {
-  beforeEach(() => ((env.NEXT_PUBLIC_COMPANION_APP as string) = "simplye"));
+describe("FulfillableBook", () => {
+  beforeEach(() => mockConfig({ companionApp: "simplye" }));
 
-  const downloadableBook = mergeBook({
-    openAccessLinks: undefined,
+  const downloadableBook = mergeBook<FulfillableBook>({
+    status: "fulfillable",
+    revokeUrl: "/revoke",
     fulfillmentLinks: [
       {
         url: "/epub-link",
-        type: "application/epub+zip"
+        contentType: "application/epub+zip",
+        supportLevel: "show"
       },
       {
         url: "/pdf-link",
-        type: "application/pdf"
+        contentType: "application/pdf",
+        supportLevel: "show"
       }
     ],
     availability: {
@@ -384,12 +255,14 @@ describe("available to access", () => {
     }
   });
 
-  const viewableAxisNowBook = mergeBook({
-    openAccessLinks: undefined,
+  const viewableAxisNowBook = mergeBook<FulfillableBook>({
+    status: "fulfillable",
+    revokeUrl: "/revoke",
     fulfillmentLinks: [
       {
         url: "/epub-link",
-        type: "application/vnd.librarysimplified.axisnow+json"
+        contentType: "application/vnd.librarysimplified.axisnow+json",
+        supportLevel: "show"
       }
     ],
     availability: {
@@ -399,11 +272,10 @@ describe("available to access", () => {
   });
 
   test("constructs link to viewer for OpenAxis Books", () => {
-    (env.NEXT_PUBLIC_COMPANION_APP as string) = "openebooks";
-    (env.NEXT_PUBLIC_AXIS_NOW_DECRYPT as boolean) = true;
+    mockConfig({ companionApp: "openebooks", axisNowDecrypt: true });
     const utils = render(<FulfillmentCard book={viewableAxisNowBook} />);
     const readerButton = utils.getByRole("button", {
-      name: /Read Online/i
+      name: /Read/i
     }) as HTMLLinkElement;
 
     expect(mockPush).toHaveBeenCalledTimes(0);
@@ -412,12 +284,14 @@ describe("available to access", () => {
   });
 
   test("shows read online button for external read online links", () => {
-    const readOnlineBook = mergeBook({
-      openAccessLinks: undefined,
+    const readOnlineBook = mergeBook<FulfillableBook>({
+      status: "fulfillable",
+      revokeUrl: "/revoke",
       fulfillmentLinks: [
         {
           url: "/overdrive-read-online",
-          type: `text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"`
+          contentType: `text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"`,
+          supportLevel: "show"
         }
       ]
     });
@@ -428,13 +302,15 @@ describe("available to access", () => {
   });
 
   test("external read online tracks open_book event", async () => {
-    const readOnlineBook = mergeBook({
+    const readOnlineBook = mergeBook<FulfillableBook>({
+      status: "fulfillable",
+      revokeUrl: "/revoke",
       trackOpenBookUrl: "http://track-open-book.com",
-      openAccessLinks: undefined,
       fulfillmentLinks: [
         {
           url: "/overdrive-read-online",
-          type: `text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"`
+          contentType: `text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"`,
+          supportLevel: "show"
         }
       ]
     });
@@ -452,21 +328,21 @@ describe("available to access", () => {
   });
 
   test("internal read online button tracks open_book event", async () => {
-    setEnv({
-      NEXT_PUBLIC_AXIS_NOW_DECRYPT: true
-    });
-    const readOnlineBook = mergeBook({
+    mockConfig({ axisNowDecrypt: true });
+    const readOnlineBook = mergeBook<FulfillableBook>({
+      status: "fulfillable",
+      revokeUrl: "/revoke",
       trackOpenBookUrl: "http://track-open-book.com",
-      openAccessLinks: undefined,
       fulfillmentLinks: [
         {
           url: "/internal-read-online",
-          type: "application/vnd.librarysimplified.axisnow+json"
+          contentType: "application/vnd.librarysimplified.axisnow+json",
+          supportLevel: "show"
         }
       ]
     });
     const utils = render(<FulfillmentCard book={readOnlineBook} />);
-    const readOnline = utils.getByRole("button", { name: "Read Online" });
+    const readOnline = utils.getByRole("button", { name: "Read" });
 
     // should not have been called ever
     expect(fetchMock).toHaveBeenCalledTimes(0);
@@ -479,40 +355,61 @@ describe("available to access", () => {
     );
   });
 
-  test("correct title and subtitle", () => {
+  test("correct title and subtitle without redirect", () => {
     const utils = render(<FulfillmentCard book={downloadableBook} />);
+    expect(utils.getByText("Ready to read!")).toBeInTheDocument();
     expect(
       utils.getByText("You have this book on loan until Thu Jun 18 2020.")
     ).toBeInTheDocument();
-    expect(utils.getByText("You're ready to read this book in SimplyE!"));
+    expect(
+      utils.queryByText("You're ready to read this book in SimplyE!")
+    ).not.toBeInTheDocument();
+  });
+  const bookWithRedirect = mergeBook<FulfillableBook>({
+    status: "fulfillable",
+    revokeUrl: "/revoke",
+    fulfillmentLinks: [
+      {
+        contentType: "application/epub+zip",
+        url: "/epub",
+        supportLevel: "redirect-and-show"
+      }
+    ]
+  });
+  test("correct title and subtitle with companion app redirect", () => {
+    const utils = render(<FulfillmentCard book={bookWithRedirect} />);
+
+    expect(utils.queryByText("Ready to Read!")).not.toBeInTheDocument();
+    expect(
+      utils.getByText("You're ready to read this book in SimplyE!")
+    ).toBeInTheDocument();
+    expect(utils.getByText("You have this book on loan.")).toBeInTheDocument();
+    expect(
+      utils.getByText("If you would rather read on your computer, you can:")
+    ).toBeInTheDocument();
+    expect(utils.getByRole("button", { name: "Download EPUB" }));
   });
 
   test("correct title and subtitle when COMPANION_APP is set to openebooks", () => {
-    (env.NEXT_PUBLIC_COMPANION_APP as string) = "openebooks";
-    const utils = render(<FulfillmentCard book={downloadableBook} />);
-    expect(
-      utils.getByText("You have this book on loan until Thu Jun 18 2020.")
-    ).toBeInTheDocument();
+    mockConfig({ companionApp: "openebooks" });
+    const utils = render(<FulfillmentCard book={bookWithRedirect} />);
     expect(
       utils.getByText("You're ready to read this book in Open eBooks!")
     ).toBeInTheDocument();
+    expect(utils.getByText("You have this book on loan.")).toBeInTheDocument();
   });
 
   test("handles lack of availability info", () => {
-    const withoutAvailability = mergeBook({
+    const withoutAvailability = mergeBook<FulfillableBook>({
       ...downloadableBook,
       availability: undefined
     });
     const utils = render(<FulfillmentCard book={withoutAvailability} />);
     expect(utils.getByText("You have this book on loan.")).toBeInTheDocument();
-    expect(utils.getByText("You're ready to read this book in SimplyE!"));
   });
 
   test("shows download options", () => {
     const utils = render(<FulfillmentCard book={downloadableBook} />);
-    expect(
-      utils.getByText("If you would rather read on your computer, you can:")
-    );
     const downloadButton = utils.getByText("Download EPUB");
     expect(downloadButton).toBeInTheDocument();
 
@@ -520,12 +417,18 @@ describe("available to access", () => {
     expect(PDFButton).toBeInTheDocument();
   });
 
-  test("download button fetches book", async () => {
+  test("download button shows loading indicator fetches book", async () => {
     const utils = render(<FulfillmentCard book={downloadableBook} />);
     const downloadButton = utils.getByText("Download EPUB");
     expect(downloadButton).toBeInTheDocument();
 
     userEvent.click(downloadButton);
+
+    expect(
+      utils.getByRole("button", { name: "Downloading..." })
+    ).toBeInTheDocument();
+
+    await waitForElementToBeRemoved(() => utils.queryByText("Downloading..."));
 
     expect(fetchMock).toHaveBeenCalledWith("/epub-link", {
       headers: {
@@ -533,18 +436,19 @@ describe("available to access", () => {
         "X-Requested-With": "XMLHttpRequest"
       }
     });
-    await waitForElementToBeRemoved(() => utils.getByText("Downloading..."));
   });
 
   test("download button fetches opds entry to indirectly fulfill book", async () => {
-    const bookWithIndirect = mergeBook({
+    const bookWithIndirect = mergeBook<FulfillableBook>({
       ...downloadableBook,
       fulfillmentLinks: [
         {
           url: "/indirect",
-          type: "application/atom+xml;type=entry;profile=opds-catalog",
-          indirectType:
-            'text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"'
+          indirectionType:
+            "application/atom+xml;type=entry;profile=opds-catalog",
+          contentType:
+            'text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"',
+          supportLevel: "show"
         }
       ]
     });
@@ -563,56 +467,52 @@ describe("available to access", () => {
       }
     });
 
-    // some error will be shown, and we need to await it or our test will
+    // some error will be shown because we didn't mock fetch for this,
+    // and we need to await it or our test will
     // warn about the unexpected promise.
     await utils.findByText(/error:/gi);
   });
 
-  test("download button says download Adobe Epub when book has adobe type", async () => {
-    const bookWithIndirect = mergeBook({
-      ...downloadableBook,
-      fulfillmentLinks: [
-        {
-          url: "/indirect",
-          type: "application/vnd.adobe.adept+xml",
-          indirectType: "application/epub+zip"
-        }
-      ]
-    });
-
-    const utils = render(<FulfillmentCard book={bookWithIndirect} />);
-    const downloadButton = utils.getByText("Download Adobe EPUB");
-    expect(downloadButton).toBeInTheDocument();
+  test("shows download error message", async () => {
+    const problem: ProblemDocument = {
+      detail: "You can't do that",
+      title: "Wrong!",
+      status: 418
+    };
+    fetchMock.once(JSON.stringify(problem), { status: 418 });
+    const utils = render(<FulfillmentCard book={downloadableBook} />);
+    const downloadButton = utils.getByText("Download EPUB");
 
     userEvent.click(downloadButton);
 
-    expect(fetchMock).toHaveBeenCalledWith("/indirect", {
+    expect(
+      await utils.findByText("Error: You can't do that")
+    ).toBeInTheDocument();
+  });
+
+  test("reattempts downloads without headers upon redirect failure", async () => {
+    // redirect the user
+    fetchMock.once("Bad headers dude!", {
+      status: 301,
+      // this is a little known feature to mock a redirected response
+      counter: 1,
+      url: "/new-location"
+    } as any);
+    const utils = render(<FulfillmentCard book={downloadableBook} />);
+    const downloadButton = utils.getByText("Download EPUB");
+
+    userEvent.click(downloadButton);
+
+    await waitForElementToBeRemoved(() => utils.queryByText("Downloading..."));
+
+    expect(fetchMock).toHaveBeenCalledWith("/epub-link", {
       headers: {
         Authorization: "user-token",
         "X-Requested-With": "XMLHttpRequest"
       }
     });
 
-    await waitForElementToBeRemoved(() => utils.getByText("Downloading..."));
-  });
-
-  test("does not show download links for audiobooks", () => {
-    const audiobook = mergeBook({
-      raw: {
-        $: {
-          "schema:additionalType": {
-            value: "http://bib.schema.org/Audiobook"
-          }
-        }
-      }
-    });
-
-    const utils = render(<FulfillmentCard book={audiobook} />);
-
-    expect(
-      utils.queryByText("If you would rather read on your computer, you can:")
-    ).toBeNull();
-
-    expect(utils.queryByText(/Download/i)).toBeNull();
+    // we try the rejected url without headers
+    expect(fetchMock).toHaveBeenCalledWith("/new-location");
   });
 });
