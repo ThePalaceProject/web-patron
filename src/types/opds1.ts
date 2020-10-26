@@ -129,7 +129,9 @@ export interface Link {
 /**
  * Auth Document
  */
+export const CatalogRootRel = "start";
 type AuthDocLinkRelations =
+  | typeof CatalogRootRel
   | "navigation"
   | "logo"
   | "register"

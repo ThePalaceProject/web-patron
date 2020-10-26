@@ -1,11 +1,5 @@
-import {
-  OPDS2,
-  LibraryData,
-  LibraryLinks,
-  OPDS1,
-  SearchData
-} from "interfaces";
-import { OPDSFeed, OPDSShelfLink } from "opds-feed-parser";
+import { OPDS2, LibraryData, LibraryLinks, OPDS1 } from "interfaces";
+import { OPDSShelfLink } from "opds-feed-parser";
 import ApplicationError, { PageNotFoundError, ServerError } from "errors";
 import { flattenSamlMethod } from "utils/auth";
 import { APP_CONFIG } from "utils/env";
@@ -64,38 +58,38 @@ async function fetchCatalogEntry(
   }
 }
 
-function findCatalogRootUrl(catalog: OPDS2.CatalogEntry) {
-  return catalog.links.find(link => link.rel === OPDS2.CatalogRootRelation)
+function findAuthDocUrl(catalog: OPDS2.CatalogEntry) {
+  return catalog.links.find(link => link.rel === OPDS2.AuthDocumentRelation)
     ?.href;
 }
 
 /**
- * Interprets the app config to return the catalog root url.
+ * Interprets the app config to return the auth document url.
  */
-export async function getCatalogRootUrl(librarySlug: string): Promise<string> {
+export async function getAuthDocUrl(librarySlug: string): Promise<string> {
   const libraries = APP_CONFIG.libraries;
 
   // we have a library registry url
   if (typeof libraries === "string") {
     const catalogEntry = await fetchCatalogEntry(librarySlug, libraries);
-    const catalogRootUrl = findCatalogRootUrl(catalogEntry);
-    if (!catalogRootUrl)
+    const authDocUrl = findAuthDocUrl(catalogEntry);
+    if (!authDocUrl)
       throw new ApplicationError(
-        `CatalogEntry did not contain a Catalog Root Url. Library UUID: ${librarySlug}`
+        `CatalogEntry did not contain a Authentication Document Url. Library UUID: ${librarySlug}`
       );
-    return catalogRootUrl;
+    return authDocUrl;
   }
   // we have a dictionary of libraries
   // just get the url from the dictionary
 
-  const catalogRootUrl =
+  const authDocUrl =
     librarySlug in libraries ? libraries[librarySlug] : undefined;
-  if (typeof catalogRootUrl !== "string") {
+  if (typeof authDocUrl !== "string") {
     throw new PageNotFoundError(
-      `No catalog root url is configured for the library: ${librarySlug}.`
+      `No authentication document url is configured for the library: ${librarySlug}.`
     );
   }
-  return catalogRootUrl;
+  return authDocUrl;
 }
 
 /**
@@ -115,33 +109,45 @@ export async function fetchAuthDocument(
 }
 
 /**
- * Extracts the loans url from a catalog root
+ * Extracts the loans url from an auth document
  */
-function getShelfUrl(catalog: OPDSFeed): string | null {
+function getShelfUrl(authDoc: OPDS1.AuthDocument): string | null {
   return (
-    catalog.links.find(link => {
+    authDoc.links?.find(link => {
       return link instanceof OPDSShelfLink;
     })?.href ?? null
   );
 }
 
 /**
+ * Extracts the catalot root url from an auth document
+ */
+function getCatalogUrl(authDoc: OPDS1.AuthDocument): string {
+  const url =
+    authDoc.links?.find(link => {
+      return link.rel === OPDS1.CatalogRootRel;
+    })?.href ?? null;
+
+  if (!url)
+    throw new ApplicationError("No Catalog Root Url present in Auth Document.");
+
+  return url;
+}
+/**
  * Constructs the internal LibraryData state from an auth document,
  * catalog url, and library slug.
  */
 export function buildLibraryData(
   authDoc: OPDS1.AuthDocument,
-  catalogUrl: string,
-  librarySlug: string,
-  catalog: OPDSFeed,
-  searchData?: SearchData
+  librarySlug: string
 ): LibraryData {
   const logoUrl = authDoc.links?.find(link => link.rel === "logo")?.href;
   const headerLinks =
     authDoc.links?.filter(link => link.rel === "navigation") ?? [];
   const libraryLinks = parseLinks(authDoc.links);
   const authMethods = flattenSamlMethod(authDoc);
-  const shelfUrl = getShelfUrl(catalog);
+  const shelfUrl = getShelfUrl(authDoc);
+  const catalogUrl = getCatalogUrl(authDoc);
   return {
     slug: librarySlug,
     catalogUrl,
@@ -157,8 +163,7 @@ export function buildLibraryData(
         : null,
     headerLinks,
     libraryLinks,
-    authMethods,
-    searchData: searchData ?? null
+    authMethods
   };
 }
 
