@@ -36,6 +36,7 @@ export default function withAppProps(
       const catalogUrl = await getCatalogRootUrl(librarySlug);
       const catalog = await fetchFeed(catalogUrl);
       const authDocHref = getAuthDocHref(catalog);
+      console.log("authdoc: ", authDocHref);
       const authDocument = await fetchAuthDocument(authDocHref);
       const searchDataUrl = findSearchLink(catalog)?.href;
       const searchData = await fetchSearchData(searchDataUrl);
