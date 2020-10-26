@@ -9,10 +9,10 @@ import { useRouter } from "next/router";
 import extractParam from "dataflow/utils";
 import { OPDS1 } from "interfaces";
 
-const ErrorComponent: React.FC<{ error?: OPDS1.ProblemDocument }> = ({
-  error
+const ErrorComponent: React.FC<{ info?: OPDS1.ProblemDocument }> = ({
+  info
 }) => {
-  const { title = "Something went wrong", status, detail } = error ?? {};
+  const { title = "Something went wrong", status, detail } = info ?? {};
 
   const router = useRouter();
   const isRoot = router.asPath === "/";
