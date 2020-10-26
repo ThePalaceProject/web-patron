@@ -5,16 +5,16 @@ import { OPDS1 } from "interfaces";
 import track from "analytics/track";
 
 const Error: NextPage<{
-  error?: OPDS1.ProblemDocument;
-}> = ({ error }) => {
-  return <ErrorComponent error={error} />;
+  errorInfo?: OPDS1.ProblemDocument;
+}> = ({ errorInfo }) => {
+  return <ErrorComponent info={errorInfo} />;
 };
 
 Error.getInitialProps = ({ res, err }) => {
   if (err) track.error(err);
   const statusCode = res?.statusCode ?? err?.statusCode ?? 404;
   return {
-    error: {
+    errorInfo: {
       status: statusCode,
       title: "Server Error",
       detail: "An unexpected error occurred on the server."
