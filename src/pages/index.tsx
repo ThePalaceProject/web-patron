@@ -1,19 +1,21 @@
 import * as React from "react";
-import { NextPage } from "next";
-import { AppProps } from "dataflow/withAppProps";
-import ErrorComponent from "components/Error";
+import { NextPage, GetStaticProps } from "next";
+import withAppProps, { AppProps } from "dataflow/withAppProps";
+import { APP_CONFIG } from "config";
+import OpenEbooksLandingComponent from "components/OpenEbooksLanding";
+import LayoutPage from "components/LayoutPage";
 
-const CollectionPage: NextPage<AppProps> = () => {
+const CollectionPage: NextPage<AppProps> = ({ library, error }) => {
   return (
-    <ErrorComponent
-      info={{
-        title: "Page Not Found",
-        status: 404,
-        detail:
-          "This app does not have a home page. Url should contain a library slug: https://domain.com/<library>"
-      }}
-    />
+    <>
+      <LayoutPage library={library} error={error}>
+        <OpenEbooksLandingComponent />
+      </LayoutPage>
+    </>
   );
 };
+
+const librarySlug = APP_CONFIG.companionApp === "openebooks" ? "qa" : undefined;
+export const getStaticProps: GetStaticProps = withAppProps(librarySlug);
 
 export default CollectionPage;

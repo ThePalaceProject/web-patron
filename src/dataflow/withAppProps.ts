@@ -1,5 +1,5 @@
 import { LibraryData, OPDS1 } from "../interfaces";
-import { GetStaticProps } from "next";
+import { GetStaticProps, GetStaticPropsContext } from "next";
 import {
   getAuthDocUrl,
   fetchAuthDocument,
@@ -8,6 +8,7 @@ import {
 import ApplicationError, { PageNotFoundError } from "errors";
 import extractParam from "dataflow/utils";
 import track from "analytics/track";
+import { ParsedUrlQuery } from "querystring";
 
 export type AppProps = {
   library?: LibraryData;
@@ -15,11 +16,15 @@ export type AppProps = {
 };
 
 export default function withAppProps(
+  defaultLibSlug?: string,
   pageGetStaticProps?: GetStaticProps
 ): GetStaticProps<AppProps> {
-  return async ctx => {
+  return async (ctx: GetStaticPropsContext<ParsedUrlQuery>) => {
     try {
-      const librarySlug = extractParam(ctx.params, "library");
+      const librarySlug = defaultLibSlug
+        ? defaultLibSlug
+        : extractParam(ctx.params, "library");
+
       if (!librarySlug)
         throw new PageNotFoundError(
           "A library slug is required to be provided in the URL. Eg: https://domain.com/:library"
