@@ -223,6 +223,7 @@ export interface CollectionData {
   parentLink?: LinkData | null;
   shelfUrl?: string;
   links?: LinkData[] | null;
+  searchDataUrl: string | null;
   raw?: any;
 }
 

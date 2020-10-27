@@ -104,8 +104,7 @@ export function stripUndefined(json: any) {
  * Fetches the search description for the catalog root, used for the global
  * search bar
  */
-export async function fetchSearchData(url?: string) {
-  if (!url) return;
+export async function fetchSearchData(url: string) {
   const response = await fetch(url);
 
   if (!response.ok) {
