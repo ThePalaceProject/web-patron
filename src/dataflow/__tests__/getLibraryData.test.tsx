@@ -53,7 +53,7 @@ describe("getAuthDocUrl", () => {
     const promise = getAuthDocUrl("not there slug");
     await expect(promise).rejects.toThrowError(PageNotFoundError);
     await expect(promise).rejects.toMatchInlineSnapshot(
-      `[Page Not Found Error: No catalog root url is configured for the library: not there slug.]`
+      `[Page Not Found Error: No authentication document url is configured for the library: not there slug.]`
     );
   });
 
@@ -72,7 +72,7 @@ describe("getAuthDocUrl", () => {
         JSON.stringify(fixtures.opds2.feedWithCatalog)
       );
       const url = await getAuthDocUrl("library-uuid");
-      expect(url).toBe("/catalog-root-feed");
+      expect(url).toBe("/auth-doc");
     });
 
     test("Throws ApplicationError if it doesn't find a catalogRootUrl", async () => {
@@ -94,7 +94,7 @@ describe("getAuthDocUrl", () => {
       const promise = getAuthDocUrl("library-uuid");
       expect(promise).rejects.toThrowError(ApplicationError);
       expect(promise).rejects.toThrowErrorMatchingInlineSnapshot(
-        `"CatalogEntry did not contain a Catalog Root Url. Library UUID: library-uuid"`
+        `"CatalogEntry did not contain a Authentication Document Url. Library UUID: library-uuid"`
       );
     });
 
@@ -169,7 +169,7 @@ describe("buildLibraryData", () => {
     const library = buildLibraryData(fixtures.authDoc, "librarySlug");
     expect(library).toEqual({
       slug: "librarySlug",
-      catalogUrl: "/catalog-url",
+      catalogUrl: "/catalog-root",
       catalogName: "auth doc title",
       logoUrl: null,
       colors: null,
@@ -239,6 +239,10 @@ describe("buildLibraryData", () => {
       {
         rel: "navigation",
         href: "/navigation-two"
+      },
+      {
+        rel: "start",
+        href: "/catalog-root"
       }
     ];
 
