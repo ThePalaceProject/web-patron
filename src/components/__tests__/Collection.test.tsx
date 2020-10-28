@@ -41,7 +41,9 @@ test("displays loader", () => {
     isValidating: true,
     data: undefined
   });
-  const utils = render(<Collection />);
+  const utils = render(<Collection />, {
+    router: { query: { collectionUrl: "/collection" } }
+  });
   expect(
     utils.getByRole("heading", { name: "Loading..." })
   ).toBeInTheDocument();
@@ -64,7 +66,9 @@ test("displays lanes when present", () => {
       searchDataUrl: "/search-data-url"
     }
   });
-  const utils = render(<Collection />);
+  const utils = render(<Collection />, {
+    router: { query: { collectionUrl: "/collection" } }
+  });
 
   // expect there to be a lane with books
   const laneTitle = utils.getByRole("heading", { name: "Lane Title" });
@@ -90,7 +94,9 @@ test("prefers lanes over books", () => {
       searchDataUrl: "/search-data-url"
     }
   });
-  const utils = render(<Collection />);
+  const utils = render(<Collection />, {
+    router: { query: { collectionUrl: "/collection" } }
+  });
 
   // expect the lane title to be rendered, indicating it chose
   // lanes over books
@@ -115,7 +121,9 @@ test("renders books in list view if no lanes", () => {
     data: [{ books: fixtures.makeBorrowableBooks(2) }],
     isValidating: false
   } as any);
-  const utils = render(<Collection />);
+  const utils = render(<Collection />, {
+    router: { query: { collectionUrl: "/collection" } }
+  });
 
   const list = utils.getByTestId("listview-list");
   expect(list).toBeInTheDocument();
@@ -134,7 +142,9 @@ test("renders empty state if no lanes or books", () => {
       searchDataUrl: "/search-data-url"
     }
   });
-  const utils = render(<Collection />);
+  const utils = render(<Collection />, {
+    router: { query: { collectionUrl: "/collection" } }
+  });
 
   expect(utils.getByText("This collection is empty.")).toBeInTheDocument();
 });

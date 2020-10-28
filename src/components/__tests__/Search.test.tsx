@@ -3,27 +3,57 @@ import { render, fixtures, fireEvent } from "test-utils";
 import Search from "../Search";
 import userEvent from "@testing-library/user-event";
 import { mockPush } from "test-utils/mockNextRouter";
+import useSWR from "swr";
+import { makeSwrResponse, MockSwr } from "test-utils/mockSwr";
+import { SearchData } from "interfaces";
 
 const fixtureData = {
   template: "/search/{searchTerms}",
   description: "search desc",
   shortName: "search shortname",
-  url: "http://search-url"
+  url: "http://search-url.com/"
 };
 
-test("doesn't render if there is no searchData in the library context", () => {
+jest.mock("swr");
+
+const mockedSWR = useSWR as jest.MockedFunction<typeof useSWR>;
+
+const mockSwr: MockSwr<SearchData> = (
+  value = makeSwrResponse({ data: fixtureData })
+) => {
+  mockedSWR.mockImplementation(key => {
+    if (key === "/collection")
+      return makeSwrResponse({ data: fixtures.emptyCollection });
+    return makeSwrResponse(value);
+  });
+};
+
+test("doesn't render if there is no searchData set", () => {
+  mockSwr({ data: undefined });
   const utils = render(<Search />, {
-    library: {
-      ...fixtures.libraryData
+    router: {
+      query: { collectionUrl: "/collection" }
     }
   });
   expect(utils.container).toBeEmptyDOMElement();
 });
 
+test("fetches search description", async () => {
+  mockSwr({ data: fixtureData });
+  render(<Search />, {
+    router: {
+      query: { collectionUrl: "/collection" }
+    }
+  });
+  expect(mockedSWR).toHaveBeenCalledWith("/collection", expect.anything());
+  expect(mockedSWR).toHaveBeenCalledWith("/search-data-url", expect.anything());
+});
+
 test("searching calls history.push with url", async () => {
+  mockSwr();
   const utils = render(<Search />, {
-    library: {
-      ...fixtures.libraryData
+    router: {
+      query: { collectionUrl: "/collection" }
     }
   });
   const searchButton = utils.getByText("Search");
@@ -37,7 +67,7 @@ test("searching calls history.push with url", async () => {
   expect(
     mockPush
   ).toHaveBeenCalledWith(
-    "/testlib/collection/http%3A%2F%2Fsearch-url%2Fsearch%2Fmy%2520search",
+    "/testlib/collection/http%3A%2F%2Fsearch-url.com%2Fsearch%2Fmy%2520search",
     undefined,
     { shallow: true }
   );
