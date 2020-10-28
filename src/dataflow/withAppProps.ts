@@ -15,7 +15,7 @@ export type AppProps = {
 };
 
 export default function withAppProps(
-  pageGetServerSideProps?: GetStaticProps
+  pageGetStaticProps?: GetStaticProps
 ): GetStaticProps<AppProps> {
   return async ctx => {
     try {
@@ -29,7 +29,7 @@ export default function withAppProps(
       const authDocument = await fetchAuthDocument(authDocUrl);
       const library = buildLibraryData(authDocument, librarySlug);
       // fetch the static props for the page
-      const pageResult = (await pageGetServerSideProps?.(ctx)) ?? { props: {} };
+      const pageResult = (await pageGetStaticProps?.(ctx)) ?? { props: {} };
       return {
         ...pageResult,
         props: {
