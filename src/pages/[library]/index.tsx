@@ -5,8 +5,9 @@ import LayoutPage from "components/LayoutPage";
 import withAppProps, { AppProps } from "dataflow/withAppProps";
 
 const LibraryHome: NextPage<AppProps> = ({ library, error }) => {
+  const props = { library: library, error: error };
   return (
-    <LayoutPage library={library} error={error}>
+    <LayoutPage props={props}>
       <Collection title={`${library?.catalogName} Home`} />
     </LayoutPage>
   );

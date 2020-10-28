@@ -8,14 +8,18 @@ import SkipNavigation from "./SkipNavigation";
 
 export const CONTENT_ID = "cpw-content";
 
-const Layout: React.FC<{ bg?: string }> = ({ children, bg }) => {
+const Layout: React.FC<{
+  bg?: string;
+  showHeader: boolean;
+  showFooter: boolean;
+}> = ({ children, bg, showHeader = true, showFooter = true }) => {
   return (
     <Styled.root
       sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
     >
       <SkipNavigation />
       <GlobalStyles />
-      <Header sx={{ width: "100%" }} />
+      {showHeader && <Header sx={{ width: "100%" }} />}
       <main
         id={CONTENT_ID}
         sx={{
@@ -28,7 +32,7 @@ const Layout: React.FC<{ bg?: string }> = ({ children, bg }) => {
       >
         {children}
       </main>
-      <Footer sx={{ width: "100%" }} />
+      {showFooter && <Footer sx={{ width: "100%" }} />}
     </Styled.root>
   );
 };

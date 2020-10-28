@@ -5,8 +5,10 @@ import withAppProps, { AppProps } from "dataflow/withAppProps";
 import MyBooks from "components/MyBooks";
 
 const MyBooksPage: NextPage<AppProps> = ({ library, error }) => {
+  const props = { library: library, error: error };
+
   return (
-    <LayoutPage library={library} error={error}>
+    <LayoutPage props={props}>
       <MyBooks />
     </LayoutPage>
   );

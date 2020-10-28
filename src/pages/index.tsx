@@ -6,9 +6,13 @@ import OpenEbooksLandingComponent from "components/OpenEbooksLanding";
 import LayoutPage from "components/LayoutPage";
 
 const CollectionPage: NextPage<AppProps> = ({ library, error }) => {
+  const props: AppProps = {
+    library: library,
+    error: error
+  };
   return (
     <>
-      <LayoutPage library={library} error={error}>
+      <LayoutPage props={props} showHeader={false}>
         <OpenEbooksLandingComponent />
       </LayoutPage>
     </>
