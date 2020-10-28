@@ -130,8 +130,10 @@ export interface Link {
  * Auth Document
  */
 export const CatalogRootRel = "start";
+export const ShelfLinkRel = "http://opds-spec.org/shelf";
 type AuthDocLinkRelations =
   | typeof CatalogRootRel
+  | typeof ShelfLinkRel
   | "navigation"
   | "logo"
   | "register"

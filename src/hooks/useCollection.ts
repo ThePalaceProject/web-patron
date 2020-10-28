@@ -1,4 +1,5 @@
 import useLibraryContext from "components/context/LibraryContext";
+import useUser from "components/context/UserContext";
 import { fetchCollection } from "dataflow/opds1/fetch";
 import extractParam from "dataflow/utils";
 import { useRouter } from "next/router";
@@ -8,6 +9,7 @@ import { cacheCollectionBooks } from "utils/cache";
 
 export default function useCollection() {
   const { catalogUrl } = useLibraryContext();
+  const { token } = useUser();
   const { query, pathname } = useRouter();
   const collectionUrlParam = extractParam(query, "collectionUrl") ?? null;
   // use catalog url if you're at home
@@ -15,7 +17,7 @@ export default function useCollection() {
   const collectionUrl = isLibraryHome ? catalogUrl : collectionUrlParam;
 
   const { data: collection, error, isValidating } = useSWR(
-    collectionUrl,
+    collectionUrl ? [collectionUrl, token] : null,
     fetchCollection
   );
 
