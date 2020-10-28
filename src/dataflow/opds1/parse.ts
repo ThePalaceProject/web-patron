@@ -261,9 +261,6 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
       ...supportedFulfillmentLinks,
       ...openAccessLinks
     ];
-    if (book.title === "Apollo and the Battle of the Birds") {
-      console.log(acquisitionLinks);
-    }
     return {
       ...book,
       status: "fulfillable",

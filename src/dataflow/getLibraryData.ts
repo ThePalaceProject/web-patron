@@ -114,7 +114,7 @@ export async function fetchAuthDocument(
 function getShelfUrl(authDoc: OPDS1.AuthDocument): string | null {
   return (
     authDoc.links?.find(link => {
-      return link instanceof OPDSShelfLink;
+      return link.rel === OPDS1.ShelfLinkRel;
     })?.href ?? null
   );
 }
