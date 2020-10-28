@@ -78,6 +78,7 @@ test("doesn't show recommendations if the lanes don't have > 1 book", () => {
     url: "data-related-url",
     books: [],
     navigationLinks: [],
+    searchDataUrl: "/search-data-url",
     lanes: [
       {
         title: "lane 1",
@@ -129,6 +130,7 @@ test("shows multiple lanes if existing", () => {
     url: "data-related-url",
     books: [],
     navigationLinks: [],
+    searchDataUrl: "/search-data-url",
     lanes: [
       {
         title: "lane 1",

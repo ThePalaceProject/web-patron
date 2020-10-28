@@ -60,7 +60,8 @@ test("displays lanes when present", () => {
       title: "title",
       navigationLinks: [],
       books: [],
-      lanes: [laneData]
+      lanes: [laneData],
+      searchDataUrl: "/search-data-url"
     }
   });
   const utils = render(<Collection />);
@@ -85,7 +86,8 @@ test("prefers lanes over books", () => {
       title: "title",
       navigationLinks: [],
       books: fixtures.makeBorrowableBooks(2),
-      lanes: [laneData]
+      lanes: [laneData],
+      searchDataUrl: "/search-data-url"
     }
   });
   const utils = render(<Collection />);
@@ -105,7 +107,8 @@ test("renders books in list view if no lanes", () => {
       title: "title",
       navigationLinks: [],
       books: fixtures.makeBorrowableBooks(2),
-      lanes: []
+      lanes: [],
+      searchDataUrl: "/search-data-url"
     }
   });
   mockedSWRInfinite.mockReturnValue({
@@ -127,7 +130,8 @@ test("renders empty state if no lanes or books", () => {
       title: "title",
       navigationLinks: [],
       books: [],
-      lanes: []
+      lanes: [],
+      searchDataUrl: "/search-data-url"
     }
   });
   const utils = render(<Collection />);

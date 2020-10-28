@@ -4,11 +4,17 @@ import Search from "../Search";
 import userEvent from "@testing-library/user-event";
 import { mockPush } from "test-utils/mockNextRouter";
 
+const fixtureData = {
+  template: "/search/{searchTerms}",
+  description: "search desc",
+  shortName: "search shortname",
+  url: "http://search-url"
+};
+
 test("doesn't render if there is no searchData in the library context", () => {
   const utils = render(<Search />, {
     library: {
-      ...fixtures.libraryData,
-      searchData: null
+      ...fixtures.libraryData
     }
   });
   expect(utils.container).toBeEmptyDOMElement();
@@ -17,13 +23,7 @@ test("doesn't render if there is no searchData in the library context", () => {
 test("searching calls history.push with url", async () => {
   const utils = render(<Search />, {
     library: {
-      ...fixtures.libraryData,
-      searchData: {
-        template: "/search/{searchTerms}",
-        description: "search desc",
-        shortName: "search shortname",
-        url: "http://search-url"
-      }
+      ...fixtures.libraryData
     }
   });
   const searchButton = utils.getByText("Search");
