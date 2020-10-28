@@ -9,6 +9,7 @@ import { Text } from "./Text";
 import BreadcrumbBar from "./BreadcrumbBar";
 import computeBreadcrumbs from "computeBreadcrumbs";
 import useCollection from "hooks/useCollection";
+import ApplicationError from "errors";
 
 export const Collection: React.FC<{
   title?: string;
@@ -22,6 +23,12 @@ export const Collection: React.FC<{
   const pageTitle = isLoading ? "" : title ?? collection?.title ?? "Collection";
 
   const breadcrumbs = computeBreadcrumbs(collection);
+
+  if (!collectionUrl)
+    throw new ApplicationError(
+      "Cannot render collection on page without collectionUrl"
+    );
+
   return (
     <div
       sx={{

@@ -6,8 +6,6 @@ import {
   buildLibraryData
 } from "dataflow/getLibraryData";
 import ApplicationError, { PageNotFoundError } from "errors";
-import { findSearchLink } from "dataflow/opds1/parse";
-import { fetchSearchData } from "dataflow/opds1/fetch";
 import extractParam from "dataflow/utils";
 import track from "analytics/track";
 
@@ -20,11 +18,6 @@ export default function withAppProps(
   pageGetServerSideProps?: GetStaticProps
 ): GetStaticProps<AppProps> {
   return async ctx => {
-    /**
-     * Determine the catalog url
-     * Get library catalog
-     * Fetch the auth document provided in it
-     */
     try {
       const librarySlug = extractParam(ctx.params, "library");
       if (!librarySlug)
