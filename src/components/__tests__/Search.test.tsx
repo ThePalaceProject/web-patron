@@ -22,7 +22,7 @@ const mockSwr: MockSwr<SearchData> = (
   value = makeSwrResponse({ data: fixtureData })
 ) => {
   mockedSWR.mockImplementation(key => {
-    if (key === "/collection")
+    if (key?.[0] === "/collection")
       return makeSwrResponse({ data: fixtures.emptyCollection });
     return makeSwrResponse(value);
   });
@@ -45,7 +45,10 @@ test("fetches search description", async () => {
       query: { collectionUrl: "/collection" }
     }
   });
-  expect(mockedSWR).toHaveBeenCalledWith("/collection", expect.anything());
+  expect(mockedSWR).toHaveBeenCalledWith(
+    ["/collection", "user-token"],
+    expect.anything()
+  );
   expect(mockedSWR).toHaveBeenCalledWith("/search-data-url", expect.anything());
 });
 

@@ -48,7 +48,10 @@ test("shows recommendations loading state", async () => {
 test("fetches the proper url for recommendation collection", () => {
   render(<Recommendations book={fixtures.borrowableBook} />);
   expect(mockedSWR).toHaveBeenCalledTimes(1);
-  expect(mockedSWR).toHaveBeenCalledWith("http://related-url", fetchCollection);
+  expect(mockedSWR).toHaveBeenCalledWith(
+    ["http://related-url", "user-token"],
+    fetchCollection
+  );
 });
 
 test("shows recommendation lanes", () => {
