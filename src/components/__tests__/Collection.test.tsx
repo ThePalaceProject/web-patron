@@ -33,7 +33,10 @@ test("calls swr to fetch collection", () => {
   });
 
   expect(mockedSWR).toHaveBeenCalledTimes(1);
-  expect(mockedSWR).toHaveBeenCalledWith("/collection", fetchCollection);
+  expect(mockedSWR).toHaveBeenCalledWith(
+    ["/collection", "user-token"],
+    fetchCollection
+  );
 });
 
 test("displays loader", () => {
