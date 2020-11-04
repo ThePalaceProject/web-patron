@@ -94,10 +94,11 @@ When building for production using `npm run build`, the env vars are set at buil
 
 ## Contributing
 
-There are two protected branches in this repository: `beta`, and `master`.
+There are three protected branches in this repository: `dev`, `qa`, and `production`.
 
-- `master` is the most current production deployment code. Any time a PR is merged in to master, a release is tagged and created. A Docker Image is then built by Github Actions, which is finally pushed to Docker Hub with the tag `latest` as well as the specific version tag of the release (ie `2.3.6`). Generally, we only make PRs to `master` from `beta` unless a hotfix is necessary in production.
-- `beta` is the development and qa branch where feature PRs are brought together and staged/tried before being pushed into production. This is the default branch that most PRs should be pointed to. It is also tested, built and deployed by Github Actions with the tag `beta` and `beta.short_sha` where `short_sha` is from the most recent commit to beta. This way users can install the most recent beta using `beta` tag, or one at a specific commit for testing purposes.
+- `production` is the most current production deployment code. Any time a PR is merged in, a release is tagged and created. A Docker Image is then built by Github Actions, which is finally pushed to Docker Hub with the tag `latest` as well as the specific version tag of the release (ie `2.3.6`). Generally, we only make PRs to `production` from `qa` unless a hotfix is necessary.
+- `qa` is for staging release candidates when they are ready to be QA'd by the community. These will be pushed to docker with the tag `qa` as well as `qa.short_sha` where `short_sha` is from the most recent commit.
+- `dev` is the default branch. This is where PRs with development work should be made. Once determined it is ready for QA, we will make a PR to `qa`, then a subsequent PR to `production` if it is ready.
 
 ## Testing
 
