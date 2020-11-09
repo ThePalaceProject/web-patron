@@ -5,11 +5,15 @@ import * as React from "react";
  */
 
 const AuthModalContext = React.createContext<
-  { showModal: () => void; showModalAndReset: () => void } | undefined
+  | {
+      showModal: ({ selectedMethod: method }) => void;
+      showModalAndReset: () => void;
+    }
+  | undefined
 >(undefined);
 
 export const AuthModalProvider: React.FC<{
-  showModal: () => void;
+  showModal: ({ selectedMethod: method }) => void;
   showModalAndReset: () => void;
 }> = ({ showModal, showModalAndReset, children }) => (
   <AuthModalContext.Provider value={{ showModal, showModalAndReset }}>
