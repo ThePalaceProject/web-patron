@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { useDialogState } from "reakit/Dialog";
+import { useDialogState, Dialog } from "reakit/Dialog";
 import useLibraryContext from "../components/context/LibraryContext";
 import Modal from "../components/Modal";
 import ClientOnly from "../components/ClientOnly";
@@ -20,7 +20,10 @@ import ExternalLink from "components/ExternalLink";
 import BasicAuthButton from "auth/BasicAuthButton";
 import LoadingIndicator from "components/LoadingIndicator";
 
-const AuthModal: React.FC = ({ children }) => {
+const AuthModal: React.FC<{ selectedMethod?: AppAuthMethod }> = ({
+  selectedMethod: preSelectedAuth,
+  children
+}) => {
   const dialog = useDialogState();
   const { hide } = dialog;
   const { catalogName, authMethods } = useLibraryContext();
@@ -41,6 +44,8 @@ const AuthModal: React.FC = ({ children }) => {
     show();
   }, [show, clearCredentials]);
 
+  const selectedAuthMethods = preSelectedAuth ? [preSelectedAuth] : authMethods;
+  console.log("selectedAuthMethods", preSelectedAuth, selectedAuthMethods);
   /**
    * The options:
    *  - No auth methods available. Tell the user.
@@ -50,11 +55,11 @@ const AuthModal: React.FC = ({ children }) => {
    */
   const formStatus = isLoading
     ? "loading"
-    : authMethods.length === 0
+    : selectedAuthMethods.length === 0
     ? "no-auth"
-    : authMethods.length === 1
+    : selectedAuthMethods.length === 1
     ? "single-auth"
-    : authMethods.length < 5
+    : selectedAuthMethods.length < 5
     ? "buttons"
     : "combobox";
 
@@ -80,11 +85,11 @@ const AuthModal: React.FC = ({ children }) => {
           ) : formStatus === "no-auth" ? (
             <NoAuth />
           ) : formStatus === "single-auth" ? (
-            <SignInForm method={authMethods[0]} />
+            <SignInForm method={selectedAuthMethods[0]} />
           ) : formStatus === "combobox" ? (
-            <Combobox authMethods={authMethods} />
+            <Combobox authMethods={selectedAuthMethods} />
           ) : (
-            <Buttons authMethods={authMethods} />
+            <Buttons authMethods={selectedAuthMethods} />
           )}
         </Modal>
       </ClientOnly>
@@ -215,9 +220,10 @@ const Buttons: React.FC<{
  */
 const Combobox: React.FC<{
   authMethods: AppAuthMethod[];
-}> = ({ authMethods }) => {
+  preSelectedMethod?: AppAuthMethod;
+}> = ({ authMethods, preSelectedMethod = authMethods[0] }) => {
   const [selectedMethod, setSelectedMethod] = React.useState<AppAuthMethod>(
-    authMethods[0]
+    preSelectedMethod
   );
 
   const handleChangeMethod = (id: string) => {

@@ -1,9 +1,20 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { H1, H2, Text } from "./Text";
+import { H2, Text } from "./Text";
 import Button from "./Button";
 import Stack from "./Stack";
+import CleverButton from "auth/CleverAuthButton";
+import { OPDS1 } from "interfaces";
+import useLibraryContext from "./context/LibraryContext";
+import { BasicAuthMethod, CleverAuthMethod } from "types/opds1";
+import BasicAuthButton from "auth/BasicAuthButton";
+import useUser from "./context/UserContext";
+import SignOut from "./SignOut";
+import useAuthModalContext from "auth/AuthModalContext";
+import { basicAuthMethod } from "test-utils/fixtures";
+import { flexDirection } from "styled-system";
+import Link from "next/link";
 
 type PopularBook = { alt: string; imgHref: string };
 
@@ -26,6 +37,15 @@ const popularBooks = {
 };
 
 const OpenEbooksLandingComponent = () => {
+  const { authMethods } = useLibraryContext();
+  const cleverMethod: CleverAuthMethod = authMethods.find(
+    method => method.type === OPDS1.CleverAuthType
+  ) as CleverAuthMethod;
+  const basicMethod: BasicAuthMethod = authMethods.find(
+    method => method.type === OPDS1.BasicAuthType
+  ) as BasicAuthMethod;
+  const { showModal } = useAuthModalContext();
+
   return (
     <>
       <div
@@ -54,6 +74,7 @@ const OpenEbooksLandingComponent = () => {
           </Text>
         </div>
         <div
+          id="loginRegion"
           sx={{
             backgroundColor: "ui.gray.extraLight"
           }}
@@ -83,9 +104,7 @@ const OpenEbooksLandingComponent = () => {
                 in the classroom.
               </Text>
               <div>
-                <Button variant="filled" color="brand.primary">
-                  Sign in with Clever
-                </Button>
+                <CleverButton method={cleverMethod} />
               </div>
             </Stack>
             <Stack
@@ -106,8 +125,10 @@ const OpenEbooksLandingComponent = () => {
                 in need.
               </Text>
               <div>
-                <Button variant="filled" color="brand.primary">
-                  Sign in with First Book
+                <Button
+                  onClick={() => showModal({ selectedMethod: basicMethod })}
+                >
+                  Sign In
                 </Button>
               </div>
             </Stack>
@@ -192,14 +213,16 @@ const OpenEbooksLandingComponent = () => {
   );
 };
 
-const OpenEbooksHero: React.FC<{}> = () => {
+const OpenEbooksHero: React.FC = () => {
+  const { isAuthenticated, isLoading } = useUser();
+  const { showModalAndReset } = useAuthModalContext();
+
   return (
     <div
       sx={{
         backgroundImage: `url('/img/HeroImage.jpg')`,
         minHeight: "350px",
-        display: "flex",
-        flexDirection: "column",
+
         flexWrap: "nowrap",
         justifyContent: "center",
         alignItems: "center"
@@ -207,17 +230,36 @@ const OpenEbooksHero: React.FC<{}> = () => {
     >
       <div
         sx={{
-          flex: "1",
-          maxWidth: "960px"
+          display: "flex",
+          flexDirection: "column"
         }}
       >
-        <img
+        <div sx={{ display: "flex", justifyContent: "flex-end" }}>
+          {isAuthenticated ? (
+            <SignOut />
+          ) : (
+            <Button onClick={showModalAndReset} loading={isLoading}>
+              Sign In
+            </Button>
+          )}
+        </div>
+        <div
           sx={{
-            mx: "auto"
+            margin: "auto",
+            maxWidth: "1100"
           }}
-          alt="Open Ebooks Logo"
-          src="/img/OpenEbooksLogo.png"
-        />
+        >
+          <img
+            sx={{
+              mx: "auto"
+            }}
+            alt="Open Ebooks Logo"
+            src="/img/OpenEbooksLogo.png"
+          />
+        </div>
+        <div sx={{ marginBottom: "auto" }}>
+          <Link href="#loginRegion">blah</Link>
+        </div>
       </div>
     </div>
   );
