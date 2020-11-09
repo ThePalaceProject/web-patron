@@ -4,6 +4,7 @@ import * as React from "react";
 import { AspectRatio } from "@theme-ui/components";
 import { MediumIcon } from "./MediumIndicator";
 import { AnyBook } from "interfaces";
+
 /**
  * This is meant to be a book cover. Primarily the image and styling,
  * along with possibly extending it to lazy load the images in the future.

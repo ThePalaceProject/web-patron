@@ -30,6 +30,7 @@ import {
 } from "utils/fulfill";
 import { ArrowForward } from "icons";
 import BookStatus from "components/BookStatus";
+import Link from "./Link";
 
 const ListLoadingIndicator = () => (
   <div
@@ -131,18 +132,26 @@ export const BookListItem: React.FC<{
         }}
         spacing={3}
       >
-        <BookCover
-          book={book}
+        <Link
+          bookUrl={book.url}
+          aria-label={`View ${book.title}`}
           sx={{
             flex: ["0 0 100px", "0 0 100px", "0 0 148px"],
             height: [141, 141, 219]
           }}
-          showMedium={APP_CONFIG.showMedium}
-        />
+        >
+          <BookCover book={book} showMedium={APP_CONFIG.showMedium} />
+        </Link>
         <Stack direction="column" sx={{ alignItems: "flex-start" }}>
           <div>
-            <H2 sx={{ mb: 0, variant: "text.body.bold", display: "inline" }}>
-              {truncateString(book.title, 50)}
+            <H2 sx={{ mb: 0, display: "inline" }}>
+              <Link
+                bookUrl={book.url}
+                sx={{ variant: "text.link.bold", color: "brand.primary" }}
+                aria-label={`${book.title}`}
+              >
+                {truncateString(book.title, 50)}
+              </Link>
             </H2>
             {book.subtitle && (
               <Text variant="callouts.italic" aria-label="Subtitle">
