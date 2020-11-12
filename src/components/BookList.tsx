@@ -148,7 +148,7 @@ export const BookListItem: React.FC<{
               <Link
                 bookUrl={book.url}
                 sx={{ variant: "text.link.bold", color: "brand.primary" }}
-                aria-label={`${book.title}`}
+                aria-label={book.title}
               >
                 {truncateString(book.title, 50)}
               </Link>
