@@ -62,13 +62,23 @@ const variants = {
         fontStyle: "italic"
       }
     },
-    textLink: {
-      fontFamily: "body",
-      fontSize: 0,
-      fontWeight: "light",
-      lineHeight: 3,
-      color: "ui.link.primary",
-      textDecoration: "underline"
+    link: {
+      text: {
+        fontFamily: "body",
+        fontSize: 0,
+        fontWeight: "light",
+        lineHeight: 3,
+        color: "ui.link.primary",
+        textDecoration: "underline"
+      },
+      bold: {
+        fontFamily: "body",
+        fontSize: 0,
+        fontWeight: "bold",
+        lineHeight: 3,
+        color: "ui.link.primary",
+        textDecoration: "underline"
+      }
     }
   }
 };
