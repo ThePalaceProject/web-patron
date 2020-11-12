@@ -1,6 +1,7 @@
 ## CHANGELOG
 
 ### UNRELEASED CHANGES
+- Fix: Book covers and titles in BookList now link to the book page
 
 ### v3.1.2
 - Bump to v3.1.2 in order to tricker Github Actions run. No changes, but renamed branches to `dev` `qa` and `production` from `beta` and `master`. 
