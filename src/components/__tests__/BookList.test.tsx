@@ -93,13 +93,13 @@ describe("infinite loading book list", () => {
     const utils = render(<InfiniteBookList firstPageUrl="/first-page" />);
 
     expect(
-      utils.getByRole("heading", { name: "Book Title 0" })
+      utils.getByRole("link", { name: "Book Title 0" })
     ).toBeInTheDocument();
     expect(
-      utils.getByRole("heading", { name: "Book Title 1" })
+      utils.getByRole("link", { name: "Book Title 1" })
     ).toBeInTheDocument();
     expect(
-      utils.getByRole("heading", { name: "The Mayan Secrets" })
+      utils.getByRole("link", { name: "The Mayan Secrets" })
     ).toBeInTheDocument();
   });
 
