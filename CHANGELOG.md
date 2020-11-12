@@ -2,6 +2,9 @@
 
 ### UNRELEASED CHANGES
 
+### v3.1.2
+- Bump to v3.1.2 in order to tricker Github Actions run. No changes, but renamed branches to `dev` `qa` and `production` from `beta` and `master`. 
+
 ### v3.1.1
 - Fix: Update github workflow files to properly publish new branches (production, qa, dev).
 
