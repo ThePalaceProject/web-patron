@@ -1,6 +1,7 @@
 ## CHANGELOG
 
-### UNRELEASED CHANGES
+### 3.1.3
+- Fix: Update the production docker publish Github Action to v2, allowing for use of private Github package registry for AxisNow Decryptor.
 - Fix: Book covers and titles in BookList now link to the book page
 
 ### v3.1.2
