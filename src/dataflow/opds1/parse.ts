@@ -25,9 +25,10 @@ import {
   FulfillmentLink,
   AnyBook
 } from "interfaces";
-import { IncorrectAdeptMediaType } from "types/opds1";
+import { IncorrectAdobeDrmMediaType } from "types/opds1";
 import { getAppSupportLevel } from "utils/fulfill";
 import { TrackOpenBookRel } from "types/opds1";
+import DOMPurify from "dompurify";
 
 /**
  * Parses OPDS 1.x Feed or Entry into a Collection or Book
@@ -76,9 +77,13 @@ const resolve = (base: string, relative: string) =>
  * Adobe media types.
  */
 export function fixMimeType(
-  mimeType: OPDS1.IndirectAcquisitionType | typeof OPDS1.IncorrectAdeptMediaType
+  mimeType:
+    | OPDS1.IndirectAcquisitionType
+    | typeof OPDS1.IncorrectAdobeDrmMediaType
 ): OPDS1.IndirectAcquisitionType {
-  return mimeType === IncorrectAdeptMediaType ? OPDS1.AdeptMediaType : mimeType;
+  return mimeType === IncorrectAdobeDrmMediaType
+    ? OPDS1.AdobeDrmMediaType
+    : mimeType;
 }
 
 function parseFormat(format: OPDSAcquisitionLink | OPDSIndirectAcquisition) {
@@ -113,32 +118,36 @@ function buildFulfillmentLink(feedUrl: string) {
       indirectionType: fixMimeType(
         indirectionType as
           | OPDS1.IndirectAcquisitionType
-          | typeof OPDS1.IncorrectAdeptMediaType
+          | typeof OPDS1.IncorrectAdobeDrmMediaType
       )
     };
   };
 }
 
 /**
- * HTML Sanitizer
+ * A book cannot be returned (even with a revoke url) if:
+ *  - It is locked in to Adobe ACS
+ *  - It is an axisnow book
+ *  - It comes from certain vendors
+ *
+ * We use a heuristic to determine when books can be returned. This may
+ * need to be updated in the future.
  */
-let sanitizeHtml: any;
-const createDOMPurify = require("dompurify");
-if (typeof window === "undefined") {
-  // sanitization needs to work server-side,
-  // so we use jsdom to build it a window object
-  const { JSDOM } = require("jsdom");
-  const jsdom = new JSDOM("<!doctype html><html><body></body></html>", {
-    url: "http://localhost",
-    FetchExternalResources: false,
-    ProcessExternalResources: false
+function canReturnFulfillableBook(links: OPDSAcquisitionLink[]): boolean {
+  return !!links.map(parseFormat).find(link => {
+    // no AxisNow
+    if (link.contentType === OPDS1.AxisNowWebpubMediaType) return false;
+    // match if there is otherwise a direct link. These won't be present
+    // if the book has been locked in to Adobe ACS
+    if (!link.indirectionType) return true;
+    // match if it has a link to read online externally.
+    if (link.contentType === OPDS1.ExternalReaderMediaType) return true;
+    return false;
   });
-  const { window } = jsdom;
-  const { defaultView } = window;
+}
 
-  sanitizeHtml = createDOMPurify(defaultView).sanitize;
-} else {
-  sanitizeHtml = createDOMPurify(window).sanitize;
+function findRevokeUrl(links: OPDSLink[]) {
+  return links.find(link => link.rel === OPDS1.RevokeLinkRel)?.href ?? null;
 }
 
 /**
@@ -211,8 +220,7 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
     link => link.supportLevel !== "unsupported"
   );
 
-  const revokeUrl =
-    entry.links.find(link => link.rel === OPDS1.RevokeLinkRel)?.href ?? null;
+  const revokeUrl = findRevokeUrl(entry.links);
 
   const trackOpenBookLink = entry.links.find(isTrackOpenBookLink);
 
@@ -223,7 +231,7 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
     authors: authors,
     contributors: contributors,
     subtitle: entry.subtitle,
-    summary: entry.summary.content && sanitizeHtml?.(entry.summary.content),
+    summary: entry.summary.content && DOMPurify.sanitize(entry.summary.content),
     imageUrl: imageUrl,
     availability: {
       ...availability,
@@ -253,13 +261,17 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
       ...supportedFulfillmentLinks,
       ...openAccessLinks
     ];
+    if (book.title === "Apollo and the Battle of the Birds") {
+      console.log(acquisitionLinks);
+    }
     return {
       ...book,
       status: "fulfillable",
       fulfillmentLinks: allFulfillmentLinks,
-      revokeUrl
+      revokeUrl: canReturnFulfillableBook(acquisitionLinks) ? revokeUrl : null
     };
   }
+
   // it's a reserved book
   if (availability?.status === "reserved") {
     return {
@@ -268,6 +280,7 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
       revokeUrl
     };
   }
+
   // it's a reservable book
   if (borrowLink && borrowLink.availability.status === "unavailable") {
     return {

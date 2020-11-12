@@ -1,22 +1,29 @@
 import { OPDS1 } from "interfaces";
 
 export default class ApplicationError extends Error {
-  readonly statusCode: number | null = null;
+  info: OPDS1.ProblemDocument;
 
   constructor(m: string, baseError?: Error) {
     super(`${m}${baseError ? `\nBase Error:\n${baseError.message}` : ""}`);
     Object.setPrototypeOf(this, ApplicationError.prototype);
     this.name = "Application Error";
+    this.info = {
+      title: "Application Error",
+      detail: m
+    };
   }
 }
 
 export class PageNotFoundError extends ApplicationError {
-  readonly statusCode = 404;
-
   constructor(m: string, baseError?: Error) {
     super(`${m}${baseError ? baseError.message : ""}`);
     Object.setPrototypeOf(this, PageNotFoundError.prototype);
     this.name = "Page Not Found Error";
+    this.info = {
+      title: "Page Not Found",
+      detail: m,
+      status: 404
+    };
   }
 }
 
@@ -25,16 +32,42 @@ export class UnimplementedError extends ApplicationError {
     super(`${m}${baseError ? baseError.message : ""}`);
     Object.setPrototypeOf(this, UnimplementedError.prototype);
     this.name = "Unimplemented Error";
+    this.info = {
+      title: "Unimplemented",
+      detail: m
+    };
   }
 }
 
 export class AppSetupError extends ApplicationError {
-  readonly statusCode = 500;
-
   constructor(m: string, baseError?: Error) {
     super(`${m}${baseError ? baseError.message : ""}`);
     Object.setPrototypeOf(this, AppSetupError.prototype);
     this.name = "App Setup Error";
+    this.info = {
+      status: 500,
+      title: "App Setup Error",
+      detail: m
+    };
+  }
+}
+
+/**
+ * Specifically for when fetch rejects, not for when you get an invalid response.
+ */
+export class FetchError extends ApplicationError {
+  url: string;
+
+  constructor(url: string, baseError?: Error) {
+    super(`${baseError ? baseError.message : ""}`);
+    Object.setPrototypeOf(this, FetchError.prototype);
+    this.name = "Fetch Error";
+    this.url = url;
+    this.info = {
+      title: "Fetch Error",
+      detail:
+        "The fetch promise for the requested resource was rejected. This is probably an offline, CORS, or other network error."
+    };
   }
 }
 
@@ -46,11 +79,10 @@ function isProblemDocument(
 export class ServerError extends ApplicationError {
   // a default problem document
   url: string;
-  status: number;
   info: OPDS1.ProblemDocument = {
     detail: "An unknown error server occurred.",
     title: "Server Error",
-    status: 418
+    status: 500
   };
   authDocument?: OPDS1.AuthDocument;
 
@@ -61,13 +93,12 @@ export class ServerError extends ApplicationError {
   ) {
     super("Server Error");
     this.url = url;
-    this.status = status;
     Object.setPrototypeOf(this, ServerError.prototype);
     if (status === 401 && !isProblemDocument(details)) {
       // 401 errors return auth document instead of problem document
       // we will construct our own problem document.
       this.info = {
-        title: "No Authorized",
+        title: "Not Authorized",
         detail: "You are not authorized for the requested resource.",
         status: 401
       };
@@ -75,5 +106,6 @@ export class ServerError extends ApplicationError {
     } else if (isProblemDocument(details)) {
       this.info = details;
     }
+    this.name = `Server Error`;
   }
 }

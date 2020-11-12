@@ -1,49 +1,43 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import { H1 } from "./Text";
 import { SystemStyleObject } from "@styled-system/css";
 import Link from "next/link";
 import { getLibrarySlugs } from "dataflow/getLibraryData";
+import { useRouter } from "next/router";
+import extractParam from "dataflow/utils";
+import { OPDS1 } from "interfaces";
 
-const statusCodes: { [code: number]: string } = {
-  400: "Bad Request",
-  404: "This page could not be found",
-  405: "Method Not Allowed",
-  500: "Internal Server Error"
-};
-
-const ErrorComponent = ({
-  statusCode = 404,
-  title,
-  detail
-}: {
-  statusCode?: number | null;
-  title?: string;
-  detail?: string;
+const ErrorComponent: React.FC<{ error?: OPDS1.ProblemDocument }> = ({
+  error
 }) => {
-  const errorTitle = title
-    ? title
-    : statusCode
-    ? statusCodes[statusCode]
-    : "An unexpected error has occurred";
+  const { title = "Something went wrong", status, detail } = error ?? {};
 
-  const libraries = getLibrarySlugs();
+  const router = useRouter();
+  const isRoot = router.asPath === "/";
+  const library = extractParam(router.query, "library");
 
   return (
-    <>
-      <H1 sx={{ fontSize: 3, textAlign: `center` }}>
-        Error{`: ${errorTitle}`}
+    <div
+      sx={{
+        p: [3, 4]
+      }}
+    >
+      <H1>
+        {status} Error: {title}
       </H1>
-      <p sx={{ textAlign: `center` }}>
-        {statusCode
-          ? `A ${statusCode} error occurred on server`
-          : "An error occurred"}
-      </p>
-      <p sx={{ textAlign: `center` }}>
+      <p>
         {detail && `${detail}`} <br />
       </p>
-      {libraries && <LibraryList libraries={libraries} />}
-    </>
+      {isRoot ? (
+        <LibraryList />
+      ) : library ? (
+        <Link href={`/${library}`}>
+          <a>Return Home</a>
+        </Link>
+      ) : null}
+    </div>
   );
 };
 
@@ -64,7 +58,11 @@ const buttonBase: SystemStyleObject = {
   bg: "transparent"
 };
 
-const LibraryList: React.FC<{ libraries: string[] }> = ({ libraries }) => {
+const LibraryList: React.FC = () => {
+  const libraries = getLibrarySlugs();
+
+  if (!libraries || libraries.length === 0) return null;
+
   return (
     <div>
       <h3>Did you mean to visit one of these?</h3>
@@ -81,8 +79,6 @@ const LibraryList: React.FC<{ libraries: string[] }> = ({ libraries }) => {
               }}
               href={`/${lib}`}
             >
-              {/* nextjs passes the href when cloning the element */}
-              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
               <a>/{lib}</a>
             </Link>
           </li>

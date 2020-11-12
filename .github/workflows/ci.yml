@@ -11,6 +11,17 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
+  # changelog must be edited for every PR
+  changelog:
+    name: Updates Changelog
+    runs-on: ubuntu-latest
+    steps: 
+      - uses: actions/checkout@v2
+      - uses: dangoslen/changelog-enforcer@v1.4.0
+        with:
+          changeLogPath: 'CHANGELOG.md'
+          skipLabel: 'no-changelog'
+
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -18,9 +29,6 @@ jobs:
       CI: true
     steps:
       - uses: actions/checkout@v2
-        with:
-          submodules: true
-          token: ${{ secrets.AXIS_NOW_ACCESS_TOKEN }}
       - id: nvmrc
         run: echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
 
@@ -28,8 +36,22 @@ jobs:
         uses: actions/setup-node@v1
         with: { node-version: "${{ steps.nvmrc.outputs.NODE_VERSION }}" }
 
-      - name: Cache and install node modules
-        uses: bahmutov/npm-install@v1
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      
+      - name: Install Dependencies
+        run: npm install
+
       - name: Lint
         run: npm run lint
 
@@ -49,8 +71,23 @@ jobs:
       - name: Use Node Version from nvmrc
         uses: actions/setup-node@v1
         with: { node-version: "${{ steps.nvmrc.outputs.NODE_VERSION }}" }
-      - name: Cache and install node modules
-        uses: bahmutov/npm-install@v1
+
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      
+      - name: Install Dependencies
+        run: npm install
+
       - name: Typecheck
         run: node_modules/typescript/bin/tsc --noEmit
 
@@ -70,8 +107,23 @@ jobs:
       - name: Use Node Version from nvmrc
         uses: actions/setup-node@v1
         with: { node-version: "${{ steps.nvmrc.outputs.NODE_VERSION }}" }
-      - name: Cache and install node modules
-        uses: bahmutov/npm-install@v1
+
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      
+      - name: Install Dependencies
+        run: npm install
+
       - name: Test
         run: npm run test:ci -- --coverage
       - name: Coveralls Report

@@ -1,4 +1,3 @@
-import { APP_CONFIG } from "config";
 import { fetchBook } from "dataflow/opds1/fetch";
 import ApplicationError from "errors";
 import {
@@ -8,7 +7,7 @@ import {
   OPDS1
 } from "interfaces";
 import { bookIsAudiobook } from "utils/book";
-import { AXISNOW_DECRYPT } from "utils/env";
+import { APP_CONFIG, AXISNOW_DECRYPT } from "utils/env";
 import { typeMap } from "utils/file";
 
 /**
@@ -75,7 +74,8 @@ export function getFulfillmentFromLink(link: FulfillmentLink): AnyFullfillment {
     case OPDS1.MobiPocketMediaType:
     case OPDS1.EpubMediaType:
       const typeName = typeMap[contentType].name;
-      const modifier = indirectionType === OPDS1.AdeptMediaType ? "Adobe " : "";
+      const modifier =
+        indirectionType === OPDS1.AdobeDrmMediaType ? "Adobe " : "";
       return {
         id: link.url,
         getUrl: constructGetUrl(indirectionType, contentType, link.url),
@@ -93,7 +93,6 @@ export function getFulfillmentFromLink(link: FulfillmentLink): AnyFullfillment {
       };
 
     case OPDS1.AxisNowWebpubMediaType:
-      // you can only read these if you can decrypt them.
       if (!AXISNOW_DECRYPT) {
         return { type: "unsupported" };
       }

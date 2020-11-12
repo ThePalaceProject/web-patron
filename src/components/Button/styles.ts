@@ -91,7 +91,7 @@ export const styleProps = (
     case "link":
       return {
         ...buttonBase,
-        variant: "text.textLink",
+        variant: "text.link.text",
         p: 0,
         color,
         fill: color,
