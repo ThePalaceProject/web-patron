@@ -35,7 +35,6 @@ const swrConfig: ConfigInterface<any, Error> = {
     // Retry after 5 seconds.
     setTimeout(() => revalidate({ retryCount: retryCount + 1 }), 5000);
   }
-  }
 };
 
 export default swrConfig;

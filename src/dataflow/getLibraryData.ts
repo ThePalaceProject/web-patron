@@ -1,5 +1,4 @@
 import { OPDS2, LibraryData, LibraryLinks, OPDS1 } from "interfaces";
-import { OPDSShelfLink } from "opds-feed-parser";
 import ApplicationError, { PageNotFoundError, ServerError } from "errors";
 import { flattenSamlMethod } from "utils/auth";
 import { APP_CONFIG } from "utils/env";
