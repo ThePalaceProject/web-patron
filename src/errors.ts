@@ -4,56 +4,50 @@ export default class ApplicationError extends Error {
   info: OPDS1.ProblemDocument;
   baseError?: Error;
 
-  constructor(m: string, baseError?: Error) {
-    super(m);
+  constructor(info: OPDS1.ProblemDocument, baseError?: Error) {
+    super(`${info.title}: ${info.detail}`);
     Object.setPrototypeOf(this, ApplicationError.prototype);
-    this.name = "Application Error";
+    this.name = `ApplicationError: ${info.title}`;
     this.baseError = baseError;
-    this.info = {
-      title: "Application Error",
-      detail: m
-    };
+    this.info = info;
   }
 }
 
 export class PageNotFoundError extends ApplicationError {
   constructor(m: string, baseError?: Error) {
-    super(m);
-    Object.setPrototypeOf(this, PageNotFoundError.prototype);
-    this.baseError = baseError;
-    this.name = "Page Not Found Error";
-    this.info = {
+    const info = {
       title: "Page Not Found",
       detail: m,
       status: 404
     };
+    super(info, baseError);
+    Object.setPrototypeOf(this, PageNotFoundError.prototype);
+    this.name = "Page Not Found Error";
   }
 }
 
 export class UnimplementedError extends ApplicationError {
   constructor(m: string, baseError?: Error) {
-    super(m);
-    Object.setPrototypeOf(this, UnimplementedError.prototype);
-    this.baseError = baseError;
-    this.name = "Unimplemented Error";
-    this.info = {
+    const info = {
       title: "Unimplemented",
       detail: m
     };
+    super(info, baseError);
+    Object.setPrototypeOf(this, UnimplementedError.prototype);
+    this.name = "Unimplemented Error";
   }
 }
 
 export class AppSetupError extends ApplicationError {
   constructor(m: string, baseError?: Error) {
-    super(m);
-    Object.setPrototypeOf(this, AppSetupError.prototype);
-    this.name = "App Setup Error";
-    this.baseError = baseError;
-    this.info = {
+    const info = {
       status: 500,
       title: "App Setup Error",
       detail: m
     };
+    super(info, baseError);
+    Object.setPrototypeOf(this, AppSetupError.prototype);
+    this.name = "App Setup Error";
   }
 }
 
@@ -64,15 +58,14 @@ export class FetchError extends ApplicationError {
   url: string;
 
   constructor(url: string, baseError?: Error) {
-    super(`Failed to fetch url: ${url}`);
-    Object.setPrototypeOf(this, FetchError.prototype);
-    this.name = "Fetch Error";
-    this.baseError = baseError;
-    this.url = url;
-    this.info = {
+    const info = {
       title: "Fetch Error",
       detail: `The fetch promise for the requested resource was rejected. This is probably an offline, CORS, or other network error. Requested URL: ${url}`
     };
+    super(info, baseError);
+    Object.setPrototypeOf(this, FetchError.prototype);
+    this.name = "Fetch Error";
+    this.url = url;
   }
 }
 
@@ -96,21 +89,26 @@ export class ServerError extends ApplicationError {
     status: number,
     details: OPDS1.ProblemDocument | OPDS1.AuthDocument
   ) {
-    super("Server Error");
+    super(
+      isProblemDocument(details)
+        ? details
+        : status === 401
+        ? {
+            title: "Not Authorized",
+            detail: "You are not authorized for the requested resource.",
+            status: 401
+          }
+        : {
+            title: "Unknown Server Error",
+            detail: `The Circulation Manager returned a ${status} error for: ${url}.`,
+            status
+          }
+    );
+    if (status === 401 && !isProblemDocument(details))
+      this.authDocument = details;
+
     this.url = url;
     Object.setPrototypeOf(this, ServerError.prototype);
-    if (status === 401 && !isProblemDocument(details)) {
-      // 401 errors return auth document instead of problem document
-      // we will construct our own problem document.
-      this.info = {
-        title: "Not Authorized",
-        detail: "You are not authorized for the requested resource.",
-        status: 401
-      };
-      this.authDocument = details;
-    } else if (isProblemDocument(details)) {
-      this.info = details;
-    }
     this.name = `Server Error`;
   }
 }
