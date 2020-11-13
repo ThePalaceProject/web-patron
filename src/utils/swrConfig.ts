@@ -32,6 +32,7 @@ const swrConfig: ConfigInterface<any, Error> = {
     }
     // Only retry up to 10 times.
     if (retryCount >= 10) return;
+
     // Retry after 5 seconds.
     setTimeout(() => revalidate({ retryCount: retryCount + 1 }), 5000);
   }

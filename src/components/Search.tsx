@@ -30,7 +30,7 @@ let searchData: null | SearchData = null;
 const Search: React.FC<SearchProps> = ({ className, ...props }) => {
   const [value, setValue] = React.useState("");
   const linkUtils = useLinkUtils();
-  const { collection } = useCollection();
+  const { collection, error } = useCollection();
 
   const { data } = useSWR(collection?.searchDataUrl ?? null, fetchSearchData);
 
@@ -39,8 +39,8 @@ const Search: React.FC<SearchProps> = ({ className, ...props }) => {
     searchData = data;
   }
 
-  // show no searchbar if we cannot perform a search
-  if (!searchData) return null;
+  // show no searchbar if we cannot perform a search or there was an error
+  if (!searchData || error) return null;
 
   // handle the search
   const onSearch = (e: React.FormEvent<HTMLFormElement>) => {

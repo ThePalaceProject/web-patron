@@ -10,11 +10,14 @@ import BreadcrumbBar from "./BreadcrumbBar";
 import computeBreadcrumbs from "computeBreadcrumbs";
 import useCollection from "hooks/useCollection";
 import ApplicationError from "errors";
+import ErrorComponent from "components/Error";
 
 export const Collection: React.FC<{
   title?: string;
 }> = ({ title }) => {
-  const { collection, collectionUrl, isValidating } = useCollection();
+  const { collection, collectionUrl, isValidating, error } = useCollection();
+
+  if (error) return <ErrorComponent info={error?.info} />;
 
   const isLoading = !collection && isValidating;
 
