@@ -10,7 +10,7 @@ export default class ApplicationError extends Error {
       detail: "An unknown Application Error Occurred",
       ...info
     };
-    super(`${info.title}: ${info.detail}`);
+    super(`${problemDoc.title}: ${problemDoc.detail}`);
     Object.setPrototypeOf(this, ApplicationError.prototype);
     this.name = `ApplicationError${info.title ? `: ${info.title}` : ""}`;
     this.baseError = baseError;
