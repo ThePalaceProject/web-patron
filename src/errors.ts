@@ -82,11 +82,6 @@ function isProblemDocument(
 export class ServerError extends ApplicationError {
   // a default problem document
   url: string;
-  info: OPDS1.ProblemDocument = {
-    detail: "An unknown error server occurred.",
-    title: "Server Error",
-    status: 500
-  };
   authDocument?: OPDS1.AuthDocument;
 
   constructor(

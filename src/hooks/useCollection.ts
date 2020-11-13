@@ -2,6 +2,8 @@ import useLibraryContext from "components/context/LibraryContext";
 import useUser from "components/context/UserContext";
 import { fetchCollection } from "dataflow/opds1/fetch";
 import extractParam from "dataflow/utils";
+import ApplicationError from "errors";
+import { CollectionData } from "interfaces";
 import { useRouter } from "next/router";
 import * as React from "react";
 import useSWR from "swr";
@@ -16,10 +18,23 @@ export default function useCollection() {
   const isLibraryHome = pathname === "/[library]";
   const collectionUrl = isLibraryHome ? catalogUrl : collectionUrlParam;
 
-  const { data: collection, error, isValidating } = useSWR(
-    collectionUrl ? [collectionUrl, token] : null,
-    fetchCollection
-  );
+  const { data: collection, error, isValidating } = useSWR<
+    CollectionData,
+    Error | ApplicationError
+  >(collectionUrl ? [collectionUrl, token] : null, fetchCollection);
+
+  // wrap unidentified errors in an ApplicationError
+  const applicationError = error
+    ? error instanceof ApplicationError
+      ? error
+      : new ApplicationError(
+          {
+            title: "Fetch Collection Error",
+            detail: "An unknown error occurred while fetching the collection"
+          },
+          error
+        )
+    : undefined;
 
   // extract the books from the collection and set them in the SWR cache
   // so we don't have to refetch them when you click a book.
@@ -27,8 +42,5 @@ export default function useCollection() {
     cacheCollectionBooks(collection);
   }, [collection]);
 
-  // throw errors from fetch so they can be handled by an error boundary
-  if (error) throw error;
-
-  return { collection, collectionUrl, isValidating };
+  return { collection, collectionUrl, isValidating, error: applicationError };
 }
