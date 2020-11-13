@@ -40,23 +40,27 @@ export default function withAppProps(
         revalidate: 60 * 60
       };
     } catch (e) {
+      // if it is not already an application error, wrap it in one
+      const error =
+        e instanceof ApplicationError
+          ? e
+          : new ApplicationError(
+              {
+                title: "App Startup Failure",
+                detail: "Static props could not be fetched.",
+                status: 500
+              },
+              e
+            );
       // show the error page if there was an ApplicationError
-      if (e instanceof ApplicationError) {
-        track.error(e, { severity: "error" });
-        return {
-          props: {
-            error: e.info
-          },
-          // library data will be revalidated often for error pages.
-          revalidate: 1
-        };
-      }
-      // otherwise we probably can't recover at all,
-      // so rethrow.
-      throw new ApplicationError(
-        "Failed to fetch static props for app startup.",
-        e
-      );
+      track.error(error, { severity: "error" });
+      return {
+        props: {
+          error: error.info
+        },
+        // library data will be revalidated often for error pages.
+        revalidate: 1
+      };
     }
   };
 }

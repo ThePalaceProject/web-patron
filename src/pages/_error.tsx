@@ -8,14 +8,12 @@ import ApplicationError from "errors";
 const Error: NextPage<{
   errorInfo?: OPDS1.ProblemDocument;
 }> = ({ errorInfo }) => {
-  console.log(errorInfo);
   return <ErrorComponent info={errorInfo} />;
 };
 
 Error.getInitialProps = ({ res, err }) => {
   if (err) track.error(err);
   if (err instanceof ApplicationError) {
-    console.log("WHAT", err.info);
     return {
       errorInfo: err.info
     };
