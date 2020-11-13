@@ -42,7 +42,7 @@ describe("fetching catalog", () => {
     const promise = fetchFeed("not a valid url");
     await expect(promise).rejects.toThrowError(Error);
     await expect(promise).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"Something wrong"`
+      `"Fetch Error: The fetch promise for the requested resource was rejected. This is probably an offline, CORS, or other network error. Requested URL: not a valid url"`
     );
   });
 });
@@ -53,7 +53,7 @@ describe("getAuthDocUrl", () => {
     const promise = getAuthDocUrl("not there slug");
     await expect(promise).rejects.toThrowError(PageNotFoundError);
     await expect(promise).rejects.toMatchInlineSnapshot(
-      `[Page Not Found Error: No authentication document url is configured for the library: not there slug.]`
+      `[Page Not Found Error: Page Not Found: No authentication document url is configured for the library: not there slug.]`
     );
   });
 
@@ -94,7 +94,7 @@ describe("getAuthDocUrl", () => {
       const promise = getAuthDocUrl("library-uuid");
       expect(promise).rejects.toThrowError(ApplicationError);
       expect(promise).rejects.toThrowErrorMatchingInlineSnapshot(
-        `"CatalogEntry did not contain a Authentication Document Url. Library UUID: library-uuid"`
+        `"Application Error: CatalogEntry did not contain a Authentication Document Url. Library UUID: library-uuid"`
       );
     });
 
@@ -107,7 +107,7 @@ describe("getAuthDocUrl", () => {
       const promise = getAuthDocUrl("library-uuid");
       expect(promise).rejects.toThrowError(ApplicationError);
       expect(promise).rejects.toThrow(
-        "Could not fetch catalog entry for library: library-uuid at reg-base\nBase Error:\nLibraryRegistryFeed returned by /catalog-template-url-library-uuid does not contain a CatalogEntry."
+        "Application Error: Could not fetch catalog entry for library: library-uuid at reg-base"
       );
     });
 
@@ -119,7 +119,7 @@ describe("getAuthDocUrl", () => {
       const promise = getAuthDocUrl("library-uuid");
       expect(promise).rejects.toThrowError(ApplicationError);
       expect(promise).rejects.toThrow(
-        "Could not fetch catalog entry for library: library-uuid at reg-base\nBase Error:\ninvalid json response body at  reason: Unexpected end of JSON input"
+        "Could not fetch catalog entry for library: library-uuid at reg-base"
       );
     });
 
@@ -133,7 +133,7 @@ describe("getAuthDocUrl", () => {
       const promise = getAuthDocUrl("library-uuid");
       expect(promise).rejects.toThrowError(ApplicationError);
       expect(promise).rejects.toThrow(
-        "Could not fetch the library template at: reg-base\nBase Error:\nTemplate not present in response from: reg-base"
+        "Could not fetch the library template at: reg-base"
       );
     });
   });
