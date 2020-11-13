@@ -16,7 +16,9 @@ const ErrorComponent: React.FC<{ info?: OPDS1.ProblemDocument }> = ({
 
   const router = useRouter();
   const isRoot = router.asPath === "/";
+  const is404 = status === 404;
   const library = extractParam(router.query, "library");
+  const isLibraryRoot = router.pathname === "/[library]";
 
   return (
     <div
@@ -30,9 +32,9 @@ const ErrorComponent: React.FC<{ info?: OPDS1.ProblemDocument }> = ({
       <p>
         {detail && `${detail}`} <br />
       </p>
-      {isRoot ? (
+      {isRoot || (isLibraryRoot && is404) ? (
         <LibraryList />
-      ) : library ? (
+      ) : library && !isLibraryRoot ? (
         <Link href={`/${library}`}>
           <a>Return Home</a>
         </Link>
