@@ -46,9 +46,9 @@ const Search: React.FC<SearchProps> = ({ className, ...props }) => {
   const onSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!searchData)
-      throw new ApplicationError(
-        "Cannot perform search. No search template available."
-      );
+      throw new ApplicationError({
+        detail: "Cannot perform search. No search template available."
+      });
     const searchTerms = encodeURIComponent(value);
     const url = createSearchUrl(
       searchData.template,

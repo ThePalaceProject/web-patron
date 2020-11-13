@@ -4,12 +4,17 @@ export default class ApplicationError extends Error {
   info: OPDS1.ProblemDocument;
   baseError?: Error;
 
-  constructor(info: OPDS1.ProblemDocument, baseError?: Error) {
+  constructor(info: Partial<OPDS1.ProblemDocument>, baseError?: Error) {
+    const problemDoc = {
+      title: "Application Error",
+      detail: "An unknown Application Error Occurred",
+      ...info
+    };
     super(`${info.title}: ${info.detail}`);
     Object.setPrototypeOf(this, ApplicationError.prototype);
-    this.name = `ApplicationError: ${info.title}`;
+    this.name = `ApplicationError${info.title ? `: ${info.title}` : ""}`;
     this.baseError = baseError;
-    this.info = info;
+    this.info = problemDoc;
   }
 }
 

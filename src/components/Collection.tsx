@@ -25,9 +25,9 @@ export const Collection: React.FC<{
   const breadcrumbs = computeBreadcrumbs(collection);
 
   if (!collectionUrl)
-    throw new ApplicationError(
-      "Cannot render collection on page without collectionUrl"
-    );
+    throw new ApplicationError({
+      detail: "Cannot render collection on page without collectionUrl"
+    });
 
   return (
     <div
