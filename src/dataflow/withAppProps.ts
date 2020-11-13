@@ -53,7 +53,10 @@ export default function withAppProps(
       }
       // otherwise we probably can't recover at all,
       // so rethrow.
-      throw e;
+      throw new ApplicationError(
+        "Failed to fetch static props for app startup.",
+        e
+      );
     }
   };
 }
