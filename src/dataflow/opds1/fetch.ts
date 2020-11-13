@@ -29,7 +29,10 @@ export async function fetchOPDS(
     return await parser.parse(text);
   } catch (e) {
     throw new ApplicationError(
-      "Could not parse fetch response into an OPDS Feed or Entry",
+      {
+        title: "OPDS Error",
+        detail: "Could not parse fetch response into an OPDS Feed or Entry"
+      },
       e
     );
   }
@@ -46,9 +49,10 @@ export async function fetchFeed(
   if (result instanceof OPDSFeed) {
     return result;
   }
-  throw new ApplicationError(
-    `Network response was expected to be an OPDS 1.x Feed, but was not parseable as such. Url: ${url}`
-  );
+  throw new ApplicationError({
+    title: "OPDS Error",
+    detail: `Network response was expected to be an OPDS 1.x Feed, but was not parseable as such. Url: ${url}`
+  });
 }
 
 /**
@@ -62,9 +66,10 @@ export async function fetchEntry(
   if (result instanceof OPDSEntry) {
     return result;
   }
-  throw new ApplicationError(
-    `Network response was expected to be an OPDS 1.x Entry, but was not parseable as such. Url: ${url}`
-  );
+  throw new ApplicationError({
+    title: "OPDS Error",
+    detail: `Network response was expected to be an OPDS 1.x Entry, but was not parseable as such. Url: ${url}`
+  });
 }
 
 /**

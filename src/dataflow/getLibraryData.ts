@@ -17,14 +17,14 @@ async function fetchCatalogLinkBuilder(
       link => link.rel === OPDS2.CatalogLinkTemplateRelation
     )?.href;
     if (!templateUrl) {
-      throw new ApplicationError(
-        `Template not present in response from: ${registryBase}`
-      );
+      throw new ApplicationError({
+        detail: `Template not present in response from: ${registryBase}`
+      });
     }
     return uuid => templateUrl.replace("{uuid}", uuid);
   } catch (e) {
     throw new ApplicationError(
-      `Could not fetch the library template at: ${registryBase}`,
+      { detail: `Could not fetch the library template at: ${registryBase}` },
       e
     );
   }
@@ -45,13 +45,16 @@ async function fetchCatalogEntry(
     const catalogFeed = (await response.json()) as OPDS2.LibraryRegistryFeed;
     const catalogEntry = catalogFeed?.catalogs?.[0];
     if (!catalogEntry)
-      throw new ApplicationError(
-        `LibraryRegistryFeed returned by ${catalogFeedUrl} does not contain a CatalogEntry.`
-      );
+      throw new ApplicationError({
+        detail: `LibraryRegistryFeed returned by ${catalogFeedUrl} does not contain a CatalogEntry.`
+      });
     return catalogEntry;
   } catch (e) {
+    if (e instanceof ApplicationError) throw e;
     throw new ApplicationError(
-      `Could not fetch catalog entry for library: ${librarySlug} at ${registryBase}`,
+      {
+        detail: `Could not fetch catalog entry for library: ${librarySlug} at ${registryBase}`
+      },
       e
     );
   }
@@ -73,9 +76,9 @@ export async function getAuthDocUrl(librarySlug: string): Promise<string> {
     const catalogEntry = await fetchCatalogEntry(librarySlug, libraries);
     const authDocUrl = findAuthDocUrl(catalogEntry);
     if (!authDocUrl)
-      throw new ApplicationError(
-        `CatalogEntry did not contain a Authentication Document Url. Library UUID: ${librarySlug}`
-      );
+      throw new ApplicationError({
+        detail: `CatalogEntry did not contain a Authentication Document Url. Library UUID: ${librarySlug}`
+      });
     return authDocUrl;
   }
   // we have a dictionary of libraries
@@ -128,7 +131,9 @@ function getCatalogUrl(authDoc: OPDS1.AuthDocument): string {
     })?.href ?? null;
 
   if (!url)
-    throw new ApplicationError("No Catalog Root Url present in Auth Document.");
+    throw new ApplicationError({
+      detail: "No Catalog Root Url present in Auth Document."
+    });
 
   return url;
 }
