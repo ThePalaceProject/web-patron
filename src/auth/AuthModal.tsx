@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { useDialogState, Dialog } from "reakit/Dialog";
+import { useDialogState } from "reakit/Dialog";
 import useLibraryContext from "../components/context/LibraryContext";
 import Modal from "../components/Modal";
 import ClientOnly from "../components/ClientOnly";

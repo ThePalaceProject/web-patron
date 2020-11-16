@@ -1,7 +1,7 @@
 import * as React from "react";
 import { NextPage, GetStaticProps } from "next";
 import withAppProps, { AppProps } from "dataflow/withAppProps";
-import { APP_CONFIG } from "config";
+import { APP_CONFIG } from "utils/env";
 import OpenEbooksLandingComponent from "components/OpenEbooksLanding";
 import LayoutPage from "components/LayoutPage";
 

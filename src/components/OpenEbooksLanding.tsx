@@ -8,13 +8,12 @@ import CleverButton from "auth/CleverAuthButton";
 import { OPDS1 } from "interfaces";
 import useLibraryContext from "./context/LibraryContext";
 import { BasicAuthMethod, CleverAuthMethod } from "types/opds1";
-import BasicAuthButton from "auth/BasicAuthButton";
 import useUser from "./context/UserContext";
 import SignOut from "./SignOut";
 import useAuthModalContext from "auth/AuthModalContext";
-import { basicAuthMethod } from "test-utils/fixtures";
+import SvgChevronRight from "icons/ExpandMore";
+import BasicAuthButton from "auth/BasicAuthButton";
 import { flexDirection } from "styled-system";
-import Link from "next/link";
 
 type PopularBook = { alt: string; imgHref: string };
 
@@ -83,7 +82,8 @@ const OpenEbooksLandingComponent = () => {
             sx={{
               maxWidth: 1100,
               mx: "auto",
-              display: "flex"
+              display: "flex",
+              flexWrap: ["wrap", "wrap", "nowrap"]
             }}
           >
             <Stack
@@ -125,11 +125,11 @@ const OpenEbooksLandingComponent = () => {
                 in need.
               </Text>
               <div>
-                <Button
-                  onClick={() => showModal({ selectedMethod: basicMethod })}
-                >
-                  Sign In
-                </Button>
+                <BasicAuthButton
+                  method={basicMethod}
+                  // eslint-disable-next-line @typescript-eslint/no-empty-function
+                  onClick={() => {}}
+                ></BasicAuthButton>
               </div>
             </Stack>
           </div>
@@ -144,15 +144,19 @@ const OpenEbooksLandingComponent = () => {
               maxWidth: 1100,
               mx: "auto",
               display: "flex",
-              flexWrap: ["wrap", "nowrap"]
+              flexWrap: "wrap",
+              flexDirection: ["column", "row"]
             }}
           >
             <div
               sx={{
-                flex: "1"
+                flex: "1",
+                display: "flex",
+                justifyContent: "center"
               }}
             >
               <img
+                sx={{ alignItems: "flex-end" }}
                 alt="Mobile Device with Open Ebooks"
                 src={"/img/SimplyEIpad.png"}
               />
@@ -230,6 +234,7 @@ const OpenEbooksHero: React.FC = () => {
     >
       <div
         sx={{
+          minHeight: "350px",
           display: "flex",
           flexDirection: "column"
         }}
@@ -257,8 +262,20 @@ const OpenEbooksHero: React.FC = () => {
             src="/img/OpenEbooksLogo.png"
           />
         </div>
-        <div sx={{ marginBottom: "auto" }}>
-          <Link href="#loginRegion">blah</Link>
+        {/* The down arrow that goes to the login section */}
+        <div sx={{ display: "flex", alignItems: "center" }}>
+          <a
+            href="#loginRegion"
+            sx={{
+              backgroundColor: "ui.white",
+              margin: "auto",
+              textAlign: "center",
+              borderRadius: "25px 25px 0 0",
+              display: "flex"
+            }}
+          >
+            <SvgChevronRight sx={{ width: "50px", height: "35px" }} />
+          </a>
         </div>
       </div>
     </div>
@@ -274,19 +291,19 @@ const PopularBookSection: React.FC<{
       sx={{
         display: "flex",
         my: 4,
-        flexWrap: ["wrap", "wrap", "nowrap"],
+        flexWrap: "wrap",
         flexDirection: coverLocation === "right" ? "row-reverse" : "row"
       }}
     >
-      <div sx={{ display: "flex", flex: "2", mx: [3, 4], my: 4 }}>
+      {/* The three book covers */}
+      <div
+        sx={{ height: "100%", display: "flex", flex: "2", mx: [3, 4], my: 4 }}
+      >
         {books.map(book => {
           return (
-            <div
-              key={book.imgHref}
-              sx={{ flex: "1", mx: 1, maxHeight: "400px" }}
-            >
+            <div key={book.imgHref} sx={{ flex: "1", mx: 1 }}>
               <img
-                sx={{ maxWidth: "100%", minWidth: "180px" }}
+                sx={{ maxWidth: "100%", minWidth: ["50px", "180px"] }}
                 alt={book.alt}
                 src={book.imgHref}
               />
@@ -294,7 +311,15 @@ const PopularBookSection: React.FC<{
           );
         })}
       </div>
-      <Stack direction="column" sx={{ flex: "1", mx: [3, 5], my: 4 }}>
+      <Stack
+        direction="column"
+        sx={{
+          minWidth: "300px",
+          flex: "1",
+          mx: [3, 5],
+          my: 4
+        }}
+      >
         <H2>Popular Early Grades Books</H2>
         <Text>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
