@@ -1,6 +1,4 @@
 import path from "path"
-import webpack from "webpack"
-import { config as appConfig } from "../src/test-utils/fixtures/config"
 
 module.exports = {
   "stories": [
