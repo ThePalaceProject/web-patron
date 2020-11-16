@@ -11,7 +11,6 @@ const CatchFetchErrors: React.FC = ({ children }) => {
   const { showModal } = useAuthModalContext();
 
   function handle401() {
-    console.log("401!");
     showModal();
   }
 
