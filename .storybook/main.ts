@@ -1,4 +1,6 @@
 import path from "path"
+import webpack from "webpack"
+import { config as appConfig } from "../src/test-utils/fixtures/config"
 
 module.exports = {
   "stories": [
@@ -14,12 +16,14 @@ module.exports = {
     config.resolve.alias['core-js/features'] = '@storybook/core/node_modules/core-js/features';
     // mock SWR
     config.resolve.alias['swr'] = require.resolve("./swr-mock.tsx");
+    // mock our env vars so they can be updated via the toolbar
+    config.resolve.alias['utils/env'] = require.resolve("./env-mock.ts");
 
     config.resolve.modules = [
       path.resolve(__dirname, "../src"),
       "node_modules"
     ]
-
+    
     return config
   },
   refs: {
