@@ -63,5 +63,5 @@ export const loans: CollectionData = {
   lanes: [],
   books: makeFulfillableBooks(1),
   navigationLinks: [],
-  searchDataUrl: "/search-data-ur"
+  searchDataUrl: "/search-data-url"
 };
