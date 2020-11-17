@@ -1,4 +1,6 @@
 ## CHANGELOG
+### [Unreleased]
+- Add: Landing page for Open Ebooks
 
 ### 3.1.3
 - Fix: Update the production docker publish Github Action to v2, allowing for use of private Github package registry for AxisNow Decryptor.
