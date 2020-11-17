@@ -45,7 +45,6 @@ const AuthModal: React.FC<{ selectedMethod?: AppAuthMethod }> = ({
   }, [show, clearCredentials]);
 
   const selectedAuthMethods = preSelectedAuth ? [preSelectedAuth] : authMethods;
-  console.log("selectedAuthMethods", preSelectedAuth, selectedAuthMethods);
   /**
    * The options:
    *  - No auth methods available. Tell the user.
