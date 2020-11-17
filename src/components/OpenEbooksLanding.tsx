@@ -43,7 +43,6 @@ const OpenEbooksLandingComponent = () => {
   const basicMethod: BasicAuthMethod = authMethods.find(
     method => method.type === OPDS1.BasicAuthType
   ) as BasicAuthMethod;
-  const { showModal } = useAuthModalContext();
 
   return (
     <>
@@ -64,13 +63,19 @@ const OpenEbooksLandingComponent = () => {
             textAlign: "center"
           }}
         >
-          <H2>Lorem Ipsum Secondary Headline Welcome Openebooks</H2>
-          <Text>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat.
-          </Text>
+          <div
+            sx={{
+              mx: [2, 4]
+            }}
+          >
+            <H2>Lorem Ipsum Secondary Headline Welcome Openebooks</H2>
+            <Text>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat.
+            </Text>
+          </div>
         </div>
         <div
           id="loginRegion"
@@ -83,6 +88,7 @@ const OpenEbooksLandingComponent = () => {
               maxWidth: 1100,
               mx: "auto",
               display: "flex",
+              textAlign: ["center", "center", "left"],
               flexWrap: ["wrap", "wrap", "nowrap"]
             }}
           >
@@ -91,6 +97,7 @@ const OpenEbooksLandingComponent = () => {
               sx={{
                 mx: [3, 5],
                 my: 4,
+                justifyContent: "space-between",
                 flexWrap: ["wrap", "nowrap"]
               }}
             >
@@ -112,6 +119,7 @@ const OpenEbooksLandingComponent = () => {
               sx={{
                 mx: [3, 5],
                 my: 4,
+                justifyContent: "space-between",
                 flexWrap: ["wrap", "nowrap"]
               }}
             >
@@ -142,10 +150,11 @@ const OpenEbooksLandingComponent = () => {
           <div
             sx={{
               maxWidth: 1100,
+              textAlign: ["center", "center", "left"],
               mx: "auto",
               display: "flex",
               flexWrap: "wrap",
-              flexDirection: ["column", "row"]
+              flexDirection: ["column", "column", "row"]
             }}
           >
             <div
@@ -166,6 +175,7 @@ const OpenEbooksLandingComponent = () => {
               sx={{
                 flex: "2",
                 my: 4,
+                mx: [2, 4],
                 color: "ui.white"
               }}
             >
@@ -216,6 +226,10 @@ const OpenEbooksLandingComponent = () => {
     </>
   );
 };
+
+/**
+ * Components in the Landing Page
+ */
 
 const OpenEbooksHero: React.FC = () => {
   const { isAuthenticated, isLoading } = useUser();
@@ -271,10 +285,11 @@ const OpenEbooksHero: React.FC = () => {
               margin: "auto",
               textAlign: "center",
               borderRadius: "25px 25px 0 0",
-              display: "flex"
+              display: "flex",
+              paddingTop: "5px"
             }}
           >
-            <SvgChevronRight sx={{ width: "50px", height: "35px" }} />
+            <SvgChevronRight sx={{ width: "50px", height: "25px" }} />
           </a>
         </div>
       </div>
@@ -290,34 +305,22 @@ const PopularBookSection: React.FC<{
     <div
       sx={{
         display: "flex",
-        my: 4,
-        flexWrap: "wrap",
-        flexDirection: coverLocation === "right" ? "row-reverse" : "row"
+        my: [0, 0, 4],
+        mx: [2, 4],
+        flexDirection: [
+          "column",
+          "column",
+          coverLocation === "right" ? "row" : "row-reverse"
+        ]
       }}
     >
-      {/* The three book covers */}
-      <div
-        sx={{ height: "100%", display: "flex", flex: "2", mx: [3, 4], my: 4 }}
-      >
-        {books.map(book => {
-          return (
-            <div key={book.imgHref} sx={{ flex: "1", mx: 1 }}>
-              <img
-                sx={{ maxWidth: "100%", minWidth: ["50px", "180px"] }}
-                alt={book.alt}
-                src={book.imgHref}
-              />
-            </div>
-          );
-        })}
-      </div>
       <Stack
         direction="column"
         sx={{
           minWidth: "300px",
           flex: "1",
-          mx: [3, 5],
-          my: 4
+          mx: [0, 2],
+          marginTop: [4, 4, 0]
         }}
       >
         <H2>Popular Early Grades Books</H2>
@@ -328,6 +331,38 @@ const PopularBookSection: React.FC<{
           aliquip ex ea commodo consequat.
         </Text>
       </Stack>
+      {/* The three book covers */}
+      <div
+        sx={{
+          height: "100%",
+          display: "flex",
+          flex: "2",
+          justifyContent: "space-between"
+        }}
+      >
+        {books.map(book => {
+          return (
+            <div
+              key={book.imgHref}
+              sx={{
+                flex: "[1, 0, 1]",
+                mx: [0, 2],
+                my: [2, 2, 0],
+                paddingLeft: 1,
+                backgroundColor: "brand.secondary",
+                width: "30%",
+                height: "100%"
+              }}
+            >
+              <img
+                sx={{ maxWidth: "100%", minWidth: ["100px", "100px"] }}
+                alt={book.alt}
+                src={book.imgHref}
+              />
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
