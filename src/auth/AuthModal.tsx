@@ -20,10 +20,7 @@ import ExternalLink from "components/ExternalLink";
 import BasicAuthButton from "auth/BasicAuthButton";
 import LoadingIndicator from "components/LoadingIndicator";
 
-const AuthModal: React.FC<{ selectedMethod?: AppAuthMethod }> = ({
-  selectedMethod: preSelectedAuth,
-  children
-}) => {
+const AuthModal: React.FC = ({ children }) => {
   const dialog = useDialogState();
   const { hide } = dialog;
   const { catalogName, authMethods } = useLibraryContext();
@@ -44,7 +41,6 @@ const AuthModal: React.FC<{ selectedMethod?: AppAuthMethod }> = ({
     show();
   }, [show, clearCredentials]);
 
-  const selectedAuthMethods = preSelectedAuth ? [preSelectedAuth] : authMethods;
   /**
    * The options:
    *  - No auth methods available. Tell the user.
@@ -54,11 +50,11 @@ const AuthModal: React.FC<{ selectedMethod?: AppAuthMethod }> = ({
    */
   const formStatus = isLoading
     ? "loading"
-    : selectedAuthMethods.length === 0
+    : authMethods.length === 0
     ? "no-auth"
-    : selectedAuthMethods.length === 1
+    : authMethods.length === 1
     ? "single-auth"
-    : selectedAuthMethods.length < 5
+    : authMethods.length < 5
     ? "buttons"
     : "combobox";
 
@@ -84,11 +80,11 @@ const AuthModal: React.FC<{ selectedMethod?: AppAuthMethod }> = ({
           ) : formStatus === "no-auth" ? (
             <NoAuth />
           ) : formStatus === "single-auth" ? (
-            <SignInForm method={selectedAuthMethods[0]} />
+            <SignInForm method={authMethods[0]} />
           ) : formStatus === "combobox" ? (
-            <Combobox authMethods={selectedAuthMethods} />
+            <Combobox authMethods={authMethods} />
           ) : (
-            <Buttons authMethods={selectedAuthMethods} />
+            <Buttons authMethods={authMethods} />
           )}
         </Modal>
       </ClientOnly>
@@ -219,10 +215,9 @@ const Buttons: React.FC<{
  */
 const Combobox: React.FC<{
   authMethods: AppAuthMethod[];
-  preSelectedMethod?: AppAuthMethod;
-}> = ({ authMethods, preSelectedMethod = authMethods[0] }) => {
+}> = ({ authMethods }) => {
   const [selectedMethod, setSelectedMethod] = React.useState<AppAuthMethod>(
-    preSelectedMethod
+    authMethods[0]
   );
 
   const handleChangeMethod = (id: string) => {

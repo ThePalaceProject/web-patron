@@ -1,4 +1,6 @@
 ## CHANGELOG
+### [Unreleased]
+- Add: Landing page for Open Ebooks
 
 ### UNRELEASED CHANGES
 - Fix: Fix our `APP_CONFIG` mocking in storybook so that `showMedium` and `companionApp` can be set via the toolbar once again.

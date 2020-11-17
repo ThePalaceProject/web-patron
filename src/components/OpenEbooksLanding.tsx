@@ -13,7 +13,6 @@ import SignOut from "./SignOut";
 import useAuthModalContext from "auth/AuthModalContext";
 import SvgChevronRight from "icons/ExpandMore";
 import BasicAuthButton from "auth/BasicAuthButton";
-import { flexDirection } from "styled-system";
 
 type PopularBook = { alt: string; imgHref: string };
 

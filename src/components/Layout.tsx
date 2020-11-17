@@ -11,8 +11,8 @@ export const CONTENT_ID = "cpw-content";
 
 const Layout: React.FC<{
   bg?: string;
-  showHeader: boolean;
-  showFooter: boolean;
+  showHeader?: boolean;
+  showFooter?: boolean;
 }> = ({ children, bg, showHeader = true, showFooter = true }) => {
   return (
     <Styled.root
