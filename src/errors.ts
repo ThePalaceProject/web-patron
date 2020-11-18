@@ -89,21 +89,28 @@ export class ServerError extends ApplicationError {
     status: number,
     details: OPDS1.ProblemDocument | OPDS1.AuthDocument
   ) {
-    super(
-      isProblemDocument(details)
-        ? details
-        : status === 401
-        ? {
-            title: "Not Authorized",
-            detail: "You are not authorized for the requested resource.",
-            status: 401
-          }
-        : {
-            title: "Unknown Server Error",
-            detail: `The Circulation Manager returned a ${status} error for: ${url}.`,
-            status
-          }
-    );
+    // default info in case no problem doc came back and it wasn't a 401
+    let info: OPDS1.ProblemDocument = {
+      title: "Unknown Server Error",
+      detail: `The Circulation Manager returned a ${status} error for: ${url}.`,
+      status
+    };
+    if (isProblemDocument(details)) {
+      // if the server returned a problem document
+      info = details;
+    } else if (status === 401) {
+      // if the server returned a 401 with an authentication document
+      // we build our own problem document
+      info = {
+        title: "Not Authorized",
+        detail: "You are not authorized for the requested resource.",
+        status: 401
+      };
+    }
+    super(info);
+
+    // if the server returned a 401 with a non problem document, we assume
+    // it returned an authentication document.
     if (status === 401 && !isProblemDocument(details))
       this.authDocument = details;
 
