@@ -52,7 +52,6 @@ export default function withAppProps(
               },
               e
             );
-      // show the error page if there was an ApplicationError
       track.error(error, { severity: "error" });
       return {
         props: {
