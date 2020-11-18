@@ -1,18 +1,21 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { H2, Text } from "./Text";
-import Button from "./Button";
-import Stack from "./Stack";
+import { H2, Text } from "../Text";
+import Button from "../Button";
+import Stack from "../Stack";
 import CleverButton from "auth/CleverAuthButton";
 import { OPDS1 } from "interfaces";
-import useLibraryContext from "./context/LibraryContext";
+import useLibraryContext from "../context/LibraryContext";
 import { BasicAuthMethod, CleverAuthMethod } from "types/opds1";
-import useUser from "./context/UserContext";
-import SignOut from "./SignOut";
+import useUser from "../context/UserContext";
+import SignOut from "../SignOut";
 import useAuthModalContext from "auth/AuthModalContext";
 import SvgChevronRight from "icons/ExpandMore";
 import BasicAuthButton from "auth/BasicAuthButton";
+import { GetStaticPaths, GetStaticProps, NextPage } from "next";
+import withAppProps, { AppProps } from "dataflow/withAppProps";
+import LayoutPage from "components/LayoutPage";
 
 type PopularBook = { alt: string; imgHref: string };
 
@@ -32,6 +35,20 @@ const popularBooks = {
     { alt: "book cover text 1", imgHref: "/img/highschool-2.jpg" },
     { alt: "book cover text 1", imgHref: "/img/highschool-3.jpg" }
   ]
+};
+
+const LandingPage: NextPage<AppProps> = ({ library, error }) => {
+  const props: AppProps = {
+    library: library,
+    error: error
+  };
+  return (
+    <>
+      <LayoutPage props={props} showHeader={false}>
+        <OpenEbooksLandingComponent />
+      </LayoutPage>
+    </>
+  );
 };
 
 const OpenEbooksLandingComponent = () => {
@@ -366,4 +383,12 @@ const PopularBookSection: React.FC<{
   );
 };
 
-export default OpenEbooksLandingComponent;
+export default LandingPage;
+
+export const landingPageStaticProps: GetStaticProps = withAppProps("app");
+export const landingPageStaticPaths: GetStaticPaths = async () => {
+  return {
+    paths: ["/"],
+    fallback: false
+  };
+};
