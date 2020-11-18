@@ -52,6 +52,11 @@ function parseConfig(raw) {
     unparsed.companion_app === "openebooks" ? "openebooks" : "simplye";
 
   const showMedium = unparsed.show_medium !== false;
+
+  // openebooks settings
+  const openebooks = unparsed.openebooks;
+  const landingPageSlug = openebooks ? openebooks.landing_page_slug : undefined;
+
   // otherwise assume the file is properly structured.
   return {
     instanceName: unparsed.instance_name || "Patron Web Catalog",
@@ -60,7 +65,8 @@ function parseConfig(raw) {
     bugsnagApiKey: unparsed.bugsnag_api_key || null,
     gtmId: unparsed.gtmId || null,
     companionApp,
-    showMedium
+    showMedium,
+    openebooks: openebooks ? { landingPageSlug } : null
   };
 }
 
