@@ -129,42 +129,27 @@ import { render, fixtures, fireEvent, actions } from "../../test-utils";
 
 test("fetches search description", async () => {
   /**
-   * use merge to create an initial state specific for this test. Merge is useful
-   * not only because it will deep merge the objects, but it copies them to a new
-   * object, so if the app alters the passed in state object, it won't break other
-   * tests that rely on it. This is a common source of flakiness where one test fails
-   * only if another one runs. Merge should solve it.
+   * First mock the SWR data, which effectively mocks the network call to fetch
+   * the search description. You can see details of how this works in the
+   * mockSwr function. 
    */
-  const initialState: State = merge(fixtures.initialState, {
-    collection: {
-      data: {
-        search: {
-          url: "/search-url"
-        }
-      }
+  mockSwr({ data: fixtureData });
+
+  // then render the app. utils will contain the query functions provided by 
+  // react-testing-library 
+  const utils = render(<Search />, {
+    router: {
+      query: { collectionUrl: "/collection" }
     }
   });
-
-  // spy on a specific action in the ActionsCreator.
-  const mockedFetchSearchDescription = jest.spyOn(
-    actions,
-    "fetchSearchDescription"
+  // we can then make sure that the mocked `useSWR` function was called as
+  // expected. In this case once for the collection, then for it's search 
+  // description.
+  expect(mockedSWR).toHaveBeenCalledWith(
+    ["/collection", "user-token"],
+    expect.anything()
   );
-  /**
-   * utils will contain
-   *  - the result of render
-   *  - the redux store
-   *  - the history object
-   *  - the spied on dispatch function
-   */
-  const utils = render(<Search />, {
-    initialState
-  });
-
-  expect(mockedFetchSearchDescription).toHaveBeenCalledTimes(1);
-  expect(mockedFetchSearchDescription).toHaveBeenCalledWith("/search-url");
-  // we can assert on the app's dispatch like this
-  expect(utils.dispatch).toHaveBeenCalledTimes(1);
+  expect(mockedSWR).toHaveBeenCalledWith("/search-data-url", expect.anything());
 });
 ```
 
