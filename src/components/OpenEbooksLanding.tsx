@@ -20,7 +20,6 @@ import Footer from "components/Footer";
 import GlobalStyles from "components/GlobalStyles";
 import { ErrorBoundary } from "components/ErrorBoundary";
 import { APP_CONFIG } from "utils/env";
-import { flex } from "styled-system";
 
 type PopularBook = { alt: string; imgHref: string };
 
@@ -64,140 +63,144 @@ const OpenEbooksLandingComponent = () => {
   ) as BasicAuthMethod;
 
   return (
-    <>
+    <Stack
+      sx={{
+        flex: "1 1 auto",
+        display: "flex",
+        flexDirection: "column"
+      }}
+    >
+      <OpenEbooksHero />
       <div
         sx={{
-          flex: "1 1 auto",
-          display: "flex",
-          flexDirection: "column"
+          flex: "2",
+          maxWidth: 1100,
+          mx: "auto",
+          my: 4,
+          textAlign: "center"
         }}
       >
-        <OpenEbooksHero />
         <div
           sx={{
-            flex: "2",
-            maxWidth: 1100,
-            mx: "auto",
-            my: 4,
-            textAlign: "center"
+            mx: [2, 4]
           }}
         >
-          <div
-            sx={{
-              mx: [2, 4]
-            }}
-          >
-            <H2>Lorem Ipsum Secondary Headline Welcome Openebooks</H2>
-            <Text>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat.
-            </Text>
-          </div>
+          <H2>Lorem Ipsum Secondary Headline Welcome Openebooks</H2>
+          <Text>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+            aliquip ex ea commodo consequat.
+          </Text>
         </div>
-        <div
-          id="loginRegion"
+      </div>
+      <div
+        id="loginRegion"
+        sx={{
+          backgroundColor: "ui.gray.extraLight"
+        }}
+      >
+        <Stack
+          direction="row"
           sx={{
-            backgroundColor: "ui.gray.extraLight"
+            maxWidth: 1100,
+            mx: "auto",
+            display: "flex",
+            textAlign: ["center", "center", "left"],
+            flexWrap: ["wrap", "wrap", "nowrap"]
           }}
         >
           <Stack
-            direction="row"
+            direction="column"
             sx={{
-              maxWidth: 1100,
-              mx: "auto",
-              display: "flex",
-              textAlign: ["center", "center", "left"],
-              flexWrap: ["wrap", "wrap", "nowrap"]
+              mx: [3, 5],
+              my: 4,
+              justifyContent: "space-between",
+              flexWrap: ["wrap", "nowrap"]
             }}
           >
-            <Stack
-              direction="column"
-              sx={{
-                mx: [3, 5],
-                my: 4,
-                justifyContent: "space-between",
-                flexWrap: ["wrap", "nowrap"]
-              }}
-            >
-              <div>
-                <img alt="Clever Logo" src={"/img/CleverLogo.png"} />
-              </div>
-              <Text>
-                Clever is the platform that powers technology in the classroom.
-                Today, one in three innovative K-12 schools in the U.S. trust
-                Clever to secure their student data as they adopt learning apps
-                in the classroom.
-              </Text>
-              <div>
-                <CleverButton sx={{ margin: 0 }} method={cleverMethod} />
-              </div>
-            </Stack>
-            <Stack
-              direction="column"
-              sx={{
-                mx: [3, 5],
-                my: 4,
-                justifyContent: "space-between",
-                flexWrap: ["wrap", "nowrap"]
-              }}
-            >
-              <div>
-                <img alt="FirstBook Logo" src={"/img/FirstBookLogo.png"} />
-              </div>
-              <Text>
-                First Book is a nonprofit organization that provides access to
-                high quality, brand new books and educational resources - for
-                free and at low cost - to schools and programs serving children
-                in need.
-              </Text>
-              <div>
-                <BasicAuthButton
-                  method={basicMethod}
-                  // eslint-disable-next-line @typescript-eslint/no-empty-function
-                  onClick={() => {}}
-                ></BasicAuthButton>
-              </div>
-            </Stack>
+            <div>
+              <img alt="Clever Logo" src={"/img/CleverLogo.png"} />
+            </div>
+            <Text>
+              Clever is the platform that powers technology in the classroom.
+              Today, one in three innovative K-12 schools in the U.S. trust
+              Clever to secure their student data as they adopt learning apps in
+              the classroom.
+            </Text>
+            <div>
+              <CleverButton sx={{ margin: 0 }} method={cleverMethod} />
+            </div>
           </Stack>
-        </div>
+          <Stack
+            direction="column"
+            sx={{
+              mx: [3, 5],
+              my: 4,
+              justifyContent: "space-between",
+              flexWrap: ["wrap", "nowrap"]
+            }}
+          >
+            <div>
+              <img alt="FirstBook Logo" src={"/img/FirstBookLogo.png"} />
+            </div>
+            <Text>
+              First Book is a nonprofit organization that provides access to
+              high quality, brand new books and educational resources - for free
+              and at low cost - to schools and programs serving children in
+              need.
+            </Text>
+            <div>
+              <BasicAuthButton
+                method={basicMethod}
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                onClick={() => {}}
+              ></BasicAuthButton>
+            </div>
+          </Stack>
+        </Stack>
+      </div>
+      <div
+        sx={{
+          backgroundColor: "brand.primary"
+        }}
+      >
         <div
           sx={{
-            backgroundColor: "brand.primary"
+            maxWidth: 1100,
+            textAlign: ["center", "center", "left"],
+            mx: "auto",
+            display: "flex",
+            flexWrap: "wrap",
+            flexDirection: ["column", "column", "row"]
           }}
         >
           <div
             sx={{
-              maxWidth: 1100,
-              textAlign: ["center", "center", "left"],
-              mx: "auto",
+              flex: "1",
               display: "flex",
-              flexWrap: "wrap",
-              flexDirection: ["column", "column", "row"]
+              justifyContent: "center"
             }}
           >
-            <div
+            <img
+              sx={{ alignItems: "flex-end" }}
+              alt="Mobile Device with Open Ebooks"
+              src={"/img/SimplyEIpad.png"}
+            />
+          </div>
+          <div
+            sx={{
+              flex: "2",
+              display: "flex",
+              justifyContent: "center"
+            }}
+          >
+            <Stack
+              direction="column"
               sx={{
-                flex: "1",
-                display: "flex",
-                justifyContent: "center"
-              }}
-            >
-              <img
-                sx={{ alignItems: "flex-end" }}
-                alt="Mobile Device with Open Ebooks"
-                src={"/img/SimplyEIpad.png"}
-              />
-            </div>
-            <div
-              sx={{
-                display: "flex",
-                flex: "2",
+                justifyContent: "center",
                 my: 4,
                 mx: [2, 4],
-                flexDirection: "column",
-                justifyContent: "center",
                 color: "ui.white"
               }}
             >
@@ -208,44 +211,69 @@ const OpenEbooksLandingComponent = () => {
                 enim ad minim veniam, quis nostrud exercitation ullamco laboris
                 nisi ut aliquip ex ea commodo consequat.
               </Text>
-            </div>
-          </div>
-        </div>
-        <div sx={{ maxWidth: 1100, mx: "auto" }}>
-          <PopularBookSection books={popularBooks.HighSchool} />
-          <PopularBookSection
-            books={popularBooks.MiddleGrades}
-            coverLocation="right"
-          />
-          <PopularBookSection books={popularBooks.EarlyGrades} />
-        </div>
-        <div sx={{ backgroundColor: "brand.primary" }}>
-          <div
-            sx={{
-              maxWidth: 1100,
-              mx: "auto",
-              textAlign: "center",
-              color: "ui.white"
-            }}
-          >
-            <Stack direction="column" sx={{ mx: [3, 5], my: 4 }}>
-              <H2>FAQ</H2>
-              <Text>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                nisi ut aliquip ex ea commodo consequat.{" "}
-              </Text>
-              <div>
-                <Button variant="filled" color="ui.white">
-                  <span sx={{ color: "ui.black" }}> Learn More</span>
-                </Button>
-              </div>
             </Stack>
           </div>
         </div>
       </div>
-    </>
+      <div sx={{ maxWidth: 1100, mx: "auto", my: 4 }}>
+        <Stack direction="column">
+          <PopularBookSection books={popularBooks.HighSchool}>
+            <H2>Popular High School Books</H2>
+            <Text>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat.
+            </Text>
+          </PopularBookSection>
+          <PopularBookSection
+            books={popularBooks.MiddleGrades}
+            coverLocation="right"
+          >
+            <H2>Popular Middle Grades Books</H2>
+            <Text>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat.
+            </Text>
+          </PopularBookSection>
+          <PopularBookSection books={popularBooks.EarlyGrades}>
+            <H2>Popular Early Grades Books</H2>
+            <Text>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat.
+            </Text>
+          </PopularBookSection>
+        </Stack>
+      </div>
+      <div sx={{ backgroundColor: "brand.primary" }}>
+        <div
+          sx={{
+            maxWidth: 1100,
+            mx: "auto",
+            my: 4,
+            textAlign: "center",
+            color: "ui.white"
+          }}
+        >
+          <H2>FAQ</H2>
+          <Text>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+            aliquip ex ea commodo consequat.{" "}
+          </Text>
+          <div>
+            <Button variant="filled" color="ui.white">
+              <span sx={{ color: "ui.black" }}> Learn More</span>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </Stack>
   );
 };
 
@@ -326,13 +354,12 @@ const OpenEbooksHero: React.FC = () => {
 const PopularBookSection: React.FC<{
   books: PopularBook[];
   coverLocation?: "left" | "right";
-}> = ({ books, coverLocation }) => {
+}> = ({ children, books, coverLocation }) => {
   return (
     <div
       sx={{
+        m: 2,
         display: "flex",
-        my: [0, 0, 4],
-        mx: [2, 4],
         flexDirection: [
           "column",
           "column",
@@ -340,61 +367,59 @@ const PopularBookSection: React.FC<{
         ]
       }}
     >
-      <Stack
-        direction="column"
-        sx={{
-          minWidth: "300px",
-          flex: "1",
-          mx: [0, 2],
-          marginTop: [4, 4, 0]
-        }}
-      >
-        <H2>Popular Early Grades Books</H2>
-        <Text>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-          aliquip ex ea commodo consequat.
-        </Text>
-      </Stack>
-      {/* The three book covers */}
       <div
         sx={{
-          height: "100%",
+          flex: "1",
           display: "flex",
-          flex: "2",
-          justifyContent: "space-between"
+          m: 2
         }}
       >
-        {books.map(book => {
-          return (
-            <div
-              key={book.imgHref}
-              sx={{
-                flex: "[1, 0, 1]",
-                mx: [0, 2],
-                my: [2, 2, 0],
-                paddingLeft: 1,
-                backgroundColor: "brand.secondary",
-                width: "30%",
-                height: "100%"
-              }}
-            >
-              <img
-                sx={{ maxWidth: "100%", minWidth: ["100px", "100px"] }}
-                alt={book.alt}
-                src={book.imgHref}
-              />
-            </div>
-          );
-        })}
+        <Stack
+          direction="column"
+          sx={{
+            minWidth: "300px",
+            flex: "1",
+            m: 2,
+            justifyContent: "center"
+          }}
+        >
+          {children}
+        </Stack>
+      </div>
+      {/* The three book covers */}
+      <div sx={{ m: 2, flex: "2" }}>
+        <Stack
+          direction="row"
+          sx={{
+            justifyContent: "space-around"
+          }}
+        >
+          {books.map(book => {
+            return (
+              <div
+                key={book.imgHref}
+                sx={{
+                  flex: "[1, 0, 1]",
+                  mx: [0, 2],
+                  my: [2, 2, 0],
+                  paddingLeft: 1,
+                  backgroundColor: "brand.secondary",
+                  maxWidth: "30%",
+                  height: "100%"
+                }}
+              >
+                <img
+                  sx={{ maxWidth: "100%", minWidth: ["100px", "100px"] }}
+                  alt={book.alt}
+                  src={book.imgHref}
+                />
+              </div>
+            );
+          })}
+        </Stack>
       </div>
     </div>
   );
-};
-
-const AuthSection: React.FC = ({ chidlren }) => {
-  return;
 };
 
 export default LandingPage;
