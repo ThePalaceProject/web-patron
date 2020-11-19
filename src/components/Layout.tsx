@@ -9,31 +9,26 @@ import { ErrorBoundary } from "components/ErrorBoundary";
 
 export const CONTENT_ID = "cpw-content";
 
-const Layout: React.FC<{
-  bg?: string;
-  showHeader?: boolean;
-  showFooter?: boolean;
-}> = ({ children, bg, showHeader = true, showFooter = true }) => {
+const Layout: React.FC = ({ children }) => {
   return (
     <Styled.root
       sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
     >
       <SkipNavigation />
       <GlobalStyles />
-      {showHeader && <Header sx={{ width: "100%" }} />}
+      <Header sx={{ width: "100%" }} />
       <main
         id={CONTENT_ID}
         sx={{
           flex: "1 1 auto",
           width: "100%",
           display: "flex",
-          flexDirection: "column",
-          bg
+          flexDirection: "column"
         }}
       >
         <ErrorBoundary>{children}</ErrorBoundary>
       </main>
-      {showFooter && <Footer sx={{ width: "100%" }} />}
+      <Footer sx={{ width: "100%" }} />
     </Styled.root>
   );
 };

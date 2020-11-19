@@ -7,15 +7,11 @@ import { AppProps } from "dataflow/withAppProps";
 
 const LayoutPage: React.FC<{
   props: AppProps;
-  showHeader?: boolean;
-  showFooter?: boolean;
-}> = ({ children, props, showHeader = true, showFooter = true }) => {
+}> = ({ children, props }) => {
   const { library, error } = props;
   return (
     <Page library={library} error={error}>
-      <Layout showHeader={showHeader} showFooter={showFooter}>
-        {children}
-      </Layout>
+      <Layout>{children}</Layout>
     </Page>
   );
 };
