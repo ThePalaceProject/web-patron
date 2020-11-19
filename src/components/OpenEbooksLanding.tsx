@@ -105,6 +105,7 @@ const OpenEbooksLandingComponent = () => {
             direction="row"
             sx={{
               maxWidth: 1100,
+              mx: "auto",
               display: "flex",
               textAlign: ["center", "center", "left"],
               flexWrap: ["wrap", "wrap", "nowrap"]
@@ -152,7 +153,6 @@ const OpenEbooksLandingComponent = () => {
               </Text>
               <div>
                 <BasicAuthButton
-                  sx={{ margin: 0 }}
                   method={basicMethod}
                   // eslint-disable-next-line @typescript-eslint/no-empty-function
                   onClick={() => {}}

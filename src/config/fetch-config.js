@@ -55,7 +55,7 @@ function parseConfig(raw) {
 
   // openebooks settings
   const openebooks = unparsed.openebooks;
-  const defaultLibrary = openebooks ? openebooks.defaultLibrary : undefined;
+  const defaultLibrary = openebooks ? openebooks.default_library : undefined;
 
   // otherwise assume the file is properly structured.
   return {

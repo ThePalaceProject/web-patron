@@ -2,6 +2,14 @@
 ### [Unreleased]
 - Add: Landing page for Open Ebooks
 
+### UNRELEASED CHANGES
+- Fix: Fix our `APP_CONFIG` mocking in storybook so that `showMedium` and `companionApp` can be set via the toolbar once again.
+
+### 4.0.0
+- BREAKING CHANGE: Start app by fetching auth document first instead of catalog root. This means that the `libraries` key in the config file needs to be set with auth document urls instead of catalog root urls.
+- Feature: Support auth-protected collections.
+- Fix: Update webpub viewer.
+
 ### 3.1.3
 - Fix: Update the production docker publish Github Action to v2, allowing for use of private Github package registry for AxisNow Decryptor.
 - Fix: Book covers and titles in BookList now link to the book page
@@ -22,6 +30,7 @@
 - Fix: Deterministic `buildId` based on git commit SHA in order to allow running multiple instances of the application behind a load balancer.
 - Fix: Fetch the config file synchronously at startup so that the bugsnag api key can be used during the webpack setup.
 - Improvement: Application now tracks errors better by parsing them more precisely, and then recording them to bugsnag and console.
+
 
 ### v3.0.1
 
