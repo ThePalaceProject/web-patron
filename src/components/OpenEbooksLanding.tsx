@@ -1,15 +1,15 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { H2, Text } from "../Text";
-import Button from "../Button";
-import Stack from "../Stack";
+import { H2, Text } from "./Text";
+import Button from "./Button";
+import Stack from "./Stack";
 import CleverButton from "auth/CleverAuthButton";
 import { OPDS1 } from "interfaces";
-import useLibraryContext from "../context/LibraryContext";
+import useLibraryContext from "./context/LibraryContext";
 import { BasicAuthMethod, CleverAuthMethod } from "types/opds1";
-import useUser from "../context/UserContext";
-import SignOut from "../SignOut";
+import useUser from "./context/UserContext";
+import SignOut from "./SignOut";
 import useAuthModalContext from "auth/AuthModalContext";
 import SvgChevronRight from "icons/ExpandMore";
 import BasicAuthButton from "auth/BasicAuthButton";
