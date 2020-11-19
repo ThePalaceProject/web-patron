@@ -215,7 +215,14 @@ const OpenEbooksLandingComponent = () => {
           </div>
         </div>
       </div>
-      <div sx={{ maxWidth: 1100, mx: "auto", my: 4 }}>
+      <div
+        sx={{
+          maxWidth: 1100,
+          mx: "auto",
+          my: 4,
+          textAlign: ["center", "center", "left"]
+        }}
+      >
         <Stack direction="column">
           <PopularBookSection books={popularBooks.HighSchool}>
             <H2>Popular High School Books</H2>
@@ -310,11 +317,12 @@ const OpenEbooksHero: React.FC = () => {
             <SignOut />
           ) : (
             <Button
-              variant="white"
+              variant="filled"
+              color="ui.white"
               onClick={showModalAndReset}
               loading={isLoading}
             >
-              Log In
+              <span sx={{ color: "ui.black" }}>Log In</span>
             </Button>
           )}
         </div>
