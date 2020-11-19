@@ -13,6 +13,13 @@ import SignOut from "./SignOut";
 import useAuthModalContext from "auth/AuthModalContext";
 import SvgChevronRight from "icons/ExpandMore";
 import BasicAuthButton from "auth/BasicAuthButton";
+import { GetStaticPaths, GetStaticProps, NextPage } from "next";
+import withAppProps, { AppProps } from "dataflow/withAppProps";
+import Page from "components/Page";
+import Footer from "components/Footer";
+import GlobalStyles from "components/GlobalStyles";
+import { ErrorBoundary } from "components/ErrorBoundary";
+import { APP_CONFIG } from "utils/env";
 
 type PopularBook = { alt: string; imgHref: string };
 
@@ -32,6 +39,18 @@ const popularBooks = {
     { alt: "book cover text 1", imgHref: "/img/highschool-2.jpg" },
     { alt: "book cover text 1", imgHref: "/img/highschool-3.jpg" }
   ]
+};
+
+const LandingPage: NextPage<AppProps> = ({ library, error }) => {
+  return (
+    <Page library={library} error={error}>
+      <ErrorBoundary>
+        <GlobalStyles />
+        <OpenEbooksLandingComponent />
+        <Footer />
+      </ErrorBoundary>
+    </Page>
+  );
 };
 
 const OpenEbooksLandingComponent = () => {
@@ -366,4 +385,15 @@ const PopularBookSection: React.FC<{
   );
 };
 
-export default OpenEbooksLandingComponent;
+export default LandingPage;
+
+export const landingPageStaticProps: GetStaticProps = withAppProps(
+  undefined,
+  APP_CONFIG.openebooks?.defaultLibrary
+);
+export const landingPageStaticPaths: GetStaticPaths = async () => {
+  return {
+    paths: ["/"],
+    fallback: false
+  };
+};

@@ -1,25 +1,19 @@
 import * as React from "react";
-import { NextPage, GetStaticProps } from "next";
-import withAppProps, { AppProps } from "dataflow/withAppProps";
 import { APP_CONFIG } from "utils/env";
-import OpenEbooksLandingComponent from "components/OpenEbooksLanding";
-import LayoutPage from "components/LayoutPage";
+import OpenEbooksLandingPage, {
+  landingPageStaticPaths,
+  landingPageStaticProps
+} from "components/OpenEbooksLanding";
+import ErrorComponent from "components/Error";
 
-const CollectionPage: NextPage<AppProps> = ({ library, error }) => {
-  const props: AppProps = {
-    library: library,
-    error: error
-  };
-  return (
-    <>
-      <LayoutPage props={props} showHeader={false}>
-        <OpenEbooksLandingComponent />
-      </LayoutPage>
-    </>
-  );
-};
+const HomePage =
+  APP_CONFIG.companionApp === "openebooks"
+    ? OpenEbooksLandingPage
+    : ErrorComponent;
 
-const librarySlug = APP_CONFIG.companionApp === "openebooks" ? "qa" : undefined;
-export const getStaticProps: GetStaticProps = withAppProps(librarySlug);
+export const getStaticProps =
+  APP_CONFIG.companionApp === "openebooks" ? landingPageStaticProps : undefined;
+export const getStaticPaths =
+  APP_CONFIG.companionApp === "openebooks" ? landingPageStaticPaths : undefined;
 
-export default CollectionPage;
+export default HomePage;
