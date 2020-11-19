@@ -1,11 +1,11 @@
 import * as React from "react";
 import { render } from "../../test-utils";
-import FullLayout from "../Layout";
+import Layout from "../Layout";
 import userEvent from "@testing-library/user-event";
 
 describe("Layout nav + structure", () => {
   test("Library icon button navigates home", () => {
-    const utils = render(<FullLayout>Child</FullLayout>);
+    const utils = render(<Layout>Child</Layout>);
     const homeButton = utils.getByLabelText(
       "Library catalog, back to homepage"
     );
@@ -15,19 +15,19 @@ describe("Layout nav + structure", () => {
   });
 
   test("my books navigates to /loans", () => {
-    const utils = render(<FullLayout>Child</FullLayout>);
+    const utils = render(<Layout>Child</Layout>);
     const myBooks = utils.getAllByRole("link", { name: "My Books" });
     myBooks.forEach(ln => expect(ln).toHaveAttribute("href", "/testlib/loans"));
   });
 
   test("displays children within main", () => {
-    const utils = render(<FullLayout>Some children</FullLayout>);
+    const utils = render(<Layout>Some children</Layout>);
     const main = utils.getByRole("main");
     expect(main).toHaveTextContent("Some children");
   });
 
   test("provides a working skip nav link", async () => {
-    const utils = render(<FullLayout>Child</FullLayout>);
+    const utils = render(<Layout>Child</Layout>);
     const skipNav = utils.getByText("Skip to content").closest("a");
     const main = utils.getByRole("main");
 
@@ -40,7 +40,7 @@ describe("Layout nav + structure", () => {
   });
 
   test("provides global styles", () => {
-    render(<FullLayout>Some children</FullLayout>);
+    render(<Layout>Some children</Layout>);
     expect(document.body).toHaveStyle("margin: 0;");
   });
 });
