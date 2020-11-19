@@ -4,9 +4,12 @@ import OpenEbooksLandingPage, {
   landingPageStaticPaths,
   landingPageStaticProps
 } from "components/OpenEbooksLanding";
+import ErrorComponent from "components/Error";
 
 const HomePage =
-  APP_CONFIG.companionApp === "openebooks" ? OpenEbooksLandingPage : () => null;
+  APP_CONFIG.companionApp === "openebooks"
+    ? OpenEbooksLandingPage
+    : ErrorComponent;
 
 export const getStaticProps =
   APP_CONFIG.companionApp === "openebooks" ? landingPageStaticProps : undefined;
