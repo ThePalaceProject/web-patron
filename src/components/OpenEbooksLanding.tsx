@@ -259,18 +259,20 @@ const OpenEbooksLandingComponent = () => {
             color: "ui.white"
           }}
         >
-          <H2>FAQ</H2>
-          <Text>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat.{" "}
-          </Text>
-          <div>
-            <Button variant="filled" color="ui.white">
-              <span sx={{ color: "ui.black" }}> Learn More</span>
-            </Button>
-          </div>
+          <Stack sx={{ m: 2 }} direction="column">
+            <H2>FAQ</H2>
+            <Text>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat.{" "}
+            </Text>
+            <div>
+              <Button variant="filled" color="ui.white">
+                <span sx={{ color: "ui.black" }}> Learn More</span>
+              </Button>
+            </div>
+          </Stack>
         </div>
       </div>
     </Stack>
