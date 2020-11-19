@@ -3,7 +3,7 @@ import { APP_CONFIG } from "utils/env";
 import OpenEbooksLandingPage, {
   landingPageStaticPaths,
   landingPageStaticProps
-} from "components/open-ebooks-landing";
+} from "components/OpenEbooksLanding";
 
 const HomePage =
   APP_CONFIG.companionApp === "openebooks" ? OpenEbooksLandingPage : () => null;
