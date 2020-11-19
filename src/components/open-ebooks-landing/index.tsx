@@ -19,6 +19,7 @@ import Page from "components/Page";
 import Footer from "components/Footer";
 import GlobalStyles from "components/GlobalStyles";
 import { ErrorBoundary } from "components/ErrorBoundary";
+import { APP_CONFIG } from "utils/env";
 
 type PopularBook = { alt: string; imgHref: string };
 
@@ -386,7 +387,10 @@ const PopularBookSection: React.FC<{
 
 export default LandingPage;
 
-export const landingPageStaticProps: GetStaticProps = withAppProps("app");
+export const landingPageStaticProps: GetStaticProps = withAppProps(
+  undefined,
+  APP_CONFIG.openebooks?.defaultLibrary
+);
 export const landingPageStaticPaths: GetStaticPaths = async () => {
   return {
     paths: ["/"],

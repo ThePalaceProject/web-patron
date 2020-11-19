@@ -28,7 +28,7 @@ export type AppConfig = {
 };
 
 export type OpenEbooksConfig = {
-  landingPageSlug: string;
+  defaultLibrary: string;
 };
 
 export type MediaSupportConfig = DirectMediaSupport & IndirectMediaSupport;

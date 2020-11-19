@@ -16,8 +16,8 @@ export type AppProps = {
 };
 
 export default function withAppProps(
-  defaultLibSlug?: string,
-  pageGetStaticProps?: GetStaticProps
+  pageGetStaticProps?: GetStaticProps,
+  defaultLibSlug?: string
 ): GetStaticProps<AppProps> {
   return async (ctx: GetStaticPropsContext<ParsedUrlQuery>) => {
     try {

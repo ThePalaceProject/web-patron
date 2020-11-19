@@ -55,7 +55,7 @@ function parseConfig(raw) {
 
   // openebooks settings
   const openebooks = unparsed.openebooks;
-  const landingPageSlug = openebooks ? openebooks.landing_page_slug : undefined;
+  const defaultLibrary = openebooks ? openebooks.defaultLibrary : undefined;
 
   // otherwise assume the file is properly structured.
   return {
@@ -66,7 +66,7 @@ function parseConfig(raw) {
     gtmId: unparsed.gtmId || null,
     companionApp,
     showMedium,
-    openebooks: openebooks ? { landingPageSlug } : null
+    openebooks: openebooks ? { defaultLibrary } : null
   };
 }
 
