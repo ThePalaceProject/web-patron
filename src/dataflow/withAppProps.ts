@@ -9,7 +9,6 @@ import ApplicationError, { PageNotFoundError } from "errors";
 import extractParam from "dataflow/utils";
 import { ParsedUrlQuery } from "querystring";
 import track from "analytics/track";
-import { ParsedUrlQuery } from "querystring";
 
 export type AppProps = {
   library?: LibraryData;

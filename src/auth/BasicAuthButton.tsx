@@ -2,6 +2,7 @@
 import { jsx } from "theme-ui";
 import Button from "components/Button";
 import { OPDS1 } from "interfaces";
+import { authButtonstyles } from "./AuthButton";
 
 const BasicAuthButton: React.FC<{
   method: OPDS1.BasicAuthMethod;
@@ -17,7 +18,7 @@ const BasicAuthButton: React.FC<{
       type="submit"
       onClick={() => onClick(method.type)}
       sx={{
-        flex: 1,
+        ...authButtonstyles,
         backgroundImage: `url(${imageUrl})`
       }}
     >

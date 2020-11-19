@@ -20,6 +20,7 @@ import Footer from "components/Footer";
 import GlobalStyles from "components/GlobalStyles";
 import { ErrorBoundary } from "components/ErrorBoundary";
 import { APP_CONFIG } from "utils/env";
+import { flex } from "styled-system";
 
 type PopularBook = { alt: string; imgHref: string };
 
@@ -189,12 +190,14 @@ const OpenEbooksLandingComponent = () => {
                 src={"/img/SimplyEIpad.png"}
               />
             </div>
-            <Stack
-              direction="column"
+            <div
               sx={{
+                display: "flex",
                 flex: "2",
                 my: 4,
                 mx: [2, 4],
+                flexDirection: "column",
+                justifyContent: "center",
                 color: "ui.white"
               }}
             >
@@ -205,7 +208,7 @@ const OpenEbooksLandingComponent = () => {
                 enim ad minim veniam, quis nostrud exercitation ullamco laboris
                 nisi ut aliquip ex ea commodo consequat.
               </Text>
-            </Stack>
+            </div>
           </div>
         </div>
         <div sx={{ maxWidth: 1100, mx: "auto" }}>
@@ -388,6 +391,10 @@ const PopularBookSection: React.FC<{
       </div>
     </div>
   );
+};
+
+const AuthSection: React.FC = ({ chidlren }) => {
+  return;
 };
 
 export default LandingPage;

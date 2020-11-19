@@ -1,7 +1,7 @@
 import * as React from "react";
 import { AnchorButton } from "components/Button";
-import { modalButtonStyles } from "components/Modal";
 import { OPDS1 } from "interfaces";
+import { authButtonstyles } from "./AuthButton";
 
 const CleverButton: React.FC<{ method: OPDS1.CleverAuthMethod }> = ({
   method
@@ -26,7 +26,7 @@ const CleverButton: React.FC<{ method: OPDS1.CleverAuthMethod }> = ({
       href={authUrl}
       type="submit"
       sx={{
-        ...modalButtonStyles,
+        ...authButtonstyles,
         color: "#ffffff",
         backgroundColor: "#2f67aa"
       }}

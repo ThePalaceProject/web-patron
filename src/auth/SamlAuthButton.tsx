@@ -2,8 +2,8 @@
 import { jsx } from "theme-ui";
 import * as React from "react";
 import Button from "components/Button";
-import { modalButtonStyles } from "../components/Modal";
 import { ClientSamlMethod } from "interfaces";
+import { authButtonstyles } from "./AuthButton";
 
 /**
  * The SAML Auth button sends you off to an external website to complete
@@ -17,7 +17,7 @@ const SamlAuthButton: React.FC<{ method: ClientSamlMethod }> = ({ method }) => {
     window.open(urlWithReferrer, "_self");
   };
   return (
-    <Button sx={{ ...modalButtonStyles }} onClick={handleClick}>
+    <Button sx={{ ...authButtonstyles }} onClick={handleClick}>
       Login with {method.description ?? "Unknown IDP"}
     </Button>
   );
