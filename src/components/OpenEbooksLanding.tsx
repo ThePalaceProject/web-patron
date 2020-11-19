@@ -13,7 +13,7 @@ import SignOut from "./SignOut";
 import useAuthModalContext from "auth/AuthModalContext";
 import SvgChevronRight from "icons/ExpandMore";
 import BasicAuthButton from "auth/BasicAuthButton";
-import { GetStaticPaths, GetStaticProps, NextPage } from "next";
+import { GetStaticProps, NextPage } from "next";
 import withAppProps, { AppProps } from "dataflow/withAppProps";
 import Page from "components/Page";
 import Footer from "components/Footer";
@@ -428,9 +428,3 @@ export const landingPageStaticProps: GetStaticProps = withAppProps(
   undefined,
   APP_CONFIG.openebooks?.defaultLibrary
 );
-export const landingPageStaticPaths: GetStaticPaths = async () => {
-  return {
-    paths: ["/"],
-    fallback: false
-  };
-};
