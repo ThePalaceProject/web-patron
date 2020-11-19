@@ -6,11 +6,8 @@ import { OPDS1 } from "interfaces";
 const CleverButton: React.FC<{ method: OPDS1.CleverAuthMethod }> = ({
   method
 }) => {
-  const [currentUrl, setCurrentUrl] = React.useState("");
-
-  React.useEffect(() => {
-    setCurrentUrl(window.location.origin + window.location.pathname);
-  }, []);
+  if (typeof window === "undefined") return null;
+  const currentUrl = window.location.origin + window.location.pathname;
 
   const imageUrl = method.links?.find(link => link.rel === "logo")?.href;
 
