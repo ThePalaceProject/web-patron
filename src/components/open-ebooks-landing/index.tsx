@@ -15,7 +15,10 @@ import SvgChevronRight from "icons/ExpandMore";
 import BasicAuthButton from "auth/BasicAuthButton";
 import { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import withAppProps, { AppProps } from "dataflow/withAppProps";
-import LayoutPage from "components/LayoutPage";
+import Page from "components/Page";
+import Footer from "components/Footer";
+import GlobalStyles from "components/GlobalStyles";
+import { ErrorBoundary } from "components/ErrorBoundary";
 
 type PopularBook = { alt: string; imgHref: string };
 
@@ -38,16 +41,14 @@ const popularBooks = {
 };
 
 const LandingPage: NextPage<AppProps> = ({ library, error }) => {
-  const props: AppProps = {
-    library: library,
-    error: error
-  };
   return (
-    <>
-      <LayoutPage props={props} showHeader={false}>
+    <Page library={library} error={error}>
+      <ErrorBoundary>
+        <GlobalStyles />
         <OpenEbooksLandingComponent />
-      </LayoutPage>
-    </>
+        <Footer />
+      </ErrorBoundary>
+    </Page>
   );
 };
 
