@@ -5,10 +5,8 @@ import LayoutPage from "components/LayoutPage";
 import { NextPage, GetStaticProps, GetStaticPaths } from "next";
 
 const BookPage: NextPage<AppProps> = ({ library, error }) => {
-  const props = { library: library, error: error };
-
   return (
-    <LayoutPage props={props}>
+    <LayoutPage library={library} error={error}>
       <BookDetails />
     </LayoutPage>
   );
