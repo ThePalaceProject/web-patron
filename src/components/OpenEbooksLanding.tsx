@@ -391,9 +391,3 @@ export const landingPageStaticProps: GetStaticProps = withAppProps(
   undefined,
   APP_CONFIG.openebooks?.defaultLibrary
 );
-export const landingPageStaticPaths: GetStaticPaths = async () => {
-  return {
-    paths: ["/"],
-    fallback: false
-  };
-};

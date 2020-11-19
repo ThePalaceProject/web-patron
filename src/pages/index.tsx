@@ -1,7 +1,6 @@
 import * as React from "react";
 import { APP_CONFIG } from "utils/env";
 import OpenEbooksLandingPage, {
-  landingPageStaticPaths,
   landingPageStaticProps
 } from "components/OpenEbooksLanding";
 import ErrorComponent from "components/Error";
@@ -22,6 +21,5 @@ const HomePage = hasHomePage
     );
 
 export const getStaticProps = hasHomePage ? landingPageStaticProps : undefined;
-export const getStaticPaths = hasHomePage ? landingPageStaticPaths : undefined;
 
 export default HomePage;
