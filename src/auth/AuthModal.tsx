@@ -3,7 +3,7 @@ import { jsx } from "theme-ui";
 import * as React from "react";
 import { useDialogState } from "reakit/Dialog";
 import useLibraryContext from "../components/context/LibraryContext";
-import Modal from "../components/Modal";
+import Modal, { modalButtonStyles } from "../components/Modal";
 import ClientOnly from "../components/ClientOnly";
 import { H2, Text } from "../components/Text";
 import FormLabel from "../components/form/FormLabel";
@@ -175,19 +175,29 @@ const Buttons: React.FC<{
           switch (method.type) {
             case OPDS1.BasicAuthType:
               return (
-                <BasicAuthButton
-                  key={getIdForMethod(method)}
-                  method={method}
-                  onClick={() => handleChangeMethod(OPDS1.BasicAuthType)}
-                />
+                <div sx={{ ...modalButtonStyles }}>
+                  <BasicAuthButton
+                    key={getIdForMethod(method)}
+                    method={method}
+                    onClick={() => handleChangeMethod(OPDS1.BasicAuthType)}
+                  />
+                </div>
               );
             case OPDS1.SamlAuthType:
               return (
-                <SamlAuthButton method={method} key={getIdForMethod(method)} />
+                <SamlAuthButton
+                  sx={{ ...modalButtonStyles }}
+                  method={method}
+                  key={getIdForMethod(method)}
+                />
               );
             case OPDS1.CleverAuthType:
               return (
-                <CleverButton method={method} key={getIdForMethod(method)} />
+                <CleverButton
+                  sx={{ ...modalButtonStyles }}
+                  method={method}
+                  key={getIdForMethod(method)}
+                />
               );
             default:
               return null;

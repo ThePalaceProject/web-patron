@@ -66,6 +66,33 @@ export const styleProps = (
         }
       };
 
+    case "white":
+      return {
+        // sets the text style
+        variant: "text.body.regular",
+        ...buttonBase,
+        ...sizes[size],
+        bg: "white",
+        color: "black",
+        fill: "white",
+        "&:focus,&:hover": {
+          bg: "ui.gray.extraLight",
+          color: "black",
+          textDecoration: "none"
+        },
+        "&:focus": {
+          boxShadow: "focus"
+        },
+        "&:active": {
+          bg: "ui.gray.extraLight"
+        },
+        "&:disabled": {
+          bg: "ui.gray.light",
+          color: "ui.gray.extraDark",
+          cursor: "default"
+        }
+      };
+
     case "ghost":
       return {
         // sets the text style

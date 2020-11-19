@@ -101,10 +101,10 @@ const OpenEbooksLandingComponent = () => {
             backgroundColor: "ui.gray.extraLight"
           }}
         >
-          <div
+          <Stack
+            direction="row"
             sx={{
               maxWidth: 1100,
-              mx: "auto",
               display: "flex",
               textAlign: ["center", "center", "left"],
               flexWrap: ["wrap", "wrap", "nowrap"]
@@ -129,7 +129,7 @@ const OpenEbooksLandingComponent = () => {
                 in the classroom.
               </Text>
               <div>
-                <CleverButton method={cleverMethod} />
+                <CleverButton sx={{ margin: 0 }} method={cleverMethod} />
               </div>
             </Stack>
             <Stack
@@ -152,13 +152,14 @@ const OpenEbooksLandingComponent = () => {
               </Text>
               <div>
                 <BasicAuthButton
+                  sx={{ margin: 0 }}
                   method={basicMethod}
                   // eslint-disable-next-line @typescript-eslint/no-empty-function
                   onClick={() => {}}
                 ></BasicAuthButton>
               </div>
             </Stack>
-          </div>
+          </Stack>
         </div>
         <div
           sx={{
@@ -271,12 +272,16 @@ const OpenEbooksHero: React.FC = () => {
           flexDirection: "column"
         }}
       >
-        <div sx={{ display: "flex", justifyContent: "flex-end" }}>
+        <div sx={{ display: "flex", margin: 3, justifyContent: "flex-end" }}>
           {isAuthenticated ? (
             <SignOut />
           ) : (
-            <Button onClick={showModalAndReset} loading={isLoading}>
-              Sign In
+            <Button
+              variant="white"
+              onClick={showModalAndReset}
+              loading={isLoading}
+            >
+              Log In
             </Button>
           )}
         </div>
