@@ -419,7 +419,7 @@ const PopularBookSection: React.FC<{
                 }}
               >
                 <img
-                  sx={{ maxWidth: "100%", minWidth: ["100px", "100px"] }}
+                  sx={{ maxWidth: "100%", minWidth: "100px" }}
                   alt={book.alt}
                   src={book.imgHref}
                 />

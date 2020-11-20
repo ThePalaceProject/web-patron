@@ -1,5 +1,4 @@
 export const authButtonstyles = {
-  m: 2,
   display: "flex",
   flex: "1 0 auto",
   width: "280px",
@@ -8,7 +7,11 @@ export const authButtonstyles = {
   backgroundRepeat: "no-repeat",
   backgroundPosition: "0",
   cursor: "pointer",
-  border: "none",
+  border: "none"
+};
+
+export const centerButton = {
+  m: 2,
   marginLeft: "auto",
   marginRight: "auto"
 };

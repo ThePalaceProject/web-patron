@@ -19,6 +19,7 @@ import Button from "components/Button";
 import ExternalLink from "components/ExternalLink";
 import BasicAuthButton from "auth/BasicAuthButton";
 import LoadingIndicator from "components/LoadingIndicator";
+import { centerButton } from "./AuthButton";
 
 const AuthModal: React.FC = ({ children }) => {
   const dialog = useDialogState();
@@ -176,6 +177,7 @@ const Buttons: React.FC<{
             case OPDS1.BasicAuthType:
               return (
                 <BasicAuthButton
+                  sx={{ ...centerButton }}
                   key={getIdForMethod(method)}
                   method={method}
                   onClick={() => handleChangeMethod(OPDS1.BasicAuthType)}
@@ -183,11 +185,19 @@ const Buttons: React.FC<{
               );
             case OPDS1.SamlAuthType:
               return (
-                <SamlAuthButton method={method} key={getIdForMethod(method)} />
+                <SamlAuthButton
+                  sx={{ ...centerButton }}
+                  method={method}
+                  key={getIdForMethod(method)}
+                />
               );
             case OPDS1.CleverAuthType:
               return (
-                <CleverButton method={method} key={getIdForMethod(method)} />
+                <CleverButton
+                  sx={{ ...centerButton }}
+                  method={method}
+                  key={getIdForMethod(method)}
+                />
               );
             default:
               return null;
