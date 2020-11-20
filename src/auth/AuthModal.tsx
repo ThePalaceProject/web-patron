@@ -19,7 +19,6 @@ import Button from "components/Button";
 import ExternalLink from "components/ExternalLink";
 import BasicAuthButton from "auth/BasicAuthButton";
 import LoadingIndicator from "components/LoadingIndicator";
-import { centerButton } from "./AuthButton";
 
 const AuthModal: React.FC = ({ children }) => {
   const dialog = useDialogState();

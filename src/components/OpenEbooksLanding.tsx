@@ -20,6 +20,7 @@ import Footer from "components/Footer";
 import GlobalStyles from "components/GlobalStyles";
 import { ErrorBoundary } from "components/ErrorBoundary";
 import { APP_CONFIG } from "utils/env";
+import { AppSetupError } from "errors";
 
 type PopularBook = { alt: string; imgHref: string };
 
@@ -55,15 +56,22 @@ const LandingPage: NextPage<AppProps> = ({ library, error }) => {
 
 const OpenEbooksLandingComponent = () => {
   const { authMethods } = useLibraryContext();
+
   const cleverMethod: CleverAuthMethod = authMethods.find(
     method => method.type === OPDS1.CleverAuthType
   ) as CleverAuthMethod;
+
   const basicMethod: BasicAuthMethod = authMethods.find(
     method => method.type === OPDS1.BasicAuthType
   ) as BasicAuthMethod;
 
+  if (!cleverMethod || !basicMethod)
+    throw new AppSetupError(
+      "Application is missing either Clever or Basic Auth methods"
+    );
+
   return (
-    <Stack
+    <div
       sx={{
         marginRight: 0,
         flex: "1 1 auto",
@@ -101,8 +109,7 @@ const OpenEbooksLandingComponent = () => {
           backgroundColor: "ui.gray.extraLight"
         }}
       >
-        <Stack
-          direction="row"
+        <div
           sx={{
             maxWidth: 1100,
             mx: "auto",
@@ -120,9 +127,11 @@ const OpenEbooksLandingComponent = () => {
               flexWrap: ["wrap", "nowrap"]
             }}
           >
-            <div>
-              <img alt="Clever Logo" src={"/img/CleverLogo.png"} />
-            </div>
+            <img
+              sx={{ alignSelf: "center" }}
+              alt="Clever Logo"
+              src={"/img/CleverLogo.png"}
+            />
             <Text>
               Clever is the platform that powers technology in the classroom.
               Today, one in three innovative K-12 schools in the U.S. trust
@@ -145,9 +154,11 @@ const OpenEbooksLandingComponent = () => {
               flexWrap: ["wrap", "nowrap"]
             }}
           >
-            <div>
-              <img alt="FirstBook Logo" src={"/img/FirstBookLogo.png"} />
-            </div>
+            <img
+              sx={{ alignSelf: "center" }}
+              alt="FirstBook Logo"
+              src={"/img/FirstBookLogo.png"}
+            />
             <Text>
               First Book is a nonprofit organization that provides access to
               high quality, brand new books and educational resources - for free
@@ -160,10 +171,10 @@ const OpenEbooksLandingComponent = () => {
                 method={basicMethod}
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 onClick={() => {}}
-              ></BasicAuthButton>
+              />
             </div>
           </Stack>
-        </Stack>
+        </div>
       </div>
       <div
         sx={{
@@ -222,7 +233,6 @@ const OpenEbooksLandingComponent = () => {
       </div>
       <div
         sx={{
-          maxWidth: 1100,
           mx: "auto",
           my: 4,
           textAlign: ["center", "center", "left"]
@@ -279,15 +289,18 @@ const OpenEbooksLandingComponent = () => {
               enim ad minim veniam, quis nostrud exercitation ullamco laboris
               nisi ut aliquip ex ea commodo consequat.{" "}
             </Text>
-            <div>
-              <Button variant="filled" color="ui.white">
-                <span sx={{ color: "ui.black" }}> Learn More</span>
-              </Button>
-            </div>
+
+            <Button
+              sx={{ alignSelf: "center" }}
+              variant="filled"
+              color="ui.white"
+            >
+              <span sx={{ color: "ui.black" }}>Learn More</span>
+            </Button>
           </Stack>
         </div>
       </div>
-    </Stack>
+    </div>
   );
 };
 
@@ -392,7 +405,6 @@ const PopularBookSection: React.FC<{
         <Stack
           direction="column"
           sx={{
-            minWidth: "300px",
             flex: "1",
             m: 2,
             justifyContent: "center"
@@ -424,7 +436,7 @@ const PopularBookSection: React.FC<{
                 }}
               >
                 <img
-                  sx={{ maxWidth: "100%", minWidth: "100px" }}
+                  sx={{ maxWidth: "100%", minWidth: "75px" }}
                   alt={book.alt}
                   src={book.imgHref}
                 />

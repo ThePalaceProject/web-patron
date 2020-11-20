@@ -13,7 +13,6 @@ const CleverButton: React.FC<{
   const currentUrl = window.location.origin + window.location.pathname;
 
   const imageUrl = method.links?.find(link => link.rel === "logo")?.href;
-
   const authenticateHref = method.links?.find(
     link => link.rel === "authenticate"
   )?.href;
