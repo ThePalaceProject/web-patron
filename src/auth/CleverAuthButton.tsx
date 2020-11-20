@@ -1,11 +1,14 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import * as React from "react";
 import { AnchorButton } from "components/Button";
 import { OPDS1 } from "interfaces";
 import { authButtonstyles } from "./AuthButton";
 
-const CleverButton: React.FC<{ method: OPDS1.CleverAuthMethod }> = ({
-  method
-}) => {
+const CleverButton: React.FC<{
+  className?: string;
+  method: OPDS1.CleverAuthMethod;
+}> = ({ className, method }) => {
   if (typeof window === "undefined") return null;
   const currentUrl = window.location.origin + window.location.pathname;
 
@@ -25,6 +28,7 @@ const CleverButton: React.FC<{ method: OPDS1.CleverAuthMethod }> = ({
     <AnchorButton
       href={authUrl}
       type="submit"
+      className={className}
       sx={{
         ...authButtonstyles,
         color: "#ffffff",

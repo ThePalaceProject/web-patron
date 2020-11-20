@@ -177,7 +177,6 @@ const Buttons: React.FC<{
             case OPDS1.BasicAuthType:
               return (
                 <BasicAuthButton
-                  sx={{ ...centerButton }}
                   key={getIdForMethod(method)}
                   method={method}
                   onClick={() => handleChangeMethod(OPDS1.BasicAuthType)}
@@ -185,19 +184,11 @@ const Buttons: React.FC<{
               );
             case OPDS1.SamlAuthType:
               return (
-                <SamlAuthButton
-                  sx={{ ...centerButton }}
-                  method={method}
-                  key={getIdForMethod(method)}
-                />
+                <SamlAuthButton method={method} key={getIdForMethod(method)} />
               );
             case OPDS1.CleverAuthType:
               return (
-                <CleverButton
-                  sx={{ ...centerButton }}
-                  method={method}
-                  key={getIdForMethod(method)}
-                />
+                <CleverButton method={method} key={getIdForMethod(method)} />
               );
             default:
               return null;

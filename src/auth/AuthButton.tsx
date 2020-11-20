@@ -9,9 +9,3 @@ export const authButtonstyles = {
   cursor: "pointer",
   border: "none"
 };
-
-export const centerButton = {
-  m: 2,
-  marginLeft: "auto",
-  marginRight: "auto"
-};

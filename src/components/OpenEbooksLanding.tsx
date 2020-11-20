@@ -65,6 +65,7 @@ const OpenEbooksLandingComponent = () => {
   return (
     <Stack
       sx={{
+        marginRight: 0,
         flex: "1 1 auto",
         display: "flex",
         flexDirection: "column"
@@ -129,7 +130,10 @@ const OpenEbooksLandingComponent = () => {
               the classroom.
             </Text>
             <div>
-              <CleverButton sx={{ margin: 0 }} method={cleverMethod} />
+              <CleverButton
+                sx={{ mx: ["auto", "auto", 0] }}
+                method={cleverMethod}
+              />
             </div>
           </Stack>
           <Stack
@@ -152,6 +156,7 @@ const OpenEbooksLandingComponent = () => {
             </Text>
             <div>
               <BasicAuthButton
+                sx={{ mx: ["auto", "auto", 0] }}
                 method={basicMethod}
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 onClick={() => {}}
