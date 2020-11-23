@@ -57,9 +57,9 @@ const LandingPage: NextPage<AppProps> = ({ library, error }) => {
 const OpenEbooksLandingComponent = () => {
   const { authMethods } = useLibraryContext();
 
-  const cleverMethod: CleverAuthMethod = authMethods.find(
+  const cleverMethod: CleverAuthMethod | undefined = authMethods.find(
     method => method.type === OPDS1.CleverAuthType
-  ) as CleverAuthMethod;
+  ) as CleverAuthMethod | undefined;
 
   const basicMethod: BasicAuthMethod = authMethods.find(
     method => method.type === OPDS1.BasicAuthType
