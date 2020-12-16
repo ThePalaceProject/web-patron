@@ -9,6 +9,7 @@
 - Fix: Don't download react-axe in production. Shaves 60% off the first load bundle.
 - Add: Lazy-loading of book cover images: A book cover image source will now only download once at least one pixel of the image's placeholder becomes visible in the viewport.
 - Refactor: Re-enabled Typescript's strict type checking to provide better runtime type safety guarantees, and keep type safety from deteriorating hrough development.
+- Fix: Properly track AxisNow decryption errors to Bugsnag.
 
 ### 4.1.0
 - Add: Landing page for Open Ebooks
