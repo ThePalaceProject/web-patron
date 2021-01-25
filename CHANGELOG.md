@@ -3,6 +3,7 @@
 ### UNRELEASED CHANGES
 
 - Add: Add catalog button on openE home page
+- Fix: Protect against invalid redirect uris caused by mismatch in hydration.
 - Fix: Improve the appearance of home page book thumbnails for larger viewports
 - tests: Add a Github Workflow to trigger integration tests in NYPL-Simplified/integration-tests-web.
 
