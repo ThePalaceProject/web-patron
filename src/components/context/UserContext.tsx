@@ -1,6 +1,7 @@
 import useCredentials from "auth/useCredentials";
 import useLibraryContext from "components/context/LibraryContext";
 import { fetchCollection } from "dataflow/opds1/fetch";
+import { ServerError } from "errors";
 import { AppAuthMethod, AnyBook } from "interfaces";
 import * as React from "react";
 import useSWR from "swr";
@@ -45,13 +46,13 @@ export const UserProvider: React.FC = ({ children }) => {
     {
       shouldRetryOnError: false,
       revalidateOnFocus: false,
-      revalidateOnReconnect: false
+      revalidateOnReconnect: false,
       // clear credentials whenever we receive a 401
-      // onError: err => {
-      //   if (err instanceof ServerError && err?.status === 401) {
-      //     clearCredentials();
-      //   }
-      // }
+      onError: err => {
+        if (err instanceof ServerError && err?.info.status === 401) {
+          clearCredentials();
+        }
+      }
     }
   );
 
@@ -82,7 +83,7 @@ export const UserProvider: React.FC = ({ children }) => {
       : credentials && isValidating
       ? "loading"
       : "unauthenticated";
-
+  console.log(status);
   const isAuthenticated = status === "authenticated";
   const isLoading = status === "loading";
   const user: UserState = {
