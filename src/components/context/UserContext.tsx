@@ -101,7 +101,7 @@ export const UserProvider: React.FC = ({ children }) => {
     token: credentials?.token,
     clearCredentials
   };
-  console.log(error);
+
   return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
 };
 
