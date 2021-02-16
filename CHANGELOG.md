@@ -1,6 +1,7 @@
 ## CHANGELOG
 
 ### UNRELEASED CHANGES
+
 - Documentation: update README.
 - Add: Support using a library registry in the CONFIG_FILE so that the community deployment can use the SimplyE library registry to display all libraries. 
 - Add: Include browsing history in breadcrumbs
@@ -9,6 +10,7 @@
 - Fix: Improve the appearance of home page book thumbnails for larger viewports
 - tests: Add a Github Workflow to trigger integration tests in NYPL-Simplified/integration-tests-web.
 - Fix: Serve the sw.js file from library-simplified-webpub-viewer in /public so that it can actually be used by the webpub viewer.
+- Fix: Improve UI in cases where server throws a 401 error
 
 ### 4.2.0
 
