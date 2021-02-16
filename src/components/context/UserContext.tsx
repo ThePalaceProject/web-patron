@@ -83,7 +83,7 @@ export const UserProvider: React.FC = ({ children }) => {
       : credentials && isValidating
       ? "loading"
       : "unauthenticated";
-  console.log(status);
+
   const isAuthenticated = status === "authenticated";
   const isLoading = status === "loading";
   const user: UserState = {
