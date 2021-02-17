@@ -2,6 +2,8 @@
 
 ### UNRELEASED CHANGES
 
+- Update: Update landing page copy.
+
 ### 4.3.0
 
 - Documentation: update README.
