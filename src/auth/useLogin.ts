@@ -35,13 +35,16 @@ export default function useLogin() {
         query: newQuery
       };
     },
-    [query, asPath, slug]
+    [query, asPath, slug, isReady]
   );
 
   const initLogin = React.useCallback(
     (methodId?: string) => {
       const urlObject = getLoginUrl(methodId);
-      if (!IS_SERVER) push(urlObject, undefined, { shallow: true });
+      if (!IS_SERVER) {
+        // redirect to the login page
+        push(urlObject, undefined, { shallow: true });
+      }
     },
     [push, getLoginUrl]
   );
