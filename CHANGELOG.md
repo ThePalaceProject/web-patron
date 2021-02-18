@@ -2,7 +2,6 @@
 
 ### UNRELEASED CHANGES
 
-- Update: Update landing page copy.
 
 ### 4.3.0
 
@@ -15,6 +14,7 @@
 - tests: Add a Github Workflow to trigger integration tests in NYPL-Simplified/integration-tests-web.
 - Fix: Improve UI in cases where server throws a 401 error
 - Fix: Clear tokens that result in a 401 response from the server.
+- Update: Update landing page copy.
 
 ### 4.2.0
 
