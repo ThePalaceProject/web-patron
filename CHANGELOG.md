@@ -2,6 +2,7 @@
 
 ### UNRELEASED CHANGES
 
+- chore: Improve error tracking when app fails to fetch static props.
 
 ### 4.3.0
 
