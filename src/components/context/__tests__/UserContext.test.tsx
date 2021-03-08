@@ -57,14 +57,11 @@ test("does not fetch loans if no credentials are present", () => {
   expect(fetchMock).toHaveBeenCalledTimes(0);
 });
 
-const mockReplace = jest.fn(() => {
-  window.location.hash = "";
-});
+const replaceStateSpy = jest.spyOn(window.history, "replaceState");
 
 test("extracts clever tokens from the url", () => {
   window.location.hash = "#access_token=fry6H3" as any;
 
-  useRouterSpy.mockReturnValue({ replace: mockReplace, query: {} } as any);
   renderUserContext();
 
   expect(mockSWR).toHaveBeenCalledWith(
@@ -89,17 +86,16 @@ test("extracts clever tokens from the url", () => {
   );
 
   // mock the router
-  expect(mockReplace).toHaveBeenCalledTimes(1);
-  expect(mockReplace).toHaveBeenCalledWith(
-    "http://test-domain.com/",
-    undefined,
-    { shallow: true }
+  expect(replaceStateSpy).toHaveBeenCalledTimes(1);
+  expect(replaceStateSpy).toHaveBeenCalledWith(
+    null,
+    "",
+    "http://test-domain.com/"
   );
 });
 
-test("extracts SAML tokens from the url", () => {
+test.only("extracts SAML tokens from the url", () => {
   useRouterSpy.mockReturnValue({
-    replace: mockReplace,
     query: { access_token: "saml-token" }
   } as any);
   renderUserContext();
@@ -126,10 +122,11 @@ test("extracts SAML tokens from the url", () => {
     expect.anything()
   );
 
-  expect(mockReplace).toHaveBeenCalledWith(
-    "http://test-domain.com/",
-    undefined,
-    { shallow: true }
+  expect(replaceStateSpy).toHaveBeenCalledTimes(1);
+  expect(replaceStateSpy).toHaveBeenCalledWith(
+    null,
+    "",
+    "http://test-domain.com/"
   );
 });
 

@@ -3,6 +3,7 @@ import Cookie from "js-cookie";
 import { AuthCredentials, OPDS1 } from "interfaces";
 import { IS_SERVER } from "utils/env";
 import { NextRouter, useRouter } from "next/router";
+import { SAML_LOGIN_QUERY_PARAM } from "utils/constants";
 
 /**
  * This hook:
@@ -130,12 +131,13 @@ function lookForCleverCredentials(): AuthCredentials | undefined {
 function lookForSamlCredentials(
   router: NextRouter
 ): AuthCredentials | undefined {
-  const { access_token: samlAccessToken } = router.query;
+  const { [SAML_LOGIN_QUERY_PARAM]: samlAccessToken } = router.query;
   if (samlAccessToken) {
     if (!IS_SERVER && typeof window !== "undefined") {
       // clear the browser query using replaceState
       const url = new URL(window.location.href);
-      url.searchParams.delete("access_token");
+      if (url.searchParams.has(SAML_LOGIN_QUERY_PARAM))
+        url.searchParams.delete(SAML_LOGIN_QUERY_PARAM);
       window.history.replaceState(null, document.title, url.toString());
     }
 

@@ -5,3 +5,4 @@
 export const DEFAULT_AVAILABILITY = "available";
 
 export const LOGIN_REDIRECT_QUERY_PARAM = "nextUrl";
+export const SAML_LOGIN_QUERY_PARAM = "access_token";
