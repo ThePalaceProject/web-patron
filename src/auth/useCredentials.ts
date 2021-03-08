@@ -136,9 +136,10 @@ function lookForSamlCredentials(
     if (!IS_SERVER && typeof window !== "undefined") {
       // clear the browser query using replaceState
       const url = new URL(window.location.href);
-      if (url.searchParams.has(SAML_LOGIN_QUERY_PARAM))
+      if (url.searchParams.has(SAML_LOGIN_QUERY_PARAM)) {
         url.searchParams.delete(SAML_LOGIN_QUERY_PARAM);
-      window.history.replaceState(null, document.title, url.toString());
+        window.history.replaceState(null, document.title, url.toString());
+      }
     }
 
     return {

@@ -57,6 +57,10 @@ test("does not fetch loans if no credentials are present", () => {
   expect(fetchMock).toHaveBeenCalledTimes(0);
 });
 
+const mockReplace = jest.fn(() => {
+  window.location.hash = "";
+});
+
 const replaceStateSpy = jest.spyOn(window.history, "replaceState");
 
 test("extracts clever tokens from the url", () => {
@@ -94,8 +98,15 @@ test("extracts clever tokens from the url", () => {
   );
 });
 
-test.only("extracts SAML tokens from the url", () => {
+test("extracts SAML tokens from the url", () => {
+  // we have to mock the token in the router spy and also in
+  // the url
+  const url = new URL(window.location.href);
+  url.searchParams.set("access_token", "saml-token");
+  delete (window as any).location;
+  window.location = url as any;
   useRouterSpy.mockReturnValue({
+    replace: mockReplace,
     query: { access_token: "saml-token" }
   } as any);
   renderUserContext();
@@ -122,7 +133,6 @@ test.only("extracts SAML tokens from the url", () => {
     expect.anything()
   );
 
-  expect(replaceStateSpy).toHaveBeenCalledTimes(1);
   expect(replaceStateSpy).toHaveBeenCalledWith(
     null,
     "",
