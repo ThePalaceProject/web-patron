@@ -99,13 +99,11 @@ function getUrlCredentials(router: NextRouter) {
   /* TODO: throw error if samlAccessToken and cleverAccessToken exist at the same time as this is an invalid state that shouldn't be reached */
   return IS_SERVER
     ? undefined
-    : lookForCleverCredentials(router) ?? lookForSamlCredentials(router);
+    : lookForCleverCredentials() ?? lookForSamlCredentials(router);
 }
 
 // check for clever credentials
-function lookForCleverCredentials(
-  router: NextRouter
-): AuthCredentials | undefined {
+function lookForCleverCredentials(): AuthCredentials | undefined {
   if (!IS_SERVER) {
     const accessTokenKey = "access_token=";
     if (window?.location?.hash) {
@@ -118,11 +116,7 @@ function lookForCleverCredentials(
         const token = `Bearer ${accessToken}`;
 
         // clear the url hash
-        router.replace(
-          window.location.href.replace(window.location.hash, ""),
-          undefined,
-          { shallow: true }
-        );
+        removeUrlHash();
 
         return { token, methodType: OPDS1.CleverAuthType };
       }
@@ -137,16 +131,20 @@ function lookForSamlCredentials(
   const { access_token: samlAccessToken } = router.query;
   if (samlAccessToken) {
     // clear the browser query
-    if (!IS_SERVER) {
-      router.replace(
-        window.location.href.replace(window.location.search, ""),
-        undefined,
-        { shallow: true }
-      );
-    }
+    removeUrlHash();
     return {
       token: `Bearer ${samlAccessToken}`,
       methodType: OPDS1.SamlAuthType
     };
+  }
+}
+
+function removeUrlHash() {
+  if (!IS_SERVER && typeof window !== "undefined") {
+    const uri = window.location.toString();
+    if (uri.indexOf("#") > 0) {
+      const cleanUri = uri.substring(0, uri.indexOf("#"));
+      window.history.replaceState({}, document.title, cleanUri);
+    }
   }
 }
