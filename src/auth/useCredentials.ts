@@ -115,8 +115,10 @@ function lookForCleverCredentials(): AuthCredentials | undefined {
           .split("&")[0];
         const token = `Bearer ${accessToken}`;
 
-        // clear the url hash
-        removeUrlHash();
+        // clear the url hash with replaceState
+        const url = new URL(window.location.href);
+        url.hash = "";
+        window.history.replaceState(null, document.title, url.toString());
 
         return { token, methodType: OPDS1.CleverAuthType };
       }
@@ -130,21 +132,16 @@ function lookForSamlCredentials(
 ): AuthCredentials | undefined {
   const { access_token: samlAccessToken } = router.query;
   if (samlAccessToken) {
-    // clear the browser query
-    removeUrlHash();
+    if (!IS_SERVER && typeof window !== "undefined") {
+      // clear the browser query using replaceState
+      const url = new URL(window.location.href);
+      url.searchParams.delete("access_token");
+      window.history.replaceState(null, document.title, url.toString());
+    }
+
     return {
       token: `Bearer ${samlAccessToken}`,
       methodType: OPDS1.SamlAuthType
     };
-  }
-}
-
-function removeUrlHash() {
-  if (!IS_SERVER && typeof window !== "undefined") {
-    const uri = window.location.toString();
-    if (uri.indexOf("#") > 0) {
-      const cleanUri = uri.substring(0, uri.indexOf("#"));
-      window.history.replaceState({}, document.title, cleanUri);
-    }
   }
 }
