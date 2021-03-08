@@ -3,6 +3,7 @@
 ### UNRELEASED CHANGES
 
 - Fix: Use `window.history.replaceState` to strip the url hash after login instead of Next.js's `router.replace`. This fixes a bug where render would fail after initial login.
+- chore: Improve error tracking when app fails to fetch static props.
 
 ### 4.3.0
 
