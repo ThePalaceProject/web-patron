@@ -362,7 +362,7 @@ test("includes open access links with fulfillable book", () => {
   });
 });
 
-test.only("does not allow authors with undefined name", () => {
+test("does not allow authors with undefined name", () => {
   mockConfig();
   const author = factory.contributor({ name: undefined, role: "author" });
   const entry = factory.entry({
