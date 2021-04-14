@@ -121,9 +121,6 @@ export const BookListItem: React.FC<{
   // uses contributors if there are no authors
   const authors = getAuthors(book);
 
-  if (authors[0] === undefined) {
-    console.log(book);
-  }
   return (
     <li
       sx={{
