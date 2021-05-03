@@ -110,6 +110,18 @@ export const BookList: React.FC<{
   );
 };
 
+function getAuthorsString(book: AnyBook): string {
+  const { authors } = book;
+  if (!authors) return "Unknown Author";
+  const authorsArray = getAuthors(book, 2);
+
+  if (authors.length > 2) {
+    authorsArray.push(`& ${authors?.length - 2} more`);
+  }
+
+  return authorsArray.join(", ");
+}
+
 export const BookListItem: React.FC<{
   book: AnyBook;
 }> = ({ book: collectionBook }) => {
@@ -119,7 +131,7 @@ export const BookListItem: React.FC<{
   const book = loanedBook ?? collectionBook;
 
   // uses contributors if there are no authors
-  const authors = getAuthors(book);
+  const authors = getAuthorsString(book);
 
   return (
     <li
@@ -164,8 +176,7 @@ export const BookListItem: React.FC<{
               </Text>
             )}
             <Text aria-label="Authors" sx={{ display: "block" }}>
-              {authors.join(", ")}
-              {authors.length > 2 && ` & ${authors?.length - 2} more`}
+              {authors}
             </Text>
           </div>
 
