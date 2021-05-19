@@ -8,7 +8,8 @@ import {
   bookIsFulfillable,
   bookIsReservable,
   bookIsReserved,
-  bookIsOnHold
+  bookIsOnHold,
+  getAuthorsString
 } from "../utils/book";
 import Lane from "./Lane";
 import Button, { NavButton } from "./Button";
@@ -109,18 +110,6 @@ export const BookList: React.FC<{
     </ul>
   );
 };
-
-function getAuthorsString(book: AnyBook): string {
-  const { authors } = book;
-  if (!authors) return "Unknown Author";
-  const authorsArray = getAuthors(book, 2);
-
-  if (authors.length > 2) {
-    authorsArray.push(`& ${authors?.length - 2} more`);
-  }
-
-  return authorsArray.join(", ");
-}
 
 export const BookListItem: React.FC<{
   book: AnyBook;
