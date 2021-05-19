@@ -3,7 +3,6 @@ import { jsx } from "theme-ui";
 import * as React from "react";
 import { truncateString, stripHTML } from "../utils/string";
 import {
-  getAuthors,
   bookIsBorrowable,
   bookIsFulfillable,
   bookIsReservable,
