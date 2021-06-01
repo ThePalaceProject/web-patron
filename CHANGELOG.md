@@ -7,6 +7,7 @@
 - Add: Allow Clever log-in issues to display properly on the site.
 - Fix: Use `window.history.replaceState` to strip the url hash after login instead of Next.js's `router.replace`. This fixes a bug where render would fail after initial login.
 - chore: Improve error tracking when app fails to fetch static props.
+- Fix: Use contributors when there are no authors, fix parsing of authors with undefined names, and remove extra 0 in name when there are no authors.
 
 ### 4.3.0
 
