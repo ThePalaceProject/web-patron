@@ -1,3 +1,6 @@
+/**
+ * An Open eBooks test user
+ */
 const username = "A3IAYP9NDS";
 const password = "9864";
 
