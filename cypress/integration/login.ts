@@ -48,7 +48,11 @@ describe("Open eBooks Login Flow", () => {
     );
 
     // then sign out
-    cy.findByRole("button", { name: "Log out" }).should("exist").click();
+    cy.findByRole("button", { name: "Sign Out" }).should("exist").click();
+    cy.findByRole("button", { name: "Cancel" }).should("exist");
+    cy.findByRole("button", { name: "Confirm Sign Out" })
+      .should("exist")
+      .click();
     cy.location("pathname").should("eq", "/app/login");
   });
 });
