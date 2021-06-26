@@ -61,7 +61,7 @@ test("shows recommendation lanes", () => {
     utils.getByRole("heading", { name: "Recommendations" })
   ).toBeInTheDocument();
   expect(
-    utils.getByRole("heading", { name: "Lane Title" })
+    utils.getByRole("heading", { name: "Jane Austen collection" })
   ).toBeInTheDocument();
 });
 
@@ -153,7 +153,8 @@ test("shows multiple lanes if existing", () => {
   });
   const utils = render(<Recommendations book={fixtures.borrowableBook} />);
 
-  expect(utils.getAllByRole("heading", { name: "Lane Title" })).toHaveLength(2);
+  expect(utils.getByRole("heading", { name: "lane 1 collection" }));
+  expect(utils.getByRole("heading", { name: "lane 2 collection" }));
 
   expect(utils.getAllByText("See More")).toHaveLength(2);
 });
