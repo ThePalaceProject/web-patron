@@ -9,5 +9,5 @@ const password = "9864";
  */
 export const visitAuthd = (
   url: string,
-  options: Partial<Cypress.VisitOptions>
+  options?: Partial<Cypress.VisitOptions>
 ) => cy.visit(url, { ...options, auth: { username, password } });
