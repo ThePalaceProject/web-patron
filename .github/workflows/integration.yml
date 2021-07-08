@@ -5,6 +5,8 @@
 name: Integration
 
 on:
+  # we need to change this to run when github has a new deploy, and 
+  # specifically only an open-ebooks deploy, not community CPW deploy (for now)
   push:
     branches: [dev, qa, production]
 
