@@ -41,3 +41,5 @@ jobs:
         uses: cypress-io/github-action@v2
         env:
           CYPRESS_BASE_URL: ${{ github.event.deployment_status.target_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
