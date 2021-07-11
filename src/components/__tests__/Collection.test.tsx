@@ -17,7 +17,7 @@ const mockedSWRInfinite = useSWRInfinite as jest.MockedFunction<
 
 const defaultMock = makeSwrResponse({ data: fixtures.emptyCollection });
 const mockSwr: MockSwr<CollectionData> = (value = defaultMock) => {
-  mockedSWR.mockReturnValue(makeSwrResponse(value));
+  mockedSWR.mockReturnValue(makeSwrResponse<any>(value));
 };
 
 beforeEach(() => {

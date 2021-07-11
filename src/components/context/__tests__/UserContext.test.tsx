@@ -16,7 +16,7 @@ const mockCookie = Cookie as any;
 const useRouterSpy = jest.spyOn(router, "useRouter");
 
 const mutateMock = jest.fn();
-const defaultMock = makeSwrResponse({
+const defaultMock = makeSwrResponse<any>({
   data: fixtures.emptyCollection,
   mutate: mutateMock
 });
