@@ -23,8 +23,8 @@ const mockSwr: MockSwr<SearchData> = (
 ) => {
   mockedSWR.mockImplementation((key: any) => {
     if (key?.[0] === "/collection")
-      return makeSwrResponse({ data: fixtures.emptyCollection });
-    return makeSwrResponse(value);
+      return makeSwrResponse<any>({ data: fixtures.emptyCollection });
+    return makeSwrResponse<any>(value);
   });
 };
 

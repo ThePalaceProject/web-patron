@@ -176,7 +176,10 @@ const Lane: React.FC<{
           alignItems: "baseline"
         }}
       >
-        <TitleTag aria-label="Lane Title" sx={{ pr: [3, 5], m: 0, mb: 3 }}>
+        <TitleTag
+          aria-label={`${title} collection`}
+          sx={{ pr: [3, 5], m: 0, mb: 3 }}
+        >
           {title}
         </TitleTag>
         <NavButton

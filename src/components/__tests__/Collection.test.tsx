@@ -17,7 +17,7 @@ const mockedSWRInfinite = useSWRInfinite as jest.MockedFunction<
 
 const defaultMock = makeSwrResponse({ data: fixtures.emptyCollection });
 const mockSwr: MockSwr<CollectionData> = (value = defaultMock) => {
-  mockedSWR.mockReturnValue(makeSwrResponse(value));
+  mockedSWR.mockReturnValue(makeSwrResponse<any>(value));
 };
 
 beforeEach(() => {
@@ -75,7 +75,7 @@ test("displays lanes when present", () => {
   });
 
   // expect there to be a lane with books
-  const laneTitle = utils.getByRole("heading", { name: "Lane Title" });
+  const laneTitle = utils.getByRole("heading", { name: `my lane collection` });
   expect(laneTitle).toBeInTheDocument();
   expect(utils.getByText(fixtures.makeBook(0).title)).toBeInTheDocument();
   expect(utils.getByText("Book 0 author")).toBeInTheDocument();
@@ -104,7 +104,7 @@ test("prefers lanes over books", () => {
 
   // expect the lane title to be rendered, indicating it chose
   // lanes over books
-  const laneTitle = utils.getByRole("heading", { name: "Lane Title" });
+  const laneTitle = utils.getByRole("heading", { name: "my lane collection" });
   expect(laneTitle).toBeInTheDocument();
 });
 

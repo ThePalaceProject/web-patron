@@ -74,7 +74,7 @@ export function fetchComplaintTypes(
 
 export function postComplaint(dispatch: React.Dispatch<ComplaintsAction>) {
   // returning functions allows us to curry this.
-  return (url: string) => (data: ComplaintData): Promise<string[]> => {
+  return (url: string) => (data: ComplaintData): Promise<void> => {
     dispatch({ type: "POST_COMPLAINT_REQUEST", url });
     return new Promise((resolve, reject) => {
       const options = {

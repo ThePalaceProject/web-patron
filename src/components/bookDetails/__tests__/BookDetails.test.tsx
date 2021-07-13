@@ -161,7 +161,7 @@ describe("book details page", () => {
     });
     expect(utils.getByText("Recommendations")).toBeInTheDocument();
     expect(
-      utils.getByRole("heading", { name: "Lane Title" })
+      utils.getByRole("heading", { name: "Jane Austen collection" })
     ).toBeInTheDocument();
   });
 
@@ -318,7 +318,7 @@ describe("report problem", () => {
     // make postComplaint dispatch a success message
     postComplaintSpy.mockImplementation(dispatch => _url => _data => {
       dispatch({ type: "POST_COMPLAINT_SUCCESS" });
-      return Promise.resolve(["some string"]);
+      return Promise.resolve(["some string"] as any);
     });
 
     mockSwr({ data: fixtures.book });
