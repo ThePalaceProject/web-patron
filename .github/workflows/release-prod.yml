@@ -9,13 +9,13 @@ on:
 
 jobs:
   release_master:
-    name: Tag, Release and Publish 
+    name: Tag, Release and Publish
     # only run if PR is merged (not just closed)
     if: github.event.pull_request.merged
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-          
+
         # the tag will match the package.json version (eg. v1.0.0)
       - name: Tag
         id: autotagger
@@ -60,8 +60,8 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            nypl/patron-web:${{steps.autotagger.outputs.version}}
-            nypl/patron-web:latest
+            thepalaceproject/web-patron:${{steps.autotagger.outputs.version}}
+            thepalaceproject/web-patron:latest
           # allows us to install the private axisnow package
           build-args: |
             github_token=${{ secrets.GH_PACKAGES_TOKEN }}

@@ -1,7 +1,7 @@
 version: "2"
 services:
-  patron-web:
-    container_name: patron-web
+  web-patron:
+    container_name: web-patron
     build: ./
     environment:
       CONFIG_FILE: /config/config.yml
