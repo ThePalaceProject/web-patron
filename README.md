@@ -1,23 +1,23 @@
-# circulation-patron-web
+# web-patron
 
 <div>
-<a aria-label="Docker images" href="[https://hub.docker.com/r/nypl/patron-web/tags](https://hub.docker.com/r/nypl/patron-web/tags)">
-<img alt="Docker Image Version (latest semver)" src="[https://img.shields.io/docker/v/nypl/patron-web?label=Docker Hub&logo=docker&sort=semver](https://img.shields.io/docker/v/nypl/patron-web?label=Docker%20Hub&logo=docker&sort=semver)">
+<a aria-label="Docker images" href="[https://hub.docker.com/r/thepalaceproject/web-patron/tags](https://hub.docker.com/r/thepalaceproject/web-patron/tags)">
+<img alt="Docker Image Version (latest semver)" src="[https://img.shields.io/docker/v/thepalaceproject/web-patron?label=Docker Hub&logo=docker&sort=semver](https://img.shields.io/docker/v/thepalaceproject/web-patron?label=Docker%20Hub&logo=docker&sort=semver)">
 </a>
-<img alt="GitHub Workflow Status" src="[https://img.shields.io/github/workflow/status/nypl-simplified/circulation-patron-web/CI?label=Tests&logo=github](https://img.shields.io/github/workflow/status/nypl-simplified/circulation-patron-web/CI?label=Tests&logo=github)">
-<img alt="GitHub Workflow Status" src="[https://img.shields.io/github/workflow/status/nypl-simplified/circulation-patron-web/Production](https://img.shields.io/github/workflow/status/nypl-simplified/circulation-patron-web/Production) Release?label=Build%20%28master%29&logo=github">
-<img alt="GitHub Workflow Status" src="[https://img.shields.io/github/workflow/status/nypl-simplified/circulation-patron-web/Publish](https://img.shields.io/github/workflow/status/nypl-simplified/circulation-patron-web/Publish) beta?label=Build%20%28beta%29&logo=github">
+<img alt="GitHub Workflow Status" src="[https://img.shields.io/github/workflow/status/thepalaceproject/web-patron/CI?label=Tests&logo=github](https://img.shields.io/github/workflow/status/thepalaceproject/web-patron/CI?label=Tests&logo=github)">
+<img alt="GitHub Workflow Status" src="[https://img.shields.io/github/workflow/status/thepalaceproject/web-patron/Production](https://img.shields.io/github/workflow/status/thepalaceproject/web-patron/Production) Release?label=Build%20%28master%29&logo=github">
+<img alt="GitHub Workflow Status" src="[https://img.shields.io/github/workflow/status/thepalaceproject/web-patron/Publish](https://img.shields.io/github/workflow/status/thepalaceproject/web-patron/Publish) beta?label=Build%20%28beta%29&logo=github">
 </div>
 
 An OPDS web catalog client for library patrons.
 
 ## Background
 
-The `circulation-patron-web` application serves as a way for libraries to publish their collections to the web. A library *must* be part of a [Circulation Manager](https://github.com/NYPL-Simplified/circulation) and *can* be registered to a [Library Registry](https://github.com/NYPL-Simplified/library_registry). A Library Registry provides details about a library, and a Circulation Manager provides a library's collection of eBooks and audiobooks in OPDS format. Registering with NYPL's Library Registry is how libraries can show up in the SimplyE mobile application and the [Community Demo](#demo) of this app. In order to have a web version of your library catalog, you can deploy this app.
+The `web-patron` application serves as a way for libraries to publish their collections to the web. A library *must* be part of a [Circulation Manager](https://github.com/ThePalaceProject/circulation) and *can* be registered to a [Library Registry](https://github.com/ThePalaceProject/library-registry). A Library Registry provides details about a library, and a Circulation Manager provides a library's collection of eBooks and audiobooks in OPDS format. Registering with The Palace Project's Library Registry is how libraries can show up in the Palace mobile application and the [Community Demo](#demo) of this app. In order to have a web version of your library catalog, you can deploy this app.
 
 This app can support many libraries, each at their own url: `http://example.com/library1` can be one library, and `http://example.com/library2` another library. You configure the libraries for the app in the [config file](#configuration-file).
 
-## Community Demo
+<!-- ## Community Demo
 
 - Community Preview - [https://web.librarysimplified.org](https://web.librarysimplified.org)
 
@@ -26,15 +26,15 @@ In addition to the preview of the production branch, we also have previews of th
 - qa - [https://qa-web.librarysimplified.org](https://qa-web.librarysimplified.org)
 - dev - [https://dev-web.librarysimplified.org](https://dev-web.librarysimplified.org)
 
-Finally, every PR in this repository has a unique preview deployment so proposed changes can be previewed with any library in the community config file. 
+Finally, every PR in this repository has a unique preview deployment so proposed changes can be previewed with any library in the community config file.
 
-__To have your library added to the demo, register it with NYPL's Library Registry.__
+__To have your library added to the demo, register it with NYPL's Library Registry.__ -->
 
 # Table of Contents
 
-- [circulation-patron-web](#circulation-patron-web)
+- [web-patron](#web-patron)
   * [Background](#background)
-  * [Demo](#community-demo)
+  <!-- * [Demo](#community-demo) -->
 - [Configuring the App](#configuring-the-app)
   * [Configuration File](#configuration-file)
   * [Environment Variables](#environment-variables)
@@ -59,7 +59,7 @@ __To have your library added to the demo, register it with NYPL's Library Regist
     + [Using `docker-compose`](#using--docker-compose-)
     + [Helpful commands](#helpful-commands)
     + [Credits](#credits)
-    
+
 # Configuring the App
 
 ## Configuration File
@@ -105,7 +105,7 @@ We use [Next.js](https://nextjs.org/) as our react framework. This handles build
 
 There are three protected branches in this repository: `dev`, `qa`, and `production`.
 
-- `production` is the most current code, used in production at NYPL. Any time a PR is merged in, a release is tagged and created. A Docker Image is then built by Github Actions, which is finally pushed to Docker Hub with the tag `latest` as well as the specific version tag of the release (ie `2.3.6`). Generally, we only make PRs to `production` from `qa` unless a hotfix is necessary.
+- `production` is the most current code, used in production by The Palace Project. Any time a PR is merged in, a release is tagged and created. A Docker Image is then built by Github Actions, which is finally pushed to Docker Hub with the tag `latest` as well as the specific version tag of the release (ie `2.3.6`). Generally, we only make PRs to `production` from `qa` unless a hotfix is necessary.
 - `qa` is for staging release candidates when they are ready to be QA'd by the community. These will be pushed to docker with the tag `qa` as well as `qa.short_sha` where `short_sha` is from the most recent commit.
 - `dev` is the default branch. This is where PRs with development work should be made. Once determined it is ready for QA, we will make a PR to `qa`, then a subsequent PR to `production` if it is ready.
 
@@ -115,7 +115,7 @@ PRs to `dev` should include:
 
 - An entry in the `CHANGELOG` under `UNRELEASED CHANGES`
 - New/updated tests as appropriate
-- A link to the associated ticket in [NYPL's JIRA](https://nypl.jira.org) when possible
+<!-- - A link to the associated ticket in [NYPL's JIRA](https://nypl.jira.org) when possible -->
 
 ## Installing Dependencies
 
@@ -219,7 +219,7 @@ When creating links using `<Link>`, you don't need to worry about whether it is 
 
 # Deploying
 
-This repository includes a Dockerfile, and the master branch is built as an image in Docker Hub in the Hub repository [nypl/patron-web](https://hub.docker.com/r/nypl/patron-web). You can deploy the application simply by running the image from Docker Hub. You can either use the `latest` tag in Docker Hub, or a specific version tagged with the version number. There will also be an image tagged `beta` for the most recent code on the `beta` branch.
+This repository includes a Dockerfile, and the master branch is built as an image in Docker Hub in the Hub repository [thepalaceproject/web-patron](https://hub.docker.com/r/thepalaceproject/web-patron). You can deploy the application simply by running the image from Docker Hub. You can either use the `latest` tag in Docker Hub, or a specific version tagged with the version number. There will also be an image tagged `beta` for the most recent code on the `beta` branch.
 
 Alternatively, you can build your own container from local changes as described below. If you would like to deploy from Docker Hub, skip to [Running a container from the image](#running-a-container-from-the-image).
 
@@ -231,11 +231,11 @@ When you have code changes you wish to review locally, you will need to build a 
 2. Build the image
 
     ```
-    docker build -t patronweb  .
+    docker build -t webpatron  .
 
     ```
 
-If you wanted to customize the image, you could create an additional Dockerfile (e.g., Dockerfile.second) and simply specify its name in the docker build commands. The Docker file you specify will guide the image build. For this image, the build takes about 4-6 minutes, depending on your Internet speed and load on the Node package servers, to complete the final image. Eg: `docker build -f Dockerfile.second -t patronweb .`
+If you wanted to customize the image, you could create an additional Dockerfile (e.g., Dockerfile.second) and simply specify its name in the docker build commands. The Docker file you specify will guide the image build. For this image, the build takes about 4-6 minutes, depending on your Internet speed and load on the Node package servers, to complete the final image. Eg: `docker build -f Dockerfile.second -t webpatron .`
 
 ### Building With AxisNow Decryptor
 
@@ -256,14 +256,14 @@ When running the image with the `CONFIG_FILE` option, you will want to provide t
 
 ### From the command line
 
-This command will download the image from NYPL's Docker Hub repo, and then run it with the `CONFIG_FILE` option (using a file named `cm_libraries.txt`) and the name `patronweb`. If you would like to run your locally built image, substitute `nypl/patron-web` with the tag of the image you built previously (just `patronweb` in the example above).
+This command will download the image from The Palace Project's Docker Hub repo, and then run it with the `CONFIG_FILE` option (using a file named `cm_libraries.txt`) and the name `webpatron`. If you would like to run your locally built image, substitute `thepalaceproject/web-patron` with the tag of the image you built previously (just `webpatron` in the example above).
 
 ```
-docker run -d --name patronweb -p 3000:3000\\
+docker run -d --name webpatron -p 3000:3000\\
   --restart=unless-stopped \\
   -e "CONFIG_FILE=/config_volume/config.yml" \\
   -v $PATH_TO_LOCAL_VOLUME:/config_volume \\
-  nypl/patronweb
+  thepalaceproject/web-patron
 
 ```
 
@@ -288,7 +288,7 @@ If you would like to use a `SIMPLIFIED_CATALOG_BASE` or `REGISTRY_BASE`, or prov
 
 - For debugging purposes, you can run the container and skip the command to start the app, instead launching it directly into a shell. To do so, use this command:
   ```
-  docker run -it --name patronweb -v $PATH_TO_LOCAL_VOLUME:/config --rm --entrypoint=/bin/sh patronweb
+  docker run -it --name webpatron -v $PATH_TO_LOCAL_VOLUME:/config --rm --entrypoint=/bin/sh webpatron
   ```
 
 ### Credits
