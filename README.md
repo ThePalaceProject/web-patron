@@ -105,7 +105,7 @@ We use [Next.js](https://nextjs.org/) as our react framework. This handles build
 
 There are three protected branches in this repository: `dev`, `qa`, and `production`.
 
-- `production` is the most current code, used in production at LYRASIS. Any time a PR is merged in, a release is tagged and created. A Docker Image is then built by Github Actions, which is finally pushed to Docker Hub with the tag `latest` as well as the specific version tag of the release (ie `2.3.6`). Generally, we only make PRs to `production` from `qa` unless a hotfix is necessary.
+- `production` is the most current code, used in production by The Palace Project. Any time a PR is merged in, a release is tagged and created. A Docker Image is then built by Github Actions, which is finally pushed to Docker Hub with the tag `latest` as well as the specific version tag of the release (ie `2.3.6`). Generally, we only make PRs to `production` from `qa` unless a hotfix is necessary.
 - `qa` is for staging release candidates when they are ready to be QA'd by the community. These will be pushed to docker with the tag `qa` as well as `qa.short_sha` where `short_sha` is from the most recent commit.
 - `dev` is the default branch. This is where PRs with development work should be made. Once determined it is ready for QA, we will make a PR to `qa`, then a subsequent PR to `production` if it is ready.
 
