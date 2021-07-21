@@ -9,7 +9,7 @@
 <img alt="GitHub Workflow Status" src="[https://img.shields.io/github/workflow/status/thepalaceproject/web-patron/Publish](https://img.shields.io/github/workflow/status/thepalaceproject/web-patron/Publish) beta?label=Build%20%28beta%29&logo=github">
 </div>
 
-An OPDS web catalog client for library patrons.
+An OPDS web catalog client for library patrons. 📚
 
 ## Background
 
