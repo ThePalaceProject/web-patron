@@ -1,13 +1,13 @@
 # web-patron
 
-<div>
+<!-- <div>
 <a aria-label="Docker images" href="[https://hub.docker.com/r/thepalaceproject/web-patron/tags](https://hub.docker.com/r/thepalaceproject/web-patron/tags)">
 <img alt="Docker Image Version (latest semver)" src="[https://img.shields.io/docker/v/thepalaceproject/web-patron?label=Docker Hub&logo=docker&sort=semver](https://img.shields.io/docker/v/thepalaceproject/web-patron?label=Docker%20Hub&logo=docker&sort=semver)">
 </a>
 <img alt="GitHub Workflow Status" src="[https://img.shields.io/github/workflow/status/thepalaceproject/web-patron/CI?label=Tests&logo=github](https://img.shields.io/github/workflow/status/thepalaceproject/web-patron/CI?label=Tests&logo=github)">
 <img alt="GitHub Workflow Status" src="[https://img.shields.io/github/workflow/status/thepalaceproject/web-patron/Production](https://img.shields.io/github/workflow/status/thepalaceproject/web-patron/Production) Release?label=Build%20%28master%29&logo=github">
 <img alt="GitHub Workflow Status" src="[https://img.shields.io/github/workflow/status/thepalaceproject/web-patron/Publish](https://img.shields.io/github/workflow/status/thepalaceproject/web-patron/Publish) beta?label=Build%20%28beta%29&logo=github">
-</div>
+</div> -->
 
 An OPDS web catalog client for library patrons.
 
@@ -103,15 +103,7 @@ We use [Next.js](https://nextjs.org/) as our react framework. This handles build
 
 ## Contributing
 
-There are three protected branches in this repository: `main`, `qa`, and `production`.
-
-- `production` is the most current code, used in production by The Palace Project. Any time a PR is merged in, a release is tagged and created. A Docker Image is then built by Github Actions, which is finally pushed to GitHub Container Registry with a major.minor version tag (e.g. `2.3`), a specific version tag (e.g. `2.3.6`), a tag with the short commit id (e.g. `sha-c5cda3a`), and the tag `production`. Generally, we only make PRs to `production` from `qa` unless a hotfix is necessary.
-- `qa` is for staging release candidates when they are ready to be QA'd by the community. These will be pushed to GitHub Container Registry with a major.minor version tag (e.g. `2.3`), a specific version tag (e.g. `2.3.6`), a tag with the short commit id (e.g. `sha-c5cda3a`), and the tag `qa`.
-- `main` is the default branch. This is where PRs with development work should be made. Once determined it is ready for QA, we will make a PR to `qa`, then a subsequent PR to `production` if it is ready.
-
-<!-- We try to move code from `qa` to `production` and `dev` to `qa` once every two weeks. -->
-
-PRs to `main` should include:
+The default branch of the repository is `main`. This is where PRs with development work should be made. PRs to `main` should include:
 
 - An entry in the `CHANGELOG` under `UNRELEASED CHANGES`
 - New/updated tests as appropriate
