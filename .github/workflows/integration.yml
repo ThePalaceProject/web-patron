@@ -1,12 +1,12 @@
-# this file will run integration tests when code is merged into any
-# of our release branches (main, qa, production).
+# This file will run integration tests when code is merged into the
+# main branch.
 # The workflow is currently in use by Lyrasis and this trigger was
 # requested by Helen Suboch
 name: Integration
 
 on:
   push:
-    branches: [main, qa, production]
+    branches: [main]
 
 jobs:
   integration:
