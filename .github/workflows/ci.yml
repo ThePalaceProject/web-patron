@@ -62,8 +62,6 @@ jobs:
       CI: true
     steps:
       - uses: actions/checkout@v2
-        with:
-          submodules: true
       - id: nvmrc
         run: echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
 
@@ -97,8 +95,6 @@ jobs:
       CI: true
     steps:
       - uses: actions/checkout@v2
-        with:
-          submodules: true
       - id: nvmrc
         run: echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
 
