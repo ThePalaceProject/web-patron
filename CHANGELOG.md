@@ -2,6 +2,7 @@
 
 ### UNRELEASED CHANGES
 - Fix "Cannot find module 'sharp'" error on installation.
+- Update logo/text in mobile app callouts.
 - Implement indirect bearer token borrowing (adds support for Johns Hopkins, Biblioboard, ProQuest, and other distributors).
 - Add new github action to sync a branch with NYPL.
 - Fix foreign-language books not appearing in search results.

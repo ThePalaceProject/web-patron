@@ -92,14 +92,12 @@ describe("book details page", () => {
     mockSwr({ data: fixtures.book });
     const utils = render(<BookDetails />);
 
-    expect(
-      utils.queryByText("Read Now. Read Everywhere.")
-    ).not.toBeInTheDocument();
+    expect(utils.queryByText("Download Palace")).not.toBeInTheDocument();
 
-    expect(utils.queryByText("SimplyE Logo")).not.toBeInTheDocument();
+    expect(utils.queryByText("Palace Logo")).not.toBeInTheDocument();
     expect(
       utils.queryByText(
-        "Browse and read our collection of eBooks and Audiobooks right from your phone."
+        "Browse and read our collection of ebooks and audiobooks right from your phone."
       )
     ).not.toBeInTheDocument();
   });
@@ -109,16 +107,16 @@ describe("book details page", () => {
     mockSwr({ data: fixtures.book });
     const utils = render(<BookDetails />);
 
-    expect(utils.getByText("Read Now. Read Everywhere.")).toBeInTheDocument();
-    expect(utils.getByLabelText("SimplyE Logo")).toBeInTheDocument();
+    expect(utils.getByText("Download Palace")).toBeInTheDocument();
+    expect(utils.getByLabelText("Palace Logo")).toBeInTheDocument();
     expect(
       utils.getByText(
-        "Browse and read our collection of eBooks and Audiobooks right from your phone."
+        "Browse and read our collection of ebooks and audiobooks right from your phone."
       )
     ).toBeInTheDocument();
 
     const iosBadge = utils.getByRole("link", {
-      name: "Download SimplyE on the Apple App Store",
+      name: "Download Palace on the Apple App Store",
       hidden: true // it is initially hidden by a media query, only displayed on desktop
     });
     expect(iosBadge).toBeInTheDocument();
@@ -128,7 +126,7 @@ describe("book details page", () => {
     );
 
     const googleBadge = utils.getByRole("link", {
-      name: "Get SimplyE on the Google Play Store",
+      name: "Get Palace on the Google Play Store",
       hidden: true // hidden initially on mobile
     });
     expect(googleBadge).toBeInTheDocument();
