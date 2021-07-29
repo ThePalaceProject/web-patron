@@ -3,6 +3,7 @@ import Cookie from "js-cookie";
 import { AuthCredentials, OPDS1 } from "interfaces";
 import { IS_SERVER } from "utils/env";
 import { NextRouter, useRouter } from "next/router";
+import { generateCredentials } from "utils/auth";
 import { SAML_LOGIN_QUERY_PARAM } from "utils/constants";
 
 /**
@@ -88,9 +89,8 @@ function clearCredentialsCookie(librarySlug: string | null) {
   Cookie.remove(cookieName(librarySlug));
 }
 
-export function generateToken(username: string, password: string) {
-  const btoaStr = btoa(`${username}:${password}`);
-  return `Basic ${btoaStr}`;
+export function generateToken(username: string, password?: string) {
+  return generateCredentials(username, password);
 }
 
 /**

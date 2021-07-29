@@ -12,6 +12,7 @@ import useUser from "components/context/UserContext";
 import { ServerError } from "errors";
 import useLogin from "auth/useLogin";
 import useLibraryContext from "components/context/LibraryContext";
+import { Keyboard } from "types/opds1";
 
 type FormData = {
   [key: string]: string;
@@ -43,6 +44,9 @@ const BasicAuthHandler: React.FC<{ method: ClientBasicMethod }> = ({
 
   const hasMultipleMethods = authMethods.length > 1;
 
+  const hasPasswordInput =
+    method.inputs?.password?.keyboard !== Keyboard.NoInput;
+
   return (
     <form
       onSubmit={onSubmit}
@@ -65,17 +69,20 @@ const BasicAuthHandler: React.FC<{ method: ClientBasicMethod }> = ({
           errors[usernameInputName] && `Your ${usernameInputName} is required.`
         }
       />
-      <FormInput
-        name={passwordInputName}
-        label={passwordInputName}
-        ref={register({ required: true, maxLength: 25 })}
-        id="password"
-        type="password"
-        placeholder={passwordInputName}
-        error={
-          errors[passwordInputName] && `Your ${passwordInputName} is required.`
-        }
-      />
+      {hasPasswordInput && (
+        <FormInput
+          name={passwordInputName}
+          label={passwordInputName}
+          ref={register({ required: true, maxLength: 25 })}
+          id="password"
+          type="password"
+          placeholder={passwordInputName}
+          error={
+            errors[passwordInputName] &&
+            `Your ${passwordInputName} is required.`
+          }
+        />
+      )}
 
       <Button
         type="submit"

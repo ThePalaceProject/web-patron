@@ -176,10 +176,26 @@ export interface ServerSamlMethod
 export interface CleverAuthMethod extends AuthMethod<typeof CleverAuthType> {}
 
 export interface BasicAuthMethod extends AuthMethod<typeof BasicAuthType> {
+  inputs?: {
+    login?: AuthInput;
+    password?: AuthInput;
+  };
+
   labels: {
     login: string;
     password: string;
   };
+}
+
+export interface AuthInput {
+  keyboard?: Keyboard;
+}
+
+export enum Keyboard {
+  Default = "Default",
+  NoInput = "No input",
+  NumberPad = "Number pad",
+  EmailAddress = "Email address"
 }
 
 export type ServerAuthMethod =

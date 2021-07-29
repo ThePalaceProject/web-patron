@@ -36,7 +36,7 @@ function serverToClientSamlMethods(
 export const getEnglishValue = (arr: [{ language: string; value: string }]) =>
   arr.find(item => item.language === "en")?.value;
 
-export function generateCredentials(username: string, password: string) {
+export function generateCredentials(username: string, password = "") {
   const btoaStr = btoa(`${username}:${password}`);
   return `Basic ${btoaStr}`;
 }
