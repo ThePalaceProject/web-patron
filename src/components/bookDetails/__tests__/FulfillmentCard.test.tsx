@@ -460,7 +460,7 @@ describe("FulfillableBook", () => {
       utils.getByText(`You have this book on loan until ${MOCK_DATE_STRING}.`)
     ).toBeInTheDocument();
     expect(
-      utils.queryByText("You're ready to read this book in SimplyE!")
+      utils.queryByText("Ready to Read in Palace!")
     ).not.toBeInTheDocument();
   });
   const bookWithRedirect = mergeBook<FulfillableBook>({
@@ -480,7 +480,7 @@ describe("FulfillableBook", () => {
     });
     const utils = render(<FulfillmentCard book={bookWithRedirect} />);
     expect(utils.queryByText("Ready to Read!")).not.toBeInTheDocument();
-    expect(utils.getByText("Ready to Read in SimplyE!")).toBeInTheDocument();
+    expect(utils.getByText("Ready to Read in Palace!")).toBeInTheDocument();
     expect(
       utils.getByText("If you would rather read on your computer, you can:")
     ).toBeInTheDocument();
