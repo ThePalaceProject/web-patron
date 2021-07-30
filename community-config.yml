@@ -1,15 +1,15 @@
-# Set an instance name to be used in bug tracking and for other debugging purposes. 
+# Set an instance name to be used in bug tracking and for other debugging purposes.
 # This is not patron-facing, so call it something that will be meaningful to you when
 # reviewing bugs, especially if you operate multiple instances.
 instance_name: Patron Web Catalog - Community Demo
 
 # APP MEDIA SUPPORT
 # Each entry has a setting of "show", "redirect" or "show-and-redirect".
-# 
-# "redirect" tells the app to display a prompt directing the 
+#
+# "redirect" tells the app to display a prompt directing the
 # user to read the book in the companion mobile app (usually SimplyE).
-# 
-# The default for unlisted entries is unsupported. The format will be 
+#
+# The default for unlisted entries is unsupported. The format will be
 # completely hidden. Any OPDS Entry with only this one unsupported format
 # will not be visible in the app.
 media_support:
@@ -27,14 +27,16 @@ media_support:
   # Audiobooks
   application/audiobook+json: redirect
   application/vnd.overdrive.circulation.api+json;profile=audiobook: redirect
+  application/audiobook+json;profile="http://www.feedbooks.com/audiobooks/access-restriction": redirect
+  application/vnd.librarysimplified.findaway.license+json: redirect
 
   ### INDIRECT TYPES
   # OPDS Entry Indirection type
-  application/atom+xml;type=entry;profile=opds-catalog: 
+  application/atom+xml;type=entry;profile=opds-catalog:
     text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media": show
 
   # Adobe Encryption
-  application/vnd.adobe.adept+xml: 
+  application/vnd.adobe.adept+xml:
     application/epub+zip: redirect-and-show
 
   # Bearer Token Exchange (web app currently doesn't support this)

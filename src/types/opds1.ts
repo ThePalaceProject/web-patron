@@ -89,6 +89,8 @@ export const AxisNowWebpubMediaType =
   "application/vnd.librarysimplified.axisnow+json";
 export const AccessRestrictionAudiobookMediaType =
   'application/audiobook+json;profile="http://www.feedbooks.com/audiobooks/access-restriction"';
+export const FindawayAudiobookMediaType =
+  "application/vnd.librarysimplified.findaway.license+json";
 
 export type ReadOnlineMediaType =
   | typeof ExternalReaderMediaType
@@ -105,7 +107,8 @@ export type DownloadMediaType =
 export type UnsupportedMediaType =
   | typeof AccessRestrictionAudiobookMediaType
   | typeof AudiobookMediaType
-  | typeof OverdriveAudiobookMediaType;
+  | typeof OverdriveAudiobookMediaType
+  | typeof FindawayAudiobookMediaType;
 
 export type AnyBookMediaType =
   | ReadOnlineMediaType

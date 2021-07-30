@@ -17,7 +17,7 @@ const BookStatus: React.FC<{ book: AnyBook }> = ({ book }) => {
     : false;
 
   const companionApp =
-    APP_CONFIG.companionApp === "openebooks" ? "Open eBooks" : "SimplyE";
+    APP_CONFIG.companionApp === "openebooks" ? "Open eBooks" : "Palace";
 
   const str =
     status === "borrowable"
