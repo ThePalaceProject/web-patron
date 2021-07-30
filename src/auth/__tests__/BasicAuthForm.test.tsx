@@ -8,8 +8,10 @@ import Cookie from "js-cookie";
 import { generateCredentials } from "utils/auth";
 import { UserProvider } from "components/context/UserContext";
 import { basicAuthMethod, cleverAuthMethod } from "test-utils/fixtures";
+import { Keyboard } from "types/opds1";
 
 const mockCookie = Cookie as any;
+
 const method: ClientBasicMethod = {
   id: "basic-id",
   labels: {
@@ -18,6 +20,15 @@ const method: ClientBasicMethod = {
   },
   type: OPDS1.BasicAuthType,
   description: "Library Barcode"
+};
+
+const noPasswordMethod: ClientBasicMethod = {
+  ...method,
+  inputs: {
+    password: {
+      keyboard: Keyboard.NoInput
+    }
+  }
 };
 
 beforeEach(() => fetchMock.resetMocks());
@@ -148,6 +159,64 @@ test("accepts different input labels", async () => {
 
   expect(utils.getByLabelText("Username input")).toBeInTheDocument();
   expect(utils.getByLabelText("Password input")).toBeInTheDocument();
+});
+
+test("does not display password input when keyboard is 'No input'", () => {
+  const utils = render(<BasicAuthHandler method={noPasswordMethod} />);
+
+  const barcode = utils.getByLabelText("Barcode input");
+  const pin = utils.queryByLabelText("Pin input");
+  expect(barcode).toBeInTheDocument();
+  expect(pin).not.toBeInTheDocument();
+});
+
+test("submits with no password input", async () => {
+  // give the mock a delay to allow loading state to appear
+  fetchMock.mockResponseOnce(
+    () =>
+      new Promise(resolve =>
+        setTimeout(() => resolve(JSON.stringify(fixtures.loans)), 100)
+      )
+  );
+  const utils = render(
+    <UserProvider>
+      <BasicAuthHandler method={noPasswordMethod} />
+    </UserProvider>
+  );
+
+  // act
+  const barcode = utils.getByLabelText("Barcode input");
+  userEvent.type(barcode, "1234");
+  const loginButton = utils.getByRole("button", { name: "Login" });
+  userEvent.click(loginButton);
+
+  const token = generateCredentials("1234");
+
+  // shows a loading state
+  const loadingButton = await utils.findByLabelText("Signing in...");
+  expect(loadingButton).toBeInTheDocument();
+  expect(loadingButton).toBeDisabled();
+
+  // assert
+  // we wrap this in waitFor because the handleSubmit from react-hook-form has
+  // async code in it
+  await waitFor(() => {
+    // we set the cookie
+    expect(Cookie.set).toHaveBeenCalledTimes(1);
+    expect(Cookie.set).toHaveBeenCalledWith(
+      // the library slug is null because we are only running with one library
+      "CPW_AUTH_COOKIE/testlib",
+      JSON.stringify({
+        token,
+        methodType: OPDS1.BasicAuthType
+      })
+    );
+
+    // we also trigger a loans request with the cookie
+    expect(fetchMock).toHaveBeenCalledWith("/shelf-url", {
+      headers: { Authorization: token, "X-Requested-With": "XMLHttpRequest" }
+    });
+  });
 });
 
 describe("choose a different method NavButton", () => {
