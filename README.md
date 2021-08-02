@@ -91,6 +91,24 @@ The following environment variables can be set to further configure the applicat
 - Set `AXE_TEST=true` to run the application with `react-axe` enabled (only works when `NODE_ENV` is "development").
 - Set `ANALYZE=true` to generate bundle analysis files inside `.next/analyze` which will show bundle sizes for server and client, as well as composition.
 
+### Configure Multiple Config Files
+
+Create a directory in the root of the project called `config`. Within that directory, you can store as many config files as you want. This directory is ignored by git. For the open ebooks config, create a file called `opene.yml` and in your `.env.local ` file, set `CONFIG_FILE=config/opene.yml` to run the project using the `opene.yml` configuration.
+
+### Example Open eBooks Config
+
+```
+instance_name: qa-web.openebooks.us
+companion_app: openebooks
+show_medium: false
+libraries:
+  app: https://qa-circulation.openebooks.us/USOEI/authentication_document
+media_support:
+  application/vnd.librarysimplified.axisnow+json: show
+openebooks:
+  default_library: app
+```
+
 ## Manager, Registry, and Application Configurations
 
 Any Circulation Manager you'll be using with the app also needs a configuration setting to turn on CORS headers. In the Circulation Manager interface, go to the Sitewide Settings section under System Configuration (`/admin/web/config/sitewideSettings`) and add a setting for "URL of the web catalog for patrons". For development, you can set this to "\*", but for production it should be the real URL where you will run the catalog.
