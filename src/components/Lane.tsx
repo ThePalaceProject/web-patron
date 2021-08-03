@@ -187,6 +187,7 @@ const Lane: React.FC<{
           collectionUrl={url}
           iconRight={ArrowForward}
           sx={{ variant: "text.body.bold", textDecoration: "none" }}
+          aria-label={`See more: ${title} collection`}
         >
           See More
         </NavButton>
