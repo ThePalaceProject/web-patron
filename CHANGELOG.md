@@ -2,6 +2,7 @@
 
 ### UNRELEASED CHANGES
 - Fix "Cannot find module 'sharp'" error on installation.
+- Update Google Play Store badge to link to Palace app.
 - Update logo/text in mobile app callouts.
 - Implement indirect bearer token borrowing (adds support for Johns Hopkins, Biblioboard, ProQuest, and other distributors).
 - Add new github action to sync a branch with NYPL.
