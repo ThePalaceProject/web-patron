@@ -111,7 +111,7 @@ describe("toggling SimplyE Branding", () => {
     expect(googleBadge).toBeInTheDocument();
     expect(googleBadge).toHaveAttribute(
       "href",
-      "https://play.google.com/store/apps/details?id=org.nypl.simplified.simplye&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1"
+      "https://play.google.com/store/apps/details?id=org.thepalaceproject.palace&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1"
     );
 
     // my books nav link
