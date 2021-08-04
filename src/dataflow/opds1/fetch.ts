@@ -12,9 +12,10 @@ const parser = new OPDSParser();
  */
 export async function fetchOPDS(
   url: string,
-  token?: string
+  token?: string,
+  additionalHeaders?: { [key: string]: string }
 ): Promise<OPDSEntry | OPDSFeed> {
-  const response = await fetchWithHeaders(url, token);
+  const response = await fetchWithHeaders(url, token, additionalHeaders);
   // If the status code is not in the range 200-299,
   // we still try to parse and throw it.
   if (!response.ok) {
@@ -45,7 +46,12 @@ export async function fetchFeed(
   url: string,
   token?: string
 ): Promise<OPDSFeed> {
-  const result = await fetchOPDS(url, token);
+  const result = await fetchOPDS(url, token, {
+    // Explicitly accept all languages when fetching feeds. Otherwise, the browser will send an
+    // Accept-Language header for its current language, which causes books in other languages to
+    // be filtered out of search results.
+    "Accept-Language": "*"
+  });
   if (result instanceof OPDSFeed) {
     return result;
   }

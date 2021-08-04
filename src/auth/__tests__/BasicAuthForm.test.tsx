@@ -95,7 +95,11 @@ test("sumbits", async () => {
 
     // we also trigger a loans request with the cookie
     expect(fetchMock).toHaveBeenCalledWith("/shelf-url", {
-      headers: { Authorization: token, "X-Requested-With": "XMLHttpRequest" }
+      headers: {
+        Authorization: token,
+        "X-Requested-With": "XMLHttpRequest",
+        "Accept-Language": "*"
+      }
     });
   });
 });
@@ -136,7 +140,8 @@ test("displays server error", async () => {
   expect(fetchMock).toHaveBeenCalledWith("/shelf-url", {
     headers: {
       Authorization: "token",
-      "X-Requested-With": "XMLHttpRequest"
+      "X-Requested-With": "XMLHttpRequest",
+      "Accept-Language": "*"
     }
   });
   const serverError = await utils.findByText(
@@ -214,7 +219,11 @@ test("submits with no password input", async () => {
 
     // we also trigger a loans request with the cookie
     expect(fetchMock).toHaveBeenCalledWith("/shelf-url", {
-      headers: { Authorization: token, "X-Requested-With": "XMLHttpRequest" }
+      headers: {
+        Authorization: token,
+        "X-Requested-With": "XMLHttpRequest",
+        "Accept-Language": "*"
+      }
     });
   });
 });
