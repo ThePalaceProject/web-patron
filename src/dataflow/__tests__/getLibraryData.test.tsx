@@ -17,7 +17,10 @@ describe("fetching catalog", () => {
     fetchMock.mockResponseOnce(rawCatalog);
     await fetchFeed("some-url");
     expect(fetchMock).toHaveBeenCalledWith("some-url", {
-      headers: { "X-Requested-With": "XMLHttpRequest" }
+      headers: {
+        "X-Requested-With": "XMLHttpRequest",
+        "Accept-Language": "*"
+      }
     });
   });
 

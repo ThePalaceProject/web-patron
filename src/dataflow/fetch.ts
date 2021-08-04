@@ -5,8 +5,13 @@
 
 import { FetchError } from "errors";
 
-export default async function fetchWithHeaders(url: string, token?: string) {
-  const headers = prepareHeaders(token);
+export default async function fetchWithHeaders(
+  url: string,
+  token?: string,
+  additionalHeaders?: { [key: string]: string }
+) {
+  const headers = prepareHeaders(token, additionalHeaders);
+
   /**
    * Fetch doesn't reject if it receives a response from the server,
    * only if the actual fetch fails due to network failure or permission failure like
@@ -19,11 +24,15 @@ export default async function fetchWithHeaders(url: string, token?: string) {
   }
 }
 
-function prepareHeaders(token?: string) {
+function prepareHeaders(
+  token?: string,
+  additionalHeaders?: { [key: string]: string }
+) {
   const headers: {
     [key: string]: string;
   } = {
-    "X-Requested-With": "XMLHttpRequest"
+    "X-Requested-With": "XMLHttpRequest",
+    ...additionalHeaders
   };
   if (token) {
     headers["Authorization"] = token;
