@@ -1,48 +1,28 @@
 /// <reference types="cypress" />
-// import { generateToken } from "auth/useCredentials";
 
-const allAccessUser = {
-  username: "A3IAYP9NDS"
-};
+import {
+  APP_PATH,
+  EARLY_GRADES_CHAPTER_BOOKS_COLLECTION_PATH,
+  EARLY_GRADES_COLLECTION_PATH,
+  EARLY_GRADES_DETAIL_BOOK_PATH,
+  HIGH_SCHOOL_AUTHOR_RECOMMENDATIONS_PATH,
+  HIGH_SCHOOL_COLLECTION_PATH,
+  HIGH_SCHOOL_DETAIL_BOOK_PATH_1,
+  HIGH_SCHOOL_DETAIL_BOOK_PATH_3,
+  HIGH_SCHOOL_ROMANCE_COLLECTION_PATH,
+  MIDDLE_GRADES_COLLECTION_PATH,
+  MIDDLE_GRADES_COMICS_COLLECTION_PATH,
+  MIDDLE_GRADES_DETAIL_BOOK_PATH,
+  MIDDLE_GRADES_STAFF_PICKS_COLLECTION_PATH
+} from "../../support/utils";
 
-const highSchoolUser = {
-  username: "HMN4IIRXX5"
-};
-
-const middleGradesUser = {
-  username: "MX8GNTIL6I"
-};
-
-const earlyGradesUser = {
-  username: "EMNK6TDG4R"
-};
-
-/**
- * TODO:
- *  - Separate navigating to "Recommendations" from the rest of the browsing?
- *  - Import `generateToken` instead of copying it here. This will likely require some changes to webpack in next.config.js.
- *  - Move usernames to Cypress config and passwords noted in google doc? Talk with team about the best solution here: https://glebbahmutov.com/blog/keep-passwords-secret-in-e2e-tests/
- */
-
-function generateToken(username: string, password: string) {
-  const btoaStr = btoa(`${username}:${password}`);
-  return `Basic ${btoaStr}`;
-}
-
-describe("All-access browsing", () => {
-  const token = generateToken(allAccessUser.username, allAccessUser.password);
-  const credentials = {
-    methodType: "http://opds-spec.org/auth/basic",
-    token
-  };
-
+describe("All access", () => {
   beforeEach(() => {
-    cy.clearCookie("CPW_AUTH_COOKIE%2Fapp");
-    cy.setCookie("CPW_AUTH_COOKIE%2Fapp", JSON.stringify(credentials));
+    cy.loginByApi("ALL_ACCESS_USER");
   });
 
-  it("can browse all collections and view books", () => {
-    cy.visit("/app");
+  it("can view books and collections for all access levels", () => {
+    cy.visit(APP_PATH);
 
     // Verify collection title
     cy.findByRole("heading", { name: "Open eBooks (QA Server)" }).should(
@@ -60,140 +40,37 @@ describe("All-access browsing", () => {
       "exist"
     );
 
-    // Click the high school Staff Picks see more button
-    cy.findByRole("link", { name: "See more: High School collection" }).click();
+    // Verify you can visit all 3 lanes
+    cy.visit(HIGH_SCHOOL_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.visit(MIDDLE_GRADES_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.visit(EARLY_GRADES_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("not.exist");
 
-    // Verify we have navigated to the High School lane
-    cy.location("pathname").should(
-      "contain",
-      "/app/collection/https%3A%2F%2Fqa-circulation.openebooks.us%2FUSOEI%2Fgroups%2F406%3Fentrypoint%3DBook"
-    );
-
-    // Verify the high school heading is there and staff picks
-    cy.findByRole("heading", { name: "High School" }).should("exist");
-    cy.findByRole("heading", { name: "Staff Picks collection" }).should(
-      "exist"
-    );
-
-    // Click on another see more
-    cy.findByRole("link", { name: "See more: Staff Picks collection" }).click();
-
-    // Make sure we changed to the new collection page
-    cy.location("pathname").should(
-      "contain",
-      "/app/collection/https%3A%2F%2Fqa-circulation.openebooks.us%2FUSOEI%2Ffeed%2F407%3Fentrypoint%3DBook"
-    );
-    // Verify we are at the book list view
-    cy.findByRole("heading", { name: "Staff Picks" }).should("exist");
-
-    // Find a book to click on
-    cy.findByRole("listitem", { name: "Book: Heart of a Champion" })
-      .should("exist")
-      .within(() => {
-        cy.findByRole("heading", { name: "Heart of a Champion" }).should(
-          "exist"
-        );
-        cy.findByText("Deuker, Carl").should("exist");
-        cy.findByText("Deuker, Carl").should("exist");
-        cy.findByText("Available to borrow").should("exist");
-        cy.findByText("9999 out of 9999 copies available.").should("exist");
-        cy.findAllByText(
-          "Seth faces a strain on his friendship with Jimmy, who is both a baseball champion and something of an irresponsible fool, when Jimmy is kicked off the team."
-        ).should("exist", 2);
-        cy.findByRole("button", { name: "Borrow this book" }).should("exist");
-
-        // Verify that the read more button works
-        cy.findByRole("link", { name: "Read more" }).should("exist").click();
-      });
-
-    // Verify we are at the book detail view
-    cy.location("pathname").should(
-      "contain",
-      "/app/book/https%3A%2F%2Fqa-circulation.openebooks.us%2FUSOEI%2Fworks%2FAxis%2520360%2520ID%2F00132176"
-    );
-    cy.findByRole("listitem", {
-      name: "Current location: Heart of a Champion"
-    }).should("exist");
-    cy.findByRole("heading", { name: "Heart of a Champion" }).should("exist");
-    cy.findByText("Hachette Book Group USA").should("exist");
-    cy.findByText("May 30, 2009").should("exist");
-    cy.findByText("Fiction, Young Adult, 12-14").should("exist");
-    cy.findByRole("button", { name: "Report a problem" }).should("exist");
-
-    // "Recommendations" swimlane does not render for this book
-    cy.findByRole("heading", { name: "Recommendations" }).should("not.exist");
-
-    // Navigate back to "Staff Picks" using breadcrumbs
-    cy.findByRole("link", { name: "Staff Picks" }).click();
-
-    // Click new book and render detail view
-    cy.findByRole("listitem", { name: "Book: Betrayed" })
-      .should("exist")
-      .within(() => {
-        // Verify that the read more button works
-        cy.findByRole("link", { name: "Read more" }).should("exist").click();
-      });
-    cy.location("pathname").should(
-      "contain",
-      "/app/book/https%3A%2F%2Fqa-circulation.openebooks.us%2FUSOEI%2Fworks%2FAxis%2520360%2520ID%2F0015470129"
-    );
-
-    // Verify we are at the book detail view
-    cy.findByRole("listitem", {
-      name: "Current location: Betrayed"
-    }).should("exist");
-
-    // "Recommendations" swimlane does render for this book
-    cy.findByRole("heading", { name: "Recommendations" }).should("exist");
-    cy.findByRole("heading", { name: "Rush, Jennifer collection" }).should(
-      "exist"
-    );
-    cy.findByRole("link", { name: "See more: Rush, Jennifer collection" })
-      .should("exist")
-      .click();
-
-    // Navigate to "Recommendations" page
-    cy.location("pathname").should(
-      "contain",
-      "/app/collection/https%3A%2F%2Fqa-circulation.openebooks.us%2FUSOEI%2Fworks%2Fcontributor%2FRush%252C%2520Jennifer%2Feng%2FAll%252BAges%252CChildren%252CYoung%252BAdult"
-    );
-    cy.findByRole("heading", { name: "Rush, Jennifer" }).should("exist");
-    cy.findAllByRole("img", { name: "Cover of book: Altered" })
-      .should("exist", 2)
-      .first()
-      .click();
-
-    // Navigate to detail page
-    cy.location("pathname").should(
-      "contain",
-      "/app/book/https%3A%2F%2Fqa-circulation.openebooks.us%2FUSOEI%2Fworks%2FAxis%2520360%2520ID%2F0013215327"
-    );
-    cy.findByRole("listitem", { name: "Current location: Altered" }).should(
-      "exist"
-    );
-
-    // Navigate back through breadcrumbs
-    cy.findByRole("link", { name: "Book" }).should("exist").click();
-    cy.findByRole("listitem", {
-      name: "Current location: Open eBooks (QA Server)"
-    }).should("exist");
+    // Verify you can navigate to books and collections at any level
+    cy.visit(HIGH_SCHOOL_ROMANCE_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.visit(HIGH_SCHOOL_DETAIL_BOOK_PATH_1);
+    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.visit(MIDDLE_GRADES_COMICS_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.visit(MIDDLE_GRADES_DETAIL_BOOK_PATH);
+    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.visit(EARLY_GRADES_CHAPTER_BOOKS_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.visit(EARLY_GRADES_DETAIL_BOOK_PATH);
+    cy.findByText("404 Error: No such lane.").should("not.exist");
   });
 });
 
-describe("High school access browsing", () => {
-  const token = generateToken(highSchoolUser.username, highSchoolUser.password);
-  const credentials = {
-    methodType: "http://opds-spec.org/auth/basic",
-    token
-  };
-
+describe("High school access", () => {
   beforeEach(() => {
-    cy.clearCookie("CPW_AUTH_COOKIE%2Fapp");
-    cy.setCookie("CPW_AUTH_COOKIE%2Fapp", JSON.stringify(credentials));
+    cy.loginByApi("HIGH_SCHOOL_USER");
   });
 
-  it("can browse books for high school grades", () => {
-    cy.visit("/app");
+  it("can view books and collections for high school grades", () => {
+    cy.visit(APP_PATH);
 
     // Verify collection title
     cy.findByRole("heading", { name: "Open eBooks (QA Server)" }).should(
@@ -258,26 +135,42 @@ describe("High school access browsing", () => {
     cy.findByRole("heading", { name: "All Middle Grades collection" }).should(
       "not.exist"
     );
+
+    // Verify only High School "All access" lane is accessible via direct link
+    cy.visit(HIGH_SCHOOL_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.visit(MIDDLE_GRADES_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("exist");
+    cy.visit(EARLY_GRADES_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("exist");
+
+    // Verify you can navigate to collections and books in your age class
+    cy.visit(HIGH_SCHOOL_ROMANCE_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.visit(HIGH_SCHOOL_AUTHOR_RECOMMENDATIONS_PATH);
+    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.visit(HIGH_SCHOOL_DETAIL_BOOK_PATH_3);
+    cy.findByText("404 Error: No such lane.").should("not.exist");
+
+    // Verify you cannot navigate to collections or books outside your age class
+    cy.visit(MIDDLE_GRADES_COMICS_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("exist");
+    // cy.visit(MIDDLE_GRADES_DETAIL_BOOK_PATH);
+    // cy.findByText("404 Error: No such lane.").should("exist");
+    cy.visit(EARLY_GRADES_CHAPTER_BOOKS_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("exist");
+    // cy.visit(EARLY_GRADES_DETAIL_BOOK_PATH);
+    // cy.findByText("404 Error: No such lane.").should("exist");
   });
 });
 
-describe("Middle grades access browsing", () => {
-  const token = generateToken(
-    middleGradesUser.username,
-    middleGradesUser.password
-  );
-  const credentials = {
-    methodType: "http://opds-spec.org/auth/basic",
-    token
-  };
-
+describe("Middle grades access", () => {
   beforeEach(() => {
-    cy.clearCookie("CPW_AUTH_COOKIE%2Fapp");
-    cy.setCookie("CPW_AUTH_COOKIE%2Fapp", JSON.stringify(credentials));
+    cy.loginByApi("MIDDLE_GRADES_USER");
   });
 
-  it("can browse books for middle grades", () => {
-    cy.visit("/app");
+  it("can view books and collections for middle grades", () => {
+    cy.visit(APP_PATH);
 
     // Verify collection title
     cy.findByRole("heading", { name: "Open eBooks (QA Server)" }).should(
@@ -348,26 +241,44 @@ describe("Middle grades access browsing", () => {
     cy.findByRole("heading", { name: "All Early Grades collection" }).should(
       "not.exist"
     );
+
+    // Verify only Middle Grades "All access" lane is accessible via direct link
+    cy.visit(HIGH_SCHOOL_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("exist");
+    cy.visit(MIDDLE_GRADES_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.visit(EARLY_GRADES_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("exist");
+
+    // Verify you can navigate to collections and books in your age class
+    cy.visit(MIDDLE_GRADES_COMICS_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.visit(MIDDLE_GRADES_DETAIL_BOOK_PATH);
+    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.visit(MIDDLE_GRADES_STAFF_PICKS_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("not.exist");
+
+    // Verify you cannot navigate to collections or books outside your age class
+    cy.visit(HIGH_SCHOOL_ROMANCE_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("exist");
+    cy.visit(HIGH_SCHOOL_AUTHOR_RECOMMENDATIONS_PATH);
+    cy.findByText("404 Error: No such lane.").should("exist");
+    // cy.visit(HIGH_SCHOOL_DETAIL_BOOK_PATH_3);
+    // cy.findByText("404 Error: No such lane.").should("exist");
+    cy.visit(EARLY_GRADES_CHAPTER_BOOKS_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("exist");
+    // cy.visit(EARLY_GRADES_DETAIL_BOOK_PATH);
+    // cy.findByText("404 Error: No such lane.").should("exist");
   });
 });
 
-describe("Early grades access browsing", () => {
-  const token = generateToken(
-    earlyGradesUser.username,
-    earlyGradesUser.password
-  );
-  const credentials = {
-    methodType: "http://opds-spec.org/auth/basic",
-    token
-  };
-
+describe("Early grades access", () => {
   beforeEach(() => {
-    cy.clearCookie("CPW_AUTH_COOKIE%2Fapp");
-    cy.setCookie("CPW_AUTH_COOKIE%2Fapp", JSON.stringify(credentials));
+    cy.loginByApi("EARLY_GRADES_USER");
   });
 
-  it("can browse books for early grades", () => {
-    cy.visit("/app");
+  it("can view books and collections for early grades", () => {
+    cy.visit(APP_PATH);
 
     // Verify collection title
     cy.findByRole("heading", { name: "Open eBooks (QA Server)" }).should(
@@ -426,6 +337,32 @@ describe("Early grades access browsing", () => {
     cy.findByRole("heading", { name: "All Middle Grades collection" }).should(
       "not.exist"
     );
+
+    // Verify only Early Grades "All access" lane is accessible via direct link
+    cy.visit(HIGH_SCHOOL_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("exist");
+    cy.visit(MIDDLE_GRADES_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("exist");
+    cy.visit(EARLY_GRADES_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("not.exist");
+
+    // Verify you can navigate to collections and books in your age class
+    cy.visit(EARLY_GRADES_CHAPTER_BOOKS_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.visit(EARLY_GRADES_DETAIL_BOOK_PATH);
+    cy.findByText("404 Error: No such lane.").should("not.exist");
+
+    // Verify you cannot navigate to collections or books outside your age class
+    cy.visit(HIGH_SCHOOL_AUTHOR_RECOMMENDATIONS_PATH);
+    cy.findByText("404 Error: No such lane.").should("exist");
+    // cy.visit(HIGH_SCHOOL_ROMANCE_COLLECTION_PATH);
+    // cy.findByText("404 Error: No such lane.").should("exist");
+    // cy.visit(HIGH_SCHOOL_DETAIL_BOOK_PATH_3);
+    // cy.findByText("404 Error: No such lane.").should("exist");
+    // cy.visit(MIDDLE_GRADES_COMICS_COLLECTION_PATH);
+    // cy.findByText("404 Error: No such lane.").should("exist");
+    // cy.visit(MIDDLE_GRADES_DETAIL_BOOK_PATH);
+    // cy.findByText("404 Error: No such lane.").should("exist");
   });
 });
 
