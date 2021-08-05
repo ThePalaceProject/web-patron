@@ -19,12 +19,12 @@ describe("Report a problem", () => {
     cy.findByRole("textbox", { name: "Details" })
       .should("exist")
       .type("frontend cypress test");
-    // cy.findByRole("button", { name: "Submit" }).should("exist").click();
-    // cy.findByRole("heading", {
-    //   name: "Your problem was reported. Thank you!"
-    // }).should("exist");
-    // cy.findByRole("button", { name: "Done" }).should("exist").click();
-    // cy.findByRole("dialog", { name: "Report a problem" }).should("not.exist");
+    cy.findByRole("button", { name: "Submit" }).should("exist").click();
+    cy.findByRole("heading", {
+      name: "Your problem was reported. Thank you!"
+    }).should("exist");
+    cy.findByRole("button", { name: "Done" }).should("exist").click();
+    cy.findByRole("dialog", { name: "Report a problem" }).should("not.exist");
   });
 });
 
