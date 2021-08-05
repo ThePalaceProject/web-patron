@@ -55,7 +55,6 @@ Cypress.Commands.add(
   (userType: UserType, appType: AppType = "OPENEBOOKS") => {
     const username = Cypress.env(`${appType}_${userType}_USERNAME`);
     const password = Cypress.env(`${appType}_${userType}_PW`);
-    cy.log(password);
     if (password === "" || !password) {
       throw new Error(
         "Missing password value, set using CYPRESS_values_in_cypress_json_config..."
