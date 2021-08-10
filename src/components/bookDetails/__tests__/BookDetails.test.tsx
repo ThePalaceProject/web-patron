@@ -122,7 +122,7 @@ describe("book details page", () => {
     expect(iosBadge).toBeInTheDocument();
     expect(iosBadge).toHaveAttribute(
       "href",
-      "https://apps.apple.com/us/app/simplye/id1046583900"
+      "https://apps.apple.com/us/app/the-palace-project/id1574359693"
     );
 
     const googleBadge = utils.getByRole("link", {
