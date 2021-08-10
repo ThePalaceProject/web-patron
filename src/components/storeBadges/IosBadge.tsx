@@ -8,8 +8,7 @@ const IosBadge = (props: React.ComponentProps<"a">) => {
     <a
       rel="noopener noreferrer"
       target="__blank"
-      // TODO: Replace with correct URL when Palace is in the App Store.
-      href="https://apps.apple.com/us/app/simplye/id1046583900"
+      href="https://apps.apple.com/us/app/the-palace-project/id1574359693"
       aria-label="Download Palace on the Apple App Store"
       sx={{ display: "block" }}
       {...props}
