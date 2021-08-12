@@ -1,26 +1,17 @@
-// import { visitAuthd } from "../fixtures/testUser";
-// import { rest } from "msw";
-// import mswServer from "../../msw";
-// import { mockLoans } from "../../msw/handlers/mockLoans";
+import { LOANS_PATH, SERVER_URL } from "../../support/utils";
 
-// const serverUrl = "https://qa-circulation.openebooks.us/USOEI";
-
-// describe("Open eBooks Read Online", () => {
-//   /**
-//    * We will have to mock the server response for this so that there is
-//    * always a checked out book viewable.
-//    */
-//   it("Read Online button exists and works", () => {
-//     visitAuthd("/app/loans");
-
-//     mswServer.use(rest.get(`${serverUrl}/loans`, mockLoans));
-
-//     cy.intercept("GET", `${serverUrl}/loans`, {
-//       fixture: "open-ebooks/loans.xml"
-//     });
-//     // make sure the read online buttons are there
-//     cy.findAllByRole("link", { name: "Read Online" }).should("have.length", 3);
-//   });
-// });
+describe("Open eBooks Read Online", () => {
+  beforeEach(() => {
+    cy.loginByApi("ALL_ACCESS_USER");
+  });
+  it("Read Online button exists and works", () => {
+    cy.visit(LOANS_PATH);
+    cy.intercept("GET", `${SERVER_URL}/loans`, {
+      fixture: "open-ebooks/all-access/loans.html"
+    }).as("loans");
+    cy.wait("@loans");
+    cy.findAllByText("Ready to Read!").should("have.length", 3);
+  });
+});
 
 export {};

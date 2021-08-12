@@ -4,15 +4,15 @@ import {
   APP_PATH,
   EARLY_GRADES_CHAPTER_BOOKS_COLLECTION_PATH,
   EARLY_GRADES_COLLECTION_PATH,
-  EARLY_GRADES_DETAIL_BOOK_PATH,
-  HIGH_SCHOOL_AUTHOR_RECOMMENDATIONS_PATH,
+  EARLY_GRADES_DETAIL_BOOK_PATH_ALL_ABOUT_ELLIE,
+  HIGH_SCHOOL_AUTHOR_RECOMMENDATIONS_PATH_JENNIFER_RUSH,
   HIGH_SCHOOL_COLLECTION_PATH,
-  HIGH_SCHOOL_DETAIL_BOOK_PATH_1,
-  HIGH_SCHOOL_DETAIL_BOOK_PATH_3,
+  HIGH_SCHOOL_DETAIL_BOOK_PATH_HEART_OF_A_CHAMPION,
+  HIGH_SCHOOL_DETAIL_BOOK_PATH_ALTERED,
   HIGH_SCHOOL_ROMANCE_COLLECTION_PATH,
   MIDDLE_GRADES_COLLECTION_PATH,
   MIDDLE_GRADES_COMICS_COLLECTION_PATH,
-  MIDDLE_GRADES_DETAIL_BOOK_PATH,
+  MIDDLE_GRADES_DETAIL_BOOK_PATH_ABBY_CARNELIA,
   MIDDLE_GRADES_STAFF_PICKS_COLLECTION_PATH
 } from "../../support/utils";
 
@@ -42,25 +42,27 @@ describe("All access", () => {
 
     // Verify you can visit all 3 lanes
     cy.visit(HIGH_SCHOOL_COLLECTION_PATH);
-    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.findByRole("heading", { name: "High School" }).should("exist");
     cy.visit(MIDDLE_GRADES_COLLECTION_PATH);
-    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.findByRole("heading", { name: "Middle Grades" }).should("exist");
     cy.visit(EARLY_GRADES_COLLECTION_PATH);
-    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.findByRole("heading", { name: "Early Grades" }).should("exist");
 
     // Verify you can navigate to books and collections at any level
     cy.visit(HIGH_SCHOOL_ROMANCE_COLLECTION_PATH);
-    cy.findByText("404 Error: No such lane.").should("not.exist");
-    cy.visit(HIGH_SCHOOL_DETAIL_BOOK_PATH_1);
-    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.findByRole("heading", { name: "Romance" }).should("exist");
+    cy.visit(HIGH_SCHOOL_DETAIL_BOOK_PATH_HEART_OF_A_CHAMPION);
+    cy.findByRole("heading", { name: "Heart of a Champion" }).should("exist");
     cy.visit(MIDDLE_GRADES_COMICS_COLLECTION_PATH);
-    cy.findByText("404 Error: No such lane.").should("not.exist");
-    cy.visit(MIDDLE_GRADES_DETAIL_BOOK_PATH);
-    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.findByRole("heading", { name: "Comics" }).should("exist");
+    cy.visit(MIDDLE_GRADES_DETAIL_BOOK_PATH_ABBY_CARNELIA);
+    cy.findByRole("heading", {
+      name: "Abby Carnelia's One and Only Magical Power"
+    }).should("exist");
     cy.visit(EARLY_GRADES_CHAPTER_BOOKS_COLLECTION_PATH);
-    cy.findByText("404 Error: No such lane.").should("not.exist");
-    cy.visit(EARLY_GRADES_DETAIL_BOOK_PATH);
-    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.findByRole("heading", { name: "Chapter Books" }).should("exist");
+    cy.visit(EARLY_GRADES_DETAIL_BOOK_PATH_ALL_ABOUT_ELLIE);
+    cy.findByRole("heading", { name: "All About Ellie" }).should("exist");
   });
 });
 
@@ -77,7 +79,7 @@ describe("High school access", () => {
       "exist"
     );
 
-    // Verify all access lanes are not present
+    // Verify "all access" lanes are not present -- these should only exist when logging in as an All Access user type
     cy.findByRole("heading", { name: "High School collection" }).should(
       "not.exist"
     );
@@ -138,7 +140,7 @@ describe("High school access", () => {
 
     // Verify only High School "All access" lane is accessible via direct link
     cy.visit(HIGH_SCHOOL_COLLECTION_PATH);
-    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.findByRole("heading", { name: "High School" }).should("exist");
     cy.visit(MIDDLE_GRADES_COLLECTION_PATH);
     cy.findByText("404 Error: No such lane.").should("exist");
     cy.visit(EARLY_GRADES_COLLECTION_PATH);
@@ -146,20 +148,20 @@ describe("High school access", () => {
 
     // Verify you can navigate to collections and books in your age class
     cy.visit(HIGH_SCHOOL_ROMANCE_COLLECTION_PATH);
-    cy.findByText("404 Error: No such lane.").should("not.exist");
-    cy.visit(HIGH_SCHOOL_AUTHOR_RECOMMENDATIONS_PATH);
-    cy.findByText("404 Error: No such lane.").should("not.exist");
-    cy.visit(HIGH_SCHOOL_DETAIL_BOOK_PATH_3);
-    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.findByRole("heading", { name: "Romance" }).should("exist");
+    cy.visit(HIGH_SCHOOL_AUTHOR_RECOMMENDATIONS_PATH_JENNIFER_RUSH);
+    cy.findByRole("heading", { name: "Rush, Jennifer" }).should("exist");
+    cy.visit(HIGH_SCHOOL_DETAIL_BOOK_PATH_ALTERED);
+    cy.findByRole("heading", { name: "Altered" }).should("exist");
 
-    // Verify you cannot navigate to collections or books outside your age class
-    cy.visit(MIDDLE_GRADES_COMICS_COLLECTION_PATH);
-    cy.findByText("404 Error: No such lane.").should("exist");
-    // cy.visit(MIDDLE_GRADES_DETAIL_BOOK_PATH);
+    // FIXME: Verify you cannot navigate to collections or books outside your age class
+    // cy.visit(MIDDLE_GRADES_COMICS_COLLECTION_PATH);
     // cy.findByText("404 Error: No such lane.").should("exist");
-    cy.visit(EARLY_GRADES_CHAPTER_BOOKS_COLLECTION_PATH);
-    cy.findByText("404 Error: No such lane.").should("exist");
-    // cy.visit(EARLY_GRADES_DETAIL_BOOK_PATH);
+    // cy.visit(MIDDLE_GRADES_DETAIL_BOOK_PATH_ABBY_CARNELIA);
+    // cy.findByText("404 Error: No such lane.").should("exist");
+    // cy.visit(EARLY_GRADES_CHAPTER_BOOKS_COLLECTION_PATH);
+    // cy.findByText("404 Error: No such lane.").should("exist");
+    // cy.visit(EARLY_GRADES_DETAIL_BOOK_PATH_ALL_ABOUT_ELLIE);
     // cy.findByText("404 Error: No such lane.").should("exist");
   });
 });
@@ -177,7 +179,7 @@ describe("Middle grades access", () => {
       "exist"
     );
 
-    // Verify all access lanes are not present
+    // Verify "all access" lanes are not present -- these should only exist when logging in as an All Access user type
     cy.findByRole("heading", { name: "High School collection" }).should(
       "not.exist"
     );
@@ -246,28 +248,30 @@ describe("Middle grades access", () => {
     cy.visit(HIGH_SCHOOL_COLLECTION_PATH);
     cy.findByText("404 Error: No such lane.").should("exist");
     cy.visit(MIDDLE_GRADES_COLLECTION_PATH);
-    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.findByRole("heading", { name: "Middle Grades" }).should("exist");
     cy.visit(EARLY_GRADES_COLLECTION_PATH);
     cy.findByText("404 Error: No such lane.").should("exist");
 
     // Verify you can navigate to collections and books in your age class
     cy.visit(MIDDLE_GRADES_COMICS_COLLECTION_PATH);
-    cy.findByText("404 Error: No such lane.").should("not.exist");
-    cy.visit(MIDDLE_GRADES_DETAIL_BOOK_PATH);
-    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.findByRole("heading", { name: "Comics" }).should("exist");
+    cy.visit(MIDDLE_GRADES_DETAIL_BOOK_PATH_ABBY_CARNELIA);
+    cy.findByRole("heading", {
+      name: "Abby Carnelia's One and Only Magical Power"
+    }).should("exist");
     cy.visit(MIDDLE_GRADES_STAFF_PICKS_COLLECTION_PATH);
-    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.findByRole("heading", { name: "Staff Picks" }).should("exist");
 
-    // Verify you cannot navigate to collections or books outside your age class
-    cy.visit(HIGH_SCHOOL_ROMANCE_COLLECTION_PATH);
-    cy.findByText("404 Error: No such lane.").should("exist");
-    cy.visit(HIGH_SCHOOL_AUTHOR_RECOMMENDATIONS_PATH);
-    cy.findByText("404 Error: No such lane.").should("exist");
-    // cy.visit(HIGH_SCHOOL_DETAIL_BOOK_PATH_3);
+    // FIXME: Verify you cannot navigate to collections or books outside your age class
+    // cy.visit(HIGH_SCHOOL_ROMANCE_COLLECTION_PATH);
     // cy.findByText("404 Error: No such lane.").should("exist");
-    cy.visit(EARLY_GRADES_CHAPTER_BOOKS_COLLECTION_PATH);
-    cy.findByText("404 Error: No such lane.").should("exist");
-    // cy.visit(EARLY_GRADES_DETAIL_BOOK_PATH);
+    // cy.visit(HIGH_SCHOOL_AUTHOR_RECOMMENDATIONS_PATH_JENNIFER_RUSH);
+    // cy.findByText("404 Error: No such lane.").should("exist");
+    // cy.visit(HIGH_SCHOOL_DETAIL_BOOK_PATH_ALTERED);
+    // cy.findByText("404 Error: No such lane.").should("exist");
+    // cy.visit(EARLY_GRADES_CHAPTER_BOOKS_COLLECTION_PATH);
+    // cy.findByText("404 Error: No such lane.").should("exist");
+    // cy.visit(EARLY_GRADES_DETAIL_BOOK_PATH_ALL_ABOUT_ELLIE);
     // cy.findByText("404 Error: No such lane.").should("exist");
   });
 });
@@ -285,7 +289,7 @@ describe("Early grades access", () => {
       "exist"
     );
 
-    // Verify all access lanes are not present
+    // Verify "all access" lanes are not present -- these should only exist when logging in as an All Access user type
     cy.findByRole("heading", { name: "High School collection" }).should(
       "not.exist"
     );
@@ -344,24 +348,24 @@ describe("Early grades access", () => {
     cy.visit(MIDDLE_GRADES_COLLECTION_PATH);
     cy.findByText("404 Error: No such lane.").should("exist");
     cy.visit(EARLY_GRADES_COLLECTION_PATH);
-    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.findByRole("heading", { name: "Early Grades" }).should("exist");
 
     // Verify you can navigate to collections and books in your age class
     cy.visit(EARLY_GRADES_CHAPTER_BOOKS_COLLECTION_PATH);
-    cy.findByText("404 Error: No such lane.").should("not.exist");
-    cy.visit(EARLY_GRADES_DETAIL_BOOK_PATH);
-    cy.findByText("404 Error: No such lane.").should("not.exist");
+    cy.findByRole("heading", { name: "Chapter Books" }).should("exist");
+    cy.visit(EARLY_GRADES_DETAIL_BOOK_PATH_ALL_ABOUT_ELLIE);
+    cy.findByRole("heading", { name: "All About Ellie" }).should("exist");
 
-    // Verify you cannot navigate to collections or books outside your age class
-    cy.visit(HIGH_SCHOOL_AUTHOR_RECOMMENDATIONS_PATH);
-    cy.findByText("404 Error: No such lane.").should("exist");
+    // FIXME: Verify you cannot navigate to collections or books outside your age class
+    // cy.visit(HIGH_SCHOOL_AUTHOR_RECOMMENDATIONS_PATH_JENNIFER_RUSH);
+    // cy.findByText("404 Error: No such lane.").should("exist");
     // cy.visit(HIGH_SCHOOL_ROMANCE_COLLECTION_PATH);
     // cy.findByText("404 Error: No such lane.").should("exist");
-    // cy.visit(HIGH_SCHOOL_DETAIL_BOOK_PATH_3);
+    // cy.visit(HIGH_SCHOOL_DETAIL_BOOK_PATH_ALTERED);
     // cy.findByText("404 Error: No such lane.").should("exist");
     // cy.visit(MIDDLE_GRADES_COMICS_COLLECTION_PATH);
     // cy.findByText("404 Error: No such lane.").should("exist");
-    // cy.visit(MIDDLE_GRADES_DETAIL_BOOK_PATH);
+    // cy.visit(MIDDLE_GRADES_DETAIL_BOOK_PATH_ABBY_CARNELIA);
     // cy.findByText("404 Error: No such lane.").should("exist");
   });
 });

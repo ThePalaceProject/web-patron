@@ -2,11 +2,12 @@
 
 import {
   APP_PATH,
-  HIGH_SCHOOL_AUTHOR_RECOMMENDATIONS_PATH,
+  SERVER_URL,
+  HIGH_SCHOOL_AUTHOR_RECOMMENDATIONS_PATH_JENNIFER_RUSH,
   HIGH_SCHOOL_COLLECTION_PATH,
-  HIGH_SCHOOL_DETAIL_BOOK_PATH_1,
-  HIGH_SCHOOL_DETAIL_BOOK_PATH_2,
-  HIGH_SCHOOL_DETAIL_BOOK_PATH_3,
+  HIGH_SCHOOL_DETAIL_BOOK_PATH_HEART_OF_A_CHAMPION,
+  HIGH_SCHOOL_DETAIL_BOOK_PATH_BETRAYED,
+  HIGH_SCHOOL_DETAIL_BOOK_PATH_ALTERED,
   HIGH_SCHOOL_STAFF_PICKS_COLLECTION_PATH
 } from "../../support/utils";
 
@@ -37,6 +38,10 @@ describe("All-access browsing", () => {
 
     // Click on another see more
     cy.findByRole("link", { name: "See more: Staff Picks collection" }).click();
+    cy.intercept("GET", `${SERVER_URL}/feed/407?entrypoint=Book`, {
+      fixture: "open-ebooks/high-school/staff-picks.html"
+    }).as("staffPicks");
+    cy.wait("@staffPicks");
 
     // Make sure we changed to the new collection page
     cy.location("pathname").should(
@@ -65,8 +70,20 @@ describe("All-access browsing", () => {
         cy.findByRole("link", { name: "Read more" }).should("exist").click();
       });
 
+    cy.intercept(
+      "GET",
+      `${SERVER_URL}/works/Axis%20360%20ID/0013217610/related_books`,
+      {
+        fixture: "open-ebooks/high-school/book-heart-of-a-champion.html"
+      }
+    ).as("heartOfAChampionBook");
+    cy.wait("@heartOfAChampionBook");
+
     // Verify we are at the book detail view
-    cy.location("pathname").should("contain", HIGH_SCHOOL_DETAIL_BOOK_PATH_1);
+    cy.location("pathname").should(
+      "contain",
+      HIGH_SCHOOL_DETAIL_BOOK_PATH_HEART_OF_A_CHAMPION
+    );
     cy.findByRole("listitem", {
       name: "Current location: Heart of a Champion"
     }).should("exist");
@@ -82,6 +99,11 @@ describe("All-access browsing", () => {
     // Navigate back to "Staff Picks" using breadcrumbs
     cy.findByRole("link", { name: "Staff Picks" }).click();
 
+    cy.intercept("GET", `${SERVER_URL}/feed/407?entrypoint=Book`, {
+      fixture: "open-ebooks/high-school/staff-picks.html"
+    }).as("staffPicks");
+    cy.wait("@staffPicks");
+
     // Click new book and render detail view
     cy.findByRole("listitem", { name: "Book: Betrayed" })
       .should("exist")
@@ -89,7 +111,18 @@ describe("All-access browsing", () => {
         // Verify that the read more button works
         cy.findByRole("link", { name: "Read more" }).should("exist").click();
       });
-    cy.location("pathname").should("contain", HIGH_SCHOOL_DETAIL_BOOK_PATH_2);
+    cy.intercept(
+      "GET",
+      `${SERVER_URL}/works/Axis%20360%20ID/0015470129/related_books`,
+      {
+        fixture: "open-ebooks/high-school/book-betrayed.html"
+      }
+    ).as("betrayedBook");
+    cy.wait("@betrayedBook");
+    cy.location("pathname").should(
+      "contain",
+      HIGH_SCHOOL_DETAIL_BOOK_PATH_BETRAYED
+    );
 
     // Verify we are at the book detail view
     cy.findByRole("listitem", {
@@ -106,9 +139,19 @@ describe("All-access browsing", () => {
       .click();
 
     // Navigate to "Recommendations" page
+    cy.intercept(
+      "GET",
+      `${SERVER_URL}/works/contributor/Rush%2C%20Jennifer/eng/All%2BAges%2CChildren%2CYoung%2BAdult
+      `,
+      {
+        fixture: "open-ebooks/high-school/jennifer-rush-recommendations.html"
+      }
+    ).as("recommendations");
+    cy.wait("@recommendations");
+
     cy.location("pathname").should(
       "contain",
-      HIGH_SCHOOL_AUTHOR_RECOMMENDATIONS_PATH
+      HIGH_SCHOOL_AUTHOR_RECOMMENDATIONS_PATH_JENNIFER_RUSH
     );
     cy.findByRole("heading", { name: "Rush, Jennifer" }).should("exist");
     cy.findAllByRole("img", { name: "Cover of book: Altered" })
@@ -117,7 +160,18 @@ describe("All-access browsing", () => {
       .click();
 
     // Navigate to detail page
-    cy.location("pathname").should("contain", HIGH_SCHOOL_DETAIL_BOOK_PATH_3);
+    cy.intercept(
+      "GET",
+      `${SERVER_URL}/works/Axis%20360%20ID/0013215327/related_books`,
+      {
+        fixture: "open-ebooks/high-school/book-altered.html"
+      }
+    ).as("alteredBook");
+    cy.wait("@alteredBook");
+    cy.location("pathname").should(
+      "contain",
+      HIGH_SCHOOL_DETAIL_BOOK_PATH_ALTERED
+    );
     cy.findByRole("listitem", { name: "Current location: Altered" }).should(
       "exist"
     );

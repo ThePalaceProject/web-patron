@@ -55,9 +55,14 @@ Cypress.Commands.add(
   (userType: UserType, appType: AppType = "OPENEBOOKS") => {
     const username = Cypress.env(`${appType}_${userType}_USERNAME`);
     const password = Cypress.env(`${appType}_${userType}_PW`);
+    if (username === "" || !username) {
+      throw new Error(
+        "Missing username value, set as an environment variable prefixed by CYPRESS_"
+      );
+    }
     if (password === "" || !password) {
       throw new Error(
-        "Missing password value, set using CYPRESS_values_in_cypress_json_config..."
+        "Missing password value, set as an environment variable prefixed by CYPRESS_"
       );
     }
     const token = generateToken(username, password);
