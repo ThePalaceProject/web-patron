@@ -12,5 +12,4 @@ describe("Open eBooks Read Online", () => {
   });
 });
 
-// have to do this to appease typescript
 export {};

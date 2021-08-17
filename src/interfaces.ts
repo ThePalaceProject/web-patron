@@ -5,7 +5,8 @@
  * Currently only used for support of a Library Registry, which is
  * an OPDS 2 Feed of OPDS 2 Catalogs from which we extract the catalog root url
  */
-export * as OPDS2 from "types/opds2";
+import * as OPDS2 from "types/opds2";
+export { OPDS2 };
 /**
  * OPDS 1.x DATA TYPES
  */

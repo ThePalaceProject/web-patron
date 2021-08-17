@@ -48,6 +48,8 @@ const ReportProblem: React.FC<{ book: AnyBook }> = ({ book }) => {
   return (
     <React.Fragment>
       <Modal
+        role="dialog"
+        aria-labelledby="Report a problem"
         isVisible={state.showForm}
         dialog={dialog}
         label="Report a problem"

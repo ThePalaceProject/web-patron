@@ -163,7 +163,10 @@ export const BookListItem: React.FC<{
                 , {truncateString(book.subtitle, 50)}
               </Text>
             )}
-            <Text aria-label="Authors" sx={{ display: "block" }}>
+            <Text
+              aria-label={`Author(s): ${authors}`}
+              sx={{ display: "block" }}
+            >
               {authors}
             </Text>
           </div>
