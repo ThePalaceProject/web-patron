@@ -1,5 +1,5 @@
 ## CHANGELOG
-
+- Add: Set up Cypress tests for browsing and ensuring age appropriateness
 ### UNRELEASED CHANGES
 - Add: Set up e2e testing on vercel deploys via cypress
 
