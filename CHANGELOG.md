@@ -1,8 +1,8 @@
 ## CHANGELOG
-- Add: Set up Cypress tests for browsing and ensuring age appropriateness
+- Add: Update scripts for Cypress and add Cypress instructions to the README
 ### UNRELEASED CHANGES
 - Add: Set up e2e testing on vercel deploys via cypress
-
+- Add: Set up Cypress tests for browsing and ensuring age appropriateness
 ### 4.4.1
 - Fix: Use contributors when there are no authors, fix parsing of authors with undefined names, and remove extra 0 in name when there are no authors.
 

@@ -4,6 +4,11 @@
 # testing
 /coverage
 
+# cypress
+cypress.env.json
+/cypress/videos
+/cypress/screenshots
+
 # next.js
 /.next/
 /out/
