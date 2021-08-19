@@ -1,4 +1,4 @@
-import { fetchBook } from "dataflow/opds1/fetch";
+import { fetchBearerToken, fetchBook } from "dataflow/opds1/fetch";
 import ApplicationError from "errors";
 import {
   FulfillableBook,
@@ -26,11 +26,16 @@ import { typeMap } from "utils/file";
  * https://docs.google.com/document/d/1dli5mgTbVaURN_B2AtUmPhgpaFUVqOqrzsaoFvCXnkA/edit?pli=1#
  */
 
+export type AuthorizedLocation = {
+  url: string;
+  token?: string;
+};
+
 export type DownloadFulfillment = {
   type: "download";
   id: string;
   contentType: DownloadMediaType;
-  getUrl: GetUrlWithIndirection;
+  getLocation: GetLocationWithIndirection;
   buttonLabel: string;
 };
 export type ReadInternalFulfillment = {
@@ -42,7 +47,7 @@ export type ReadInternalFulfillment = {
 export type ReadExternalFulfillment = {
   type: "read-online-external";
   id: string;
-  getUrl: GetUrlWithIndirection;
+  getLocation: GetLocationWithIndirection;
   buttonLabel: string;
 };
 export type UnsupportedFulfillment = {
@@ -79,7 +84,11 @@ export function getFulfillmentFromLink(link: FulfillmentLink): AnyFullfillment {
         indirectionType === OPDS1.AdobeDrmMediaType ? "Adobe " : "";
       return {
         id: link.url,
-        getUrl: constructGetUrl(indirectionType, contentType, link.url),
+        getLocation: constructGetLocation(
+          indirectionType,
+          contentType,
+          link.url
+        ),
         type: "download",
         buttonLabel: `Download ${modifier}${typeName}`,
         contentType
@@ -89,7 +98,11 @@ export function getFulfillmentFromLink(link: FulfillmentLink): AnyFullfillment {
       return {
         id: link.url,
         type: "read-online-external",
-        getUrl: constructGetUrl(indirectionType, contentType, link.url),
+        getLocation: constructGetLocation(
+          indirectionType,
+          contentType,
+          link.url
+        ),
         buttonLabel: "Read Online"
       };
 
@@ -131,18 +144,18 @@ function isSupported(
 }
 
 /**
- * Constructs a function to be used later to fetch the actual url of the book,
- * when a user clicks on the fulfillment button
+ * Constructs a function to be used later to fetch the actual url and token to use to retrieve the
+ * book, when a user clicks on the fulfillment button
  */
-type GetUrlWithIndirection = (
+type GetLocationWithIndirection = (
   catalogUrl: string,
   token?: string
-) => Promise<string>;
-const constructGetUrl = (
+) => Promise<AuthorizedLocation>;
+const constructGetLocation = (
   indirectionType: OPDS1.IndirectAcquisitionType | undefined,
   contentType: OPDS1.AnyBookMediaType,
   url: string
-): GetUrlWithIndirection => async (catalogUrl: string, token?: string) => {
+): GetLocationWithIndirection => async (catalogUrl: string, token?: string) => {
   /**
    * If there is OPDS Entry Indirection, we fetch the actual link
    * from within an entry
@@ -159,10 +172,26 @@ const constructGetUrl = (
           "Indirect OPDS Entry did not contain the correct acquisition link."
       });
     }
-    return resolvedUrl;
+    return {
+      url: resolvedUrl,
+      token
+    };
   }
-  // otherwise there is no indirection, just return the url.
-  return url;
+
+  if (indirectionType === OPDS1.BearerTokenMediaType) {
+    const bearerToken = await fetchBearerToken(url, token);
+
+    return {
+      url: bearerToken.location,
+      token: `${bearerToken.token_type} ${bearerToken.access_token}`
+    };
+  }
+
+  // otherwise there is no indirection, just return the url and token.
+  return {
+    url,
+    token
+  };
 };
 
 export function dedupeLinks(links: readonly FulfillmentLink[]) {

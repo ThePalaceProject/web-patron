@@ -40,7 +40,9 @@ media_support:
     application/epub+zip: redirect-and-show
 
   # Bearer Token Exchange (web app currently doesn't support this)
-  # application/vnd.librarysimplified.bearer-token+json:
+  application/vnd.librarysimplified.bearer-token+json:
+    application/pdf: show
+    application/epub+zip: show
 
 # defines the companion app for the instance. Can be "simplye" or "openebooks"
 # default is "simplye"

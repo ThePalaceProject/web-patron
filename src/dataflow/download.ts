@@ -10,26 +10,33 @@ export default async function downloadFile(
   type: DownloadMediaType,
   token?: string
 ) {
-  const response = await fetchWithHeaders(url, token);
+  let response;
+
+  try {
+    response = await fetchWithHeaders(url, token);
+  } catch (err) {
+    // There was a network or CORS error. In case this was a CORS error, retry the request without
+    // the X-Requested-With header. Some distributors' servers may not have this header whitelisted
+    // for CORS.
+
+    response = await fetchWithHeaders(url, token, {
+      "X-Requested-With": undefined
+    });
+  }
+
+  if (!response.ok && response.redirected) {
+    // If the response errored after a redirect, try again without the Authorization header, as it
+    // causes errors when redirected to Amazon S3.
+
+    response = await fetch(response.url);
+  }
+
   if (response.ok) {
     return downloadBlob(response, title, type);
   }
 
-  /**
-   * If the response errored after a redirect, try again
-   * without the Authorization header, as it causes errors when
-   * redirected to Amazon S3
-   */
-  if (response.redirected) {
-    const newResp = await fetch(response.url);
-    if (newResp.ok) {
-      return downloadBlob(newResp, title, type);
-    }
-    throw new ServerError(response.url, newResp.status, await newResp.json());
-  }
-
   const details = await response.json();
-  throw new ServerError(url, response.status, details);
+  throw new ServerError(response.url, response.status, details);
 }
 
 async function downloadBlob(

@@ -226,6 +226,18 @@ export interface AuthDocument {
 }
 
 /**
+ * Bearer token propagation document
+ * See: https://github.com/NYPL-Simplified/Simplified/wiki/OPDSForDistributors#how-it-works
+ */
+
+export interface BearerTokenDocument {
+  expires_in: string;
+  token_type: string;
+  access_token: string;
+  location: string;
+}
+
+/**
  * SAML is an extension on the OPDS1 spec which only
  * works when backed by a Circulation Manager
  */

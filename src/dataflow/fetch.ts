@@ -8,7 +8,7 @@ import { FetchError } from "errors";
 export default async function fetchWithHeaders(
   url: string,
   token?: string,
-  additionalHeaders?: { [key: string]: string }
+  additionalHeaders?: { [key: string]: string | undefined }
 ) {
   const headers = prepareHeaders(token, additionalHeaders);
 
@@ -26,16 +26,38 @@ export default async function fetchWithHeaders(
 
 function prepareHeaders(
   token?: string,
-  additionalHeaders?: { [key: string]: string }
+  additionalHeaders?: { [key: string]: string | undefined }
 ) {
-  const headers: {
-    [key: string]: string;
+  // Merge the additional headers into any default headers.
+
+  const mergedHeaders: {
+    [key: string]: string | undefined;
   } = {
     "X-Requested-With": "XMLHttpRequest",
     ...additionalHeaders
   };
+
+  // The headers to be returned.
+
+  const headers: {
+    [key: string]: string;
+  } = {};
+
+  // Return only the headers that are not undefined.
+
+  Object.keys(mergedHeaders).forEach(key => {
+    const value = mergedHeaders[key];
+
+    if (value !== undefined) {
+      headers[key] = value;
+    }
+  });
+
+  // Add the authorization header if a token is present.
+
   if (token) {
     headers["Authorization"] = token;
   }
+
   return headers;
 }
