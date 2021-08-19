@@ -33,10 +33,6 @@ describe("All-access browsing", () => {
       }
     ).as("heartOfAChampionBook");
 
-    cy.intercept("GET", `${SERVER_URL}/feed/407?entrypoint=Book`, {
-      fixture: "open-ebooks/high-school/staff-picks.html"
-    }).as("staffPicks");
-
     cy.intercept(
       "GET",
       `${SERVER_URL}/works/Axis%20360%20ID/0015470129/related_books`,
@@ -187,6 +183,7 @@ describe("All-access browsing", () => {
     })
       .should("exist")
       .click();
+    // TODO: Figure out why this request fails in Firefox
     cy.wait("@highSchoolCollection");
     cy.findByRole("heading", { name: "High School" }).should("exist");
     cy.findByRole("listitem", {

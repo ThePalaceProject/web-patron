@@ -78,6 +78,9 @@ describe("High school access", () => {
     cy.findByRole("heading", { name: "Open eBooks (QA Server)" }).should(
       "exist"
     );
+    cy.findByRole("listitem", { name: "Current location: High School" }).should(
+      "exist"
+    );
 
     // Veryify high school lane headings are present
     cy.findByRole("heading", { name: "Staff Picks collection" }).should(
@@ -146,6 +149,9 @@ describe("Middle grades access", () => {
     cy.findByRole("heading", { name: "Open eBooks (QA Server)" }).should(
       "exist"
     );
+    cy.findByRole("listitem", {
+      name: "Current location: Middle Grades"
+    }).should("exist");
 
     // Veryify middle grades lane headings are present
     cy.findByRole("heading", { name: "Staff Picks collection" }).should(
@@ -221,6 +227,9 @@ describe("Early grades access", () => {
     cy.findByRole("heading", { name: "Open eBooks (QA Server)" }).should(
       "exist"
     );
+    cy.findByRole("listitem", {
+      name: "Current location: Early Grades"
+    }).should("exist");
 
     // Veryify early grade collection lane headings are present
     cy.findByRole("heading", { name: "Action & Adventure collection" }).should(
