@@ -79,17 +79,6 @@ describe("High school access", () => {
       "exist"
     );
 
-    // Verify "all access" lanes are not present -- these should only exist when logging in as an All Access user type
-    cy.findByRole("heading", { name: "High School collection" }).should(
-      "not.exist"
-    );
-    cy.findByRole("heading", { name: "Middle Grades collection" }).should(
-      "not.exist"
-    );
-    cy.findByRole("heading", { name: "Early Grades collection" }).should(
-      "not.exist"
-    );
-
     // Veryify high school lane headings are present
     cy.findByRole("heading", { name: "Staff Picks collection" }).should(
       "exist"
@@ -115,27 +104,6 @@ describe("High school access", () => {
     cy.findByRole("heading", { name: "Nonfiction collection" }).should("exist");
     cy.findByRole("heading", { name: "All High School collection" }).should(
       "exist"
-    );
-
-    // Verify early and middle grade lanes are not present
-    cy.findByRole("heading", { name: "Animals collection" }).should(
-      "not.exist"
-    );
-    cy.findByRole("heading", { name: "Chapter Books collection" }).should(
-      "not.exist"
-    );
-    cy.findByRole("heading", { name: "Humorous collection" }).should(
-      "not.exist"
-    );
-    cy.findByRole("heading", { name: "Informational Books collection" }).should(
-      "not.exist"
-    );
-    cy.findByRole("heading", { name: "Comics collection" }).should("not.exist");
-    cy.findByRole("heading", { name: "All Early Grades collection" }).should(
-      "not.exist"
-    );
-    cy.findByRole("heading", { name: "All Middle Grades collection" }).should(
-      "not.exist"
     );
 
     // Verify only High School "All access" lane is accessible via direct link
@@ -179,17 +147,6 @@ describe("Middle grades access", () => {
       "exist"
     );
 
-    // Verify "all access" lanes are not present -- these should only exist when logging in as an All Access user type
-    cy.findByRole("heading", { name: "High School collection" }).should(
-      "not.exist"
-    );
-    cy.findByRole("heading", { name: "Middle Grades collection" }).should(
-      "not.exist"
-    );
-    cy.findByRole("heading", { name: "Early Grades collection" }).should(
-      "not.exist"
-    );
-
     // Veryify middle grades lane headings are present
     cy.findByRole("heading", { name: "Staff Picks collection" }).should(
       "exist"
@@ -218,30 +175,6 @@ describe("Middle grades access", () => {
     );
     cy.findByRole("heading", { name: "All Middle Grades collection" }).should(
       "exist"
-    );
-
-    // Verify early grade and high school lanes are not present
-    cy.findByRole("heading", { name: "Animals collection" }).should(
-      "not.exist"
-    );
-    cy.findByRole("heading", { name: "Chapter Books collection" }).should(
-      "not.exist"
-    );
-    cy.findByRole("heading", { name: "Humorous collection" }).should(
-      "not.exist"
-    );
-    cy.findByRole("heading", { name: "Romance collection" }).should(
-      "not.exist"
-    );
-    cy.findByRole("heading", { name: "Nonfiction collection" }).should(
-      "not.exist"
-    );
-
-    cy.findByRole("heading", { name: "All High School collection" }).should(
-      "not.exist"
-    );
-    cy.findByRole("heading", { name: "All Early Grades collection" }).should(
-      "not.exist"
     );
 
     // Verify only Middle Grades "All access" lane is accessible via direct link
@@ -289,17 +222,6 @@ describe("Early grades access", () => {
       "exist"
     );
 
-    // Verify "all access" lanes are not present -- these should only exist when logging in as an All Access user type
-    cy.findByRole("heading", { name: "High School collection" }).should(
-      "not.exist"
-    );
-    cy.findByRole("heading", { name: "Middle Grades collection" }).should(
-      "not.exist"
-    );
-    cy.findByRole("heading", { name: "Early Grades collection" }).should(
-      "not.exist"
-    );
-
     // Veryify early grade collection lane headings are present
     cy.findByRole("heading", { name: "Action & Adventure collection" }).should(
       "exist"
@@ -322,24 +244,6 @@ describe("Early grades access", () => {
     );
     cy.findByRole("heading", { name: "All Early Grades collection" }).should(
       "exist"
-    );
-
-    // Verify middle and high school collection lanes are not present
-    cy.findByRole("heading", { name: "Romance collection" }).should(
-      "not.exist"
-    );
-    cy.findByRole("heading", { name: "Nonfiction collection" }).should(
-      "not.exist"
-    );
-    cy.findByRole("heading", { name: "Historical Fiction collection" }).should(
-      "not.exist"
-    );
-    cy.findByRole("heading", { name: "Comics collection" }).should("not.exist");
-    cy.findByRole("heading", { name: "All High School collection" }).should(
-      "not.exist"
-    );
-    cy.findByRole("heading", { name: "All Middle Grades collection" }).should(
-      "not.exist"
     );
 
     // Verify only Early Grades "All access" lane is accessible via direct link
