@@ -14,7 +14,7 @@ import {
   MIDDLE_GRADES_COMICS_COLLECTION_PATH,
   MIDDLE_GRADES_DETAIL_BOOK_PATH_ABBY_CARNELIA,
   MIDDLE_GRADES_STAFF_PICKS_COLLECTION_PATH
-} from "../../support/utils";
+} from "../../../support/utils";
 
 describe("All access", () => {
   beforeEach(() => {

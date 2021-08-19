@@ -40,6 +40,7 @@ const BreadcrumbBar: React.FC<{
       }}
     >
       <List
+        data-testid="breadcrumbs-list"
         sx={{
           display: "flex",
           alignItems: "center",
