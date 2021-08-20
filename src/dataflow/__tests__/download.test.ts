@@ -50,7 +50,8 @@ describe("downloadFile", () => {
   test("should retry the request to the redirected url, without any headers, if there is an error response after a redirect", async () => {
     fetchMock.mockResponseOnce("oh no", {
       status: 400,
-      // counter >= 1 indicates a redirect occurred in Node's fetch implementation
+      // counter >= 1 indicates a redirect occurred in Node's fetch implementation.
+      // @ts-ignore: The counter property is not declared in the MockParams type.
       counter: 1,
       url: "redirected-url"
     });
