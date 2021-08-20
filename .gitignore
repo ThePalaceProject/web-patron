@@ -5,7 +5,6 @@
 /coverage
 
 # cypress
-cypress.env.json
 /cypress/videos
 /cypress/screenshots
 
