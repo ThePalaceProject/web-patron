@@ -177,7 +177,7 @@ This project uses [Theme UI](https://theme-ui.com/) which provides a simple Java
 - `npm run lint:ts:fix` - Will lint the ts and tsx files and apply automatic fixes where possible.
 - `npm run generate-icons` - You can place svg files in `src/icons` and then run this command, and it will generate react components that can be imported and rendered normally.
 
-## Testing
+## Unit Testing
 
 The code is tested using Jest as a test runner and mocking library, and a combination of [React Testing Library](https://testing-library.com/docs/react-testing-library/intro) and [Enzyme](https://enzymejs.github.io/enzyme/). New tests are generally written with React Testing Library while the legacy tests were written with Enzyme. React Testing Library is good because it encourages devs not to test implementation details, but instead test the expected user experience. This results in tests that provide more confidence and change less frequently (they are implementation agnostic), therefore requiring less maintenance. In general, we have favored integration over unit tests, and testing components higher up the tree instead of in complete isolation. Similarly we have chosen to mock as few values and modules as possible. Both of these decisions will lead to higher confidence that the app works as expected for users.
 
@@ -230,6 +230,28 @@ test("fetches search description", async () => {
 });
 
 ```
+## Cypress Tests (currently only configured for open ebooks)
+
+We have some Cypress tests set up for integration and end-to-end testing. You can run these tests locally if you have your app configured for Open eBooks.
+
+In order to run Cypress tests locally, you'll need to add a set of specific usernames and passwords to your `.env.lile` file. This file is not committed to the repository to keep these passwords secure. Usernames and passwords are marked in the _Contributed test library cards_ Google document.
+
+Your `.env.local` file should include the following 8 key value pairs:
+
+```
+{
+    "OPENEBOOKS_ALL_ACCESS_USER_USERNAME": "",
+    "OPENEBOOKS_ALL_ACCESS_USER_PW": "",
+    "OPENEBOOKS_HIGH_SCHOOL_USER_USERNAME": "",
+    "OPENEBOOKS_HIGH_SCHOOL_USER_PW": "",
+    "OPENEBOOKS_MIDDLE_GRADES_USER_USERNAME": "",
+    "OPENEBOOKS_MIDDLE_GRADES_USER_PW": "",
+    "OPENEBOOKS_EARLY_GRADES_USER_USERNAME": "",
+    "OPENEBOOKS_EARLY_GRADES_USER_PW": ""
+}
+```
+
+Run Cypress tests locally using the commands prefixed with `cypress:` in the `package.json` file. Commands prefixed with `cypress:run` will run all of the tests with a headless Electron browser (the default browser that comes with Cypress), which is how they are run in the CI via GitHub Actions. This is useful for debugging. Cypress Commands prefixed with `cypress:open` will open Cypress in interacive test runner where you can run each test separately. Using this option, Cypress automatically detects available browsers on your OS. You can switch the browser in the [Test Runner by using the drop down in the top right corner](https://docs.cypress.io/guides/guides/launching-browsers#Browsers).
 
 ## Links and Routing
 

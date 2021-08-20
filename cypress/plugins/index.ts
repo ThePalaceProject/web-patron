@@ -15,12 +15,31 @@
 /**
  * @type {Cypress.PluginConfig}
  */
+
+require("dotenv").config({ path: ".env.local" });
+
 module.exports = (
   on: Cypress.PluginEvents,
   config: Cypress.PluginConfigOptions
 ) => {
-  // `on` is used to hook into various events Cypress emits
-  // `config` is the resolved Cypress config
+  config.env.OPENEBOOKS_ALL_ACCESS_USER_USERNAME =
+    process.env.OPENEBOOKS_ALL_ACCESS_USER_USERNAME;
+  config.env.OPENEBOOKS_ALL_ACCESS_USER_PW =
+    process.env.OPENEBOOKS_ALL_ACCESS_USER_PW;
+  config.env.OPENEBOOKS_HIGH_SCHOOL_USER_USERNAME =
+    process.env.OPENEBOOKS_HIGH_SCHOOL_USER_USERNAME;
+  config.env.OPENEBOOKS_HIGH_SCHOOL_USER_PW =
+    process.env.OPENEBOOKS_HIGH_SCHOOL_USER_PW;
+  config.env.OPENEBOOKS_MIDDLE_GRADES_USER_USERNAME =
+    process.env.OPENEBOOKS_MIDDLE_GRADES_USER_USERNAME;
+  config.env.OPENEBOOKS_MIDDLE_GRADES_USER_PW =
+    process.env.OPENEBOOKS_MIDDLE_GRADES_USER_PW;
+  config.env.OPENEBOOKS_EARLY_GRADES_USER_USERNAME =
+    process.env.OPENEBOOKS_EARLY_GRADES_USER_USERNAME;
+  config.env.OPENEBOOKS_EARLY_GRADES_USER_PW =
+    process.env.OPENEBOOKS_EARLY_GRADES_USER_PW;
+
+  return config;
 };
 
 export {};
