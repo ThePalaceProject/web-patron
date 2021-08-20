@@ -39,7 +39,7 @@ media_support:
   application/vnd.adobe.adept+xml:
     application/epub+zip: redirect-and-show
 
-  # Bearer Token Exchange (web app currently doesn't support this)
+  # Bearer Token Exchange
   application/vnd.librarysimplified.bearer-token+json:
     application/pdf: show
     application/epub+zip: show
