@@ -51,6 +51,7 @@ describe("downloadFile", () => {
     fetchMock.mockResponseOnce("oh no", {
       status: 400,
       // counter >= 1 indicates a redirect occurred in Node's fetch implementation.
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore: The counter property is not declared in the MockParams type.
       counter: 1,
       url: "redirected-url"
