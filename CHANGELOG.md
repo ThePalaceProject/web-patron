@@ -1,6 +1,6 @@
 ## CHANGELOG
-- Add: Update scripts for Cypress and add Cypress instructions to the README
 ### UNRELEASED CHANGES
+- Add: Update scripts for Cypress and add Cypress instructions to the README
 - Add: Set up e2e testing on vercel deploys via cypress
 - Add: Set up Cypress tests for browsing and ensuring age appropriateness
 ### 4.4.1

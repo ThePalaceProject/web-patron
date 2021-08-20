@@ -230,11 +230,13 @@ test("fetches search description", async () => {
 });
 
 ```
-## Cypress Tests
+## Cypress Tests (currently only configured for open ebooks)
 
-In order to run Cypress tests locally, you'll need to add a set of specific usernames and passwords to a `cypress.env.json` file. This file is not committed to the repository to keep these passwords secure. Usernames and passwords are marked in the [Contributed test library cards](https://docs.google.com/spreadsheets/d/1D0153QostVdk6YWMSZ4Vv_aBa2TxpKJ8vW7R8biiZoA/edit#gid=317403225) document.
+We have some Cypress tests set up for integration and end-to-end testing. You can run these tests locally if you have your app configured for Open eBooks.
 
-Your `cypress.env.json` file should include the following 8 key value pairs:
+In order to run Cypress tests locally, you'll need to add a set of specific usernames and passwords to your `.env.lile` file. This file is not committed to the repository to keep these passwords secure. Usernames and passwords are marked in the _Contributed test library cards_ Google document.
+
+Your `.env.local` file should include the following 8 key value pairs:
 
 ```
 {
