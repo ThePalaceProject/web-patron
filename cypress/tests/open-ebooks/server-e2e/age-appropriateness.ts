@@ -129,6 +129,7 @@ describe("High school access", () => {
     });
 
     it("Blocks users from navigating to collections outside their age class", () => {
+      // FIXME: Occasionally, these tests fail when they shouldn't! https://jira.nypl.org/browse/SFR-1272
       cy.visit(MIDDLE_GRADES_COLLECTION_PATH);
       cy.findByText("404 Error: No such lane.").should("exist");
       cy.visit(EARLY_GRADES_COLLECTION_PATH);
@@ -213,6 +214,7 @@ describe("Middle grades access", () => {
   });
 
   it("Blocks users from navigating to collections outside their age class", () => {
+    // FIXME: Occasionally, these tests fail when they shouldn't! https://jira.nypl.org/browse/SFR-1272
     cy.visit(HIGH_SCHOOL_COLLECTION_PATH);
     cy.findByText("404 Error: No such lane.").should("exist");
     cy.visit(EARLY_GRADES_COLLECTION_PATH);
@@ -288,6 +290,7 @@ describe("Early grades access", () => {
   });
 
   it("Blocks users from navigating to collections outside their age class", () => {
+    // FIXME: Occasionally, these tests fail when they shouldn't! https://jira.nypl.org/browse/SFR-1272
     cy.visit(HIGH_SCHOOL_COLLECTION_PATH);
     cy.findByText("404 Error: No such lane.").should("exist");
     cy.visit(MIDDLE_GRADES_COLLECTION_PATH);
