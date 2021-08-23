@@ -2,10 +2,9 @@
 
 import {
   APP_PATH,
-  HIGH_SCHOOL_AUTHOR_RECOMMENDATIONS_PATH_JENNIFER_RUSH,
-  HIGH_SCHOOL_COLLECTION_PATH,
-  HIGH_SCHOOL_DETAIL_BOOK_PATH_ALTERED,
-  HIGH_SCHOOL_STAFF_PICKS_COLLECTION_PATH
+  ALL_ACCESS_INTEGRATION_TESTING_COLLECTION_PATH,
+  ALL_ACCESS_AUTHOR_RECOMMENDATIONS_PATH_HUNTER_C_C,
+  ALL_ACCESS_DETAIL_BOOK_PATH_ALMOST_MIDNIGHT
 } from "../../../support/utils";
 
 describe("All-access browsing", () => {
@@ -21,62 +20,65 @@ describe("All-access browsing", () => {
       "exist"
     );
 
-    // Click the high school see more button
-    cy.findByRole("link", { name: "See more: High School collection" }).click();
+    // Click the books for integration testing see more button
+    cy.findByRole("link", {
+      name: "See more: Books for integration testing collection"
+    }).click();
 
-    // Verify we have navigated to the High School lane
-    cy.location("pathname").should("contain", HIGH_SCHOOL_COLLECTION_PATH);
-
-    // Verify the high school heading is there and staff picks
-    cy.findByRole("heading", { name: "High School" }).should("exist");
-    cy.findByRole("heading", { name: "Staff Picks collection" }).should(
-      "exist"
-    );
-
-    cy.findByRole("link", { name: "See more: Staff Picks collection" })
-      .should("exist")
-      .click();
-
-    // Make sure we changed to the new collection page
+    // Verify we have navigated to the testing lane
     cy.location("pathname").should(
       "contain",
-      HIGH_SCHOOL_STAFF_PICKS_COLLECTION_PATH
+      ALL_ACCESS_INTEGRATION_TESTING_COLLECTION_PATH
     );
-    // Verify we are at the book list view
-    cy.findByRole("heading", { name: "Staff Picks" }).should("exist");
+
+    // Verify the heading is there
+    cy.findByRole("heading", {
+      name: "Books for integration testing"
+    }).should("exist");
 
     // Verify a list of books is displayed
     cy.get("[data-testid=listview-list]").find("li").as("bookList");
     cy.get("@bookList").should("have.length.at.least", 1);
 
-    cy.findAllByText("Available to borrow").should("have.length.at.least", 1);
+    cy.findAllByText("Available to borrow").should("have.lengthOf", 5);
     cy.findAllByRole("button", { name: "Borrow this book" }).should(
-      "have.length.at.least",
-      1
+      "have.lengthOf",
+      5
     );
+    cy.findAllByRole("link", { name: "Almost Midnight" }).should("exist", 2);
+    cy.findAllByAltText("Cover of book: Almost Midnight").should("exist");
   });
 
   it("Can browse recommendations", () => {
     // Navigate to "Recommendations" page
-    cy.visit(HIGH_SCHOOL_AUTHOR_RECOMMENDATIONS_PATH_JENNIFER_RUSH);
+    cy.visit(ALL_ACCESS_AUTHOR_RECOMMENDATIONS_PATH_HUNTER_C_C);
     cy.location("pathname").should(
       "contain",
-      HIGH_SCHOOL_AUTHOR_RECOMMENDATIONS_PATH_JENNIFER_RUSH
+      ALL_ACCESS_AUTHOR_RECOMMENDATIONS_PATH_HUNTER_C_C
     );
-    cy.findByRole("heading", { name: "Rush, Jennifer" }).should("exist");
+    cy.findByRole("heading", { name: "Hunter, C. C." }).should("exist");
     // Verify a list of books is displayed
     cy.get("[data-testid=listview-list]").find("li").as("bookList");
-    cy.get("@bookList").should("have.length.at.least", 1);
+    cy.get("@bookList").should("have.lengthOf", 2);
+    cy.findAllByText("Available to borrow").should("have.lengthOf", 2);
+    cy.findAllByRole("button", { name: "Borrow this book" }).should(
+      "have.lengthOf",
+      2
+    );
+    cy.findAllByAltText("Cover of book: Almost Midnight").should("exist");
+    cy.findAllByAltText("Cover of book: Midnight Hour").should("exist");
   });
 
   it("Can view book details", () => {
     // Navigate to a book page
-    cy.visit(HIGH_SCHOOL_DETAIL_BOOK_PATH_ALTERED);
+    cy.visit(ALL_ACCESS_DETAIL_BOOK_PATH_ALMOST_MIDNIGHT);
     cy.location("pathname").should(
       "contain",
-      HIGH_SCHOOL_DETAIL_BOOK_PATH_ALTERED
+      ALL_ACCESS_DETAIL_BOOK_PATH_ALMOST_MIDNIGHT
     );
     // View book details
+    cy.findByRole("heading", { name: "Almost Midnight" }).should("exist");
+    cy.findAllByAltText("Cover of book: Almost Midnight").should("exist");
     cy.findByText("Available to borrow").should("exist");
     cy.findByRole("button", { name: "Borrow this book" }).should("exist");
     cy.findByText("Summary").should("exist");
@@ -87,41 +89,54 @@ describe("All-access browsing", () => {
   it("Can navigate through breadcrumbs", () => {
     // Navigate to the root /app
     cy.visit(APP_PATH);
-    // Navigate to a book detail vieew through several collection paths
-    cy.findByRole("link", { name: "See more: High School collection" }).click();
-    cy.findByRole("link", { name: "See more: Staff Picks collection" }).click();
+
+    // Navigate to a book detail view through collection paths
+    cy.findByRole("link", {
+      name: "See more: Books for integration testing collection"
+    }).click();
     cy.get("[data-testid=listview-list]")
       .find("li")
       .first()
       .find("a")
       .first()
       .click();
+
     // Verify breadcrumbs list exists
     cy.get("[data-testid=breadcrumbs-list]").find("li").as("breadcrumbsList");
     cy.get("@breadcrumbsList").should("have.lengthOf", 4);
+
     // Navigate back through breadrumbs
-    cy.findByRole("link", {
-      name: "Staff Picks"
-    })
+    cy.findByRole("link", { name: "Books for integration testing" })
       .should("exist")
       .click();
-    cy.findByRole("heading", { name: "Staff Picks" }).should("exist");
+    cy.findByRole("heading", { name: "Books for integration testing" }).should(
+      "exist"
+    );
     cy.findByRole("link", {
       name: "Book"
     })
       .should("exist")
       .click();
-    cy.findByRole("heading", { name: "High School" }).should("exist");
     cy.findByRole("listitem", {
-      name: "Current location: High School"
+      name: "Current location: Open eBooks (QA Server)"
     }).should("exist");
     cy.findByRole("link", {
       name: "All Books"
     })
       .should("exist")
       .click();
-    // Verify base collection title
+
+    // Verify base collection titles and lanes
     cy.findAllByRole("heading", { name: "Open eBooks (QA Server)" }).should(
+      "exist"
+    );
+    cy.findByRole("heading", { name: "High School collection" }).should(
+      "exist"
+    );
+    cy.findByRole("heading", { name: "Middle Grades collection" }).should(
+      "exist"
+    );
+    cy.findByRole("heading", { name: "Early Grades collection" }).should(
       "exist"
     );
   });

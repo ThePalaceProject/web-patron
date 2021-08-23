@@ -30,6 +30,9 @@ describe("All access", () => {
     );
 
     // Verify all level lanes are present
+    cy.findByRole("heading", {
+      name: "Books for integration testing collection"
+    }).should("exist");
     cy.findByRole("heading", { name: "High School collection" }).should(
       "exist"
     );
@@ -113,40 +116,40 @@ describe("High school access", () => {
     cy.findByRole("heading", { name: "All High School collection" }).should(
       "exist"
     );
+  });
 
-    it("Can navigate directly to collections inside their age class", () => {
-      cy.visit(HIGH_SCHOOL_COLLECTION_PATH);
-      cy.findByRole("heading", { name: "High School" }).should("exist");
-      cy.visit(HIGH_SCHOOL_ROMANCE_COLLECTION_PATH);
-      cy.findByRole("heading", { name: "Romance" }).should("exist");
-      cy.visit(HIGH_SCHOOL_AUTHOR_RECOMMENDATIONS_PATH_JENNIFER_RUSH);
-      cy.findByRole("heading", { name: "Rush, Jennifer" }).should("exist");
-    });
+  it("Can navigate directly to collections inside their age class", () => {
+    cy.visit(HIGH_SCHOOL_COLLECTION_PATH);
+    cy.findByRole("heading", { name: "High School" }).should("exist");
+    cy.visit(HIGH_SCHOOL_ROMANCE_COLLECTION_PATH);
+    cy.findByRole("heading", { name: "Romance" }).should("exist");
+    cy.visit(HIGH_SCHOOL_AUTHOR_RECOMMENDATIONS_PATH_JENNIFER_RUSH);
+    cy.findByRole("heading", { name: "Rush, Jennifer" }).should("exist");
+  });
 
-    it("Can navigate directly to books inside their age class", () => {
-      cy.visit(HIGH_SCHOOL_DETAIL_BOOK_PATH_ALTERED);
-      cy.findByRole("heading", { name: "Altered" }).should("exist");
-    });
+  it("Can navigate directly to books inside their age class", () => {
+    cy.visit(HIGH_SCHOOL_DETAIL_BOOK_PATH_ALTERED);
+    cy.findByRole("heading", { name: "Altered" }).should("exist");
+  });
 
-    it("Blocks users from navigating to collections outside their age class", () => {
-      // FIXME: Occasionally, these tests fail when they shouldn't! https://jira.nypl.org/browse/SFR-1272
-      cy.visit(MIDDLE_GRADES_COLLECTION_PATH);
-      cy.findByText("404 Error: No such lane.").should("exist");
-      cy.visit(EARLY_GRADES_COLLECTION_PATH);
-      cy.findByText("404 Error: No such lane.").should("exist");
-      cy.visit(MIDDLE_GRADES_COMICS_COLLECTION_PATH);
-      cy.findByText("404 Error: No such lane.").should("exist");
-      cy.visit(EARLY_GRADES_CHAPTER_BOOKS_COLLECTION_PATH);
-      cy.findByText("404 Error: No such lane.").should("exist");
-    });
+  it("Blocks users from navigating to collections outside their age class", () => {
+    // FIXME: Occasionally, these tests fail when they shouldn't! https://jira.nypl.org/browse/SFR-1272
+    cy.visit(MIDDLE_GRADES_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("exist");
+    cy.visit(EARLY_GRADES_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("exist");
+    cy.visit(MIDDLE_GRADES_COMICS_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("exist");
+    cy.visit(EARLY_GRADES_CHAPTER_BOOKS_COLLECTION_PATH);
+    cy.findByText("404 Error: No such lane.").should("exist");
+  });
 
-    it("Blocks users from navigating to books outside their age class", () => {
-      // FIXME: This is a bug that needs to be fixed in order to get these tests to pass https://jira.nypl.org/browse/SFR-1268
-      // cy.visit(EARLY_GRADES_DETAIL_BOOK_PATH_ALL_ABOUT_ELLIE);
-      // cy.findByText("404 Error: No such lane.").should("exist");
-      // cy.visit(MIDDLE_GRADES_DETAIL_BOOK_PATH_ABBY_CARNELIA);
-      // cy.findByText("404 Error: No such lane.").should("exist");
-    });
+  it("Blocks users from navigating to books outside their age class", () => {
+    // FIXME: This is a bug that needs to be fixed in order to get these tests to pass https://jira.nypl.org/browse/SFR-1268
+    // cy.visit(EARLY_GRADES_DETAIL_BOOK_PATH_ALL_ABOUT_ELLIE);
+    // cy.findByText("404 Error: No such lane.").should("exist");
+    // cy.visit(MIDDLE_GRADES_DETAIL_BOOK_PATH_ABBY_CARNELIA);
+    // cy.findByText("404 Error: No such lane.").should("exist");
   });
 });
 
