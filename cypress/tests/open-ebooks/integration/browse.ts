@@ -17,8 +17,12 @@ describe("All-access browsing", () => {
       fixture: "open-ebooks/all-access/all-collections.html"
     }).as("allCollections");
 
-    cy.intercept("GET", `${SERVER_URL}/groups/406?entrypoint=Book`, {
-      fixture: "open-ebooks/high-school/collection-high-school.html"
+    cy.intercept("GET", `${SERVER_URL}/groups/406?entrypoint=Book`, req => {
+      // https://glebbahmutov.com/blog/cypress-intercept-problems/#cached-response
+      delete req.headers["if-none-match"];
+      req.reply({
+        fixture: "open-ebooks/high-school/collection-high-school.html"
+      });
     }).as("highSchoolCollection");
 
     cy.intercept("GET", `${SERVER_URL}/feed/407?entrypoint=Book`, {
@@ -64,9 +68,9 @@ describe("All-access browsing", () => {
     cy.wait("@allCollections");
 
     // Verify collection title
-    cy.findAllByRole("heading", { name: "Open eBooks (QA Server)" }).should(
-      "exist"
-    );
+    cy.get("main")
+      .findByRole("heading", { name: "Open eBooks (QA Server) Home" })
+      .should("exist");
 
     // Click the high school see more button
     cy.findByRole("link", { name: "See more: High School collection" }).click();
@@ -178,6 +182,7 @@ describe("All-access browsing", () => {
       .click();
     cy.wait("@staffPicks");
     cy.findByRole("heading", { name: "Staff Picks" }).should("exist");
+
     cy.findByRole("link", {
       name: "Book"
     })
@@ -196,9 +201,9 @@ describe("All-access browsing", () => {
       .click();
     cy.wait("@allCollections");
     // Verify base collection title
-    cy.findAllByRole("heading", { name: "Open eBooks (QA Server)" }).should(
-      "exist"
-    );
+    cy.get("main")
+      .findByRole("heading", { name: "Open eBooks (QA Server)" })
+      .should("exist");
   });
 });
 

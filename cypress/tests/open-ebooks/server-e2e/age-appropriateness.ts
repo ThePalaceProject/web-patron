@@ -25,9 +25,9 @@ describe("All access", () => {
     cy.visit(APP_PATH);
 
     // Verify collection title
-    cy.findByRole("heading", { name: "Open eBooks (QA Server)" }).should(
-      "exist"
-    );
+    cy.get("main")
+      .findByRole("heading", { name: "Open eBooks (QA Server) Home" })
+      .should("exist");
 
     // Verify all level lanes are present
     cy.findByRole("heading", {
@@ -83,11 +83,23 @@ describe("High school access", () => {
     cy.visit(APP_PATH);
 
     // Verify collection title
-    cy.findByRole("heading", { name: "Open eBooks (QA Server)" }).should(
-      "exist"
-    );
+    cy.get("main")
+      .findByRole("heading", { name: "Open eBooks (QA Server) Home" })
+      .should("exist");
+
     cy.findByRole("listitem", { name: "Current location: High School" }).should(
       "exist"
+    );
+
+    // Verify "all access" lanes are not present -- these should only exist when logging in as an All Access user type
+    cy.findByRole("heading", { name: "High School collection" }).should(
+      "not.exist"
+    );
+    cy.findByRole("heading", { name: "Middle Grades collection" }).should(
+      "not.exist"
+    );
+    cy.findByRole("heading", { name: "Early Grades collection" }).should(
+      "not.exist"
     );
 
     // Veryify high school lane headings are present
@@ -162,12 +174,23 @@ describe("Middle grades access", () => {
     cy.visit(APP_PATH);
 
     // Verify collection title
-    cy.findByRole("heading", { name: "Open eBooks (QA Server)" }).should(
-      "exist"
-    );
+    cy.get("main")
+      .findByRole("heading", { name: "Open eBooks (QA Server) Home" })
+      .should("exist");
     cy.findByRole("listitem", {
       name: "Current location: Middle Grades"
     }).should("exist");
+
+    // Verify "all access" lanes are not present -- these should only exist when logging in as an All Access user type
+    cy.findByRole("heading", { name: "High School collection" }).should(
+      "not.exist"
+    );
+    cy.findByRole("heading", { name: "Middle Grades collection" }).should(
+      "not.exist"
+    );
+    cy.findByRole("heading", { name: "Early Grades collection" }).should(
+      "not.exist"
+    );
 
     // Veryify middle grades lane headings are present
     cy.findByRole("heading", { name: "Staff Picks collection" }).should(
@@ -248,12 +271,23 @@ describe("Early grades access", () => {
     cy.visit(APP_PATH);
 
     // Verify collection title
-    cy.findByRole("heading", { name: "Open eBooks (QA Server)" }).should(
-      "exist"
-    );
+    cy.get("main")
+      .findByRole("heading", { name: "Open eBooks (QA Server) Home" })
+      .should("exist");
     cy.findByRole("listitem", {
       name: "Current location: Early Grades"
     }).should("exist");
+
+    // Verify "all access" lanes are not present -- these should only exist when logging in as an All Access user type
+    cy.findByRole("heading", { name: "High School collection" }).should(
+      "not.exist"
+    );
+    cy.findByRole("heading", { name: "Middle Grades collection" }).should(
+      "not.exist"
+    );
+    cy.findByRole("heading", { name: "Early Grades collection" }).should(
+      "not.exist"
+    );
 
     // Veryify early grade collection lane headings are present
     cy.findByRole("heading", { name: "Action & Adventure collection" }).should(

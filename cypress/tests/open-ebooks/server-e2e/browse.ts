@@ -16,9 +16,9 @@ describe("All-access browsing", () => {
     cy.visit(APP_PATH);
 
     // Verify collection title
-    cy.findAllByRole("heading", { name: "Open eBooks (QA Server)" }).should(
-      "exist"
-    );
+    cy.get("main")
+      .findByRole("heading", { name: "Open eBooks (QA Server) Home" })
+      .should("exist");
 
     // Click the books for integration testing see more button
     cy.findByRole("link", {
@@ -127,9 +127,9 @@ describe("All-access browsing", () => {
       .click();
 
     // Verify base collection titles and lanes
-    cy.findAllByRole("heading", { name: "Open eBooks (QA Server)" }).should(
-      "exist"
-    );
+    cy.get("main")
+      .findByRole("heading", { name: "Open eBooks (QA Server)" })
+      .should("exist");
     cy.findByRole("heading", { name: "High School collection" }).should(
       "exist"
     );
