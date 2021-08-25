@@ -1,6 +1,6 @@
 import OPDSParser, { OPDSFeed, OPDSEntry } from "opds-feed-parser";
 import ApplicationError, { ServerError } from "errors";
-import { AnyBook, CollectionData } from "interfaces";
+import { AnyBook, CollectionData, OPDS1 } from "interfaces";
 import { entryToBook, feedToCollection } from "dataflow/opds1/parse";
 import fetchWithHeaders from "dataflow/fetch";
 import parseSearchData from "dataflow/opds1/parseSearchData";
@@ -101,6 +101,23 @@ export async function fetchBook(
   const entry = await fetchEntry(url, token);
   const book = entryToBook(entry, catalogUrl);
   return book;
+}
+
+/**
+ * Fetch a bearer token to use to download a book
+ */
+export async function fetchBearerToken(
+  url: string,
+  token?: string
+): Promise<OPDS1.BearerTokenDocument> {
+  const response = await fetchWithHeaders(url, token);
+  const json = await response.json();
+
+  if (!response.ok) {
+    throw new ServerError(url, response.status, json);
+  }
+
+  return json;
 }
 
 /**

@@ -85,11 +85,15 @@ const ReadOnlineExternal: React.FC<{
     try {
       // the url may be behind indirection, so we fetch it with the
       // provided function
-      const url = await details.getUrl(catalogUrl, token);
+      const { url: externalReaderUrl } = await details.getLocation(
+        catalogUrl,
+        token
+      );
+
       // we are about to open the book, so send a track event
       track.openBook(trackOpenBookUrl);
       setLoading(false);
-      window.open(url, "__blank");
+      window.open(externalReaderUrl, "__blank");
     } catch (e) {
       setLoading(false);
       handleError(e);
@@ -147,8 +151,17 @@ const DownloadButton: React.FC<{
     setLoading(true);
     clearError();
     try {
-      const url = await details.getUrl(catalogUrl, token);
-      await downloadFile(url, title, details.contentType, token);
+      const {
+        url: downloadUrl,
+        token: downloadToken
+      } = await details.getLocation(catalogUrl, token);
+
+      await downloadFile(
+        downloadUrl,
+        title,
+        details.contentType,
+        downloadToken
+      );
     } catch (e) {
       setLoading(false);
       handleError(e);
