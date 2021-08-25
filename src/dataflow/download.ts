@@ -22,6 +22,10 @@ export default async function downloadFile(
     response = await fetchWithHeaders(url, token, {
       "X-Requested-With": undefined
     });
+
+    console.warn(
+      `Download from ${url} only proceeded after retry without X-Requested-With header. Distributor may not allow X-Requested-With for CORS.`
+    );
   }
 
   if (!response.ok && response.redirected) {
