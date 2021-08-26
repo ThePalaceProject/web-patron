@@ -1,0 +1,89 @@
+name: Open Ebooks End-to-End Tests with Cypress
+# https://docs.github.com/en/actions/reference/events-that-trigger-workflows
+on:
+  schedule:
+    # every day at 8 AM
+    - cron: "0 8 * * *"
+
+jobs:
+  cypress-tests:
+    name: Cypress Tests
+    runs-on: ubuntu-latest
+    container: cypress/browsers:node14.17.0-chrome88-ff89
+    steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "$GITHUB_CONTEXT"
+
+      - name: Checkout
+        uses: actions/checkout@v2
+      - id: nvmrc
+        run: echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
+
+      - name: Cache NPM and Cypress 📦
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/Cypress
+            node_modules
+          key: my-cache-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Cypress 📥
+        run: npm i cypress
+
+      - name: Chrome desktop tests
+        uses: cypress-io/github-action@v2
+        with:
+          install: false
+          browser: chrome
+          spec: cypress/tests/open-ebooks/server-e2e/**/*
+        env:
+          CYPRESS_BASE_URL: https://qa-web.openebooks.us
+          CYPRESS_OPENEBOOKS_ALL_ACCESS_USER_USERNAME: ${{ secrets.CYPRESS_OPENEBOOKS_ALL_ACCESS_USER_USERNAME }}
+          CYPRESS_OPENEBOOKS_ALL_ACCESS_USER_PW: ${{ secrets.CYPRESS_OPENEBOOKS_ALL_ACCESS_USER_PW }}
+          CYPRESS_OPENEBOOKS_HIGH_SCHOOL_USER_USERNAME: ${{ secrets.CYPRESS_OPENEBOOKS_HIGH_SCHOOL_USER_USERNAME }}
+          CYPRESS_OPENEBOOKS_HIGH_SCHOOL_USER_PW: ${{ secrets.CYPRESS_OPENEBOOKS_HIGH_SCHOOL_USER_PW }}
+          CYPRESS_OPENEBOOKS_MIDDLE_GRADES_USER_USERNAME: ${{ secrets.CYPRESS_OPENEBOOKS_MIDDLE_GRADES_USER_USERNAME }}
+          CYPRESS_OPENEBOOKS_MIDDLE_GRADES_USER_PW: ${{ secrets.CYPRESS_OPENEBOOKS_MIDDLE_GRADES_USER_PW }}
+          CYPRESS_OPENEBOOKS_EARLY_GRADES_USER_USERNAME: ${{ secrets.CYPRESS_OPENEBOOKS_EARLY_GRADES_USER_USERNAME }}
+          CYPRESS_OPENEBOOKS_EARLY_GRADES_USER_PW: ${{ secrets.CYPRESS_OPENEBOOKS_EARLY_GRADES_USER_PW }}
+          # Recommended: pass the GitHub token lets this action correctly
+          # determine the unique run id necessary to re-run the checks
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Chrome mobile tests
+        uses: cypress-io/github-action@v2
+        with:
+          config: "viewportWidth=375,viewportHeight=667"
+          install: false
+          browser: chrome
+          spec: cypress/tests/open-ebooks/server-e2e/**/*
+        env:
+          CYPRESS_BASE_URL: https://qa-web.openebooks.us
+          CYPRESS_OPENEBOOKS_ALL_ACCESS_USER_USERNAME: ${{ secrets.CYPRESS_OPENEBOOKS_ALL_ACCESS_USER_USERNAME }}
+          CYPRESS_OPENEBOOKS_ALL_ACCESS_USER_PW: ${{ secrets.CYPRESS_OPENEBOOKS_ALL_ACCESS_USER_PW }}
+          CYPRESS_OPENEBOOKS_HIGH_SCHOOL_USER_USERNAME: ${{ secrets.CYPRESS_OPENEBOOKS_HIGH_SCHOOL_USER_USERNAME }}
+          CYPRESS_OPENEBOOKS_HIGH_SCHOOL_USER_PW: ${{ secrets.CYPRESS_OPENEBOOKS_HIGH_SCHOOL_USER_PW }}
+          CYPRESS_OPENEBOOKS_MIDDLE_GRADES_USER_USERNAME: ${{ secrets.CYPRESS_OPENEBOOKS_MIDDLE_GRADES_USER_USERNAME }}
+          CYPRESS_OPENEBOOKS_MIDDLE_GRADES_USER_PW: ${{ secrets.CYPRESS_OPENEBOOKS_MIDDLE_GRADES_USER_PW }}
+          CYPRESS_OPENEBOOKS_EARLY_GRADES_USER_USERNAME: ${{ secrets.CYPRESS_OPENEBOOKS_EARLY_GRADES_USER_USERNAME }}
+          CYPRESS_OPENEBOOKS_EARLY_GRADES_USER_PW: ${{ secrets.CYPRESS_OPENEBOOKS_EARLY_GRADES_USER_PW }}
+          # Recommended: pass the GitHub token lets this action correctly
+          # determine the unique run id necessary to re-run the checks
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+     
+      - name: Upload failure screenshots
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+
+      - name: Upload failure videos
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: cypress-videos
+          path: cypress/videos
