@@ -8,11 +8,10 @@ module.exports = {
   ],
   "addons": [
     "@storybook/addon-links",
-    "@storybook/addon-essentials"
+    "@storybook/addon-essentials",
+    "@storybook/addon-actions"
   ],
   webpackFinal: async config => {
-    config.resolve.alias['core-js/modules'] = '@storybook/core/node_modules/core-js/modules';
-    config.resolve.alias['core-js/features'] = '@storybook/core/node_modules/core-js/features';
     // mock SWR
     config.resolve.alias['swr'] = require.resolve("./swr-mock.tsx");
     // mock our env vars so they can be updated via the toolbar
