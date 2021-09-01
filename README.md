@@ -234,21 +234,21 @@ test("fetches search description", async () => {
 
 We have some Cypress tests set up for integration and end-to-end testing. You can run these tests locally if you have your app configured for Open eBooks.
 
-In order to run Cypress tests locally, you'll need to add a set of specific usernames and passwords to your `.env.lile` file. This file is not committed to the repository to keep these passwords secure. Usernames and passwords are marked in the _Contributed test library cards_ Google document.
+In order to run Cypress tests locally, you'll need to add a set of specific usernames and passwords to your `.env.local` file. This file is not committed to the repository to keep these passwords secure. Usernames and passwords are marked in the _Contributed test library cards_ Google document.
 
-Your `.env.local` file should include the following 8 key value pairs:
+Your `.env.local` file should include the following (with usernames and passwords added after the equal sign):
 
 ```
-{
-    "OPENEBOOKS_ALL_ACCESS_USER_USERNAME": "",
-    "OPENEBOOKS_ALL_ACCESS_USER_PW": "",
-    "OPENEBOOKS_HIGH_SCHOOL_USER_USERNAME": "",
-    "OPENEBOOKS_HIGH_SCHOOL_USER_PW": "",
-    "OPENEBOOKS_MIDDLE_GRADES_USER_USERNAME": "",
-    "OPENEBOOKS_MIDDLE_GRADES_USER_PW": "",
-    "OPENEBOOKS_EARLY_GRADES_USER_USERNAME": "",
-    "OPENEBOOKS_EARLY_GRADES_USER_PW": ""
-}
+CONFIG_FILE=config/opene.yml
+OPENEBOOKS_ALL_ACCESS_USER_USERNAME=
+OPENEBOOKS_ALL_ACCESS_USER_PW=
+OPENEBOOKS_HIGH_SCHOOL_USER_USERNAME=
+OPENEBOOKS_HIGH_SCHOOL_USER_PW=
+OPENEBOOKS_MIDDLE_GRADES_USER_USERNAME=
+OPENEBOOKS_MIDDLE_GRADES_USER_PW=
+OPENEBOOKS_EARLY_GRADES_USER_USERNAME=
+OPENEBOOKS_EARLY_GRADES_USER_PW=
+OPENEBOOKS_CLEVER_HIGH_SCHOOL_ACCESS_TOKEN=
 ```
 
 Run Cypress tests locally using the commands prefixed with `cypress:` in the `package.json` file. Commands prefixed with `cypress:run` will run all of the tests with a headless Electron browser (the default browser that comes with Cypress), which is how they are run in the CI via GitHub Actions. This is useful for debugging. Cypress Commands prefixed with `cypress:open` will open Cypress in interacive test runner where you can run each test separately. Using this option, Cypress automatically detects available browsers on your OS. You can switch the browser in the [Test Runner by using the drop down in the top right corner](https://docs.cypress.io/guides/guides/launching-browsers#Browsers).

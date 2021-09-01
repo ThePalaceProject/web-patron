@@ -1,6 +1,7 @@
 ## CHANGELOG
 
 ### UNRELEASED CHANGES
+- Add: Update cypress test info in README
 - Fix: Update Storybook to fix the build
 - Add: Set up e2e testing on vercel deploys via cypress
 - Add: Refactor Cypress test into two separate directories — one that runs with mocked data, and one that uses real communication with the server
