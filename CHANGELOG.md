@@ -3,7 +3,6 @@
 ### UNRELEASED CHANGES
 - Implement indirect bearer token borrowing (adds support for Johns Hopkins, Biblioboard, ProQuest, and other distributors).
 - Add new github action to sync a branch with NYPL.
-- Update iOS App Store badge to link to Palace app.
 - Fix foreign-language books not appearing in search results.
 - Update Google Play Store badge to link to Palace app.
 - Add support for Biblioteca, Axis360, and DPLA Exchange audiobooks.

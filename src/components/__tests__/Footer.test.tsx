@@ -102,7 +102,7 @@ describe("toggling SimplyE Branding", () => {
     expect(iosbadge).toBeInTheDocument();
     expect(iosbadge).toHaveAttribute(
       "href",
-      "https://apps.apple.com/us/app/the-palace-project/id1574359693"
+      "https://apps.apple.com/us/app/simplye/id1046583900"
     );
 
     const googleBadge = utils.getByRole("link", {
