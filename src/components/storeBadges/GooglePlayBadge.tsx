@@ -9,7 +9,7 @@ const GooglePlayBadge = (props: React.ComponentProps<"a">) => {
       target="__blank"
       aria-label="Get Palace on the Google Play Store"
       // TODO: Replace with correct URL when Palace is in the Play Store.
-      href="https://play.google.com/store/apps/details?id=org.thepalaceproject.palace&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1"
+      href="https://play.google.com/store/apps/details?id=org.nypl.simplified.simplye&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1"
       sx={{ display: "block" }}
       {...props}
     >
