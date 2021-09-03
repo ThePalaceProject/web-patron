@@ -1,6 +1,8 @@
 ## CHANGELOG
 
 ### UNRELEASED CHANGES
+
+### 4.5.0
 - Add: Update cypress test info in README
 - Fix: Update Storybook to fix the build
 - Add: Set up e2e testing on vercel deploys via cypress
