@@ -15,28 +15,28 @@ describe("All-access browsing", () => {
   it("Can browse collections", () => {
     cy.visit(APP_PATH);
 
-    // Verify collection title
+    cy.log("verify collection title");
     cy.get("main")
       .findByRole("heading", { name: "Open eBooks (QA Server) Home" })
       .should("exist");
 
-    // Click the books for integration testing see more button
+    cy.log("click the books for integration testing see more button");
     cy.findByRole("link", {
       name: "See more: Books for integration testing collection"
     }).click();
 
-    // Verify we have navigated to the testing lane
+    cy.log("verify we have navigated to the testing lane");
     cy.location("pathname").should(
       "contain",
       ALL_ACCESS_INTEGRATION_TESTING_COLLECTION_PATH
     );
 
-    // Verify the heading is there
+    cy.log("verify the heading is there");
     cy.findByRole("heading", {
       name: "Books for integration testing"
     }).should("exist");
 
-    // Verify a list of books is displayed
+    cy.log("verify a list of books is displayed");
     cy.get("[data-testid=listview-list]").find("li").as("bookList");
     cy.get("@bookList").should("have.length.at.least", 1);
 
@@ -50,14 +50,15 @@ describe("All-access browsing", () => {
   });
 
   it("Can browse recommendations", () => {
-    // Navigate to "Recommendations" page
+    cy.log("navigate to 'Recommendations' page");
     cy.visit(ALL_ACCESS_AUTHOR_RECOMMENDATIONS_PATH_HUNTER_C_C);
     cy.location("pathname").should(
       "contain",
       ALL_ACCESS_AUTHOR_RECOMMENDATIONS_PATH_HUNTER_C_C
     );
     cy.findByRole("heading", { name: "Hunter, C. C." }).should("exist");
-    // Verify a list of books is displayed
+
+    cy.log("verify a list of books is displayed");
     cy.get("[data-testid=listview-list]").find("li").as("bookList");
     cy.get("@bookList").should("have.lengthOf", 2);
     cy.findAllByText("Available to borrow").should("have.lengthOf", 2);
@@ -70,13 +71,14 @@ describe("All-access browsing", () => {
   });
 
   it("Can view book details", () => {
-    // Navigate to a book page
+    cy.log("navigate to a book page");
     cy.visit(ALL_ACCESS_DETAIL_BOOK_PATH_ALMOST_MIDNIGHT);
     cy.location("pathname").should(
       "contain",
       ALL_ACCESS_DETAIL_BOOK_PATH_ALMOST_MIDNIGHT
     );
-    // View book details
+
+    cy.log("viewew book details");
     cy.findByRole("heading", { name: "Almost Midnight" }).should("exist");
     cy.findAllByAltText("Cover of book: Almost Midnight").should("exist");
     cy.findByText("Available to borrow").should("exist");
@@ -87,10 +89,9 @@ describe("All-access browsing", () => {
   });
 
   it("Can navigate through breadcrumbs", () => {
-    // Navigate to the root /app
     cy.visit(APP_PATH);
 
-    // Navigate to a book detail view through collection paths
+    cy.log("navigate to a book detail view through collection paths");
     cy.findByRole("link", {
       name: "See more: Books for integration testing collection"
     }).click();
@@ -101,11 +102,11 @@ describe("All-access browsing", () => {
       .first()
       .click();
 
-    // Verify breadcrumbs list exists
+    cy.log("verify breadcrumbs list exists");
     cy.get("[data-testid=breadcrumbs-list]").find("li").as("breadcrumbsList");
     cy.get("@breadcrumbsList").should("have.lengthOf", 4);
 
-    // Navigate back through breadrumbs
+    cy.log("navigate back through breadrumbs");
     cy.findByRole("link", { name: "Books for integration testing" })
       .should("exist")
       .click();
@@ -126,7 +127,7 @@ describe("All-access browsing", () => {
       .should("exist")
       .click();
 
-    // Verify base collection titles and lanes
+    cy.log("verify base collection titles and lanes");
     cy.get("main")
       .findByRole("heading", { name: "Open eBooks (QA Server)" })
       .should("exist");

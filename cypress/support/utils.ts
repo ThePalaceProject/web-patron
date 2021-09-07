@@ -5,7 +5,9 @@ export const COOKIE_KEY = "CPW_AUTH_COOKIE%2Fapp";
 
 // Base Paths
 export const APP_PATH = "/app";
+export const LOGIN_PATH = `${APP_PATH}/login`;
 export const LOANS_PATH = `${APP_PATH}/loans`;
+export const FIRSTBOOK_LOGIN_PATH = `${LOGIN_PATH}/http%3A%2F%2Fopds-spec.org%2Fauth%2Fbasic`;
 const COLLECTION_PATH = `${APP_PATH}/collection`;
 const BOOK_PATH = `${APP_PATH}/book`;
 

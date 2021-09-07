@@ -12,17 +12,15 @@ describe("All-access browsing", () => {
   beforeEach(() => {
     cy.loginByApi("ALL_ACCESS_USER");
 
-    // all intercepts need to come before the actual requests, so we will mock them out here first
+    cy.log(
+      "all intercepts need to come before the actual requests, so we will mock them out here first"
+    );
     cy.intercept("GET", `${SERVER_URL}/groups`, {
       fixture: "open-ebooks/all-access/all-collections.html"
     }).as("allCollections");
 
-    cy.intercept("GET", `${SERVER_URL}/groups/406?entrypoint=Book`, req => {
-      // https://glebbahmutov.com/blog/cypress-intercept-problems/#cached-response
-      delete req.headers["if-none-match"];
-      req.reply({
-        fixture: "open-ebooks/high-school/collection-high-school.html"
-      });
+    cy.intercept("GET", `${SERVER_URL}/groups/406?entrypoint=Book`, {
+      fixture: "open-ebooks/high-school/collection-high-school.html"
     }).as("highSchoolCollection");
 
     cy.intercept("GET", `${SERVER_URL}/feed/407?entrypoint=Book`, {
@@ -67,19 +65,19 @@ describe("All-access browsing", () => {
     cy.visit(APP_PATH);
     cy.wait("@allCollections");
 
-    // Verify collection title
+    cy.log("verify collection title");
     cy.get("main")
       .findByRole("heading", { name: "Open eBooks (QA Server) Home" })
       .should("exist");
 
-    // Click the high school see more button
+    cy.log("click the high school see more button");
     cy.findByRole("link", { name: "See more: High School collection" }).click();
     cy.wait("@highSchoolCollection");
 
-    // Verify we have navigated to the High School lane
+    cy.log("verify we have navigated to the High School lane");
     cy.location("pathname").should("contain", HIGH_SCHOOL_COLLECTION_PATH);
 
-    // Verify the high school heading is there and staff picks
+    cy.log("verify high school and staff picks headings exist");
     cy.findByRole("heading", { name: "High School" }).should("exist");
     cy.findByRole("heading", { name: "Staff Picks collection" }).should(
       "exist"
@@ -90,19 +88,20 @@ describe("All-access browsing", () => {
       .click();
     cy.wait("@staffPicks");
 
-    // Make sure we changed to the new collection page
+    cy.log("make sure we changed to the new collection page");
     cy.location("pathname").should(
       "contain",
       HIGH_SCHOOL_STAFF_PICKS_COLLECTION_PATH
     );
-    // Verify we are at the book list view
+
+    cy.log("verify we are at the book list view");
     cy.findByRole("heading", { name: "Staff Picks" }).should("exist");
 
-    // Verify a list of books is displayed
+    cy.log("verify a list of books is displayed");
     cy.get("[data-testid=listview-list]").find("li").as("bookList");
     cy.get("@bookList").should("have.length", 20);
 
-    // Verify book list content
+    cy.log("verify book list content");
     cy.findByRole("listitem", { name: "Book: Heart of a Champion" })
       .should("exist")
       .within(() => {
@@ -124,7 +123,7 @@ describe("All-access browsing", () => {
   });
 
   it("Can browse recommendations", () => {
-    // Navigate to "Recommendations" page
+    cy.log("navigate to 'Recommendations' page");
     cy.visit(HIGH_SCHOOL_AUTHOR_RECOMMENDATIONS_PATH_JENNIFER_RUSH);
     cy.wait("@recommendations");
 
@@ -133,20 +132,22 @@ describe("All-access browsing", () => {
       HIGH_SCHOOL_AUTHOR_RECOMMENDATIONS_PATH_JENNIFER_RUSH
     );
     cy.findByRole("heading", { name: "Rush, Jennifer" }).should("exist");
-    // Verify a list of books is displayed
+
+    cy.log("verify a list of books is displayed");
     cy.get("[data-testid=listview-list]").find("li").as("bookList");
     cy.get("@bookList").should("have.lengthOf", 3);
   });
 
   it("Can view book details", () => {
-    // Navigate to a book page
+    cy.log("navigate to a book page");
     cy.visit(HIGH_SCHOOL_DETAIL_BOOK_PATH_HEART_OF_A_CHAMPION);
     cy.wait("@heartOfAChampionBook");
     cy.location("pathname").should(
       "contain",
       HIGH_SCHOOL_DETAIL_BOOK_PATH_HEART_OF_A_CHAMPION
     );
-    // View book details
+
+    cy.log("view book details");
     cy.findByRole("listitem", {
       name: "Current location: Heart of a Champion"
     }).should("exist");
@@ -161,34 +162,21 @@ describe("All-access browsing", () => {
   });
 
   it("Can navigate through breadcrumbs", () => {
-    // navigate to the root /app
-    cy.visit(APP_PATH);
-    cy.wait("@allCollections");
-    // Navigate to a book detail vieew through several collection paths
-    cy.findByRole("link", { name: "See more: High School collection" }).click();
-    cy.wait("@highSchoolCollection");
-    cy.findByRole("link", { name: "See more: Staff Picks collection" }).click();
+    cy.log("navigate to a collection path");
+    cy.visit(HIGH_SCHOOL_STAFF_PICKS_COLLECTION_PATH);
     cy.wait("@staffPicks");
-    cy.findByRole("link", { name: "View Betrayed" }).click();
-    cy.wait("@betrayedBook");
-    // Verify breadcrumbs list exists
-    cy.get("[data-testid=breadcrumbs-list]").find("li").as("breadcrumbsList");
-    cy.get("@breadcrumbsList").should("have.lengthOf", 4);
-    // Navigate back through breadrumbs
-    cy.findByRole("link", {
-      name: "Staff Picks"
-    })
-      .should("exist")
-      .click();
-    cy.wait("@staffPicks");
-    cy.findByRole("heading", { name: "Staff Picks" }).should("exist");
+    cy.wait(2000);
 
+    cy.log("verify breadcrumbs list exists");
+    cy.get("[data-testid=breadcrumbs-list]").find("li").as("breadcrumbsList");
+    cy.get("@breadcrumbsList").should("have.lengthOf", 3);
+
+    cy.log("navigate back through breadcrumbs");
     cy.findByRole("link", {
       name: "Book"
     })
       .should("exist")
       .click();
-    // TODO: Figure out why this request fails in Firefox
     cy.wait("@highSchoolCollection");
     cy.findByRole("heading", { name: "High School" }).should("exist");
     cy.findByRole("listitem", {
@@ -200,7 +188,8 @@ describe("All-access browsing", () => {
       .should("exist")
       .click();
     cy.wait("@allCollections");
-    // Verify base collection title
+
+    cy.log("verify base collecion title");
     cy.get("main")
       .findByRole("heading", { name: "Open eBooks (QA Server)" })
       .should("exist");

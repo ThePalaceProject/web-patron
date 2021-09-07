@@ -1,6 +1,7 @@
 ## CHANGELOG
 
 ### UNRELEASED CHANGES
+- Add: Set up e2e Cypress tests for login with FirstBook
 
 ### 4.5.0
 - Add: Update cypress test info in README

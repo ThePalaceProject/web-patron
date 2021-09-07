@@ -30,13 +30,13 @@ describe("Report a problem", () => {
     cy.visit(HIGH_SCHOOL_DETAIL_BOOK_PATH_HEART_OF_A_CHAMPION);
     cy.wait("@book");
 
-    // Modal should not yet exist in the DOM
+    cy.log("verify that the modal should not yet exist in the DOM");
     cy.findByRole("dialog", { name: "Report a problem" }).should("not.exist");
     cy.findByRole("button", { name: "Report a problem" })
       .should("exist")
       .click();
 
-    // Now the modal should exist
+    cy.log("now the modal should exist");
     cy.findByRole("dialog", { name: "Report a problem" }).should("exist");
     cy.findByRole("heading", { name: "Report a problem" }).should("exist");
     cy.findByRole("button", { name: "Cancel" }).should("exist");
