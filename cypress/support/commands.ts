@@ -71,7 +71,7 @@ Cypress.Commands.add(
       token
     };
     cy.clearCookie(COOKIE_KEY);
-    cy.setCookie(COOKIE_KEY, JSON.stringify(credentials));
+    cy.setCookie(COOKIE_KEY, JSON.stringify(credentials), { log: false });
     cy.getCookie(COOKIE_KEY).should("exist");
   }
 );

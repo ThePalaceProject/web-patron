@@ -164,12 +164,12 @@ describe("All-access browsing", () => {
   it("Can navigate through breadcrumbs", () => {
     cy.log("navigate to a collection path");
     cy.visit(HIGH_SCHOOL_STAFF_PICKS_COLLECTION_PATH);
-    cy.wait("@staffPicks");
-    cy.wait(2000);
-
-    cy.log("verify breadcrumbs list exists");
-    cy.get("[data-testid=breadcrumbs-list]").find("li").as("breadcrumbsList");
-    cy.get("@breadcrumbsList").should("have.lengthOf", 3);
+    cy.wait("@staffPicks").then(() => {
+      cy.log("verify breadcrumbs list exists");
+      cy.findByRole("heading", { name: "Staff Picks" }).should("exist");
+      cy.get("[data-testid=breadcrumbs-list]").find("li").as("breadcrumbsList");
+      cy.get("@breadcrumbsList").should("have.lengthOf", 3);
+    });
 
     cy.log("navigate back through breadcrumbs");
     cy.findByRole("link", {

@@ -1,8 +1,8 @@
 ## CHANGELOG
 
 ### UNRELEASED CHANGES
-- Add: Set up e2e Cypress tests for login with FirstBook
 - Fix: Block users from navigating directly to books above their age range
+- Add: Set up e2e Cypress tests for login with FirstBook & Clever
 
 ### 4.5.0
 - Add: Update cypress test info in README

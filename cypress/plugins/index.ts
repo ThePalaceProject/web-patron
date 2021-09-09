@@ -38,6 +38,8 @@ module.exports = (
     process.env.OPENEBOOKS_EARLY_GRADES_USER_USERNAME;
   config.env.OPENEBOOKS_EARLY_GRADES_USER_PW =
     process.env.OPENEBOOKS_EARLY_GRADES_USER_PW;
+  config.env.OPENEBOOKS_CLEVER_HIGH_SCHOOL_ACCESS_TOKEN =
+    process.env.OPENEBOOKS_CLEVER_HIGH_SCHOOL_ACCESS_TOKEN;
 
   return config;
 };

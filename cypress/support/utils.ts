@@ -1,4 +1,6 @@
 export const BASIC_LOGIN = "http://opds-spec.org/auth/basic";
+export const CLEVER_LOGIN =
+  "http://librarysimplified.org/authtype/OAuth-with-intermediary";
 export const SERVER_URL = "https://qa-circulation.openebooks.us/USOEI";
 export const BASE_COLLECTIONS_URL = `${SERVER_URL}/groups/429`;
 export const COOKIE_KEY = "CPW_AUTH_COOKIE%2Fapp";
@@ -8,6 +10,7 @@ export const APP_PATH = "/app";
 export const LOGIN_PATH = `${APP_PATH}/login`;
 export const LOANS_PATH = `${APP_PATH}/loans`;
 export const FIRSTBOOK_LOGIN_PATH = `${LOGIN_PATH}/http%3A%2F%2Fopds-spec.org%2Fauth%2Fbasic`;
+export const CLEVER_LOGIN_PATH = `${LOGIN_PATH}/http%3A%2F%2Flibrarysimplified.org%2Fauthtype%2FOAuth-with-intermediary`;
 const COLLECTION_PATH = `${APP_PATH}/collection`;
 const BOOK_PATH = `${APP_PATH}/book`;
 

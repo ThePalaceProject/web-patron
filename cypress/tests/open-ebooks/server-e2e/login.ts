@@ -1,5 +1,7 @@
 import {
   APP_PATH,
+  SERVER_URL,
+  CLEVER_LOGIN_PATH,
   COOKIE_KEY,
   FIRSTBOOK_LOGIN_PATH,
   LOGIN_PATH
@@ -52,6 +54,7 @@ describe("FirstBook login", () => {
   });
 
   it("Can login with FirstBook", () => {
+    cy.intercept("GET", `${SERVER_URL}/groups`).as("allCollections");
     cy.visit("/");
     cy.findByRole("link", { name: "Login with First Book" }).click();
     cy.location("pathname").should("eq", FIRSTBOOK_LOGIN_PATH);
@@ -68,6 +71,7 @@ describe("FirstBook login", () => {
     cy.findByRole("button", { name: "Login" }).click();
 
     cy.log("wait for url to change after submitting credentials");
+    cy.wait("@allCollections");
     cy.url().should("eq", `${Cypress.config().baseUrl}${APP_PATH}`);
     cy.get("main")
       .findByRole("heading", { name: "Open eBooks (QA Server) Home" })
@@ -136,18 +140,63 @@ describe("FirstBook login", () => {
   });
 
   it("Can logout with FirstBook", () => {
+    cy.intercept("GET", `${SERVER_URL}/groups`).as("allCollections");
+    cy.intercept("GET", `${SERVER_URL}/loans`).as("loans");
     cy.loginByApi("ALL_ACCESS_USER");
     cy.visit(APP_PATH);
-    cy.wait(5000);
+    cy.wait("@allCollections");
     cy.findByRole("button", { name: "Sign Out" }).should("exist").click();
     cy.findByRole("button", { name: "Cancel" }).should("exist");
     cy.findByRole("button", { name: "Confirm Sign Out" })
       .should("exist")
       .click();
-    cy.wait(5000);
+    cy.wait("@loans");
     cy.location("pathname").should("eq", LOGIN_PATH);
     cy.findByRole("listitem", { name: "Current location: Login" }).should(
       "exist"
     );
+  });
+});
+
+describe("Clever login", () => {
+  beforeEach(() => {
+    cy.clearCookie(COOKIE_KEY);
+  });
+
+  it("Redirects to Clever login", () => {
+    cy.visit("/");
+    cy.findByRole("link", { name: "Login with Clever" }).should(
+      "have.attr",
+      "href",
+      CLEVER_LOGIN_PATH
+    );
+
+    cy.findByRole("link", { name: "Login with Clever" }).should("exist");
+  });
+
+  it("Correct Clever token is handled", () => {
+    cy.visit(
+      `${APP_PATH}#access_token=${Cypress.env(
+        "OPENEBOOKS_CLEVER_HIGH_SCHOOL_ACCESS_TOKEN"
+      )}`
+    );
+
+    cy.log(
+      "Clever auth token is cleared & high school home page collection properly loads"
+    );
+    cy.location("pathname").should("eq", APP_PATH);
+    cy.findByRole("heading", { name: "Open eBooks (QA Server) Home" }).should(
+      "exist"
+    );
+    cy.findByRole("listitem", { name: "Current location: High School" }).should(
+      "exist"
+    );
+  });
+
+  it("Incorrect Clever token displays error", () => {
+    const cleverErrorMessage = "Clever login error";
+    cy.visit(`${APP_PATH}?loginError=${cleverErrorMessage}`);
+    cy.location("pathname").should("eq", LOGIN_PATH);
+    cy.findByText(cleverErrorMessage).should("exist");
   });
 });
