@@ -21,22 +21,40 @@ import extractParam from "dataflow/utils";
 import useSWR from "swr";
 import { fetchBook } from "dataflow/opds1/fetch";
 import useUser from "components/context/UserContext";
+import useLibraryContext from "components/context/LibraryContext";
 import useBreadcrumbContext from "components/context/BreadcrumbContext";
 import { APP_CONFIG } from "utils/env";
 import { getAuthors } from "utils/book";
+import { ServerError } from "errors";
+import ErrorComponent from "components/Error";
 
 export const BookDetails: React.FC = () => {
   const { query } = useRouter();
+  const { token } = useUser();
+  const { catalogUrl } = useLibraryContext();
   const bookUrl = extractParam(query, "bookUrl");
-  const { data, error } = useSWR(bookUrl ?? null, fetchBook);
+  /*
+    You can view books without being logged in
+    (teachers or librarians may want to browse without logging in),
+    but if a token _is_ present, meaning a student is logged in,
+    then it will be passed to `fetchBook` and requests to books 
+    will be blocked based on age restrictions
+  */
+  const { data, error } = useSWR(
+    bookUrl && catalogUrl ? [bookUrl, catalogUrl, token] : null,
+    fetchBook
+  );
   const { loans } = useUser();
   const { storedBreadcrumbs } = useBreadcrumbContext();
   // use the loans version if it exists
   const book = loans?.find(loanedBook => data?.id === loanedBook.id) ?? data;
 
   if (error) {
-    // just throw the error and let it be handled by an error boundary
-    throw error;
+    if (error instanceof ServerError) {
+      return <ErrorComponent info={error.info} />;
+    } else {
+      throw error;
+    }
   }
 
   if (!book) return <PageLoader />;

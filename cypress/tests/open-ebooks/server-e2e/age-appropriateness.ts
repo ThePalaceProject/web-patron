@@ -146,6 +146,15 @@ describe("High school access", () => {
     cy.findByRole("heading", { name: "Altered" }).should("exist");
   });
 
+  it("Can navigate directly to books below their age class", () => {
+    cy.visit(MIDDLE_GRADES_DETAIL_BOOK_PATH_ABBY_CARNELIA);
+    cy.findByRole("heading", {
+      name: "Abby Carnelia's One and Only Magical Power"
+    }).should("exist");
+    cy.visit(EARLY_GRADES_DETAIL_BOOK_PATH_ALL_ABOUT_ELLIE);
+    cy.findByRole("heading", { name: "All About Ellie" }).should("exist");
+  });
+
   it("Blocks users from navigating to collections outside their age class", () => {
     // FIXME: Occasionally, these tests fail when they shouldn't! https://jira.nypl.org/browse/SFR-1272
     cy.visit(MIDDLE_GRADES_COLLECTION_PATH);
@@ -156,14 +165,6 @@ describe("High school access", () => {
     cy.findByText("404 Error: No such lane.").should("exist");
     cy.visit(EARLY_GRADES_CHAPTER_BOOKS_COLLECTION_PATH);
     cy.findByText("404 Error: No such lane.").should("exist");
-  });
-
-  it("Blocks users from navigating to books outside their age class", () => {
-    // FIXME: This is a bug that needs to be fixed in order to get these tests to pass https://jira.nypl.org/browse/SFR-1268
-    // cy.visit(EARLY_GRADES_DETAIL_BOOK_PATH_ALL_ABOUT_ELLIE);
-    // cy.findByText("404 Error: No such lane.").should("exist");
-    // cy.visit(MIDDLE_GRADES_DETAIL_BOOK_PATH_ABBY_CARNELIA);
-    // cy.findByText("404 Error: No such lane.").should("exist");
   });
 });
 
@@ -243,6 +244,11 @@ describe("Middle grades access", () => {
     }).should("exist");
   });
 
+  it("Can navigate directly to books below their age class", () => {
+    cy.visit(EARLY_GRADES_DETAIL_BOOK_PATH_ALL_ABOUT_ELLIE);
+    cy.findByRole("heading", { name: "All About Ellie" }).should("exist");
+  });
+
   it("Blocks users from navigating to collections outside their age class", () => {
     // FIXME: Occasionally, these tests fail when they shouldn't! https://jira.nypl.org/browse/SFR-1272
     cy.visit(HIGH_SCHOOL_COLLECTION_PATH);
@@ -258,11 +264,8 @@ describe("Middle grades access", () => {
   });
 
   it("Blocks users from navigating to books outside their age class", () => {
-    // FIXME: This is a bug that needs to be fixed in order to get these tests to pass https://jira.nypl.org/browse/SFR-1268
-    // cy.visit(HIGH_SCHOOL_DETAIL_BOOK_PATH_ALTERED);
-    // cy.findByText("404 Error: No such lane.").should("exist");
-    // cy.visit(EARLY_GRADES_DETAIL_BOOK_PATH_ALL_ABOUT_ELLIE);
-    // cy.findByText("404 Error: No such lane.").should("exist");
+    cy.visit(HIGH_SCHOOL_DETAIL_BOOK_PATH_ALTERED);
+    cy.findByText("451 Error: Forbidden by policy.").should("exist");
   });
 });
 
@@ -347,11 +350,10 @@ describe("Early grades access", () => {
   });
 
   it("Blocks users from navigating to books outside their age class", () => {
-    // FIXME: This is a bug that needs to be fixed in order to get these tests to pass https://jira.nypl.org/browse/SFR-1268
-    // cy.visit(HIGH_SCHOOL_DETAIL_BOOK_PATH_ALTERED);
-    // cy.findByText("404 Error: No such lane.").should("exist");
-    // cy.visit(MIDDLE_GRADES_DETAIL_BOOK_PATH_ABBY_CARNELIA);
-    // cy.findByText("404 Error: No such lane.").should("exist");
+    cy.visit(HIGH_SCHOOL_DETAIL_BOOK_PATH_ALTERED);
+    cy.findByText("451 Error: Forbidden by policy.").should("exist");
+    cy.visit(MIDDLE_GRADES_DETAIL_BOOK_PATH_ABBY_CARNELIA);
+    cy.findByText("451 Error: Forbidden by policy.").should("exist");
   });
 });
 

@@ -72,12 +72,13 @@ describe("FirstBook login", () => {
     );
     cy.findByRole("button", { name: "Login" }).click();
 
+    cy.wait("@allCollections");
+
     cy.log("wait for url to change after submitting credentials");
     cy.url({ timeout: 7000 }).should(
       "eq",
       `${Cypress.config().baseUrl}${APP_PATH}`
     );
-    cy.wait("@allCollections");
 
     cy.log(
       "verify you are on the landing page and collection lanes are present"

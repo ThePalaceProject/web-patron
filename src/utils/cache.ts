@@ -6,19 +6,25 @@ import { mutate } from "swr";
  */
 
 export async function cacheCollectionBooks(
-  collection: CollectionData | undefined
+  collection: CollectionData | undefined,
+  catalogUrl: string,
+  token?: string
 ) {
   if (!collection) return;
-  await cacheBooks(collection.books);
+  await cacheBooks(collection.books, catalogUrl, token);
   await Promise.all(
     collection.lanes.map(lane => {
-      return cacheBooks(lane.books);
+      return cacheBooks(lane.books, catalogUrl, token);
     })
   );
 }
 
-async function cacheBooks(books: AnyBook[]) {
+async function cacheBooks(
+  books: AnyBook[],
+  catalogUrl: string,
+  token?: string
+) {
   books.forEach(book => {
-    mutate(book.url, book, false);
+    mutate([book.url, catalogUrl, token], book, false);
   });
 }

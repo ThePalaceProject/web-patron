@@ -50,11 +50,11 @@ describe("book details page", () => {
       })
     });
 
-    expect(() =>
-      render(<BookDetails />, {
-        router: { query: { bookUrl: "/book-url" } }
-      })
-    ).toThrowError(ServerError);
+    const utils = render(<BookDetails />, {
+      router: { query: { bookUrl: "/book-url" } }
+    });
+
+    expect(utils.getByRole("heading", { name: "418 Error: you messed up" }));
   });
 
   test("shows categories", () => {
@@ -142,7 +142,7 @@ describe("book details page", () => {
     // we make a special mock so we can differentiate the book request
     // and the related collection request
     mockedSWR.mockImplementation(((key: any) => {
-      if (key === "/book-url") {
+      if (key?.[0] === "/book-url") {
         return makeSwrResponse({
           data: {
             ...fixtures.book,
@@ -157,7 +157,11 @@ describe("book details page", () => {
       }
     }) as any);
     const utils = render(<BookDetails />, {
-      router: { query: { bookUrl: "/book-url" } }
+      router: {
+        query: {
+          bookUrl: "/book-url"
+        }
+      }
     });
     expect(utils.getByText("Recommendations")).toBeInTheDocument();
     expect(

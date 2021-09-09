@@ -42,8 +42,8 @@ export default function useCollection() {
   // extract the books from the collection and set them in the SWR cache
   // so we don't have to refetch them when you click a book.
   React.useEffect(() => {
-    cacheCollectionBooks(collection);
-  }, [collection]);
+    cacheCollectionBooks(collection, catalogUrl, token);
+  }, [collection, catalogUrl, token]);
 
   return { collection, collectionUrl, isValidating, error: applicationError };
 }
