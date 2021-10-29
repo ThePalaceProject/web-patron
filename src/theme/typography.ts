@@ -1,7 +1,7 @@
 const typography = {
   fonts: {
-    body: "-apple-system, BlinkMacSystemFont, system-ui, sans-serif",
-    heading: "-apple-system, BlinkMacSystemFont, system-ui, sans-seri",
+    body: "'Open Sans',Helvetica,Arial,sans-serif",
+    heading: "'Open Sans',Helvetica,Arial,sans-serif",
     monospace: "Menlo, monospace"
   },
   fontSizes: {

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;700&display=swap');
+
 /* this is to fix a problem in NYPL Design System setting global svg styles */
 svg {
   width: initial;

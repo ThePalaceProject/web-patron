@@ -16,7 +16,7 @@ exports[`select matches snapshot 1`] = `
   padding-bottom: 4px;
   border: 1px solid #bdbdbd;
   border-radius: 2px;
-  font-family: -apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  font-family: 'Open Sans',Helvetica,Arial,sans-serif;
   font-size: 0.875rem;
   font-weight: 300;
   line-height: 1.5;
