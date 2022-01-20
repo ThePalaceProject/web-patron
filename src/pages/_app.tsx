@@ -3,7 +3,6 @@ import ReactDOM from "react-dom";
 import { AppProps, NextWebVitalsMetric } from "next/app";
 import { IS_SERVER, REACT_AXE } from "../utils/env";
 import { ErrorBoundary } from "components/ErrorBoundary";
-import "system-font-css";
 import "@nypl/design-system-react-components/dist/styles.css";
 import "css-overrides.css";
 import track from "analytics/track";

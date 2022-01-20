@@ -8,8 +8,8 @@ const IosBadge = (props: React.ComponentProps<"a">) => {
     <a
       rel="noopener noreferrer"
       target="__blank"
-      href="https://apps.apple.com/us/app/simplye/id1046583900"
-      aria-label="Download SimplyE on the Apple App Store"
+      href="https://apps.apple.com/us/app/the-palace-project/id1574359693"
+      aria-label="Download Palace on the Apple App Store"
       sx={{ display: "block" }}
       {...props}
     >

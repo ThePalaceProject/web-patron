@@ -21,7 +21,7 @@ exports[`renders as expected 1`] = `
   padding-top: 4px;
   padding-bottom: 4px;
   font-size: 1rem;
-  font-family: -apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  font-family: 'Open Sans',Helvetica,Arial,sans-serif;
   font-weight: 300;
   line-height: 1.5;
   width: 100%;

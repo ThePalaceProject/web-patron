@@ -1,6 +1,10 @@
 ## CHANGELOG
 
 ### UNRELEASED CHANGES
+- Change font to Open Sans.
+- Update iOS App Store badge to link to Palace app.
+- Update Google Play Store badge to link to Palace app.
+- Update logo/text in mobile app callouts.
 - Fix "Cannot find module 'sharp'" error on installation.
 - Implement indirect bearer token borrowing (adds support for Johns Hopkins, Biblioboard, ProQuest, and other distributors).
 - Add new github action to sync a branch with NYPL.

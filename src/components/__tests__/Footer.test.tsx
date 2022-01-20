@@ -52,23 +52,23 @@ describe("toggling SimplyE Branding", () => {
 
     const utils = render(<Footer />);
 
-    expect(utils.queryByText(/download simplye/i)).not.toBeInTheDocument();
+    expect(utils.queryByText(/download palace/i)).not.toBeInTheDocument();
 
     expect(
       utils.queryByText(
-        "Our mobile app lets you browse, borrow and read from our whole collection of eBooks and Audiobooks right on your phone!"
+        "Our mobile app lets you browse, borrow and read from our whole collection of ebooks and audiobooks right on your phone!"
       )
     ).not.toBeInTheDocument();
 
     // badges
     const iosbadge = utils.queryByText(
-      /download simplye on the apple app store/i
+      /download palace on the apple app store/i
     );
 
     expect(iosbadge).not.toBeInTheDocument();
 
     const googleBadge = utils.queryByText(
-      /get simplye on the google play store/
+      /get palace on the google play store/
     );
     expect(googleBadge).not.toBeInTheDocument();
 
@@ -85,33 +85,33 @@ describe("toggling SimplyE Branding", () => {
 
     expect(
       utils.getByRole("heading", {
-        name: /download simplye/i
+        name: /download palace/i
       })
     ).toBeInTheDocument();
 
     expect(
       utils.getByText(
-        "Our mobile app lets you browse, borrow and read from our whole collection of eBooks and Audiobooks right on your phone!"
+        "Our mobile app lets you browse, borrow and read from our whole collection of ebooks and audiobooks right on your phone!"
       )
     ).toBeInTheDocument();
 
     // badges
     const iosbadge = utils.getByRole("link", {
-      name: /download simplye on the apple app store/i
+      name: /download palace on the apple app store/i
     });
     expect(iosbadge).toBeInTheDocument();
     expect(iosbadge).toHaveAttribute(
       "href",
-      "https://apps.apple.com/us/app/simplye/id1046583900"
+      "https://apps.apple.com/us/app/the-palace-project/id1574359693"
     );
 
     const googleBadge = utils.getByRole("link", {
-      name: /get simplye on the google play store/i
+      name: /get palace on the google play store/i
     });
     expect(googleBadge).toBeInTheDocument();
     expect(googleBadge).toHaveAttribute(
       "href",
-      "https://play.google.com/store/apps/details?id=org.nypl.simplified.simplye&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1"
+      "https://play.google.com/store/apps/details?id=org.thepalaceproject.palace&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1"
     );
 
     // my books nav link

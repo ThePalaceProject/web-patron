@@ -13,7 +13,7 @@ import ReportProblem from "./ReportProblem";
 import Head from "next/head";
 import { H1, H2, H3, Text } from "components/Text";
 import MediumIndicator from "components/MediumIndicator";
-import SimplyELogo from "components/SimplyELogo";
+import PalaceLogo from "components/PalaceLogo";
 import IosBadge from "components/storeBadges/IosBadge";
 import GooglePlayBadge from "components/storeBadges/GooglePlayBadge";
 import { useRouter } from "next/router";
@@ -120,7 +120,7 @@ const Summary: React.FC<{ book: AnyBook; className?: string }> = ({
 const SimplyECallout: React.FC<{ className?: "string" }> = ({ className }) => {
   return (
     <section
-      aria-label="Download the SimplyE Mobile App"
+      aria-label="Download the Palace Mobile App"
       sx={{
         mt: 4,
         bg: "ui.gray.lightWarm",
@@ -131,10 +131,10 @@ const SimplyECallout: React.FC<{ className?: "string" }> = ({ className }) => {
       }}
       className={className}
     >
-      <SimplyELogo sx={{ m: 3 }} />
-      <H3 sx={{ mt: 0 }}>Read Now. Read Everywhere.</H3>
+      <PalaceLogo sx={{ mt: 3, height: "120px" }} />
+      <H3 sx={{ mt: 0 }}>Download Palace</H3>
       <Text>
-        Browse and read our collection of eBooks and Audiobooks right from your
+        Browse and read our collection of ebooks and audiobooks right from your
         phone.
       </Text>
       <div sx={{ maxWidth: 140, mx: "auto", mt: 3 }}>
