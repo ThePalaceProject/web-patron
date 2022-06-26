@@ -49,7 +49,7 @@
     "moment": "^2.24.0",
     "next": "^10.0.8",
     "next-transpile-modules": "^4.0.0",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^2.6.7",
     "opds-feed-parser": "0.0.18",
     "react": "16.13.1",
     "react-dom": "16.13.1",
