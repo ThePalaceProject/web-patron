@@ -83,4 +83,46 @@ describe("redirects when user becomes authenticated", () => {
       shallow: true
     });
   });
+
+  test("uses homepage when nextUrl start with http", () => {
+    render(<LoginWrapper />, {
+      user: {
+        isAuthenticated: true
+      },
+      router: {
+        query: {
+          nextUrl: "http://test.com/test123"
+        }
+      }
+    });
+
+    expect(mockPush).toHaveBeenCalledTimes(1);
+    // redirects to home page instead of nextUrl
+    expect(mockPush).toHaveBeenCalledWith("/testlib", undefined, {
+      shallow: true
+    });
+  });
+
+  test("uses nextUrl when url contains http", () => {
+    render(<LoginWrapper />, {
+      user: {
+        isAuthenticated: true
+      },
+      router: {
+        query: {
+          nextUrl: "/book/somewhere/http%3A%2F%2Ftest.com%2F123%2F456"
+        }
+      }
+    });
+
+    expect(mockPush).toHaveBeenCalledTimes(1);
+    // redirects to home page instead of nextUrl
+    expect(mockPush).toHaveBeenCalledWith(
+      "/book/somewhere/http%3A%2F%2Ftest.com%2F123%2F456",
+      undefined,
+      {
+        shallow: true
+      }
+    );
+  });
 });
