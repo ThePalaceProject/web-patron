@@ -1,7 +1,7 @@
 ## CHANGELOG
 
 ### UNRELEASED CHANGES
-- Fix check on redirect URL to make sure it doesn't start with http, instead of contain HTTP, since it was falsely matching some legitimate URLs.
+- Fix check on redirect URL to make sure it doesn't start with HTTP, instead of contain HTTP, since it was falsely matching some legitimate URLs.
 - Change font to Open Sans.
 - Update iOS App Store badge to link to Palace app.
 - Update Google Play Store badge to link to Palace app.

@@ -84,7 +84,7 @@ describe("redirects when user becomes authenticated", () => {
     });
   });
 
-  test("uses homepage when nextUrl start with http", () => {
+  test("uses homepage when nextUrl starts with http", () => {
     render(<LoginWrapper />, {
       user: {
         isAuthenticated: true
@@ -103,7 +103,7 @@ describe("redirects when user becomes authenticated", () => {
     });
   });
 
-  test("uses nextUrl when url contains http", () => {
+  test("uses nextUrl when url contains, but does not start with, http", () => {
     render(<LoginWrapper />, {
       user: {
         isAuthenticated: true
