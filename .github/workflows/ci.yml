@@ -33,7 +33,7 @@ jobs:
         run: echo "NODE_VERSION=$(cat .nvmrc)" >> $GITHUB_OUTPUT
 
       - name: Use Node Version from nvmrc
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with: { node-version: "${{ steps.nvmrc.outputs.NODE_VERSION }}" }
 
       - name: Cache node modules
@@ -66,7 +66,7 @@ jobs:
         run: echo "NODE_VERSION=$(cat .nvmrc)" >> $GITHUB_OUTPUT
 
       - name: Use Node Version from nvmrc
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with: { node-version: "${{ steps.nvmrc.outputs.NODE_VERSION }}" }
 
       - name: Cache node modules
@@ -99,7 +99,7 @@ jobs:
         run: echo "NODE_VERSION=$(cat .nvmrc)" >> $GITHUB_OUTPUT
 
       - name: Use Node Version from nvmrc
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with: { node-version: "${{ steps.nvmrc.outputs.NODE_VERSION }}" }
 
       - name: Cache node modules
