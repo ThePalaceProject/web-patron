@@ -16,11 +16,11 @@ jobs:
     name: Updates Changelog
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: dangoslen/changelog-enforcer@v1.4.0
+      - uses: actions/checkout@v3
+      - uses: dangoslen/changelog-enforcer@v3
         with:
           changeLogPath: "CHANGELOG.md"
-          skipLabel: "no-changelog"
+          skipLabels: "no-changelog"
 
   lint:
     name: Lint
@@ -28,16 +28,16 @@ jobs:
     env:
       CI: true
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - id: nvmrc
-        run: echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
+        run: echo "NODE_VERSION=$(cat .nvmrc)" >> $GITHUB_OUTPUT
 
       - name: Use Node Version from nvmrc
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with: { node-version: "${{ steps.nvmrc.outputs.NODE_VERSION }}" }
 
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-node-modules
         with:
@@ -61,16 +61,16 @@ jobs:
     env:
       CI: true
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - id: nvmrc
-        run: echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
+        run: echo "NODE_VERSION=$(cat .nvmrc)" >> $GITHUB_OUTPUT
 
       - name: Use Node Version from nvmrc
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with: { node-version: "${{ steps.nvmrc.outputs.NODE_VERSION }}" }
 
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-node-modules
         with:
@@ -94,16 +94,16 @@ jobs:
     env:
       CI: true
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - id: nvmrc
-        run: echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
+        run: echo "NODE_VERSION=$(cat .nvmrc)" >> $GITHUB_OUTPUT
 
       - name: Use Node Version from nvmrc
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with: { node-version: "${{ steps.nvmrc.outputs.NODE_VERSION }}" }
 
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-node-modules
         with:
