@@ -16,8 +16,7 @@ jobs:
     name: Updates Changelog
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: dangoslen/changelog-enforcer@v3
+      - uses: dangoslen/changelog-enforcer@v3.3.0
         with:
           changeLogPath: "CHANGELOG.md"
           skipLabels: "no-changelog"
