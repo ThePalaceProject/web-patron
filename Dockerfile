@@ -1,5 +1,5 @@
 # build environment
-FROM node:12.2.0-alpine as builder	
+FROM node:18.19.0-alpine as builder
 
 RUN apk update
 RUN apk add git
