@@ -1,4 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
+/** @jsxRuntime classic */
 /** @jsx jsx */
 import { jsx, Styled, ThemeProvider } from "theme-ui";
 import * as React from "react";

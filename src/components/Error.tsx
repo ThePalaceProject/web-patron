@@ -1,6 +1,8 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
+/** @jsxRuntime classic */
 /** @jsx jsx */
 import { jsx } from "theme-ui";
+import * as React from "react";
 import { H1 } from "./Text";
 import Link from "next/link";
 import { useRouter } from "next/router";
