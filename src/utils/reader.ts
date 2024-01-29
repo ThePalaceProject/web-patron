@@ -13,7 +13,7 @@ import {
   ServiceWorkerCacher,
   ColumnsPaginatedBookView,
   ScrollingBookView
-} from "library-simplified-webpub-viewer";
+} from "@thepalaceproject/webpub-viewer/dist/webpub-viewer";
 import fetchWithHeaders from "dataflow/fetch";
 import Decryptor from "@nypl-simplified-packages/axisnow-access-control-web";
 import ApplicationError from "errors";

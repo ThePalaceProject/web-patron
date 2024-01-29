@@ -1,5 +1,5 @@
 const withTM = require("next-transpile-modules")([
-  "library-simplified-webpub-viewer"
+  "@thepalaceproject/webpub-viewer"
 ]);
 const {
   BugsnagBuildReporterPlugin,
