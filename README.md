@@ -11,6 +11,8 @@
 
 An OPDS web catalog client for library patrons.
 
+This app supports discovery, borrowing, downloading, and returning of material. It does not directly support viewing.
+
 ## Background
 
 The `web-patron` application serves as a way for libraries to publish their collections to the web. A library *must* be part of a [Circulation Manager](https://github.com/ThePalaceProject/circulation) and *can* be registered to a [Library Registry](https://github.com/ThePalaceProject/library-registry). A Library Registry provides details about a library, and a Circulation Manager provides a library's collection of eBooks and audiobooks in OPDS format. Registering with The Palace Project's Library Registry is how libraries can show up in the Palace mobile application and the [Community Demo](#demo) of this app. In order to have a web version of your library catalog, you can deploy this app.
@@ -43,7 +45,6 @@ __To have your library added to the demo, register it with NYPL's Library Regist
   * [Contributing](#contributing)
   * [Installing Dependencies](#installing-dependencies)
   * [Running the Application](#running-the-application)
-    + [Running with Decryption](#running-with-decryption)
     + [ENV Vars and Building](#env-vars-and-building)
     + [Useful Scripts](#useful-scripts)
   * [Testing](#testing)
@@ -53,7 +54,6 @@ __To have your library added to the demo, register it with NYPL's Library Regist
   * [Links and Routing](#links-and-routing)
 - [Deploying](#deploying)
   * [Build a docker container](#build-a-docker-container)
-    + [Building With AxisNow Decryptor](#building-with-axisnow-decryptor)
     + [Running the docker container](#running-the-docker-container)
     + [From the command line](#from-the-command-line)
     + [Using `docker-compose`](#using--docker-compose-)
@@ -123,16 +123,6 @@ Once the dependencies are installed and application environments configured, the
 - `npm run storybook` - This will run the storybook application to preview and develop components in isolation.
 
 The application will start at the base URL of `localhost:3000`. (NOTE: `npm run dev:https` will also make the site available using your computer's IP address. For example, https://192.168.1.15:3000.)
-
-### Running with Decryption
-
-This app supports read online for encrypted books only in the AxisNow format, and if you have access to the [Decryptor](https://github.com/nypl-simplified-packages/axisnow-access-control-web)
-
-To run with decryption:
-
-- Run `npm login --registry=https://npm.pkg.github.com`. You will need a Github Personal Access Token to use as your password.
-- Run `npm install` as normal.
-- The app will automatically pick up the installed optional `@nypl-simplified-packages/axisnow-access-control-web` package, and run with decryption enabled.
 
 ### ENV Vars and Building
 
@@ -228,17 +218,6 @@ When you have code changes you wish to review locally, you will need to build a 
     ```
 
 If you wanted to customize the image, you could create an additional Dockerfile (e.g., Dockerfile.second) and simply specify its name in the docker build commands. The Docker file you specify will guide the image build. For this image, the build takes about 4-6 minutes, depending on your Internet speed and load on the Node package servers, to complete the final image. Eg: `docker build -f Dockerfile.second -t webpatron .`
-
-### Building With AxisNow Decryptor
-
-To build the docker image with the AxisNow Decryptor included, you must provide a `github_token` build arg to the docker build command:
-
-```
-docker build --build-arg github_token=xxx .
-
-```
-
-This will set the correct permissions for when the app runs `npm install` while building the image.
 
 ### Running the docker container
 

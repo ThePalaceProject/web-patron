@@ -8,13 +8,9 @@ RUN apk add git
 # to take advantage of layer caching
 ENV NPM_CONFIG_LOGLEVEL=warn
 COPY package*.json ./
-COPY .npmrc ./
-COPY install-deps.sh ./
-# conditionally login to github package registry
-# and install dependencies
-ARG github_token=""
-RUN chmod +x ./install-deps.sh
-RUN sh ./install-deps.sh
+#COPY .npmrc ./
+#COPY install-deps.sh ./
+RUN npm i --legacy-peer-deps
 
 # then copy the rest of the files
 COPY . ./

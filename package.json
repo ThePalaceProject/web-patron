@@ -64,9 +64,6 @@
     "theme-ui": "^0.3.1",
     "tslib": "^2.3.0"
   },
-  "optionalDependencies": {
-    "@nypl-simplified-packages/axisnow-access-control-web": "^1.0.3"
-  },
   "devDependencies": {
     "@axe-core/react": "^4.1.0",
     "@babel/core": "^7.12.7",
