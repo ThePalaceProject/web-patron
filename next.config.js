@@ -80,24 +80,24 @@ const config = {
   },
   productionBrowserSourceMaps: true,
   generateBuildId: async () => BUILD_ID,
+  future: {
+    webpack5: true,
+  },
   webpack: (config, { dev, isServer, _defaultLoaders, webpack }) => {
     console.log(
       chalk.cyan("info  -"),
-      `Building ${isServer ? "server" : "client"} files.`
+      `Building ${isServer ? "server" : "client"} files using Webpack version ${webpack.version}.`
     );
-    // Note: we provide webpack above so you should not `require` it
     // Perform customizations to webpack config
     // Important: return the modified config
-    !isServer && config.plugins.push(new webpack.IgnorePlugin(/jsdom$/));
+    !isServer && config.plugins.push(new webpack.IgnorePlugin({ resourceRegExp: /jsdom$/ }));
     // react-axe should only be bundled when REACT_AXE=true
     !REACT_AXE === "true" &&
-      config.plugins.push(new webpack.IgnorePlugin(/react-axe$/));
+      config.plugins.push(new webpack.IgnorePlugin({ resourceRegExp: /react-axe$/ }));
     // Fixes dependency on "fs" module.
-    // we don't (and can't) depend on this in client-side code.
+    // We don't (and can't) depend on this in client-side code.
     if (!isServer) {
-      config.node = {
-        fs: "empty"
-      };
+      config.resolve.fallback.fs = false;
     }
 
     // ignore the axisnow decryptor, since we don't have access
