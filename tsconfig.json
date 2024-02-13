@@ -17,6 +17,7 @@
     "downlevelIteration": true,
     "importHelpers": true,
     "baseUrl": "src",
+    "useUnknownInCatchVariables": false,
   },
   "exclude": ["node_modules", "jest.config.js", "cypress"],
   "include": [
