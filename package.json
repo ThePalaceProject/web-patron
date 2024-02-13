@@ -36,7 +36,6 @@
     "@theme-ui/components": "^0.3.5",
     "@theme-ui/match-media": "^0.3.5",
     "@thepalaceproject/webpub-viewer": "^0.1.0",
-    "@zeit/next-source-maps": "0.0.3",
     "chalk": "^4.1.0",
     "deepmerge": "^4.2.2",
     "dompurify": "^3.0.8",

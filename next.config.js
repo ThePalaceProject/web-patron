@@ -5,7 +5,6 @@ const {
   BugsnagBuildReporterPlugin,
   BugsnagSourceMapUploaderPlugin
 } = require("webpack-bugsnag-plugins");
-const withSourceMaps = require("@zeit/next-source-maps");
 const chalk = require("chalk");
 const package = require("./package.json");
 const APP_VERSION = package.version;
@@ -131,4 +130,4 @@ const config = {
 const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true"
 });
-module.exports = withSourceMaps(withTM(withBundleAnalyzer(config)));
+module.exports = withTM(withBundleAnalyzer(config));
