@@ -10,7 +10,7 @@ ENV NPM_CONFIG_LOGLEVEL=warn
 COPY package*.json ./
 #COPY .npmrc ./
 #COPY install-deps.sh ./
-RUN npm i --legacy-peer-deps
+RUN npm i
 
 # then copy the rest of the files
 COPY . ./
