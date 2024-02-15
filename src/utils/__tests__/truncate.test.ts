@@ -1,3 +1,4 @@
+import { expect, test } from "@jest/globals";
 import { truncateString } from "../string";
 
 test("truncates at correct length and word boundary by default", () => {

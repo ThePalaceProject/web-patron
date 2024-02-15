@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { responseInterface } from "swr";
 
 export function makeSwrResponse<T>(value?: Partial<responseInterface<T, any>>) {

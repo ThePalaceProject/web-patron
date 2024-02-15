@@ -2,6 +2,7 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
+import { expect, test } from "@jest/globals";
 import { render, screen } from "@testing-library/react";
 
 import LazyImage from "../LazyImage";

@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 const consoleErrorSpy = jest.spyOn(global.console, "error");
 
 // use this to make console errors fail tests. Useful when running in to issues.

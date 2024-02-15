@@ -1,3 +1,4 @@
+import { expect, test } from "@jest/globals";
 import { OPDS1 } from "interfaces";
 import { parseLinks } from "utils/libraryLinks";
 

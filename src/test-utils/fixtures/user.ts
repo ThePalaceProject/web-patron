@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { UserState } from "components/context/UserContext";
 
 export const mockRefetchLoans = jest.fn();
