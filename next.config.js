@@ -79,9 +79,6 @@ const config = {
   },
   productionBrowserSourceMaps: true,
   generateBuildId: async () => BUILD_ID,
-  future: {
-    webpack5: true,
-  },
   webpack: (config, { dev, isServer, _defaultLoaders, webpack }) => {
     console.log(
       chalk.cyan("info  -"),
