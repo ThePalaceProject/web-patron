@@ -36,9 +36,7 @@ const ErrorComponent: React.FC<{ info?: OPDS1.ProblemDocument }> = ({
           <p>
             {detail && `${detail}`} <br />
           </p>
-          <Link href={`/${library}`}>
-            <a>Return Home</a>
-          </Link>
+          <Link href={`/${library}`}>Return Home</Link>
         </div>
       )}
     </>

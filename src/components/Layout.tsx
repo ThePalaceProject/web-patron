@@ -10,7 +10,11 @@ import { ErrorBoundary } from "components/ErrorBoundary";
 
 export const CONTENT_ID = "cpw-content";
 
-const Layout: React.FC = ({ children }) => {
+interface Props {
+  children: React.ReactNode;
+}
+
+const Layout = ({ children }: Props) => {
   return (
     <Styled.root
       sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}

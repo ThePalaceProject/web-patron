@@ -28,7 +28,11 @@ export const BreadcrumbContext = React.createContext<BreadcrumbContextType>(
   undefined
 );
 
-export const BreadcrumbProvider: React.FC = ({ children }) => {
+interface Props {
+  children: React.ReactNode;
+}
+
+export const BreadcrumbProvider = ({ children }: Props) => {
   const [storedBreadcrumbs, setStoredBreadcrumbs] = React.useState<LinkData[]>(
     []
   );

@@ -28,9 +28,7 @@ const MultiLibraryHome: React.FC = () => {
         <ul>
           {slugs.map(slug => (
             <li key={slug}>
-              <Link href={`/${slug}`}>
-                <a>/{libraries[slug]?.title}</a>
-              </Link>
+              <Link href={`/${slug}`}>/{libraries[slug]?.title}</Link>
             </li>
           ))}
         </ul>

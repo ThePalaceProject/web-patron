@@ -11,7 +11,9 @@ import { PageLoader } from "components/LoadingIndicator";
 
 /* Page without Header and Footer should wrap pages that should not have sitewide navigation */
 
-const Page: React.FC<AppProps> = props => {
+type AppPropsWithChildren = AppProps & { children?: React.ReactNode };
+
+const Page = (props: AppPropsWithChildren) => {
   const { isFallback } = useRouter();
   /**
    * If we are in a static generation fallback, we have no

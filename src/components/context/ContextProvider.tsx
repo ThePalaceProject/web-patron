@@ -11,6 +11,7 @@ import CatchFetchErrors from "auth/Catch401";
 
 type ProviderProps = {
   library: LibraryData;
+  children: React.ReactNode;
 };
 
 /**

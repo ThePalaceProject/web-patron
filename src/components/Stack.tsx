@@ -10,6 +10,7 @@ type StackProps = {
   direction?: "row" | "column";
   spacing?: number | string;
   className?: string;
+  children?: React.ReactNode;
 };
 const Stack: React.FC<StackProps> = ({
   direction = "row",

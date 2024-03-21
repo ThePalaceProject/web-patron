@@ -272,6 +272,7 @@ const OpenEbooksHero: React.FC = () => {
 const PopularBookSection: React.FC<{
   books: PopularBook[];
   coverLocation?: "left" | "right";
+  children?: React.ReactNode;
 }> = ({ children, books, coverLocation }) => {
   return (
     <section

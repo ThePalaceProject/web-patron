@@ -88,19 +88,16 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
         scroll={scroll}
         shallow={shallow}
         passHref
+        ref={ref}
+        sx={{
+          textDecoration: "none",
+          color: "inherit",
+          "&:hover": { color: "inherit", textDecoration: "underline" }
+        }}
+        className={className}
+        {...rest}
       >
-        <a
-          ref={ref}
-          sx={{
-            textDecoration: "none",
-            color: "inherit",
-            "&:hover": { color: "inherit", textDecoration: "underline" }
-          }}
-          className={className}
-          {...rest}
-        >
-          {children}
-        </a>
+        {children}
       </BaseLink>
     );
   }

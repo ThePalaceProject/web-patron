@@ -30,6 +30,7 @@ type ModalProps = {
   hideOnClickOutside?: boolean;
   role?: string;
   showClose?: boolean;
+  children?: React.ReactNode;
 };
 
 const Modal: React.FC<ModalProps> = ({

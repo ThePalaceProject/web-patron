@@ -1,8 +1,6 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-import { jsx } from "theme-ui";
+/** @jsxImportSource theme-ui */
 import * as React from "react";
-import { AspectRatio } from "@theme-ui/components";
+import {AspectRatio, Card} from "@theme-ui/components";
 import { Tabbable } from "reakit/Tabbable";
 import Book, { BOOK_HEIGHT, BOOK_WIDTH } from "./BookCard";
 import withErrorBoundary, { FallbackProps } from "./ErrorBoundary";
@@ -265,7 +263,7 @@ const SeeMoreBlock = React.forwardRef<HTMLLIElement, SeeMoreBlockProps>(
               }
             }}
           >
-            <Box
+            <Card
               sx={{
                 left: 0,
                 p: 2,
@@ -279,7 +277,7 @@ const SeeMoreBlock = React.forwardRef<HTMLLIElement, SeeMoreBlockProps>(
                 <Text>See All</Text>
                 <Text variant="text.headers.tertiary">{props.title}</Text>
               </Stack>
-            </Box>
+            </Card>
           </Link>
         </AspectRatio>
       </li>

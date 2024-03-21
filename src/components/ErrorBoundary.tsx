@@ -28,6 +28,7 @@ const initialState: ErrorState = { error: undefined, info: undefined };
 class DefaultErrorBoundary extends React.Component<
   {
     FallbackComponent: React.ComponentType<FallbackProps>;
+    children?: React.ReactNode;
   },
   ErrorState
 > {
@@ -68,6 +69,7 @@ class DefaultErrorBoundary extends React.Component<
 
 export const ErrorBoundary: React.FC<{
   fallback?: React.ComponentType<FallbackProps>;
+  children?: React.ReactNode;
 }> = ({ children, fallback: Fallback = DefaultFallback }) => {
   if (!BugsnagErrorBoundary) {
     return (

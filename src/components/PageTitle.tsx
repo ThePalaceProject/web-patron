@@ -6,10 +6,10 @@ import { H1 } from "./Text";
 import { CollectionData } from "interfaces";
 import ListFilters from "components/ListFilters";
 
-const PageTitle: React.FC<{ collection?: CollectionData }> = ({
-  children,
-  collection
-}) => {
+const PageTitle: React.FC<{
+  children?: React.ReactNode;
+  collection?: CollectionData;
+}> = ({children, collection }) => {
   return (
     <div
       sx={{
