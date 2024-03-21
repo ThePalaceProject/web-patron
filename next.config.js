@@ -74,7 +74,7 @@ const config = {
     GIT_BRANCH,
     GIT_COMMIT_SHA,
     RELEASE_STAGE,
-    AXISNOW_DECRYPT: false,
+    AXISNOW_DECRYPT: undefined,
     APP_CONFIG: JSON.stringify(APP_CONFIG)
   },
   productionBrowserSourceMaps: true,
