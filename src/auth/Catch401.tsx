@@ -9,7 +9,11 @@ import track from "analytics/track";
 import useLogin from "auth/useLogin";
 import useUser from "components/context/UserContext";
 
-const CatchFetchErrors: React.FC = ({ children }) => {
+interface Props {
+  children: React.ReactNode;
+}
+
+const CatchFetchErrors = ({ children }: Props) => {
   const { initLogin } = useLogin();
   const { isLoading } = useUser();
 

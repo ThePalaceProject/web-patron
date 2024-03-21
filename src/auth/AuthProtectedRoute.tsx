@@ -7,7 +7,11 @@ import React from "react";
  * This will show a message and redirect the user to the login
  * page if they try to access a route they are not permitted to see.
  */
-const AuthProtectedRoute: React.FC = ({ children }) => {
+
+interface Props {
+  children: React.ReactNode;
+}
+const AuthProtectedRoute = ({ children }: Props) => {
   const { isLoading, isAuthenticated, token, error } = useUser();
   const { initLogin } = useLogin();
 
