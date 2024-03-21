@@ -27,7 +27,8 @@ module.exports = {
     "prettier",
     "prettier/@typescript-eslint",
     "plugin:prettier/recommended",
-    "prettier/react"
+    "prettier/react",
+    'plugin:@next/next/recommended',
   ],
   rules: {
     // this rule was deprecated in favor of another
