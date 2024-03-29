@@ -12,14 +12,15 @@ exports[`LinkButton renders correct element 1`] = `
   display: inline-flex;
   -webkit-appearance: none;
   -moz-appearance: none;
+  -ms-appearance: none;
   appearance: none;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
   -webkit-box-pack: center;
-  -webkit-justify-content: center;
   -ms-flex-pack: center;
+  -webkit-justify-content: center;
   justify-content: center;
   text-align: center;
   white-space: nowrap;
@@ -31,23 +32,23 @@ exports[`LinkButton renders correct element 1`] = `
   cursor: pointer;
   -webkit-text-decoration: none;
   text-decoration: none;
-  background-color: var(--theme-ui-colors-brand-primary,#337ab7);
+  background-color: var(--theme-ui-colors-brand-primary);
   height: 32px;
   min-width: 32px;
-  color: var(--theme-ui-colors-ui-white,#ffffff);
-  fill: var(--theme-ui-colors-ui-white,#ffffff);
+  color: var(--theme-ui-colors-ui-white);
+  fill: var(--theme-ui-colors-ui-white);
 }
 
 .emotion-0:focus,
 .emotion-0:hover {
   background-color: #2d6da3;
-  color: var(--theme-ui-colors-ui-white,#ffffff);
+  color: var(--theme-ui-colors-ui-white);
   -webkit-text-decoration: none;
   text-decoration: none;
 }
 
 .emotion-0:focus {
-  box-shadow: 0 0 0 0.2em rgba(0,109,255,0.4);
+  box-shadow: 0 0 0 0.2em rgba(0, 109, 255, 0.4);
 }
 
 .emotion-0:active {
@@ -55,8 +56,8 @@ exports[`LinkButton renders correct element 1`] = `
 }
 
 .emotion-0:disabled {
-  background-color: var(--theme-ui-colors-ui-gray-light,#e0e0e0);
-  color: var(--theme-ui-colors-ui-gray-extraDark,#424242);
+  background-color: var(--theme-ui-colors-ui-gray-light);
+  color: var(--theme-ui-colors-ui-gray-extraDark);
   cursor: default;
 }
 
@@ -83,14 +84,15 @@ exports[`NavButton renders correct element 1`] = `
   display: inline-flex;
   -webkit-appearance: none;
   -moz-appearance: none;
+  -ms-appearance: none;
   appearance: none;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
   -webkit-box-pack: center;
-  -webkit-justify-content: center;
   -ms-flex-pack: center;
+  -webkit-justify-content: center;
   justify-content: center;
   text-align: center;
   white-space: nowrap;
@@ -102,11 +104,11 @@ exports[`NavButton renders correct element 1`] = `
   cursor: pointer;
   -webkit-text-decoration: none;
   text-decoration: none;
-  background-color: var(--theme-ui-colors-brand-primary,#337ab7);
+  background-color: var(--theme-ui-colors-brand-primary);
   height: 32px;
   min-width: 32px;
-  color: var(--theme-ui-colors-ui-white,#ffffff);
-  fill: var(--theme-ui-colors-ui-white,#ffffff);
+  color: var(--theme-ui-colors-ui-white);
+  fill: var(--theme-ui-colors-ui-white);
 }
 
 .emotion-0:hover {
@@ -118,13 +120,13 @@ exports[`NavButton renders correct element 1`] = `
 .emotion-0:focus,
 .emotion-0:hover {
   background-color: #2d6da3;
-  color: var(--theme-ui-colors-ui-white,#ffffff);
+  color: var(--theme-ui-colors-ui-white);
   -webkit-text-decoration: none;
   text-decoration: none;
 }
 
 .emotion-0:focus {
-  box-shadow: 0 0 0 0.2em rgba(0,109,255,0.4);
+  box-shadow: 0 0 0 0.2em rgba(0, 109, 255, 0.4);
 }
 
 .emotion-0:active {
@@ -132,8 +134,8 @@ exports[`NavButton renders correct element 1`] = `
 }
 
 .emotion-0:disabled {
-  background-color: var(--theme-ui-colors-ui-gray-light,#e0e0e0);
-  color: var(--theme-ui-colors-ui-gray-extraDark,#424242);
+  background-color: var(--theme-ui-colors-ui-gray-light);
+  color: var(--theme-ui-colors-ui-gray-extraDark);
   cursor: default;
 }
 
@@ -157,14 +159,15 @@ exports[`variants filled (default) 1`] = `
   display: inline-flex;
   -webkit-appearance: none;
   -moz-appearance: none;
+  -ms-appearance: none;
   appearance: none;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
   -webkit-box-pack: center;
-  -webkit-justify-content: center;
   -ms-flex-pack: center;
+  -webkit-justify-content: center;
   justify-content: center;
   text-align: center;
   white-space: nowrap;
@@ -176,23 +179,23 @@ exports[`variants filled (default) 1`] = `
   cursor: pointer;
   -webkit-text-decoration: none;
   text-decoration: none;
-  background-color: var(--theme-ui-colors-brand-primary,#337ab7);
+  background-color: var(--theme-ui-colors-brand-primary);
   height: 32px;
   min-width: 32px;
-  color: var(--theme-ui-colors-ui-white,#ffffff);
-  fill: var(--theme-ui-colors-ui-white,#ffffff);
+  color: var(--theme-ui-colors-ui-white);
+  fill: var(--theme-ui-colors-ui-white);
 }
 
 .emotion-0:focus,
 .emotion-0:hover {
   background-color: #2d6da3;
-  color: var(--theme-ui-colors-ui-white,#ffffff);
+  color: var(--theme-ui-colors-ui-white);
   -webkit-text-decoration: none;
   text-decoration: none;
 }
 
 .emotion-0:focus {
-  box-shadow: 0 0 0 0.2em rgba(0,109,255,0.4);
+  box-shadow: 0 0 0 0.2em rgba(0, 109, 255, 0.4);
 }
 
 .emotion-0:active {
@@ -200,8 +203,8 @@ exports[`variants filled (default) 1`] = `
 }
 
 .emotion-0:disabled {
-  background-color: var(--theme-ui-colors-ui-gray-light,#e0e0e0);
-  color: var(--theme-ui-colors-ui-gray-extraDark,#424242);
+  background-color: var(--theme-ui-colors-ui-gray-light);
+  color: var(--theme-ui-colors-ui-gray-extraDark);
   cursor: default;
 }
 
@@ -225,14 +228,15 @@ exports[`variants ghost 1`] = `
   display: inline-flex;
   -webkit-appearance: none;
   -moz-appearance: none;
+  -ms-appearance: none;
   appearance: none;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
   -webkit-box-pack: center;
-  -webkit-justify-content: center;
   -ms-flex-pack: center;
+  -webkit-justify-content: center;
   justify-content: center;
   text-align: center;
   white-space: nowrap;
@@ -247,21 +251,23 @@ exports[`variants ghost 1`] = `
   background-color: transparent;
   height: 32px;
   min-width: 32px;
-  color: var(--theme-ui-colors-brand-primary,#337ab7);
-  fill: var(--theme-ui-colors-brand-primary,#337ab7);
+  color: var(--theme-ui-colors-brand-primary);
+  fill: var(--theme-ui-colors-brand-primary);
 }
 
 .emotion-0:focus,
 .emotion-0:hover {
   background-color: #c3daee;
-  color: var(--theme-ui-colors-brand-primary,#337ab7);
+  color: var(--theme-ui-colors-brand-primary);
   -webkit-text-decoration: none;
   text-decoration: none;
 }
 
 .emotion-0:focus {
-  box-shadow: 0 0 0 0.2em rgba(0,109,255,0.4);
+  box-shadow: 0 0 0 0.2em rgba(0, 109, 255, 0.4);
 }
+
+
 
 <button
   class="emotion-0"
@@ -279,14 +285,15 @@ exports[`variants link 1`] = `
   display: inline-flex;
   -webkit-appearance: none;
   -moz-appearance: none;
+  -ms-appearance: none;
   appearance: none;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
   -webkit-box-pack: center;
-  -webkit-justify-content: center;
   -ms-flex-pack: center;
+  -webkit-justify-content: center;
   justify-content: center;
   text-align: center;
   white-space: nowrap;
@@ -303,13 +310,13 @@ exports[`variants link 1`] = `
   font-size: 1rem;
   font-weight: 300;
   line-height: 1.5;
-  color: var(--theme-ui-colors-brand-primary,#337ab7);
+  color: var(--theme-ui-colors-brand-primary);
   padding: 0;
-  fill: var(--theme-ui-colors-brand-primary,#337ab7);
+  fill: var(--theme-ui-colors-brand-primary);
 }
 
 .emotion-0:hover {
-  color: var(--theme-ui-colors-brand-primary,#337ab7);
+  color: var(--theme-ui-colors-brand-primary);
 }
 
 <button

@@ -8,6 +8,7 @@ exports[`select matches snapshot 1`] = `
 .emotion-0 {
   -webkit-appearance: none;
   -moz-appearance: none;
+  -ms-appearance: none;
   appearance: none;
   width: 100%;
   padding-left: 8px;
