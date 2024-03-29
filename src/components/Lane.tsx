@@ -1,4 +1,6 @@
-/** @jsxImportSource theme-ui */
+/** @jsxRuntime classic */
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import * as React from "react";
 import {AspectRatio, Card} from "@theme-ui/components";
 import { Tabbable } from "reakit/Tabbable";

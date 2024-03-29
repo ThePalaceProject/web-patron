@@ -1,7 +1,7 @@
 import { jest } from "@jest/globals";
 import * as React from "react";
 import Router from "next/router";
-import { RouterContext } from "next/dist/next-server/lib/router-context";
+import { RouterContext } from "next/dist/shared/lib/router-context.shared-runtime"
 import { NextRouter } from "next/router";
 import { libraryData } from "test-utils/fixtures";
 

@@ -1,7 +1,6 @@
 import * as React from "react";
 import { render } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { beforeEach, expect, jest } from "@jest/globals";
 import Adapter from "enzyme-adapter-react-16";
 import { configure } from "enzyme";
 import { LibraryData } from "../interfaces";
@@ -67,7 +66,11 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
     ...options?.user
   };
 
-  const AllTheProviders: React.FC = ({ children }) => {
+  interface AllTheProvidersProps {
+    children?: React.ReactNode;
+  }
+
+  const AllTheProviders = ({ children }: AllTheProvidersProps) => {
     return (
       <MockNextRouterContextProvider router={options?.router}>
         <ThemeProvider theme={theme}>
@@ -82,6 +85,7 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
       </MockNextRouterContextProvider>
     );
   };
+  // @ts-ignore
   return {
     ...render(ui, { wrapper: AllTheProviders, ...options })
   };
