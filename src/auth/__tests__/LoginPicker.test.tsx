@@ -5,6 +5,7 @@ import { render, fixtures } from "test-utils";
 import userEvent from "@testing-library/user-event";
 import LoginPicker from "../LoginPicker";
 import { mockPush } from "test-utils/mockNextRouter";
+import {act} from "@testing-library/react";
 
 test("shows warning if there is no auth method configured", async () => {
   const utils = render(<LoginPicker />, {
@@ -138,7 +139,7 @@ test("shows combobox with five auth methods configured", () => {
   expect(utils.getByRole("option", { name: "Library Barcode" }));
 
   // selecting one should show a NavButton to that page
-  userEvent.selectOptions(select, "client-basic");
+  act(() => userEvent.selectOptions(select, "client-basic"))
   const barcodeLink = utils.getByRole("link", {
     name: "Login with Library Barcode"
   });
@@ -148,7 +149,7 @@ test("shows combobox with five auth methods configured", () => {
   );
 
   // select another
-  userEvent.selectOptions(select, "id-1");
+  act(() => userEvent.selectOptions(select, "id-1"));
   expect(
     utils.queryByText("Login with Library Barcode")
   ).not.toBeInTheDocument();

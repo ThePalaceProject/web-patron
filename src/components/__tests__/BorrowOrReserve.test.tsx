@@ -11,6 +11,7 @@ import userEvent from "@testing-library/user-event";
 import * as fetch from "dataflow/opds1/fetch";
 import { ServerError } from "errors";
 import { mockPush } from "test-utils/mockNextRouter";
+import {act} from "@testing-library/react";
 
 test("shows correct button for borrowable book", () => {
   const utils = render(<BorrowOrReserve isBorrow url="/url" />);
@@ -43,7 +44,7 @@ test("borrowing calls correct url with token", async () => {
     name: "Borrow this book"
   });
 
-  userEvent.click(button);
+  act(() => userEvent.click(button));
 
   // loading state
   const loading = utils.getByRole("button", { name: "Borrowing..." });
@@ -70,7 +71,7 @@ test("redirects to login when not signed in", () => {
   });
   expect(mockPush).toHaveBeenCalledTimes(0);
 
-  userEvent.click(button);
+  act(() => userEvent.click(button));
 
   // no loading state
   expect(utils.queryByText("Borrowing...")).not.toBeInTheDocument();
@@ -108,7 +109,7 @@ test("catches and displays server errors", async () => {
     })
   );
 
-  userEvent.click(button);
+  act(() => userEvent.click(button));
 
   // shows the error, button resets.
   await waitFor(() => {
@@ -130,7 +131,7 @@ test("catches unrecognized fetch errors", async () => {
 
   mockedFetchBook.mockRejectedValueOnce(new Error("You messed up!"));
 
-  userEvent.click(button);
+  act(() => userEvent.click(button));
 
   // shows the error, button resets.
   await waitFor(() => {
@@ -153,7 +154,7 @@ test("calls set book after borrowing", async () => {
   mockedFetchBook.mockResolvedValueOnce(fixtures.fulfillableBook);
   expect(fixtures.mockSetBook).toHaveBeenCalledTimes(0);
 
-  userEvent.click(button);
+  act(() => userEvent.click(button));
 
   await waitFor(() => expect(fixtures.mockSetBook).toHaveBeenCalledTimes(1));
 });

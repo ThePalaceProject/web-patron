@@ -11,6 +11,7 @@ import { ServerError } from "errors";
 import useSWR from "swr";
 import mockConfig from "test-utils/mockConfig";
 import { BreadcrumbContext } from "components/context/BreadcrumbContext";
+import {act} from "@testing-library/react";
 
 jest.mock("swr");
 
@@ -242,7 +243,7 @@ describe("report problem", () => {
     expect(utils.getByLabelText("Complaint Type")).not.toBeVisible();
 
     const reportProblemLink = utils.getByTestId("report-problem-link");
-    userEvent.click(reportProblemLink);
+    act(() => userEvent.click(reportProblemLink));
 
     // one for the original report problem button, one for the form
     expect(utils.getAllByText("Report a problem")).toHaveLength(2);
@@ -283,16 +284,18 @@ describe("report problem", () => {
     const utils = render(<BookDetails />);
     // open the form
     const reportProblemLink = utils.getByTestId("report-problem-link");
-    userEvent.click(reportProblemLink);
+    act(() => userEvent.click(reportProblemLink));
 
     // fill the form
-    userEvent.selectOptions(
-      utils.getByLabelText("Complaint Type"),
-      "complaint-type-b"
-    );
-    userEvent.type(utils.getByLabelText("Details"), "Some issue happened.");
-    // submit the form
-    userEvent.click(utils.getByText("Submit"));
+    act(() => {
+      userEvent.selectOptions(
+        utils.getByLabelText("Complaint Type"),
+        "complaint-type-b"
+      );
+      userEvent.type(utils.getByLabelText("Details"), "Some issue happened.");
+      // submit the form
+      userEvent.click(utils.getByText("Submit"));
+    });
 
     // actually posted the complaint
     await waitFor(() =>
@@ -324,16 +327,18 @@ describe("report problem", () => {
     const utils = render(<BookDetails />);
     // open the form
     const reportProblemLink = utils.getByTestId("report-problem-link");
-    userEvent.click(reportProblemLink);
+    act(() => userEvent.click(reportProblemLink));
 
     // fill the form
-    userEvent.selectOptions(
-      utils.getByLabelText("Complaint Type"),
-      "complaint-type-b"
-    );
-    userEvent.type(utils.getByLabelText("Details"), "Some issue happened.");
-    // submit the form
-    userEvent.click(utils.getByText("Submit"));
+    act(() => {
+      userEvent.selectOptions(
+        utils.getByLabelText("Complaint Type"),
+        "complaint-type-b"
+      );
+      userEvent.type(utils.getByLabelText("Details"), "Some issue happened.");
+      // submit the form
+      userEvent.click(utils.getByText("Submit"));
+    });
 
     // shows thank you message
     expect(
@@ -342,7 +347,7 @@ describe("report problem", () => {
     expect(await utils.findByText("Done")).toBeInTheDocument();
 
     // can close the form
-    userEvent.click(utils.getByText("Done"));
+    act(() => userEvent.click(utils.getByText("Done")));
     expect(utils.getByText("Complaint Type")).not.toBeVisible();
   });
 
@@ -354,11 +359,11 @@ describe("report problem", () => {
     const utils = render(<ReportProblem book={fixtures.borrowableBook} />);
     // open the form
     const reportProblemLink = utils.getByTestId("report-problem-link");
-    userEvent.click(reportProblemLink);
+    act(() => userEvent.click(reportProblemLink));
 
     // don't fill the form
     // submit the form
-    userEvent.click(utils.getByText("Submit"));
+    act(() => userEvent.click(utils.getByText("Submit")));
 
     expect(
       await utils.findByText("Error: Please choose a type")

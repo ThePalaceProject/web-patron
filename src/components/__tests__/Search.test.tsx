@@ -7,6 +7,7 @@ import { mockPush } from "test-utils/mockNextRouter";
 import useSWR from "swr";
 import { makeSwrResponse, MockSwr } from "test-utils/mockSwr";
 import { SearchData } from "interfaces";
+import {act} from "@testing-library/react";
 
 const fixtureData = {
   template: "/search/{searchTerms}",
@@ -63,8 +64,10 @@ test("searching calls history.push with url", async () => {
   const searchButton = utils.getByText("Search");
   const input = utils.getByLabelText("Enter search keyword or keywords");
   // act
-  userEvent.type(input, "my search");
-  fireEvent.click(searchButton);
+  act(() => {
+    userEvent.type(input, "my search");
+    fireEvent.click(searchButton);
+  });
 
   // assert
   expect(mockPush).toHaveBeenCalledTimes(1);

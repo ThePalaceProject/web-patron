@@ -20,6 +20,7 @@ import * as fetch from "dataflow/opds1/fetch";
 import { ServerError } from "errors";
 import * as env from "utils/env";
 import { MOCK_DATE_STRING } from "test-utils/mockToDateString";
+import {act} from "@testing-library/react";
 
 jest.mock("downloadjs");
 window.open = jest.fn();
@@ -71,7 +72,7 @@ describe("BorrowableBook", () => {
     expect(borrowButton).toBeInTheDocument();
 
     // click borrow
-    userEvent.click(borrowButton);
+    act(() => userEvent.click(borrowButton));
 
     // the borrow button should be gone now
     await waitForElementToBeRemoved(() => utils.getByText("Borrowing..."));
@@ -111,7 +112,7 @@ describe("OnHoldBook", () => {
     expect(borrowButton).toBeInTheDocument();
 
     // click borrow
-    userEvent.click(borrowButton);
+    act(() => userEvent.click(borrowButton));
 
     // the borrow button should be gone now
     await waitForElementToBeRemoved(() => utils.getByText("Borrowing..."));
@@ -204,7 +205,7 @@ describe("ReservableBook", () => {
     expect(reserveButton).toBeInTheDocument();
 
     // click borrow
-    userEvent.click(reserveButton);
+    act(() => userEvent.click(reserveButton));
 
     // the borrow button should be gone now
     await waitForElementToBeRemoved(() => utils.getByText("Reserving..."));
@@ -237,7 +238,7 @@ describe("reserved", () => {
     });
     expect(revokeButton).toBeInTheDocument();
 
-    userEvent.click(revokeButton);
+    act(() => userEvent.click(revokeButton));
 
     expect(
       await utils.findByRole("button", { name: "Cancelling..." })
@@ -265,7 +266,7 @@ describe("reserved", () => {
     });
     expect(revokeButton).toBeInTheDocument();
 
-    userEvent.click(revokeButton);
+    act(() => userEvent.click(revokeButton));
 
     expect(
       await utils.findByRole("button", { name: "Cancelling..." })
@@ -357,7 +358,7 @@ describe("FulfillableBook", () => {
     });
     expect(revokeButton).toBeInTheDocument();
 
-    userEvent.click(revokeButton);
+    act(() => userEvent.click(revokeButton));
 
     expect(
       await utils.findByRole("button", { name: "Returning..." })
@@ -422,7 +423,7 @@ describe("FulfillableBook", () => {
 
     // no calls until we click the button
     expect(fetchMock).toHaveBeenCalledTimes(0);
-    userEvent.click(readOnline);
+    act(() => userEvent.click(readOnline));
     await waitFor(() =>
       expect(fetchMock).toHaveBeenCalledWith("http://track-open-book.com")
     );
@@ -519,7 +520,7 @@ describe("FulfillableBook", () => {
     const downloadButton = utils.getByText("Download EPUB");
     expect(downloadButton).toBeInTheDocument();
 
-    userEvent.click(downloadButton);
+    act(() => userEvent.click(downloadButton));
 
     expect(
       utils.getByRole("button", { name: "Downloading..." })
@@ -554,7 +555,7 @@ describe("FulfillableBook", () => {
     const downloadButton = utils.getByText("Read Online");
     expect(downloadButton).toBeInTheDocument();
 
-    userEvent.click(downloadButton);
+    act(() => userEvent.click(downloadButton));
 
     // you fetch the opds entry which should then return you a book with the correct link
     expect(fetchMock).toHaveBeenCalledWith("/indirect", {
@@ -580,7 +581,7 @@ describe("FulfillableBook", () => {
     const utils = render(<FulfillmentCard book={downloadableBook} />);
     const downloadButton = utils.getByText("Download EPUB");
 
-    userEvent.click(downloadButton);
+    act(() => userEvent.click(downloadButton));
 
     expect(
       await utils.findByText("Error: You can't do that")
@@ -598,7 +599,7 @@ describe("FulfillableBook", () => {
     const utils = render(<FulfillmentCard book={downloadableBook} />);
     const downloadButton = utils.getByText("Download EPUB");
 
-    userEvent.click(downloadButton);
+    act(() => userEvent.click(downloadButton));
 
     await waitForElementToBeRemoved(() => utils.queryByText("Downloading..."));
 
