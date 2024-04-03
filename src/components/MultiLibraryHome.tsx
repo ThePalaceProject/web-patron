@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 /** @jsxRuntime classic */
 /** @jsx jsx */
-import { jsx, Styled, ThemeProvider } from "theme-ui";
+import { jsx, Themed, ThemeProvider } from "theme-ui";
 import * as React from "react";
 import Link from "next/link";
 import { APP_CONFIG } from "utils/env";
@@ -15,7 +15,7 @@ const MultiLibraryHome: React.FC = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Styled.root
+      <Themed.root
         sx={{
           display: "flex",
           flexDirection: "column",
@@ -32,7 +32,7 @@ const MultiLibraryHome: React.FC = () => {
             </li>
           ))}
         </ul>
-      </Styled.root>
+      </Themed.root>
     </ThemeProvider>
   );
 };

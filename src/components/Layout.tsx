@@ -1,6 +1,6 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
-import { jsx, Styled } from "theme-ui";
+import { jsx, Themed } from "theme-ui";
 import * as React from "react";
 import GlobalStyles from "./GlobalStyles";
 import Header from "./Header";
@@ -16,7 +16,7 @@ interface Props {
 
 const Layout = ({ children }: Props) => {
   return (
-    <Styled.root
+    <Themed.root
       sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
     >
       <SkipNavigation />
@@ -34,7 +34,7 @@ const Layout = ({ children }: Props) => {
         <ErrorBoundary>{children}</ErrorBoundary>
       </main>
       <Footer sx={{ width: "100%" }} />
-    </Styled.root>
+    </Themed.root>
   );
 };
 
