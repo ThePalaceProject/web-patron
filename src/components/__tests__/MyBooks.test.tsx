@@ -1,5 +1,4 @@
 import * as React from "react";
-import { expect, test } from "@jest/globals";
 import { render, fixtures, fireEvent } from "test-utils";
 import { MyBooks } from "../MyBooks";
 import { FulfillableBook } from "interfaces";

@@ -1,4 +1,3 @@
-import { expect, jest, test } from "@jest/globals";
 import * as React from "react";
 import { render, fixtures, waitFor } from "test-utils";
 import { CollectionData } from "interfaces";

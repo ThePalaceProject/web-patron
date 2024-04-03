@@ -1,5 +1,4 @@
 import * as React from "react";
-import { expect, jest, test } from "@jest/globals";
 import { render, fixtures, fireEvent } from "test-utils";
 import Search from "../Search";
 import userEvent from "@testing-library/user-event";

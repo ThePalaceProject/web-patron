@@ -1,4 +1,3 @@
-import { expect, test } from "@jest/globals";
 import * as React from "react";
 import { fixtures, render } from "../../test-utils";
 import { SignOut } from "components/SignOut";

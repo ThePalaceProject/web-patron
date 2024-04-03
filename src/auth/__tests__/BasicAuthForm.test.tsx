@@ -1,5 +1,4 @@
 import * as React from "react";
-import { beforeEach, describe, expect, test } from "@jest/globals";
 import { fixtures, render, waitFor } from "test-utils";
 import BasicAuthHandler from "auth/BasicAuthHandler";
 import { ClientBasicMethod, OPDS1 } from "interfaces";

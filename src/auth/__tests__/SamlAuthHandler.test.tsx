@@ -1,4 +1,3 @@
-import { beforeEach, expect, test } from "@jest/globals";
 import * as React from "react";
 import { fixtures, render, waitFor } from "test-utils";
 import SamlAuthHandler from "../SamlAuthHandler";

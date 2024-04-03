@@ -1,5 +1,4 @@
 import * as React from "react";
-import { beforeEach, expect, jest, test } from "@jest/globals";
 import { render, fixtures } from "../../test-utils";
 import Lane from "../Lane";
 import { LaneData } from "interfaces";

@@ -1,6 +1,5 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
-import { expect, test } from "@jest/globals";
 import { jsx } from "theme-ui";
 import * as React from "react";
 import { render } from "../../test-utils";
