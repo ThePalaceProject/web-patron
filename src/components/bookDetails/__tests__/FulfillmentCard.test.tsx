@@ -19,7 +19,7 @@ import * as fetch from "dataflow/opds1/fetch";
 import { ServerError } from "errors";
 import * as env from "utils/env";
 import { MOCK_DATE_STRING } from "test-utils/mockToDateString";
-import {act} from "@testing-library/react";
+import { act } from "@testing-library/react";
 
 jest.mock("downloadjs");
 window.open = jest.fn();

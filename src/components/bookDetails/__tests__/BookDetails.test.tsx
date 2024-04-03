@@ -10,7 +10,7 @@ import { ServerError } from "errors";
 import useSWR from "swr";
 import mockConfig from "test-utils/mockConfig";
 import { BreadcrumbContext } from "components/context/BreadcrumbContext";
-import {act} from "@testing-library/react";
+import { act } from "@testing-library/react";
 
 jest.mock("swr");
 

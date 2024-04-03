@@ -12,7 +12,7 @@ import {
 } from "interfaces";
 import { mergeBook, mockSetBook } from "test-utils/fixtures";
 import { MOCK_DATE_STRING } from "test-utils/mockToDateString";
-import {act} from "@testing-library/react";
+import { act } from "@testing-library/react";
 
 function expectReadMore(utils: ReturnType<typeof render>) {
   const link = utils.getByRole("link", { name: "Read more" });
@@ -67,7 +67,7 @@ describe("BorrowableBook", () => {
     });
 
     // click borrow
-    act(() => userEvent.click(utils.getByText("Borrow this book")) );
+    act(() => userEvent.click(utils.getByText("Borrow this book")));
     expect(mockFetchBook).toHaveBeenCalledTimes(1);
     expect(mockFetchBook).toHaveBeenCalledWith(
       "/borrow",
@@ -119,7 +119,7 @@ describe("OnHoldBook", () => {
     });
 
     // click borrow
-    act(() => userEvent.click(utils.getByText("Borrow this book")) );
+    act(() => userEvent.click(utils.getByText("Borrow this book")));
     expect(mockFetchBook).toHaveBeenCalledTimes(1);
     expect(mockFetchBook).toHaveBeenCalledWith(
       "/borrow",
@@ -179,7 +179,7 @@ describe("ReservableBook", () => {
     });
 
     // click borrow
-    act(() => userEvent.click(utils.getByText("Reserve this book")) );
+    act(() => userEvent.click(utils.getByText("Reserve this book")));
     expect(mockFetchBook).toHaveBeenCalledTimes(1);
     expect(mockFetchBook).toHaveBeenCalledWith(
       "/reserve",

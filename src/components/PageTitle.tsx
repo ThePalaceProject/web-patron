@@ -9,7 +9,7 @@ import ListFilters from "components/ListFilters";
 const PageTitle: React.FC<{
   children?: React.ReactNode;
   collection?: CollectionData;
-}> = ({children, collection }) => {
+}> = ({ children, collection }) => {
   return (
     <div
       sx={{

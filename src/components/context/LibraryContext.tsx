@@ -6,9 +6,7 @@ const LibraryContext = React.createContext<LibraryData | undefined>(undefined);
 export const LibraryProvider: React.FC<{
   library: LibraryData;
   children: React.ReactNode;
-}> = ({
-  library, children
-}) => (
+}> = ({ library, children }) => (
   <LibraryContext.Provider value={library}>{children}</LibraryContext.Provider>
 );
 

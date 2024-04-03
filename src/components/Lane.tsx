@@ -2,7 +2,7 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import {AspectRatio, Card} from "@theme-ui/components";
+import { AspectRatio, Card } from "@theme-ui/components";
 import { Tabbable } from "reakit/Tabbable";
 import Book, { BOOK_HEIGHT, BOOK_WIDTH } from "./BookCard";
 import withErrorBoundary, { FallbackProps } from "./ErrorBoundary";
@@ -11,7 +11,6 @@ import { H2 } from "./Text";
 import { NavButton } from "./Button";
 import ArrowForward from "icons/ArrowForward";
 import Stack from "./Stack";
-import { Box } from "theme-ui";
 import { AnyBook, LaneData } from "interfaces";
 import Link from "components/Link";
 import { Text } from "components/Text";

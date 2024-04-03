@@ -6,7 +6,7 @@ import { mockPush } from "test-utils/mockNextRouter";
 import useSWR from "swr";
 import { makeSwrResponse, MockSwr } from "test-utils/mockSwr";
 import { SearchData } from "interfaces";
-import {act} from "@testing-library/react";
+import { act } from "@testing-library/react";
 
 const fixtureData = {
   template: "/search/{searchTerms}",

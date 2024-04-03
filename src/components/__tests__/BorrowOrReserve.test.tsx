@@ -10,7 +10,7 @@ import userEvent from "@testing-library/user-event";
 import * as fetch from "dataflow/opds1/fetch";
 import { ServerError } from "errors";
 import { mockPush } from "test-utils/mockNextRouter";
-import {act} from "@testing-library/react";
+import { act } from "@testing-library/react";
 
 test("shows correct button for borrowable book", () => {
   const utils = render(<BorrowOrReserve isBorrow url="/url" />);

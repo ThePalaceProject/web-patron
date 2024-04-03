@@ -20,7 +20,9 @@ export default {
   component: Login
 } as Meta;
 
-const Template: Story = ({children, ...rest}) => <Login children={children} {...rest} />;
+const Template: Story = ({ children, ...rest }) => (
+  <Login {...rest}>{children}</Login>
+);
 
 export const Basic = Template.bind({});
 Basic.parameters = {

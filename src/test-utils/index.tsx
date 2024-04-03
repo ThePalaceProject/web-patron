@@ -85,7 +85,6 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
       </MockNextRouterContextProvider>
     );
   };
-  // @ts-ignore
   return {
     ...render(ui, { wrapper: AllTheProviders, ...options })
   };

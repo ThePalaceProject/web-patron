@@ -2,7 +2,7 @@ import * as React from "react";
 import { fixtures, render } from "../../test-utils";
 import { SignOut } from "components/SignOut";
 import userEvent from "@testing-library/user-event";
-import {act} from "@testing-library/react";
+import { act } from "@testing-library/react";
 
 // const mockCookie
 test("Shows button", () => {
