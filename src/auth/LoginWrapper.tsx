@@ -17,11 +17,11 @@ import useLoginRedirectUrl from "auth/useLoginRedirect";
  * Shows loader if the state is still loading
  * Adds wrapping components for styling
  */
-interface Props {
-  children: React.ReactNode;
+interface LoginWrapperProps {
+  children?: React.ReactNode;
 }
 
-const LoginWrapper = ({ children }: Props) => {
+const LoginWrapper = ({ children }: LoginWrapperProps) => {
   const { isAuthenticated, isLoading } = useUser();
   const { catalogName } = useLibraryContext();
   const { push } = useRouter();
