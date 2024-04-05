@@ -83,7 +83,8 @@ module.exports = {
     "id-match": "error",
     "no-eval": "error",
     "no-redeclare": "error",
-    "no-var": "error"
+    "no-var": "error",
+    "@next/next/no-img-element": "off",
   },
   settings: {
     react: {
