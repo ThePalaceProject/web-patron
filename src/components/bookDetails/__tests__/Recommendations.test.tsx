@@ -40,9 +40,7 @@ test("shows recommendations loading state", async () => {
     isValidating: true
   });
   const utils = render(<Recommendations book={fixtures.borrowableBook} />);
-  await waitFor(() =>
-    expect(utils.getByText("Loading...")).toBeInTheDocument()
-  );
+  await waitFor(() => expect(utils.getByText("Loading")).toBeInTheDocument());
 });
 
 test("fetches the proper url for recommendation collection", () => {

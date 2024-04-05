@@ -2,7 +2,7 @@ import * as React from "react";
 import { LibraryData } from "interfaces";
 import { LibraryProvider } from "./LibraryContext";
 import { Provider as ReakitProvider } from "reakit";
-import { ThemeProvider } from "theme-ui";
+import { ThemeUIProvider } from "theme-ui";
 import makeTheme from "../../theme";
 import { UserProvider } from "components/context/UserContext";
 import { SWRConfig } from "swr";
@@ -22,7 +22,7 @@ const AppContextProvider: React.FC<ProviderProps> = ({ children, library }) => {
 
   return (
     <SWRConfig value={swrConfig}>
-      <ThemeProvider theme={theme}>
+      <ThemeUIProvider theme={theme}>
         <ReakitProvider>
           <LibraryProvider library={library}>
             <UserProvider>
@@ -30,7 +30,7 @@ const AppContextProvider: React.FC<ProviderProps> = ({ children, library }) => {
             </UserProvider>
           </LibraryProvider>
         </ReakitProvider>
-      </ThemeProvider>
+      </ThemeUIProvider>
     </SWRConfig>
   );
 };

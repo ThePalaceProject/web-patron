@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ThemeProvider } from "theme-ui";
+import { ThemeUIProvider } from "theme-ui";
 import { Provider as ReakitProvider } from "reakit";
 import { LibraryProvider } from "../src/components/context/LibraryContext";
 import { UserContext, UserState } from "../src/components/context/UserContext";
@@ -61,7 +61,7 @@ export const decorators = [
     const theme = makeTheme(libraryData.colors);
     const library = libraryData;
     return (
-      <ThemeProvider theme={theme}>
+      <ThemeUIProvider theme={theme}>
         <ReakitProvider>
           <LibraryProvider library={library}>
             <UserContext.Provider value={user}>
@@ -69,7 +69,7 @@ export const decorators = [
             </UserContext.Provider>
           </LibraryProvider>
         </ReakitProvider>
-      </ThemeProvider>
+      </ThemeUIProvider>
     )
   },
 ];

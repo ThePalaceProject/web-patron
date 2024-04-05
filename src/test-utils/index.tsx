@@ -14,7 +14,7 @@ import { enableFetchMocks } from "jest-fetch-mock";
 import { LibraryProvider } from "components/context/LibraryContext";
 import { BreadcrumbProvider } from "components/context/BreadcrumbContext";
 import { UserContext, UserState } from "components/context/UserContext";
-import { ThemeProvider } from "theme-ui";
+import { ThemeUIProvider } from "theme-ui";
 import makeTheme from "theme";
 import mockConfig from "test-utils/mockConfig";
 import track from "analytics/track";
@@ -73,7 +73,7 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
   const AllTheProviders = ({ children }: AllTheProvidersProps) => {
     return (
       <MockNextRouterContextProvider router={options?.router}>
-        <ThemeProvider theme={theme}>
+        <ThemeUIProvider theme={theme}>
           <ReakitProvider>
             <LibraryProvider library={library}>
               <UserContext.Provider value={user}>
@@ -81,7 +81,7 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
               </UserContext.Provider>
             </LibraryProvider>
           </ReakitProvider>
-        </ThemeProvider>
+        </ThemeUIProvider>
       </MockNextRouterContextProvider>
     );
   };
