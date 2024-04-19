@@ -1,6 +1,6 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
-import { jsx, SxProps } from "theme-ui";
+import { jsx, SxProp } from "theme-ui";
 import * as React from "react";
 import Stack from "components/Stack";
 import AuthButton from "auth/AuthButton";
@@ -74,7 +74,7 @@ export default function LoginRegion(): JSX.Element {
   );
 }
 
-const column: SxProps["sx"] = {
+const column: SxProp["sx"] = {
   mx: [3, 5],
   my: 4,
   justifyContent: "flex-start",
@@ -83,12 +83,12 @@ const column: SxProps["sx"] = {
   width: ["100%", "100%", "50%"]
 };
 
-const loginButton: SxProps["sx"] = {
+const loginButton: SxProp["sx"] = {
   flex: "0 0 auto",
   mx: ["auto", "auto", 0]
 };
 
-const logoHeader: SxProps["sx"] = {
+const logoHeader: SxProp["sx"] = {
   height: 86,
   display: "flex",
   alignItems: "center",
