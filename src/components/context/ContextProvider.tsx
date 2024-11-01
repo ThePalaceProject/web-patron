@@ -1,7 +1,7 @@
 import * as React from "react";
 import { LibraryData } from "interfaces";
 import { LibraryProvider } from "./LibraryContext";
-import { Provider as ReakitProvider } from "reakit";
+// import { Provider as ReakitProvider } from "@ariakit/react";
 import { ThemeUIProvider } from "theme-ui";
 import makeTheme from "../../theme";
 import { UserProvider } from "components/context/UserContext";
@@ -23,13 +23,13 @@ const AppContextProvider: React.FC<ProviderProps> = ({ children, library }) => {
   return (
     <SWRConfig value={swrConfig}>
       <ThemeUIProvider theme={theme}>
-        <ReakitProvider>
-          <LibraryProvider library={library}>
-            <UserProvider>
-              <CatchFetchErrors>{children}</CatchFetchErrors>
-            </UserProvider>
-          </LibraryProvider>
-        </ReakitProvider>
+        {/* <ReakitProvider> */}
+        <LibraryProvider library={library}>
+          <UserProvider>
+            <CatchFetchErrors>{children}</CatchFetchErrors>
+          </UserProvider>
+        </LibraryProvider>
+        {/* </ReakitProvider> */}
       </ThemeUIProvider>
     </SWRConfig>
   );

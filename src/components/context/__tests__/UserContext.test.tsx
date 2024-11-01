@@ -8,8 +8,8 @@ import Cookie from "js-cookie";
 import * as router from "next/router";
 import useUser, { UserProvider } from "components/context/UserContext";
 import mockAuthenticatedOnce from "test-utils/mockAuthState";
-import * as swr from "swr";
-import { makeSwrResponse } from "test-utils/mockSwr";
+import useSWR, * as swr from "swr";
+// import { makeSwrResponse } from "test-utils/mockSwr";
 
 const mockSWR = jest.spyOn(swr, "default");
 
@@ -17,12 +17,35 @@ const str = JSON.stringify;
 const mockCookie = Cookie as any;
 const useRouterSpy = jest.spyOn(router, "useRouter");
 
+jest.mock("swr");
+
+// const mockedSWR = useSWR as jest.MockedFunction<typeof useSWR>;
+
+function makeSwrResponse(value: Partial<ReturnType<typeof useSWR>>) {
+  return {
+    data: undefined,
+    error: undefined,
+    revalidate: jest.fn(),
+    isValidating: false,
+    mutate: jest.fn(),
+    ...value
+  };
+}
+// function mockSwr(value: Partial<ReturnType<typeof useSWR>>) {
+//   mockedSWR.mockReturnValue(makeSwrResponse(value));
+// }
+
+// const mutateMock = jest.fn();
+// const defaultMock = makeSwrResponse({
+//   data: fixtures.emptyCollection,
+//   mutate: mutateMock
+// });
+// mockSWR.mockReturnValue(defaultMock);
 const mutateMock = jest.fn();
-const defaultMock = makeSwrResponse<any>({
-  data: fixtures.emptyCollection,
-  mutate: mutateMock
+const defaultMock = makeSwrResponse({
+  data: fixtures.emptyCollection
 });
-mockSWR.mockReturnValue(defaultMock);
+mockSWR.mockReturnValue(defaultMock as any);
 
 /**
  * This file tests both UserContext and useCredentials, as

@@ -3,7 +3,7 @@
 import { jsx } from "theme-ui";
 import * as React from "react";
 import { AspectRatio, Card } from "@theme-ui/components";
-import { Tabbable } from "reakit/Tabbable";
+import { Focusable } from "@ariakit/react/focusable";
 import Book, { BOOK_HEIGHT, BOOK_WIDTH } from "./BookCard";
 import withErrorBoundary, { FallbackProps } from "./ErrorBoundary";
 import { lighten } from "@theme-ui/color";
@@ -292,7 +292,7 @@ const PrevNextButton: React.FC<{
   disabled: boolean;
 }> = ({ onClick, isPrev = false, disabled }) => {
   return (
-    <Tabbable
+    <Focusable
       as="div"
       sx={{
         alignItems: "center",
@@ -317,7 +317,7 @@ const PrevNextButton: React.FC<{
           transform: isPrev ? "rotate(180deg)" : ""
         }}
       />
-    </Tabbable>
+    </Focusable>
   );
 };
 

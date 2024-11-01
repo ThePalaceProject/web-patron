@@ -9,7 +9,7 @@ RUN apk add git
 ENV NPM_CONFIG_LOGLEVEL=warn
 COPY package*.json ./
 COPY .npmrc ./
-RUN npm install --legacy-peer-deps
+RUN npm install
 
 # then copy the rest of the files
 COPY . ./

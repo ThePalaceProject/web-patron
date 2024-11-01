@@ -3,7 +3,7 @@
 import { jsx } from "theme-ui";
 import * as React from "react";
 import Modal from "./Modal";
-import { useDialogState, DialogDisclosure } from "reakit/Dialog";
+import { useDialogStore, DialogDisclosure } from "@ariakit/react/dialog";
 import Button from "./Button";
 import Stack from "./Stack";
 import useUser from "components/context/UserContext";
@@ -15,8 +15,8 @@ interface SignOutProps {
 export const SignOut: React.FC<SignOutProps> = ({
   color = "ui.black"
 }: SignOutProps) => {
-  const dialog = useDialogState();
-  const { signOut, isLoading } = useUser();
+  const dialog = useDialogStore();
+  const { signOut } = useUser();
   function signOutAndClose() {
     signOut();
     dialog.hide();
@@ -26,8 +26,9 @@ export const SignOut: React.FC<SignOutProps> = ({
       <DialogDisclosure
         as={Button}
         color={color}
-        loading={isLoading}
-        {...dialog}
+        // loading={isLoading}
+        store={dialog}
+        // {...dialog}
       >
         Sign Out
       </DialogDisclosure>

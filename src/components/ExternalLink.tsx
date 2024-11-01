@@ -4,7 +4,7 @@
 // @ts-nocheck
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { VisuallyHidden } from "reakit";
+import { VisuallyHidden } from "@ariakit/react";
 import { AnchorButton } from "./Button";
 
 const ExternalLink: React.FC<React.ComponentPropsWithoutRef<"a">> = ({

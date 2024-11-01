@@ -3,7 +3,7 @@ import { render, fixtures } from "test-utils";
 import { BookList, InfiniteBookList } from "../BookList";
 import merge from "deepmerge";
 import { BorrowableBook, CollectionData } from "interfaces";
-import { useSWRInfinite } from "swr";
+import useSWRInfinite from "swr/infinite";
 import { fetchCollection } from "dataflow/opds1/fetch";
 import userEvent from "@testing-library/user-event";
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Story, Meta } from "@storybook/react/types-6-0";
+import { StoryFn, Meta } from "@storybook/react";
 import { reservableBook } from "test-utils/fixtures/book";
 import BookPage from "components/bookDetails";
 
@@ -8,7 +8,7 @@ export default {
   component: BookPage
 } as Meta;
 
-const Template: Story = args => <BookPage {...args} />;
+const Template: StoryFn = args => <BookPage {...args} />;
 
 export const ReservableBook = Template.bind({});
 ReservableBook.parameters = {

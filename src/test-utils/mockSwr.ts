@@ -1,15 +1,17 @@
 import { jest } from "@jest/globals";
-import { responseInterface } from "swr";
+import { SWRResponse } from "swr";
 
-export function makeSwrResponse<T>(value?: Partial<responseInterface<T, any>>) {
+jest.mock("swr");
+
+export function makeSwrResponse<T>(value?: Partial<SWRResponse<T, any>>) {
   return {
     data: undefined,
     error: undefined,
-    revalidate: jest.fn(),
+    // revalidate: jest.fn(),
     isValidating: false,
     mutate: jest.fn(),
     ...value
   };
 }
 
-export type MockSwr<T> = (value?: Partial<responseInterface<T, any>>) => void;
+export type MockSwr<T> = (value?: Partial<SWRResponse<T, any>>) => void;

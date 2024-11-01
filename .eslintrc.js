@@ -28,7 +28,7 @@ module.exports = {
     "prettier/@typescript-eslint",
     "plugin:prettier/recommended",
     "prettier/react",
-    'plugin:@next/next/recommended',
+    "plugin:@next/next/recommended"
   ],
   rules: {
     // this rule was deprecated in favor of another
@@ -85,6 +85,7 @@ module.exports = {
     "no-redeclare": "error",
     "no-var": "error",
     "@next/next/no-img-element": "off",
+    "react/no-unknown-property": ["error", { ignore: ["sx", "jsx", "global"] }]
   },
   settings: {
     react: {

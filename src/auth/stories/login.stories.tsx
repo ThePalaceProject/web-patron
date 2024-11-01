@@ -1,5 +1,6 @@
 import React from "react";
-import { Story, Meta } from "@storybook/react/types-6-0";
+// import { StoryFn, Meta } from "@storybook/react";
+import { StoryFn, Meta } from "@storybook/react";
 import Login from "auth/LoginWrapper";
 
 /**
@@ -20,7 +21,7 @@ export default {
   component: Login
 } as Meta;
 
-const Template: Story = ({ children, ...rest }) => (
+const Template: StoryFn = ({ children, ...rest }) => (
   <Login {...rest}>{children}</Login>
 );
 

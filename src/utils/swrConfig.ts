@@ -1,8 +1,8 @@
 import track from "analytics/track";
 import { ServerError } from "errors";
-import { ConfigInterface } from "swr";
+import { SWRConfiguration } from "swr";
 
-const swrConfig: ConfigInterface<any, Error> = {
+const swrConfig: SWRConfiguration<any, Error> = {
   // we don't generally need to revalidate our data very often
   revalidateOnFocus: false,
   revalidateOnReconnect: false,

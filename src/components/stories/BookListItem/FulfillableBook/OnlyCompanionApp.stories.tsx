@@ -1,5 +1,5 @@
 import React from "react";
-import { Story, Meta } from "@storybook/react/types-6-0";
+import { StoryFn, Meta } from "@storybook/react";
 import {
   axisnowFulfillmentLink,
   epubFulfillmentLink,
@@ -16,7 +16,7 @@ export default {
   component: BookListItem
 } as Meta;
 
-const Template: Story<{ book: AnyBook }> = args => <BookListItem {...args} />;
+const Template: StoryFn<{ book: AnyBook }> = args => <BookListItem {...args} />;
 
 const redirectEpub = {
   ...epubFulfillmentLink,

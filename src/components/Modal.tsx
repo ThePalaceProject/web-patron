@@ -2,7 +2,9 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { DialogStateReturn, DialogBackdrop, Dialog } from "reakit";
+// import { DialogStateReturn, DialogBackdrop, Dialog } from "@ariakit/react";
+// import { Dialog } from "@ariakit/react/cjs/dialog";
+import { Dialog } from "@ariakit/react/dialog";
 import { Icon, IconNames } from "@nypl/design-system-react-components";
 import Button from "components/Button";
 
@@ -23,7 +25,8 @@ export const modalButtonStyles = {
 
 type ModalProps = {
   isVisible: boolean;
-  dialog: DialogStateReturn;
+  // dialog: DialogStateReturn;
+  dialog: any;
   hide?: () => void;
   label?: string;
   className?: string;
@@ -35,7 +38,7 @@ type ModalProps = {
 
 const Modal: React.FC<ModalProps> = ({
   dialog,
-  isVisible,
+  // isVisible,
   hide,
   children,
   label,
@@ -45,57 +48,41 @@ const Modal: React.FC<ModalProps> = ({
   showClose = true
 }) => {
   return (
-    <DialogBackdrop
-      {...dialog}
+    <Dialog
+      // {...dialog}
+      store={dialog}
+      role={role}
+      // visible={isVisible}
+      // hide={hide ?? dialog.hide}
+      className={className}
+      hideOnInteractOutside={hideOnClickOutside}
       sx={{
-        display: isVisible ? "flex" : "none",
-        position: "fixed",
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: "rgba(0,0,0,0.5)",
-        zIndex: ["modal"],
-        justifyContent: "center",
-        alignItems: "center"
+        background: "white",
+        borderRadius: 2,
+        boxShadow: "modal",
+        px: 4,
+        py: 3,
+        m: 2,
+        position: "relative"
       }}
-      visible={isVisible}
+      aria-label={label}
     >
-      <Dialog
-        {...dialog}
-        role={role}
-        visible={isVisible}
-        hide={hide ?? dialog.hide}
-        className={className}
-        hideOnClickOutside={hideOnClickOutside}
-        sx={{
-          background: "white",
-          borderRadius: 2,
-          boxShadow: "modal",
-          px: 4,
-          py: 3,
-          m: 2,
-          position: "relative"
-        }}
-        aria-label={label}
-      >
-        {showClose && (
-          <Button
-            variant="ghost"
-            color="ui.gray.dark"
-            onClick={hide}
-            sx={{ position: "absolute", top: 2, right: 2 }}
-          >
-            <Icon
-              decorative={false}
-              name={IconNames.close}
-              sx={{ fontSize: 18 }}
-            />
-          </Button>
-        )}
-        {children}
-      </Dialog>
-    </DialogBackdrop>
+      {showClose && (
+        <Button
+          variant="ghost"
+          color="ui.gray.dark"
+          onClick={hide}
+          sx={{ position: "absolute", top: 2, right: 2 }}
+        >
+          <Icon
+            decorative={false}
+            name={IconNames.close}
+            sx={{ fontSize: 18 }}
+          />
+        </Button>
+      )}
+      {children}
+    </Dialog>
   );
 };
 

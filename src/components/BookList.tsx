@@ -19,7 +19,7 @@ import BookCover from "./BookCover";
 import BorrowOrReserve from "./BorrowOrReserve";
 import { AnyBook, CollectionData, LaneData } from "interfaces";
 import { fetchCollection } from "dataflow/opds1/fetch";
-import { useSWRInfinite } from "swr";
+import useSWRInfinite from "swr/infinite";
 import useUser from "components/context/UserContext";
 import Stack from "components/Stack";
 import CancelOrReturn from "components/CancelOrReturn";

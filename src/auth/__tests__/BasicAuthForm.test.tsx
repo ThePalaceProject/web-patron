@@ -1,5 +1,5 @@
 import * as React from "react";
-import { fixtures, render, waitFor } from "test-utils";
+import { act, fixtures, render, waitFor } from "test-utils";
 import BasicAuthHandler from "auth/BasicAuthHandler";
 import { ClientBasicMethod, OPDS1 } from "interfaces";
 import userEvent from "@testing-library/user-event";
@@ -69,7 +69,7 @@ test("sumbits", async () => {
   userEvent.type(barcode, "1234");
   userEvent.type(pin, "pinpin");
   const loginButton = utils.getByRole("button", { name: "Login" });
-  userEvent.click(loginButton);
+  act(() => userEvent.click(loginButton));
 
   const token = generateCredentials("1234", "pinpin");
 
@@ -109,7 +109,7 @@ test("displays client error when inputs are unfilled", async () => {
 
   // don't fill form, but click login
   const loginButton = utils.getByRole("button", { name: "Login" });
-  userEvent.click(loginButton);
+  act(() => userEvent.click(loginButton));
 
   // assert
   await utils.findByText("Your Barcode is required.");
@@ -193,7 +193,7 @@ test("submits with no password input", async () => {
   const barcode = utils.getByLabelText("Barcode input");
   userEvent.type(barcode, "1234");
   const loginButton = utils.getByRole("button", { name: "Login" });
-  userEvent.click(loginButton);
+  act(() => userEvent.click(loginButton));
 
   const token = generateCredentials("1234");
 

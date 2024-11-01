@@ -3,13 +3,11 @@
 import * as React from "react";
 import { render } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import Adapter from "enzyme-adapter-react-16";
-import { configure } from "enzyme";
 import { LibraryData } from "../interfaces";
 import "./mockScrollTo";
 import * as fixtures from "./fixtures";
 import serializer from "jest-emotion";
-import { Provider as ReakitProvider } from "reakit";
+// import { Provider as ReakitProvider } from "@ariakit/react";
 import { MockNextRouterContextProvider } from "./mockNextRouter";
 import { NextRouter } from "next/router";
 import { enableFetchMocks } from "jest-fetch-mock";
@@ -36,9 +34,6 @@ export const mockTrackError = jest.fn();
 track.error = mockTrackError;
 
 export { fixtures };
-
-// configure the enzyme adapter
-configure({ adapter: new Adapter() });
 
 /**
  * mock out the window.URL.createObjectURL since it isn't
@@ -76,13 +71,13 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
     return (
       <MockNextRouterContextProvider router={options?.router}>
         <ThemeUIProvider theme={theme}>
-          <ReakitProvider>
-            <LibraryProvider library={library}>
-              <UserContext.Provider value={user}>
-                <BreadcrumbProvider>{children}</BreadcrumbProvider>
-              </UserContext.Provider>
-            </LibraryProvider>
-          </ReakitProvider>
+          {/* <ReakitProvider> */}
+          <LibraryProvider library={library}>
+            <UserContext.Provider value={user}>
+              <BreadcrumbProvider>{children}</BreadcrumbProvider>
+            </UserContext.Provider>
+          </LibraryProvider>
+          {/* </ReakitProvider> */}
         </ThemeUIProvider>
       </MockNextRouterContextProvider>
     );

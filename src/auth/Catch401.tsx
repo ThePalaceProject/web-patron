@@ -1,8 +1,10 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { keyInterface, SWRConfig } from "swr";
+import { Key, SWRConfig } from "swr";
 import swrConfig from "utils/swrConfig";
 import { ServerError } from "errors";
 import track from "analytics/track";
@@ -30,7 +32,7 @@ const CatchFetchErrors = ({ children }: Props) => {
 
   const config = {
     ...swrConfig,
-    onError: (error: Error, _key: keyInterface) => {
+    onError: (error: Error, _key: Key) => {
       if (error instanceof ServerError) {
         if (error.info.status === 401) {
           handle401();

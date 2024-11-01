@@ -4,7 +4,7 @@ import { jsx } from "theme-ui";
 import * as React from "react";
 import Modal from "../Modal";
 import useComplaints from "../../hooks/useComplaints";
-import { DialogDisclosure } from "reakit";
+import { DialogDisclosure } from "@ariakit/react/dialog";
 import { TextArea } from "../TextInput";
 import { useForm } from "react-hook-form";
 import Button from "../Button";
@@ -30,9 +30,12 @@ const ReportProblem: React.FC<{ book: AnyBook }> = ({ book }) => {
   const hasReportUrl = Boolean(getReportUrl(book.raw));
   const handleClick = () => dispatch({ type: "REPORT_PROBLEM" });
 
-  const { register, handleSubmit, errors, reset } = useForm<
-    ComplaintFormData
-  >();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset
+  } = useForm<ComplaintFormData>();
   const cancel = () => {
     reset();
     dispatch({ type: "REPORT_PROBLEM_CANCEL" });
@@ -87,8 +90,9 @@ const ReportProblem: React.FC<{ book: AnyBook }> = ({ book }) => {
             <Label htmlFor="complaint-type">Complaint Type</Label>
             <Select
               id="complaint-type"
-              name="type"
-              ref={register({ required: "Please choose a type" })}
+              // name="type"
+              // ref={register({ required: "Please choose a type" })}
+              {...register("type", { required: "Please choose a type" })}
               aria-describedby="complaint-type-error"
             >
               {state.types.map(type => (
@@ -108,8 +112,11 @@ const ReportProblem: React.FC<{ book: AnyBook }> = ({ book }) => {
             <label htmlFor="complaint-body">Details</label>
             <TextArea
               id="complaint-body"
-              name="detail"
-              ref={register({
+              // name="detail"
+              // ref={register({
+              //   required: "Please enter details about the problem."
+              // })}
+              {...register("detail", {
                 required: "Please enter details about the problem."
               })}
               sx={{ alignSelf: "stretch", maxWidth: "100%" }}
@@ -134,7 +141,8 @@ const ReportProblem: React.FC<{ book: AnyBook }> = ({ book }) => {
       </Modal>
 
       <DialogDisclosure
-        {...dialog}
+        // {...dialog}
+        store={dialog}
         onClick={handleClick}
         as={Button}
         data-testid="report-problem-link"
