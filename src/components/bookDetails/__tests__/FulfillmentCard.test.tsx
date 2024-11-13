@@ -1,8 +1,13 @@
 import * as React from "react";
-import { render, waitForElementToBeRemoved, waitFor } from "test-utils";
+import {
+  setup,
+  screen,
+  waitFor,
+  waitForElementToBeRemoved,
+  fireEvent
+} from "test-utils";
 import { mergeBook, mockSetBook } from "test-utils/fixtures";
 import FulfillmentCard from "../FulfillmentCard";
-import userEvent from "@testing-library/user-event";
 import _download from "downloadjs";
 import mockConfig from "test-utils/mockConfig";
 import {
@@ -19,7 +24,6 @@ import * as fetch from "dataflow/opds1/fetch";
 import { ServerError } from "errors";
 import * as env from "utils/env";
 import { MOCK_DATE_STRING } from "test-utils/mockToDateString";
-import { act } from "@testing-library/react";
 
 jest.mock("downloadjs");
 window.open = jest.fn();
@@ -50,7 +54,7 @@ describe("BorrowableBook", () => {
   });
 
   test("correct title and subtitle", () => {
-    const utils = render(<FulfillmentCard book={borrowableBook} />);
+    const utils = setup(<FulfillmentCard book={borrowableBook} />);
     expect(utils.getByText("Available to borrow")).toBeInTheDocument();
     expect(utils.getByText("10 out of 13 copies available."));
   });
@@ -62,20 +66,20 @@ describe("BorrowableBook", () => {
       status: 418
     };
     mockFetchBook.mockRejectedValue(new ServerError("/borrow", 418, problem));
-    const utils = render(<FulfillmentCard book={borrowableBook} />, {
+    setup(<FulfillmentCard book={borrowableBook} />, {
       user: { isAuthenticated: true }
     });
-    const borrowButton = utils.getByRole("button", {
+    const borrowButton = await screen.findByRole("button", {
       name: "Borrow this book"
     });
     expect(borrowButton).toBeInTheDocument();
 
     // click borrow
-    act(() => userEvent.click(borrowButton));
+    fireEvent.click(borrowButton);
 
     // the borrow button should be gone now
-    await waitForElementToBeRemoved(() => utils.getByText("Borrowing..."));
-    expect(utils.getByText("Error: Can't do that"));
+    await waitForElementToBeRemoved(() => screen.queryByText("Borrowing..."));
+    expect(screen.getByText("Error: Can't do that"));
   });
 });
 
@@ -90,10 +94,10 @@ describe("OnHoldBook", () => {
   });
 
   test("correct title and subtitle", () => {
-    const utils = render(<FulfillmentCard book={onHoldBook} />);
-    expect(utils.getByText("Ready to Borrow")).toBeInTheDocument();
+    setup(<FulfillmentCard book={onHoldBook} />);
+    expect(screen.getByText("Ready to Borrow")).toBeInTheDocument();
     expect(
-      utils.getByText(`You have this book on hold until ${MOCK_DATE_STRING}.`)
+      screen.getByText(`You have this book on hold until ${MOCK_DATE_STRING}.`)
     );
   });
 
@@ -104,18 +108,18 @@ describe("OnHoldBook", () => {
       status: 418
     };
     mockFetchBook.mockRejectedValue(new ServerError("/borrow", 418, problem));
-    const utils = render(<FulfillmentCard book={onHoldBook} />, {
+    setup(<FulfillmentCard book={onHoldBook} />, {
       user: { isAuthenticated: true }
     });
-    const borrowButton = utils.getByText("Borrow this book");
+    const borrowButton = await screen.findByText("Borrow this book");
     expect(borrowButton).toBeInTheDocument();
 
     // click borrow
-    act(() => userEvent.click(borrowButton));
+    fireEvent.click(borrowButton);
 
     // the borrow button should be gone now
-    await waitForElementToBeRemoved(() => utils.getByText("Borrowing..."));
-    expect(utils.getByText("Error: Can't do that"));
+    await waitForElementToBeRemoved(() => screen.queryByText("Borrowing..."));
+    expect(screen.getByText("Error: Can't do that"));
   });
 
   test("handles lack of availability.until info", () => {
@@ -123,8 +127,8 @@ describe("OnHoldBook", () => {
       ...onHoldBook,
       availability: { status: "ready" }
     });
-    const utils = render(<FulfillmentCard book={withoutCopies} />);
-    expect(utils.getByText("You have this book on hold."));
+    setup(<FulfillmentCard book={withoutCopies} />);
+    expect(screen.getByText("You have this book on hold."));
   });
 });
 
@@ -142,16 +146,16 @@ describe("ReservableBook", () => {
   });
 
   test("correct title and subtitle", () => {
-    const utils = render(<FulfillmentCard book={reservableBook} />);
-    expect(utils.getByText("Unavailable")).toBeInTheDocument();
+    setup(<FulfillmentCard book={reservableBook} />);
+    expect(screen.getByText("Unavailable")).toBeInTheDocument();
     expect(
-      utils.getByText("0 out of 13 copies available.")
+      screen.getByText("0 out of 13 copies available.")
     ).toBeInTheDocument();
   });
 
-  test("displays reserve button", () => {
-    const utils = render(<FulfillmentCard book={reservableBook} />);
-    const reserveButton = utils.getByRole("button", {
+  test("displays reserve button", async () => {
+    setup(<FulfillmentCard book={reservableBook} />);
+    const reserveButton = await screen.findByRole("button", {
       name: /Reserve/i
     });
     expect(reserveButton).toBeInTheDocument();
@@ -164,16 +168,16 @@ describe("ReservableBook", () => {
         total: 4
       }
     });
-    const utils = render(<FulfillmentCard book={bookWithQueue} />);
+    setup(<FulfillmentCard book={bookWithQueue} />);
     expect(
-      utils.getByText("0 out of 13 copies available. 4 patrons in the queue.")
+      screen.getByText("0 out of 13 copies available. 4 patrons in the queue.")
     );
   });
 
   test("doesn't show patrons in queue when holds info no present", () => {
-    const utils = render(<FulfillmentCard book={reservableBook} />);
+    setup(<FulfillmentCard book={reservableBook} />);
     expect(
-      utils.getByText("0 out of 13 copies available.")
+      screen.getByText("0 out of 13 copies available.")
     ).toBeInTheDocument();
   });
 
@@ -183,11 +187,11 @@ describe("ReservableBook", () => {
       reserveUrl: "/reserve",
       copies: undefined
     });
-    const utils = render(<FulfillmentCard book={bookWithQueue} />);
+    setup(<FulfillmentCard book={bookWithQueue} />);
     expect(
-      utils.getByRole("button", { name: "Reserve this book" })
+      screen.getByRole("button", { name: "Reserve this book" })
     ).toBeInTheDocument();
-    expect(utils.getByText("Unavailable")).toBeInTheDocument();
+    expect(screen.getByText("Unavailable")).toBeInTheDocument();
   });
 
   test("shows reserve button which fetches book", async () => {
@@ -197,18 +201,18 @@ describe("ReservableBook", () => {
       status: 418
     };
     mockFetchBook.mockRejectedValue(new ServerError("/borrow", 418, problem));
-    const utils = render(<FulfillmentCard book={reservableBook} />, {
+    setup(<FulfillmentCard book={reservableBook} />, {
       user: { isAuthenticated: true }
     });
-    const reserveButton = utils.getByText("Reserve this book");
+    const reserveButton = await screen.findByText("Reserve this book");
     expect(reserveButton).toBeInTheDocument();
 
     // click borrow
-    act(() => userEvent.click(reserveButton));
+    fireEvent.click(reserveButton);
 
     // the borrow button should be gone now
-    await waitForElementToBeRemoved(() => utils.getByText("Reserving..."));
-    expect(utils.getByText("Error: Can't do that"));
+    await waitForElementToBeRemoved(() => screen.queryByText("Reserving..."));
+    expect(screen.getByText("Error: Can't do that"));
   });
 });
 
@@ -231,17 +235,21 @@ describe("reserved", () => {
       borrowUrl: "/borrow"
     });
     mockFetchBook.mockResolvedValue(unreservedBook);
-    const utils = render(<FulfillmentCard book={reservedBook} />);
-    const revokeButton = utils.getByRole("button", {
+    setup(<FulfillmentCard book={reservedBook} />);
+    const revokeButton = await screen.findByRole("button", {
       name: "Cancel Reservation"
     });
     expect(revokeButton).toBeInTheDocument();
 
-    act(() => userEvent.click(revokeButton));
+    fireEvent.click(revokeButton);
 
     expect(
-      await utils.findByRole("button", { name: "Cancelling..." })
+      screen.getByRole("button", { name: "Cancelling..." })
     ).toBeInTheDocument();
+
+    await waitForElementToBeRemoved(() =>
+      screen.getByRole("button", { name: "Cancelling..." })
+    );
 
     expect(mockFetchBook).toHaveBeenCalledWith(
       "/revoke",
@@ -259,16 +267,16 @@ describe("reserved", () => {
       status: 418
     };
     mockFetchBook.mockRejectedValue(new ServerError("/revoke", 418, problem));
-    const utils = render(<FulfillmentCard book={reservedBook} />);
-    const revokeButton = utils.getByRole("button", {
+    setup(<FulfillmentCard book={reservedBook} />);
+    const revokeButton = await screen.findByRole("button", {
       name: "Cancel Reservation"
     });
     expect(revokeButton).toBeInTheDocument();
 
-    act(() => userEvent.click(revokeButton));
+    fireEvent.click(revokeButton);
 
     expect(
-      await utils.findByRole("button", { name: "Cancelling..." })
+      await screen.findByRole("button", { name: "Cancelling..." })
     ).toBeInTheDocument();
 
     expect(mockFetchBook).toHaveBeenCalledWith(
@@ -277,9 +285,9 @@ describe("reserved", () => {
       "user-token"
     );
 
-    expect(await utils.findByText("Error: Can't do that")).toBeInTheDocument();
+    expect(await screen.findByText("Error: Can't do that")).toBeInTheDocument();
     expect(
-      await utils.findByRole("button", { name: "Cancel Reservation" })
+      await screen.findByRole("button", { name: "Cancel Reservation" })
     ).toBeInTheDocument();
   });
 
@@ -299,8 +307,8 @@ describe("reserved", () => {
         position: 5
       }
     });
-    const utils = render(<FulfillmentCard book={reservedBookWithQueue} />);
-    expect(utils.getByText("5 patrons ahead of you in the queue."))
+    setup(<FulfillmentCard book={reservedBookWithQueue} />);
+    expect(screen.getByText("5 patrons ahead of you in the queue."))
       .toBeInTheDocument;
   });
 });
@@ -351,16 +359,16 @@ describe("FulfillableBook", () => {
       borrowUrl: "/borrow"
     });
     mockFetchBook.mockResolvedValue(unborrowed);
-    const utils = render(<FulfillmentCard book={downloadableBook} />);
-    const revokeButton = utils.getByRole("button", {
+    setup(<FulfillmentCard book={downloadableBook} />);
+    const revokeButton = await screen.findByRole("button", {
       name: "Return"
     });
     expect(revokeButton).toBeInTheDocument();
 
-    act(() => userEvent.click(revokeButton));
+    fireEvent.click(revokeButton);
 
     expect(
-      await utils.findByRole("button", { name: "Returning..." })
+      await screen.findByRole("button", { name: "Returning..." })
     ).toBeInTheDocument();
 
     expect(mockFetchBook).toHaveBeenCalledWith(
@@ -372,21 +380,21 @@ describe("FulfillableBook", () => {
     expect(mockSetBook).toHaveBeenCalledWith(unborrowed, downloadableBook.id);
   });
 
-  test("constructs link to viewer for OpenAxis Books", () => {
+  test("constructs link to viewer for OpenAxis Books", async () => {
     mockConfig({ companionApp: "openebooks" });
     (env as any).AXISNOW_DECRYPT = "true";
 
-    const utils = render(<FulfillmentCard book={viewableAxisNowBook} />);
-    const readerButton = utils.getByRole("button", {
+    setup(<FulfillmentCard book={viewableAxisNowBook} />);
+    const readerButton = await screen.findByRole("button", {
       name: /Read/i
-    }) as HTMLLinkElement;
+    });
 
     expect(mockPush).toHaveBeenCalledTimes(0);
-    userEvent.click(readerButton);
+    fireEvent.click(readerButton);
     expect(mockPush).toHaveBeenCalledTimes(1);
   });
 
-  test("shows read online button for external read online links", () => {
+  test("shows read online button for external read online links", async () => {
     const readOnlineBook = mergeBook<FulfillableBook>({
       status: "fulfillable",
       revokeUrl: "/revoke",
@@ -398,9 +406,11 @@ describe("FulfillableBook", () => {
         }
       ]
     });
-    const utils = render(<FulfillmentCard book={readOnlineBook} />);
+    setup(<FulfillmentCard book={readOnlineBook} />);
 
-    const readOnline = utils.getByRole("button", { name: "Read Online" });
+    const readOnline = await screen.findByRole("button", {
+      name: "Read Online"
+    });
     expect(readOnline).toBeInTheDocument();
   });
 
@@ -417,12 +427,14 @@ describe("FulfillableBook", () => {
         }
       ]
     });
-    const utils = render(<FulfillmentCard book={readOnlineBook} />);
-    const readOnline = utils.getByRole("button", { name: "Read Online" });
+    setup(<FulfillmentCard book={readOnlineBook} />);
+    const readOnline = await screen.findByRole("button", {
+      name: "Read Online"
+    });
 
     // no calls until we click the button
     expect(fetchMock).toHaveBeenCalledTimes(0);
-    act(() => userEvent.click(readOnline));
+    fireEvent.click(readOnline);
     await waitFor(() =>
       expect(fetchMock).toHaveBeenCalledWith("http://track-open-book.com")
     );
@@ -442,12 +454,12 @@ describe("FulfillableBook", () => {
         }
       ]
     });
-    const utils = render(<FulfillmentCard book={readOnlineBook} />);
-    const readOnline = utils.getByRole("button", { name: "Read" });
+    setup(<FulfillmentCard book={readOnlineBook} />);
+    const readOnline = await screen.findByRole("button", { name: "Read" });
 
     // should not have been called ever
     expect(fetchMock).toHaveBeenCalledTimes(0);
-    userEvent.click(readOnline);
+    fireEvent.click(readOnline);
 
     await waitFor(() =>
       expect(fetchMock).toHaveBeenCalledWith("http://track-open-book.com")
@@ -455,13 +467,13 @@ describe("FulfillableBook", () => {
   });
 
   test("correct title and subtitle without redirect", () => {
-    const utils = render(<FulfillmentCard book={downloadableBook} />);
-    expect(utils.getByText("Ready to Read!")).toBeInTheDocument();
+    setup(<FulfillmentCard book={downloadableBook} />);
+    expect(screen.getByText("Ready to Read!")).toBeInTheDocument();
     expect(
-      utils.getByText(`You have this book on loan until ${MOCK_DATE_STRING}.`)
+      screen.getByText(`You have this book on loan until ${MOCK_DATE_STRING}.`)
     ).toBeInTheDocument();
     expect(
-      utils.queryByText("Ready to Read in Palace!")
+      screen.queryByText("Ready to Read in Palace!")
     ).not.toBeInTheDocument();
   });
   const bookWithRedirect = mergeBook<FulfillableBook>({
@@ -479,20 +491,20 @@ describe("FulfillableBook", () => {
     mockConfig({
       companionApp: "simplye"
     });
-    const utils = render(<FulfillmentCard book={bookWithRedirect} />);
-    expect(utils.queryByText("Ready to Read!")).not.toBeInTheDocument();
-    expect(utils.getByText("Ready to Read in Palace!")).toBeInTheDocument();
+    setup(<FulfillmentCard book={bookWithRedirect} />);
+    expect(screen.queryByText("Ready to Read!")).not.toBeInTheDocument();
+    expect(screen.getByText("Ready to Read in Palace!")).toBeInTheDocument();
     expect(
-      utils.getByText("If you would rather read on your computer, you can:")
+      screen.getByText("If you would rather read on your computer, you can:")
     ).toBeInTheDocument();
-    expect(utils.getByRole("button", { name: "Download EPUB" }));
+    expect(screen.getByRole("button", { name: "Download EPUB" }));
   });
 
   test("correct title and subtitle when COMPANION_APP is set to openebooks", () => {
     mockConfig({ companionApp: "openebooks" });
-    const utils = render(<FulfillmentCard book={bookWithRedirect} />);
+    setup(<FulfillmentCard book={bookWithRedirect} />);
     expect(
-      utils.getByText("Ready to Read in Open eBooks!")
+      screen.getByText("Ready to Read in Open eBooks!")
     ).toBeInTheDocument();
   });
 
@@ -501,31 +513,33 @@ describe("FulfillableBook", () => {
       ...downloadableBook,
       availability: undefined
     });
-    const utils = render(<FulfillmentCard book={withoutAvailability} />);
-    expect(utils.getByText("Ready to Read!")).toBeInTheDocument();
+    setup(<FulfillmentCard book={withoutAvailability} />);
+    expect(screen.getByText("Ready to Read!")).toBeInTheDocument();
   });
 
-  test("shows download options", () => {
-    const utils = render(<FulfillmentCard book={downloadableBook} />);
-    const downloadButton = utils.getByText("Download EPUB");
+  test("shows download options", async () => {
+    setup(<FulfillmentCard book={downloadableBook} />);
+    const downloadButton = await screen.findByText("Download EPUB");
     expect(downloadButton).toBeInTheDocument();
 
-    const PDFButton = utils.getByText("Download PDF");
+    const PDFButton = await screen.findByText("Download PDF");
     expect(PDFButton).toBeInTheDocument();
   });
 
   test("download button shows loading indicator fetches book", async () => {
-    const utils = render(<FulfillmentCard book={downloadableBook} />);
-    const downloadButton = utils.getByText("Download EPUB");
+    setup(<FulfillmentCard book={downloadableBook} />);
+    const downloadButton = screen.getByText("Download EPUB");
     expect(downloadButton).toBeInTheDocument();
 
-    act(() => userEvent.click(downloadButton));
+    fireEvent.click(downloadButton);
 
-    expect(
-      utils.getByRole("button", { name: "Downloading..." })
-    ).toBeInTheDocument();
+    // expect(
+    //   screen.getByRole("button", { name: /downloading\.\.\./i })
+    // ).toBeInTheDocument();
+    expect(downloadButton).toHaveTextContent(/downloading\.\.\./i);
 
-    await waitForElementToBeRemoved(() => utils.queryByText("Downloading..."));
+    await waitForElementToBeRemoved(() => screen.queryByText("Downloading..."));
+    // expect(screen.queryByText("Downloading...")).not.toBeInTheDocument();
 
     expect(fetchMock).toHaveBeenCalledWith("/epub-link", {
       headers: {
@@ -550,11 +564,11 @@ describe("FulfillableBook", () => {
       ]
     });
 
-    const utils = render(<FulfillmentCard book={bookWithIndirect} />);
-    const downloadButton = utils.getByText("Read Online");
+    setup(<FulfillmentCard book={bookWithIndirect} />);
+    const downloadButton = await screen.findByText("Read Online");
     expect(downloadButton).toBeInTheDocument();
 
-    act(() => userEvent.click(downloadButton));
+    fireEvent.click(downloadButton);
 
     // you fetch the opds entry which should then return you a book with the correct link
     expect(fetchMock).toHaveBeenCalledWith("/indirect", {
@@ -567,7 +581,7 @@ describe("FulfillableBook", () => {
     // some error will be shown because we didn't mock fetch for this,
     // and we need to await it or our test will
     // warn about the unexpected promise.
-    await utils.findByText(/error:/gi);
+    await screen.findByText(/error:/i);
   });
 
   test("shows download error message", async () => {
@@ -577,13 +591,13 @@ describe("FulfillableBook", () => {
       status: 418
     };
     fetchMock.once(JSON.stringify(problem), { status: 418 });
-    const utils = render(<FulfillmentCard book={downloadableBook} />);
-    const downloadButton = utils.getByText("Download EPUB");
+    setup(<FulfillmentCard book={downloadableBook} />);
+    const downloadButton = await screen.findByText("Download EPUB");
 
-    act(() => userEvent.click(downloadButton));
+    fireEvent.click(downloadButton);
 
     expect(
-      await utils.findByText("Error: You can't do that")
+      await screen.findByText("Error: You can't do that")
     ).toBeInTheDocument();
   });
 
@@ -595,12 +609,13 @@ describe("FulfillableBook", () => {
       counter: 1,
       url: "/new-location"
     } as any);
-    const utils = render(<FulfillmentCard book={downloadableBook} />);
-    const downloadButton = utils.getByText("Download EPUB");
+    setup(<FulfillmentCard book={downloadableBook} />);
+    const downloadButton = await screen.findByText("Download EPUB");
 
-    act(() => userEvent.click(downloadButton));
+    fireEvent.click(downloadButton);
 
-    await waitForElementToBeRemoved(() => utils.queryByText("Downloading..."));
+    await waitForElementToBeRemoved(() => screen.queryByText("Downloading..."));
+    expect(screen.queryByText("Downloading...")).not.toBeInTheDocument();
 
     expect(fetchMock).toHaveBeenCalledWith("/epub-link", {
       headers: {

@@ -8,7 +8,6 @@ import "./mockScrollTo";
 import * as fixtures from "./fixtures";
 import userEvent from "@testing-library/user-event";
 import serializer from "jest-emotion";
-// import { Provider as ReakitProvider } from "@ariakit/react";
 import { MockNextRouterContextProvider } from "./mockNextRouter";
 import { NextRouter } from "next/router";
 import { enableFetchMocks } from "jest-fetch-mock";
@@ -72,13 +71,11 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
     return (
       <MockNextRouterContextProvider router={options?.router}>
         <ThemeUIProvider theme={theme}>
-          {/* <ReakitProvider> */}
           <LibraryProvider library={library}>
             <UserContext.Provider value={user}>
               <BreadcrumbProvider>{children}</BreadcrumbProvider>
             </UserContext.Provider>
           </LibraryProvider>
-          {/* </ReakitProvider> */}
         </ThemeUIProvider>
       </MockNextRouterContextProvider>
     );
@@ -88,9 +85,6 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
   };
 };
 
-// re-export everything
-export * from "@testing-library/react";
-
 // setup function
 // see: https://testing-library.com/docs/user-event/intro/#writing-tests-with-userevent
 function setup(jsx: any, options?: CustomRenderOptions) {
@@ -99,6 +93,10 @@ function setup(jsx: any, options?: CustomRenderOptions) {
     ...customRender(jsx, options)
   };
 }
+
+// re-export everything
+export * from "@testing-library/react";
+export * from "@testing-library/user-event";
 
 // override render method
 export { customRender as render, setup };

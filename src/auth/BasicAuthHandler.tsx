@@ -29,7 +29,6 @@ const BasicAuthHandler: React.FC<{ method: ClientBasicMethod }> = ({
 }) => {
   const { signIn, error, isLoading } = useUser();
   const { baseLoginUrl } = useLogin();
-  // const { register, handleSubmit, errors } = useForm<FormData>();
   const {
     register,
     handleSubmit,
@@ -68,11 +67,10 @@ const BasicAuthHandler: React.FC<{ method: ClientBasicMethod }> = ({
         {serverError && `${serverError.info.title}: ${serverError.info.detail}`}
       </Text>
       <FormInput
-        // name={usernameInputName}
+        name={usernameInputName}
         label={usernameInputName}
         id="login"
         placeholder={usernameInputName}
-        // ref={register({ required: true, maxLength: 25 })}
         {...register(usernameInputName, {
           required: true,
           maxLength: 25
@@ -83,9 +81,8 @@ const BasicAuthHandler: React.FC<{ method: ClientBasicMethod }> = ({
       />
       {hasPasswordInput && (
         <FormInput
-          // name={passwordInputName}
+          name={passwordInputName}
           label={passwordInputName}
-          // ref={register({ required: true, maxLength: 25 })}
           {...register(passwordInputName, {
             required: true,
             maxLength: 25
