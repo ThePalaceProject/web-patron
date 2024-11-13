@@ -15,7 +15,7 @@ This app supports discovery, borrowing, downloading, and returning of material. 
 
 ## Background
 
-The `web-patron` application serves as a way for libraries to publish their collections to the web. A library *must* be part of a [Circulation Manager](https://github.com/ThePalaceProject/circulation) and *can* be registered to a [Library Registry](https://github.com/ThePalaceProject/library-registry). A Library Registry provides details about a library, and a Circulation Manager provides a library's collection of eBooks and audiobooks in OPDS format. Registering with The Palace Project's Library Registry is how libraries can show up in the Palace mobile application and the [Community Demo](#demo) of this app. In order to have a web version of your library catalog, you can deploy this app.
+The `web-patron` application serves as a way for libraries to publish their collections to the web. A library _must_ be part of a [Circulation Manager](https://github.com/ThePalaceProject/circulation) and _can_ be registered to a [Library Registry](https://github.com/ThePalaceProject/library-registry). A Library Registry provides details about a library, and a Circulation Manager provides a library's collection of eBooks and audiobooks in OPDS format. Registering with The Palace Project's Library Registry is how libraries can show up in the Palace mobile application and the [Community Demo](#demo) of this app. In order to have a web version of your library catalog, you can deploy this app.
 
 This app can support many libraries, each at their own url: `http://example.com/library1` can be one library, and `http://example.com/library2` another library. You configure the libraries for the app in the [config file](#configuration-file).
 
@@ -35,30 +35,30 @@ __To have your library added to the demo, register it with NYPL's Library Regist
 # Table of Contents
 
 - [web-patron](#web-patron)
-  * [Background](#background)
+  - [Background](#background)
   <!-- * [Demo](#community-demo) -->
 - [Configuring the App](#configuring-the-app)
-  * [Configuration File](#configuration-file)
-  * [Environment Variables](#environment-variables)
-  * [Manager, Registry, and Application Configurations](#manager--registry--and-application-configurations)
+  - [Configuration File](#configuration-file)
+  - [Environment Variables](#environment-variables)
+  - [Manager, Registry, and Application Configurations](#manager--registry--and-application-configurations)
 - [Development](#development)
-  * [Contributing](#contributing)
-  * [Installing Dependencies](#installing-dependencies)
-  * [Running the Application](#running-the-application)
-    + [ENV Vars and Building](#env-vars-and-building)
-    + [Useful Scripts](#useful-scripts)
-  * [Testing](#testing)
-    + [Context and useful spies](#context-and-useful-spies)
-    + [Running tests](#running-tests)
-    + [Example](#example)
-  * [Links and Routing](#links-and-routing)
+  - [Contributing](#contributing)
+  - [Installing Dependencies](#installing-dependencies)
+  - [Running the Application](#running-the-application)
+    - [ENV Vars and Building](#env-vars-and-building)
+    - [Useful Scripts](#useful-scripts)
+  - [Testing](#testing)
+    - [Context and useful spies](#context-and-useful-spies)
+    - [Running tests](#running-tests)
+    - [Example](#example)
+  - [Links and Routing](#links-and-routing)
 - [Deploying](#deploying)
-  * [Build a docker container](#build-a-docker-container)
-    + [Running the docker container](#running-the-docker-container)
-    + [From the command line](#from-the-command-line)
-    + [Using `docker-compose`](#using--docker-compose-)
-    + [Helpful commands](#helpful-commands)
-    + [Credits](#credits)
+  - [Build a docker container](#build-a-docker-container)
+    - [Running the docker container](#running-the-docker-container)
+    - [From the command line](#from-the-command-line)
+    - [Using `docker-compose`](#using--docker-compose-)
+    - [Helpful commands](#helpful-commands)
+    - [Credits](#credits)
 
 # Configuring the App
 
@@ -135,7 +135,6 @@ This project uses [Theme UI](https://theme-ui.com/) which provides a simple Java
 ### Useful Scripts
 
 - `npm run test` - This will launch the test runner (jest) and run all tests.
-- `npm run test:watch` - This will run jest in watch mode, rerunning and affected tests whenever you save a file. It's recommended to have this running when developing, that way you know immediately when a change causes some test to fail.
 - `npm run dev:axe` - Will run the dev script with react-axe enabled for viewing accessibility issues.
 - `npm run lint` - Will lint all code and show errors/warnings in the console.
 - `npm run lint:ts:fix` - Will lint the ts and tsx files and apply automatic fixes where possible.
@@ -155,7 +154,7 @@ Inside of `src/test-utils/fixtures` are some useful data fixtures. Typically the
 
 ### Running tests
 
-You can run `npm run test` to run the test suite once. Alternatively, and recommended, is keeping the test suite running in watch mode while developing with `npm run test:watch`. The CLI output for that function will also provide instructions to filter the tests to a specific file for speed, if you'd like.
+You can run `npm run test` to run the test suite once. The CLI output for that function will also provide instructions to filter the tests to a specific file for speed, if you'd like.
 
 ### Example
 
@@ -212,10 +211,10 @@ When you have code changes you wish to review locally, you will need to build a 
 1. Clone this repository and make some changes.
 2. Build the image
 
-    ```
-    docker build -t webpatron  .
+   ```
+   docker build -t webpatron  .
 
-    ```
+   ```
 
 If you wanted to customize the image, you could create an additional Dockerfile (e.g., Dockerfile.second) and simply specify its name in the docker build commands. The Docker file you specify will guide the image build. For this image, the build takes about 4-6 minutes, depending on your Internet speed and load on the Node package servers, to complete the final image. Eg: `docker build -f Dockerfile.second -t webpatron .`
 

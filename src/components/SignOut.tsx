@@ -28,12 +28,10 @@ export const SignOut: React.FC<SignOutProps> = ({
         color={color}
         // loading={isLoading}
         store={dialog}
-        // {...dialog}
       >
         Sign Out
       </DialogDisclosure>
       <Modal
-        isVisible={dialog.visible}
         dialog={dialog}
         role="alertdialog"
         hideOnClickOutside

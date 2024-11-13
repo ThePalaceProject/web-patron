@@ -24,8 +24,6 @@ export const modalButtonStyles = {
 };
 
 type ModalProps = {
-  isVisible: boolean;
-  // dialog: DialogStateReturn;
   dialog: any;
   hide?: () => void;
   label?: string;
@@ -49,11 +47,8 @@ const Modal: React.FC<ModalProps> = ({
 }) => {
   return (
     <Dialog
-      // {...dialog}
       store={dialog}
       role={role}
-      // visible={isVisible}
-      // hide={hide ?? dialog.hide}
       className={className}
       hideOnInteractOutside={hideOnClickOutside}
       sx={{

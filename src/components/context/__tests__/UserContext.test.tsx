@@ -31,16 +31,7 @@ function makeSwrResponse(value: Partial<ReturnType<typeof useSWR>>) {
     ...value
   };
 }
-// function mockSwr(value: Partial<ReturnType<typeof useSWR>>) {
-//   mockedSWR.mockReturnValue(makeSwrResponse(value));
-// }
 
-// const mutateMock = jest.fn();
-// const defaultMock = makeSwrResponse({
-//   data: fixtures.emptyCollection,
-//   mutate: mutateMock
-// });
-// mockSWR.mockReturnValue(defaultMock);
 const mutateMock = jest.fn();
 const defaultMock = makeSwrResponse({
   data: fixtures.emptyCollection
@@ -57,17 +48,21 @@ function renderUserContext() {
   return render(<UserProvider>child</UserProvider>);
 }
 
-beforeEach(() => {
-  window.location.hash = "";
-  useRouterSpy.mockReturnValue({
-    query: {},
-    replace: jest.fn()
-  } as any);
+act(() => {
+  beforeEach(() => {
+    window.location.hash = "";
+    useRouterSpy.mockReturnValue({
+      query: {},
+      replace: jest.fn()
+    } as any);
+  });
 });
 
 test("fetches loans when credentials are present", async () => {
   mockAuthenticatedOnce();
-  renderUserContext();
+  act(() => {
+    renderUserContext();
+  });
 
   expect(mockSWR).toHaveBeenCalledWith(
     ["/shelf-url", "some-token", "http://opds-spec.org/auth/basic"],
@@ -78,7 +73,9 @@ test("fetches loans when credentials are present", async () => {
 
 test("does not fetch loans if no credentials are present", () => {
   mockAuthenticatedOnce(null);
-  renderUserContext();
+  act(() => {
+    renderUserContext();
+  });
   expect(fetchMock).toHaveBeenCalledTimes(0);
 });
 
@@ -91,7 +88,9 @@ const replaceStateSpy = jest.spyOn(window.history, "replaceState");
 test("extracts clever tokens from the url", () => {
   window.location.hash = "#access_token=fry6H3" as any;
 
-  renderUserContext();
+  act(() => {
+    renderUserContext();
+  });
 
   expect(mockSWR).toHaveBeenCalledWith(
     null,
@@ -134,7 +133,9 @@ test("extracts SAML tokens from the url", () => {
     replace: mockReplace,
     query: { access_token: "saml-token" }
   } as any);
-  renderUserContext();
+  act(() => {
+    renderUserContext();
+  });
 
   expect(mockSWR).toHaveBeenCalledWith(
     null,
@@ -173,11 +174,13 @@ test("sign out clears cookies and data", async () => {
     extractedSignOut = signOut;
     return <div>hello</div>;
   }
-  render(
-    <UserProvider>
-      <Extractor />
-    </UserProvider>
-  );
+  act(() => {
+    render(
+      <UserProvider>
+        <Extractor />
+      </UserProvider>
+    );
+  });
 
   // make sure fetch was called and you have the right data
   expect(mockSWR).toHaveBeenCalledWith(
@@ -206,11 +209,13 @@ test("sign in sets cookie", async () => {
     extractedSignIn = signIn;
     return <div>{token}</div>;
   }
-  render(
-    <UserProvider>
-      <Extractor />
-    </UserProvider>
-  );
+  act(() => {
+    render(
+      <UserProvider>
+        <Extractor />
+      </UserProvider>
+    );
+  });
   expect(mockSWR).toHaveBeenCalledWith(
     null,
     expect.anything(),

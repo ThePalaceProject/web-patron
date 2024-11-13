@@ -6,6 +6,7 @@ import "@testing-library/jest-dom";
 import { LibraryData } from "../interfaces";
 import "./mockScrollTo";
 import * as fixtures from "./fixtures";
+import userEvent from "@testing-library/user-event";
 import serializer from "jest-emotion";
 // import { Provider as ReakitProvider } from "@ariakit/react";
 import { MockNextRouterContextProvider } from "./mockNextRouter";
@@ -90,5 +91,14 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
 // re-export everything
 export * from "@testing-library/react";
 
+// setup function
+// see: https://testing-library.com/docs/user-event/intro/#writing-tests-with-userevent
+function setup(jsx: any, options?: CustomRenderOptions) {
+  return {
+    user: userEvent.setup(),
+    ...customRender(jsx, options)
+  };
+}
+
 // override render method
-export { customRender as render };
+export { customRender as render, setup };

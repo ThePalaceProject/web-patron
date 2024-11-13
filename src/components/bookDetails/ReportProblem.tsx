@@ -38,7 +38,7 @@ const ReportProblem: React.FC<{ book: AnyBook }> = ({ book }) => {
   } = useForm<ComplaintFormData>();
   const cancel = () => {
     reset();
-    dispatch({ type: "REPORT_PROBLEM_CANCEL" });
+    dialog.hide();
   };
 
   const onSubmit = handleSubmit(({ type, detail }) => {
@@ -52,7 +52,6 @@ const ReportProblem: React.FC<{ book: AnyBook }> = ({ book }) => {
   return (
     <React.Fragment>
       <Modal
-        isVisible={state.showForm}
         dialog={dialog}
         label="Report a problem"
         hide={cancel}
@@ -90,8 +89,6 @@ const ReportProblem: React.FC<{ book: AnyBook }> = ({ book }) => {
             <Label htmlFor="complaint-type">Complaint Type</Label>
             <Select
               id="complaint-type"
-              // name="type"
-              // ref={register({ required: "Please choose a type" })}
               {...register("type", { required: "Please choose a type" })}
               aria-describedby="complaint-type-error"
             >
@@ -112,10 +109,6 @@ const ReportProblem: React.FC<{ book: AnyBook }> = ({ book }) => {
             <label htmlFor="complaint-body">Details</label>
             <TextArea
               id="complaint-body"
-              // name="detail"
-              // ref={register({
-              //   required: "Please enter details about the problem."
-              // })}
               {...register("detail", {
                 required: "Please enter details about the problem."
               })}
@@ -141,7 +134,6 @@ const ReportProblem: React.FC<{ book: AnyBook }> = ({ book }) => {
       </Modal>
 
       <DialogDisclosure
-        // {...dialog}
         store={dialog}
         onClick={handleClick}
         as={Button}
