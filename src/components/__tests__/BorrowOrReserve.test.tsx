@@ -1,5 +1,6 @@
 import * as React from "react";
 import {
+  fireEvent,
   fixtures,
   screen,
   setup,
@@ -37,16 +38,16 @@ const mockedFetchBook = fetch.fetchBook as jest.MockedFunction<
 
 test("borrowing calls correct url with token", async () => {
   mockedFetchBook.mockResolvedValueOnce(fixtures.fulfillableBook);
-  const { user } = setup(<BorrowOrReserve isBorrow url="/url" />);
+  setup(<BorrowOrReserve isBorrow url="/url" />);
 
   const button = await screen.findByRole("button", {
     name: "Borrow this book"
   });
 
-  await user.click(button);
+  fireEvent.click(button);
 
   // loading state
-  const loading = await screen.findByText("Borrowing...");
+  const loading = screen.getByText("Borrowing...");
   expect(loading).toBeInTheDocument();
 
   // calls borrow

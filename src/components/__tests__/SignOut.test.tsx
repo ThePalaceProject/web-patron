@@ -1,5 +1,5 @@
 import * as React from "react";
-import { fixtures, screen, setup } from "../../test-utils";
+import { fixtures, screen, setup, waitFor } from "../../test-utils";
 import { SignOut } from "components/SignOut";
 
 test("Shows button", () => {
@@ -37,7 +37,9 @@ test("hides dialog on cancel", async () => {
   const cancel = await screen.findByRole("button", { name: "Cancel" });
 
   await user.click(cancel);
-  expect(screen.getByLabelText("Sign Out")).not.toBeVisible();
+  await waitFor(() =>
+    expect(screen.getByLabelText("Sign Out")).not.toBeVisible()
+  );
 });
 
 test("signs out on click signout", async () => {

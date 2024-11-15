@@ -3,13 +3,13 @@ import { beforeEach, expect, jest, test } from "@jest/globals";
 import fetchMock from "jest-fetch-mock";
 import * as React from "react";
 import { OPDS1 } from "interfaces";
-import { act, fixtures, render } from "test-utils";
+import { act, fixtures, setup } from "test-utils";
 import Cookie from "js-cookie";
 import * as router from "next/router";
 import useUser, { UserProvider } from "components/context/UserContext";
 import mockAuthenticatedOnce from "test-utils/mockAuthState";
-import useSWR, * as swr from "swr";
-// import { makeSwrResponse } from "test-utils/mockSwr";
+import * as swr from "swr";
+import { makeSwrResponse } from "test-utils/mockSwr";
 
 const mockSWR = jest.spyOn(swr, "default");
 
@@ -17,24 +17,10 @@ const str = JSON.stringify;
 const mockCookie = Cookie as any;
 const useRouterSpy = jest.spyOn(router, "useRouter");
 
-jest.mock("swr");
-
-// const mockedSWR = useSWR as jest.MockedFunction<typeof useSWR>;
-
-function makeSwrResponse(value: Partial<ReturnType<typeof useSWR>>) {
-  return {
-    data: undefined,
-    error: undefined,
-    revalidate: jest.fn(),
-    isValidating: false,
-    mutate: jest.fn(),
-    ...value
-  };
-}
-
 const mutateMock = jest.fn();
-const defaultMock = makeSwrResponse({
-  data: fixtures.emptyCollection
+const defaultMock = makeSwrResponse<any>({
+  data: fixtures.emptyCollection,
+  mutate: mutateMock as any
 });
 mockSWR.mockReturnValue(defaultMock as any);
 
@@ -45,24 +31,20 @@ mockSWR.mockReturnValue(defaultMock as any);
  * render wraps everything with our ContextProvider already (see text-utils/index)
  */
 function renderUserContext() {
-  return render(<UserProvider>child</UserProvider>);
+  return setup(<UserProvider>child</UserProvider>);
 }
 
-act(() => {
-  beforeEach(() => {
-    window.location.hash = "";
-    useRouterSpy.mockReturnValue({
-      query: {},
-      replace: jest.fn()
-    } as any);
-  });
+beforeEach(() => {
+  window.location.hash = "";
+  useRouterSpy.mockReturnValue({
+    query: {},
+    replace: jest.fn()
+  } as any);
 });
 
 test("fetches loans when credentials are present", async () => {
   mockAuthenticatedOnce();
-  act(() => {
-    renderUserContext();
-  });
+  renderUserContext();
 
   expect(mockSWR).toHaveBeenCalledWith(
     ["/shelf-url", "some-token", "http://opds-spec.org/auth/basic"],
@@ -73,9 +55,7 @@ test("fetches loans when credentials are present", async () => {
 
 test("does not fetch loans if no credentials are present", () => {
   mockAuthenticatedOnce(null);
-  act(() => {
-    renderUserContext();
-  });
+  renderUserContext();
   expect(fetchMock).toHaveBeenCalledTimes(0);
 });
 
@@ -88,9 +68,7 @@ const replaceStateSpy = jest.spyOn(window.history, "replaceState");
 test("extracts clever tokens from the url", () => {
   window.location.hash = "#access_token=fry6H3" as any;
 
-  act(() => {
-    renderUserContext();
-  });
+  renderUserContext();
 
   expect(mockSWR).toHaveBeenCalledWith(
     null,
@@ -133,9 +111,7 @@ test("extracts SAML tokens from the url", () => {
     replace: mockReplace,
     query: { access_token: "saml-token" }
   } as any);
-  act(() => {
-    renderUserContext();
-  });
+  renderUserContext();
 
   expect(mockSWR).toHaveBeenCalledWith(
     null,
@@ -174,13 +150,12 @@ test("sign out clears cookies and data", async () => {
     extractedSignOut = signOut;
     return <div>hello</div>;
   }
-  act(() => {
-    render(
-      <UserProvider>
-        <Extractor />
-      </UserProvider>
-    );
-  });
+
+  setup(
+    <UserProvider>
+      <Extractor />
+    </UserProvider>
+  );
 
   // make sure fetch was called and you have the right data
   expect(mockSWR).toHaveBeenCalledWith(
@@ -190,9 +165,7 @@ test("sign out clears cookies and data", async () => {
   );
 
   // now sign out
-  act(() => {
-    extractedSignOut();
-  });
+  act(() => extractedSignOut());
 
   // should have removed cookie
   expect(Cookie.remove).toHaveBeenCalledTimes(1);
@@ -209,13 +182,12 @@ test("sign in sets cookie", async () => {
     extractedSignIn = signIn;
     return <div>{token}</div>;
   }
-  act(() => {
-    render(
-      <UserProvider>
-        <Extractor />
-      </UserProvider>
-    );
-  });
+  setup(
+    <UserProvider>
+      <Extractor />
+    </UserProvider>
+  );
+
   expect(mockSWR).toHaveBeenCalledWith(
     null,
     expect.anything(),

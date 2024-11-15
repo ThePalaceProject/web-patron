@@ -85,18 +85,25 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
   };
 };
 
-// setup function
-// see: https://testing-library.com/docs/user-event/intro/#writing-tests-with-userevent
+/**
+ * setup function
+ * see: https://testing-library.com/docs/user-event/intro/#writing-tests-with-userevent
+ * this should enable tests to use a single "user" to mock events, e.g. user.click(), user.type()
+ * currently, this doesn't work for await user.click() which is likely related to any click handlers
+ * that are asynchronous
+ * not sure why, but defining advanceTimers resolves timeout issues that occurred when upgrading to library-testing/user-event@^14.5.2
+ * see: https://testing-library.com/docs/user-event/options/#advancetimers
+ */
 function setup(jsx: any, options?: CustomRenderOptions) {
+  const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
   return {
-    user: userEvent.setup(),
+    user: user,
     ...customRender(jsx, options)
   };
 }
 
 // re-export everything
 export * from "@testing-library/react";
-export * from "@testing-library/user-event";
 
 // override render method
 export { customRender as render, setup };

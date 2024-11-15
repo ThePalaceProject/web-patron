@@ -34,7 +34,7 @@ module.exports = {
   coveragePathIgnorePatterns: [
     "/node_modules/",
     "/src/test-utils/",
-    "/src/icons/",
+    "/src/icons/"
   ],
 
   // A list of reporter names that Jest uses when writing coverage reports
@@ -73,10 +73,7 @@ module.exports = {
   // maxWorkers: "50%",
 
   // An array of directory names to be searched recursively up from the requiring module's location
-  moduleDirectories: [
-    "node_modules",
-    "src"
-  ],
+  moduleDirectories: ["node_modules", "src"],
 
   // An array of file extensions your modules use
   // moduleFileExtensions: [
@@ -144,7 +141,7 @@ module.exports = {
   // snapshotSerializers: [],
 
   // The test environment that will be used for testing
-  // testEnvironment: "jest-environment-jsdom",
+  testEnvironment: "jest-environment-jsdom",
 
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},
@@ -171,10 +168,20 @@ module.exports = {
   // testRunner: "jasmine2",
 
   // This option sets the URL for the jsdom environment. It is reflected in properties such as location.href
-  testURL: "http://test-domain.com/"
+  // testURL: "http://test-domain.com/"
+  testEnvironmentOptions: {
+    url: "http://test-domain.com/"
+  },
 
-  // Setting this value to "fake" allows the use of fake timers for functions such as "setTimeout"
-  // timers: "real",
+  fakeTimers: {
+    enableGlobally: true,
+    legacyFakeTimers: true
+  },
+
+  snapshotFormat: {
+    escapeString: true,
+    printBasicPrototype: true
+  }
 
   // A map from regular expressions to paths to transformers
   // transform: undefined,

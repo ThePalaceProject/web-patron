@@ -23,12 +23,7 @@ export const SignOut: React.FC<SignOutProps> = ({
   }
   return (
     <>
-      <DialogDisclosure
-        as={Button}
-        color={color}
-        // loading={isLoading}
-        store={dialog}
-      >
+      <DialogDisclosure as={Button} color={color} store={dialog}>
         Sign Out
       </DialogDisclosure>
       <Modal

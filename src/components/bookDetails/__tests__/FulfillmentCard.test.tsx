@@ -54,9 +54,9 @@ describe("BorrowableBook", () => {
   });
 
   test("correct title and subtitle", () => {
-    const utils = setup(<FulfillmentCard book={borrowableBook} />);
-    expect(utils.getByText("Available to borrow")).toBeInTheDocument();
-    expect(utils.getByText("10 out of 13 copies available."));
+    setup(<FulfillmentCard book={borrowableBook} />);
+    expect(screen.getByText("Available to borrow")).toBeInTheDocument();
+    expect(screen.getByText("10 out of 13 copies available."));
   });
 
   test("borrow button fetches book and displays borrow errors", async () => {

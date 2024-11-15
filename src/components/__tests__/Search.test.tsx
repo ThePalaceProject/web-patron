@@ -1,12 +1,12 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import * as React from "react";
-import { render, fixtures, fireEvent } from "test-utils";
+import { fixtures, screen, setup, fireEvent } from "test-utils";
 import Search from "../Search";
-import userEvent from "@testing-library/user-event";
 import { mockPush } from "test-utils/mockNextRouter";
 import useSWR from "swr";
 import { makeSwrResponse, MockSwr } from "test-utils/mockSwr";
 import { SearchData } from "interfaces";
-import { act } from "@testing-library/react";
 
 const fixtureData = {
   template: "/search/{searchTerms}",
@@ -31,17 +31,17 @@ const mockSwr: MockSwr<SearchData> = (
 
 test("doesn't render if there is no searchData set", () => {
   mockSwr({ data: undefined });
-  const utils = render(<Search />, {
+  const { container } = setup(<Search />, {
     router: {
       query: { collectionUrl: "/collection" }
     }
   });
-  expect(utils.container).toBeEmptyDOMElement();
+  expect(container).toBeEmptyDOMElement();
 });
 
 test("fetches search description", async () => {
   mockSwr({ data: fixtureData });
-  render(<Search />, {
+  setup(<Search />, {
     router: {
       query: { collectionUrl: "/collection" }
     }
@@ -55,18 +55,16 @@ test("fetches search description", async () => {
 
 test("searching calls history.push with url", async () => {
   mockSwr();
-  const utils = render(<Search />, {
+  const { user } = setup(<Search />, {
     router: {
       query: { collectionUrl: "/collection" }
     }
   });
-  const searchButton = utils.getByText("Search");
-  const input = utils.getByLabelText("Enter search keyword or keywords");
+  const searchButton = screen.getByText("Search");
+  const input = screen.getByLabelText("Enter search keyword or keywords");
   // act
-  act(() => {
-    userEvent.type(input, "my search");
-    fireEvent.click(searchButton);
-  });
+  await user.type(input, "my search");
+  fireEvent.click(searchButton);
 
   // assert
   expect(mockPush).toHaveBeenCalledTimes(1);
