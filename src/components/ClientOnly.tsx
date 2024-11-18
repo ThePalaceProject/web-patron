@@ -15,7 +15,7 @@ export default function ClientOnly({
 }
 
 export function clientOnly<T>(Component: React.ComponentType<T>) {
-  const Wrapped = (props: T) => (
+  const Wrapped = (props: any) => (
     <ClientOnly>
       <Component {...props} />
     </ClientOnly>

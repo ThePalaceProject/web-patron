@@ -89,7 +89,7 @@ export default function withErrorBoundary<T>(
   Component: React.ComponentType<T>,
   Fallback: React.ComponentType<FallbackProps> = DefaultFallback
 ) {
-  const Wrapped = (props: T) => {
+  const Wrapped = (props: any) => {
     if (!BugsnagErrorBoundary) {
       return (
         <DefaultErrorBoundary FallbackComponent={Fallback}>
