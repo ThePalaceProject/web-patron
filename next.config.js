@@ -82,14 +82,21 @@ const config = {
   webpack: (config, { dev, isServer, _defaultLoaders, webpack }) => {
     console.log(
       chalk.cyan("info  -"),
-      `Building ${isServer ? "server" : "client"} files using Webpack version ${webpack.version}.`
+      `Building ${isServer ? "server" : "client"} files using Webpack version ${
+        webpack.version
+      }.`
     );
     // Perform customizations to webpack config
     // Important: return the modified config
-    !isServer && config.plugins.push(new webpack.IgnorePlugin({ resourceRegExp: /jsdom$/ }));
+    !isServer &&
+      config.plugins.push(
+        new webpack.IgnorePlugin({ resourceRegExp: /jsdom$/ })
+      );
     // react-axe should only be bundled when REACT_AXE=true
     !REACT_AXE === "true" &&
-      config.plugins.push(new webpack.IgnorePlugin({ resourceRegExp: /react-axe$/ }));
+      config.plugins.push(
+        new webpack.IgnorePlugin({ resourceRegExp: /react-axe$/ })
+      );
     // Fixes dependency on "fs" module.
     // We don't (and can't) depend on this in client-side code.
     if (!isServer) {
@@ -136,5 +143,5 @@ module.exports = {
     } else {
       return `${new Date().getTime()}`;
     }
-  },
+  }
 };
