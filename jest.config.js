@@ -88,6 +88,7 @@ module.exports = {
   // A map from regular expressions to module names that allow to stub out resources with a single module
   moduleNameMapper: {
     "\\.(svg)$": "<rootDir>/__mocks__/fileMock.ts",
+    // resolve SyntaxError: cannot find export error thrown after updating fetch-mock from v9 to v10
     "^fetch-mock": require.resolve("fetch-mock")
   },
 
