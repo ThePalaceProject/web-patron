@@ -2,5 +2,5 @@
 
 /* this is to fix a problem in NYPL Design System setting global svg styles */
 svg {
-  width: initial;
+  width: initial !important;
 }
