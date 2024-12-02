@@ -1,7 +1,7 @@
 name: Sync branch with NYPL
 on:
   schedule:
-    - cron:  '0 7 * * *'
+    - cron: "0 7 * * *"
 
   workflow_dispatch:
 
@@ -17,14 +17,14 @@ jobs:
 
     steps:
       - name: Checkout repo to sync
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: code
 
       - name: Checkout CI scripts
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          repository: 'ThePalaceProject/ci-scripts'
+          repository: "ThePalaceProject/ci-scripts"
           path: ci
 
       - name: Set up Python
