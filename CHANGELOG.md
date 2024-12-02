@@ -1,6 +1,9 @@
 ## CHANGELOG
 
 ### UNRELEASED CHANGES
+
+- replace reakit with ariakit
+- Update nextjs to v15, react to v18
 - Fix check on redirect URL to make sure it doesn't start with HTTP, instead of contain HTTP, since it was falsely matching some legitimate URLs.
 - Change font to Open Sans.
 - Update iOS App Store badge to link to Palace app.
