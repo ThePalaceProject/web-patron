@@ -1,10 +1,9 @@
 import * as React from "react";
-import { render, fixtures, waitFor } from "test-utils";
+import { fixtures, render, setup, screen, waitFor } from "test-utils";
 import merge from "deepmerge";
 import { BookDetails } from "../index";
 import { AnyBook } from "interfaces";
 import * as complaintActions from "hooks/useComplaints/actions";
-import userEvent from "@testing-library/user-event";
 import ReportProblem from "../ReportProblem";
 import { ServerError } from "errors";
 import useSWR from "swr";
@@ -33,40 +32,42 @@ describe("book details page", () => {
   test("shows loading state", () => {
     mockSwr({ data: undefined });
 
-    const utils = render(<BookDetails />, {
+    setup(<BookDetails />, {
       router: { query: { bookUrl: "/book-url" } }
     });
     expect(
-      utils.getByRole("heading", { name: "Loading..." })
+      screen.getByRole("heading", { name: "Loading..." })
     ).toBeInTheDocument();
   });
 
   test("rethrows SWR errors to be caught by error boundary", async () => {
-    mockSwr({
-      error: new ServerError("url", 418, {
-        detail: "Something",
-        title: "you messed up",
-        status: 418
-      })
-    });
-
-    expect(() =>
-      render(<BookDetails />, {
-        router: { query: { bookUrl: "/book-url" } }
-      })
-    ).toThrowError(ServerError);
+    try {
+      mockSwr({
+        error: new ServerError("url", 418, {
+          detail: "Something",
+          title: "you messed up",
+          status: 418
+        })
+      });
+    } catch (err) {
+      expect(() =>
+        setup(<BookDetails />, {
+          router: { query: { bookUrl: "/book-url" } }
+        })
+      ).toThrowError(ServerError);
+    }
   });
 
   test("shows categories", () => {
     mockSwr({
       data: fixtures.book
     });
-    const utils = render(<BookDetails />, {
+    setup(<BookDetails />, {
       router: { query: { bookUrl: "/book-url" } }
     });
     const categories = fixtures.book.categories?.join(", ") as string;
-    expect(utils.getByText(categories));
-    expect(utils.getByText("Categories:"));
+    expect(screen.getByText(categories));
+    expect(screen.getByText("Categories:"));
   });
 
   test("doesn't show categories when there aren't any", () => {
@@ -74,29 +75,29 @@ describe("book details page", () => {
       categories: null
     });
     mockSwr({ data: bookWithoutCategories });
-    const utils = render(<BookDetails />);
-    expect(utils.queryByText("Categories:")).toBeFalsy();
+    setup(<BookDetails />);
+    expect(screen.queryByText("Categories:")).toBeFalsy();
   });
 
   test("shows publisher", () => {
     mockSwr({ data: fixtures.book });
-    const utils = render(<BookDetails />);
+    setup(<BookDetails />);
     const publisher = fixtures.book.publisher as string;
 
-    expect(utils.getByText(publisher)).toBeInTheDocument();
-    expect(utils.getByText("Publisher:")).toBeInTheDocument();
+    expect(screen.getByText(publisher)).toBeInTheDocument();
+    expect(screen.getByText("Publisher:")).toBeInTheDocument();
   });
 
   test("does not show simplyE callout when NEXT_PUBLIC_COMPANION_APP is 'openebooks'", () => {
     mockConfig({ companionApp: "openebooks" });
     mockSwr({ data: fixtures.book });
-    const utils = render(<BookDetails />);
+    setup(<BookDetails />);
 
-    expect(utils.queryByText("Download Palace")).not.toBeInTheDocument();
+    expect(screen.queryByText("Download Palace")).not.toBeInTheDocument();
 
-    expect(utils.queryByText("Palace Logo")).not.toBeInTheDocument();
+    expect(screen.queryByText("Palace Logo")).not.toBeInTheDocument();
     expect(
-      utils.queryByText(
+      screen.queryByText(
         "Browse and read our collection of ebooks and audiobooks right from your phone."
       )
     ).not.toBeInTheDocument();
@@ -105,17 +106,17 @@ describe("book details page", () => {
   test("shows simplyE callout when NEXT_PUBLIC_COMPANION_APP is 'simplye'", async () => {
     mockConfig({ companionApp: "simplye" });
     mockSwr({ data: fixtures.book });
-    const utils = render(<BookDetails />);
+    setup(<BookDetails />);
 
-    expect(utils.getByText("Download Palace")).toBeInTheDocument();
-    expect(utils.getByLabelText("Palace Logo")).toBeInTheDocument();
+    expect(screen.getByText("Download Palace")).toBeInTheDocument();
+    expect(screen.getByLabelText("Palace Logo")).toBeInTheDocument();
     expect(
-      utils.getByText(
+      screen.getByText(
         "Browse and read our collection of ebooks and audiobooks right from your phone."
       )
     ).toBeInTheDocument();
 
-    const iosBadge = utils.getByRole("link", {
+    const iosBadge = screen.getByRole("link", {
       name: "Download Palace on the Apple App Store",
       hidden: true // it is initially hidden by a media query, only displayed on desktop
     });
@@ -125,7 +126,7 @@ describe("book details page", () => {
       "https://apps.apple.com/us/app/the-palace-project/id1574359693"
     );
 
-    const googleBadge = utils.getByRole("link", {
+    const googleBadge = screen.getByRole("link", {
       name: "Get Palace on the Google Play Store",
       hidden: true // hidden initially on mobile
     });
@@ -154,12 +155,12 @@ describe("book details page", () => {
         });
       }
     }) as any);
-    const utils = render(<BookDetails />, {
+    setup(<BookDetails />, {
       router: { query: { bookUrl: "/book-url" } }
     });
-    expect(utils.getByText("Recommendations")).toBeInTheDocument();
+    expect(screen.getByText("Recommendations")).toBeInTheDocument();
     expect(
-      utils.getByRole("heading", { name: "Jane Austen collection" })
+      screen.getByRole("heading", { name: "Jane Austen collection" })
     ).toBeInTheDocument();
   });
 
@@ -169,7 +170,7 @@ describe("book details page", () => {
     });
 
     // we render a context provider so we can control the value
-    const utils = render(
+    setup(
       <BreadcrumbContext.Provider
         value={{
           setStoredBreadcrumbs: jest.fn(),
@@ -186,13 +187,13 @@ describe("book details page", () => {
       }
     );
     expect(
-      utils.getByRole("link", { name: "breadcrumb title" })
+      screen.getByRole("link", { name: "breadcrumb title" })
     ).toHaveAttribute("href", "/testlib/collection/breadcrumb-url");
     expect(
-      utils.getByRole("link", { name: "breadcrumb title 2" })
+      screen.getByRole("link", { name: "breadcrumb title 2" })
     ).toHaveAttribute("href", "/testlib/collection/breadcrumb-url-2");
     expect(
-      utils.getByLabelText(`Current location: ${fixtures.book.title}`)
+      screen.getByLabelText(`Current location: ${fixtures.book.title}`)
     ).toBeInTheDocument();
   });
 });
@@ -228,28 +229,28 @@ const bookWithReportUrl = merge<AnyBook>(fixtures.book, {
 describe("report problem", () => {
   test("shows report problem link", () => {
     mockSwr({ data: fixtures.book });
-    const utils = render(<BookDetails />);
+    setup(<BookDetails />);
 
-    const reportProblemLink = utils.getByTestId("report-problem-link");
+    const reportProblemLink = screen.getByTestId("report-problem-link");
     expect(reportProblemLink).toBeInTheDocument();
   });
 
   test("shows form (only) when clicked", async () => {
     mockSwr({ data: fixtures.book });
-    const utils = render(<BookDetails />);
+    const { user } = setup(<BookDetails />);
     // make sure it's not visible at first
-    expect(utils.getByLabelText("Complaint Type")).not.toBeVisible();
+    expect(screen.getByLabelText("Complaint Type")).not.toBeVisible();
 
-    const reportProblemLink = utils.getByTestId("report-problem-link");
-    userEvent.click(reportProblemLink);
+    const reportProblemLink = screen.getByTestId("report-problem-link");
+    await user.click(reportProblemLink);
 
     // one for the original report problem button, one for the form
-    expect(utils.getAllByText("Report a problem")).toHaveLength(2);
-    expect(utils.getByLabelText("Complaint Type")).toBeVisible();
-    expect(utils.getByLabelText("Details")).toBeVisible();
-    expect(utils.getByText("Cancel")).toBeVisible();
-    expect(utils.getByText("Submit")).toBeVisible();
-    expect(utils.getByText("Submit")).toHaveAttribute("type", "submit");
+    expect(screen.getAllByText("Report a problem")).toHaveLength(2);
+    expect(screen.getByLabelText("Complaint Type")).toBeVisible();
+    expect(screen.getByLabelText("Details")).toBeVisible();
+    expect(screen.getByText("Cancel")).toBeVisible();
+    expect(screen.getByText("Submit")).toBeVisible();
+    expect(screen.getByText("Submit")).toHaveAttribute("type", "submit");
   });
 
   test("fetches complaint types", async () => {
@@ -279,19 +280,20 @@ describe("report problem", () => {
     postComplaintSpy.mockReturnValue(_url => mockBoundPostComplaint);
 
     mockSwr({ data: fixtures.book });
-    const utils = render(<BookDetails />);
+    const { user } = setup(<BookDetails />);
     // open the form
-    const reportProblemLink = utils.getByTestId("report-problem-link");
-    userEvent.click(reportProblemLink);
+    const reportProblemLink = screen.getByTestId("report-problem-link");
+    await user.click(reportProblemLink);
 
     // fill the form
-    userEvent.selectOptions(
-      utils.getByLabelText("Complaint Type"),
+
+    await user.selectOptions(
+      screen.getByLabelText("Complaint Type"),
       "complaint-type-b"
     );
-    userEvent.type(utils.getByLabelText("Details"), "Some issue happened.");
+    await user.type(screen.getByLabelText("Details"), "Some issue happened.");
     // submit the form
-    userEvent.click(utils.getByText("Submit"));
+    await user.click(screen.getByText("Submit"));
 
     // actually posted the complaint
     await waitFor(() =>
@@ -320,29 +322,29 @@ describe("report problem", () => {
     });
 
     mockSwr({ data: fixtures.book });
-    const utils = render(<BookDetails />);
+    const { user } = setup(<BookDetails />);
     // open the form
-    const reportProblemLink = utils.getByTestId("report-problem-link");
-    userEvent.click(reportProblemLink);
+    const reportProblemLink = screen.getByTestId("report-problem-link");
+    await user.click(reportProblemLink);
 
     // fill the form
-    userEvent.selectOptions(
-      utils.getByLabelText("Complaint Type"),
+    await user.selectOptions(
+      screen.getByLabelText("Complaint Type"),
       "complaint-type-b"
     );
-    userEvent.type(utils.getByLabelText("Details"), "Some issue happened.");
+    await user.type(screen.getByLabelText("Details"), "Some issue happened.");
     // submit the form
-    userEvent.click(utils.getByText("Submit"));
+    await user.click(screen.getByText("Submit"));
 
     // shows thank you message
     expect(
-      await utils.findByText("Your problem was reported. Thank you!")
+      screen.getByText("Your problem was reported. Thank you!")
     ).toBeInTheDocument();
-    expect(await utils.findByText("Done")).toBeInTheDocument();
+    expect(screen.getByText("Done")).toBeInTheDocument();
 
     // can close the form
-    userEvent.click(utils.getByText("Done"));
-    expect(utils.getByText("Complaint Type")).not.toBeVisible();
+    await user.click(screen.getByText("Done"));
+    expect(screen.queryByText("Complaint Type")).not.toBeInTheDocument();
   });
 
   test("displays client error when unfilled", async () => {
@@ -350,20 +352,20 @@ describe("report problem", () => {
     postComplaintSpy.mockReturnValue(_url => mockBoundPostComplaint);
 
     mockSwr({ data: bookWithReportUrl });
-    const utils = render(<ReportProblem book={fixtures.borrowableBook} />);
+    const { user } = setup(<ReportProblem book={fixtures.borrowableBook} />);
     // open the form
-    const reportProblemLink = utils.getByTestId("report-problem-link");
-    userEvent.click(reportProblemLink);
+    const reportProblemLink = screen.getByTestId("report-problem-link");
+    await user.click(reportProblemLink);
 
     // don't fill the form
     // submit the form
-    userEvent.click(utils.getByText("Submit"));
+    await user.click(screen.getByText("Submit"));
 
     expect(
-      await utils.findByText("Error: Please choose a type")
+      await screen.findByText("Error: Please choose a type")
     ).toBeInTheDocument();
     expect(
-      await utils.findByText("Error: Please enter details about the problem.")
+      await screen.findByText("Error: Please enter details about the problem.")
     ).toBeInTheDocument();
 
     expect(mockBoundPostComplaint).toHaveBeenCalledTimes(0);

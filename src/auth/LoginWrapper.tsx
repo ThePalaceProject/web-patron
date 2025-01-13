@@ -1,3 +1,4 @@
+/** @jsxRuntime classic */
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
@@ -16,7 +17,11 @@ import useLoginRedirectUrl from "auth/useLoginRedirect";
  * Shows loader if the state is still loading
  * Adds wrapping components for styling
  */
-const LoginWrapper: React.FC = ({ children }) => {
+interface LoginWrapperProps {
+  children?: React.ReactNode;
+}
+
+const LoginWrapper = ({ children }: LoginWrapperProps) => {
   const { isAuthenticated, isLoading } = useUser();
   const { catalogName } = useLibraryContext();
   const { push } = useRouter();

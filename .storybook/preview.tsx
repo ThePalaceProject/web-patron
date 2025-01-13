@@ -1,6 +1,6 @@
 import * as React from "react";
-import { ThemeProvider } from "theme-ui";
-import { Provider as ReakitProvider } from "reakit";
+import { ThemeUIProvider } from "theme-ui";
+// import { Provider as ReakitProvider } from "@ariakit/react";
 import { LibraryProvider } from "../src/components/context/LibraryContext";
 import { UserContext, UserState } from "../src/components/context/UserContext";
 import makeTheme from "../src/theme";
@@ -61,15 +61,15 @@ export const decorators = [
     const theme = makeTheme(libraryData.colors);
     const library = libraryData;
     return (
-      <ThemeProvider theme={theme}>
-        <ReakitProvider>
+      <ThemeUIProvider theme={theme}>
+        {/* <ReakitProvider> */}
           <LibraryProvider library={library}>
             <UserContext.Provider value={user}>
                 <Story />
             </UserContext.Provider>
           </LibraryProvider>
-        </ReakitProvider>
-      </ThemeProvider>
+        {/* </ReakitProvider> */}
+      </ThemeUIProvider>
     )
   },
 ];

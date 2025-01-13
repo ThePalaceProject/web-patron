@@ -1,5 +1,7 @@
+/** @jsxRuntime classic */
 /** @jsx jsx */
-import { jsx, Styled } from "theme-ui";
+import { jsx } from "theme-ui";
+import { Themed } from "@theme-ui/mdx";
 import * as React from "react";
 import GlobalStyles from "./GlobalStyles";
 import Header from "./Header";
@@ -9,9 +11,13 @@ import { ErrorBoundary } from "components/ErrorBoundary";
 
 export const CONTENT_ID = "cpw-content";
 
-const Layout: React.FC = ({ children }) => {
+interface Props {
+  children: React.ReactNode;
+}
+
+const Layout = ({ children }: Props) => {
   return (
-    <Styled.root
+    <Themed.root
       sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
     >
       <SkipNavigation />
@@ -29,7 +35,7 @@ const Layout: React.FC = ({ children }) => {
         <ErrorBoundary>{children}</ErrorBoundary>
       </main>
       <Footer sx={{ width: "100%" }} />
-    </Styled.root>
+    </Themed.root>
   );
 };
 

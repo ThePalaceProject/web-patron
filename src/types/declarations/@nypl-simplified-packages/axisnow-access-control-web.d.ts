@@ -1,5 +1,5 @@
 declare module "@nypl-simplified-packages/axisnow-access-control-web" {
-  import IDecryptor from "library-simplified-webpub-viewer/dist/Decryptor";
+  import IDecryptor from "@thepalaceproject/webpub-viewer/dist/Decryptor";
 
   class Decryptor implements IDecryptor {
     readonly keyPair: CryptoKeyPair;

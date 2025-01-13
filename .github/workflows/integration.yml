@@ -13,7 +13,7 @@ jobs:
     name: Integration Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Trigger test with webhook
         uses: joelwmale/webhook-action@aed4f319dce44a4f73cdf0480b94df9e6dfc6cae
         # based on the following curl command from A1QA

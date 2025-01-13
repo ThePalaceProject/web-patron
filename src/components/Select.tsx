@@ -1,4 +1,7 @@
+/** @jsxRuntime classic */
 /** @jsx jsx */
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import { jsx } from "theme-ui";
 import * as React from "react";
 import SvgExpandMore from "icons/ExpandMore";

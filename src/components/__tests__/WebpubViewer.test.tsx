@@ -3,6 +3,7 @@ import { render } from "test-utils";
 import WebpubViewer from "components/WebpubViewer";
 import { PageNotFoundError } from "errors";
 import * as env from "utils/env";
+import fetchMock from "jest-fetch-mock";
 import { mockPush } from "test-utils/mockNextRouter";
 
 jest.mock("utils/reader", () => ({

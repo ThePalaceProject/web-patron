@@ -1,8 +1,8 @@
 import * as React from "react";
 import { LibraryData } from "interfaces";
 import { LibraryProvider } from "./LibraryContext";
-import { Provider as ReakitProvider } from "reakit";
-import { ThemeProvider } from "theme-ui";
+// import { Provider as ReakitProvider } from "@ariakit/react";
+import { ThemeUIProvider } from "theme-ui";
 import makeTheme from "../../theme";
 import { UserProvider } from "components/context/UserContext";
 import { SWRConfig } from "swr";
@@ -11,6 +11,7 @@ import CatchFetchErrors from "auth/Catch401";
 
 type ProviderProps = {
   library: LibraryData;
+  children: React.ReactNode;
 };
 
 /**
@@ -21,15 +22,15 @@ const AppContextProvider: React.FC<ProviderProps> = ({ children, library }) => {
 
   return (
     <SWRConfig value={swrConfig}>
-      <ThemeProvider theme={theme}>
-        <ReakitProvider>
-          <LibraryProvider library={library}>
-            <UserProvider>
-              <CatchFetchErrors>{children}</CatchFetchErrors>
-            </UserProvider>
-          </LibraryProvider>
-        </ReakitProvider>
-      </ThemeProvider>
+      <ThemeUIProvider theme={theme}>
+        {/* <ReakitProvider> */}
+        <LibraryProvider library={library}>
+          <UserProvider>
+            <CatchFetchErrors>{children}</CatchFetchErrors>
+          </UserProvider>
+        </LibraryProvider>
+        {/* </ReakitProvider> */}
+      </ThemeUIProvider>
     </SWRConfig>
   );
 };

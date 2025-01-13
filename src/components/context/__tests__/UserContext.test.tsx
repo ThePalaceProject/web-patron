@@ -1,7 +1,9 @@
 /* eslint-disable camelcase */
+import { beforeEach, expect, jest, test } from "@jest/globals";
+import fetchMock from "jest-fetch-mock";
 import * as React from "react";
 import { OPDS1 } from "interfaces";
-import { act, fixtures, render } from "test-utils";
+import { act, fixtures, setup } from "test-utils";
 import Cookie from "js-cookie";
 import * as router from "next/router";
 import useUser, { UserProvider } from "components/context/UserContext";
@@ -18,9 +20,9 @@ const useRouterSpy = jest.spyOn(router, "useRouter");
 const mutateMock = jest.fn();
 const defaultMock = makeSwrResponse<any>({
   data: fixtures.emptyCollection,
-  mutate: mutateMock
+  mutate: mutateMock as any
 });
-mockSWR.mockReturnValue(defaultMock);
+mockSWR.mockReturnValue(defaultMock as any);
 
 /**
  * This file tests both UserContext and useCredentials, as
@@ -29,7 +31,7 @@ mockSWR.mockReturnValue(defaultMock);
  * render wraps everything with our ContextProvider already (see text-utils/index)
  */
 function renderUserContext() {
-  return render(<UserProvider>child</UserProvider>);
+  return setup(<UserProvider>child</UserProvider>);
 }
 
 beforeEach(() => {
@@ -148,7 +150,8 @@ test("sign out clears cookies and data", async () => {
     extractedSignOut = signOut;
     return <div>hello</div>;
   }
-  render(
+
+  setup(
     <UserProvider>
       <Extractor />
     </UserProvider>
@@ -162,9 +165,7 @@ test("sign out clears cookies and data", async () => {
   );
 
   // now sign out
-  act(() => {
-    extractedSignOut();
-  });
+  act(() => extractedSignOut());
 
   // should have removed cookie
   expect(Cookie.remove).toHaveBeenCalledTimes(1);
@@ -181,11 +182,12 @@ test("sign in sets cookie", async () => {
     extractedSignIn = signIn;
     return <div>{token}</div>;
   }
-  render(
+  setup(
     <UserProvider>
       <Extractor />
     </UserProvider>
   );
+
   expect(mockSWR).toHaveBeenCalledWith(
     null,
     expect.anything(),

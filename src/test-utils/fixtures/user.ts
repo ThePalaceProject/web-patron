@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { UserState } from "components/context/UserContext";
 
 export const mockRefetchLoans = jest.fn();
@@ -6,7 +7,7 @@ export const mockSignOut = jest.fn();
 export const mockSetBook = jest.fn();
 export const mockClearCredentials = jest.fn();
 
-export const user: UserState = {
+export const user: Partial<UserState> = {
   error: undefined,
   isAuthenticated: false,
   isLoading: false,
@@ -16,6 +17,6 @@ export const user: UserState = {
   signOut: mockSignOut,
   setBook: mockSetBook,
   status: "unauthenticated",
-  clearCredentials: mockClearCredentials(),
+  clearCredentials: mockClearCredentials() as () => void,
   token: "user-token"
 };

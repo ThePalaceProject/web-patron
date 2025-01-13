@@ -27,16 +27,16 @@ jobs:
     env:
       CI: true
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - id: nvmrc
         run: echo "NODE_VERSION=$(cat .nvmrc)" >> $GITHUB_OUTPUT
 
       - name: Use Node Version from nvmrc
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with: { node-version: "${{ steps.nvmrc.outputs.NODE_VERSION }}" }
 
       - name: Cache node modules
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         env:
           cache-name: cache-node-modules
         with:
@@ -60,16 +60,16 @@ jobs:
     env:
       CI: true
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - id: nvmrc
         run: echo "NODE_VERSION=$(cat .nvmrc)" >> $GITHUB_OUTPUT
 
       - name: Use Node Version from nvmrc
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with: { node-version: "${{ steps.nvmrc.outputs.NODE_VERSION }}" }
 
       - name: Cache node modules
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         env:
           cache-name: cache-node-modules
         with:
@@ -93,16 +93,16 @@ jobs:
     env:
       CI: true
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - id: nvmrc
         run: echo "NODE_VERSION=$(cat .nvmrc)" >> $GITHUB_OUTPUT
 
       - name: Use Node Version from nvmrc
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with: { node-version: "${{ steps.nvmrc.outputs.NODE_VERSION }}" }
 
       - name: Cache node modules
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         env:
           cache-name: cache-node-modules
         with:

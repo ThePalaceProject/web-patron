@@ -44,14 +44,12 @@ async function fetchConfigFile(configFileUrl) {
 /**
  * Fetches an object of libraries from a library registry
  */
-async function fetchLibrariesFromRegistry(
-  registryBase
-) {
+async function fetchLibrariesFromRegistry(registryBase) {
   const response = await fetch(registryBase);
   if (!response.ok) {
     throw new Error("Could not fetch registry base at: " + registryBase);
   }
-  const registryFeed = (await response.json());
+  const registryFeed = await response.json();
   if (!registryFeed.catalogs) {
     throw new Error(
       "Registry feed did not contain any catalogs at url: " + registryBase
@@ -61,7 +59,7 @@ async function fetchLibrariesFromRegistry(
   return registryFeed.catalogs.reduce((record, catalog) => {
     const authDocLink = catalog.links.find(
       link => link.type === "application/vnd.opds.authentication.v1.0+json"
-    )
+    );
     if (!authDocLink) {
       throw new ApplicationError({
         title: "Invalid Registry Feed",
@@ -81,9 +79,7 @@ async function fetchLibrariesFromRegistry(
 /**
  * Creates a LibrariesConfig from the object in the config file
  */
-function makeLibrariesConfig(
-  libraries
-) {
+function makeLibrariesConfig(libraries) {
   return Object.keys(libraries).reduce((record, slug) => {
     const authDocUrl = libraries[slug];
     if (!authDocUrl)

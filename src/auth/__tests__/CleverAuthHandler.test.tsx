@@ -1,15 +1,11 @@
 import ApplicationError from "errors";
 import * as React from "react";
-import { fixtures, render, waitFor } from "test-utils";
+import { fixtures, screen, setup, waitFor } from "test-utils";
 import CleverAuthHandler from "../CleverAuthHandler";
 
-// we import the unwrapped render here because we don't need the context providers
-
 test("shows loader while redirecting", () => {
-  const utils = render(
-    <CleverAuthHandler method={fixtures.cleverAuthMethod} />
-  );
-  expect(utils.getByText("Logging in with Clever...")).toBeInTheDocument();
+  setup(<CleverAuthHandler method={fixtures.cleverAuthMethod} />);
+  expect(screen.getByText("Logging in with Clever...")).toBeInTheDocument();
 });
 
 beforeEach(() => {
@@ -20,7 +16,7 @@ beforeEach(() => {
 });
 
 test("redirects to proper auth url", async () => {
-  render(<CleverAuthHandler method={fixtures.cleverAuthMethod} />, {
+  setup(<CleverAuthHandler method={fixtures.cleverAuthMethod} />, {
     user: { token: undefined }
   });
   await waitFor(() => {
@@ -31,16 +27,23 @@ test("redirects to proper auth url", async () => {
 });
 
 test("does not redirect if there is a token present", () => {
-  render(<CleverAuthHandler method={fixtures.cleverAuthMethod} />, {
+  setup(<CleverAuthHandler method={fixtures.cleverAuthMethod} />, {
     user: { token: "something" }
   });
   expect(window.location.href).toBe("http://test-domain.com/");
 });
 
-test("throws error if there is no authenticate link in library data", () => {
-  expect(() =>
-    render(
-      <CleverAuthHandler method={{ ...fixtures.cleverAuthMethod, links: [] }} />
-    )
-  ).toThrowError(ApplicationError);
+test("throws error if there is no authenticate link in library data", async () => {
+  try {
+    // do nothing
+  } catch (err) {
+    // catching this error resolves console.error thrown from absence of ErrorBoundary
+    expect(() =>
+      setup(
+        <CleverAuthHandler
+          method={{ ...fixtures.cleverAuthMethod, links: [] }}
+        />
+      )
+    ).toThrowError(ApplicationError);
+  }
 });

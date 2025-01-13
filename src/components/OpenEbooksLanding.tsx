@@ -1,4 +1,7 @@
+/** @jsxRuntime classic */
 /** @jsx jsx */
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import { jsx } from "theme-ui";
 import * as React from "react";
 import { H2, Text } from "./Text";
@@ -271,6 +274,7 @@ const OpenEbooksHero: React.FC = () => {
 const PopularBookSection: React.FC<{
   books: PopularBook[];
   coverLocation?: "left" | "right";
+  children?: React.ReactNode;
 }> = ({ children, books, coverLocation }) => {
   return (
     <section

@@ -1,3 +1,4 @@
+/** @jsxRuntime classic */
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
@@ -11,7 +12,7 @@ const LoadingIndicator: React.FC<React.ComponentProps<typeof Spinner>> = ({
   return <Spinner color={color} {...props} />;
 };
 
-export const PageLoader: React.FC = () => {
+export const PageLoader = () => {
   return (
     <div
       sx={{

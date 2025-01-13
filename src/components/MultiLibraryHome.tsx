@@ -1,6 +1,8 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
+/** @jsxRuntime classic */
 /** @jsx jsx */
-import { jsx, Styled, ThemeProvider } from "theme-ui";
+import { jsx, ThemeUIProvider } from "theme-ui";
+import { Themed } from "@theme-ui/mdx";
 import * as React from "react";
 import Link from "next/link";
 import { APP_CONFIG } from "utils/env";
@@ -13,8 +15,8 @@ const MultiLibraryHome: React.FC = () => {
   if (!libraries || slugs.length === 0) return null;
 
   return (
-    <ThemeProvider theme={theme}>
-      <Styled.root
+    <ThemeUIProvider theme={theme}>
+      <Themed.root
         sx={{
           display: "flex",
           flexDirection: "column",
@@ -27,14 +29,12 @@ const MultiLibraryHome: React.FC = () => {
         <ul>
           {slugs.map(slug => (
             <li key={slug}>
-              <Link href={`/${slug}`}>
-                <a>/{libraries[slug]?.title}</a>
-              </Link>
+              <Link href={`/${slug}`}>/{libraries[slug]?.title}</Link>
             </li>
           ))}
         </ul>
-      </Styled.root>
-    </ThemeProvider>
+      </Themed.root>
+    </ThemeUIProvider>
   );
 };
 

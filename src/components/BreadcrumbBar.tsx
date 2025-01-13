@@ -1,3 +1,4 @@
+/** @jsxRuntime classic */
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
@@ -10,8 +11,9 @@ const BreadcrumbBar: React.FC<{
   className?: string;
   currentLocation?: string;
   breadcrumbs?: Readonly<LinkData[]>;
+  children?: React.ReactNode;
 }> = ({ children, className, currentLocation, breadcrumbs: crumbsIn }) => {
-  // make a local copy so we can mutate this array without
+  // make a local copy, so we can mutate this array without
   // affecting the referenced value
 
   const breadcrumbs = crumbsIn ? [...crumbsIn] : [];

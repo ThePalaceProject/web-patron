@@ -1,5 +1,5 @@
 # build environment
-FROM node:12.2.0-alpine as builder	
+FROM node:20.18.1-alpine AS builder
 
 RUN apk update
 RUN apk add git
@@ -9,12 +9,7 @@ RUN apk add git
 ENV NPM_CONFIG_LOGLEVEL=warn
 COPY package*.json ./
 COPY .npmrc ./
-COPY install-deps.sh ./
-# conditionally login to github package registry
-# and install dependencies
-ARG github_token=""
-RUN chmod +x ./install-deps.sh
-RUN sh ./install-deps.sh
+RUN npm install
 
 # then copy the rest of the files
 COPY . ./

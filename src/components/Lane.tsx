@@ -1,8 +1,9 @@
+/** @jsxRuntime classic */
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { AspectRatio } from "@theme-ui/components";
-import { Tabbable } from "reakit/Tabbable";
+import { AspectRatio, Card } from "@theme-ui/components";
+import { Focusable } from "@ariakit/react/focusable";
 import Book, { BOOK_HEIGHT, BOOK_WIDTH } from "./BookCard";
 import withErrorBoundary, { FallbackProps } from "./ErrorBoundary";
 import { lighten } from "@theme-ui/color";
@@ -10,7 +11,6 @@ import { H2 } from "./Text";
 import { NavButton } from "./Button";
 import ArrowForward from "icons/ArrowForward";
 import Stack from "./Stack";
-import { Box } from "theme-ui";
 import { AnyBook, LaneData } from "interfaces";
 import Link from "components/Link";
 import { Text } from "components/Text";
@@ -264,7 +264,7 @@ const SeeMoreBlock = React.forwardRef<HTMLLIElement, SeeMoreBlockProps>(
               }
             }}
           >
-            <Box
+            <Card
               sx={{
                 left: 0,
                 p: 2,
@@ -278,7 +278,7 @@ const SeeMoreBlock = React.forwardRef<HTMLLIElement, SeeMoreBlockProps>(
                 <Text>See All</Text>
                 <Text variant="text.headers.tertiary">{props.title}</Text>
               </Stack>
-            </Box>
+            </Card>
           </Link>
         </AspectRatio>
       </li>
@@ -292,7 +292,7 @@ const PrevNextButton: React.FC<{
   disabled: boolean;
 }> = ({ onClick, isPrev = false, disabled }) => {
   return (
-    <Tabbable
+    <Focusable
       as="div"
       sx={{
         alignItems: "center",
@@ -317,7 +317,7 @@ const PrevNextButton: React.FC<{
           transform: isPrev ? "rotate(180deg)" : ""
         }}
       />
-    </Tabbable>
+    </Focusable>
   );
 };
 

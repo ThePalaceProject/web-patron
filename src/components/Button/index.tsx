@@ -1,6 +1,9 @@
+/** @jsxRuntime classic */
 /** @jsx jsx */
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import { jsx } from "theme-ui";
-import { Button as BaseButton } from "reakit";
+import { Button as BaseButton } from "@ariakit/react";
 import * as React from "react";
 import Link, { LinkProps } from "../Link";
 import { styleProps } from "./styles";
@@ -16,6 +19,7 @@ type ButtonOwnProps = {
   className?: string;
   iconLeft?: React.ComponentType;
   iconRight?: React.ComponentType;
+  children: React.ReactNode;
 };
 
 /**
@@ -88,23 +92,24 @@ const ButtonContent: React.FC<
  * we need to pass that through the PolymorphicBox via some other name
  */
 type NavButtonProps = LinkProps & ButtonOwnProps;
-export const NavButton = React.forwardRef<HTMLAnchorElement, NavButtonProps>(
-  function (props, ref) {
-    const {
-      variant = defaultVariant,
-      color = defaultColor,
-      size = defaultSize,
-      iconLeft,
-      iconRight,
-      ...rest
-    } = props;
-    return (
-      <Link sx={styleProps(color, size, variant)} ref={ref} {...rest}>
-        <ButtonContent {...props} />
-      </Link>
-    );
-  }
-);
+export const NavButton: JSX = React.forwardRef<
+  HTMLAnchorElement,
+  NavButtonProps
+>(function (props, ref) {
+  const {
+    variant = defaultVariant,
+    color = defaultColor,
+    size = defaultSize,
+    iconLeft,
+    iconRight,
+    ...rest
+  } = props;
+  return (
+    <Link sx={styleProps(color, size, variant)} ref={ref} {...rest}>
+      <ButtonContent {...props} />
+    </Link>
+  );
+});
 
 type AnchorButtonProps = React.ComponentPropsWithoutRef<"a"> &
   ButtonOwnProps & { newTab?: boolean };

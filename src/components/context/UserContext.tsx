@@ -25,6 +25,10 @@ export const UserContext = React.createContext<UserState | undefined>(
   undefined
 );
 
+interface UserProviderProps {
+  children: React.ReactNode;
+}
+
 /**
  * Here we fetch the loans and provide functions to sign in
  * and sign out. Calling mutate() will invalidate the SWR
@@ -32,7 +36,7 @@ export const UserContext = React.createContext<UserState | undefined>(
  * includes the shelfUrl, token and auth method type, so if any of
  * those change it will cause a refetch.
  */
-export const UserProvider: React.FC = ({ children }) => {
+export const UserProvider = ({ children }: UserProviderProps) => {
   const { shelfUrl, slug } = useLibraryContext();
   const { credentials, setCredentials, clearCredentials } = useCredentials(
     slug

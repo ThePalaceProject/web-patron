@@ -1,9 +1,11 @@
 import * as React from "react";
 import complaints, { initState } from "./reducer";
 import { fetchComplaintTypes, postComplaint } from "./actions";
-import { useDialogState } from "reakit";
+// import { useDialogState } from "@ariakit/react";
+// import { useDialogStore } from "@ariakit/react";
 import { AnyBook } from "interfaces";
 import { getReportUrl } from "../../utils/libraryLinks";
+import { useDialogStore } from "@ariakit/react/dialog";
 /**
  * We are using react useReducer instead of redux. The only real difference
  * here is that instead of using redux-thunk, we import the thunk actions
@@ -18,7 +20,7 @@ import { getReportUrl } from "../../utils/libraryLinks";
  */
 export default function useComplaints(book: AnyBook) {
   const [state, dispatch] = React.useReducer(complaints, initState);
-  const dialog = useDialogState();
+  const dialog = useDialogStore();
 
   const reportUrl = getReportUrl(book.raw);
 

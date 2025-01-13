@@ -34,7 +34,7 @@ module.exports = {
   coveragePathIgnorePatterns: [
     "/node_modules/",
     "/src/test-utils/",
-    "/src/icons/",
+    "/src/icons/"
   ],
 
   // A list of reporter names that Jest uses when writing coverage reports
@@ -66,14 +66,14 @@ module.exports = {
   // A set of global variables that need to be available in all test environments
   // globals: {},
 
+  // Don't inject objects into the global scope.
+  injectGlobals: true,
+
   // The maximum amount of workers used to run your tests. Can be specified as % or a number. E.g. maxWorkers: 10% will use 10% of your CPU amount + 1 as the maximum worker number. maxWorkers: 2 will use a maximum of 2 workers.
   // maxWorkers: "50%",
 
   // An array of directory names to be searched recursively up from the requiring module's location
-  moduleDirectories: [
-    "node_modules",
-    "src"
-  ],
+  moduleDirectories: ["node_modules", "src"],
 
   // An array of file extensions your modules use
   // moduleFileExtensions: [
@@ -87,7 +87,9 @@ module.exports = {
 
   // A map from regular expressions to module names that allow to stub out resources with a single module
   moduleNameMapper: {
-    "\\.(svg)$": "<rootDir>/__mocks__/fileMock.ts"
+    "\\.(svg)$": "<rootDir>/__mocks__/fileMock.ts",
+    // resolve SyntaxError: cannot find export error thrown after updating fetch-mock from v9 to v10
+    "^fetch-mock": require.resolve("fetch-mock")
   },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
@@ -141,7 +143,7 @@ module.exports = {
   // snapshotSerializers: [],
 
   // The test environment that will be used for testing
-  // testEnvironment: "jest-environment-jsdom",
+  testEnvironment: "jest-environment-jsdom",
 
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},
@@ -168,10 +170,20 @@ module.exports = {
   // testRunner: "jasmine2",
 
   // This option sets the URL for the jsdom environment. It is reflected in properties such as location.href
-  testURL: "http://test-domain.com/"
+  // testURL: "http://test-domain.com/"
+  testEnvironmentOptions: {
+    url: "http://test-domain.com/"
+  },
 
-  // Setting this value to "fake" allows the use of fake timers for functions such as "setTimeout"
-  // timers: "real",
+  fakeTimers: {
+    enableGlobally: true,
+    legacyFakeTimers: true
+  },
+
+  snapshotFormat: {
+    escapeString: true,
+    printBasicPrototype: true
+  }
 
   // A map from regular expressions to paths to transformers
   // transform: undefined,

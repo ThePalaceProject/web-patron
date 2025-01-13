@@ -1,3 +1,4 @@
+/** @jsxRuntime classic */
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
@@ -27,6 +28,7 @@ const initialState: ErrorState = { error: undefined, info: undefined };
 class DefaultErrorBoundary extends React.Component<
   {
     FallbackComponent: React.ComponentType<FallbackProps>;
+    children?: React.ReactNode;
   },
   ErrorState
 > {
@@ -67,6 +69,7 @@ class DefaultErrorBoundary extends React.Component<
 
 export const ErrorBoundary: React.FC<{
   fallback?: React.ComponentType<FallbackProps>;
+  children?: React.ReactNode;
 }> = ({ children, fallback: Fallback = DefaultFallback }) => {
   if (!BugsnagErrorBoundary) {
     return (
@@ -86,7 +89,7 @@ export default function withErrorBoundary<T>(
   Component: React.ComponentType<T>,
   Fallback: React.ComponentType<FallbackProps> = DefaultFallback
 ) {
-  const Wrapped = (props: T) => {
+  const Wrapped = (props: any) => {
     if (!BugsnagErrorBoundary) {
       return (
         <DefaultErrorBoundary FallbackComponent={Fallback}>

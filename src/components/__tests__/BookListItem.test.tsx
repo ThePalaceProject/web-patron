@@ -1,7 +1,6 @@
 import * as React from "react";
-import { render, fixtures, waitFor } from "test-utils";
+import { screen, setup, fireEvent, fixtures, waitFor } from "test-utils";
 import { BookListItem } from "components/BookList";
-import userEvent from "@testing-library/user-event";
 import * as fetch from "dataflow/opds1/fetch";
 import {
   BorrowableBook,
@@ -13,8 +12,8 @@ import {
 import { mergeBook, mockSetBook } from "test-utils/fixtures";
 import { MOCK_DATE_STRING } from "test-utils/mockToDateString";
 
-function expectReadMore(utils: ReturnType<typeof render>) {
-  const link = utils.getByRole("link", { name: "Read more" });
+function expectReadMore() {
+  const link = screen.getByRole("link", { name: "Read more" });
   expect(link).toBeInTheDocument();
   expect(link).toHaveAttribute(
     "href",
@@ -47,17 +46,17 @@ describe("BorrowableBook", () => {
   });
 
   test("shows correct string and link to book details", () => {
-    const utils = render(<BookListItem book={borrowableBook} />);
-    expectReadMore(utils);
+    setup(<BookListItem book={borrowableBook} />);
+    expectReadMore();
     expect(
-      utils.getByText("10 out of 13 copies available.")
+      screen.getByText("10 out of 13 copies available.")
     ).toBeInTheDocument();
   });
 
   test("shows loading state when borrowing, borrows, and revalidates loans", async () => {
     const mockSetBook = jest.fn();
     mockFetchBook.mockResolvedValue(borrowableBook);
-    const utils = render(<BookListItem book={borrowableBook} />, {
+    setup(<BookListItem book={borrowableBook} />, {
       user: {
         setBook: mockSetBook,
         isAuthenticated: true,
@@ -66,14 +65,14 @@ describe("BorrowableBook", () => {
     });
 
     // click borrow
-    userEvent.click(utils.getByText("Borrow this book"));
+    fireEvent.click(screen.getByText("Borrow this book"));
     expect(mockFetchBook).toHaveBeenCalledTimes(1);
     expect(mockFetchBook).toHaveBeenCalledWith(
       "/borrow",
       "http://test-cm.com/catalogUrl",
       "user-token"
     );
-    const borrowButton = utils.getByRole("button", {
+    const borrowButton = screen.getByRole("button", {
       name: /Borrowing.../i
     });
     expect(borrowButton).toBeInTheDocument();
@@ -97,11 +96,11 @@ describe("OnHoldBook", () => {
   });
 
   test("shows correct string and link to book details", () => {
-    const utils = render(<BookListItem book={onHoldBook} />);
-    expectReadMore(utils);
-    expect(utils.getByText("Ready to Borrow")).toBeInTheDocument();
+    setup(<BookListItem book={onHoldBook} />);
+    expectReadMore();
+    expect(screen.getByText("Ready to Borrow")).toBeInTheDocument();
     expect(
-      utils.getByText(`You have this book on hold until ${MOCK_DATE_STRING}.`)
+      screen.getByText(`You have this book on hold until ${MOCK_DATE_STRING}.`)
     ).toBeInTheDocument();
   });
 
@@ -109,7 +108,7 @@ describe("OnHoldBook", () => {
     const mockSetBook = jest.fn();
     mockFetchBook.mockResolvedValue(onHoldBook);
 
-    const utils = render(<BookListItem book={onHoldBook} />, {
+    setup(<BookListItem book={onHoldBook} />, {
       user: {
         setBook: mockSetBook,
         isAuthenticated: true,
@@ -118,14 +117,14 @@ describe("OnHoldBook", () => {
     });
 
     // click borrow
-    userEvent.click(utils.getByText("Borrow this book"));
+    fireEvent.click(screen.getByText("Borrow this book"));
     expect(mockFetchBook).toHaveBeenCalledTimes(1);
     expect(mockFetchBook).toHaveBeenCalledWith(
       "/borrow",
       "http://test-cm.com/catalogUrl",
       "user-token"
     );
-    const borrowButton = utils.getByRole("button", {
+    const borrowButton = screen.getByRole("button", {
       name: /Borrowing.../i
     });
     expect(borrowButton).toBeInTheDocument();
@@ -150,16 +149,16 @@ describe("ReservableBook", () => {
   });
 
   test("displays correct title and subtitle", () => {
-    const utils = render(<BookListItem book={reservableBook} />);
+    setup(<BookListItem book={reservableBook} />);
     expect(
-      utils.getByText("0 out of 13 copies available.")
+      screen.getByText("0 out of 13 copies available.")
     ).toBeInTheDocument();
-    expectReadMore(utils);
+    expectReadMore();
   });
 
   test("displays reserve button", () => {
-    const utils = render(<BookListItem book={reservableBook} />);
-    const reserveButton = utils.getByRole("button", {
+    setup(<BookListItem book={reservableBook} />);
+    const reserveButton = screen.getByRole("button", {
       name: "Reserve this book"
     });
     expect(reserveButton).toBeInTheDocument();
@@ -169,7 +168,7 @@ describe("ReservableBook", () => {
     const mockSetBook = jest.fn();
     mockFetchBook.mockResolvedValue(reservableBook);
 
-    const utils = render(<BookListItem book={reservableBook} />, {
+    setup(<BookListItem book={reservableBook} />, {
       user: {
         setBook: mockSetBook,
         isAuthenticated: true,
@@ -178,14 +177,14 @@ describe("ReservableBook", () => {
     });
 
     // click borrow
-    userEvent.click(utils.getByText("Reserve this book"));
+    fireEvent.click(screen.getByText("Reserve this book"));
     expect(mockFetchBook).toHaveBeenCalledTimes(1);
     expect(mockFetchBook).toHaveBeenCalledWith(
       "/reserve",
       "http://test-cm.com/catalogUrl",
       "user-token"
     );
-    const borrowButton = utils.getByRole("button", {
+    const borrowButton = screen.getByRole("button", {
       name: /Reserving.../i
     });
     expect(borrowButton).toBeInTheDocument();
@@ -212,8 +211,8 @@ describe("ReservedBook", () => {
   });
 
   test("displays reserved status and string ", () => {
-    const utils = render(<BookListItem book={reservedBook} />);
-    expect(utils.getByText("Reserved"));
+    setup(<BookListItem book={reservedBook} />);
+    expect(screen.getByText("Reserved"));
   });
 
   test("allows cancelling reservation", async () => {
@@ -222,15 +221,15 @@ describe("ReservedBook", () => {
       borrowUrl: "/borrow"
     });
     mockFetchBook.mockResolvedValue(unreservedBook);
-    const utils = render(<BookListItem book={reservedBook} />);
-    expect(utils.getByText("Reserved"));
-    const cancel = utils.getByRole("button", { name: "Cancel Reservation" });
+    setup(<BookListItem book={reservedBook} />);
+    expect(screen.getByText("Reserved"));
+    const cancel = screen.getByRole("button", { name: "Cancel Reservation" });
     expect(cancel).toBeInTheDocument();
 
-    userEvent.click(cancel);
+    fireEvent.click(cancel);
 
     expect(
-      await utils.findByRole("button", { name: "Cancelling..." })
+      await screen.findByRole("button", { name: "Cancelling..." })
     ).toBeInTheDocument();
 
     expect(mockFetchBook).toHaveBeenCalledWith(
@@ -258,9 +257,9 @@ describe("ReservedBook", () => {
         position: 5
       }
     });
-    const utils = render(<BookListItem book={reservedBookWithQueue} />);
+    setup(<BookListItem book={reservedBookWithQueue} />);
     expect(
-      utils.getByText("5 patrons ahead of you in the queue.")
+      screen.getByText("5 patrons ahead of you in the queue.")
     ).toBeInTheDocument();
   });
 });
@@ -308,23 +307,23 @@ describe("FulfillableBook", () => {
         until: "2020-06-18"
       }
     });
-    const utils = render(<BookListItem book={book} />);
+    setup(<BookListItem book={book} />);
     expect(
-      utils.getByRole("button", { name: "Download PDF" })
+      screen.getByRole("button", { name: "Download PDF" })
     ).toBeInTheDocument();
   });
 
   test("doesn't show FulfillmentButton if multiple options", () => {
-    const utils = render(<BookListItem book={downloadableBook} />);
-    expect(utils.queryByText("Download PDF")).not.toBeInTheDocument();
+    setup(<BookListItem book={downloadableBook} />);
+    expect(screen.queryByText("Download PDF")).not.toBeInTheDocument();
   });
 
   test("displays correct title and subtitle and view details", () => {
-    const utils = render(<BookListItem book={downloadableBook} />);
+    setup(<BookListItem book={downloadableBook} />);
     expect(
-      utils.getByText(`You have this book on loan until ${MOCK_DATE_STRING}.`)
+      screen.getByText(`You have this book on loan until ${MOCK_DATE_STRING}.`)
     ).toBeInTheDocument();
-    expectReadMore(utils);
+    expectReadMore();
   });
 
   test("handles lack of availability info", () => {
@@ -332,7 +331,7 @@ describe("FulfillableBook", () => {
       ...downloadableBook,
       availability: undefined
     });
-    const utils = render(<BookListItem book={withoutAvailability} />);
-    expect(utils.getByText("Ready to Read!")).toBeInTheDocument();
+    setup(<BookListItem book={withoutAvailability} />);
+    expect(screen.getByText("Ready to Read!")).toBeInTheDocument();
   });
 });

@@ -1,20 +1,20 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import * as React from "react";
 import { render } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import Adapter from "enzyme-adapter-react-16";
-import { configure } from "enzyme";
 import { LibraryData } from "../interfaces";
 import "./mockScrollTo";
 import * as fixtures from "./fixtures";
+import userEvent from "@testing-library/user-event";
 import serializer from "jest-emotion";
-import { Provider as ReakitProvider } from "reakit";
 import { MockNextRouterContextProvider } from "./mockNextRouter";
 import { NextRouter } from "next/router";
 import { enableFetchMocks } from "jest-fetch-mock";
 import { LibraryProvider } from "components/context/LibraryContext";
 import { BreadcrumbProvider } from "components/context/BreadcrumbContext";
 import { UserContext, UserState } from "components/context/UserContext";
-import { ThemeProvider } from "theme-ui";
+import { ThemeUIProvider } from "theme-ui";
 import makeTheme from "theme";
 import mockConfig from "test-utils/mockConfig";
 import track from "analytics/track";
@@ -34,9 +34,6 @@ export const mockTrackError = jest.fn();
 track.error = mockTrackError;
 
 export { fixtures };
-
-// configure the enzyme adapter
-configure({ adapter: new Adapter() });
 
 /**
  * mock out the window.URL.createObjectURL since it isn't
@@ -66,18 +63,20 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
     ...options?.user
   };
 
-  const AllTheProviders: React.FC = ({ children }) => {
+  interface AllTheProvidersProps {
+    children?: React.ReactNode;
+  }
+
+  const AllTheProviders = ({ children }: AllTheProvidersProps) => {
     return (
       <MockNextRouterContextProvider router={options?.router}>
-        <ThemeProvider theme={theme}>
-          <ReakitProvider>
-            <LibraryProvider library={library}>
-              <UserContext.Provider value={user}>
-                <BreadcrumbProvider>{children}</BreadcrumbProvider>
-              </UserContext.Provider>
-            </LibraryProvider>
-          </ReakitProvider>
-        </ThemeProvider>
+        <ThemeUIProvider theme={theme}>
+          <LibraryProvider library={library}>
+            <UserContext.Provider value={user}>
+              <BreadcrumbProvider>{children}</BreadcrumbProvider>
+            </UserContext.Provider>
+          </LibraryProvider>
+        </ThemeUIProvider>
       </MockNextRouterContextProvider>
     );
   };
@@ -86,8 +85,25 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
   };
 };
 
+/**
+ * setup function
+ * see: https://testing-library.com/docs/user-event/intro/#writing-tests-with-userevent
+ * this should enable tests to use a single "user" to mock events, e.g. user.click(), user.type()
+ * currently, this doesn't work for await user.click() which is likely related to any click handlers
+ * that are asynchronous
+ * not sure why, but defining advanceTimers resolves timeout issues that occurred when upgrading to library-testing/user-event@^14.5.2
+ * see: https://testing-library.com/docs/user-event/options/#advancetimers
+ */
+function setup(jsx: any, options?: CustomRenderOptions) {
+  const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+  return {
+    user: user,
+    ...customRender(jsx, options)
+  };
+}
+
 // re-export everything
 export * from "@testing-library/react";
 
 // override render method
-export { customRender as render };
+export { customRender as render, setup };

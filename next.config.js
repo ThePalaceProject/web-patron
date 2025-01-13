@@ -1,11 +1,10 @@
 const withTM = require("next-transpile-modules")([
-  "library-simplified-webpub-viewer"
+  "@thepalaceproject/webpub-viewer"
 ]);
 const {
   BugsnagBuildReporterPlugin,
   BugsnagSourceMapUploaderPlugin
 } = require("webpack-bugsnag-plugins");
-const withSourceMaps = require("@zeit/next-source-maps");
 const chalk = require("chalk");
 const package = require("./package.json");
 const APP_VERSION = package.version;
@@ -38,18 +37,6 @@ const APP_CONFIG = JSON.parse(
   })
 );
 
-/**
- * Set the AXISNOW_DECRYPT variable based on whether the package is available.
- */
-let AXISNOW_DECRYPT = false;
-try {
-  const Decryptor = require("@nypl-simplified-packages/axisnow-access-control-web");
-  if (Decryptor) AXISNOW_DECRYPT = true;
-  log("AxisNow Decryptor package is available.");
-} catch (e) {
-  log("AxisNow Decryptor package is not available.");
-}
-
 // log some info to the console for the record.
 log(`Instance Name: ${APP_CONFIG.instanceName}`);
 log(`CONFIG_FILE: ${CONFIG_FILE}`);
@@ -58,9 +45,6 @@ log(`APP_VERSION: ${APP_VERSION}`);
 log(`NODE_ENV: ${NODE_ENV}`);
 log(`RELEASE_STAGE: ${RELEASE_STAGE}`);
 log(`BUILD_ID: ${BUILD_ID}`);
-log(
-  `AXISNOW_DECRYPT: ${AXISNOW_DECRYPT} (based on availability of decryptor package)`
-);
 log(`Companion App: ${APP_CONFIG.companionApp}`);
 log(`Show Medium: ${APP_CONFIG.showMedium ? "enabled" : "disabled"}`);
 log(
@@ -90,7 +74,7 @@ const config = {
     GIT_BRANCH,
     GIT_COMMIT_SHA,
     RELEASE_STAGE,
-    AXISNOW_DECRYPT,
+    AXISNOW_DECRYPT: undefined,
     APP_CONFIG: JSON.stringify(APP_CONFIG)
   },
   productionBrowserSourceMaps: true,
@@ -98,32 +82,34 @@ const config = {
   webpack: (config, { dev, isServer, _defaultLoaders, webpack }) => {
     console.log(
       chalk.cyan("info  -"),
-      `Building ${isServer ? "server" : "client"} files.`
+      `Building ${isServer ? "server" : "client"} files using Webpack version ${
+        webpack.version
+      }.`
     );
-    // Note: we provide webpack above so you should not `require` it
     // Perform customizations to webpack config
     // Important: return the modified config
-    !isServer && config.plugins.push(new webpack.IgnorePlugin(/jsdom$/));
+    !isServer &&
+      config.plugins.push(
+        new webpack.IgnorePlugin({ resourceRegExp: /jsdom$/ })
+      );
     // react-axe should only be bundled when REACT_AXE=true
     !REACT_AXE === "true" &&
-      config.plugins.push(new webpack.IgnorePlugin(/react-axe$/));
+      config.plugins.push(
+        new webpack.IgnorePlugin({ resourceRegExp: /react-axe$/ })
+      );
     // Fixes dependency on "fs" module.
-    // we don't (and can't) depend on this in client-side code.
+    // We don't (and can't) depend on this in client-side code.
     if (!isServer) {
-      config.node = {
-        fs: "empty"
-      };
+      config.resolve.fallback.fs = false;
     }
 
-    // ignore the axisnow decryptor if we don't have access
-    if (!AXISNOW_DECRYPT) {
-      config.plugins.push(
-        new webpack.NormalModuleReplacementPlugin(
-          /@nypl-simplified-packages\/axisnow-access-control-web/,
-          "utils/mockDecryptor.ts"
-        )
-      );
-    }
+    // ignore the axisnow decryptor, since we don't have access
+    config.plugins.push(
+      new webpack.NormalModuleReplacementPlugin(
+        /@nypl-simplified-packages\/axisnow-access-control-web/,
+        "utils/mockDecryptor.ts"
+      )
+    );
 
     // upload sourcemaps to bugsnag if we are not in dev
     if (!dev && APP_CONFIG.bugsnagApiKey) {
@@ -148,4 +134,14 @@ const config = {
 const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true"
 });
-module.exports = withSourceMaps(withTM(withBundleAnalyzer(config)));
+module.exports = {
+  ...withTM(withBundleAnalyzer(config)),
+  distDir: "_next",
+  generateBuildId: async () => {
+    if (process.env.BUILD_ID) {
+      return process.env.BUILD_ID;
+    } else {
+      return `${new Date().getTime()}`;
+    }
+  }
+};

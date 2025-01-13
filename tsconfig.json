@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
@@ -17,14 +21,23 @@
     "downlevelIteration": true,
     "importHelpers": true,
     "baseUrl": "src",
+    "useUnknownInCatchVariables": false,
+    "incremental": true,
+    "noImplicitAny": false,
   },
-  "exclude": ["node_modules", "jest.config.js", "cypress"],
+  "exclude": [
+    "node_modules",
+    "jest.config.js",
+    "cypress"
+  ],
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     ".eslintrc.js",
     "**/*.tsx",
     "next.config.js",
-    "public/sw.js"
+    "public/sw.js",
+    "src/config/fetch-config.js",
+    "src/icons/_template.js"
   ]
 }

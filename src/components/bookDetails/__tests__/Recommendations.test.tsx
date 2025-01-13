@@ -2,20 +2,20 @@ import * as React from "react";
 import { render, fixtures, waitFor } from "test-utils";
 import { CollectionData } from "interfaces";
 import Recommendations from "../Recommendations";
-import useSWR, { responseInterface } from "swr";
+import useSWR, { SWRResponse } from "swr";
 import { fetchCollection } from "dataflow/opds1/fetch";
 
 jest.mock("swr");
 
 const mockedSWR = useSWR as jest.MockedFunction<typeof useSWR>;
-type CollectionResponse = responseInterface<CollectionData, any>;
+type CollectionResponse = SWRResponse<CollectionData, any>;
 function makeSwrResponse(
   value: Partial<CollectionResponse>
 ): CollectionResponse {
   return {
     data: undefined,
     error: undefined,
-    revalidate: jest.fn(),
+    // revalidate: jest.fn(),
     isValidating: false,
     mutate: jest.fn(),
     ...value
@@ -40,9 +40,7 @@ test("shows recommendations loading state", async () => {
     isValidating: true
   });
   const utils = render(<Recommendations book={fixtures.borrowableBook} />);
-  await waitFor(() =>
-    expect(utils.getByText("Loading...")).toBeInTheDocument()
-  );
+  await waitFor(() => expect(utils.getByText("Loading")).toBeInTheDocument());
 });
 
 test("fetches the proper url for recommendation collection", () => {

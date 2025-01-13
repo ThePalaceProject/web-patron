@@ -4,7 +4,11 @@ import * as env from "utils/env";
 import track from "analytics/track";
 import extractParam from "dataflow/utils";
 
-const PageviewTracker: React.FC = ({ children }) => {
+interface Props {
+  children: React.ReactNode;
+}
+
+const PageviewTracker = ({ children }: Props) => {
   const { asPath, pathname, query } = useRouter();
   const collectionUrl = extractParam(query, "collectionUrl");
   const bookUrl = extractParam(query, "bookUrl");

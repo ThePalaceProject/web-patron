@@ -1,3 +1,4 @@
+/** @jsxRuntime classic */
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
@@ -9,6 +10,7 @@ type StackProps = {
   direction?: "row" | "column";
   spacing?: number | string;
   className?: string;
+  children?: React.ReactNode;
 };
 const Stack: React.FC<StackProps> = ({
   direction = "row",

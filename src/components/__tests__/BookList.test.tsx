@@ -1,22 +1,21 @@
 import * as React from "react";
-import { render, fixtures } from "test-utils";
+import { fixtures, setup, screen } from "test-utils";
 import { BookList, InfiniteBookList } from "../BookList";
 import merge from "deepmerge";
 import { BorrowableBook, CollectionData } from "interfaces";
-import { useSWRInfinite } from "swr";
+import useSWRInfinite from "swr/infinite";
 import { fetchCollection } from "dataflow/opds1/fetch";
-import userEvent from "@testing-library/user-event";
 
 const books = fixtures.makeBorrowableBooks(3);
 
 test("renders books", () => {
-  const utils = render(<BookList books={books} />);
+  setup(<BookList books={books} />);
 
   function expectBook(i: number) {
     const book = fixtures.makeBook(i);
-    expect(utils.getByText(book.title)).toBeInTheDocument();
+    expect(screen.getByText(book.title)).toBeInTheDocument();
     // shows details as well
-    expect(utils.getByText("Book 0 author")).toBeInTheDocument();
+    expect(screen.getByText("Book 0 author")).toBeInTheDocument();
   }
 
   expectBook(0);
@@ -30,9 +29,9 @@ test("truncates long titles", () => {
     borrowUrl: "/borrow",
     title: "This is an extremely long title it's really way too long"
   });
-  const utils = render(<BookList books={[longBook]} />);
+  setup(<BookList books={[longBook]} />);
 
-  const title = utils.getByText(/This is an extremely/i);
+  const title = screen.getByText(/This is an extremely/i);
   expect(title.textContent).toHaveLength(50);
 });
 
@@ -48,13 +47,13 @@ test("truncates authors", () => {
       arrayMerge: (a, b) => b
     }
   );
-  const utils = render(<BookList books={[longBook]} />);
+  setup(<BookList books={[longBook]} />);
 
-  expect(utils.getByText("one, two, & 3 more"));
-  expect(utils.queryByText("one, two, three")).toBeFalsy();
+  expect(screen.getByText("one, two, & 3 more"));
+  expect(screen.queryByText("one, two, three")).toBeFalsy();
 });
 
-jest.mock("swr");
+jest.mock("swr/infinite");
 const useSWRInfiniteMock = useSWRInfinite as jest.MockedFunction<
   typeof useSWRInfinite
 >;
@@ -70,7 +69,7 @@ function mockCollection(data?: CollectionData[]) {
 describe("infinite loading book list", () => {
   test("fetches collection", () => {
     mockCollection();
-    render(<InfiniteBookList firstPageUrl="/first-page" />);
+    setup(<InfiniteBookList firstPageUrl="/first-page" />);
 
     expect(useSWRInfinite).toHaveBeenCalledWith(
       expect.anything(),
@@ -90,16 +89,16 @@ describe("infinite loading book list", () => {
         books: [fixtures.borrowableBook]
       }
     ]);
-    const utils = render(<InfiniteBookList firstPageUrl="/first-page" />);
+    setup(<InfiniteBookList firstPageUrl="/first-page" />);
 
     expect(
-      utils.getByRole("link", { name: "Book Title 0" })
+      screen.getByRole("link", { name: "Book Title 0" })
     ).toBeInTheDocument();
     expect(
-      utils.getByRole("link", { name: "Book Title 1" })
+      screen.getByRole("link", { name: "Book Title 1" })
     ).toBeInTheDocument();
     expect(
-      utils.getByRole("link", { name: "The Mayan Secrets" })
+      screen.getByRole("link", { name: "The Mayan Secrets" })
     ).toBeInTheDocument();
   });
 
@@ -119,9 +118,9 @@ describe("infinite loading book list", () => {
       setSize: jest.fn(),
       data: [notFinalCollection]
     } as any);
-    const utils = render(<InfiniteBookList firstPageUrl="/first-page" />);
+    setup(<InfiniteBookList firstPageUrl="/first-page" />);
 
-    expect(utils.getByText("Loading ...")).toBeInTheDocument();
+    expect(screen.getByText("Loading ...")).toBeInTheDocument();
   });
 
   test("doesn't show loader when at end of list", () => {
@@ -141,16 +140,14 @@ describe("infinite loading book list", () => {
       data: [finalCollection]
     } as any);
 
-    const utils = render(
-      <InfiniteBookList firstPageUrl="http://first-page.com" />
-    );
+    setup(<InfiniteBookList firstPageUrl="http://first-page.com" />);
 
-    expect(utils.getByText("The Mayan Secrets")).toBeInTheDocument();
+    expect(screen.getByText("The Mayan Secrets")).toBeInTheDocument();
 
-    expect(utils.queryByText("Loading...")).not.toBeInTheDocument();
+    expect(screen.queryByText("Loading...")).not.toBeInTheDocument();
   });
 
-  test("shows view more button which loads more books on click", () => {
+  test("shows view more button which loads more books on click", async () => {
     const notFinalCollection: CollectionData = {
       books: [fixtures.borrowableBook],
       id: "id!",
@@ -167,9 +164,9 @@ describe("infinite loading book list", () => {
       setSize: mockSetSize,
       data: [notFinalCollection]
     } as any);
-    const utils = render(<InfiniteBookList firstPageUrl="/first-page" />);
+    const { user } = setup(<InfiniteBookList firstPageUrl="/first-page" />);
 
-    const viewMore = utils.getByRole("button", {
+    const viewMore = screen.getByRole("button", {
       name: "View more"
     });
 
@@ -177,7 +174,7 @@ describe("infinite loading book list", () => {
 
     // click it and you should fetch more
     expect(mockSetSize).toHaveBeenCalledTimes(0);
-    userEvent.click(viewMore);
+    await user.click(viewMore);
     expect(mockSetSize).toHaveBeenCalledTimes(1);
   });
 });
