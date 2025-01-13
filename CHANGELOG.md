@@ -3,6 +3,8 @@
 ### UNRELEASED CHANGES
 
 - Update default libraries config.
+- Remove no longer needed node option: -openssl-legacy-provider.
+- Fix a couple of vulnerable dependencies.
 - replace reakit with ariakit
 - Update nextjs to v15, react to v18
 - Fix check on redirect URL to make sure it doesn't start with HTTP, instead of contain HTTP, since it was falsely matching some legitimate URLs.
