@@ -2,6 +2,7 @@
 
 ### UNRELEASED CHANGES
 
+- Update default libraries config.
 - replace reakit with ariakit
 - Update nextjs to v15, react to v18
 - Fix check on redirect URL to make sure it doesn't start with HTTP, instead of contain HTTP, since it was falsely matching some legitimate URLs.
