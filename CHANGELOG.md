@@ -2,6 +2,7 @@
 
 ### UNRELEASED CHANGES
 
+- Update default libraries config.
 - Remove no longer needed node option: -openssl-legacy-provider.
 - Fix a couple of vulnerable dependencies.
 - replace reakit with ariakit
