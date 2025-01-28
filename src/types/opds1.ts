@@ -10,6 +10,7 @@
 /**
  * Link Relations
  */
+export const SelfRel = "self";
 export const AuthDocLinkRelation = "http://opds-spec.org/auth/document";
 export const AcquisitionLinkRel = "http://opds-spec.org/acquisition";
 export const BorrowLinkRel = "http://opds-spec.org/acquisition/borrow";
@@ -17,6 +18,7 @@ export const RevokeLinkRel = "http://librarysimplified.org/terms/rel/revoke";
 export const TrackOpenBookRel =
   "http://librarysimplified.org/terms/rel/analytics/open-book";
 export type AnyLinkRelation =
+  | typeof SelfRel
   | typeof AuthDocLinkRelation
   | typeof AcquisitionLinkRel
   | typeof BorrowLinkRel
@@ -135,6 +137,7 @@ export interface Link {
 export const CatalogRootRel = "start";
 export const ShelfLinkRel = "http://opds-spec.org/shelf";
 type AuthDocLinkRelations =
+  | typeof SelfRel
   | typeof CatalogRootRel
   | typeof ShelfLinkRel
   | "navigation"
