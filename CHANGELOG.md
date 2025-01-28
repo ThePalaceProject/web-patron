@@ -2,6 +2,7 @@
 
 ### UNRELEASED CHANGES
 
+- Log auth document URL when Catalog Root link missing. (PP-1209)
 - Update default libraries config.
 - Remove no longer needed node option: -openssl-legacy-provider.
 - Fix a couple of vulnerable dependencies.

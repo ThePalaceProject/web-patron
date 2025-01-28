@@ -47,18 +47,21 @@ function getShelfUrl(authDoc: OPDS1.AuthDocument): string | null {
 }
 
 /**
- * Extracts the catalot root url from an auth document
+ * Extracts the catalog root url from an auth document
  */
 function getCatalogUrl(authDoc: OPDS1.AuthDocument): string {
-  const url =
-    authDoc.links?.find(link => {
-      return link.rel === OPDS1.CatalogRootRel;
-    })?.href ?? null;
+  const url: string | undefined = authDoc.links?.find(
+    link => link.rel === OPDS1.CatalogRootRel
+  )?.href;
 
-  if (!url)
+  if (!url) {
+    const selfUrl =
+      authDoc.links?.find(link => link.rel === OPDS1.SelfRel)?.href ??
+      "(unknown: missing auth doc 'self' link or href)";
     throw new ApplicationError({
-      detail: "No Catalog Root Url present in Auth Document."
+      detail: `No Catalog Root URL present in Auth Document at ${selfUrl}.`
     });
+  }
 
   return url;
 }
