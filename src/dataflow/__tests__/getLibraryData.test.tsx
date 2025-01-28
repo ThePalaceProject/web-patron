@@ -111,6 +111,34 @@ describe("buildLibraryData", () => {
     });
   });
 
+  test("throws ApplicationError with auth doc URL, if auth doc has no catalog root url", () => {
+    // Make sure that the error is actually thrown.
+    expect.assertions(2);
+
+    try {
+      buildLibraryData(fixtures.authDocNoCatalogRoot, "librarySlug");
+    } catch (error) {
+      expect(error).toBeInstanceOf(ApplicationError);
+      expect(error.message).toBe(
+        "Application Error: No Catalog Root URL present in Auth Document at /auth-doc."
+      );
+    }
+  });
+
+  test("throws ApplicationError without auth doc URL, if auth doc has no self url", () => {
+    // Make sure that the error is actually thrown.
+    expect.assertions(2);
+
+    try {
+      buildLibraryData(fixtures.authDocNoLinks, "librarySlug");
+    } catch (error) {
+      expect(error).toBeInstanceOf(ApplicationError);
+      expect(error.message).toBe(
+        "Application Error: No Catalog Root URL present in Auth Document at (unknown: missing auth doc 'self' link or href)."
+      );
+    }
+  });
+
   test("correctly parses web_color_scheme", () => {
     const library = buildLibraryData(
       {
