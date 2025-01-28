@@ -2,7 +2,6 @@ import { LibraryData, LibraryLinks, OPDS1 } from "interfaces";
 import ApplicationError, { PageNotFoundError, ServerError } from "errors";
 import { flattenSamlMethod } from "utils/auth";
 import { APP_CONFIG } from "utils/env";
-import { AuthDocumentLink } from "../types/opds1";
 
 /**
  * Interprets the app config to return the auth document url.
@@ -48,19 +47,18 @@ function getShelfUrl(authDoc: OPDS1.AuthDocument): string | null {
 }
 
 /**
- * Extracts the catalog root url from an auth document
+ * Extracts the catalot root url from an auth document
  */
 function getCatalogUrl(authDoc: OPDS1.AuthDocument): string {
-  const url: string | undefined =
-    authDoc.links?.find(link => link.rel === OPDS1.CatalogRootRel)?.href ?? null;
+  const url =
+    authDoc.links?.find(link => {
+      return link.rel === OPDS1.CatalogRootRel;
+    })?.href ?? null;
 
-  if (!url) {
-    const selfUrl =
-      authDoc.links?.find(link => link.rel === OPDS1.SelfRel)?.href ?? "(unknown: missing auth doc 'self' link or href)";
+  if (!url)
     throw new ApplicationError({
-      detail: `No Catalog Root URL present in Auth Document at ${selfUrl}.`
+      detail: "No Catalog Root Url present in Auth Document."
     });
-  }
 
   return url;
 }
