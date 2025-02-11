@@ -160,6 +160,7 @@ export type Book<Status = EmptyObject> = Readonly<
     publisher?: string;
     published?: string;
     categories?: string[];
+    providerName?: string;
     language?: string;
     relatedUrl: string | null;
     raw?: any;

@@ -226,6 +226,8 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
 
   const trackOpenBookLink = entry.links.find(isTrackOpenBookLink);
 
+  const providerName = getProviderName(entry);
+
   const book: Book = {
     id: entry.id,
     title: entry.title,
@@ -246,6 +248,7 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
     publisher: entry.publisher,
     published: entry.issued && formatDate(entry.issued),
     categories: categories,
+    providerName: providerName,
     language: entry.language,
     url: detailUrl,
     relatedUrl: relatedLink?.href ?? null,
@@ -333,6 +336,19 @@ function getBorrowLink(
     return false;
   });
   return supportedLink ?? null;
+}
+
+/**
+ * Extracts provider name from entry.unparsed,
+ * because opds-feed-parser doesn't parse bibframe:distribution.
+ * Messy, but grabs provider name from tag spit out by xml2js
+ */
+function getProviderName(entry: OPDSEntry): string | undefined {
+  const tag = entry.unparsed?.["bibframe:distribution"];
+  // grabbing first, assuming only one distributor
+  const attr = tag?.[0]?.["$"];
+  const providerName = attr?.["bibframe:ProviderName"];
+  return providerName?.value;
 }
 
 function entryToLink(entry: OPDSEntry, feedUrl: string): LinkData | null {

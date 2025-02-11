@@ -96,6 +96,10 @@ export const BookDetails: React.FC = () => {
                 heading="Categories"
                 details={book.categories?.join(", ")}
               />
+              <DetailField
+                heading="Distributed by"
+                details={book.providerName}
+              />
             </div>
             <ReportProblem book={book} />
           </div>
