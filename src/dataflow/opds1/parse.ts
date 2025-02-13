@@ -345,13 +345,6 @@ function getBorrowLink(
  * because opds-feed-parser doesn't parse bibframe:distribution.
  * Messy, but grabs provider name from tag spit out by xml2js
  */
-// function getProviderName(entry: OPDSEntry): string | undefined {
-//   const tag = entry.unparsed?.["bibframe:distribution"];
-//   // grabbing first, assuming only one distributor
-//   const attr = tag?.[0]?.["$"];
-//   const providerName = attr?.["bibframe:ProviderName"];
-//   return providerName?.value;
-// }
 function getProviderName(
   bibframeTags: Map<string, XMLTagWithAttributes> | null
 ): string | undefined {
