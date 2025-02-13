@@ -258,6 +258,27 @@ export interface LinkData {
 }
 
 /**
+ * Xml2js
+ */
+interface XMLAttribute {
+  local?: string;
+  name?: string;
+  prefix?: string;
+  uri?: string;
+  value?: string;
+}
+
+interface XMLNamespace {
+  uri?: string;
+  local?: string;
+}
+
+export interface XMLTagWithAttributes {
+  $?: XMLAttribute;
+  $ns?: XMLNamespace;
+}
+
+/**
  * Complaints
  */
 
