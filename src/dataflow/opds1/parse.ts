@@ -340,6 +340,14 @@ function getBorrowLink(
   return supportedLink ?? null;
 }
 
+function findFirstAttributeValue(
+  tag: XMLTagWithAttributes | undefined,
+  attributeName: string
+): string | undefined {
+  const attr = tag?.[0]?.["$"];
+  return attr?.[attributeName]?.value;
+}
+
 /**
  * Extracts provider name from entry.unparsed,
  * because opds-feed-parser doesn't parse bibframe:distribution.
@@ -351,9 +359,7 @@ function getProviderName(
   if (bibframeTags) {
     const tag = bibframeTags.get("bibframe:distribution");
     // grabbing first, assuming only one distributor
-    const attr = tag?.[0]?.["$"];
-    const providerName = attr?.["bibframe:ProviderName"];
-    return providerName?.value;
+    return findFirstAttributeValue(tag, "bibframe:distribution");
   }
   return undefined;
 }
