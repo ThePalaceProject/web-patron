@@ -359,7 +359,7 @@ function getProviderName(
   if (bibframeTags) {
     const tag = bibframeTags.get("bibframe:distribution");
     // grabbing first, assuming only one distributor
-    return findFirstAttributeValue(tag, "bibframe:distribution");
+    return findFirstAttributeValue(tag, "bibframe:ProviderName");
   }
   return undefined;
 }
