@@ -160,6 +160,7 @@ export type Book<Status = EmptyObject> = Readonly<
     publisher?: string;
     published?: string;
     categories?: string[];
+    providerName?: string;
     language?: string;
     relatedUrl: string | null;
     raw?: any;
@@ -254,6 +255,27 @@ export interface LinkData {
   url: string;
   id?: string | null;
   type?: string;
+}
+
+/**
+ * Xml2js
+ */
+interface XMLAttribute {
+  local?: string;
+  name?: string;
+  prefix?: string;
+  uri?: string;
+  value?: string;
+}
+
+interface XMLNamespace {
+  uri?: string;
+  local?: string;
+}
+
+export interface XMLTagWithAttributes {
+  $?: XMLAttribute;
+  $ns?: XMLNamespace;
 }
 
 /**

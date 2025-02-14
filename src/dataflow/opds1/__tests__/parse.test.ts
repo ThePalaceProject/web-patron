@@ -112,7 +112,26 @@ test("extracts basic book info", () => {
       name: "Fake Series",
       position: 2
     },
-    language: "en"
+    language: "en",
+    unparsed: {
+      "bibframe:distribution": [
+        {
+          $: {
+            "bibframe:ProviderName": {
+              name: "bibframe:ProviderName",
+              value: "Standard Ebooks",
+              prefix: "bibframe",
+              local: "ProviderName",
+              uri: "http://bibframe.org/vocab/"
+            }
+          },
+          $ns: {
+            uri: "http://bibframe.org/vocab/",
+            local: "distribution"
+          }
+        }
+      ]
+    }
   });
 
   const acquisitionFeed = factory.acquisitionFeed({
@@ -168,7 +187,8 @@ const basicInfo = {
   authors: [factory.contributor({ name: "Clive Cussler" })],
   contributors: [factory.contributor({ name: "Contrib" })],
   categories: [factory.category({ label: "label" })],
-  summary: "summary"
+  summary: "summary",
+  unparsed: {}
 };
 test("doesn't include borrow links without supported formats", () => {
   mockConfig({

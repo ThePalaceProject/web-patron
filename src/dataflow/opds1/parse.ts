@@ -23,7 +23,8 @@ import {
   BookAvailability,
   OPDS1,
   FulfillmentLink,
-  AnyBook
+  AnyBook,
+  XMLTagWithAttributes
 } from "interfaces";
 import { IncorrectAdobeDrmMediaType } from "types/opds1";
 import { getAppSupportLevel } from "utils/fulfill";
@@ -226,6 +227,9 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
 
   const trackOpenBookLink = entry.links.find(isTrackOpenBookLink);
 
+  const bibframeTags = entryToBibframeData(entry);
+  const providerName = getProviderName(bibframeTags);
+
   const book: Book = {
     id: entry.id,
     title: entry.title,
@@ -246,6 +250,7 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
     publisher: entry.publisher,
     published: entry.issued && formatDate(entry.issued),
     categories: categories,
+    providerName: providerName,
     language: entry.language,
     url: detailUrl,
     relatedUrl: relatedLink?.href ?? null,
@@ -333,6 +338,46 @@ function getBorrowLink(
     return false;
   });
   return supportedLink ?? null;
+}
+
+function findFirstAttributeValue(
+  tag: XMLTagWithAttributes | undefined,
+  attributeName: string
+): string | undefined {
+  const attr = tag?.[0]?.["$"];
+  return attr?.[attributeName]?.value;
+}
+
+/**
+ * Extracts provider name from entry.unparsed,
+ * because opds-feed-parser doesn't parse bibframe:distribution.
+ * Messy, but grabs provider name from tag spit out by xml2js
+ */
+function getProviderName(
+  bibframeTags: Map<string, XMLTagWithAttributes> | null
+): string | undefined {
+  if (bibframeTags) {
+    const tag = bibframeTags.get("bibframe:distribution");
+    // grabbing first, assuming only one distributor
+    return findFirstAttributeValue(tag, "bibframe:ProviderName");
+  }
+  return undefined;
+}
+
+function entryToBibframeData(
+  entry: OPDSEntry
+): Map<string, XMLTagWithAttributes> | null {
+  const bibframeRegEx = /bibframe:/g;
+  if (entry.unparsed) {
+    const tags = new Map();
+    for (const tag in entry.unparsed) {
+      if (Object.hasOwn(entry.unparsed, tag) && bibframeRegEx.test(tag)) {
+        tags.set(tag, entry.unparsed[tag]);
+      }
+    }
+    return tags.size > 0 ? tags : null;
+  }
+  return null;
 }
 
 function entryToLink(entry: OPDSEntry, feedUrl: string): LinkData | null {

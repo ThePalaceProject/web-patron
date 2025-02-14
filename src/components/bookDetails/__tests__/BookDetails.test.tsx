@@ -88,6 +88,15 @@ describe("book details page", () => {
     expect(screen.getByText("Publisher:")).toBeInTheDocument();
   });
 
+  test("shows provider name", () => {
+    mockSwr({ data: fixtures.book });
+    setup(<BookDetails />);
+    const providerName = fixtures.book.providerName as string;
+
+    expect(screen.getByText(providerName)).toBeInTheDocument();
+    expect(screen.getByText("Distributed by:")).toBeInTheDocument();
+  });
+
   test("does not show simplyE callout when NEXT_PUBLIC_COMPANION_APP is 'openebooks'", () => {
     mockConfig({ companionApp: "openebooks" });
     mockSwr({ data: fixtures.book });
