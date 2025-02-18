@@ -10,8 +10,16 @@ const package = require("./package.json");
 const APP_VERSION = package.version;
 const { NODE_ENV, CONFIG_FILE, REACT_AXE } = process.env;
 
-const log = (...message) =>
-  console.log(chalk.blue("app info") + "  -", ...message);
+const logger = require("./logger.js");
+
+// const log = (...message) =>
+//   console.log(chalk.blue("app info") + "  -", ...message);
+const log = (message, ...metadata) =>
+  logger.log({
+    level: "info",
+    message: "app info" + " - " + message,
+    metadata
+  });
 
 // Compute some git info by running commands in a child process
 const execSync = require("child_process").execSync;

@@ -37,3 +37,7 @@ wallaby.js
 
 # storybook
 storybook-static
+
+# logging
+/logs/*
+audit.json
