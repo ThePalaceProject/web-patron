@@ -2,6 +2,7 @@
 
 ### UNRELEASED CHANGES
 
+- Don't include not yet implemented Basic Token auth as available auth mechanisms. (PP-2188)
 - distributor added to book details page
 - Log auth document URL when Catalog Root link missing. (PP-1209)
 - Update default libraries config.
