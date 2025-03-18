@@ -31,7 +31,12 @@ export type OpenEbooksConfig = {
   defaultLibrary: string;
 };
 
-export type MediaSupportConfig = DirectMediaSupport & IndirectMediaSupport;
+export type MediaSupportConfig = Partial<DefaultMediaSupport> &
+  DirectMediaSupport &
+  IndirectMediaSupport;
+type DefaultMediaSupport = {
+  default: MediaSupportLevel;
+};
 export type DirectMediaSupport = Partial<
   Record<OPDS1.AnyBookMediaType, MediaSupportLevel>
 >;
