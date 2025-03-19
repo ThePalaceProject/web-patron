@@ -2,6 +2,7 @@
 
 ### UNRELEASED CHANGES
 
+- Allows configuration of media support default for unmatched content types. (PP-2190)
 - distributor added to book details page
 - Log auth document URL when Catalog Root link missing. (PP-1209)
 - Update default libraries config.
