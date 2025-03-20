@@ -87,10 +87,15 @@ export interface ClientBasicMethod extends OPDS1.BasicAuthMethod {
   id: string;
 }
 
+export interface ClientBasicTokenMethod extends OPDS1.BasicTokenAuthMethod {
+  id: string;
+}
+
 // auth methods once they have been processed for the app
 export type AppAuthMethod =
   | ClientCleverMethod
   | ClientBasicMethod
+  | ClientBasicTokenMethod
   | ClientSamlMethod;
 
 export interface AuthCredentials {
