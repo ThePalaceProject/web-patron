@@ -7,22 +7,22 @@ import AuthButton from "auth/AuthButton";
 import ExternalLink from "components/ExternalLink";
 import FormLabel from "components/form/FormLabel";
 import Stack from "components/Stack";
-import { AppAuthMethod, OPDS1 } from "interfaces";
+import { AppAuthMethod } from "interfaces";
 import { Select } from "theme-ui";
 import { Text } from "components/Text";
 import LoadingIndicator from "components/LoadingIndicator";
 import useLogin from "auth/useLogin";
+import { isSupportedAuthType } from "./AuthenticationHandler";
 
 export default function LoginPicker(): React.ReactElement {
   const { initLogin } = useLogin();
 
-  // TODO: This is a temporary hack to filter out BasicTokenAuth.
-  //  We can remove it once we actually implement support for BasicTokenAuth.
-  //  We're aliasing the `authMethods` variable here so that we can end up with
-  //  the same variable name after filtering.
-  const { authMethods: auth1MethodsFromAuthDocument } = useLibraryContext();
-  const authMethods = auth1MethodsFromAuthDocument.filter(
-    m => m.type !== OPDS1.BasicTokenAuthType
+  // Here we filter out any methods from the auth document that we don't support.
+  // We're aliasing the `authMethods` variable here so that we can end up with
+  // the same variable name after filtering.
+  const { authMethods: methodsFromAuthDocument } = useLibraryContext();
+  const authMethods = methodsFromAuthDocument.filter(m =>
+    isSupportedAuthType(m.type)
   );
 
   /**

@@ -6,13 +6,10 @@ import LoginWrapper from "auth/LoginWrapper";
 import { useRouter } from "next/router";
 import extractParam from "dataflow/utils";
 import useLibraryContext from "components/context/LibraryContext";
-import BasicAuthHandler from "auth/BasicAuthHandler";
-import { OPDS1 } from "interfaces";
-import CleverAuthHandler from "auth/CleverAuthHandler";
-import SamlAuthHandler from "auth/SamlAuthHandler";
 import track from "analytics/track";
 import ApplicationError from "errors";
 import useLogin from "auth/useLogin";
+import AuthenticationHandler from "../../../auth/AuthenticationHandler";
 
 const LoginHandlerPage: NextPage<AppProps> = ({ library, error }) => {
   return (
@@ -40,18 +37,13 @@ const LoginComponent = () => {
     );
     // go back to base login page
     initLogin();
+    // `initLogin() redirects us away, so we shouldn't need the `return` here. But
+    // TS doesn't know that, so we return here to narrow `method`s type below.
+    return null;
   }
 
-  switch (method?.type) {
-    case OPDS1.BasicAuthType:
-      return <BasicAuthHandler method={method} />;
-    case OPDS1.SamlAuthType:
-      return <SamlAuthHandler method={method} />;
-    case OPDS1.CleverAuthType:
-      return <CleverAuthHandler method={method} />;
-    default:
-      return <p>This authentication method is not supported.</p>;
-  }
+  // Return the right component for the method.
+  return <AuthenticationHandler method={method} />;
 };
 
 export const getStaticProps: GetStaticProps = withAppProps();

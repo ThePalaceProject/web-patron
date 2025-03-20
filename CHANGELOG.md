@@ -2,6 +2,7 @@
 
 ### UNRELEASED CHANGES
 
+- Exclude all unsupported authentication mechanisms from the login page. (PP-2188)
 - Don't include not yet implemented Basic Token auth as available auth mechanisms. (PP-2188)
 - Allows configuration of media support default for unmatched content types. (PP-2190)
 - distributor added to book details page
