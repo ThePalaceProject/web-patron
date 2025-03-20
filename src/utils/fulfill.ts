@@ -207,17 +207,19 @@ export function dedupeLinks(links: readonly FulfillmentLink[]) {
 export function getAppSupportLevel(
   contentType: OPDS1.AnyBookMediaType,
   indirectionType: OPDS1.IndirectAcquisitionType | undefined
-): MediaSupportLevel | "unsupported" {
-  const mediaSupport = APP_CONFIG.mediaSupport;
+): MediaSupportLevel {
+  const { mediaSupport } = APP_CONFIG;
+  const defaultSupportLevel: MediaSupportLevel =
+    mediaSupport?.default ?? "unsupported";
 
   // if there is indirection, we search through the dictionary nested inside the
   // indirectionType
   if (indirectionType) {
     const supportLevel = mediaSupport[indirectionType]?.[contentType];
-    return supportLevel ?? "unsupported";
+    return supportLevel ?? defaultSupportLevel;
   }
 
-  return mediaSupport[contentType] ?? "unsupported";
+  return mediaSupport[contentType] ?? defaultSupportLevel;
 }
 
 /**
