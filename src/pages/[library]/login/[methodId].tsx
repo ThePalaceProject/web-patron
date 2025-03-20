@@ -9,7 +9,9 @@ import useLibraryContext from "components/context/LibraryContext";
 import track from "analytics/track";
 import ApplicationError from "errors";
 import useLogin from "auth/useLogin";
-import authenticationHandlers from "../../../auth/authenticationHandlers";
+import authenticationHandlers, {
+  AuthHandlerWrapper
+} from "../../../auth/AuthenticationHandlers";
 
 const LoginHandlerPage: NextPage<AppProps> = ({ library, error }) => {
   return (
@@ -54,8 +56,7 @@ const LoginComponent = () => {
   }
 
   // Finally, the normal path leads to rendering the correct authentication handler.
-  // @ts-expect-error: Don't have the method types exactly right yet.
-  return React.createElement(AuthHandler, { method });
+  return <AuthHandlerWrapper method={method} />;
 };
 
 export const getStaticProps: GetStaticProps = withAppProps();

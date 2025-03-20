@@ -39,4 +39,24 @@ const authHandlers: {
 export const isSupportedAuthType = (type: string): boolean =>
   type in authHandlers;
 
+interface AuthHandlerWrapperProps {
+  method: { type: SupportedAuthTypes } & any;
+}
+
+export const AuthHandlerWrapper: React.ComponentType<AuthHandlerWrapperProps> = ({
+  method
+}) => {
+  const AuthHandler = authHandlers[method.type];
+
+  if (method.type === BasicAuthType && typeof method !== "string") {
+    return <AuthHandler method={method as ClientBasicMethod} />;
+  } else if (method.type === SamlAuthType && typeof method !== "string") {
+    return <AuthHandler method={method as ClientSamlMethod} />;
+  } else if (method.type === CleverAuthType && typeof method !== "string") {
+    return <AuthHandler method={method as CleverAuthMethod} />;
+  } else {
+    return null;
+  }
+};
+
 export default authHandlers;
