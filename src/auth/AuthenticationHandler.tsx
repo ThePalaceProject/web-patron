@@ -9,13 +9,15 @@ import {
   CleverAuthMethod,
   SamlAuthType
 } from "../types/opds1";
+import track from "../analytics/track";
+import ApplicationError from "../errors";
 
 type SupportedAuthTypes =
   | typeof BasicAuthType
   | typeof SamlAuthType
   | typeof CleverAuthType;
 
-type AuthHandlerProps = {
+type SupportedAuthHandlerProps = {
   [key in SupportedAuthTypes]: key extends typeof BasicAuthType
     ? ClientBasicMethod
     : key extends typeof SamlAuthType
@@ -28,8 +30,10 @@ type AuthHandlerProps = {
 // Canonical map of auth types to their respective handler components.
 // All auth types should be listed here, so that they can be
 // considered for use. Types not listed here will not be used.
-const authHandlers: {
-  [key in SupportedAuthTypes]: React.FC<{ method: AuthHandlerProps[key] }>;
+export const authHandlers: {
+  [key in SupportedAuthTypes]: React.ComponentType<{
+    method: SupportedAuthHandlerProps[key];
+  }>;
 } = {
   [BasicAuthType]: BasicAuthHandler,
   [SamlAuthType]: SamlAuthHandler,
@@ -43,20 +47,28 @@ interface AuthHandlerWrapperProps {
   method: { type: SupportedAuthTypes } & any;
 }
 
-export const AuthHandlerWrapper: React.ComponentType<AuthHandlerWrapperProps> = ({
+const AuthenticationHandler: React.ComponentType<AuthHandlerWrapperProps> = ({
   method
 }) => {
-  const AuthHandler = authHandlers[method.type];
+  const _AuthHandler = authHandlers[method.type];
 
   if (method.type === BasicAuthType && typeof method !== "string") {
-    return <AuthHandler method={method as ClientBasicMethod} />;
+    return <_AuthHandler method={method as ClientBasicMethod} />;
   } else if (method.type === SamlAuthType && typeof method !== "string") {
-    return <AuthHandler method={method as ClientSamlMethod} />;
+    return <_AuthHandler method={method as ClientSamlMethod} />;
   } else if (method.type === CleverAuthType && typeof method !== "string") {
-    return <AuthHandler method={method as CleverAuthMethod} />;
+    return <_AuthHandler method={method as CleverAuthMethod} />;
   } else {
-    return null;
+    // We should never get here, but if we do, we want to know about it.
+    // We'll log it and render a helpful message to the user.
+    track.error(
+      new ApplicationError({
+        title: "Login Method Not Supported",
+        detail: `Failed to render what should be a supported authentication method. Is the LoginPicker method filtering correctly configured? Method ID: ${method.id}`
+      })
+    );
+    return <p>This authentication method is not supported.</p>;
   }
 };
 
-export default authHandlers;
+export default AuthenticationHandler;

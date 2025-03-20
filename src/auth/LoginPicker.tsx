@@ -12,7 +12,7 @@ import { Select } from "theme-ui";
 import { Text } from "components/Text";
 import LoadingIndicator from "components/LoadingIndicator";
 import useLogin from "auth/useLogin";
-import { isSupportedAuthType } from "./AuthenticationHandlers";
+import { isSupportedAuthType } from "./AuthenticationHandler";
 
 export default function LoginPicker(): React.ReactElement {
   const { initLogin } = useLogin();
