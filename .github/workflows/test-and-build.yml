@@ -151,8 +151,10 @@ jobs:
 
     steps:
       # Using this multiple times, so set it once here.
-      - name: Set IMAGE_NAME
-        run: echo "IMAGE_NAME=${{ env.REGISTRY_HOST }}/${{ github.repository_owner }}/${{ github.event.repository.name }}" >> $GITHUB_ENV
+      - name: Set IMAGE_NAME in the environment
+        run: |
+          REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "IMAGE_NAME=${{ env.REGISTRY_HOST }}/${REPO_OWNER}/${{ github.event.repository.name }}" >> $GITHUB_ENV
 
       - uses: actions/checkout@v4
         with:
