@@ -140,7 +140,6 @@ jobs:
     env:
       REGISTRY_HOST: ghcr.io
       IMAGE_PUSH_ENABLED: ${{ secrets.NO_DOCKER_IMAGE == null }}
-      IMAGE_NAME: ${{ env.REGISTRY_HOST }}/${{ github.repository_owner }}/${{ github.event.repository.name }}
       # This gets us a real SHA for the SHA tag, instead of an ethereal one. See:
       # - https://github.com/docker/metadata-action?tab=readme-ov-file#environment-variables
       # - https://github.com/docker/metadata-action/issues/206
@@ -151,6 +150,10 @@ jobs:
       packages: write
 
     steps:
+      # Using this multiple times, so set it once here.
+      - name: Set IMAGE_NAME
+        run: echo "IMAGE_NAME=${{ env.REGISTRY_HOST }}/${{ github.repository_owner }}/${{ github.event.repository.name }}" >> $GITHUB_ENV
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
