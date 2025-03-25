@@ -140,6 +140,7 @@ jobs:
     env:
       REGISTRY_HOST: ghcr.io
       IMAGE_PUSH_ENABLED: ${{ secrets.NO_DOCKER_IMAGE == null }}
+      IMAGE_NAME: ${{ env.REGISTRY_HOST }}/${{ github.repository_owner }}/${{ github.event.repository.name }}
       # This gets us a real SHA for the SHA tag, instead of an ethereal one. See:
       # - https://github.com/docker/metadata-action?tab=readme-ov-file#environment-variables
       # - https://github.com/docker/metadata-action/issues/206
@@ -158,7 +159,7 @@ jobs:
         id: docker-image-tags
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY_HOST }}/${{ github.repository_owner }}/${{ github.event.repository.name }}
+          images: ${{ env.IMAGE_NAME }}
           tags: |
             type=semver,pattern={{major}}.{{minor}},priority=10
             type=semver,pattern={{version}},priority=20
@@ -190,5 +191,5 @@ jobs:
           file: ./Dockerfile
           push: ${{ env.IMAGE_PUSH_ENABLED }}
           tags: ${{ steps.docker-image-tags.outputs.tags }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
+          cache-from: type=registry,ref=${{ env.IMAGE_NAME }}-cache
+          cache-to: type=registry,ref=${{ env.IMAGE_NAME }}-cache,mode=max
