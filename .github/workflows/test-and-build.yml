@@ -196,5 +196,5 @@ jobs:
           file: ./Dockerfile
           push: ${{ env.IMAGE_PUSH_ENABLED }}
           tags: ${{ steps.docker-image-tags.outputs.tags }}
-          cache-from: type=registry,ref=${{ env.IMAGE_NAME }}-cache
-          cache-to: type=registry,ref=${{ env.IMAGE_NAME }}-cache,mode=max
+          cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:build-cache
+          cache-to: type=registry,ref=${{ env.IMAGE_NAME }}:build-cache,mode=max
