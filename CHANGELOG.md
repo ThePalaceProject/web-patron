@@ -2,6 +2,8 @@
 
 ### UNRELEASED CHANGES
 
+- Change test/build GitHub workflow to build after tests. (PP-1222)
+  - Once this change is merged, we will abandon this change log and use GitHub release notes instead.
 - Exclude all unsupported authentication mechanisms from the login page. (PP-2188)
 - Don't include not yet implemented Basic Token auth as available auth mechanisms. (PP-2188)
 - Allows configuration of media support default for unmatched content types. (PP-2190)
