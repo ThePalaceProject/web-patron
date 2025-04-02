@@ -175,6 +175,8 @@ export interface AuthDocumentLink extends Link {
 }
 
 export const BasicAuthType = "http://opds-spec.org/auth/basic";
+export const BasicTokenAuthType =
+  "http://thepalaceproject.org/authtype/basic-token";
 export const SamlAuthType = "http://librarysimplified.org/authtype/SAML-2.0";
 export const CleverAuthType =
   "http://librarysimplified.org/authtype/OAuth-with-intermediary";
@@ -184,6 +186,7 @@ export const PasswordCredentialsAuthType =
 
 export type AnyAuthType =
   | typeof BasicAuthType
+  | typeof BasicTokenAuthType
   | typeof SamlAuthType
   | typeof CleverAuthType
   | typeof ImplicitGrantAuthType
@@ -213,6 +216,12 @@ export interface BasicAuthMethod extends AuthMethod<typeof BasicAuthType> {
   };
 }
 
+// TODO: This may need adjustment when we actually implement BasicTokenAuth.
+//  In the mean time, we'll borrow some properties from BasicAuthMethod.
+export interface BasicTokenAuthMethod
+  extends Omit<BasicAuthMethod, "type">,
+    AuthMethod<typeof BasicTokenAuthType> {}
+
 export interface AuthInput {
   keyboard?: Keyboard;
 }
@@ -227,6 +236,7 @@ export enum Keyboard {
 export type ServerAuthMethod =
   | CleverAuthMethod
   | BasicAuthMethod
+  | BasicTokenAuthMethod
   | ServerSamlMethod;
 
 export interface Announcement {

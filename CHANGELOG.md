@@ -2,8 +2,13 @@
 
 ### UNRELEASED CHANGES
 
-- Book format (ePub, PDF, Audiobook) added to book details page
-- Distributor added to book details page
+- Add book format (ePub, PDF, Audiobook) to book details page (PP-2191)
+- Change test/build GitHub workflow to build after tests. (PP-1222)
+- Once this change is merged, we will abandon this change log and use GitHub release notes instead.
+- Exclude all unsupported authentication mechanisms from the login page. (PP-2188)
+- Don't include not yet implemented Basic Token auth as available auth mechanisms. (PP-2188)
+- Allows configuration of media support default for unmatched content types. (PP-2190)
+- distributor added to book details page
 - Log auth document URL when Catalog Root link missing. (PP-1209)
 - Update default libraries config.
 - Remove no longer needed node option: -openssl-legacy-provider.
