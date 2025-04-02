@@ -2,7 +2,8 @@
 
 ### UNRELEASED CHANGES
 
-- distributor added to book details page
+- Book format (ePub, PDF, Audiobook) added to book details page
+- Distributor added to book details page
 - Log auth document URL when Catalog Root link missing. (PP-1209)
 - Update default libraries config.
 - Remove no longer needed node option: -openssl-legacy-provider.
