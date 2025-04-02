@@ -628,3 +628,63 @@ test("extracts top-level links", () => {
   ]);
   expect(types).toEqual(["about", "terms-of-service"]);
 });
+
+test("extracts inferred eBook format from acquisition links", () => {
+  mockConfig();
+  const borrowLink = factory.acquisitionLink({
+    href: "http://example.com/borrow",
+    rel: OPDSAcquisitionLink.BORROW_REL,
+    availability: { status: "unavailable" },
+    indirectAcquisitions: [
+      {
+        type: OPDS1.AxisNowWebpubMediaType,
+        indirectAcquisitions: [
+          {
+            type: OPDS1.EpubMediaType,
+            href: "/epub"
+          }
+        ]
+      },
+      {
+        type: OPDS1.PdfMediaType
+      }
+    ]
+  });
+
+  const entry = factory.entry({
+    ...basicInfo,
+    links: [detailLink, borrowLink]
+  });
+
+  const book = entryToBook(entry, "http://test-url.com");
+  expect(book.format).toBe("ePub");
+});
+
+test("extracts inferred Audiobook format from acquisition links", () => {
+  mockConfig();
+  const borrowLink = factory.acquisitionLink({
+    href: "http://example.com/borrow",
+    rel: OPDSAcquisitionLink.BORROW_REL,
+    availability: { status: "unavailable" },
+    indirectAcquisitions: [
+      {
+        type: OPDS1.AudiobookMediaType
+      }
+    ]
+  });
+
+  const entry = factory.entry({
+    ...basicInfo,
+    unparsed: {
+      $: {
+        "schema:additionalType": {
+          value: "http://bib.schema.org/Audiobook"
+        }
+      }
+    },
+    links: [detailLink, borrowLink]
+  });
+
+  const book = entryToBook(entry, "http://test-url.com");
+  expect(book.format).toBe("Audiobook");
+});

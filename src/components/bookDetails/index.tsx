@@ -100,6 +100,7 @@ export const BookDetails: React.FC = () => {
                 heading="Distributed by"
                 details={book.providerName}
               />
+              <DetailField heading="Book format" details={book.format} />
             </div>
             <ReportProblem book={book} />
           </div>

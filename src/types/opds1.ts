@@ -78,9 +78,11 @@ export type IndirectAcquisitionType =
 export const EpubMediaType = "application/epub+zip";
 export const KepubMediaType = "application/kepub+zip";
 export const PdfMediaType = "application/pdf";
+export const AudioMpegMediaType = "audio/mpeg";
 export const MobiPocketMediaType = "application/x-mobipocket-ebook";
 export const Mobi8Mediatype = "application/x-mobi8-ebook";
 export const AudiobookMediaType = "application/audiobook+json";
+export const LcpAudioBookMediaType = "application/audiobook+lcp";
 export const ExternalReaderMediaType =
   'text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"';
 export const OverdriveAudiobookMediaType =
@@ -94,10 +96,28 @@ export const AccessRestrictionAudiobookMediaType =
 export const FindawayAudiobookMediaType =
   "application/vnd.librarysimplified.findaway.license+json";
 
+export const EPUB_MEDIA_TYPES = [
+  AxisNowWebpubMediaType,
+  EpubMediaType,
+  KepubMediaType
+];
+
 export type ReadOnlineMediaType =
   | typeof ExternalReaderMediaType
   | typeof AxisNowWebpubMediaType
   | typeof OverdriveEbookMediaType;
+
+export type EpubFormatType =
+  | typeof EpubMediaType
+  | typeof KepubMediaType
+  | typeof AxisNowWebpubMediaType;
+
+export type PdfFormatType = typeof PdfMediaType;
+
+export type BookFormatType =
+  | ReadOnlineMediaType
+  | EpubFormatType
+  | PdfFormatType;
 
 export type DownloadMediaType =
   | typeof EpubMediaType

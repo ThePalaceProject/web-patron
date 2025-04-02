@@ -24,12 +24,18 @@ import {
   OPDS1,
   FulfillmentLink,
   AnyBook,
-  XMLTagWithAttributes
+  XMLTagWithAttributes,
+  BookFormat
 } from "interfaces";
-import { IncorrectAdobeDrmMediaType } from "types/opds1";
+import {
+  EPUB_MEDIA_TYPES,
+  IncorrectAdobeDrmMediaType,
+  PdfMediaType
+} from "types/opds1";
 import { getAppSupportLevel } from "utils/fulfill";
 import { TrackOpenBookRel } from "types/opds1";
 import DOMPurify from "dompurify";
+import { bookIsAudiobook } from "utils/book";
 
 /**
  * Parses OPDS 1.x Feed or Entry into a Collection or Book
@@ -99,6 +105,50 @@ function parseFormat(format: OPDSAcquisitionLink | OPDSIndirectAcquisition) {
     contentType,
     indirectionType
   };
+}
+
+/**
+ * Indirect acquisition utils
+ */
+const isIndirectAcquisitionOrType = link =>
+  link?.indirectAcquisitions || link?.type;
+
+const linearizeAcquisitions = ia =>
+  ia.indirectAcquisitions
+    ? ia.indirectAcquisitions.map(acquistion => acquistion.type)
+    : ia.type;
+
+/**
+ * If OPDS entry has more than one acquistion type,
+ * the OPDS acquisition specs specify preserving order of types.
+ * If an entry has "application/epub+zip" followed by "application/pdf",
+ * epub takes precedence. So, get first mimetype.
+ * @see https://github.com/io7m/opds-acquisition-spec?tab=readme-ov-file#linearized-acquisitions
+ */
+function inferEBookFormat(
+  borrowLink: OPDSAcquisitionLink | null
+): BookFormat | undefined {
+  const indirectAcquisitions = borrowLink?.indirectAcquisitions;
+  if (indirectAcquisitions && indirectAcquisitions.length > 0) {
+    const mimeType = indirectAcquisitions
+      .filter(isIndirectAcquisitionOrType)
+      .flatMap(linearizeAcquisitions)
+      .at(0);
+
+    if (mimeType) {
+      if (EPUB_MEDIA_TYPES.includes(mimeType)) {
+        return "ePub";
+      }
+
+      if (mimeType === PdfMediaType) {
+        return "PDF";
+      }
+    }
+
+    return undefined;
+  } else {
+    return undefined;
+  }
 }
 
 function getFormatSupportLevel(
@@ -194,6 +244,10 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
   const acquisitionLinks = entry.links.filter(isAcquisitionLink);
 
   const borrowLink = getBorrowLink(acquisitionLinks);
+  const format = bookIsAudiobook({ ...entry.unparsed, raw: entry.unparsed })
+    ? "Audiobook"
+    : inferEBookFormat(borrowLink);
+
   const { availability, holds, copies } = borrowLink ?? {};
 
   const openAccessLinks: FulfillmentLink[] = acquisitionLinks
@@ -255,6 +309,7 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
     url: detailUrl,
     relatedUrl: relatedLink?.href ?? null,
     trackOpenBookUrl: trackOpenBookLink?.href ?? null,
+    format: format,
     raw: entry.unparsed
   };
 

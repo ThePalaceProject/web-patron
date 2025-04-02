@@ -119,8 +119,10 @@ export type FulfillmentLink = {
   supportLevel: MediaSupportLevel;
 };
 
+export type AudioBookMedium = "http://bib.schema.org/Audiobook";
+
 export type BookMedium =
-  | "http://bib.schema.org/Audiobook"
+  | AudioBookMedium
   | "http://schema.org/EBook"
   | "http://schema.org/Book";
 
@@ -164,9 +166,12 @@ export type Book<Status = EmptyObject> = Readonly<
     language?: string;
     relatedUrl: string | null;
     raw?: any;
+    format?: BookFormat;
     trackOpenBookUrl: string | null;
   }
 >;
+
+export type BookFormat = "Audiobook" | "PDF" | "ePub";
 
 export type BorrowableBook = Book<{
   status: "borrowable";
