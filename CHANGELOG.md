@@ -2,6 +2,7 @@
 
 ### UNRELEASED CHANGES
 
+- Add book format (ePub, PDF, Audiobook) to book details page (PP-2191)
 - Change test/build GitHub workflow to build after tests. (PP-1222)
   - Once this change is merged, we will abandon this change log and use GitHub release notes instead.
 - Exclude all unsupported authentication mechanisms from the login page. (PP-2188)
