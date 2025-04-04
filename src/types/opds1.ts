@@ -107,10 +107,7 @@ export type ReadOnlineMediaType =
   | typeof AxisNowWebpubMediaType
   | typeof OverdriveEbookMediaType;
 
-export type EpubFormatType =
-  | typeof EpubMediaType
-  | typeof KepubMediaType
-  | typeof AxisNowWebpubMediaType;
+export type EpubFormatType = typeof EPUB_MEDIA_TYPES[number];
 
 export type PdfFormatType = typeof PdfMediaType;
 

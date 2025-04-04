@@ -144,11 +144,8 @@ function inferEBookFormat(
         return "PDF";
       }
     }
-
-    return undefined;
-  } else {
-    return undefined;
   }
+  return undefined;
 }
 
 function getFormatSupportLevel(
