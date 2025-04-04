@@ -20,8 +20,16 @@ test("Shows modal on click", async () => {
   await user.click(signOut);
 
   const modal = await screen.findByLabelText("Sign Out");
+  screen.debug(modal);
 
-  expect(modal).toHaveStyle("display: block");
+  expect(modal).toHaveStyle({
+    display: "block",
+    position: "fixed",
+    height: "fit-content",
+    maxWidth: "400px",
+    inset: "0.75rem",
+    margin: "auto"
+  });
   expect(modal).toBeVisible();
 
   expect(screen.getByText("Are you sure you want to sign out?")).toBeVisible();
