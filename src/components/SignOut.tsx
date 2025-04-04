@@ -27,9 +27,9 @@ export const SignOut: React.FC<SignOutProps> = ({
         Sign Out
       </DialogDisclosure>
       <Modal
+        hideOnClickOutside
         dialog={dialog}
         role="alertdialog"
-        hideOnClickOutside
         label="Sign Out"
         showClose={false}
       >

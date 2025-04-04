@@ -76,7 +76,6 @@ const BookCover: React.FC<{
           book={book}
           sx={{
             position: "absolute",
-            zIndex: 200,
             bottom: 0,
             left: 0,
             borderTopRightRadius: 1,
