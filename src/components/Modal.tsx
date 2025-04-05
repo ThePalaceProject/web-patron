@@ -2,8 +2,6 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-// import { DialogStateReturn, DialogBackdrop, Dialog } from "@ariakit/react";
-// import { Dialog } from "@ariakit/react/cjs/dialog";
 import { Dialog } from "@ariakit/react/dialog";
 import { Icon, IconNames } from "@nypl/design-system-react-components";
 import Button from "components/Button";
@@ -36,7 +34,6 @@ type ModalProps = {
 
 const Modal: React.FC<ModalProps> = ({
   dialog,
-  // isVisible,
   hide,
   children,
   label,
@@ -51,6 +48,15 @@ const Modal: React.FC<ModalProps> = ({
       role={role}
       className={className}
       hideOnInteractOutside={hideOnClickOutside}
+      backdrop={
+        <div
+          sx={{
+            backgroundColor: "rgb(0 0 0 / 0.1)",
+            "-webkit-backdrop-filter": "blur(4px)",
+            backdropFilter: "blur(4px)"
+          }}
+        ></div>
+      }
       sx={{
         background: "white",
         borderRadius: 2,
@@ -58,7 +64,11 @@ const Modal: React.FC<ModalProps> = ({
         px: 4,
         py: 3,
         m: 2,
-        position: "relative"
+        position: "fixed",
+        height: "fit-content",
+        maxWidth: "400px",
+        inset: "0.75rem",
+        margin: "auto"
       }}
       aria-label={label}
     >
@@ -80,9 +90,5 @@ const Modal: React.FC<ModalProps> = ({
     </Dialog>
   );
 };
-
-// const DialogClose: React.FC = () => {
-
-// }
 
 export default Modal;
