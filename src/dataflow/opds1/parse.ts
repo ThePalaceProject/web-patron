@@ -124,25 +124,33 @@ const linearizeAcquisitions = ia =>
  * If an entry has "application/epub+zip" followed by "application/pdf",
  * epub takes precedence. So, get first mimetype.
  * @see https://github.com/io7m/opds-acquisition-spec?tab=readme-ov-file#linearized-acquisitions
+ *
+ * If a book has been fulfilled in some way, then the mimetype can
+ * be derived from there
  */
 function inferEBookFormat(
+  fulfillmentLinks: FulfillmentLink[],
   borrowLink: OPDSAcquisitionLink | null
 ): BookFormat | undefined {
+  let mimeType: OPDS1.AnyBookMediaType | undefined;
+
   const indirectAcquisitions = borrowLink?.indirectAcquisitions;
-  if (indirectAcquisitions && indirectAcquisitions.length > 0) {
-    const mimeType = indirectAcquisitions
+  // Check fulfillment links first
+  if (fulfillmentLinks.length > 0) {
+    mimeType = fulfillmentLinks.map(link => link.contentType).at(0);
+  } else if (indirectAcquisitions && indirectAcquisitions.length > 0) {
+    mimeType = indirectAcquisitions
       .filter(isIndirectAcquisitionOrType)
       .flatMap(linearizeAcquisitions)
       .at(0);
+  }
 
-    if (mimeType) {
-      if (EPUB_MEDIA_TYPES.includes(mimeType)) {
-        return "ePub";
-      }
-
-      if (mimeType === PdfMediaType) {
-        return "PDF";
-      }
+  if (mimeType) {
+    if (EPUB_MEDIA_TYPES.includes(mimeType)) {
+      return "ePub";
+    }
+    if (mimeType === PdfMediaType) {
+      return "PDF";
     }
   }
   return undefined;
@@ -241,9 +249,6 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
   const acquisitionLinks = entry.links.filter(isAcquisitionLink);
 
   const borrowLink = getBorrowLink(acquisitionLinks);
-  const format = bookIsAudiobook({ ...entry.unparsed, raw: entry.unparsed })
-    ? "Audiobook"
-    : inferEBookFormat(borrowLink);
 
   const { availability, holds, copies } = borrowLink ?? {};
 
@@ -273,6 +278,10 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
   const supportedFulfillmentLinks = fulfillmentLinks.filter(
     link => link.supportLevel !== "unsupported"
   );
+
+  const format = bookIsAudiobook({ ...entry.unparsed, raw: entry.unparsed })
+    ? "Audiobook"
+    : inferEBookFormat(fulfillmentLinks, borrowLink);
 
   const revokeUrl = findRevokeUrl(entry.links);
 
