@@ -20,7 +20,6 @@ test("Shows modal on click", async () => {
   await user.click(signOut);
 
   const modal = await screen.findByLabelText("Sign Out");
-  screen.debug(modal);
 
   expect(modal).toHaveStyle({
     display: "block",

@@ -55,7 +55,7 @@ const ReportProblem: React.FC<{ book: AnyBook }> = ({ book }) => {
         dialog={dialog}
         label="Report a problem"
         hide={cancel}
-        sx={{ maxWidth: 600 }}
+        sx={{ maxWidth: "600px" }}
       >
         {state.success ? (
           <div sx={{ display: "flex", flexDirection: "column" }}>
