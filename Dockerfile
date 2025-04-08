@@ -24,4 +24,4 @@ EXPOSE $PORT
 # In this case, we run build-and-start to 
 # build the app with our env vars, delete
 # unnecessary files, and start the app.
-CMD npm run build-and-start
+CMD ["npm", "run", "build-and-start"]
