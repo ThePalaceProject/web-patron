@@ -97,6 +97,13 @@ describe("book details page", () => {
     expect(screen.getByText("Distributed by:")).toBeInTheDocument();
   });
 
+  test("shows book format", () => {
+    mockSwr({ data: fixtures.book });
+    setup(<BookDetails />);
+    expect(screen.getByText("Book format:")).toBeInTheDocument();
+    expect(screen.getByText("ePub")).toBeInTheDocument();
+  });
+
   test("does not show simplyE callout when NEXT_PUBLIC_COMPANION_APP is 'openebooks'", () => {
     mockConfig({ companionApp: "openebooks" });
     mockSwr({ data: fixtures.book });

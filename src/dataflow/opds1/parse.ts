@@ -126,7 +126,7 @@ const linearizeAcquisitions = ia =>
  * @see https://github.com/io7m/opds-acquisition-spec?tab=readme-ov-file#linearized-acquisitions
  *
  * If a book has been fulfilled in some way, then the mimetype can
- * be derived from there
+ * be derived from a book's aquisition links
  */
 function inferEBookFormat(
   fulfillmentLinks: FulfillmentLink[],

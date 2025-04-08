@@ -359,6 +359,23 @@ describe("FulfillableBook", () => {
     expect(book.status).toBe("fulfillable");
     expect(book.revokeUrl).toBe("/revoke");
   });
+
+  test("infers book format from fulfillable book acquisition link", () => {
+    mockConfig();
+    const fulfillmentLink = factory.acquisitionLink({
+      rel: OPDSAcquisitionLink.GENERIC_REL,
+      type: OPDS1.EpubMediaType,
+      href: "/epub"
+    });
+    const entry = factory.entry({
+      ...basicInfo,
+      links: [fulfillmentLink, detailLink]
+    });
+
+    const book = entryToBook(entry, "http://test-url.com");
+
+    expect(book.format).toBe("ePub");
+  });
 });
 
 test("includes open access links with fulfillable book", () => {
@@ -629,7 +646,7 @@ test("extracts top-level links", () => {
   expect(types).toEqual(["about", "terms-of-service"]);
 });
 
-test("extracts inferred eBook format from acquisition links", () => {
+test("extracts inferred eBook format from indirect acquisition links", () => {
   mockConfig();
   const borrowLink = factory.acquisitionLink({
     href: "http://example.com/borrow",
@@ -660,7 +677,7 @@ test("extracts inferred eBook format from acquisition links", () => {
   expect(book.format).toBe("ePub");
 });
 
-test("extracts inferred Audiobook format from acquisition links", () => {
+test("extracts inferred Audiobook format from indirect acquisition links", () => {
   mockConfig();
   const borrowLink = factory.acquisitionLink({
     href: "http://example.com/borrow",
