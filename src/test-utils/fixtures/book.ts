@@ -82,6 +82,7 @@ export const book: Book = {
   published: "February 29, 2016",
   categories: ["Children", "10-12", "Fiction", "Adventure", "Fantasy"],
   providerName: "Overdrive",
+  format: "ePub",
   raw: {
     $: { "schema:additionalType": { value: "http://schema.org/EBook" } },
     category: [
@@ -151,6 +152,30 @@ export const book: Book = {
             value: "/related-url"
           }
         }
+      },
+      {
+        "opds:indirectAcquisition": [
+          {
+            $: {
+              type: {
+                local: "type",
+                name: "type",
+                value: "application/vnd.adobe.adept+xml"
+              }
+            },
+            "opds:indirectAcquisition": [
+              {
+                $: {
+                  type: {
+                    local: "type",
+                    name: "type",
+                    value: "application/epub+zip"
+                  }
+                }
+              }
+            ]
+          }
+        ]
       }
     ]
   }
