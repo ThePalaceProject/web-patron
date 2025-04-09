@@ -1,19 +1,17 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import { jsx } from "theme-ui";
 import * as React from "react";
 import FormLabel from "./FormLabel";
 import TextInput from "../TextInput";
-import { InputIconButtonType } from "components/Button";
 
 type FormInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   name: string;
   label: string;
   error?: string;
   required?: boolean;
-  endIcon?: InputIconButtonType;
+  endIcon?: React.ReactNode;
 };
 
 const END_ICON_WIDTH = 40;
