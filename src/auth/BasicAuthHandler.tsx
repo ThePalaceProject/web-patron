@@ -6,7 +6,7 @@ import { jsx } from "theme-ui";
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { Text } from "components/Text";
-import Button, { NavButton } from "components/Button";
+import Button, { InputIconButton, NavButton } from "components/Button";
 import FormInput from "components/form/FormInput";
 import { modalButtonStyles } from "components/Modal";
 import { ClientBasicMethod } from "interfaces";
@@ -16,6 +16,8 @@ import { ServerError } from "errors";
 import useLogin from "auth/useLogin";
 import useLibraryContext from "components/context/LibraryContext";
 import { Keyboard } from "types/opds1";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
 type FormData = {
   [key: string]: string;
@@ -54,6 +56,13 @@ const BasicAuthHandler: React.FC<{ method: ClientBasicMethod }> = ({
   const hasPasswordInput =
     method.inputs?.password?.keyboard !== Keyboard.NoInput;
 
+  const [showPassword, setShowPassword] = React.useState(false);
+  const togglePasswordVisibility = event => {
+    event.preventDefault();
+    event.stopPropagation();
+    setShowPassword(!showPassword);
+  };
+
   return (
     <form
       onSubmit={onSubmit}
@@ -88,11 +97,19 @@ const BasicAuthHandler: React.FC<{ method: ClientBasicMethod }> = ({
             maxLength: 25
           })}
           id="password"
-          type="password"
+          type={showPassword ? "text" : "password"}
           placeholder={passwordInputName}
           error={
             errors[passwordInputName] &&
             `Your ${passwordInputName} is required.`
+          }
+          endIcon={
+            <InputIconButton
+              aria-label={`${showPassword ? "hide" : "show"} password`}
+              onClick={togglePasswordVisibility}
+            >
+              <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+            </InputIconButton>
           }
         />
       )}

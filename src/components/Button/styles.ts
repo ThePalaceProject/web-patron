@@ -1,6 +1,6 @@
 import { SystemStyleObject } from "@styled-system/css";
 import { darken, lightness } from "@theme-ui/color";
-import { ButtonSize, ButtonVariant } from "./index";
+import { ButtonSize, ButtonVariant, IconButtonVariant } from "./index";
 
 export const sizes = {
   sm: {},
@@ -31,6 +31,39 @@ const buttonBase = {
   cursor: "pointer",
   textDecoration: "none",
   bg: "transparent"
+};
+
+export const iconButtonBase = {
+  borderStyle: "none",
+  cursor: "pointer",
+  bg: "transparent",
+  "&:focus": {
+    borderWidth: "2px",
+    borderStyle: "solid",
+    borderColor: "ui.blue.focus",
+    borderRadius: "2px"
+  }
+};
+
+export const inputIconButton = {
+  height: "100%",
+  width: "100%"
+};
+
+export const iconButtonStyleProps = (
+  variant: IconButtonVariant
+): SystemStyleObject => {
+  switch (variant) {
+    case "input":
+      return {
+        ...iconButtonBase,
+        ...inputIconButton
+      };
+    default:
+      throw new Error(
+        `You chose an unimplemented Icon Button Variant: ${variant}`
+      );
+  }
 };
 
 export const styleProps = (

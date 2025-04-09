@@ -19,6 +19,9 @@ const ui = {
     extraLight: "#f5f5f5",
     extraLightWarm: "#f8f8f7",
     extraExtraLight: "#fafafa"
+  },
+  blue: {
+    focus: "#007AFF"
   }
 };
 
