@@ -43,7 +43,7 @@
     "@thepalaceproject/webpub-viewer": "^0.1.0",
     "chalk": "^4.1.0",
     "deepmerge": "^4.2.2",
-    "dompurify": "^3.0.8",
+    "dompurify": "^3.2.4",
     "downloadjs": "^1.4.7",
     "history": "^4.10.1",
     "js-cookie": "^2.2.1",
