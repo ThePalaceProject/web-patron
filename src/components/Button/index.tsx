@@ -6,11 +6,13 @@ import { jsx } from "theme-ui";
 import { Button as BaseButton } from "@ariakit/react";
 import * as React from "react";
 import Link, { LinkProps } from "../Link";
-import { styleProps } from "./styles";
+import { iconButtonStyleProps, styleProps } from "./styles";
 import LoadingIndicator from "components/LoadingIndicator";
 import { Text } from "components/Text";
+import { FontAwesomeIconProps } from "@fortawesome/react-fontawesome";
 
 export type ButtonVariant = "filled" | "ghost" | "link";
+export type IconButtonVariant = "input";
 export type ButtonSize = "sm" | "md" | "lg";
 type ButtonOwnProps = {
   variant?: ButtonVariant;
@@ -138,6 +140,21 @@ export const AnchorButton = React.forwardRef<
     </a>
   );
 });
+
+interface InputIconButtonProps {
+  children: React.ReactElement<FontAwesomeIconProps>;
+  onClick: React.MouseEventHandler<HTMLElement>;
+}
+export const InputIconButton = ({
+  children,
+  ...props
+}: InputIconButtonProps) => {
+  return (
+    <button sx={iconButtonStyleProps("input")} {...props}>
+      {children}
+    </button>
+  );
+};
 
 const defaultVariant = "filled";
 const defaultColor = "brand.primary";

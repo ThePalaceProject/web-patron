@@ -48,6 +48,24 @@ test("displays form", async () => {
   expect(pin).toHaveValue("pinpin");
 });
 
+test("toggle password visibility", async () => {
+  const { user } = setup(<BasicAuthHandler method={method} />);
+
+  // Input initially renders as password input
+  const input = await screen.findByLabelText("Pin input");
+  expect(input).toBeInTheDocument();
+  expect(input).toHaveAttribute("type", "password");
+
+  const showPasswordIconButton = await screen.findByLabelText("show password");
+  await user.click(showPasswordIconButton);
+
+  // After toggle, input becomes text so password is visible
+  const hidePasswordIconButton = await screen.findByLabelText("hide password");
+  expect(input).toBeInTheDocument();
+  expect(input).toHaveAttribute("type", "text");
+  expect(hidePasswordIconButton).toBeInTheDocument();
+});
+
 test("submits", async () => {
   // give the mock a delay to allow loading state to appear
   fetchMock.mockResponseOnce(
