@@ -53,6 +53,12 @@ test("truncates authors", () => {
   expect(screen.queryByText("one, two, three")).toBeFalsy();
 });
 
+test("show return button for fulfillable book", () => {
+  setup(<BookList books={[fixtures.fulfillableBook]} />);
+  const button = screen.getByRole("button", { name: "Return" });
+  expect(button).toBeInTheDocument();
+});
+
 jest.mock("swr/infinite");
 const useSWRInfiniteMock = useSWRInfinite as jest.MockedFunction<
   typeof useSWRInfinite

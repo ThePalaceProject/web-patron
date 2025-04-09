@@ -243,19 +243,26 @@ const BookListCTA: React.FC<{ book: AnyBook }> = ({ book }) => {
     const singleFulfillment =
       showableFulfillments.length === 1 ? showableFulfillments[0] : undefined;
 
-    if (singleFulfillment && !shouldRedirectUser) {
-      return (
-        <FulfillmentButton
-          details={singleFulfillment}
-          book={book}
-          isPrimaryAction
-        />
-      );
-    }
     return (
-      <NavButton variant="link" bookUrl={book.url} iconRight={ArrowForward}>
-        View Book Details
-      </NavButton>
+      <>
+        <CancelOrReturn
+          url={book.revokeUrl}
+          loadingText="Returning..."
+          id={book.id}
+          text="Return"
+        />
+        {singleFulfillment && !shouldRedirectUser ? (
+          <FulfillmentButton
+            details={singleFulfillment}
+            book={book}
+            isPrimaryAction
+          />
+        ) : (
+          <NavButton variant="link" bookUrl={book.url} iconRight={ArrowForward}>
+            View Book Details
+          </NavButton>
+        )}
+      </>
     );
   }
 
