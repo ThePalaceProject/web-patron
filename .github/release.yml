@@ -6,9 +6,10 @@ changelog:
     - title: Incompatible Changes
       labels:
         - incompatible changes
-    - title: Features
+    - title: Features and Enhancements
       labels:
         - feature
+        - enhancement
     - title: Bugfixes
       labels:
         - bug
