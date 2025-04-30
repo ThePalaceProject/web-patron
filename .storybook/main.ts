@@ -18,14 +18,6 @@ module.exports = {
     // mock our env vars so they can be updated via the toolbar
     config.resolve.alias['utils/env'] = require.resolve("./env-mock.ts");
 
-    // mock out the decryptor like we do in next.config.js
-    config.plugins.push(
-      new webpack.NormalModuleReplacementPlugin(
-        /@nypl-simplified-packages\/axisnow-access-control-web/,
-        "utils/mockDecryptor.ts"
-      )
-    );
-
     config.resolve.modules = [
       path.resolve(__dirname, "../src"),
       "node_modules"

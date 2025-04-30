@@ -2,14 +2,8 @@ import * as React from "react";
 import { render } from "test-utils";
 import WebpubViewer from "components/WebpubViewer";
 import { PageNotFoundError } from "errors";
-import * as env from "utils/env";
 import fetchMock from "jest-fetch-mock";
 import { mockPush } from "test-utils/mockNextRouter";
-
-jest.mock("utils/reader", () => ({
-  __esModule: true,
-  default: jest.fn()
-}));
 
 // mock fetch to avoid console errors
 fetchMock.mockResponse(JSON.stringify({ some: "response" }));
@@ -54,18 +48,4 @@ test("renders viewer div", () => {
   });
 
   expect(utils.getByTestId("viewer")).toBeInTheDocument();
-});
-
-test("fetches params with token if run with AXISNOW_DECRYPT", async () => {
-  (env as any).AXISNOW_DECRYPT = "true";
-  render(<WebpubViewer />, {
-    router: { query: { bookUrl: "http://some-book.com" } }
-  });
-  // then we fetch the params
-  expect(fetchMock).toHaveBeenCalledWith("http://some-book.com", {
-    headers: {
-      Authorization: "user-token",
-      "X-Requested-With": "XMLHttpRequest"
-    }
-  });
 });

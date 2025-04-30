@@ -1,40 +1,12 @@
 import React from "react";
-import reader from "utils/reader";
 import { useRouter } from "next/router";
-import useLibraryContext from "./context/LibraryContext";
-import useUser from "components/context/UserContext";
-import fetchWithHeaders from "dataflow/fetch";
 import extractParam from "dataflow/utils";
-import { PageNotFoundError, ServerError } from "errors";
+import { PageNotFoundError } from "errors";
 import AuthProtectedRoute from "auth/AuthProtectedRoute";
 
-const initializeReader = async (
-  entryUrl: string,
-  catalogName: string,
-  token: string
-) => {
-  // fetch the decryptor parameters from the entry url
-  const response = await fetchWithHeaders(entryUrl, token);
-  const data = await response.json();
-  // there should never be a status code in the json
-  if (!response.ok || data.status) {
-    throw new ServerError(entryUrl, response.status, data);
-  }
-
-  return await reader(entryUrl, token, catalogName, data);
-};
-
 const WebpubViewer = () => {
-  const library = useLibraryContext();
   const router = useRouter();
   const bookUrl = extractParam(router.query, "bookUrl");
-  const { token } = useUser();
-
-  const { catalogName } = library;
-
-  React.useEffect(() => {
-    if (token && bookUrl) initializeReader(bookUrl, catalogName, token);
-  }, [token, bookUrl, catalogName]);
 
   // this will be caught by an error boundary and display a 404
   if (!bookUrl)
@@ -42,6 +14,7 @@ const WebpubViewer = () => {
       "The requested URL is missing a bookUrl parameter."
     );
 
+  // noinspection CssInvalidPropertyValue
   return (
     <AuthProtectedRoute>
       <div id="viewer" data-testid="viewer" />

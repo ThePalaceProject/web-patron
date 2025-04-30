@@ -74,7 +74,6 @@ const config = {
     GIT_BRANCH,
     GIT_COMMIT_SHA,
     RELEASE_STAGE,
-    AXISNOW_DECRYPT: undefined,
     APP_CONFIG: JSON.stringify(APP_CONFIG)
   },
   productionBrowserSourceMaps: true,
@@ -102,14 +101,6 @@ const config = {
     if (!isServer) {
       config.resolve.fallback.fs = false;
     }
-
-    // ignore the axisnow decryptor, since we don't have access
-    config.plugins.push(
-      new webpack.NormalModuleReplacementPlugin(
-        /@nypl-simplified-packages\/axisnow-access-control-web/,
-        "utils/mockDecryptor.ts"
-      )
-    );
 
     // upload sourcemaps to bugsnag if we are not in dev
     if (!dev && APP_CONFIG.bugsnagApiKey) {
