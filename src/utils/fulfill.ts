@@ -8,7 +8,7 @@ import {
 } from "interfaces";
 import { DownloadMediaType } from "types/opds1";
 import { bookIsAudiobook } from "utils/book";
-import { APP_CONFIG, AXISNOW_DECRYPT } from "utils/env";
+import { APP_CONFIG } from "utils/env";
 import { typeMap } from "utils/file";
 
 /**
@@ -17,7 +17,7 @@ import { typeMap } from "utils/file";
  *  - What UX should be presented to the user
  *  - How to actually go about fulfilling that UX
  *
- * Both of these are determinded by a combination of the final content type
+ * Both of these are determined by a combination of the final content type
  * and any layers of indirection the media is wrapped in. This file is an
  * attempt to centralize the logic of dealing with different media types
  * and layers of indirection.
@@ -70,8 +70,18 @@ export function getFulfillmentFromLink(link: FulfillmentLink): AnyFullfillment {
     return { type: "unsupported" };
   }
 
+  // TODO: I'm not sure that we need these special "unsupported" cases here,
+  //  since we can set this in the configuration. For example, there might
+  //  be cases in the future in which there is no support in this app, but
+  //  support is present in the mobile apps. It might be better to restrict
+  //  the possible types, depending on whether we directly support it in-app.
   // there is no support for books with "Libby" DRM
-  if (contentType === OPDS1.OverdriveEbookMediaType) {
+  // There is no support for books with AxisNow DRM.
+  if (
+    [OPDS1.OverdriveEbookMediaType, OPDS1.AxisNowWebpubMediaType].includes(
+      contentType
+    )
+  ) {
     return { type: "unsupported" };
   }
   switch (contentType) {
@@ -103,18 +113,6 @@ export function getFulfillmentFromLink(link: FulfillmentLink): AnyFullfillment {
           contentType,
           link.url
         ),
-        buttonLabel: "Read Online"
-      };
-
-    case OPDS1.AxisNowWebpubMediaType:
-      if (!AXISNOW_DECRYPT) {
-        return { type: "unsupported" };
-      }
-      return {
-        type: "read-online-internal",
-        id: link.url,
-        // parse the url into the internal url we need to send the user to
-        url: `/read/${encodeURIComponent(link.url)}`,
         buttonLabel: "Read Online"
       };
   }

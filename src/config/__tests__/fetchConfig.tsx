@@ -34,7 +34,6 @@ media_support:
   application/epub+zip: show
 bugsnag_api_key: bug
 gtm_id: gtm
-axisnow_decrypt: true
 companion_app: simplye
   `;
 
@@ -47,7 +46,6 @@ const mockResult = {
   },
   bugsnag_api_key: "bug",
   gtm_id: "gtm",
-  axisnow_decrypt: true,
   companion_app: "simplye"
 };
 

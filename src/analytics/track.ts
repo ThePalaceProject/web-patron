@@ -3,7 +3,6 @@ import ApplicationError, { ServerError } from "errors";
 /* eslint-disable camelcase */
 import { NextWebVitalsMetric } from "next/app";
 import { APP_CONFIG } from "utils/env";
-import { AxisNowDecryptionError } from "@nypl-simplified-packages/axisnow-access-control-web";
 
 type PageData = {
   path: string;
@@ -72,12 +71,8 @@ function error(
 ) {
   // report it to the console
   console.error(e);
-  if (
-    e instanceof ApplicationError ||
-    (typeof AxisNowDecryptionError !== "undefined" &&
-      e instanceof AxisNowDecryptionError)
-  ) {
-    if (e.baseError) console.error(`Base Error:\n${e.baseError}`);
+  if (e instanceof ApplicationError && e.baseError) {
+    console.error(`Base Error:\n${e.baseError}`);
   }
   // track to bugsnag
   if (APP_CONFIG.bugsnagApiKey) {
@@ -91,11 +86,7 @@ function error(
         keys.forEach(key => event.addMetadata(key, metadata[key]));
       }
       // add error info if there is any
-      if (
-        e instanceof ApplicationError ||
-        (typeof AxisNowDecryptionError !== "undefined" &&
-          e instanceof AxisNowDecryptionError)
-      ) {
+      if (e instanceof ApplicationError) {
         event.addMetadata("Error Info", { ...e.info, baseError: e.baseError });
         if (e instanceof ServerError) {
           event.addMetadata("Error Info", {

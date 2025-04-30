@@ -8,7 +8,6 @@ import {
 } from "test-utils";
 import { mergeBook, mockSetBook } from "test-utils/fixtures";
 import FulfillmentCard from "../FulfillmentCard";
-import _download from "downloadjs";
 import mockConfig from "test-utils/mockConfig";
 import {
   BorrowableBook,
@@ -19,10 +18,8 @@ import {
 } from "interfaces";
 import { ProblemDocument } from "types/opds1";
 import fetchMock from "jest-fetch-mock";
-import { mockPush } from "test-utils/mockNextRouter";
 import * as fetch from "dataflow/opds1/fetch";
 import { ServerError } from "errors";
-import * as env from "utils/env";
 import { MOCK_DATE_STRING } from "test-utils/mockToDateString";
 
 jest.mock("downloadjs");
@@ -337,22 +334,6 @@ describe("FulfillableBook", () => {
     }
   });
 
-  const viewableAxisNowBook = mergeBook<FulfillableBook>({
-    status: "fulfillable",
-    revokeUrl: "/revoke",
-    fulfillmentLinks: [
-      {
-        url: "/epub-link",
-        contentType: "application/vnd.librarysimplified.axisnow+json",
-        supportLevel: "show"
-      }
-    ],
-    availability: {
-      status: "available",
-      until: "2020-06-18"
-    }
-  });
-
   test("displays return button that calls apropriate url", async () => {
     const unborrowed = mergeBook<BorrowableBook>({
       status: "borrowable",
@@ -378,20 +359,6 @@ describe("FulfillableBook", () => {
     );
 
     expect(mockSetBook).toHaveBeenCalledWith(unborrowed, downloadableBook.id);
-  });
-
-  test("constructs link to viewer for OpenAxis Books", async () => {
-    mockConfig({ companionApp: "openebooks" });
-    (env as any).AXISNOW_DECRYPT = "true";
-
-    setup(<FulfillmentCard book={viewableAxisNowBook} />);
-    const readerButton = await screen.findByRole("button", {
-      name: /Read/i
-    });
-
-    expect(mockPush).toHaveBeenCalledTimes(0);
-    fireEvent.click(readerButton);
-    expect(mockPush).toHaveBeenCalledTimes(1);
   });
 
   test("shows read online button for external read online links", async () => {
@@ -435,32 +402,6 @@ describe("FulfillableBook", () => {
     // no calls until we click the button
     expect(fetchMock).toHaveBeenCalledTimes(0);
     fireEvent.click(readOnline);
-    await waitFor(() =>
-      expect(fetchMock).toHaveBeenCalledWith("http://track-open-book.com")
-    );
-  });
-
-  test("internal read online button tracks open_book event", async () => {
-    (env as any).AXISNOW_DECRYPT = "true";
-    const readOnlineBook = mergeBook<FulfillableBook>({
-      status: "fulfillable",
-      revokeUrl: "/revoke",
-      trackOpenBookUrl: "http://track-open-book.com",
-      fulfillmentLinks: [
-        {
-          url: "/internal-read-online",
-          contentType: "application/vnd.librarysimplified.axisnow+json",
-          supportLevel: "show"
-        }
-      ]
-    });
-    setup(<FulfillmentCard book={readOnlineBook} />);
-    const readOnline = await screen.findByRole("button", { name: "Read" });
-
-    // should not have been called ever
-    expect(fetchMock).toHaveBeenCalledTimes(0);
-    fireEvent.click(readOnline);
-
     await waitFor(() =>
       expect(fetchMock).toHaveBeenCalledWith("http://track-open-book.com")
     );
