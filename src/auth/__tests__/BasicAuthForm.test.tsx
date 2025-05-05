@@ -57,6 +57,7 @@ test("toggle password visibility", async () => {
   expect(input).toHaveAttribute("type", "password");
 
   const showPasswordIconButton = await screen.findByLabelText("show password");
+  expect(showPasswordIconButton).toHaveAttribute("type", "button");
   await user.click(showPasswordIconButton);
 
   // After toggle, input becomes text so password is visible
@@ -66,7 +67,7 @@ test("toggle password visibility", async () => {
   expect(hidePasswordIconButton).toBeInTheDocument();
 });
 
-test("submits", async () => {
+test("submit by clicking login button", async () => {
   // give the mock a delay to allow loading state to appear
   fetchMock.mockResponseOnce(
     () =>

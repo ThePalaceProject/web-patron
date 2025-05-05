@@ -57,9 +57,7 @@ const BasicAuthHandler: React.FC<{ method: ClientBasicMethod }> = ({
     method.inputs?.password?.keyboard !== Keyboard.NoInput;
 
   const [showPassword, setShowPassword] = React.useState(false);
-  const togglePasswordVisibility = event => {
-    event.preventDefault();
-    event.stopPropagation();
+  const togglePasswordVisibility = _event => {
     setShowPassword(!showPassword);
   };
 
@@ -106,6 +104,7 @@ const BasicAuthHandler: React.FC<{ method: ClientBasicMethod }> = ({
           endIcon={
             <InputIconButton
               aria-label={`${showPassword ? "hide" : "show"} password`}
+              type="button"
               onClick={togglePasswordVisibility}
             >
               <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
