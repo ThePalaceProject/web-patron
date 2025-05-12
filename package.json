@@ -34,7 +34,7 @@
     "@fortawesome/free-regular-svg-icons": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
-    "@nypl/design-system-react-components": "^0.7.2",
+    "@nypl/design-system-react-components": "^3.6.1",
     "@nypl/dgx-svg-icons": "^0.3.12",
     "@theme-ui/color": "^0.16.2",
     "@theme-ui/components": "^0.16.2",
