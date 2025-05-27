@@ -2,9 +2,10 @@ import useCredentials from "auth/useCredentials";
 import useLibraryContext from "components/context/LibraryContext";
 import { fetchCollection } from "dataflow/opds1/fetch";
 import { ServerError } from "errors";
-import { AppAuthMethod, AnyBook } from "interfaces";
+import { AppAuthMethod, AnyBook, AuthCredentials } from "interfaces";
 import * as React from "react";
 import useSWR from "swr";
+import { BasicTokenAuthType } from "types/opds1";
 
 type Status = "authenticated" | "loading" | "unauthenticated";
 export type UserState = {

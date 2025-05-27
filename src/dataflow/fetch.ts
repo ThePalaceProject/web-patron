@@ -5,10 +5,13 @@
 
 import { FetchError } from "errors";
 
+type HttpMethod = "GET" | "DELTE" | "POST" | "PUT";
+
 export default async function fetchWithHeaders(
   url: string,
   token?: string,
-  additionalHeaders?: { [key: string]: string | undefined }
+  additionalHeaders?: { [key: string]: string | undefined },
+  method: HttpMethod = "GET"
 ) {
   const headers = prepareHeaders(token, additionalHeaders);
 
@@ -18,7 +21,7 @@ export default async function fetchWithHeaders(
    * CORS issues. We catch and rethrow a wrapped error in those cases to give more info.
    */
   try {
-    return await fetch(url, { headers });
+    return await fetch(url, { method, headers });
   } catch (e) {
     throw new FetchError(url, e);
   }
