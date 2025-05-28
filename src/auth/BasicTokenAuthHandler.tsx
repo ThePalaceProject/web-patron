@@ -15,7 +15,7 @@ import useUser from "components/context/UserContext";
 import ApplicationError, { ServerError } from "errors";
 import useLogin from "auth/useLogin";
 import useLibraryContext from "components/context/LibraryContext";
-import { BasicAuthType, Keyboard } from "types/opds1";
+import { Keyboard } from "types/opds1";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { fetchAuthToken } from "auth/fetch";
@@ -58,7 +58,7 @@ const BasicTokenAuthHandler: React.FC<{
       });
     }
 
-    // generate Basic token to send to circuation manager
+    // generate Basic Token to send to circuation manager for Bearer Token
     const basicToken = generateToken(login, password);
     const { accessToken } = await fetchAuthToken(authenticationUrl, basicToken);
     signIn(
@@ -73,9 +73,6 @@ const BasicTokenAuthHandler: React.FC<{
 
   const serverError = error instanceof ServerError ? error : undefined;
 
-  // remove Basic auth
-  //   const hasMultipleMethods =
-  //     authMethods.filter(method => method.type !== BasicAuthType).length > 1;
   const hasMultipleMethods = authMethods.length > 1;
 
   const hasPasswordInput =

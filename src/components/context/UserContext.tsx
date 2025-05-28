@@ -56,11 +56,11 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     fetchLoans,
     {
       shouldRetryOnError: credentials?.methodType === BasicTokenAuthType,
+      // [Tyler] should I revalidate on an hour interval instead?
       revalidateOnFocus: credentials?.methodType === BasicTokenAuthType,
       revalidateOnReconnect: false,
-      // clear credentials whenever we receive a 401, but save the error so it sticks around.
       errorRetryCount: credentials?.methodType === BasicTokenAuthType ? 1 : 0,
-      onErrorRetry: async (err, key, config, revalidate) => {
+      onErrorRetry: async (err, _key, _config, revalidate) => {
         if (err instanceof ServerError && err?.info.status === 401) {
           if (credentials?.methodType === BasicTokenAuthType) {
             try {
@@ -84,7 +84,8 @@ export const UserProvider = ({ children }: UserProviderProps) => {
           }
         }
       },
-      // try refreshing token
+      // clear credentials whenever we receive a 401, but save the error so it sticks around.
+      // however, BasicTokenAuthType methods are retried in onErrorRetry
       onError: err => {
         if (err instanceof ServerError && err?.info.status === 401) {
           if (credentials?.methodType !== BasicTokenAuthType) {
