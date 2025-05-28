@@ -1,6 +1,6 @@
 import OPDSParser, { OPDSFeed, OPDSEntry } from "opds-feed-parser";
 import ApplicationError, { ServerError } from "errors";
-import { AnyBook, CollectionData, OPDS1 } from "interfaces";
+import { AnyBook, CollectionData, OPDS1, Token } from "interfaces";
 import { entryToBook, feedToCollection } from "dataflow/opds1/parse";
 import fetchWithHeaders from "dataflow/fetch";
 import parseSearchData from "dataflow/opds1/parseSearchData";

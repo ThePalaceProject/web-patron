@@ -12,7 +12,7 @@ import { modalButtonStyles } from "components/Modal";
 import { ClientBasicTokenMethod } from "interfaces";
 import { generateToken } from "auth/useCredentials";
 import useUser from "components/context/UserContext";
-import { ServerError } from "errors";
+import ApplicationError, { ServerError } from "errors";
 import useLogin from "auth/useLogin";
 import useLibraryContext from "components/context/LibraryContext";
 import { BasicAuthType, Keyboard } from "types/opds1";
@@ -41,7 +41,7 @@ const BasicTokenAuthHandler: React.FC<{
 
   const authenticationUrl = method.links?.find(
     link => link.rel === "authenticate"
-  ).href;
+  )?.href;
 
   const usernameInputName = method.labels.login;
   const passwordInputName = method.labels.password;
@@ -50,18 +50,33 @@ const BasicTokenAuthHandler: React.FC<{
     const login = values[usernameInputName];
     const password = values[passwordInputName];
 
+    if (!authenticationUrl) {
+      throw new ApplicationError({
+        title: "Incomplete Authentication Data",
+        detail:
+          "The required link with rel 'authenticate' is missing from library data."
+      });
+    }
+
     // generate Basic token to send to circuation manager
     const basicToken = generateToken(login, password);
     const { accessToken } = await fetchAuthToken(authenticationUrl, basicToken);
-    signIn(`Bearer ${accessToken}`, method);
+    signIn(
+      {
+        basicToken: basicToken,
+        bearerToken: `Bearer ${accessToken}`
+      },
+      method,
+      authenticationUrl
+    );
   });
 
   const serverError = error instanceof ServerError ? error : undefined;
 
   // remove Basic auth
-  const hasMultipleMethods =
-    authMethods.filter(method => method.type !== BasicAuthType).length > 1;
-  //   const hasMultipleMethods = authMethods.length > 1;
+  //   const hasMultipleMethods =
+  //     authMethods.filter(method => method.type !== BasicAuthType).length > 1;
+  const hasMultipleMethods = authMethods.length > 1;
 
   const hasPasswordInput =
     method.inputs?.password?.keyboard !== Keyboard.NoInput;
