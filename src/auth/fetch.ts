@@ -1,5 +1,4 @@
 import ApplicationError, { ServerError } from "errors";
-import { AuthCredentialsToken } from "interfaces";
 import fetchWithHeaders from "../dataflow/fetch";
 
 /**

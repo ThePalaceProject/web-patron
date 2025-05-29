@@ -117,7 +117,8 @@ test("submit by clicking login button", async () => {
         Authorization: token,
         "X-Requested-With": "XMLHttpRequest",
         "Accept-Language": "*"
-      }
+      },
+      method: "GET"
     });
   });
 });
@@ -160,7 +161,8 @@ test("displays server error", async () => {
       Authorization: "token",
       "X-Requested-With": "XMLHttpRequest",
       "Accept-Language": "*"
-    }
+    },
+    method: "GET"
   });
   const serverError = await screen.findByText(
     "Invalid Credentials: Wrong username."
@@ -241,7 +243,8 @@ test("submits with no password input", async () => {
         Authorization: token,
         "X-Requested-With": "XMLHttpRequest",
         "Accept-Language": "*"
-      }
+      },
+      method: "GET"
     });
   });
 });

@@ -62,7 +62,6 @@ const AuthenticationHandler: React.ComponentType<AuthHandlerWrapperProps> = ({
 }) => {
   const _AuthHandler = authHandlers[method.type];
 
-  // Prioritize Basic Token over Basic
   if (method.type === BasicTokenAuthType && typeof method !== "string") {
     return <_AuthHandler method={method as ClientBasicTokenMethod} />;
   } else if (method.type === BasicAuthType && typeof method !== "string") {

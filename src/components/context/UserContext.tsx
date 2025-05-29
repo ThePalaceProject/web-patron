@@ -60,6 +60,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
       revalidateOnFocus: credentials?.methodType === BasicTokenAuthType,
       revalidateOnReconnect: false,
       errorRetryCount: credentials?.methodType === BasicTokenAuthType ? 1 : 0,
+      // Try and fetch new token once old token has expired
       onErrorRetry: async (err, _key, _config, revalidate) => {
         if (err instanceof ServerError && err?.info.status === 401) {
           if (credentials?.methodType === BasicTokenAuthType) {
@@ -85,7 +86,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
         }
       },
       // clear credentials whenever we receive a 401, but save the error so it sticks around.
-      // however, BasicTokenAuthType methods are retried in onErrorRetry
+      // however, BasicTokenAuthType methods are retried in onErrorRetry to get new token
       onError: err => {
         if (err instanceof ServerError && err?.info.status === 401) {
           if (credentials?.methodType !== BasicTokenAuthType) {

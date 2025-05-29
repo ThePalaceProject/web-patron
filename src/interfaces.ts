@@ -108,7 +108,7 @@ export type AuthCredentialsToken = string | Token | undefined;
 export interface AuthCredentials {
   methodType: AppAuthMethod["type"];
   token: AuthCredentialsToken;
-  authenticationUrl?: string | undefined;
+  authenticationUrl?: string;
 }
 
 export interface LibraryData {
