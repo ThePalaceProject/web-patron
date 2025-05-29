@@ -122,9 +122,10 @@ test("submit by clicking login button", async () => {
       })
     );
 
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
     // First call grabs token from /patrons/me/token using username and password
-    expect(fetchMock.mock.calls[0][0]).toEqual(basicTokenAuthenticationUrl);
-    expect(fetchMock.mock.calls[0][1]).toEqual({
+    expect(fetchMock).toHaveBeenNthCalledWith(1, basicTokenAuthenticationUrl, {
       headers: {
         Authorization: basicToken,
         "X-Requested-With": "XMLHttpRequest"
@@ -133,8 +134,7 @@ test("submit by clicking login button", async () => {
     });
 
     // Second call to get loans with Bearer Token
-    expect(fetchMock.mock.calls[1][0]).toEqual("/shelf-url");
-    expect(fetchMock.mock.calls[1][1]).toEqual({
+    expect(fetchMock).toHaveBeenNthCalledWith(2, "/shelf-url", {
       headers: {
         Authorization: `Bearer ${accessToken}`,
         "X-Requested-With": "XMLHttpRequest",
