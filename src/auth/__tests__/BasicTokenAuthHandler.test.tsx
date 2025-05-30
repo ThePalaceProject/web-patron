@@ -8,9 +8,11 @@ import {
   basicTokenAuthenticationUrl,
   basicTokenAuthMethod
 } from "test-utils/fixtures";
+import mockAuthenticatedOnce, {
+  firstToken,
+  tokenCreds1
+} from "test-utils/mockAuthState";
 import { generateCredentials } from "utils/auth";
-
-const accessToken = "IaMaBeArErToKeN";
 
 beforeEach(() => fetchMock.resetMocks());
 
@@ -65,7 +67,7 @@ test("submit by clicking login button", async () => {
             () =>
               resolve(
                 JSON.stringify({
-                  accessToken: accessToken,
+                  accessToken: firstToken,
                   expiresIn: 3600,
                   tokenType: "Bearer"
                 })
@@ -115,7 +117,7 @@ test("submit by clicking login button", async () => {
       JSON.stringify({
         token: {
           basicToken: basicToken,
-          bearerToken: `Bearer ${accessToken}`
+          bearerToken: `Bearer ${firstToken}`
         },
         authenticationUrl: basicTokenAuthenticationUrl,
         methodType: OPDS1.BasicTokenAuthType
@@ -136,11 +138,58 @@ test("submit by clicking login button", async () => {
     // Second call to get loans with Bearer Token
     expect(fetchMock).toHaveBeenNthCalledWith(2, "/shelf-url", {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${firstToken}`,
         "X-Requested-With": "XMLHttpRequest",
         "Accept-Language": "*"
       },
       method: "GET"
+    });
+  });
+});
+
+test("fetch new token if token has expired", async () => {
+  // set credentials to trigger fetch in <UserProvider />
+  // expired token returns 401
+  mockAuthenticatedOnce(tokenCreds1);
+
+  const problemdoc: OPDS1.ProblemDocument = {
+    type:
+      "http://librarysimplified.org/terms/problem/patron-auth-access-token-expired",
+    detail: "The patron authentication access token has expired.",
+    title: "Access token expired",
+    status: 401
+  };
+
+  fetchMock.mockResponseOnce(JSON.stringify(problemdoc), {
+    status: 401
+  });
+
+  setup(
+    <UserProvider>
+      <BasicTokenAuthHandler method={basicTokenAuthMethod} />
+    </UserProvider>
+  );
+
+  await waitFor(() => {
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
+    // attempt fetch with old token
+    expect(fetchMock).toHaveBeenNthCalledWith(1, "/shelf-url", {
+      headers: {
+        Authorization: firstToken,
+        "X-Requested-With": "XMLHttpRequest",
+        "Accept-Language": "*"
+      },
+      method: "GET"
+    });
+
+    // get new token with username and password saved in credentials
+    expect(fetchMock).toHaveBeenNthCalledWith(2, basicTokenAuthenticationUrl, {
+      headers: {
+        Authorization: generateCredentials("1234", "pinpin"),
+        "X-Requested-With": "XMLHttpRequest"
+      },
+      method: "POST"
     });
   });
 });

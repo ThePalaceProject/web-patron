@@ -10,19 +10,22 @@ export const creds: AuthCredentials = {
   methodType: OPDS1.BasicAuthType
 };
 
+export const persistentUserCredentials = generateCredentials("1234", "pinpin");
+export const firstToken = "IaMaBeArErToKeN";
 export const tokenCreds1: AuthCredentials = {
   token: {
-    basicToken: generateCredentials("1234", "pinpin"),
-    bearerToken: `Bearer IaMaBeArErToKeN`
+    basicToken: persistentUserCredentials,
+    bearerToken: firstToken
   },
   authenticationUrl: basicTokenAuthenticationUrl,
   methodType: OPDS1.BasicTokenAuthType
 };
 
+export const newToken = "IaMaBeArErToKeN2";
 export const tokenCreds2: AuthCredentials = {
   token: {
-    basicToken: generateCredentials("1234", "pinpin"),
-    bearerToken: `Bearer IaMaBeArErToKeN2`
+    basicToken: persistentUserCredentials,
+    bearerToken: newToken
   },
   authenticationUrl: basicTokenAuthenticationUrl,
   methodType: OPDS1.BasicTokenAuthType

@@ -7,14 +7,9 @@ import { act, fixtures, setup } from "test-utils";
 import Cookie from "js-cookie";
 import * as router from "next/router";
 import useUser, { UserProvider } from "components/context/UserContext";
-import mockAuthenticatedOnce, {
-  tokenCreds,
-  tokenCreds1,
-  tokenCreds2
-} from "test-utils/mockAuthState";
+import mockAuthenticatedOnce from "test-utils/mockAuthState";
 import * as swr from "swr";
 import { makeSwrResponse } from "test-utils/mockSwr";
-import { basicTokenAuthenticationUrl } from "test-utils/fixtures";
 
 const mockSWR = jest.spyOn(swr, "default");
 
@@ -211,24 +206,6 @@ test("sign in sets cookie", async () => {
 
   expect(mockSWR).toHaveBeenCalledWith(
     ["/shelf-url", "a-token", "type"],
-    expect.anything(),
-    expect.anything()
-  );
-});
-
-test("refreshes expired basic token whenever focus returns to window", async () => {
-  mockAuthenticatedOnce(tokenCreds1);
-  renderUserContext();
-
-  expect(mockSWR).toHaveBeenCalledWith(
-    ["/shelf-url", `Bearer IaMaBeArErToKeN`, OPDS1.BasicTokenAuthType],
-    expect.anything(),
-    expect.anything()
-  );
-
-  mockAuthenticatedOnce(tokenCreds2);
-  expect(mockSWR).toHaveBeenCalledWith(
-    ["/shelf-url", `Bearer IaMaBeArErToKeN2`, OPDS1.BasicTokenAuthType],
     expect.anything(),
     expect.anything()
   );

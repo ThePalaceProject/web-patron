@@ -56,7 +56,6 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     fetchLoans,
     {
       shouldRetryOnError: credentials?.methodType === BasicTokenAuthType,
-      // [Tyler] should I revalidate on an hour interval instead?
       revalidateOnFocus: credentials?.methodType === BasicTokenAuthType,
       revalidateOnReconnect: false,
       errorRetryCount: credentials?.methodType === BasicTokenAuthType ? 1 : 0,
