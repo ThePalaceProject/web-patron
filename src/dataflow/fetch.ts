@@ -5,7 +5,7 @@
 
 import { FetchError } from "errors";
 
-type HttpMethod = "GET" | "DELTE" | "POST" | "PUT";
+type HttpMethod = "GET" | "DELETE" | "POST" | "PUT";
 
 export default async function fetchWithHeaders(
   url: string,
