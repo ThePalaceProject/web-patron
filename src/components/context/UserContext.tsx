@@ -172,8 +172,12 @@ function stringifyToken(
     credentials?.methodType === BasicTokenAuthType &&
     typeof credentials?.token === "object"
   ) {
-    return credentials?.token?.[tokenType] ?? undefined;
+    return credentials?.token?.[tokenType];
   }
 
-  return typeof credentials?.token === "string" ? credentials.token : undefined;
+  if (typeof credentials?.token === "string") {
+    return credentials.token;
+  }
+
+  return undefined;
 }
