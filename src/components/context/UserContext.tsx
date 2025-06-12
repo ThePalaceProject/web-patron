@@ -7,6 +7,7 @@ import { AppAuthMethod, AnyBook, AuthCredentials, Token } from "interfaces";
 import * as React from "react";
 import useSWR from "swr";
 import { BasicTokenAuthType } from "types/opds1";
+import { addHours, isBefore } from "date-fns";
 
 type Status = "authenticated" | "loading" | "unauthenticated";
 export type UserState = {
@@ -49,6 +50,18 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   );
   const [error, setError] = React.useState<ServerError | null>(null);
 
+  const shouldRevalidate = () => {
+    if (credentials?.methodType === BasicTokenAuthType) {
+      if (typeof credentials?.token !== "string" && credentials?.token) {
+        if (credentials.token?.expirationDate) {
+          return isBefore(credentials?.token?.expirationDate, new Date());
+        }
+      }
+    }
+
+    return false;
+  };
+
   const token = stringifyToken(credentials);
   const { data, mutate, isValidating } = useSWR(
     // pass null if there are no credentials or shelfUrl to tell SWR not to fetch at all.
@@ -56,7 +69,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     fetchLoans,
     {
       shouldRetryOnError: credentials?.methodType === BasicTokenAuthType,
-      revalidateOnFocus: credentials?.methodType === BasicTokenAuthType,
+      revalidateOnFocus: shouldRevalidate(),
       revalidateOnReconnect: false,
       errorRetryCount: credentials?.methodType === BasicTokenAuthType ? 1 : 0,
       // Try and fetch new token once old token has expired
@@ -64,7 +77,8 @@ export const UserProvider = ({ children }: UserProviderProps) => {
         if (err instanceof ServerError && err?.info.status === 401) {
           if (credentials?.methodType === BasicTokenAuthType) {
             try {
-              const { accessToken } = await fetchAuthToken(
+              // assume expiresIn is in seconds
+              const { accessToken, expiresIn } = await fetchAuthToken(
                 credentials?.authenticationUrl,
                 stringifyToken(credentials, "basicToken")
               );
@@ -73,7 +87,8 @@ export const UserProvider = ({ children }: UserProviderProps) => {
                 methodType: credentials.methodType,
                 token: {
                   bearerToken: `Bearer ${accessToken}`,
-                  basicToken: stringifyToken(credentials, "basicToken")
+                  basicToken: stringifyToken(credentials, "basicToken"),
+                  expirationDate: addHours(new Date(), expiresIn / 3600)
                 }
               });
               revalidate();

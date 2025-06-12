@@ -19,6 +19,7 @@ import { Keyboard } from "types/opds1";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { fetchAuthToken } from "auth/fetch";
+import { addHours } from "date-fns";
 
 type FormData = {
   [key: string]: string;
@@ -60,11 +61,16 @@ const BasicTokenAuthHandler: React.FC<{
 
     // generate Basic Token to send to circuation manager for Bearer Token
     const basicToken = generateToken(login, password);
-    const { accessToken } = await fetchAuthToken(authenticationUrl, basicToken);
+    const { accessToken, expiresIn } = await fetchAuthToken(
+      authenticationUrl,
+      basicToken
+    );
     signIn(
       {
         basicToken: basicToken,
-        bearerToken: `Bearer ${accessToken}`
+        bearerToken: `Bearer ${accessToken}`,
+        // assume expiresIn is in seconds
+        expirationDate: addHours(new Date(), expiresIn / 3600)
       },
       method,
       authenticationUrl

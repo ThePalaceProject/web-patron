@@ -200,7 +200,7 @@ test("submits with no password input", async () => {
   fetchMock.mockResponseOnce(
     () =>
       new Promise(resolve =>
-        setTimeout(() => resolve(JSON.stringify(fixtures.loans)), 100)
+        setTimeout(() => resolve(JSON.stringify(fixtures.loans)), 1)
       )
   );
   const { user } = setup(

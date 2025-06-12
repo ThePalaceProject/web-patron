@@ -12,10 +12,12 @@ export const creds: AuthCredentials = {
 
 export const persistentUserCredentials = generateCredentials("1234", "pinpin");
 export const firstToken = "IaMaBeArErToKeN";
+export const expirationDate = new Date("2025-06-01T00:00:00");
 export const tokenCreds1: AuthCredentials = {
   token: {
     basicToken: persistentUserCredentials,
-    bearerToken: firstToken
+    bearerToken: firstToken,
+    expirationDate: expirationDate
   },
   authenticationUrl: basicTokenAuthenticationUrl,
   methodType: OPDS1.BasicTokenAuthType
@@ -25,7 +27,8 @@ export const newToken = "IaMaBeArErToKeN2";
 export const tokenCreds2: AuthCredentials = {
   token: {
     basicToken: persistentUserCredentials,
-    bearerToken: newToken
+    bearerToken: newToken,
+    expirationDate: expirationDate
   },
   authenticationUrl: basicTokenAuthenticationUrl,
   methodType: OPDS1.BasicTokenAuthType

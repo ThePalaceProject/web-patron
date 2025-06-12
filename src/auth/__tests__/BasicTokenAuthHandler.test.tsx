@@ -9,12 +9,22 @@ import {
   basicTokenAuthMethod
 } from "test-utils/fixtures";
 import mockAuthenticatedOnce, {
+  expirationDate,
   firstToken,
   tokenCreds1
 } from "test-utils/mockAuthState";
 import { generateCredentials } from "utils/auth";
 
-beforeEach(() => fetchMock.resetMocks());
+beforeEach(() => {
+  jest.useFakeTimers();
+  const mockedDate = expirationDate;
+  jest.spyOn(Date, "now").mockImplementation(() => mockedDate.getTime());
+  fetchMock.resetMocks();
+});
+
+afterEach(() => {
+  jest.useRealTimers();
+});
 
 test("displays form", async () => {
   const { user } = setup(
@@ -72,7 +82,7 @@ test("submit by clicking login button", async () => {
                   tokenType: "Bearer"
                 })
               ),
-            100
+            1
           )
         )
     )
@@ -80,7 +90,7 @@ test("submit by clicking login button", async () => {
       // Get loans using token
       () =>
         new Promise(resolve =>
-          setTimeout(() => resolve(JSON.stringify(fixtures.loans)), 100)
+          setTimeout(() => resolve(JSON.stringify(fixtures.loans)), 1)
         )
     );
 
@@ -111,18 +121,27 @@ test("submit by clicking login button", async () => {
   await waitFor(() => {
     // we set the cookie
     expect(Cookie.set).toHaveBeenCalledTimes(1);
-    expect(Cookie.set).toHaveBeenCalledWith(
-      // the library slug is null because we are only running with one library
-      "CPW_AUTH_COOKIE/testlib",
-      JSON.stringify({
-        token: {
-          basicToken: basicToken,
-          bearerToken: `Bearer ${firstToken}`
-        },
-        authenticationUrl: basicTokenAuthenticationUrl,
-        methodType: OPDS1.BasicTokenAuthType
-      })
-    );
+    const [
+      credentialsKey,
+      credentialsValue
+    ] = (Cookie.set as jest.Mock).mock.calls[0];
+
+    expect(credentialsKey).toEqual("CPW_AUTH_COOKIE/testlib");
+    const parsed = JSON.parse(credentialsValue);
+    expect(parsed).toMatchObject({
+      token: {
+        basicToken: basicToken,
+        bearerToken: `Bearer ${firstToken}`
+      },
+      authenticationUrl: basicTokenAuthenticationUrl,
+      methodType: OPDS1.BasicTokenAuthType
+    });
+
+    // separately check that expirationDate was set
+    expect(typeof parsed.token.expirationDate).toBe("string");
+    expect(() =>
+      new Date(parsed.token.expirationDate).toISOString()
+    ).not.toThrow();
 
     expect(fetchMock).toHaveBeenCalledTimes(2);
 

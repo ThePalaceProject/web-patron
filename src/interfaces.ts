@@ -101,6 +101,7 @@ export type AppAuthMethod =
 export type Token = {
   basicToken: string | undefined;
   bearerToken: string | null;
+  expirationDate: Date;
 };
 
 export type AuthCredentialsToken = string | Token | undefined;

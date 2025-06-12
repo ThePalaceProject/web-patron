@@ -20,9 +20,6 @@ export default function LoginPicker(): React.ReactElement {
   // Here we filter out any methods from the auth document that we don't support.
   // We're aliasing the `authMethods` variable here so that we can end up with
   // the same variable name after filtering.
-  // [Tyler] For now, we are leaving both Basic and Basic Token auth as options,
-  // even if both are present. We may filter out Basic in favor of Basic Token
-  // in the future
   const { authMethods: methodsFromAuthDocument } = useLibraryContext();
   const authMethods = methodsFromAuthDocument.filter(m =>
     isSupportedAuthType(m.type)
