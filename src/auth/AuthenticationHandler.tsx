@@ -1,25 +1,34 @@
 import React from "react";
 import BasicAuthHandler from "./BasicAuthHandler";
+import BasicTokenAuthHandler from "./BasicTokenAuthHandler";
 import CleverAuthHandler from "./CleverAuthHandler";
 import SamlAuthHandler from "./SamlAuthHandler";
-import { ClientBasicMethod, ClientSamlMethod } from "interfaces";
+import {
+  ClientBasicMethod,
+  ClientBasicTokenMethod,
+  ClientSamlMethod
+} from "interfaces";
 import {
   BasicAuthType,
   CleverAuthType,
   CleverAuthMethod,
-  SamlAuthType
+  SamlAuthType,
+  BasicTokenAuthType
 } from "../types/opds1";
 import track from "../analytics/track";
 import ApplicationError from "../errors";
 
 type SupportedAuthTypes =
   | typeof BasicAuthType
+  | typeof BasicTokenAuthType
   | typeof SamlAuthType
   | typeof CleverAuthType;
 
 type SupportedAuthHandlerProps = {
   [key in SupportedAuthTypes]: key extends typeof BasicAuthType
     ? ClientBasicMethod
+    : key extends typeof BasicTokenAuthType
+    ? ClientBasicTokenMethod
     : key extends typeof SamlAuthType
     ? ClientSamlMethod
     : key extends typeof CleverAuthType
@@ -36,6 +45,7 @@ export const authHandlers: {
   }>;
 } = {
   [BasicAuthType]: BasicAuthHandler,
+  [BasicTokenAuthType]: BasicTokenAuthHandler,
   [SamlAuthType]: SamlAuthHandler,
   [CleverAuthType]: CleverAuthHandler
 };
@@ -52,7 +62,9 @@ const AuthenticationHandler: React.ComponentType<AuthHandlerWrapperProps> = ({
 }) => {
   const _AuthHandler = authHandlers[method.type];
 
-  if (method.type === BasicAuthType && typeof method !== "string") {
+  if (method.type === BasicTokenAuthType && typeof method !== "string") {
+    return <_AuthHandler method={method as ClientBasicTokenMethod} />;
+  } else if (method.type === BasicAuthType && typeof method !== "string") {
     return <_AuthHandler method={method as ClientBasicMethod} />;
   } else if (method.type === SamlAuthType && typeof method !== "string") {
     return <_AuthHandler method={method as ClientSamlMethod} />;

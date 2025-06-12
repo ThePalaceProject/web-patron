@@ -1,10 +1,13 @@
+import { fetchAuthToken } from "auth/fetch";
 import useCredentials from "auth/useCredentials";
 import useLibraryContext from "components/context/LibraryContext";
 import { fetchCollection } from "dataflow/opds1/fetch";
 import { ServerError } from "errors";
-import { AppAuthMethod, AnyBook } from "interfaces";
+import { AppAuthMethod, AnyBook, AuthCredentials, Token } from "interfaces";
 import * as React from "react";
 import useSWR from "swr";
+import { BasicTokenAuthType } from "types/opds1";
+import { addHours, isBefore } from "date-fns";
 
 type Status = "authenticated" | "loading" | "unauthenticated";
 export type UserState = {
@@ -13,7 +16,11 @@ export type UserState = {
   isAuthenticated: boolean;
   isLoading: boolean;
   refetchLoans: () => void;
-  signIn: (token: string, method: AppAuthMethod) => void;
+  signIn: (
+    token: string,
+    method: AppAuthMethod,
+    authenticationUrl: string | undefined
+  ) => void;
   signOut: () => void;
   setBook: (book: AnyBook, id?: string) => void;
   error: any;
@@ -42,30 +49,78 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     slug
   );
   const [error, setError] = React.useState<ServerError | null>(null);
+
+  const shouldRevalidate = () => {
+    if (credentials?.methodType === BasicTokenAuthType) {
+      if (typeof credentials?.token !== "string" && credentials?.token) {
+        if (credentials.token?.expirationDate) {
+          return isBefore(credentials?.token?.expirationDate, new Date());
+        }
+      }
+    }
+
+    return false;
+  };
+
+  const token = stringifyToken(credentials);
   const { data, mutate, isValidating } = useSWR(
     // pass null if there are no credentials or shelfUrl to tell SWR not to fetch at all.
-    credentials && shelfUrl
-      ? [shelfUrl, credentials?.token, credentials?.methodType]
-      : null,
+    credentials && shelfUrl ? [shelfUrl, token, credentials?.methodType] : null,
     fetchLoans,
     {
-      shouldRetryOnError: false,
-      revalidateOnFocus: false,
+      shouldRetryOnError: credentials?.methodType === BasicTokenAuthType,
+      revalidateOnFocus: shouldRevalidate(),
       revalidateOnReconnect: false,
+      errorRetryCount: credentials?.methodType === BasicTokenAuthType ? 1 : 0,
+      // Try and fetch new token once old token has expired
+      onErrorRetry: async (err, _key, _config, revalidate) => {
+        if (err instanceof ServerError && err?.info.status === 401) {
+          if (credentials?.methodType === BasicTokenAuthType) {
+            try {
+              // assume expiresIn is in seconds
+              const { accessToken, expiresIn } = await fetchAuthToken(
+                credentials?.authenticationUrl,
+                stringifyToken(credentials, "basicToken")
+              );
+              setCredentials({
+                authenticationUrl: credentials?.authenticationUrl,
+                methodType: credentials.methodType,
+                token: {
+                  bearerToken: `Bearer ${accessToken}`,
+                  basicToken: stringifyToken(credentials, "basicToken"),
+                  expirationDate: addHours(new Date(), expiresIn / 3600)
+                }
+              });
+              revalidate();
+            } catch (err) {
+              setError(err);
+              clearCredentials();
+            }
+          }
+        }
+      },
       // clear credentials whenever we receive a 401, but save the error so it sticks around.
+      // however, BasicTokenAuthType methods are retried in onErrorRetry to get new token
       onError: err => {
         if (err instanceof ServerError && err?.info.status === 401) {
-          setError(err);
-          clearCredentials();
+          if (credentials?.methodType !== BasicTokenAuthType) {
+            setError(err);
+            clearCredentials();
+          }
         }
       }
     }
   );
 
-  function signIn(token: string, method: AppAuthMethod) {
-    setCredentials({ token, methodType: method.type });
+  function signIn(
+    token: string | Token,
+    method: AppAuthMethod,
+    authenticationUrl: string | undefined
+  ) {
+    setCredentials({ token, authenticationUrl, methodType: method.type });
     mutate();
   }
+
   function signOut() {
     clearCredentials();
     mutate();
@@ -102,7 +157,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     signOut,
     setBook,
     error,
-    token: credentials?.token,
+    token: stringifyToken(credentials),
     clearCredentials
   };
 
@@ -122,4 +177,22 @@ export default function useUser() {
 async function fetchLoans(url: string, token: string) {
   const collection = await fetchCollection(url, token);
   return collection.books;
+}
+
+function stringifyToken(
+  credentials: AuthCredentials | undefined,
+  tokenType: string = "bearerToken"
+): string | undefined {
+  if (
+    credentials?.methodType === BasicTokenAuthType &&
+    typeof credentials?.token === "object"
+  ) {
+    return credentials?.token?.[tokenType];
+  }
+
+  if (typeof credentials?.token === "string") {
+    return credentials.token;
+  }
+
+  return undefined;
 }

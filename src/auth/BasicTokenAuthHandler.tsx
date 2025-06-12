@@ -9,25 +9,27 @@ import { Text } from "components/Text";
 import Button, { InputIconButton, NavButton } from "components/Button";
 import FormInput from "components/form/FormInput";
 import { modalButtonStyles } from "components/Modal";
-import { ClientBasicMethod } from "interfaces";
+import { ClientBasicTokenMethod } from "interfaces";
 import { generateToken } from "auth/useCredentials";
 import useUser from "components/context/UserContext";
-import { ServerError } from "errors";
+import ApplicationError, { ServerError } from "errors";
 import useLogin from "auth/useLogin";
 import useLibraryContext from "components/context/LibraryContext";
 import { Keyboard } from "types/opds1";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { fetchAuthToken } from "auth/fetch";
+import { addHours } from "date-fns";
 
 type FormData = {
   [key: string]: string;
 };
 
 /**
- * Renders a form for completing basic auth.
+ * Renders a form for completing basic token auth.
  */
-const BasicAuthHandler: React.FC<{
-  method: ClientBasicMethod;
+const BasicTokenAuthHandler: React.FC<{
+  method: ClientBasicTokenMethod;
 }> = ({ method }) => {
   const { signIn, error, isLoading } = useUser();
   const { baseLoginUrl } = useLogin();
@@ -38,15 +40,41 @@ const BasicAuthHandler: React.FC<{
   } = useForm<FormData>();
   const { authMethods } = useLibraryContext();
 
+  const authenticationUrl = method.links?.find(
+    link => link.rel === "authenticate"
+  )?.href;
+
   const usernameInputName = method.labels.login;
   const passwordInputName = method.labels.password;
 
   const onSubmit = handleSubmit(async values => {
     const login = values[usernameInputName];
     const password = values[passwordInputName];
-    // try to login with these credentials
-    const token = generateToken(login, password);
-    signIn(token, method);
+
+    if (!authenticationUrl) {
+      throw new ApplicationError({
+        title: "Incomplete Authentication Data",
+        detail:
+          "The required link with rel 'authenticate' is missing from library data."
+      });
+    }
+
+    // generate Basic Token to send to circuation manager for Bearer Token
+    const basicToken = generateToken(login, password);
+    const { accessToken, expiresIn } = await fetchAuthToken(
+      authenticationUrl,
+      basicToken
+    );
+    signIn(
+      {
+        basicToken: basicToken,
+        bearerToken: `Bearer ${accessToken}`,
+        // assume expiresIn is in seconds
+        expirationDate: addHours(new Date(), expiresIn / 3600)
+      },
+      method,
+      authenticationUrl
+    );
   });
 
   const serverError = error instanceof ServerError ? error : undefined;
@@ -132,4 +160,4 @@ const BasicAuthHandler: React.FC<{
   );
 };
 
-export default BasicAuthHandler;
+export default BasicTokenAuthHandler;

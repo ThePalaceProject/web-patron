@@ -38,7 +38,8 @@ describe("fulfill", () => {
           headers: {
             "X-Requested-With": "XMLHttpRequest",
             Authorization: "token"
-          }
+          },
+          method: "GET"
         });
 
         expect(location.url).toBe("download-url");

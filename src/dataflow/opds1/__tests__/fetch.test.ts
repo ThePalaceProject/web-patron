@@ -22,7 +22,8 @@ describe("fetchOPDS", () => {
     fetchMock.once(rawOpdsEntry);
     await fetchOPDS("/some-url");
     expect(fetchMock).toHaveBeenCalledWith("/some-url", {
-      headers: { "X-Requested-With": "XMLHttpRequest" }
+      headers: { "X-Requested-With": "XMLHttpRequest" },
+      method: "GET"
     });
 
     fetchMock.once(rawOpdsEntry);
@@ -31,7 +32,8 @@ describe("fetchOPDS", () => {
       headers: {
         "X-Requested-With": "XMLHttpRequest",
         Authorization: "some-token"
-      }
+      },
+      method: "GET"
     });
   });
 

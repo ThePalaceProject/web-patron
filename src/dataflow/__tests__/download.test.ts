@@ -17,7 +17,8 @@ describe("downloadFile", () => {
       headers: {
         "X-Requested-With": "XMLHttpRequest",
         Authorization: "this token"
-      }
+      },
+      method: "GET"
     });
   });
 
@@ -38,13 +39,15 @@ describe("downloadFile", () => {
       headers: {
         "X-Requested-With": "XMLHttpRequest",
         Authorization: "this token"
-      }
+      },
+      method: "GET"
     });
 
     expect(fetchMock).toHaveBeenNthCalledWith(2, "some-url", {
       headers: {
         Authorization: "this token"
-      }
+      },
+      method: "GET"
     });
   });
 
@@ -73,7 +76,8 @@ describe("downloadFile", () => {
       headers: {
         "X-Requested-With": "XMLHttpRequest",
         Authorization: "this token"
-      }
+      },
+      method: "GET"
     });
 
     expect(fetchMock).toHaveBeenNthCalledWith(2, "redirected-url");

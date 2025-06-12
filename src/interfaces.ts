@@ -98,9 +98,18 @@ export type AppAuthMethod =
   | ClientBasicTokenMethod
   | ClientSamlMethod;
 
+export type Token = {
+  basicToken: string | undefined;
+  bearerToken: string | null;
+  expirationDate: Date;
+};
+
+export type AuthCredentialsToken = string | Token | undefined;
+
 export interface AuthCredentials {
   methodType: AppAuthMethod["type"];
-  token: string;
+  token: AuthCredentialsToken;
+  authenticationUrl?: string;
 }
 
 export interface LibraryData {

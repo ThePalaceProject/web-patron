@@ -21,7 +21,8 @@ describe("fetching catalog", () => {
       headers: {
         "X-Requested-With": "XMLHttpRequest",
         "Accept-Language": "*"
-      }
+      },
+      method: "GET"
     });
   });
 

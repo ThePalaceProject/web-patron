@@ -486,7 +486,8 @@ describe("FulfillableBook", () => {
       headers: {
         Authorization: "user-token",
         "X-Requested-With": "XMLHttpRequest"
-      }
+      },
+      method: "GET"
     });
   });
 
@@ -516,7 +517,8 @@ describe("FulfillableBook", () => {
       headers: {
         Authorization: "user-token",
         "X-Requested-With": "XMLHttpRequest"
-      }
+      },
+      method: "GET"
     });
 
     // some error will be shown because we didn't mock fetch for this,
@@ -562,7 +564,8 @@ describe("FulfillableBook", () => {
       headers: {
         Authorization: "user-token",
         "X-Requested-With": "XMLHttpRequest"
-      }
+      },
+      method: "GET"
     });
 
     // we try the rejected url without headers

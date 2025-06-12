@@ -11,7 +11,8 @@ describe("fetchWithHeaders", () => {
     expect(fetchMock).toHaveBeenCalledWith("some-url", {
       headers: {
         "X-Requested-With": "XMLHttpRequest"
-      }
+      },
+      method: "GET"
     });
   });
 
@@ -24,7 +25,8 @@ describe("fetchWithHeaders", () => {
       headers: {
         "X-Requested-With": "XMLHttpRequest",
         Authorization: "some token"
-      }
+      },
+      method: "GET"
     });
   });
 
@@ -42,7 +44,8 @@ describe("fetchWithHeaders", () => {
         Authorization: "some token",
         "Accept-Language": "us-en",
         "X-Something-Else": "what?"
-      }
+      },
+      method: "GET"
     });
   });
 
@@ -57,7 +60,8 @@ describe("fetchWithHeaders", () => {
       headers: {
         "X-Requested-With": "XMLHttpRequest",
         "X-Something-Else": "what?"
-      }
+      },
+      method: "GET"
     });
   });
 
@@ -72,7 +76,8 @@ describe("fetchWithHeaders", () => {
       headers: {
         "X-Requested-With": "I changed it",
         Authorization: "some token"
-      }
+      },
+      method: "GET"
     });
   });
 
@@ -87,7 +92,8 @@ describe("fetchWithHeaders", () => {
       headers: {
         "X-Requested-With": "XMLHttpRequest",
         Authorization: "some token"
-      }
+      },
+      method: "GET"
     });
   });
 
@@ -102,7 +108,8 @@ describe("fetchWithHeaders", () => {
     expect(fetchMock).toHaveBeenCalledWith("some-url", {
       headers: {
         Authorization: "some token"
-      }
+      },
+      method: "GET"
     });
   });
 });
