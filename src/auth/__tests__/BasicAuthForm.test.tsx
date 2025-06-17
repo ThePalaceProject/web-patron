@@ -249,16 +249,14 @@ test("submits with no password input", async () => {
   });
 });
 
-describe("choose a different method NavButton", () => {
-  test("doesn't display if library only has one method", () => {
-    setup(<BasicAuthHandler method={method} />, {
-      library: {
-        authMethods: [basicAuthMethod]
-      }
-    });
-    const chooseAnother = screen.queryByRole("link", {
-      name: "Use a different login method"
-    });
-    expect(chooseAnother).not.toBeInTheDocument();
+test("doesn't display if library only has one method", () => {
+  setup(<BasicAuthHandler method={method} />, {
+    library: {
+      authMethods: [basicAuthMethod]
+    }
   });
+  const chooseAnother = screen.queryByRole("link", {
+    name: "Use a different login method"
+  });
+  expect(chooseAnother).not.toBeInTheDocument();
 });
