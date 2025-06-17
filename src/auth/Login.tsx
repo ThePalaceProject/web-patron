@@ -9,26 +9,24 @@ import LoadingIndicator from "components/LoadingIndicator";
 import useLogin from "auth/useLogin";
 import { isSupportedAuthType } from "./AuthenticationHandler";
 
-export default function LoginPicker(): React.ReactElement {
+export default function Login(): React.ReactElement {
   const { initLogin } = useLogin();
 
-  // Here we filter out any methods from the auth document that we don't support.
-  // We're aliasing the `authMethods` variable here so that we can end up with
-  // the same variable name after filtering.
-  const { authMethods: methodsFromAuthDocument } = useLibraryContext();
-  const authMethods = methodsFromAuthDocument.filter(m =>
+  // AppAuthMethod[] shouldn't be populated with unsupported auth methods from auth document,
+  // but we filter out any unsupported methods just in case.
+  const { authMethods } = useLibraryContext();
+  const supportedAuthMethods = authMethods.filter(m =>
     isSupportedAuthType(m.type)
   );
 
-  // Redirect user automatically to appropriate method if there is
-  // only one auth method
+  // Automatically redirect user to first supported auth method
   React.useEffect(() => {
-    if (authMethods.length > 0) {
-      initLogin(authMethods[0].id);
+    if (supportedAuthMethods.length > 0) {
+      initLogin(supportedAuthMethods[0].id);
     }
-  }, [authMethods, initLogin]);
+  }, [supportedAuthMethods, initLogin]);
 
-  if (authMethods.length === 0) {
+  if (supportedAuthMethods.length === 0) {
     return <NoAuth />;
   }
 

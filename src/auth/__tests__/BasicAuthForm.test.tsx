@@ -6,7 +6,6 @@ import fetchMock from "jest-fetch-mock";
 import Cookie from "js-cookie";
 import { generateCredentials } from "utils/auth";
 import { UserProvider } from "components/context/UserContext";
-import { basicAuthMethod } from "test-utils/fixtures";
 import { Keyboard } from "types/opds1";
 
 const mockCookie = Cookie as any;
@@ -247,16 +246,4 @@ test("submits with no password input", async () => {
       method: "GET"
     });
   });
-});
-
-test("doesn't display if library only has one method", () => {
-  setup(<BasicAuthHandler method={method} />, {
-    library: {
-      authMethods: [basicAuthMethod]
-    }
-  });
-  const chooseAnother = screen.queryByRole("link", {
-    name: "Use a different login method"
-  });
-  expect(chooseAnother).not.toBeInTheDocument();
 });
