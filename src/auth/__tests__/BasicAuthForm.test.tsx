@@ -6,7 +6,7 @@ import fetchMock from "jest-fetch-mock";
 import Cookie from "js-cookie";
 import { generateCredentials } from "utils/auth";
 import { UserProvider } from "components/context/UserContext";
-import { basicAuthMethod, cleverAuthMethod } from "test-utils/fixtures";
+import { basicAuthMethod } from "test-utils/fixtures";
 import { Keyboard } from "types/opds1";
 
 const mockCookie = Cookie as any;
@@ -250,22 +250,6 @@ test("submits with no password input", async () => {
 });
 
 describe("choose a different method NavButton", () => {
-  test("displays if multiple library has multiple methods", async () => {
-    setup(<BasicAuthHandler method={method} />, {
-      library: {
-        authMethods: [basicAuthMethod, cleverAuthMethod]
-      }
-    });
-    const chooseAnother = screen.getByRole("link", {
-      name: "Use a different login method"
-    });
-    expect(chooseAnother).toBeInTheDocument();
-    expect(chooseAnother).toHaveAttribute(
-      "href",
-      "/testlib/login?nextUrl=%2Ftestlib"
-    );
-  });
-
   test("doesn't display if library only has one method", () => {
     setup(<BasicAuthHandler method={method} />, {
       library: {

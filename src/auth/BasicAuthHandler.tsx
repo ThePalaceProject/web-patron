@@ -6,15 +6,13 @@ import { jsx } from "theme-ui";
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { Text } from "components/Text";
-import Button, { InputIconButton, NavButton } from "components/Button";
+import Button, { InputIconButton } from "components/Button";
 import FormInput from "components/form/FormInput";
 import { modalButtonStyles } from "components/Modal";
 import { ClientBasicMethod } from "interfaces";
 import { generateToken } from "auth/useCredentials";
 import useUser from "components/context/UserContext";
 import { ServerError } from "errors";
-import useLogin from "auth/useLogin";
-import useLibraryContext from "components/context/LibraryContext";
 import { Keyboard } from "types/opds1";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
@@ -30,13 +28,11 @@ const BasicAuthHandler: React.FC<{
   method: ClientBasicMethod;
 }> = ({ method }) => {
   const { signIn, error, isLoading } = useUser();
-  const { baseLoginUrl } = useLogin();
   const {
     register,
     handleSubmit,
     formState: { errors }
   } = useForm<FormData>();
-  const { authMethods } = useLibraryContext();
 
   const usernameInputName = method.labels.login;
   const passwordInputName = method.labels.password;
@@ -50,8 +46,6 @@ const BasicAuthHandler: React.FC<{
   });
 
   const serverError = error instanceof ServerError ? error : undefined;
-
-  const hasMultipleMethods = authMethods.length > 1;
 
   const hasPasswordInput =
     method.inputs?.password?.keyboard !== Keyboard.NoInput;
@@ -123,11 +117,6 @@ const BasicAuthHandler: React.FC<{
       >
         Login
       </Button>
-      {hasMultipleMethods && (
-        <NavButton href={baseLoginUrl} variant="link">
-          Use a different login method
-        </NavButton>
-      )}
     </form>
   );
 };

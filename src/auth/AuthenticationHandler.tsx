@@ -76,7 +76,7 @@ const AuthenticationHandler: React.ComponentType<AuthHandlerWrapperProps> = ({
     track.error(
       new ApplicationError({
         title: "Login Method Not Supported",
-        detail: `Failed to render what should be a supported authentication method. Is the LoginPicker method filtering correctly configured? Method ID: ${method.id}`
+        detail: `Failed to render what should be a supported authentication method. Is the Login method filtering correctly configured? Method ID: ${method.id}`
       })
     );
     return <p>This authentication method is not supported.</p>;
