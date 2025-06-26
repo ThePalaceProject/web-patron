@@ -16,6 +16,8 @@ export const samlAuthId = "http://librarysimplified.org/authtype/SAML-2.0";
 export const basicTokenAuthenticationUrl =
   "https://exmple.com/patrons/me/token/";
 
+export const unsupportedAuthId = "http://opds-spec.org/auth/oauth/implicit";
+
 export const basicAuthMethod: ClientBasicMethod = {
   id: "client-basic",
   labels: {
@@ -85,6 +87,18 @@ export function createSamlMethod(num: number): ClientSamlMethod {
     ]
   };
 }
+
+export const unsupportedAuthMethod = {
+  id: "unsupported-auth-method",
+  description: "Unsupported auth method",
+  links: [
+    {
+      rel: "authenticate",
+      href: "https://example.com/oauth"
+    }
+  ],
+  type: unsupportedAuthId
+};
 
 export const loans: CollectionData = {
   id: "loans-id",
