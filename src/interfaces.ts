@@ -145,6 +145,8 @@ export type BookMedium =
   | "http://schema.org/EBook"
   | "http://schema.org/Book";
 
+export type BookMediumName = "Audiobook" | "eBook" | "Book";
+
 export type BookAvailability =
   | "available"
   | "unavailable"
