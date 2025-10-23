@@ -12,7 +12,7 @@ import {
   getAuthorsString
 } from "../utils/book";
 import Lane from "./Lane";
-import Button, { NavButton } from "./Button";
+import Button from "./Button";
 import LoadingIndicator from "./LoadingIndicator";
 import { H2, P, ScreenReaderOnly, Text } from "./Text";
 import BookCover from "./BookCover";
@@ -28,11 +28,9 @@ import {
   getFulfillmentFromLink,
   shouldRedirectToCompanionApp
 } from "utils/fulfill";
-import { ArrowForward } from "icons";
 import BookStatus from "components/BookStatus";
 import Link from "./Link";
 import { APP_CONFIG } from "utils/env";
-import DetailField from "./BookMetaDetail";
 
 const ListLoadingIndicator = () => (
   <div
@@ -131,7 +129,6 @@ export const BookListItem: React.FC<{
         borderColor: "ui.gray.light",
         py: 3
       }}
-      aria-label={`Book: ${book.title}`}
     >
       <Stack
         sx={{

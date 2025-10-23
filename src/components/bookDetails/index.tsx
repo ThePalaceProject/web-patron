@@ -14,7 +14,7 @@ import { truncateString } from "../../utils/string";
 import DetailField from "../BookMetaDetail";
 import ReportProblem from "./ReportProblem";
 import Head from "next/head";
-import { H1, H2, H3, Text } from "components/Text";
+import { H1, H2, H3, ScreenReaderOnly, Text } from "components/Text";
 import MediumIndicator from "components/MediumIndicator";
 import PalaceLogo from "components/PalaceLogo";
 import IosBadge from "components/storeBadges/IosBadge";
@@ -75,9 +75,9 @@ export const BookDetails: React.FC = () => {
               display: "flex",
               flexDirection: "column"
             }}
-            aria-label="Book info"
           >
             <H1 sx={{ m: 0 }}>
+              <ScreenReaderOnly>Book title: </ScreenReaderOnly>
               {book.title}
               {book.subtitle && `: ${book.subtitle}`}
             </H1>
@@ -122,7 +122,7 @@ const Summary: React.FC<{ book: AnyBook; className?: string }> = ({
   book,
   className
 }) => (
-  <div sx={{ my: 2 }} className={className} aria-label="Book summary">
+  <div sx={{ my: 2 }} className={className}>
     <H2 sx={{ mb: 2, variant: "text.headers.tertiary" }}>Summary</H2>
     <div
       dangerouslySetInnerHTML={{

@@ -7,7 +7,7 @@ import { Focusable } from "@ariakit/react/focusable";
 import Book, { BOOK_HEIGHT, BOOK_WIDTH } from "./BookCard";
 import withErrorBoundary, { FallbackProps } from "./ErrorBoundary";
 import { lighten } from "@theme-ui/color";
-import { H2 } from "./Text";
+import { H2, ScreenReaderOnly } from "./Text";
 import { NavButton } from "./Button";
 import ArrowForward from "icons/ArrowForward";
 import Stack from "./Stack";
@@ -168,7 +168,7 @@ const Lane: React.FC<{
   if (filteredBooks.length === 0) return null;
 
   return (
-    <li sx={{ m: 0, p: 0, mb: 4, listStyle: "none" }} aria-label={title}>
+    <li sx={{ m: 0, p: 0, mb: 4, listStyle: "none" }}>
       <Stack
         sx={{
           justifyContent: ["space-between", "initial"],
@@ -176,14 +176,12 @@ const Lane: React.FC<{
           alignItems: "baseline"
         }}
       >
-        <TitleTag
-          aria-label={`${title} collection`}
-          sx={{ pr: [3, 5], m: 0, mb: 3 }}
-        >
-          {title}
+        <TitleTag sx={{ pr: [3, 5], m: 0, mb: 3 }}>
+          {title} <ScreenReaderOnly>collection</ScreenReaderOnly>
         </TitleTag>
         <NavButton
           variant="link"
+          color="ui.black"
           collectionUrl={url}
           iconRight={ArrowForward}
           sx={{ variant: "text.body.bold", textDecoration: "none" }}

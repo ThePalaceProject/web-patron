@@ -37,10 +37,7 @@ const Recommendations: React.FC<{ book: AnyBook }> = ({ book }) => {
   if (!isLoading && !hasBooks) return null;
 
   return (
-    <section
-      aria-label="Recommendations"
-      sx={{ bg: "ui.gray.lightWarm", py: 4 }}
-    >
+    <section sx={{ bg: "ui.gray.lightWarm", py: 4 }}>
       <H2
         sx={{
           px: [3, 5],
