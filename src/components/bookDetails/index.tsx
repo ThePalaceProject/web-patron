@@ -89,7 +89,14 @@ export const BookDetails: React.FC = () => {
             {APP_CONFIG.showMedium && <MediumIndicator book={book} />}
             <FulfillmentCard book={book} sx={{ mt: 3 }} />
             <Summary book={book} />
-            <div sx={{ mt: 2 }}>
+            <dl
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "auto 1fr",
+                rowGap: 10,
+                mt: 2
+              }}
+            >
               <DetailField heading="Publisher" details={book.publisher} />
               <DetailField heading="Published" details={book.published} />
               <DetailField
@@ -101,7 +108,7 @@ export const BookDetails: React.FC = () => {
                 details={book.providerName}
               />
               <DetailField heading="Book format" details={book.format} />
-            </div>
+            </dl>
             <ReportProblem book={book} />
           </div>
         </div>

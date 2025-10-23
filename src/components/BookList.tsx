@@ -1,6 +1,6 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
-import { jsx } from "theme-ui";
+import { jsx, SxProp } from "theme-ui";
 import * as React from "react";
 import { truncateString, stripHTML } from "../utils/string";
 import {
@@ -14,7 +14,7 @@ import {
 import Lane from "./Lane";
 import Button, { NavButton } from "./Button";
 import LoadingIndicator from "./LoadingIndicator";
-import { H2, Text } from "./Text";
+import { H2, P, ScreenReaderOnly, Text } from "./Text";
 import BookCover from "./BookCover";
 import BorrowOrReserve from "./BorrowOrReserve";
 import { AnyBook, CollectionData, LaneData } from "interfaces";
@@ -32,6 +32,7 @@ import { ArrowForward } from "icons";
 import BookStatus from "components/BookStatus";
 import Link from "./Link";
 import { APP_CONFIG } from "utils/env";
+import DetailField from "./BookMetaDetail";
 
 const ListLoadingIndicator = () => (
   <div
@@ -141,12 +142,21 @@ export const BookListItem: React.FC<{
         <Link
           bookUrl={book.url}
           aria-label={`View ${book.title}`}
+          aria-hidden="true"
+          tabIndex={-1}
           sx={{
             flex: ["0 0 100px", "0 0 100px", "0 0 148px"],
             height: [141, 141, 219]
           }}
         >
-          <BookCover book={book} showMedium={APP_CONFIG.showMedium} />
+          <div
+            sx={{
+              flex: ["0 0 100px", "0 0 100px", "0 0 148px"],
+              height: [141, 141, 219]
+            }}
+          >
+            <BookCover book={book} showMedium={APP_CONFIG.showMedium} />
+          </div>
         </Link>
         <Stack direction="column" sx={{ alignItems: "flex-start" }}>
           <div>
@@ -154,19 +164,17 @@ export const BookListItem: React.FC<{
               <Link
                 bookUrl={book.url}
                 sx={{ variant: "text.link.bold", color: "brand.primary" }}
-                aria-label={book.title}
+                aria-label={`View details for ${book.title}`}
               >
-                {truncateString(book.title, 50)}
+                <Metadata display="inline" heading="Title">
+                  {truncateString(book.title, 50)}
+                </Metadata>
               </Link>
+              {book.subtitle && (
+                <Text>: {truncateString(book.subtitle, 50)}</Text>
+              )}
             </H2>
-            {book.subtitle && (
-              <Text variant="callouts.italic" aria-label="Subtitle">
-                , {truncateString(book.subtitle, 50)}
-              </Text>
-            )}
-            <Text aria-label="Authors" sx={{ display: "block" }}>
-              {authors}
-            </Text>
+            <Metadata heading="Authors">{authors}</Metadata>
           </div>
 
           <BookStatus book={book} />
@@ -185,22 +193,29 @@ export const BookListItem: React.FC<{
   );
 };
 
-const Description: React.FC<{ book: AnyBook; className?: string }> = ({
-  book,
-  className
-}) => {
+const Metadata: React.FC<{
+  heading: string;
+  variant?: string;
+  display?: string;
+  children: React.ReactNode;
+}> = ({ heading, variant, children, display = "block" }) => {
+  return (
+    <P sx={{ margin: 0, variant, display }}>
+      <ScreenReaderOnly>{heading} :</ScreenReaderOnly>
+      {children}
+    </P>
+  );
+};
+
+const Description: React.FC<{
+  book: AnyBook;
+  className?: string;
+}> = ({ book, className }) => {
   return (
     <div className={className}>
-      <Text variant="text.body.italic">
+      <Metadata heading="Description" variant="text.body.italic">
         {truncateString(stripHTML(book.summary ?? ""), 280)}
-      </Text>
-      <NavButton
-        bookUrl={book.url}
-        variant="link"
-        sx={{ verticalAlign: "baseline", ml: 1 }}
-      >
-        Read more
-      </NavButton>
+      </Metadata>
     </div>
   );
 };
@@ -251,16 +266,12 @@ const BookListCTA: React.FC<{ book: AnyBook }> = ({ book }) => {
           id={book.id}
           text="Return"
         />
-        {singleFulfillment && !shouldRedirectUser ? (
+        {singleFulfillment && !shouldRedirectUser && (
           <FulfillmentButton
             details={singleFulfillment}
             book={book}
             isPrimaryAction
           />
-        ) : (
-          <NavButton variant="link" bookUrl={book.url} iconRight={ArrowForward}>
-            View Book Details
-          </NavButton>
         )}
       </>
     );

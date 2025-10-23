@@ -111,7 +111,7 @@ export const styleProps = (
         color: color,
         fill: color,
         "&:focus,&:hover": {
-          bg: lightness(color, 0.85),
+          bg: lightness(color, 0.9),
           color: color,
           textDecoration: "none"
         },

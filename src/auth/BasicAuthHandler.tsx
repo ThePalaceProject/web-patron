@@ -70,7 +70,6 @@ const BasicAuthHandler: React.FC<{
       <FormInput
         name={usernameInputName}
         label={usernameInputName}
-        id="login"
         placeholder={usernameInputName}
         {...register(usernameInputName, {
           required: true,
@@ -88,7 +87,6 @@ const BasicAuthHandler: React.FC<{
             required: true,
             maxLength: 25
           })}
-          id="password"
           type={showPassword ? "text" : "password"}
           placeholder={passwordInputName}
           error={

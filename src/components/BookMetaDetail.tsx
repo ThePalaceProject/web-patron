@@ -5,14 +5,18 @@ import * as React from "react";
 
 const DetailField: React.FC<{
   heading: string;
+  hideHeading?: Boolean;
   details?: string;
-  className?: string;
-}> = ({ heading, details, className }) =>
+}> = ({ heading, hideHeading = false, details }) =>
   details ? (
-    <div className={className}>
-      <b>{heading}: </b>
-      <span>{details}</span>
-    </div>
+    <>
+      <dt
+        sx={{ variant: hideHeading ? "text.accessibility.visuallyHidden" : "" }}
+      >
+        <b>{heading}: </b>
+      </dt>
+      <dd style={{ marginLeft: hideHeading ? 0 : 10 }}>{details}</dd>
+    </>
   ) : null;
 
 export default DetailField;

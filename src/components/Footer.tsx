@@ -7,7 +7,7 @@ import * as React from "react";
 import ExternalLink from "./ExternalLink";
 import useLibraryContext from "./context/LibraryContext";
 import List, { ListItem } from "./List";
-import { H3, Text } from "./Text";
+import { H2, Text } from "./Text";
 import { NavButton } from "./Button";
 import SvgPhone from "icons/Phone";
 import IosBadge from "./storeBadges/IosBadge";
@@ -39,7 +39,9 @@ const Footer: React.FC<{ className?: string }> = ({ className }) => {
       className={className}
     >
       <div sx={{ flex: "0 0 auto", mt: 5, mr: 5 }}>
-        <H3 sx={{ mt: 0, maxWidth: "100%" }}>{title}</H3>
+        <H2 variant="text.headers.tertiary" sx={{ mt: 0, maxWidth: "100%" }}>
+          {title}
+        </H2>
         <FooterList>
           {libraryWebsite && (
             <ListItem>
@@ -82,7 +84,9 @@ const Footer: React.FC<{ className?: string }> = ({ className }) => {
         </FooterList>
       </div>
       <div sx={{ flex: "0 0 auto", mt: 5, mr: [3, 5] }}>
-        <H3 sx={{ mt: 0 }}>Patron Support</H3>
+        <H2 variant="text.headers.tertiary" sx={{ mt: 0 }}>
+          Patron Support
+        </H2>
         <FooterList>
           {helpEmail && (
             <ListItem>
@@ -108,10 +112,13 @@ const Footer: React.FC<{ className?: string }> = ({ className }) => {
 
 const DownloadSimplyECallout = () => (
   <div sx={{ maxWidth: 300, flex: "0 1 auto", mt: 5 }}>
-    <H3 sx={{ mt: 0, display: "flex", alignItems: "center" }}>
+    <H2
+      variant="text.headers.tertiary"
+      sx={{ mt: 0, display: "flex", alignItems: "center" }}
+    >
       <SvgPhone sx={{ mr: 1 }} />
       Download Palace
-    </H3>
+    </H2>
     <Text>
       Our mobile app lets you browse, borrow and read from our whole collection
       of ebooks and audiobooks right on your phone!
