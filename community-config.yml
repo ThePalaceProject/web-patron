@@ -59,11 +59,62 @@ companion_app: simplye
 # configuration.
 
 # REQUIRED LIBRARY CONFIG
-
-# if you would like to use a library registry, define the registry url
-# libraries: https://registry.thepalaceproject.org/libraries
-
-# Or define the catalog root and shortname for each library on this instance.
-# the homepage of the library will then be at https://domain.com/:library/
+#
+# There are three ways to configure libraries:
+#
+# 1. STATIC LIBRARIES (recommended for a few known libraries):
+#    Define libraries as a dictionary mapping slug to authentication document URL.
+#    These libraries are available immediately at build time.
+#
 libraries:
   main-street-city: https://demo.thepalaceproject.org/GA0000/authentication_document
+
+# 2. RUNTIME LIBRARY REGISTRIES (recommended for dynamic library lists):
+#    Define one or more library registry URLs that will be fetched at runtime.
+#    This allows libraries to be added/removed without rebuilding the application.
+#    NOTE: Runtime fetching is implemented in Release 1. In Release 0, this config
+#    is parsed but registries are not yet fetched at runtime.
+#
+# registries:
+#   - url: https://registry.thepalaceproject.org/libraries
+#     refreshMinInterval: 60   # Minimum seconds between fetch attempts (default: 60)
+#     refreshMaxInterval: 300  # Maximum seconds after last successful fetch before auto-refresh (default: 300)
+#
+# You can also define multiple registries (earlier registries take precedence for slug conflicts):
+# registries:
+#   - url: https://registry.thepalaceproject.org/libraries
+#     refreshMinInterval: 60
+#     refreshMaxInterval: 300
+#   - url: https://regional-registry.example.com/libraries
+#     refreshMinInterval: 120
+#     refreshMaxInterval: 600
+#
+# 3. HYBRID (static + registries):
+#    Combine static libraries with runtime registries. Static libraries always
+#    take precedence over registry libraries if there are slug conflicts.
+#
+# libraries:
+#   featured-lib: https://example.com/featured/auth
+# registries:
+#   - url: https://registry.thepalaceproject.org/libraries
+#
+# DEPRECATED FORMAT (still supported for backward compatibility):
+# Using a string for 'libraries' is deprecated. This format fetches the registry
+# at BUILD TIME only, not runtime. Please migrate to the 'registries' array format.
+#
+# libraries: https://registry.thepalaceproject.org/libraries  # DEPRECATED
+#
+# MIGRATION INSTRUCTIONS:
+# If you're currently using the string format:
+#   OLD (deprecated):
+#     libraries: https://registry.thepalaceproject.org/libraries
+#
+#   NEW (recommended):
+#     registries:
+#       - url: https://registry.thepalaceproject.org/libraries
+#         refreshMinInterval: 60
+#         refreshMaxInterval: 300
+#
+# After updating to the new format:
+# 1. With Release 0: Libraries still fetched at build time (no behavior change)
+# 2. With Release 1: Libraries fetched at runtime (no rebuild needed for library changes)

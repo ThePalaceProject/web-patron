@@ -20,6 +20,7 @@ export type AppConfig = {
   instanceName: string;
   mediaSupport: MediaSupportConfig;
   libraries: LibrariesConfig;
+  registries?: RegistryConfig[]; // Added in Release 0 for runtime registry fetching
   companionApp: "simplye" | "openebooks";
   showMedium: boolean;
   gtmId: string | null;
@@ -55,6 +56,16 @@ export type LibrariesConfig = Record<
   string,
   { title: string; authDocUrl: string } | undefined
 >;
+
+/**
+ * Registry configuration for runtime library fetching
+ * Introduced in Release 0 for config migration support
+ */
+export interface RegistryConfig {
+  url: string;
+  refreshMinInterval?: number; // seconds, default 60
+  refreshMaxInterval?: number; // seconds, default 300
+}
 
 export interface ComplaintData {
   type: string;
