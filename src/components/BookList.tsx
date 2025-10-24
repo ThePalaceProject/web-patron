@@ -1,6 +1,6 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
-import { jsx, SxProp } from "theme-ui";
+import { jsx } from "theme-ui";
 import * as React from "react";
 import { truncateString, stripHTML } from "../utils/string";
 import {

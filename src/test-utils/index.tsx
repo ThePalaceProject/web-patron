@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import * as React from "react";
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { LibraryData } from "../interfaces";
 import "./mockScrollTo";
@@ -102,17 +102,8 @@ function setup(jsx: any, options?: CustomRenderOptions) {
   };
 }
 
-function getByTextContent(text: RegExp | string) {
-  return screen.getByText((_, element) => {
-    const normalized = element.textContent?.replace(/\s+/g, " ").trim();
-    return typeof text === "string"
-      ? normalized === text
-      : text.test(normalized ?? "");
-  });
-}
-
 // re-export everything
 export * from "@testing-library/react";
 
 // override render method
-export { customRender as render, setup, getByTextContent };
+export { customRender as render, setup };

@@ -5,7 +5,7 @@ import * as React from "react";
 import { BookList } from "./BookList";
 import Head from "next/head";
 import BreadcrumbBar from "./BreadcrumbBar";
-import { H3, H2 } from "./Text";
+import { H2 } from "./Text";
 import { AnyBook } from "interfaces";
 import PageTitle from "./PageTitle";
 import { SignOut } from "./SignOut";

@@ -74,5 +74,5 @@ export const P: NativeComponent<"p", { variant?: string }> = ({
 );
 
 export const ScreenReaderOnly: NativeComponent<"span"> = ({ children }) => (
-  <span sx={{ variant: "text.accessibility.visuallyHidden" }}>{children}</span>
+  <span sx={{ variant: "accessibility.visuallyHidden" }}>{children}</span>
 );

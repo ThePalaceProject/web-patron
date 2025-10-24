@@ -1,5 +1,5 @@
 import * as React from "react";
-import { fixtures, setup, screen, getByTextContent } from "test-utils";
+import { fixtures, setup, screen } from "test-utils";
 import { BookList, InfiniteBookList } from "../BookList";
 import merge from "deepmerge";
 import { BorrowableBook, CollectionData } from "interfaces";
@@ -102,14 +102,14 @@ describe("infinite loading book list", () => {
     setup(<InfiniteBookList firstPageUrl="/first-page" />);
 
     expect(
-      screen.getByRole("link", { name: "Book Title 0" })
-    ).toBeInTheDocument();
+      screen.getAllByRole("link", { name: "Book Title 0 - details page" })
+    ).toHaveLength(2);
     expect(
-      screen.getByRole("link", { name: "Book Title 1" })
-    ).toBeInTheDocument();
+      screen.getAllByRole("link", { name: "Book Title 1 - details page" })
+    ).toHaveLength(2);
     expect(
-      screen.getByRole("link", { name: "The Mayan Secrets" })
-    ).toBeInTheDocument();
+      screen.getAllByRole("link", { name: "The Mayan Secrets - details page" })
+    ).toHaveLength(2);
   });
 
   test("shows loading indicator when fetching more", () => {

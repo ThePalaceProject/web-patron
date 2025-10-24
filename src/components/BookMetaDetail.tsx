@@ -5,17 +5,14 @@ import * as React from "react";
 
 const DetailField: React.FC<{
   heading: string;
-  hideHeading?: Boolean;
   details?: string;
-}> = ({ heading, hideHeading = false, details }) =>
+}> = ({ heading, details }) =>
   details ? (
     <>
-      <dt
-        sx={{ variant: hideHeading ? "text.accessibility.visuallyHidden" : "" }}
-      >
+      <dt>
         <b>{heading}: </b>
       </dt>
-      <dd style={{ marginLeft: hideHeading ? 0 : 10 }}>{details}</dd>
+      <dd style={{ marginLeft: 10 }}>{details}</dd>
     </>
   ) : null;
 

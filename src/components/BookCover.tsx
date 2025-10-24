@@ -6,7 +6,6 @@ import { AspectRatio } from "@theme-ui/components";
 import { MediumIcon } from "./MediumIndicator";
 import { AnyBook } from "interfaces";
 import LazyImage from "components/LazyImage";
-import { bookIsAudiobook, getMediumName } from "utils/book";
 
 /**
  * This is meant to be a book cover. Primarily the image and styling,
@@ -53,7 +52,7 @@ const BookCover: React.FC<{
         <MediumIcon book={book} sx={{ height: "30%", fill: "ui.gray.dark" }} />
       </AspectRatio>
       <LazyImage
-        alt="" //
+        alt={`Cover for ${book.title}`}
         src={imageUrl}
         onError={handleError}
         onLoad={handleLoad}
