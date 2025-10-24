@@ -138,9 +138,7 @@ export const BookListItem: React.FC<{
       >
         <Link
           bookUrl={book.url}
-          aria-label={`View ${book.title}`}
-          aria-hidden="true"
-          tabIndex={-1}
+          aria-label={`${book.title} - details page`}
           sx={{
             flex: ["0 0 100px", "0 0 100px", "0 0 148px"],
             height: [141, 141, 219]
@@ -161,7 +159,7 @@ export const BookListItem: React.FC<{
               <Link
                 bookUrl={book.url}
                 sx={{ variant: "text.link.bold", color: "brand.primary" }}
-                aria-label={book.title}
+                aria-label={`${book.title} - details page`}
               >
                 <Metadata display="inline" heading="Title">
                   {truncateString(book.title, 50)}
