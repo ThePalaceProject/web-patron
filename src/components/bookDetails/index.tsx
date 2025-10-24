@@ -135,7 +135,6 @@ const Summary: React.FC<{ book: AnyBook; className?: string }> = ({
 const SimplyECallout: React.FC<{ className?: "string" }> = ({ className }) => {
   return (
     <section
-      // aria-label="Download the Palace Mobile App"
       sx={{
         mt: 4,
         bg: "ui.gray.lightWarm",
