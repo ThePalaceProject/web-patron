@@ -53,7 +53,6 @@ const BookCover: React.FC<{
         <MediumIcon book={book} sx={{ height: "30%", fill: "ui.gray.dark" }} />
       </AspectRatio>
       <LazyImage
-        // alt={`Cover of ${getMediumName(book)}: ${book.title}`}
         alt="" //
         src={imageUrl}
         onError={handleError}

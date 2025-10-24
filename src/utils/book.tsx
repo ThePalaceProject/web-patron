@@ -140,10 +140,16 @@ export const bookMediumMap: {
   "http://schema.org/Book": { name: "Book", icon: Book }
 };
 
-export function getMediumName(book: AnyBook): BookMediumName {
+// Return empty string if no medium found
+// currently used for adding format to aria-label; it's okay if no medium is provided
+export function getMediumName(book: AnyBook): BookMediumName | "" {
   const medium = getMedium(book);
-  const { name } = bookMediumMap[medium];
-  return name;
+
+  if (!(medium in bookMediumMap)) {
+    return "";
+  }
+
+  return bookMediumMap[medium].name;
 }
 
 export function getMedium(book: AnyBook): BookMedium | "" {

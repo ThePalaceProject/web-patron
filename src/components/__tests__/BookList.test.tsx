@@ -1,5 +1,5 @@
 import * as React from "react";
-import { fixtures, setup, screen } from "test-utils";
+import { fixtures, setup, screen, getByTextContent } from "test-utils";
 import { BookList, InfiniteBookList } from "../BookList";
 import merge from "deepmerge";
 import { BorrowableBook, CollectionData } from "interfaces";
@@ -31,8 +31,12 @@ test("truncates long titles", () => {
   });
   setup(<BookList books={[longBook]} />);
 
-  const title = screen.getByText(/This is an extremely/i);
-  expect(title.textContent).toHaveLength(50);
+  const title = screen.getByText(
+    /This is an extremely long title it's really way.../i
+  );
+
+  // 57 is expected because "Title:" is prepended but hidden visually
+  expect(title.textContent).toHaveLength(57);
 });
 
 test("truncates authors", () => {

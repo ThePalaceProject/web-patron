@@ -106,7 +106,7 @@ test("recommendations are clickable", () => {
   const utils = render(<Recommendations book={fixtures.borrowableBook} />);
 
   const recommendationCover = utils.getByRole("link", {
-    name: "View Recommendation 1"
+    name: "Recommendation 1 - eBook, by Jane Austen"
   });
   expect(recommendationCover.closest("a")).toHaveAttribute(
     "href",

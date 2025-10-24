@@ -161,7 +161,7 @@ export const BookListItem: React.FC<{
               <Link
                 bookUrl={book.url}
                 sx={{ variant: "text.link.bold", color: "brand.primary" }}
-                aria-label={`View details for ${book.title}`}
+                aria-label={book.title}
               >
                 <Metadata display="inline" heading="Title">
                   {truncateString(book.title, 50)}
@@ -198,7 +198,7 @@ const Metadata: React.FC<{
 }> = ({ heading, variant, children, display = "block" }) => {
   return (
     <P sx={{ margin: 0, variant, display }}>
-      <ScreenReaderOnly>{heading} :</ScreenReaderOnly>
+      <ScreenReaderOnly>{heading}: </ScreenReaderOnly>
       {children}
     </P>
   );
