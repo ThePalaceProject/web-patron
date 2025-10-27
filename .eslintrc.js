@@ -21,9 +21,9 @@ module.exports = {
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
-    "plugin:jsx-a11y/strict"
+    "plugin:jsx-a11y/strict",
+    "plugin:@next/next/recommended", // Next.js rules
     // "plugin:prettier/recommended", // enables Prettier plugin + turns Prettier issues into ESLint errors
-    // "plugin:@next/next/recommended", // Next.js rules
     // "prettier" // disables formatting conflicts
   ],
   rules: {
@@ -44,18 +44,18 @@ module.exports = {
     "@typescript-eslint/no-empty-object-type": 0,
     "@typescript-eslint/no-require-imports": 0,
     "@typescript-eslint/no-unused-expressions": 0,
-    "@typescript-eslint/no-unused-vars": 0,
-    // "@typescript-eslint/no-unused-vars": [
-    //   "error",
-    //   {
-    //     vars: "all",
-    //     args: "after-used",
-    //     // ignore underscore _vars or jsx imports or React imports
-    //     argsIgnorePattern: "^_.*",
-    //     varsIgnorePattern: "^jsx$|^React$|^_.*",
-    //     ignoreRestSiblings: true
-    //   }
-    // ],
+    // "@typescript-eslint/no-unused-vars": 0,
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        vars: "all",
+        args: "after-used",
+        // ignore underscore _vars or jsx imports or React imports
+        argsIgnorePattern: "^_.*",
+        varsIgnorePattern: "^jsx$|^React$|^_.*",
+        ignoreRestSiblings: true
+      }
+    ],
     "no-underscore-dangle": 0,
     // these are meant to allow jsx to mark react as used. Not working right now though
     "react/jsx-uses-vars": "error",
