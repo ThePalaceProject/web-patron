@@ -68,7 +68,7 @@ describe("toggling SimplyE Branding", () => {
     expect(iosbadge).not.toBeInTheDocument();
 
     const googleBadge = utils.queryByText(
-      /get palace on the google play store/
+      /download palace on the google play store/
     );
     expect(googleBadge).not.toBeInTheDocument();
 
@@ -106,7 +106,7 @@ describe("toggling SimplyE Branding", () => {
     );
 
     const googleBadge = utils.getByRole("link", {
-      name: /get palace on the google play store/i
+      name: /download palace on the google play store/i
     });
     expect(googleBadge).toBeInTheDocument();
     expect(googleBadge).toHaveAttribute(

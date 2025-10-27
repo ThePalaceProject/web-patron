@@ -25,7 +25,6 @@ import CancelOrReturn from "components/CancelOrReturn";
 const FulfillmentCard: React.FC<{ book: AnyBook }> = ({ book }) => {
   return (
     <div
-      aria-label="Borrow and download card"
       sx={{
         display: "flex",
         flexDirection: "column",

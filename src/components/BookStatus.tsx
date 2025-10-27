@@ -5,7 +5,7 @@ import * as React from "react";
 import { MediumIcon } from "components/MediumIndicator";
 import { AnyBook } from "interfaces";
 import { availabilityString, bookIsFulfillable } from "utils/book";
-import { Text } from "components/Text";
+import { ScreenReaderOnly, Text } from "components/Text";
 import { shouldRedirectToCompanionApp } from "utils/fulfill";
 import SvgPhone from "icons/Phone";
 import { APP_CONFIG } from "utils/env";
@@ -42,6 +42,7 @@ const BookStatus: React.FC<{ book: AnyBook }> = ({ book }) => {
           <MediumIcon book={book} sx={{ mr: 1 }} />
         )}
         <Text variant="text.body.bold" sx={{ fontWeight: 600 }}>
+          <ScreenReaderOnly>Book Status: </ScreenReaderOnly>
           {str}
         </Text>
       </div>
@@ -58,6 +59,7 @@ const AvailabilityString: React.FC<{ book: AnyBook }> = ({ book }) => {
       variant="text.body.italic"
       sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
     >
+      <ScreenReaderOnly>Book Availability: </ScreenReaderOnly>
       {str}
     </Text>
   );

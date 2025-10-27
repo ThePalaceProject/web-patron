@@ -98,7 +98,6 @@ const BasicTokenAuthHandler: React.FC<{
       <FormInput
         name={usernameInputName}
         label={usernameInputName}
-        id="login"
         placeholder={usernameInputName}
         {...register(usernameInputName, {
           required: true,
@@ -116,7 +115,6 @@ const BasicTokenAuthHandler: React.FC<{
             required: true,
             maxLength: 25
           })}
-          id="password"
           type={showPassword ? "text" : "password"}
           placeholder={passwordInputName}
           error={

@@ -35,8 +35,6 @@ const BookCover: React.FC<{
           height: "100%"
         }
       }}
-      aria-label={`Cover of book: ${book.title}`}
-      role="img"
     >
       <AspectRatio
         ratio={2 / 3}
@@ -54,7 +52,7 @@ const BookCover: React.FC<{
         <MediumIcon book={book} sx={{ height: "30%", fill: "ui.gray.dark" }} />
       </AspectRatio>
       <LazyImage
-        alt={`Cover of book: ${book.title}`}
+        alt={`Cover for ${book.title}`}
         src={imageUrl}
         onError={handleError}
         onLoad={handleLoad}

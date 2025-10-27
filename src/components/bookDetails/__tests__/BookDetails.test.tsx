@@ -143,7 +143,7 @@ describe("book details page", () => {
     );
 
     const googleBadge = screen.getByRole("link", {
-      name: "Get Palace on the Google Play Store",
+      name: "Download Palace on the Google Play Store",
       hidden: true // hidden initially on mobile
     });
     expect(googleBadge).toBeInTheDocument();

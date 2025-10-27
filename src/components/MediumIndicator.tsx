@@ -37,10 +37,6 @@ export const MediumIcon: React.FC<{ book: AnyBook; className?: string }> = ({
   const mediumInfo = bookMediumMap[medium];
   const MediumSvg = mediumInfo.icon;
   return MediumSvg ? (
-    <MediumSvg
-      aria-label={`Book Medium: ${mediumInfo.name}`}
-      className={className}
-      {...rest}
-    />
+    <MediumSvg aria-hidden="true" className={className} {...rest} />
   ) : null;
 };

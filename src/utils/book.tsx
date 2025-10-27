@@ -2,6 +2,7 @@ import * as React from "react";
 import {
   AnyBook,
   BookMedium,
+  BookMediumName,
   BorrowableBook,
   FulfillableBook,
   OnHoldBook,
@@ -127,7 +128,7 @@ export function bookIsAudiobook(book: AnyBook): boolean {
 
 export const bookMediumMap: {
   [key in BookMedium]: {
-    name: string;
+    name: BookMediumName;
     icon: React.ComponentType<{ className?: string }>;
   };
 } = {
@@ -138,6 +139,18 @@ export const bookMediumMap: {
   "http://schema.org/EBook": { name: "eBook", icon: Book },
   "http://schema.org/Book": { name: "Book", icon: Book }
 };
+
+// Return empty string if no medium found
+// currently used for adding format to aria-label; it's okay if no medium is provided
+export function getMediumName(book: AnyBook): BookMediumName | "" {
+  const medium = getMedium(book);
+
+  if (!(medium in bookMediumMap)) {
+    return "";
+  }
+
+  return bookMediumMap[medium].name;
+}
 
 export function getMedium(book: AnyBook): BookMedium | "" {
   if (!book.raw || !book.raw["$"] || !book.raw["$"]["schema:additionalType"]) {

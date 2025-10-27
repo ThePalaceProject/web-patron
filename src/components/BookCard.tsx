@@ -2,11 +2,11 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { getAuthors } from "../utils/book";
+import { getAuthors, getMediumName } from "../utils/book";
 import Link from "./Link";
 import BookCover from "./BookCover";
 import { truncateString } from "../utils/string";
-import { Text, H3 } from "./Text";
+import { H3, P } from "./Text";
 import { AnyBook } from "interfaces";
 import { APP_CONFIG } from "utils/env";
 
@@ -38,7 +38,9 @@ const BookCard = React.forwardRef<
     >
       <Link
         bookUrl={book.url}
-        aria-label={`View ${book.title}`}
+        aria-label={`${book.title} - ${getMediumName(book)}, by ${authors.join(
+          ", "
+        )}`}
         sx={{ "&:hover": { textDecoration: "none" } }}
       >
         <BookCover book={book} showMedium={APP_CONFIG.showMedium} />
@@ -46,9 +48,9 @@ const BookCard = React.forwardRef<
         <H3 sx={{ m: 0, mt: 1, fontSize: -1 }}>
           {truncateString(book.title, twoLines, false)}
         </H3>
-        <Text sx={{ fontSize: -1 }}>
+        <P sx={{ fontSize: -1 }}>
           {truncateString(authors.join(", "), twoLines, false)}
-        </Text>
+        </P>
       </Link>
     </li>
   );

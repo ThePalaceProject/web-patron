@@ -36,5 +36,8 @@ wallaby.js
 .vercel
 /logs/
 
+# typescript
+tsconfig.tsbuildinfo
+
 # storybook
 storybook-static

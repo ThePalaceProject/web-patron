@@ -14,7 +14,7 @@ import { truncateString } from "../../utils/string";
 import DetailField from "../BookMetaDetail";
 import ReportProblem from "./ReportProblem";
 import Head from "next/head";
-import { H1, H2, H3, Text } from "components/Text";
+import { H1, H2, H3, ScreenReaderOnly, Text } from "components/Text";
 import MediumIndicator from "components/MediumIndicator";
 import PalaceLogo from "components/PalaceLogo";
 import IosBadge from "components/storeBadges/IosBadge";
@@ -75,9 +75,9 @@ export const BookDetails: React.FC = () => {
               display: "flex",
               flexDirection: "column"
             }}
-            aria-label="Book info"
           >
             <H1 sx={{ m: 0 }}>
+              <ScreenReaderOnly>Book title: </ScreenReaderOnly>
               {book.title}
               {book.subtitle && `: ${book.subtitle}`}
             </H1>
@@ -89,7 +89,14 @@ export const BookDetails: React.FC = () => {
             {APP_CONFIG.showMedium && <MediumIndicator book={book} />}
             <FulfillmentCard book={book} sx={{ mt: 3 }} />
             <Summary book={book} />
-            <div sx={{ mt: 2 }}>
+            <dl
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "auto 1fr",
+                rowGap: 10,
+                mt: 2
+              }}
+            >
               <DetailField heading="Publisher" details={book.publisher} />
               <DetailField heading="Published" details={book.published} />
               <DetailField
@@ -101,7 +108,7 @@ export const BookDetails: React.FC = () => {
                 details={book.providerName}
               />
               <DetailField heading="Book format" details={book.format} />
-            </div>
+            </dl>
             <ReportProblem book={book} />
           </div>
         </div>
@@ -115,7 +122,7 @@ const Summary: React.FC<{ book: AnyBook; className?: string }> = ({
   book,
   className
 }) => (
-  <div sx={{ my: 2 }} className={className} aria-label="Book summary">
+  <div sx={{ my: 2 }} className={className}>
     <H2 sx={{ mb: 2, variant: "text.headers.tertiary" }}>Summary</H2>
     <div
       dangerouslySetInnerHTML={{
@@ -128,7 +135,6 @@ const Summary: React.FC<{ book: AnyBook; className?: string }> = ({
 const SimplyECallout: React.FC<{ className?: "string" }> = ({ className }) => {
   return (
     <section
-      aria-label="Download the Palace Mobile App"
       sx={{
         mt: 4,
         bg: "ui.gray.lightWarm",

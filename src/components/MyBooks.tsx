@@ -5,7 +5,7 @@ import * as React from "react";
 import { BookList } from "./BookList";
 import Head from "next/head";
 import BreadcrumbBar from "./BreadcrumbBar";
-import { H3 } from "./Text";
+import { H2 } from "./Text";
 import { AnyBook } from "interfaces";
 import PageTitle from "./PageTitle";
 import { SignOut } from "./SignOut";
@@ -86,9 +86,9 @@ const Empty = () => {
           px: [3, 5]
         }}
       >
-        <H3>
+        <H2 variant="text.headers.tertiary">
           Your books will show up here when you have any loaned or on hold.
-        </H3>
+        </H2>
         <SignOut />
       </div>
     </>

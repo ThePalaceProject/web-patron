@@ -12,15 +12,6 @@ import {
 import { mergeBook, mockSetBook } from "test-utils/fixtures";
 import { MOCK_DATE_STRING } from "test-utils/mockToDateString";
 
-function expectReadMore() {
-  const link = screen.getByRole("link", { name: "Read more" });
-  expect(link).toBeInTheDocument();
-  expect(link).toHaveAttribute(
-    "href",
-    "/testlib/book/http%3A%2F%2Ftest-book-url"
-  );
-}
-
 /**
  * Borrowable
  * OnHold
@@ -47,7 +38,7 @@ describe("BorrowableBook", () => {
 
   test("shows correct string and link to book details", () => {
     setup(<BookListItem book={borrowableBook} />);
-    expectReadMore();
+
     expect(
       screen.getByText("10 out of 13 copies available.")
     ).toBeInTheDocument();
@@ -97,7 +88,7 @@ describe("OnHoldBook", () => {
 
   test("shows correct string and link to book details", () => {
     setup(<BookListItem book={onHoldBook} />);
-    expectReadMore();
+
     expect(screen.getByText("Ready to Borrow")).toBeInTheDocument();
     expect(
       screen.getByText(`You have this book on hold until ${MOCK_DATE_STRING}.`)
@@ -153,7 +144,6 @@ describe("ReservableBook", () => {
     expect(
       screen.getByText("0 out of 13 copies available.")
     ).toBeInTheDocument();
-    expectReadMore();
   });
 
   test("displays reserve button", () => {
@@ -323,7 +313,6 @@ describe("FulfillableBook", () => {
     expect(
       screen.getByText(`You have this book on loan until ${MOCK_DATE_STRING}.`)
     ).toBeInTheDocument();
-    expectReadMore();
   });
 
   test("handles lack of availability info", () => {

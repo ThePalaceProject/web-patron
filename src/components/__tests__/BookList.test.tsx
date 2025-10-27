@@ -31,8 +31,12 @@ test("truncates long titles", () => {
   });
   setup(<BookList books={[longBook]} />);
 
-  const title = screen.getByText(/This is an extremely/i);
-  expect(title.textContent).toHaveLength(50);
+  const title = screen.getByText(
+    /This is an extremely long title it's really way.../i
+  );
+
+  // 57 is expected because "Title:" is prepended but hidden visually
+  expect(title.textContent).toHaveLength(57);
 });
 
 test("truncates authors", () => {
@@ -98,14 +102,14 @@ describe("infinite loading book list", () => {
     setup(<InfiniteBookList firstPageUrl="/first-page" />);
 
     expect(
-      screen.getByRole("link", { name: "Book Title 0" })
-    ).toBeInTheDocument();
+      screen.getAllByRole("link", { name: "Book Title 0 - details page" })
+    ).toHaveLength(2);
     expect(
-      screen.getByRole("link", { name: "Book Title 1" })
-    ).toBeInTheDocument();
+      screen.getAllByRole("link", { name: "Book Title 1 - details page" })
+    ).toHaveLength(2);
     expect(
-      screen.getByRole("link", { name: "The Mayan Secrets" })
-    ).toBeInTheDocument();
+      screen.getAllByRole("link", { name: "The Mayan Secrets - details page" })
+    ).toHaveLength(2);
   });
 
   test("shows loading indicator when fetching more", () => {

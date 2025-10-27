@@ -12,16 +12,13 @@ const fulfillableBook = fixtures.mergeBook<FulfillableBook>({
   revokeUrl: "/revoke"
 });
 
-test("shows medium indicator when configured", () => {
+test("render accessible label for link within book card", () => {
   mockConfig();
   const utils = render(<BookCard book={fulfillableBook} />);
 
-  expect(utils.getAllByLabelText("Book Medium: eBook")).toHaveLength(2);
-});
-
-test("doesn't medium indicator when not configured", () => {
-  mockConfig({ showMedium: false });
-  const utils = render(<BookCard book={fulfillableBook} />);
-
-  expect(utils.getAllByLabelText("Book Medium: eBook")).toHaveLength(1);
+  expect(
+    utils.getByRole("link", {
+      name: "The Mayan Secrets - eBook, by Clive Cussler, Thomas Perry"
+    })
+  );
 });

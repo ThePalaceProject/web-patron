@@ -982,7 +982,18 @@ export const recommendations: CollectionData = {
           ],
           language: "en",
           url:
-            "http://test-cm.com/catalogUrl/works/URI/https://standardebooks.org/ebooks/jane-austen/sense-and-sensibility"
+            "http://test-cm.com/catalogUrl/works/URI/https://standardebooks.org/ebooks/jane-austen/sense-and-sensibility",
+          raw: {
+            $: {
+              "schema:additionalType": {
+                name: "schema:additionalType",
+                value: "http://schema.org/EBook",
+                prefix: "schema",
+                local: "additionalType",
+                uri: "http://schema.org/"
+              }
+            }
+          }
         },
         {
           status: "borrowable",
@@ -1008,7 +1019,18 @@ export const recommendations: CollectionData = {
           categories: ["Adult", "Fiction", "Romance", "Literary Fiction"],
           language: "en",
           url:
-            "http://test-cm.com/catalogUrl/works/URI/https://standardebooks.org/ebooks/jane-austen/persuasion"
+            "http://test-cm.com/catalogUrl/works/URI/https://standardebooks.org/ebooks/jane-austen/persuasion",
+          raw: {
+            $: {
+              "schema:additionalType": {
+                name: "schema:additionalType",
+                value: "http://schema.org/EBook",
+                prefix: "schema",
+                local: "additionalType",
+                uri: "http://schema.org/"
+              }
+            }
+          }
         },
         {
           status: "borrowable",
