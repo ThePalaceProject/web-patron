@@ -1,6 +1,3 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-import { jsx } from "theme-ui";
 import * as React from "react";
 import { OPDS1 } from "interfaces";
 import LoadingIndicator from "components/LoadingIndicator";

@@ -1,6 +1,3 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-import { jsx } from "theme-ui";
 import * as React from "react";
 import { getAuthors, getMediumName } from "../utils/book";
 import Link from "./Link";
@@ -55,5 +52,6 @@ const BookCard = React.forwardRef<
     </li>
   );
 });
+BookCard.displayName = "BookCard";
 
 export default BookCard;

@@ -1,6 +1,3 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-import { jsx } from "theme-ui";
 import * as React from "react";
 import { AspectRatio, Card } from "@theme-ui/components";
 import { Focusable } from "@ariakit/react/focusable";
@@ -283,6 +280,7 @@ const SeeMoreBlock = React.forwardRef<HTMLLIElement, SeeMoreBlockProps>(
     );
   }
 );
+SeeMoreBlock.displayName = "SeeMoreBlock";
 
 const PrevNextButton: React.FC<{
   onClick: () => void;
@@ -291,7 +289,6 @@ const PrevNextButton: React.FC<{
 }> = ({ onClick, isPrev = false, disabled }) => {
   return (
     <Focusable
-      as="div"
       sx={{
         alignItems: "center",
         cursor: "pointer",

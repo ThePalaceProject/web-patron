@@ -1,6 +1,3 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-import { jsx } from "theme-ui";
 import * as React from "react";
 import { Dialog } from "@ariakit/react/dialog";
 import { Icon, IconNames } from "@nypl/design-system-react-components";

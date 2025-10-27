@@ -1,6 +1,3 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-import { jsx } from "theme-ui";
 import * as React from "react";
 import Modal from "../Modal";
 import useComplaints from "../../hooks/useComplaints";
@@ -136,11 +133,22 @@ const ReportProblem: React.FC<{ book: AnyBook }> = ({ book }) => {
       <DialogDisclosure
         store={dialog}
         onClick={handleClick}
-        as={Button}
         data-testid="report-problem-link"
-        variant="link"
-        color="ui.gray.extraDark"
-        sx={{ fontStyle: "italic", alignSelf: "flex-start", my: 2 }}
+        sx={{
+          fontStyle: "italic",
+          alignSelf: "flex-start",
+          my: 2,
+          color: "ui.gray.extraDark",
+          cursor: "pointer",
+          background: "none",
+          border: "none",
+          padding: 0,
+          textDecoration: "underline",
+          font: "inherit",
+          "&:hover": {
+            opacity: 0.8
+          }
+        }}
       >
         Report a problem
       </DialogDisclosure>

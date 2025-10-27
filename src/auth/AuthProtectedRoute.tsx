@@ -1,6 +1,3 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-import { jsx } from "theme-ui";
 import useLogin from "auth/useLogin";
 import useUser from "components/context/UserContext";
 import { PageLoader } from "components/LoadingIndicator";

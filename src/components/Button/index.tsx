@@ -1,8 +1,5 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import { jsx } from "theme-ui";
 import { Button as BaseButton } from "@ariakit/react";
 import * as React from "react";
 import Link, { LinkProps } from "../Link";
@@ -21,7 +18,7 @@ type ButtonOwnProps = {
   className?: string;
   iconLeft?: React.ComponentType;
   iconRight?: React.ComponentType;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 };
 
 /**
@@ -64,6 +61,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function (
     </BaseButton>
   );
 });
+Button.displayName = "Button";
 
 const ButtonContent: React.FC<
   ButtonProps | NavButtonProps | AnchorButtonProps
@@ -112,6 +110,7 @@ export const NavButton: JSX = React.forwardRef<
     </Link>
   );
 });
+NavButton.displayName = "NavButton";
 
 type AnchorButtonProps = React.ComponentPropsWithoutRef<"a"> &
   ButtonOwnProps & { newTab?: boolean };
@@ -140,6 +139,7 @@ export const AnchorButton = React.forwardRef<
     </a>
   );
 });
+AnchorButton.displayName = "AnchorButton";
 
 interface InputIconButtonProps {
   children: React.ReactElement<FontAwesomeIconProps>;

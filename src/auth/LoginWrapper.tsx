@@ -1,6 +1,3 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-import { jsx } from "theme-ui";
 import * as React from "react";
 import useLibraryContext from "../components/context/LibraryContext";
 import Stack from "../components/Stack";

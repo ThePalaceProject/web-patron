@@ -1,6 +1,3 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-import { jsx } from "theme-ui";
 import * as React from "react";
 import Modal from "./Modal";
 import { useDialogStore, DialogDisclosure } from "@ariakit/react/dialog";
@@ -23,7 +20,21 @@ export const SignOut: React.FC<SignOutProps> = ({
   }
   return (
     <>
-      <DialogDisclosure as={Button} color={color} store={dialog}>
+      <DialogDisclosure
+        store={dialog}
+        sx={{
+          color: color,
+          cursor: "pointer",
+          background: "none",
+          border: "none",
+          padding: 0,
+          font: "inherit",
+          textDecoration: "underline",
+          "&:hover": {
+            opacity: 0.8
+          }
+        }}
+      >
         Sign Out
       </DialogDisclosure>
       <Modal

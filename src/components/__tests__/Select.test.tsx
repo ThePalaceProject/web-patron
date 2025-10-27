@@ -14,16 +14,16 @@ test("select matches snapshot", () => {
 });
 
 test("select label matches snapshot", () => {
-  expect(render(<Label>hi from label</Label>).container.firstChild)
-    .toMatchInlineSnapshot(`
-      .emotion-0 {
-        white-space: nowrap;
-      }
+  expect(render(<Label>hi from label</Label>).container.firstChild).
+toMatchInlineSnapshot(`
+.emotion-0 {
+  white-space: nowrap;
+}
 
-      <label
-        class="emotion-0"
-      >
-        hi from label
-      </label>
-    `);
+<label
+  class="emotion-0"
+>
+  hi from label
+</label>
+`);
 });
