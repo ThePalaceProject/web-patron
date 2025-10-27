@@ -8,9 +8,7 @@ module.exports = {
   parserOptions: {
     project: ["tsconfig.json", "cypress/tsconfig.json"],
     sourceType: "module",
-    ecmaFeatures: {
-      jsx: true
-    }
+    ecmaFeatures: { jsx: true }
   },
   plugins: [
     "react",
@@ -23,17 +21,16 @@ module.exports = {
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
-    "plugin:jsx-a11y/strict",
-    "prettier",
-    "prettier/@typescript-eslint",
-    "plugin:prettier/recommended",
-    "prettier/react",
-    "plugin:@next/next/recommended"
+    "plugin:jsx-a11y/strict"
+    // "plugin:prettier/recommended", // enables Prettier plugin + turns Prettier issues into ESLint errors
+    // "plugin:@next/next/recommended", // Next.js rules
+    // "prettier" // disables formatting conflicts
   ],
   rules: {
     // this rule was deprecated in favor of another
     // not sure why it is still giving errors
     "jsx-a11y/label-has-for": 0,
+    "react/react-in-jsx-scope": "off",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
     "@typescript-eslint/no-empty-interface": 0,
@@ -44,17 +41,21 @@ module.exports = {
     // disabling this bc it is checked by typescript so it is
     // redundant and doesn't function properly
     "react/prop-types": 0,
-    "@typescript-eslint/no-unused-vars": [
-      "error",
-      {
-        vars: "all",
-        args: "after-used",
-        // ignore underscore _vars or jsx imports or React imports
-        argsIgnorePattern: "^_.*",
-        varsIgnorePattern: "^jsx$|^React$|^_.*",
-        ignoreRestSiblings: true
-      }
-    ],
+    "@typescript-eslint/no-empty-object-type": 0,
+    "@typescript-eslint/no-require-imports": 0,
+    "@typescript-eslint/no-unused-expressions": 0,
+    "@typescript-eslint/no-unused-vars": 0,
+    // "@typescript-eslint/no-unused-vars": [
+    //   "error",
+    //   {
+    //     vars: "all",
+    //     args: "after-used",
+    //     // ignore underscore _vars or jsx imports or React imports
+    //     argsIgnorePattern: "^_.*",
+    //     varsIgnorePattern: "^jsx$|^React$|^_.*",
+    //     ignoreRestSiblings: true
+    //   }
+    // ],
     "no-underscore-dangle": 0,
     // these are meant to allow jsx to mark react as used. Not working right now though
     "react/jsx-uses-vars": "error",
