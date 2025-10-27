@@ -49,7 +49,7 @@ describe("book details page", () => {
           status: 418
         })
       });
-    } catch (err) {
+    } catch {
       expect(() =>
         setup(<BookDetails />, {
           router: { query: { bookUrl: "/book-url" } }
