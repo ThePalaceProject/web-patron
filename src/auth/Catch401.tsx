@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import * as React from "react";
 import { Key, SWRConfig } from "swr";
 import swrConfig from "utils/swrConfig";
