@@ -10,6 +10,7 @@ import LoadingIndicator from "../LoadingIndicator";
 import Select, { Label } from "../Select";
 import { H1 } from "components/Text";
 import { getReportUrl } from "utils/libraryLinks";
+import { styleProps } from "../Button/styles";
 
 const getDisplayType = (type: string) =>
   type
@@ -135,19 +136,9 @@ const ReportProblem: React.FC<{ book: AnyBook }> = ({ book }) => {
         onClick={handleClick}
         data-testid="report-problem-link"
         sx={{
-          fontStyle: "italic",
-          alignSelf: "flex-start",
-          my: 2,
-          color: "ui.gray.extraDark",
-          cursor: "pointer",
-          background: "none",
-          border: "none",
-          padding: 0,
-          textDecoration: "underline",
-          font: "inherit",
-          "&:hover": {
-            opacity: 0.8
-          }
+         alignSelf: "flex-start",
+         my: 2,
+         ...styleProps("ui.black", "md", "filled")
         }}
       >
         Report a problem

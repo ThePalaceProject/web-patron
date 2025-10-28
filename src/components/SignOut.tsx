@@ -4,6 +4,7 @@ import { useDialogStore, DialogDisclosure } from "@ariakit/react/dialog";
 import Button from "./Button";
 import Stack from "./Stack";
 import useUser from "components/context/UserContext";
+import { styleProps } from "./Button/styles";
 
 interface SignOutProps {
   color?: string;
@@ -22,18 +23,7 @@ export const SignOut: React.FC<SignOutProps> = ({
     <>
       <DialogDisclosure
         store={dialog}
-        sx={{
-          color: color,
-          cursor: "pointer",
-          background: "none",
-          border: "none",
-          padding: 0,
-          font: "inherit",
-          textDecoration: "underline",
-          "&:hover": {
-            opacity: 0.8
-          }
-        }}
+        sx={styleProps(color, "md", "ghost")}
       >
         Sign Out
       </DialogDisclosure>
