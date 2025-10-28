@@ -1,5 +1,3 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
 import { jsx, SxProp } from "theme-ui";
 import * as React from "react";
 import Stack from "components/Stack";

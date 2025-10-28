@@ -36,7 +36,7 @@ test("does not redirect if there is a token present", () => {
 test("throws error if there is no authenticate link in library data", async () => {
   try {
     // do nothing
-  } catch (err) {
+  } catch {
     // catching this error resolves console.error thrown from absence of ErrorBoundary
     expect(() =>
       setup(

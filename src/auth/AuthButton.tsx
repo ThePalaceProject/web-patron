@@ -1,6 +1,4 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-import { jsx } from "theme-ui";
+import React from "react";
 import { NavButton } from "components/Button";
 import { AppAuthMethod } from "interfaces";
 import useLogin from "auth/useLogin";

@@ -1,6 +1,3 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-import { jsx } from "theme-ui";
 import * as React from "react";
 import Modal from "../Modal";
 import useComplaints from "../../hooks/useComplaints";
@@ -13,6 +10,7 @@ import LoadingIndicator from "../LoadingIndicator";
 import Select, { Label } from "../Select";
 import { H1 } from "components/Text";
 import { getReportUrl } from "utils/libraryLinks";
+import { styleProps } from "../Button/styles";
 
 const getDisplayType = (type: string) =>
   type
@@ -136,11 +134,12 @@ const ReportProblem: React.FC<{ book: AnyBook }> = ({ book }) => {
       <DialogDisclosure
         store={dialog}
         onClick={handleClick}
-        as={Button}
         data-testid="report-problem-link"
-        variant="link"
-        color="ui.gray.extraDark"
-        sx={{ fontStyle: "italic", alignSelf: "flex-start", my: 2 }}
+        sx={{
+         alignSelf: "flex-start",
+         my: 2,
+         ...styleProps("ui.black", "md", "filled")
+        }}
       >
         Report a problem
       </DialogDisclosure>

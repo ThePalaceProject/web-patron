@@ -1,8 +1,5 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import { jsx } from "theme-ui";
 import * as React from "react";
 
 /**
@@ -31,6 +28,7 @@ const TextInput = React.forwardRef<
 >(({ type = "text", ...props }, ref) => {
   return <input ref={ref} type={type} sx={styles} {...props} />;
 });
+TextInput.displayName = "TextInput";
 
 export const TextArea = React.forwardRef<
   HTMLTextAreaElement,
@@ -38,5 +36,6 @@ export const TextArea = React.forwardRef<
 >((props, ref) => {
   return <textarea ref={ref} sx={styles} {...props} />;
 });
+TextArea.displayName = "TextArea";
 
 export default TextInput;

@@ -1,12 +1,10 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-import { jsx } from "theme-ui";
 import * as React from "react";
 import Modal from "./Modal";
 import { useDialogStore, DialogDisclosure } from "@ariakit/react/dialog";
 import Button from "./Button";
 import Stack from "./Stack";
 import useUser from "components/context/UserContext";
+import { styleProps } from "./Button/styles";
 
 interface SignOutProps {
   color?: string;
@@ -23,7 +21,10 @@ export const SignOut: React.FC<SignOutProps> = ({
   }
   return (
     <>
-      <DialogDisclosure as={Button} color={color} store={dialog}>
+      <DialogDisclosure
+        store={dialog}
+        sx={styleProps(color, "md", "ghost")}
+      >
         Sign Out
       </DialogDisclosure>
       <Modal

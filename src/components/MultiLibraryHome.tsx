@@ -1,6 +1,4 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-/** @jsxRuntime classic */
-/** @jsx jsx */
 import { jsx, ThemeUIProvider } from "theme-ui";
 import { Themed } from "@theme-ui/mdx";
 import * as React from "react";

@@ -1,7 +1,3 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-import { jsx } from "theme-ui";
 import * as React from "react";
 import FormLabel from "./FormLabel";
 import TextInput from "../TextInput";
@@ -68,5 +64,6 @@ const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
     );
   }
 );
+FormInput.displayName = "FormInput";
 
 export default FormInput;

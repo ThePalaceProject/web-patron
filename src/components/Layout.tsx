@@ -1,6 +1,3 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-import { jsx } from "theme-ui";
 import { Themed } from "@theme-ui/mdx";
 import * as React from "react";
 import GlobalStyles from "./GlobalStyles";

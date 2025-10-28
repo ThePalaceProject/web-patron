@@ -1,6 +1,3 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-import { jsx } from "theme-ui";
 import * as React from "react";
 import { Text } from "./Text";
 import { bookMediumMap, getMedium } from "utils/book";

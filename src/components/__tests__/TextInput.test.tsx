@@ -1,6 +1,3 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-import { jsx } from "theme-ui";
 import * as React from "react";
 import { render } from "../../test-utils";
 import TextInput, { TextArea } from "../TextInput";

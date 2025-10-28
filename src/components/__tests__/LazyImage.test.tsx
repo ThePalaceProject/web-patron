@@ -1,6 +1,4 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-import { jsx } from "theme-ui";
+import React from "react";
 import { screen, setup } from "test-utils";
 
 import LazyImage from "../LazyImage";

@@ -1,8 +1,5 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import { jsx } from "theme-ui";
 import * as React from "react";
 import LoadingIndicator from "../LoadingIndicator";
 import { H3, H2 } from "components/Text";

@@ -14,7 +14,7 @@ export default async function downloadFile(
 
   try {
     response = await fetchWithHeaders(url, token);
-  } catch (err) {
+  } catch {
     // There was a network or CORS error. In case this was a CORS error, retry the request without
     // the X-Requested-With header. Some distributors' servers may not have this header whitelisted
     // for CORS.
