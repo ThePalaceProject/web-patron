@@ -149,10 +149,8 @@ const DownloadButton: React.FC<{
     setLoading(true);
     clearError();
     try {
-      const {
-        url: downloadUrl,
-        token: downloadToken
-      } = await details.getLocation(catalogUrl, token);
+      const { url: downloadUrl, token: downloadToken } =
+        await details.getLocation(catalogUrl, token);
 
       await downloadFile(
         downloadUrl,

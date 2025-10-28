@@ -100,7 +100,7 @@ function getUrlCredentials(router: NextRouter) {
   /* TODO: throw error if samlAccessToken and cleverAccessToken exist at the same time as this is an invalid state that shouldn't be reached */
   return IS_SERVER
     ? undefined
-    : lookForCleverCredentials() ?? lookForSamlCredentials(router);
+    : (lookForCleverCredentials() ?? lookForSamlCredentials(router));
 }
 
 // check for clever credentials

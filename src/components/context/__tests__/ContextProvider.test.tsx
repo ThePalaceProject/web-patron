@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import { describe, expect, jest, test } from "@jest/globals";
 import * as React from "react";
 import { renderHook } from "@testing-library/react-hooks";
@@ -32,19 +30,16 @@ type MakeContextConfig = {
   shortenUrls?: boolean;
 };
 
-// eslint-disable-next-line react/display-name
-const makeContextWrapper = (config: MakeContextConfig = {}) => ({
-  children
-}: {
-  children: React.ReactNode;
-}) => {
-  const { library = testLibrary } = config;
-  return (
-    <MockNextRouterContextProvider>
-      <AppContextProvider library={library}>{children}</AppContextProvider>
-    </MockNextRouterContextProvider>
-  );
-};
+const makeContextWrapper =
+  (config: MakeContextConfig = {}) =>
+  ({ children }: { children: React.ReactNode }) => {
+    const { library = testLibrary } = config;
+    return (
+      <MockNextRouterContextProvider>
+        <AppContextProvider library={library}>{children}</AppContextProvider>
+      </MockNextRouterContextProvider>
+    );
+  };
 
 describe("ContextProvider", () => {
   test("provides library in context", () => {

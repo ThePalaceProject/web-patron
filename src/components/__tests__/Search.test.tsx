@@ -68,9 +68,7 @@ test("searching calls history.push with url", async () => {
 
   // assert
   expect(mockPush).toHaveBeenCalledTimes(1);
-  expect(
-    mockPush
-  ).toHaveBeenCalledWith(
+  expect(mockPush).toHaveBeenCalledWith(
     "/testlib/collection/http%3A%2F%2Fsearch-url.com%2Fsearch%2Fmy%2520search",
     undefined,
     { shallow: true }

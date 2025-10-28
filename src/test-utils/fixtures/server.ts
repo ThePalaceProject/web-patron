@@ -58,8 +58,7 @@ export const server401Response = {
     { href: "https://help.examplexyz.com", type: "text/html", rel: "help" },
     { href: "https://www.examplexyz.com", type: "text/html", rel: "alternate" },
     {
-      href:
-        "http://simplye-dev-web.amigos.org/resources/xyzlib/styles/test-css.css",
+      href: "http://simplye-dev-web.amigos.org/resources/xyzlib/styles/test-css.css",
       type: "text/css",
       rel: "stylesheet"
     }

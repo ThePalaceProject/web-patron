@@ -33,34 +33,33 @@ type ButtonProps = React.ComponentPropsWithoutRef<typeof BaseButton> &
     loading?: boolean;
     loadingText?: string;
   };
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function (
-  props,
-  ref
-) {
-  const {
-    variant = defaultVariant,
-    color = defaultColor,
-    size = defaultSize,
-    loading,
-    loadingText,
-    disabled,
-    iconLeft,
-    iconRight,
-    ...rest
-  } = props;
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  function (props, ref) {
+    const {
+      variant = defaultVariant,
+      color = defaultColor,
+      size = defaultSize,
+      loading,
+      loadingText,
+      disabled,
+      iconLeft,
+      iconRight,
+      ...rest
+    } = props;
 
-  return (
-    <BaseButton
-      sx={styleProps(color, size, variant)}
-      disabled={loading || disabled}
-      ref={ref}
-      aria-label={loading && loadingText ? loadingText : undefined}
-      {...rest}
-    >
-      <ButtonContent {...props} />
-    </BaseButton>
-  );
-});
+    return (
+      <BaseButton
+        sx={styleProps(color, size, variant)}
+        disabled={loading || disabled}
+        ref={ref}
+        aria-label={loading && loadingText ? loadingText : undefined}
+        {...rest}
+      >
+        <ButtonContent {...props} />
+      </BaseButton>
+    );
+  }
+);
 Button.displayName = "Button";
 
 const ButtonContent: React.FC<

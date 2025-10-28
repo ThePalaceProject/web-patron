@@ -74,38 +74,39 @@ export function fetchComplaintTypes(
 
 export function postComplaint(dispatch: React.Dispatch<ComplaintsAction>) {
   // returning functions allows us to curry this.
-  return (url: string) => (data: ComplaintData): Promise<void> => {
-    dispatch({ type: "POST_COMPLAINT_REQUEST", url });
-    return new Promise((resolve, reject) => {
-      const options = {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json"
-        } as { [index: string]: string },
-        body: JSON.stringify(data),
-        credentials: "same-origin" as RequestCredentials
-      };
-      fetch(url, options)
-        .then(response => {
-          if (response.ok) {
-            return;
-          } else {
-            throw {
-              status: response.status,
-              response: "Could not post complaint",
-              url: url
-            };
-          }
-        })
-        .then(() => {
-          dispatch({ type: "POST_COMPLAINT_SUCCESS" });
-          resolve();
-        })
-        .catch(err => {
-          dispatch({ type: "POST_COMPLAINT_FAILURE", error: err });
-          reject(err);
-        });
-    });
-  };
+  return (url: string) =>
+    (data: ComplaintData): Promise<void> => {
+      dispatch({ type: "POST_COMPLAINT_REQUEST", url });
+      return new Promise((resolve, reject) => {
+        const options = {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json"
+          } as { [index: string]: string },
+          body: JSON.stringify(data),
+          credentials: "same-origin" as RequestCredentials
+        };
+        fetch(url, options)
+          .then(response => {
+            if (response.ok) {
+              return;
+            } else {
+              throw {
+                status: response.status,
+                response: "Could not post complaint",
+                url: url
+              };
+            }
+          })
+          .then(() => {
+            dispatch({ type: "POST_COMPLAINT_SUCCESS" });
+            resolve();
+          })
+          .catch(err => {
+            dispatch({ type: "POST_COMPLAINT_FAILURE", error: err });
+            reject(err);
+          });
+      });
+    };
 }

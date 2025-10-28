@@ -21,10 +21,7 @@ export const SignOut: React.FC<SignOutProps> = ({
   }
   return (
     <>
-      <DialogDisclosure
-        store={dialog}
-        sx={styleProps(color, "md", "ghost")}
-      >
+      <DialogDisclosure store={dialog} sx={styleProps(color, "md", "ghost")}>
         Sign Out
       </DialogDisclosure>
       <Modal

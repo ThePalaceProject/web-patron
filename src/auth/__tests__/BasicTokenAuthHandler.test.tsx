@@ -121,10 +121,8 @@ test("submit by clicking login button", async () => {
   await waitFor(() => {
     // we set the cookie
     expect(Cookie.set).toHaveBeenCalledTimes(1);
-    const [
-      credentialsKey,
-      credentialsValue
-    ] = (Cookie.set as jest.Mock).mock.calls[0];
+    const [credentialsKey, credentialsValue] = (Cookie.set as jest.Mock).mock
+      .calls[0];
 
     expect(credentialsKey).toEqual("CPW_AUTH_COOKIE/testlib");
     const parsed = JSON.parse(credentialsValue);
@@ -172,8 +170,7 @@ test("fetch new token if token has expired", async () => {
   mockAuthenticatedOnce(tokenCreds1);
 
   const problemdoc: OPDS1.ProblemDocument = {
-    type:
-      "http://librarysimplified.org/terms/problem/patron-auth-access-token-expired",
+    type: "http://librarysimplified.org/terms/problem/patron-auth-access-token-expired",
     detail: "The patron authentication access token has expired.",
     title: "Access token expired",
     status: 401

@@ -24,9 +24,8 @@ export type BreadcrumbContextType =
     }
   | undefined;
 
-export const BreadcrumbContext = React.createContext<BreadcrumbContextType>(
-  undefined
-);
+export const BreadcrumbContext =
+  React.createContext<BreadcrumbContextType>(undefined);
 
 interface Props {
   children: React.ReactNode;

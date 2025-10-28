@@ -18,10 +18,14 @@ export default function useCollection() {
   const isLibraryHome = pathname === "/[library]";
   const collectionUrl = isLibraryHome ? catalogUrl : collectionUrlParam;
 
-  const { data: collection, error, isValidating } = useSWR<
-    CollectionData,
-    Error | ApplicationError
-  >(collectionUrl ? [collectionUrl, token] : null, fetchCollection);
+  const {
+    data: collection,
+    error,
+    isValidating
+  } = useSWR<CollectionData, Error | ApplicationError>(
+    collectionUrl ? [collectionUrl, token] : null,
+    fetchCollection
+  );
 
   // make sure unidentified errors are wrapped in an ApplicationError
   let applicationError: ApplicationError | undefined = undefined;

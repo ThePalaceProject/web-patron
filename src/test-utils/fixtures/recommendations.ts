@@ -8,8 +8,7 @@ import { CollectionData } from "interfaces";
  * http://localhost:3000/book/URI%2Fhttps%3A%2F%2Fstandardebooks.org%2Febooks%2Fjane-austen%2Femma
  */
 export const recommendations: CollectionData = {
-  id:
-    "http://test-cm.com/catalogUrl/works/URI/https://standardebooks.org/ebooks/jane-austen/emma/related_books?available=all&after=0&collection=main&entrypoint=Book&order=author&size=50",
+  id: "http://test-cm.com/catalogUrl/works/URI/https://standardebooks.org/ebooks/jane-austen/emma/related_books?available=all&after=0&collection=main&entrypoint=Book&order=author&size=50",
   title: "Related Books",
   url: "http://data-related-url",
   searchDataUrl: "/search-data-url",
@@ -22,8 +21,7 @@ export const recommendations: CollectionData = {
           status: "borrowable",
           relatedUrl: null,
           trackOpenBookUrl: null,
-          id:
-            "https://standardebooks.org/ebooks/jane-austen/pride-and-prejudice",
+          id: "https://standardebooks.org/ebooks/jane-austen/pride-and-prejudice",
           title: "Recommendation 1",
           series: undefined,
           authors: ["Jane Austen"],
@@ -132,8 +130,7 @@ export const recommendations: CollectionData = {
             ],
             summary: [
               {
-                _:
-                  "<p><i>Pride and Prejudice</i> may today be one of Jane Austen’s most enduring novels, having been widely adapted to stage, screen, and other media since its publication in 1813. The novel tells the tale of five unmarried sisters and how their lives change when a wealthy eligible bachelor moves in to their neighborhood.</p>\n\t\t\t<p>This edition removes Austen’s pathological use of period-dashes and many ungrammatical commas to make the reading smoother for modern readers.</p>",
+                _: "<p><i>Pride and Prejudice</i> may today be one of Jane Austen’s most enduring novels, having been widely adapted to stage, screen, and other media since its publication in 1813. The novel tells the tale of five unmarried sisters and how their lives change when a wealthy eligible bachelor moves in to their neighborhood.</p>\n\t\t\t<p>This edition removes Austen’s pathological use of period-dashes and many ungrammatical commas to make the reading smoother for modern readers.</p>",
                 $: {
                   type: {
                     name: "type",
@@ -905,8 +902,7 @@ export const recommendations: CollectionData = {
             ],
             id: [
               {
-                _:
-                  "https://standardebooks.org/ebooks/jane-austen/pride-and-prejudice",
+                _: "https://standardebooks.org/ebooks/jane-austen/pride-and-prejudice",
                 $ns: {
                   uri: "http://www.w3.org/2005/Atom",
                   local: "id"
@@ -954,8 +950,7 @@ export const recommendations: CollectionData = {
           status: "borrowable",
           relatedUrl: null,
           trackOpenBookUrl: null,
-          id:
-            "https://standardebooks.org/ebooks/jane-austen/sense-and-sensibility",
+          id: "https://standardebooks.org/ebooks/jane-austen/sense-and-sensibility",
           title: "Sense and Sensibility",
           series: null,
           authors: ["Jane Austen"],
@@ -981,8 +976,7 @@ export const recommendations: CollectionData = {
             "Historical Fiction"
           ],
           language: "en",
-          url:
-            "http://test-cm.com/catalogUrl/works/URI/https://standardebooks.org/ebooks/jane-austen/sense-and-sensibility",
+          url: "http://test-cm.com/catalogUrl/works/URI/https://standardebooks.org/ebooks/jane-austen/sense-and-sensibility",
           raw: {
             $: {
               "schema:additionalType": {
@@ -1018,8 +1012,7 @@ export const recommendations: CollectionData = {
           publisher: "Standard Ebooks",
           categories: ["Adult", "Fiction", "Romance", "Literary Fiction"],
           language: "en",
-          url:
-            "http://test-cm.com/catalogUrl/works/URI/https://standardebooks.org/ebooks/jane-austen/persuasion",
+          url: "http://test-cm.com/catalogUrl/works/URI/https://standardebooks.org/ebooks/jane-austen/persuasion",
           raw: {
             $: {
               "schema:additionalType": {
@@ -1062,8 +1055,7 @@ export const recommendations: CollectionData = {
             "Romance"
           ],
           language: "en",
-          url:
-            "http://test-cm.com/catalogUrl/works/URI/https://standardebooks.org/ebooks/jane-austen/emma"
+          url: "http://test-cm.com/catalogUrl/works/URI/https://standardebooks.org/ebooks/jane-austen/emma"
         }
       ]
     }
@@ -1080,8 +1072,7 @@ export const recommendations: CollectionData = {
   shelfUrl: "http://test-cm.com/catalogUrl/loans/",
   links: [
     {
-      url:
-        "http://test-cm.com/catalogUrl/works/URI/https://standardebooks.org/ebooks/jane-austen/emma/related_books?available=all&after=0&collection=main&entrypoint=Book&order=author&size=50",
+      url: "http://test-cm.com/catalogUrl/works/URI/https://standardebooks.org/ebooks/jane-austen/emma/related_books?available=all&after=0&collection=main&entrypoint=Book&order=author&size=50",
       type: "self"
     },
     {

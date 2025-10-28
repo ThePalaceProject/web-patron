@@ -68,9 +68,8 @@ const Lane: React.FC<{
     index: 0,
     snap: true
   });
-  const [isBrowserScrolling, setIsBrowserScrolling] = React.useState<boolean>(
-    false
-  );
+  const [isBrowserScrolling, setIsBrowserScrolling] =
+    React.useState<boolean>(false);
 
   // we need a ref to the UL element so we can scroll it
   const scrollContainer = React.useRef<HTMLUListElement | null>(null);

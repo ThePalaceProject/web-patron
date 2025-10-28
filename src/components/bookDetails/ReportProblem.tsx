@@ -136,9 +136,9 @@ const ReportProblem: React.FC<{ book: AnyBook }> = ({ book }) => {
         onClick={handleClick}
         data-testid="report-problem-link"
         sx={{
-         alignSelf: "flex-start",
-         my: 2,
-         ...styleProps("ui.black", "md", "filled")
+          alignSelf: "flex-start",
+          my: 2,
+          ...styleProps("ui.black", "md", "filled")
         }}
       >
         Report a problem

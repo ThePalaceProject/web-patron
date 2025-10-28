@@ -28,12 +28,12 @@ type SupportedAuthHandlerProps = {
   [key in SupportedAuthTypes]: key extends typeof BasicAuthType
     ? ClientBasicMethod
     : key extends typeof BasicTokenAuthType
-    ? ClientBasicTokenMethod
-    : key extends typeof SamlAuthType
-    ? ClientSamlMethod
-    : key extends typeof CleverAuthType
-    ? CleverAuthMethod
-    : never;
+      ? ClientBasicTokenMethod
+      : key extends typeof SamlAuthType
+        ? ClientSamlMethod
+        : key extends typeof CleverAuthType
+          ? CleverAuthMethod
+          : never;
 };
 
 // Canonical map of auth types to their respective handler components.
