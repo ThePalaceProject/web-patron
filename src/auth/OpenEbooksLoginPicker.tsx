@@ -1,4 +1,4 @@
-import { jsx, SxProp } from "theme-ui";
+import { SxProp } from "theme-ui";
 import * as React from "react";
 import Stack from "components/Stack";
 import AuthButton from "auth/AuthButton";
