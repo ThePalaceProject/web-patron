@@ -22,9 +22,9 @@ module.exports = {
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
     "plugin:jsx-a11y/strict",
-    "plugin:@next/next/recommended", // Next.js rules
-    // "plugin:prettier/recommended", // enables Prettier plugin + turns Prettier issues into ESLint errors
-    // "prettier" // disables formatting conflicts
+    "plugin:@next/next/recommended",
+    // "plugin:prettier/recommended",
+    // "prettier"
   ],
   rules: {
     // this rule was deprecated in favor of another
@@ -44,7 +44,6 @@ module.exports = {
     "@typescript-eslint/no-empty-object-type": 0,
     "@typescript-eslint/no-require-imports": 0,
     "@typescript-eslint/no-unused-expressions": 0,
-    // "@typescript-eslint/no-unused-vars": 0,
     "@typescript-eslint/no-unused-vars": [
       "error",
       {
