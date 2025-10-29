@@ -93,7 +93,6 @@ const BasicTokenAuthHandler: React.FC<{
         {serverError && `${serverError.info.title}: ${serverError.info.detail}`}
       </Text>
       <FormInput
-        name={usernameInputName}
         label={usernameInputName}
         placeholder={usernameInputName}
         {...register(usernameInputName, {
@@ -106,7 +105,6 @@ const BasicTokenAuthHandler: React.FC<{
       />
       {hasPasswordInput && (
         <FormInput
-          name={passwordInputName}
           label={passwordInputName}
           {...register(passwordInputName, {
             required: true,
