@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import * as React from "react";
 import { render } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -58,13 +56,14 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
   };
   const theme = makeTheme(library.colors);
 
+  // @ts-expect-error loans optional here, but required in UserState
   const user: UserState = {
     ...fixtures.user,
     ...options?.user
   };
 
   interface AllTheProvidersProps {
-    children?: React.ReactNode;
+    children: React.ReactNode;
   }
 
   const AllTheProviders = ({ children }: AllTheProvidersProps) => {
