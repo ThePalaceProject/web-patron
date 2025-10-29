@@ -93,7 +93,6 @@ const BasicAuthHandler: React.FC<{
           endIcon={
             <InputIconButton
               aria-label={`${showPassword ? "hide" : "show"} password`}
-              type="button"
               onClick={togglePasswordVisibility}
             >
               <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />

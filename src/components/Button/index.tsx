@@ -159,7 +159,7 @@ export const InputIconButton = ({
   ...props
 }: InputIconButtonProps) => {
   return (
-    <button sx={iconButtonStyleProps("input")} {...props}>
+    <button sx={iconButtonStyleProps("input")} type="button" {...props}>
       {children}
     </button>
   );
