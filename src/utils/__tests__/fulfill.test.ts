@@ -14,7 +14,8 @@ describe("fulfill", () => {
       const link = {
         contentType: OPDS1.EpubMediaType as OPDS1.AnyBookMediaType,
         url: "link-url",
-        indirectionType: OPDS1.BearerTokenMediaType as OPDS1.IndirectAcquisitionType,
+        indirectionType:
+          OPDS1.BearerTokenMediaType as OPDS1.IndirectAcquisitionType,
         supportLevel: "show" as MediaSupportLevel
       };
 

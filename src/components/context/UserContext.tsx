@@ -17,9 +17,9 @@ export type UserState = {
   isLoading: boolean;
   refetchLoans: () => void;
   signIn: (
-    token: string,
+    token: string | Token,
     method: AppAuthMethod,
-    authenticationUrl: string | undefined
+    authenticationUrl?: string | undefined
   ) => void;
   signOut: () => void;
   setBook: (book: AnyBook, id?: string) => void;
@@ -45,9 +45,8 @@ interface UserProviderProps {
  */
 export const UserProvider = ({ children }: UserProviderProps) => {
   const { shelfUrl, slug } = useLibraryContext();
-  const { credentials, setCredentials, clearCredentials } = useCredentials(
-    slug
-  );
+  const { credentials, setCredentials, clearCredentials } =
+    useCredentials(slug);
   const [error, setError] = React.useState<ServerError | null>(null);
 
   const shouldRevalidate = () => {
@@ -142,8 +141,8 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     data && credentials
       ? "authenticated"
       : credentials && isValidating
-      ? "loading"
-      : "unauthenticated";
+        ? "loading"
+        : "unauthenticated";
 
   const isAuthenticated = status === "authenticated";
   const isLoading = status === "loading";
@@ -151,7 +150,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     status,
     isAuthenticated,
     isLoading,
-    loans: isAuthenticated ? data ?? [] : undefined,
+    loans: isAuthenticated ? (data ?? []) : undefined,
     refetchLoans: mutate,
     signIn,
     signOut,

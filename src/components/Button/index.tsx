@@ -1,7 +1,6 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import { Button as BaseButton } from "@ariakit/react";
 import * as React from "react";
+import { SxProp } from "theme-ui";
 import Link, { LinkProps } from "../Link";
 import { iconButtonStyleProps, styleProps } from "./styles";
 import LoadingIndicator from "components/LoadingIndicator";
@@ -33,39 +32,50 @@ type ButtonProps = React.ComponentPropsWithoutRef<typeof BaseButton> &
     loading?: boolean;
     loadingText?: string;
   };
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function (
-  props,
-  ref
-) {
-  const {
-    variant = defaultVariant,
-    color = defaultColor,
-    size = defaultSize,
-    loading,
-    loadingText,
-    disabled,
-    iconLeft,
-    iconRight,
-    ...rest
-  } = props;
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  function (props, ref) {
+    const {
+      variant = defaultVariant,
+      color = defaultColor,
+      size = defaultSize,
+      loading,
+      loadingText,
+      disabled,
+      iconLeft,
+      iconRight,
+      ...rest
+    } = props;
 
-  return (
-    <BaseButton
-      sx={styleProps(color, size, variant)}
-      disabled={loading || disabled}
-      ref={ref}
-      aria-label={loading && loadingText ? loadingText : undefined}
-      {...rest}
-    >
-      <ButtonContent {...props} />
-    </BaseButton>
-  );
-});
+    return (
+      <BaseButton
+        sx={styleProps(color, size, variant)}
+        disabled={loading || disabled}
+        ref={ref}
+        aria-label={loading && loadingText ? loadingText : undefined}
+        {...rest}
+      >
+        <ButtonContent {...props} />
+      </BaseButton>
+    );
+  }
+);
 Button.displayName = "Button";
 
-const ButtonContent: React.FC<
-  ButtonProps | NavButtonProps | AnchorButtonProps
-> = ({ iconLeft: IconLeft, iconRight: IconRight, children, ...rest }) => {
+type WithSxProps = { sx?: SxProp };
+type IconComponent = React.ComponentType<WithSxProps & { [key: string]: any }>;
+type ButtonContentProps =
+  | (ButtonProps & { iconLeft?: IconComponent; iconRight?: IconComponent })
+  | (NavButtonProps & { iconLeft?: IconComponent; iconRight?: IconComponent })
+  | (AnchorButtonProps & {
+      iconLeft?: IconComponent;
+      iconRight?: IconComponent;
+    });
+const ButtonContent: React.FC<ButtonContentProps> = ({
+  iconLeft: IconLeft,
+  iconRight: IconRight,
+  children,
+  ...rest
+}) => {
   const loading = "loading" in rest ? rest.loading : false;
   const loadingText = "loadingText" in rest ? rest.loadingText : undefined;
   return (
@@ -92,24 +102,23 @@ const ButtonContent: React.FC<
  * we need to pass that through the PolymorphicBox via some other name
  */
 type NavButtonProps = LinkProps & ButtonOwnProps;
-export const NavButton: JSX = React.forwardRef<
-  HTMLAnchorElement,
-  NavButtonProps
->(function (props, ref) {
-  const {
-    variant = defaultVariant,
-    color = defaultColor,
-    size = defaultSize,
-    iconLeft,
-    iconRight,
-    ...rest
-  } = props;
-  return (
-    <Link sx={styleProps(color, size, variant)} ref={ref} {...rest}>
-      <ButtonContent {...props} />
-    </Link>
-  );
-});
+export const NavButton = React.forwardRef<HTMLAnchorElement, NavButtonProps>(
+  function (props, ref) {
+    const {
+      variant = defaultVariant,
+      color = defaultColor,
+      size = defaultSize,
+      iconLeft,
+      iconRight,
+      ...rest
+    } = props;
+    return (
+      <Link sx={styleProps(color, size, variant)} ref={ref} {...rest}>
+        <ButtonContent {...props} />
+      </Link>
+    );
+  }
+);
 NavButton.displayName = "NavButton";
 
 type AnchorButtonProps = React.ComponentPropsWithoutRef<"a"> &
@@ -150,7 +159,7 @@ export const InputIconButton = ({
   ...props
 }: InputIconButtonProps) => {
   return (
-    <button sx={iconButtonStyleProps("input")} {...props}>
+    <button sx={iconButtonStyleProps("input")} type="button" {...props}>
       {children}
     </button>
   );

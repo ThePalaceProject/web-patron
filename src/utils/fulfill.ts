@@ -149,48 +149,50 @@ type GetLocationWithIndirection = (
   catalogUrl: string,
   token?: string
 ) => Promise<AuthorizedLocation>;
-const constructGetLocation = (
-  indirectionType: OPDS1.IndirectAcquisitionType | undefined,
-  contentType: OPDS1.AnyBookMediaType,
-  url: string
-): GetLocationWithIndirection => async (catalogUrl: string, token?: string) => {
-  /**
-   * If there is OPDS Entry Indirection, we fetch the actual link
-   * from within an entry
-   */
-  if (indirectionType === OPDS1.OPDSEntryMediaType) {
-    const book = (await fetchBook(url, catalogUrl, token)) as FulfillableBook;
-    const resolvedUrl = book.fulfillmentLinks?.find(
-      link => link.contentType === contentType
-    )?.url;
-    if (!resolvedUrl) {
-      throw new ApplicationError({
-        title: "OPDS Error",
-        detail:
-          "Indirect OPDS Entry did not contain the correct acquisition link."
-      });
+const constructGetLocation =
+  (
+    indirectionType: OPDS1.IndirectAcquisitionType | undefined,
+    contentType: OPDS1.AnyBookMediaType,
+    url: string
+  ): GetLocationWithIndirection =>
+  async (catalogUrl: string, token?: string) => {
+    /**
+     * If there is OPDS Entry Indirection, we fetch the actual link
+     * from within an entry
+     */
+    if (indirectionType === OPDS1.OPDSEntryMediaType) {
+      const book = (await fetchBook(url, catalogUrl, token)) as FulfillableBook;
+      const resolvedUrl = book.fulfillmentLinks?.find(
+        link => link.contentType === contentType
+      )?.url;
+      if (!resolvedUrl) {
+        throw new ApplicationError({
+          title: "OPDS Error",
+          detail:
+            "Indirect OPDS Entry did not contain the correct acquisition link."
+        });
+      }
+      return {
+        url: resolvedUrl,
+        token
+      };
     }
+
+    if (indirectionType === OPDS1.BearerTokenMediaType) {
+      const bearerToken = await fetchBearerToken(url, token);
+
+      return {
+        url: bearerToken.location,
+        token: `${bearerToken.token_type} ${bearerToken.access_token}`
+      };
+    }
+
+    // otherwise there is no indirection, just return the url and token.
     return {
-      url: resolvedUrl,
+      url,
       token
     };
-  }
-
-  if (indirectionType === OPDS1.BearerTokenMediaType) {
-    const bearerToken = await fetchBearerToken(url, token);
-
-    return {
-      url: bearerToken.location,
-      token: `${bearerToken.token_type} ${bearerToken.access_token}`
-    };
-  }
-
-  // otherwise there is no indirection, just return the url and token.
-  return {
-    url,
-    token
   };
-};
 
 export function dedupeLinks(links: readonly FulfillmentLink[]) {
   return links.reduce<FulfillmentLink[]>((uniqueArr, current) => {

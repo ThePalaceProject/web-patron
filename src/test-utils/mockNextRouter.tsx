@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import { jest } from "@jest/globals";
 import * as React from "react";
 import Router from "next/router";
@@ -11,11 +9,16 @@ import { libraryData } from "test-utils/fixtures";
  * Mock for the next/Router import.
  */
 
-export const mockPush = jest.fn().mockImplementation(async () => true);
+export const mockPush = jest
+  .fn()
+  .mockImplementation(async () => true) as jest.MockedFunction<
+  typeof Router.push
+>;
 Router.push = mockPush;
 
 export const MockNextRouterContextProvider: React.FC<{
   router?: Partial<NextRouter>;
+  children?: React.ReactNode;
 }> = ({ router = {}, children }) => {
   const {
     isReady = true,
@@ -43,27 +46,26 @@ export const MockNextRouterContextProvider: React.FC<{
       emit: () => null
     }
   } = router;
+  const routerValue: NextRouter = {
+    isReady,
+    basePath,
+    route,
+    pathname,
+    query,
+    asPath,
+    push,
+    replace,
+    reload,
+    back,
+    prefetch,
+    beforePopState,
+    isFallback,
+    isLocaleDomain,
+    isPreview,
+    events
+  } as NextRouter;
   return (
-    <RouterContext.Provider
-      value={{
-        isReady,
-        basePath,
-        route,
-        pathname,
-        query,
-        asPath,
-        push,
-        replace,
-        reload,
-        back,
-        prefetch,
-        beforePopState,
-        isFallback,
-        isLocaleDomain,
-        isPreview,
-        events
-      }}
-    >
+    <RouterContext.Provider value={routerValue}>
       {children}
     </RouterContext.Provider>
   );

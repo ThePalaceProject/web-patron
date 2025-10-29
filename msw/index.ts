@@ -1,6 +1,6 @@
 import { setupServer } from "msw/node";
 
-let mswServer = (undefined as unknown) as ReturnType<typeof setupServer>;
+let mswServer = undefined as unknown as ReturnType<typeof setupServer>;
 
 if (typeof window === "undefined") {
   const { server } = require("./server");

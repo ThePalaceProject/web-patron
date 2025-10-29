@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import * as React from "react";
 import { H2, Text } from "./Text";
 import Button, { NavButton } from "./Button";
@@ -15,6 +13,7 @@ import GlobalStyles from "components/GlobalStyles";
 import { ErrorBoundary } from "components/ErrorBoundary";
 import { APP_CONFIG } from "utils/env";
 import OpenEbooksLoginPicker from "auth/OpenEbooksLoginPicker";
+import colors from "theme/colors";
 
 type PopularBook = { alt: string; imgHref: string };
 
@@ -316,8 +315,7 @@ const PopularBookSection: React.FC<{
             <img
               key={book.imgHref}
               sx={{
-                boxShadow: theme =>
-                  `-5px 5px 0px 0px ${theme.colors.brand.secondary}`,
+                boxShadow: `-5px 5px 0px 0px ${colors.brand.secondary}`,
                 width: "32%",
                 alignSelf: "flex-start"
               }}

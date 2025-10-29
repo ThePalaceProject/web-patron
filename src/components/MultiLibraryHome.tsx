@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import { jsx, ThemeUIProvider } from "theme-ui";
+import { ThemeUIProvider } from "theme-ui";
 import { Themed } from "@theme-ui/mdx";
 import * as React from "react";
 import Link from "next/link";

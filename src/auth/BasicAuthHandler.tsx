@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { Text } from "components/Text";
@@ -65,7 +63,6 @@ const BasicAuthHandler: React.FC<{
         {serverError && `${serverError.info.title}: ${serverError.info.detail}`}
       </Text>
       <FormInput
-        name={usernameInputName}
         label={usernameInputName}
         placeholder={usernameInputName}
         {...register(usernameInputName, {
@@ -78,7 +75,6 @@ const BasicAuthHandler: React.FC<{
       />
       {hasPasswordInput && (
         <FormInput
-          name={passwordInputName}
           label={passwordInputName}
           {...register(passwordInputName, {
             required: true,
@@ -93,7 +89,6 @@ const BasicAuthHandler: React.FC<{
           endIcon={
             <InputIconButton
               aria-label={`${showPassword ? "hide" : "show"} password`}
-              type="button"
               onClick={togglePasswordVisibility}
             >
               <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />

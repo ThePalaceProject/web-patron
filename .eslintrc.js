@@ -1,4 +1,10 @@
 module.exports = {
+  overrides: [
+    {
+      files: ["**/__tests__/**/*.{ts,tsx}", "src/test-utils/**/*.{ts,tsx}"],
+      rules: { "react/display-name": "off" }
+    }
+  ],
   root: true,
   env: {
     browser: true,
@@ -23,8 +29,8 @@ module.exports = {
     "plugin:react/recommended",
     "plugin:jsx-a11y/strict",
     "plugin:@next/next/recommended",
-    // "plugin:prettier/recommended",
-    // "prettier"
+    "plugin:prettier/recommended",
+    "prettier"
   ],
   rules: {
     // this rule was deprecated in favor of another

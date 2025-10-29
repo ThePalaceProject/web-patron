@@ -9,13 +9,8 @@ const BorrowOrReserve: React.FC<{
   url: string;
   className?: string;
 }> = ({ isBorrow, url, className }) => {
-  const {
-    isLoading,
-    loadingText,
-    buttonLabel,
-    borrowOrReserve,
-    error
-  } = useBorrow(isBorrow);
+  const { isLoading, loadingText, buttonLabel, borrowOrReserve, error } =
+    useBorrow(isBorrow);
   return (
     <Stack
       direction="column"

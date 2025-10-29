@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import * as React from "react";
 import LoadingIndicator from "../LoadingIndicator";
 import { H3, H2 } from "components/Text";
@@ -44,7 +42,10 @@ const Recommendations: React.FC<{ book: AnyBook }> = ({ book }) => {
         }}
       >
         Recommendations{" "}
-        {isLoading && <LoadingIndicator size="1.75rem" color="ui.gray.dark" />}
+        {isLoading && (
+          // @ts-expect-error theme-ui Spinner typing expects numeric size
+          <LoadingIndicator size="1.75rem" color="ui.gray.dark" />
+        )}
       </H2>
       <ul sx={{ listStyle: "none", m: 0, p: 0 }}>
         {!isLoading &&

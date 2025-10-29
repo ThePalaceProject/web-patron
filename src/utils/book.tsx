@@ -18,9 +18,9 @@ export function getAuthors(book: AnyBook, lim?: number): string[] {
     typeof book.authors?.length === "number" && book.authors.length > 0
       ? book.authors
       : typeof book.contributors?.length === "number" &&
-        book.contributors.length > 0
-      ? book.contributors
-      : ["Authors unknown"];
+          book.contributors.length > 0
+        ? book.contributors
+        : ["Authors unknown"];
 
   // now limit it to however many
   if (lim) {

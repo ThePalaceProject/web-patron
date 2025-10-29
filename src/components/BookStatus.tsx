@@ -21,14 +21,14 @@ const BookStatus: React.FC<{ book: AnyBook }> = ({ book }) => {
     status === "borrowable"
       ? "Available to borrow"
       : status === "reservable"
-      ? "Unavailable"
-      : status === "reserved"
-      ? "Reserved"
-      : status === "on-hold"
-      ? "Ready to Borrow"
-      : status === "fulfillable"
-      ? `Ready to Read${redirectUser ? ` in ${companionApp}` : ""}!`
-      : "Unsupported";
+        ? "Unavailable"
+        : status === "reserved"
+          ? "Reserved"
+          : status === "on-hold"
+            ? "Ready to Borrow"
+            : status === "fulfillable"
+              ? `Ready to Read${redirectUser ? ` in ${companionApp}` : ""}!`
+              : "Unsupported";
 
   return (
     <div>

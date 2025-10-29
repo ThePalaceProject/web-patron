@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { Text } from "components/Text";
@@ -52,7 +50,7 @@ const BasicTokenAuthHandler: React.FC<{
       });
     }
 
-    // generate Basic Token to send to circuation manager for Bearer Token
+    // generate Basic Token to send to circulation manager for Bearer Token
     const basicToken = generateToken(login, password);
     const { accessToken, expiresIn } = await fetchAuthToken(
       authenticationUrl,
@@ -93,7 +91,6 @@ const BasicTokenAuthHandler: React.FC<{
         {serverError && `${serverError.info.title}: ${serverError.info.detail}`}
       </Text>
       <FormInput
-        name={usernameInputName}
         label={usernameInputName}
         placeholder={usernameInputName}
         {...register(usernameInputName, {
@@ -106,7 +103,6 @@ const BasicTokenAuthHandler: React.FC<{
       />
       {hasPasswordInput && (
         <FormInput
-          name={passwordInputName}
           label={passwordInputName}
           {...register(passwordInputName, {
             required: true,
@@ -121,7 +117,6 @@ const BasicTokenAuthHandler: React.FC<{
           endIcon={
             <InputIconButton
               aria-label={`${showPassword ? "hide" : "show"} password`}
-              type="button"
               onClick={togglePasswordVisibility}
             >
               <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
