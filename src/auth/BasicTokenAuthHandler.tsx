@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { Text } from "components/Text";
@@ -52,7 +50,7 @@ const BasicTokenAuthHandler: React.FC<{
       });
     }
 
-    // generate Basic Token to send to circuation manager for Bearer Token
+    // generate Basic Token to send to circulation manager for Bearer Token
     const basicToken = generateToken(login, password);
     const { accessToken, expiresIn } = await fetchAuthToken(
       authenticationUrl,

@@ -17,9 +17,9 @@ export type UserState = {
   isLoading: boolean;
   refetchLoans: () => void;
   signIn: (
-    token: string,
+    token: string | Token,
     method: AppAuthMethod,
-    authenticationUrl: string | undefined
+    authenticationUrl?: string | undefined
   ) => void;
   signOut: () => void;
   setBook: (book: AnyBook, id?: string) => void;
