@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import * as React from "react";
 import { AnyBook } from "interfaces";
 import BookCover from "../BookCover";
@@ -129,7 +127,7 @@ const Summary: React.FC<{ book: AnyBook; className?: string }> = ({
   </div>
 );
 
-const SimplyECallout: React.FC<{ className?: "string" }> = ({ className }) => {
+const SimplyECallout: React.FC<{ className?: string }> = ({ className }) => {
   return (
     <section
       sx={{
