@@ -17,7 +17,10 @@ async function getAppConfig(configFileSetting) {
   if (configFileSetting.startsWith("http")) {
     return await fetchConfigFile(configFileSetting);
   }
-  const configFilePath = path.join(process.cwd(), configFileSetting);
+  // Handle absolute paths correctly
+  const configFilePath = path.isAbsolute(configFileSetting)
+    ? configFileSetting
+    : path.join(process.cwd(), configFileSetting);
   if (!fs.existsSync(configFilePath)) {
     throw new Error("Config file not found at: " + configFilePath);
   }
