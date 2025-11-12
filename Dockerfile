@@ -1,27 +1,27 @@
-# build environment
-FROM node:20.18.1-alpine AS builder
+FROM node:20.18.1-alpine
 
-RUN apk update
-RUN apk add git
+RUN apk update && apk add git
 
-# we first copy just the package.json and run npm ci
-# to take advantage of layer caching
+WORKDIR /app
+
+# Copy package files and install Node dependencies.
 ENV NPM_CONFIG_LOGLEVEL=warn
-COPY package*.json ./
-COPY .npmrc ./
-RUN npm install
+COPY package*.json .npmrc ./
+RUN npm ci
 
-# then copy the rest of the files
+# Copy the entire directory.
 COPY . ./
 
-# Set some standard ENV
-ENV PORT=3000 \	
-    NODE_ENV=production	
+# Calculate git build info, so we don't have to keep .git directory around.
+RUN GIT_COMMIT_SHA=$(git rev-parse HEAD) && \
+    GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD) && \
+    echo "GIT_COMMIT_SHA=${GIT_COMMIT_SHA}" > /app/.env.git && \
+    echo "GIT_BRANCH=${GIT_BRANCH}" >> /app/.env.git && \
+    rm -rf .git
+
+ENV PORT=3000 \
+    NODE_ENV=production
 EXPOSE $PORT
 
-# CMD will set the default command that
-# is run when running the docker container.
-# In this case, we run build-and-start to 
-# build the app with our env vars, delete
-# unnecessary files, and start the app.
-CMD ["npm", "run", "build-and-start"]
+# We need to build at container startup to get the latest libraries from the registry.
+CMD ["sh", "-c", "export $(cat /app/.env.git | xargs) && npm run build-and-start"]

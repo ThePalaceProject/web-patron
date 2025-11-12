@@ -14,11 +14,12 @@ const log = (...message) =>
   console.log(chalk.blue("app info") + "  -", ...message);
 
 // Compute some git info by running commands in a child process
+// Use env vars if available (Docker), otherwise run git commands (local dev)
 const execSync = require("child_process").execSync;
-const GIT_COMMIT_SHA = execSync("git rev-parse HEAD").toString().trim();
-const GIT_BRANCH = execSync("git rev-parse --abbrev-ref HEAD")
-  .toString()
-  .trim();
+const GIT_COMMIT_SHA = process.env.GIT_COMMIT_SHA ||
+  execSync("git rev-parse HEAD").toString().trim();
+const GIT_BRANCH = process.env.GIT_BRANCH ||
+  execSync("git rev-parse --abbrev-ref HEAD").toString().trim();
 
 // compute the release stage of the app
 const RELEASE_STAGE =
