@@ -10,18 +10,14 @@ describe("fetch-config", () => {
   let fetch;
 
   beforeEach(() => {
-    // Clear the module cache to get fresh instances
     jest.resetModules();
 
-    // Mock node-fetch
     fetch = jest.fn();
     jest.doMock("node-fetch", () => fetch);
 
-    // Import the module after mocking
     const configModule = require("../fetch-config");
     parseConfig = configModule.__parseConfigForTest;
 
-    // Clear console.warn
     jest.spyOn(console, "warn").mockImplementation(() => {});
   });
 
@@ -354,7 +350,6 @@ registries:
 media_support: {}
       `;
 
-      // Mock the fetch response for registry
       fetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ catalogs: [] })
@@ -380,7 +375,6 @@ registries:
 media_support: {}
       `;
 
-      // Mock the fetch response for registry
       fetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ catalogs: [] })
@@ -391,8 +385,8 @@ media_support: {}
       expect(config.registries).toEqual([
         {
           url: "https://registry.example.com/libraries",
-          refreshMinInterval: 60, // default
-          refreshMaxInterval: 300 // default
+          refreshMinInterval: 60,
+          refreshMaxInterval: 300
         }
       ]);
     });
@@ -411,7 +405,6 @@ registries:
 media_support: {}
       `;
 
-      // Mock the fetch responses for both registries
       fetch
         .mockResolvedValueOnce({
           ok: true,
@@ -499,7 +492,6 @@ registries:
 media_support: {}
       `;
 
-      // Mock the fetch response for registry
       fetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -558,7 +550,6 @@ registries:
 media_support: {}
       `;
 
-      // Mock the fetch response for registry
       fetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -615,7 +606,6 @@ registries:
 media_support: {}
       `;
 
-      // Mock the fetch responses for both registries
       fetch
         .mockResolvedValueOnce({
           ok: true,
@@ -680,7 +670,6 @@ registries:
 media_support: {}
       `;
 
-      // Mock the fetch response for registry
       fetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -731,7 +720,6 @@ libraries: https://registry.example.com/libraries
 media_support: {}
       `;
 
-      // Mock the fetch response for registry
       fetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -773,7 +761,6 @@ libraries: https://registry.example.com/libraries
 media_support: {}
       `;
 
-      // Mock the fetch response for registry
       fetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -829,7 +816,6 @@ registries:
 media_support: {}
       `;
 
-      // Mock the fetch response for registry
       fetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ catalogs: [] })
