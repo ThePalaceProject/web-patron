@@ -3,6 +3,25 @@ module.exports = {
     {
       files: ["**/__tests__/**/*.{ts,tsx}", "src/test-utils/**/*.{ts,tsx}"],
       rules: { "react/display-name": "off" }
+    },
+    {
+      files: ["**/*.js"],
+      parser: "espree",
+      extends: ["eslint:recommended", "plugin:prettier/recommended"],
+      parserOptions: {
+        ecmaVersion: 2020,
+        sourceType: "module"
+      },
+      env: {
+        node: true,
+        jest: true
+      }
+    },
+    {
+      files: ["src/icons/_template.js"],
+      rules: {
+        "no-unused-vars": "off"
+      }
     }
   ],
   root: true,

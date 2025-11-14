@@ -105,8 +105,8 @@ media_support: {}
       expect(config.registries).toEqual([
         {
           url: "https://registry.example.com/libraries",
-          refreshMinInterval: 60,   // default
-          refreshMaxInterval: 300    // default
+          refreshMinInterval: 60, // default
+          refreshMaxInterval: 300 // default
         }
       ]);
     });
@@ -128,8 +128,12 @@ media_support: {}
       const config = await parseConfig(yamlConfig);
 
       expect(config.registries).toHaveLength(2);
-      expect(config.registries[0].url).toBe("https://registry1.example.com/libraries");
-      expect(config.registries[1].url).toBe("https://registry2.example.com/libraries");
+      expect(config.registries[0].url).toBe(
+        "https://registry1.example.com/libraries"
+      );
+      expect(config.registries[1].url).toBe(
+        "https://registry2.example.com/libraries"
+      );
     });
 
     test("throws error if registries is not an array", async () => {
@@ -251,10 +255,14 @@ media_support: {}
       await parseConfig(yamlConfig);
 
       expect(console.warn).toHaveBeenCalledWith(
-        expect.stringContaining("WARNING: Using a string for 'libraries' in config is deprecated")
+        expect.stringContaining(
+          "WARNING: Using a string for 'libraries' in config is deprecated"
+        )
       );
       expect(console.warn).toHaveBeenCalledWith(
-        expect.stringContaining("Please migrate to the 'registries' array format")
+        expect.stringContaining(
+          "Please migrate to the 'registries' array format"
+        )
       );
     });
 

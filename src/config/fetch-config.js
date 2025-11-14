@@ -48,8 +48,7 @@ async function fetchConfigFile(configFileUrl) {
   try {
     const response = await fetch(configFileUrl);
     const text = await response.text();
-    const parsed = await parseConfig(text);
-    return parsed;
+    return await parseConfig(text);
   } catch (e) {
     console.error(e);
     throw new Error("Could not fetch config file at: " + configFileUrl);
@@ -76,11 +75,9 @@ async function fetchLibrariesFromRegistry(registryBase) {
       link => link.type === "application/vnd.opds.authentication.v1.0+json"
     );
     if (!authDocLink) {
-      throw new ApplicationError({
-        title: "Invalid Registry Feed",
-        detail: `Catalog ${catalog.metadata.title} is missing an auth document link at registry url: ${registryBase}`,
-        status: 500
-      });
+      throw new AppSetupError(
+        `Invalid Registry Feed: Catalog ${catalog.metadata.title} is missing an auth document link at registry url: ${registryBase}`
+      );
     }
     const authDocUrl = authDocLink.href;
     const library = { title: catalog.metadata.title, authDocUrl };
@@ -131,7 +128,7 @@ function parseRegistriesConfig(registries) {
     }
 
     // Default values for refresh intervals (in seconds)
-    const DEFAULT_MIN_INTERVAL = 60;  // 1 minute
+    const DEFAULT_MIN_INTERVAL = 60; // 1 minute
     const DEFAULT_MAX_INTERVAL = 300; // 5 minutes
 
     return {
@@ -164,9 +161,9 @@ async function parseConfig(raw) {
     // DEPRECATED: String format for libraries is deprecated in favor of registries array
     console.warn(
       "WARNING: Using a string for 'libraries' in config is deprecated. " +
-      "Please migrate to the 'registries' array format. " +
-      "See community-config.yml for migration instructions. " +
-      "String format will continue to work but fetches at build-time only."
+        "Please migrate to the 'registries' array format. " +
+        "See community-config.yml for migration instructions. " +
+        "String format will continue to work but fetches at build-time only."
     );
     libraries = await fetchLibrariesFromRegistry(unparsed.libraries);
   } else if (unparsed.libraries) {
