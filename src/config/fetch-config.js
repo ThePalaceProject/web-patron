@@ -89,17 +89,73 @@ async function fetchLibrariesFromRegistry(registryBase) {
 }
 
 /**
- * Creates a LibrariesConfig from the object in the config file
+ * Creates a LibrariesConfig from the object in the config file.
+ * Supports two formats:
+ * 1. String format: slug maps to auth doc URL (slug becomes title)
+ * 2. Object format: slug maps to { authDocUrl, title? }
  */
 function makeLibrariesConfig(libraries) {
   return Object.keys(libraries).reduce((record, slug) => {
-    const authDocUrl = libraries[slug];
-    if (!authDocUrl)
-      throw new AppSetupError(
-        `CONFIG_FILE.libraries contained a key without an auth doc url: ${slug}`
-      );
+    const value = libraries[slug];
 
-    return { ...record, [slug]: { title: slug, authDocUrl } };
+    // Validate value is not null/undefined
+    if (value == null) {
+      throw new AppSetupError(
+        `CONFIG_FILE.libraries['${slug}'] cannot be null or undefined`
+      );
+    }
+
+    // Handle string format (backward compatible)
+    if (typeof value === "string") {
+      if (value.trim() === "") {
+        throw new AppSetupError(
+          `CONFIG_FILE.libraries['${slug}'] cannot be an empty string`
+        );
+      }
+      return { ...record, [slug]: { title: slug, authDocUrl: value } };
+    }
+
+    // Handle object format
+    if (typeof value === "object") {
+      // Validate authDocUrl exists and is a string
+      if (!("authDocUrl" in value) || typeof value.authDocUrl !== "string") {
+        throw new AppSetupError(
+          `CONFIG_FILE.libraries['${slug}'] must have an 'authDocUrl' property with a valid URL string`
+        );
+      }
+      // Validate authDocUrl is not empty
+      if (value.authDocUrl.trim() === "") {
+        throw new AppSetupError(
+          `CONFIG_FILE.libraries['${slug}'].authDocUrl cannot be an empty string`
+        );
+      }
+
+      // Validate title if present
+      let title = slug; // default to slug
+      if ("title" in value) {
+        if (typeof value.title !== "string") {
+          throw new AppSetupError(
+            `CONFIG_FILE.libraries['${slug}'].title must be a string`
+          );
+        }
+        if (value.title.trim() === "") {
+          throw new AppSetupError(
+            `CONFIG_FILE.libraries['${slug}'].title cannot be an empty string`
+          );
+        }
+        title = value.title;
+      }
+
+      return {
+        ...record,
+        [slug]: { title, authDocUrl: value.authDocUrl }
+      };
+    }
+
+    // Invalid type
+    throw new AppSetupError(
+      `CONFIG_FILE.libraries['${slug}'] must be either a string (auth doc URL) or an object with 'authDocUrl' property`
+    );
   }, {});
 }
 

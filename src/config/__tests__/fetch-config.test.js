@@ -68,6 +68,280 @@ media_support: {}
     });
   });
 
+  describe("enhanced library config format (object with authDocUrl/title)", () => {
+    test("parses library with object format and custom title", async () => {
+      const yamlConfig = `
+instance_name: Test Instance
+libraries:
+  main-lib:
+    authDocUrl: https://example.com/main/auth
+    title: "Main Library"
+media_support: {}
+      `;
+
+      const config = await parseConfig(yamlConfig);
+
+      expect(config.libraries).toEqual({
+        "main-lib": {
+          title: "Main Library",
+          authDocUrl: "https://example.com/main/auth"
+        }
+      });
+    });
+
+    test("parses library with object format without title (uses slug)", async () => {
+      const yamlConfig = `
+instance_name: Test Instance
+libraries:
+  my-library:
+    authDocUrl: https://example.com/my-library/auth
+media_support: {}
+      `;
+
+      const config = await parseConfig(yamlConfig);
+
+      expect(config.libraries).toEqual({
+        "my-library": {
+          title: "my-library",
+          authDocUrl: "https://example.com/my-library/auth"
+        }
+      });
+    });
+
+    test("mixes string and object formats in same config", async () => {
+      const yamlConfig = `
+instance_name: Test Instance
+libraries:
+  simple-lib: https://example.com/simple/auth
+  custom-lib:
+    authDocUrl: https://example.com/custom/auth
+    title: "Custom Library"
+  another-lib:
+    authDocUrl: https://example.com/another/auth
+media_support: {}
+      `;
+
+      const config = await parseConfig(yamlConfig);
+
+      expect(config.libraries).toEqual({
+        "simple-lib": {
+          title: "simple-lib",
+          authDocUrl: "https://example.com/simple/auth"
+        },
+        "custom-lib": {
+          title: "Custom Library",
+          authDocUrl: "https://example.com/custom/auth"
+        },
+        "another-lib": {
+          title: "another-lib",
+          authDocUrl: "https://example.com/another/auth"
+        }
+      });
+    });
+
+    test("throws error for null value", async () => {
+      const yamlConfig = `
+instance_name: Test Instance
+libraries:
+  bad-lib: null
+media_support: {}
+      `;
+
+      await expect(parseConfig(yamlConfig)).rejects.toThrow(
+        "CONFIG_FILE.libraries['bad-lib'] cannot be null or undefined"
+      );
+    });
+
+    test("throws error for empty string value", async () => {
+      const yamlConfig = `
+instance_name: Test Instance
+libraries:
+  bad-lib: ""
+media_support: {}
+      `;
+
+      await expect(parseConfig(yamlConfig)).rejects.toThrow(
+        "CONFIG_FILE.libraries['bad-lib'] cannot be an empty string"
+      );
+    });
+
+    test("throws error for whitespace-only string value", async () => {
+      const yamlConfig = `
+instance_name: Test Instance
+libraries:
+  bad-lib: "   "
+media_support: {}
+      `;
+
+      await expect(parseConfig(yamlConfig)).rejects.toThrow(
+        "CONFIG_FILE.libraries['bad-lib'] cannot be an empty string"
+      );
+    });
+
+    test("throws error for object missing authDocUrl", async () => {
+      const yamlConfig = `
+instance_name: Test Instance
+libraries:
+  bad-lib:
+    title: "My Library"
+media_support: {}
+      `;
+
+      await expect(parseConfig(yamlConfig)).rejects.toThrow(
+        "CONFIG_FILE.libraries['bad-lib'] must have an 'authDocUrl' property with a valid URL string"
+      );
+    });
+
+    test("throws error for object with non-string authDocUrl", async () => {
+      const yamlConfig = `
+instance_name: Test Instance
+libraries:
+  bad-lib:
+    authDocUrl: 12345
+media_support: {}
+      `;
+
+      await expect(parseConfig(yamlConfig)).rejects.toThrow(
+        "CONFIG_FILE.libraries['bad-lib'] must have an 'authDocUrl' property with a valid URL string"
+      );
+    });
+
+    test("throws error for object with empty string authDocUrl", async () => {
+      const yamlConfig = `
+instance_name: Test Instance
+libraries:
+  bad-lib:
+    authDocUrl: ""
+media_support: {}
+      `;
+
+      await expect(parseConfig(yamlConfig)).rejects.toThrow(
+        "CONFIG_FILE.libraries['bad-lib'].authDocUrl cannot be an empty string"
+      );
+    });
+
+    test("throws error for object with whitespace-only authDocUrl", async () => {
+      const yamlConfig = `
+instance_name: Test Instance
+libraries:
+  bad-lib:
+    authDocUrl: "  "
+media_support: {}
+      `;
+
+      await expect(parseConfig(yamlConfig)).rejects.toThrow(
+        "CONFIG_FILE.libraries['bad-lib'].authDocUrl cannot be an empty string"
+      );
+    });
+
+    test("throws error for object with non-string title", async () => {
+      const yamlConfig = `
+instance_name: Test Instance
+libraries:
+  bad-lib:
+    authDocUrl: https://example.com/auth
+    title: 123
+media_support: {}
+      `;
+
+      await expect(parseConfig(yamlConfig)).rejects.toThrow(
+        "CONFIG_FILE.libraries['bad-lib'].title must be a string"
+      );
+    });
+
+    test("throws error for object with empty string title", async () => {
+      const yamlConfig = `
+instance_name: Test Instance
+libraries:
+  bad-lib:
+    authDocUrl: https://example.com/auth
+    title: ""
+media_support: {}
+      `;
+
+      await expect(parseConfig(yamlConfig)).rejects.toThrow(
+        "CONFIG_FILE.libraries['bad-lib'].title cannot be an empty string"
+      );
+    });
+
+    test("throws error for object with whitespace-only title", async () => {
+      const yamlConfig = `
+instance_name: Test Instance
+libraries:
+  bad-lib:
+    authDocUrl: https://example.com/auth
+    title: "   "
+media_support: {}
+      `;
+
+      await expect(parseConfig(yamlConfig)).rejects.toThrow(
+        "CONFIG_FILE.libraries['bad-lib'].title cannot be an empty string"
+      );
+    });
+
+    test("throws error for number value", async () => {
+      const yamlConfig = `
+instance_name: Test Instance
+libraries:
+  bad-lib: 12345
+media_support: {}
+      `;
+
+      await expect(parseConfig(yamlConfig)).rejects.toThrow(
+        "CONFIG_FILE.libraries['bad-lib'] must be either a string (auth doc URL) or an object with 'authDocUrl' property"
+      );
+    });
+
+    test("throws error for boolean value", async () => {
+      const yamlConfig = `
+instance_name: Test Instance
+libraries:
+  bad-lib: true
+media_support: {}
+      `;
+
+      await expect(parseConfig(yamlConfig)).rejects.toThrow(
+        "CONFIG_FILE.libraries['bad-lib'] must be either a string (auth doc URL) or an object with 'authDocUrl' property"
+      );
+    });
+
+    test("throws error for array value", async () => {
+      const yamlConfig = `
+instance_name: Test Instance
+libraries:
+  bad-lib:
+    - https://example.com/auth
+media_support: {}
+      `;
+
+      await expect(parseConfig(yamlConfig)).rejects.toThrow(
+        "CONFIG_FILE.libraries['bad-lib'] must have an 'authDocUrl' property with a valid URL string"
+      );
+    });
+
+    test("ignores extra keys in object format", async () => {
+      const yamlConfig = `
+instance_name: Test Instance
+libraries:
+  my-lib:
+    authDocUrl: https://example.com/auth
+    title: "My Library"
+    extra_field: "ignored"
+    another_field: 123
+media_support: {}
+      `;
+
+      const config = await parseConfig(yamlConfig);
+
+      expect(config.libraries).toEqual({
+        "my-lib": {
+          title: "My Library",
+          authDocUrl: "https://example.com/auth"
+        }
+      });
+    });
+  });
+
   describe("registries array config (new format)", () => {
     test("parses registries array with all fields", async () => {
       const yamlConfig = `
