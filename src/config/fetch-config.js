@@ -211,8 +211,24 @@ async function parseConfig(raw) {
   const openebooks = unparsed.openebooks;
   const defaultLibrary = openebooks ? openebooks.default_library : undefined;
 
-  // get the libraries config from either a registry base or the object in the config file
-  let libraries;
+  // Parse registries array configuration
+  const registries = unparsed.registries
+    ? parseRegistriesConfig(unparsed.registries)
+    : [];
+
+  // Build libraries from multiple sources
+  let libraries = {};
+
+  // 1. First, fetch from registries array (if present)
+  if (registries.length > 0) {
+    for (const registry of registries) {
+      const registryLibraries = await fetchLibrariesFromRegistry(registry.url);
+      // Merge registry libraries - later registries don't override earlier ones
+      libraries = { ...registryLibraries, ...libraries };
+    }
+  }
+
+  // 2. Handle deprecated string format for libraries (for backward compatibility)
   if (typeof unparsed.libraries === "string") {
     // DEPRECATED: String format for libraries is deprecated in favor of registries array
     console.warn(
@@ -221,21 +237,19 @@ async function parseConfig(raw) {
         "See community-config.yml for migration instructions. " +
         "String format will continue to work but fetches at build-time only."
     );
-    libraries = await fetchLibrariesFromRegistry(unparsed.libraries);
-  } else if (unparsed.libraries) {
-    // Static libraries defined as object
-    libraries = makeLibrariesConfig(unparsed.libraries);
-  } else {
-    // No static libraries defined
-    libraries = {};
+    const deprecatedRegistryLibraries = await fetchLibrariesFromRegistry(
+      unparsed.libraries
+    );
+    // Merge with existing libraries - deprecated format doesn't override registries
+    libraries = { ...libraries, ...deprecatedRegistryLibraries };
   }
 
-  // Parse registries array (new format for runtime fetching)
-  // In Release 0, this is parsed but not yet used for runtime fetching
-  // Release 1 will implement runtime fetching from these registries
-  const registries = unparsed.registries
-    ? parseRegistriesConfig(unparsed.registries)
-    : [];
+  // 3. Finally, overlay static libraries (these take precedence)
+  if (unparsed.libraries && typeof unparsed.libraries === "object") {
+    const staticLibraries = makeLibrariesConfig(unparsed.libraries);
+    // Static libraries override registry libraries
+    libraries = { ...libraries, ...staticLibraries };
+  }
 
   // otherwise assume the file is properly structured.
   return {
