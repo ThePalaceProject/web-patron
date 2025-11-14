@@ -1,6 +1,6 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import * as React from "react";
-import { renderHook } from "@testing-library/react-hooks";
+import { renderHook } from "@testing-library/react";
 import AppContextProvider from "../ContextProvider";
 import { LibraryData } from "interfaces";
 import useLibraryContext from "../LibraryContext";
