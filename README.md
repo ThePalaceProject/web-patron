@@ -41,6 +41,7 @@ __To have your library added to the demo, register it with NYPL's Library Regist
   - [Configuration File](#configuration-file)
   - [Environment Variables](#environment-variables)
   - [Manager, Registry, and Application Configurations](#manager--registry--and-application-configurations)
+  - [Libraries and Registries Configuration Settings](#libraries-and-registries-configuration-settings)
 - [Development](#development)
   - [Contributing](#contributing)
   - [Installing Dependencies](#installing-dependencies)
@@ -96,6 +97,99 @@ The following environment variables can be set to further configure the applicat
 Any Circulation Manager you'll be using with the app also needs a configuration setting to turn on CORS headers. In the Circulation Manager interface, go to the Sitewide Settings section under System Configuration (`/admin/web/config/sitewideSettings`) and add a setting for "URL of the web catalog for patrons". For development, you can set this to "\*", but for production it should be the real URL where you will run the catalog.
 
 If you are using a Library Registry, this configuration will automatically be created when you register libraries with the Registry, but you need to configure the URL in the Library Registry by running `bin/configuration/configure_site_setting --setting="web_client_url=http://library.org/{uuid}"` (replace the URL with your web client URL). Otherwise, you'll need to create a sitewide setting for it in the Circulation Manager. Finally, make sure that the libraries are registered to the Library Registry you are using.
+
+
+## Libraries and Registries Configuration Settings
+
+The application supports three different approaches for configuring which libraries are available:
+
+#### 1. Static Libraries (Fixed Library Lists)
+
+Define libraries directly in your configuration file as a dictionary mapping library slugs to authentication details. Each library will be accessible at `https://yourdomain.com/{slug}/`.
+
+**Simple Format:**
+```yaml
+libraries:
+  my-library: https://circulation.example.com/my-library/authentication_document
+  another-lib: https://circulation.example.com/another-lib/authentication_document
+```
+
+**Extended Format with Custom Titles:**
+
+You can also specify a custom display title for each library that will appear on the multi-library selection page:
+
+```yaml
+libraries:
+  my-library:
+    authDocUrl: https://circulation.example.com/my-library/authentication_document
+    title: "My Public Library"
+  another-lib:
+    authDocUrl: https://circulation.example.com/another-lib/authentication_document
+    title: "Community Reading Center"
+```
+
+Both formats can be mixed in the same configuration file. If no `title` is specified, the slug will be used as the display name.
+
+#### 2. Library Registries (Dynamic Library Lists)
+
+Instead of hardcoding libraries, you can configure the app to fetch library information from one or more registry URLs. This approach is beneficial when:
+- You have a large number of libraries
+- Libraries are frequently added or removed
+- You want to centralize library configuration
+
+**Note:** In the current release, registries are fetched at build time. Runtime fetching will be available in a future release.
+
+```yaml
+registries:
+  - url: https://registry.thepalaceproject.org/libraries/qa
+    refreshMinInterval: 60      # Seconds between fetch attempts (default: 60)
+    refreshMaxInterval: 300     # Seconds before forcing refresh (default: 300)
+```
+
+**Multiple Registries:**
+
+You can define multiple registries. If the same library slug appears in multiple registries, the first registry takes precedence:
+
+```yaml
+registries:
+  - url: https://primary-registry.example.com/libraries
+  - url: https://regional-registry.example.com/libraries
+```
+
+#### 3. Hybrid Configuration (Static + Registries)
+
+Combine static libraries with registry-based libraries. Static library definitions always take precedence over registry entries when slugs conflict:
+
+```yaml
+libraries:
+  featured-library:
+    authDocUrl: https://circulation.example.com/featured/authentication_document
+    title: "Featured Library"
+registries:
+  - url: https://registry.thepalaceproject.org/libraries/qa
+```
+
+In this example, if the registry also contains a library with slug `featured-library`, the static definition will be used instead.
+
+#### Deprecated Format
+
+**⚠️ The following format is deprecated, but is still supported for backward compatibility:**
+
+```yaml
+libraries: https://registry.example.com/libraries
+```
+
+This string format fetches libraries from a registry at build time only. Please migrate to the `registries` array format shown above for better control and future runtime fetching support.
+
+**Migration Example:**
+```yaml
+# OLD (deprecated):
+libraries: https://registry.thepalaceproject.org/libraries
+
+# NEW (recommended):
+registries:
+  - url: https://registry.thepalaceproject.org/libraries
+```
 
 # Development
 
