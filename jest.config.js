@@ -158,7 +158,12 @@ module.exports = {
   ],
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
-  testPathIgnorePatterns: ["/node_modules/", "/.next/"],
+  testPathIgnorePatterns: [
+    "/node_modules/",
+    "/.next/",
+    // Config tests run separately with jest.config.node.js (via test:ci)
+    "/src/config/__tests__/"
+  ],
 
   // The regexp pattern or array of patterns that Jest uses to detect test files
   // testRegex: [],
