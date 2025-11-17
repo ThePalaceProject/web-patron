@@ -2,9 +2,9 @@
 import { ThemeUIProvider } from "theme-ui";
 import { Themed } from "@theme-ui/mdx";
 import * as React from "react";
-import Link from "next/link";
 import { APP_CONFIG } from "utils/env";
 import theme from "theme/theme";
+import LibraryHomeLink from "./LibraryHomeLink";
 
 const MultiLibraryHome: React.FC = () => {
   const { libraries, instanceName } = APP_CONFIG;
@@ -27,7 +27,7 @@ const MultiLibraryHome: React.FC = () => {
         <ul>
           {slugs.map(slug => (
             <li key={slug}>
-              <Link href={`/${slug}`}>/{libraries[slug]?.title}</Link>
+              <LibraryHomeLink slug={slug} title={libraries[slug]?.title} />
             </li>
           ))}
         </ul>
