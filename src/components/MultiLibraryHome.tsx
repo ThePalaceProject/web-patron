@@ -8,7 +8,11 @@ import LibraryHomeLink from "./LibraryHomeLink";
 
 const MultiLibraryHome: React.FC = () => {
   const { libraries, instanceName } = APP_CONFIG;
-  const slugs = Object.keys(libraries);
+  const slugs = Object.keys(libraries).sort((a, b) => {
+    const titleA = libraries[a]?.title || a;
+    const titleB = libraries[b]?.title || b;
+    return titleA.localeCompare(titleB);
+  });
 
   if (!libraries || slugs.length === 0) return null;
 
