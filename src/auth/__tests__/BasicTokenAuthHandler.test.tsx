@@ -209,3 +209,42 @@ test("fetch new token if token has expired", async () => {
     });
   });
 });
+
+test("displays error when credentials are invalid", async () => {
+  const problemDoc: OPDS1.ProblemDocument = {
+    type: "http://librarysimplified.org/terms/problem/credentials-invalid",
+    title: "Invalid credentials",
+    detail: "A valid library card barcode number and PIN are required.",
+    status: 401
+  };
+
+  fetchMock.mockResponseOnce(JSON.stringify(problemDoc), {
+    status: 401
+  });
+
+  const { user } = setup(
+    <UserProvider>
+      <BasicTokenAuthHandler method={basicTokenAuthMethod} />
+    </UserProvider>
+  );
+
+  const barcode = await screen.findByLabelText("Barcode input");
+  const pin = await screen.findByLabelText("Pin input");
+  await user.type(barcode, "wrong");
+  await user.type(pin, "credentials");
+
+  const loginButton = screen.getByRole("button", { name: "Login" });
+  await user.click(loginButton);
+
+  // Error should be displayed
+  await waitFor(() => {
+    expect(
+      screen.getByText(
+        /Invalid credentials: A valid library card barcode number and PIN are required/i
+      )
+    ).toBeInTheDocument();
+  });
+
+  // Credentials should not be set
+  expect(Cookie.set).not.toHaveBeenCalled();
+});
