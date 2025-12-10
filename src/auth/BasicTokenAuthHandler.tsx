@@ -30,6 +30,7 @@ const BasicTokenAuthHandler: React.FC<{
     handleSubmit,
     formState: { errors }
   } = useForm<FormData>();
+  const [authError, setAuthError] = React.useState<ServerError | null>(null);
 
   const authenticationUrl = method.links?.find(
     link => link.rel === "authenticate"
@@ -50,25 +51,40 @@ const BasicTokenAuthHandler: React.FC<{
       });
     }
 
-    // generate Basic Token to send to circulation manager for Bearer Token
-    const basicToken = generateToken(login, password);
-    const { accessToken, expiresIn } = await fetchAuthToken(
-      authenticationUrl,
-      basicToken
-    );
-    signIn(
-      {
-        basicToken: basicToken,
-        bearerToken: `Bearer ${accessToken}`,
-        // assume expiresIn is in seconds
-        expirationDate: addHours(new Date(), expiresIn / 3600)
-      },
-      method,
-      authenticationUrl
-    );
+    // Clear any previous auth errors
+    setAuthError(null);
+
+    try {
+      // generate Basic Token to send to circulation manager for Bearer Token
+      const basicToken = generateToken(login, password);
+      const { accessToken, expiresIn } = await fetchAuthToken(
+        authenticationUrl,
+        basicToken
+      );
+      signIn(
+        {
+          basicToken: basicToken,
+          bearerToken: `Bearer ${accessToken}`,
+          // assume expiresIn is in seconds
+          expirationDate: addHours(new Date(), expiresIn / 3600)
+        },
+        method,
+        authenticationUrl
+      );
+    } catch (err) {
+      // Capture authentication errors for display
+      if (err instanceof ServerError) {
+        setAuthError(err);
+      } else {
+        // Re-throw non-server errors (shouldn't happen, but maintain existing behavior)
+        throw err;
+      }
+    }
   });
 
-  const serverError = error instanceof ServerError ? error : undefined;
+  // Combine errors from UserContext and local auth errors
+  const serverError =
+    authError || (error instanceof ServerError ? error : undefined);
 
   const hasPasswordInput =
     method.inputs?.password?.keyboard !== Keyboard.NoInput;
