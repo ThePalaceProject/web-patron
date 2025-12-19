@@ -105,6 +105,7 @@ export function getFulfillmentFromLink(link: FulfillmentLink): AnyFullfillment {
       };
 
     case OPDS1.ExternalReaderMediaType:
+    case OPDS1.ExternalReaderMediaTypeUnquoted:
       return {
         id: link.url,
         type: "read-online-external",
@@ -113,6 +114,14 @@ export function getFulfillmentFromLink(link: FulfillmentLink): AnyFullfillment {
           contentType,
           link.url
         ),
+        buttonLabel: "Read Online"
+      };
+
+    case OPDS1.HTMLMediaType:
+      return {
+        id: link.url,
+        type: "read-online-internal",
+        url: link.url,
         buttonLabel: "Read Online"
       };
   }
@@ -125,13 +134,17 @@ export function getFulfillmentFromLink(link: FulfillmentLink): AnyFullfillment {
 export function getFulfillmentsFromBook(
   book: FulfillableBook
 ): SupportedFulfillment[] {
-  // we don't support any audiobooks whatsoever right now
-  if (bookIsAudiobook(book)) return [];
   const links = book.fulfillmentLinks;
   const dedupedLinks = dedupeLinks(links);
   const supported = dedupedLinks
     .map(getFulfillmentFromLink)
     .filter(isSupported);
+  if (bookIsAudiobook(book)) {
+    // only allow read-online-internal, i.e. OPDS1.HTMLMediaType, for now
+    return supported.filter(
+      fulfillment => fulfillment.type === "read-online-internal"
+    );
+  }
   return supported;
 }
 

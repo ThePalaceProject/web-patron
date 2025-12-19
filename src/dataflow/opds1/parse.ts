@@ -30,6 +30,7 @@ import {
 import {
   EPUB_MEDIA_TYPES,
   IncorrectAdobeDrmMediaType,
+  isExternalReaderMediaType,
   PdfMediaType
 } from "types/opds1";
 import { getAppSupportLevel } from "utils/fulfill";
@@ -196,8 +197,10 @@ function canReturnFulfillableBook(links: OPDSAcquisitionLink[]): boolean {
     // match if there is otherwise a direct link. These won't be present
     // if the book has been locked in to Adobe ACS
     if (!link.indirectionType) return true;
+    // match if html/text provided
+    if (link.contentType === OPDS1.HTMLMediaType) return true;
     // match if it has a link to read online externally.
-    if (link.contentType === OPDS1.ExternalReaderMediaType) return true;
+    if (isExternalReaderMediaType(link.contentType)) return true;
     return false;
   });
 }

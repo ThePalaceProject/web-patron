@@ -22,6 +22,9 @@ media_support:
   application/vnd.overdrive.circulation.api+json;profile=ebook: show
   # External read online type (Like Overdrive)
   text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media": show
+  text/html;profile=http://librarysimplified.org/terms/profiles/streaming-media: show
+  # Demarque web reader
+  text/html: show
   # AxisNow document (read online in Webpub Viewer) - not supported in community version
   # application/vnd.librarysimplified.axisnow+json: show
   # Audiobooks
@@ -68,7 +71,6 @@ companion_app: simplye
 #
 libraries:
   main-street-city: https://demo.thepalaceproject.org/GA0000/authentication_document
-
 # 2. RUNTIME LIBRARY REGISTRIES (recommended for dynamic library lists):
 #    Define one or more library registry URLs that will be fetched at runtime.
 #    This allows libraries to be added/removed without rebuilding the application.

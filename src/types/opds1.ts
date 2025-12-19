@@ -83,8 +83,11 @@ export const MobiPocketMediaType = "application/x-mobipocket-ebook";
 export const Mobi8Mediatype = "application/x-mobi8-ebook";
 export const AudiobookMediaType = "application/audiobook+json";
 export const LcpAudioBookMediaType = "application/audiobook+lcp";
+export const HtmlTextMediaType = "text/html";
 export const ExternalReaderMediaType =
   'text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"';
+export const ExternalReaderMediaTypeUnquoted =
+  "text/html;profile=http://librarysimplified.org/terms/profiles/streaming-media";
 export const OverdriveAudiobookMediaType =
   "application/vnd.overdrive.circulation.api+json;profile=audiobook";
 export const OverdriveEbookMediaType =
@@ -96,6 +99,13 @@ export const AccessRestrictionAudiobookMediaType =
 export const FindawayAudiobookMediaType =
   "application/vnd.librarysimplified.findaway.license+json";
 
+export function isExternalReaderMediaType(contentType: string): boolean {
+  return (
+    contentType === ExternalReaderMediaType ||
+    contentType === ExternalReaderMediaTypeUnquoted
+  );
+}
+
 export const EPUB_MEDIA_TYPES = [
   AxisNowWebpubMediaType,
   EpubMediaType,
@@ -103,7 +113,9 @@ export const EPUB_MEDIA_TYPES = [
 ];
 
 export type ReadOnlineMediaType =
+  | typeof HtmlTextMediaType
   | typeof ExternalReaderMediaType
+  | typeof ExternalReaderMediaTypeUnquoted
   | typeof AxisNowWebpubMediaType
   | typeof OverdriveEbookMediaType;
 
