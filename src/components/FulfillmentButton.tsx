@@ -120,9 +120,9 @@ const ReadOnlineInternal: React.FC<{
   isPrimaryAction: boolean;
 }> = ({ details, isPrimaryAction, trackOpenBookUrl }) => {
   const router = useRouter();
-  const { buildMultiLibraryLink } = useLinkUtils();
+  const { buildReaderLink } = useLinkUtils();
 
-  const internalLink = buildMultiLibraryLink(details.url);
+  const internalLink = buildReaderLink(details.url);
   function open() {
     track.openBook(trackOpenBookUrl);
     router.push(internalLink, undefined, { shallow: true });
