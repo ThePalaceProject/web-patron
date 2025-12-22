@@ -35,3 +35,65 @@ test("does not redirect if there is a token", async () => {
   });
   expect(window.location.href).toBe("http://test-domain.com/");
 });
+
+test("displays error message when loginError query param is present", () => {
+  const utils = render(<SamlAuthHandler method={fixtures.clientSamlMethod} />, {
+    router: {
+      query: {
+        loginError:
+          "Invalid Credentials: The patron account associated with this SAML authentication could not be found."
+      }
+    },
+    user: { token: undefined }
+  });
+
+  expect(
+    utils.getByText(
+      "Invalid Credentials: The patron account associated with this SAML authentication could not be found."
+    )
+  ).toBeInTheDocument();
+  expect(utils.getByRole("button", { name: "Try Again" })).toBeInTheDocument();
+});
+
+test("does not redirect to SAML IdP when error is present", () => {
+  render(<SamlAuthHandler method={fixtures.clientSamlMethod} />, {
+    router: {
+      query: {
+        loginError: "Authentication failed"
+      }
+    },
+    user: { token: undefined }
+  });
+
+  // Should not redirect when error is present
+  expect(window.location.href).toBe("http://test-domain.com/");
+});
+
+test('clicking "Try Again" clears error and attempts SAML redirect', async () => {
+  const mockReplace = jest.fn();
+  const utils = render(<SamlAuthHandler method={fixtures.clientSamlMethod} />, {
+    router: {
+      query: {
+        loginError: "Authentication failed",
+        library: "testlib"
+      },
+      pathname: "/[library]/login/[methodId]",
+      replace: mockReplace
+    },
+    user: { token: undefined }
+  });
+
+  const tryAgainButton = utils.getByRole("button", { name: "Try Again" });
+  tryAgainButton.click();
+
+  await waitFor(() => {
+    expect(mockReplace).toHaveBeenCalledWith(
+      {
+        pathname: "/[library]/login/[methodId]",
+        query: { library: "testlib" }
+      },
+      undefined,
+      { shallow: true }
+    );
+  });
+});

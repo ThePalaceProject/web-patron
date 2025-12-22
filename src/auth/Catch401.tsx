@@ -12,11 +12,23 @@ interface Props {
 
 const CatchFetchErrors = ({ children }: Props) => {
   const { initLogin } = useLogin();
-  const { isLoading } = useUser();
+  const { isLoading, authFailureContext } = useUser();
 
   function handle401() {
-    // if a clever error is detected, we set that in the url
-    // while redirecting
+    // Handle redirect-based auth failures generically
+    if (authFailureContext) {
+      const serverErrorMessage = formatAuthError(authFailureContext.error);
+
+      initLogin(
+        undefined,
+        serverErrorMessage,
+        !authFailureContext.preventRetryToCurrentPage
+      );
+      return;
+    }
+
+    // Legacy: if a clever error is detected in URL hash, use that
+    // TODO: Migrate Clever to use authFailureContext in future
     const cleverError = extractCleverError();
     if (cleverError) {
       initLogin(undefined, cleverError);
@@ -43,6 +55,18 @@ const CatchFetchErrors = ({ children }: Props) => {
 };
 
 export default CatchFetchErrors;
+
+/**
+ * Formats a ServerError into a user-friendly message.
+ * Extracts title and detail from the OPDS Problem Document.
+ */
+function formatAuthError(error: ServerError): string {
+  if (error?.info?.title && error?.info?.detail) {
+    return `${error.info.title}: ${error.info.detail}`;
+  }
+
+  return "Authentication completed successfully, but your account was not recognized. Please contact your library for assistance.";
+}
 
 /**
  * Attempts to find an error in the url hash that was set by
