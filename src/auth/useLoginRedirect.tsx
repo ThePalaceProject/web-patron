@@ -23,9 +23,21 @@ export default function useLoginRedirectUrl() {
   // if the redirect url is the home page, choose the catalog root instead
   const isHomePage = nextPath === "/";
 
-  // go to catalog root if nextPath is invalid
+  // Check if redirect is to an auth-protected page
+  const isAuthProtectedPage = nextPath?.includes("/loans");
+
+  // Check if there's a login error (indicates auth just failed).
+  // Check both loginError (from our code) and error (from backend redirect).
+  const hasLoginError = query.loginError || query.error;
+
+  // If we have an error AND we're trying to redirect to an auth-protected page,
+  // this would create a loop, which we can avoid by redirecting to the
+  // catalog page, if necessary (see below).
+  const wouldCreateLoop = isAuthProtectedPage && hasLoginError;
+
+  // Go to catalog root if nextPath is invalid or would cause a loop.
   const successPath =
-    !nextPath || isLoginPath || isHomePage || isFullUrl
+    !nextPath || isLoginPath || isHomePage || isFullUrl || wouldCreateLoop
       ? catalogRootPath
       : nextPath;
 
