@@ -44,12 +44,13 @@ export type UserState = {
     method: AppAuthMethod,
     authenticationUrl?: string | undefined
   ) => void;
-  signOut: () => void;
+  signOut: () => AppAuthMethod["type"] | undefined;
   setBook: (book: AnyBook, id?: string) => void;
   error: any;
   token: string | undefined;
   clearCredentials: () => void;
   authFailureContext: AuthFailureContext | null;
+  credentials: AuthCredentials | undefined;
 };
 
 export const UserContext = React.createContext<UserState | undefined>(
@@ -159,8 +160,10 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   }
 
   function signOut() {
+    const methodType = credentials?.methodType;
     clearCredentials();
     mutate();
+    return methodType;
   }
 
   function setBook(book: AnyBook, id?: string) {
@@ -203,7 +206,8 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     error,
     token: stringifyToken(credentials),
     clearCredentials,
-    authFailureContext
+    authFailureContext,
+    credentials
   };
 
   return <UserContext.Provider value={user}>{children}</UserContext.Provider>;

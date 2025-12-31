@@ -63,10 +63,15 @@ const mockReplace = jest.fn(() => {
   window.location.hash = "";
 });
 
-const replaceStateSpy = jest.spyOn(window.history, "replaceState");
-
 test("extracts clever tokens from the url", () => {
   window.location.hash = "#access_token=fry6H3" as any;
+
+  // Mock router with replace function
+  useRouterSpy.mockReturnValue({
+    replace: mockReplace,
+    query: {},
+    pathname: "/testlib/loans"
+  } as any);
 
   renderUserContext();
 
@@ -91,12 +96,11 @@ test("extracts clever tokens from the url", () => {
     expect.anything()
   );
 
-  // mock the router
-  expect(replaceStateSpy).toHaveBeenCalledTimes(1);
-  expect(replaceStateSpy).toHaveBeenCalledWith(
-    null,
-    "",
-    "http://test-domain.com/"
+  // Should have used router.replace to clear the Clever hash from the URL.
+  expect(mockReplace).toHaveBeenCalledWith(
+    { pathname: "/testlib/loans", query: {}, hash: "" },
+    undefined,
+    { shallow: true }
   );
 });
 
@@ -109,7 +113,8 @@ test("extracts SAML tokens from the url", () => {
   window.location = url as any;
   useRouterSpy.mockReturnValue({
     replace: mockReplace,
-    query: { access_token: "saml-token" }
+    query: { access_token: "saml-token" },
+    pathname: "/testlib/loans"
   } as any);
   renderUserContext();
 
@@ -135,10 +140,11 @@ test("extracts SAML tokens from the url", () => {
     expect.anything()
   );
 
-  expect(replaceStateSpy).toHaveBeenCalledWith(
-    null,
-    "",
-    "http://test-domain.com/"
+  // Should have used router.replace to clear the SAML token from the URL.
+  expect(mockReplace).toHaveBeenCalledWith(
+    { pathname: "/testlib/loans", query: {} },
+    undefined,
+    { shallow: true }
   );
 });
 
