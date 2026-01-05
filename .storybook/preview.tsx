@@ -46,11 +46,16 @@ export const user: UserState = {
   loans: undefined,
   refetchLoans: () => console.log("refetch"),
   signIn: () => console.log("singIn"),
-  signOut: () => console.log("signOut"),
+  signOut: () => {
+    console.log("signOut");
+    return undefined;
+  },
   setBook:() => console.log("setBook"),
   status: "unauthenticated",
   clearCredentials: () => console.log("clearCredentials"),
   token: "user-token",
+  authFailureContext: null,
+  credentials: undefined
 };
 
 export const decorators = [

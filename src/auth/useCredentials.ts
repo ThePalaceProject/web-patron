@@ -140,11 +140,13 @@ function getUrlCredentials(router: NextRouter) {
   /* TODO: throw error if samlAccessToken and cleverAccessToken exist at the same time as this is an invalid state that shouldn't be reached */
   return IS_SERVER
     ? undefined
-    : (lookForCleverCredentials() ?? lookForSamlCredentials(router));
+    : (lookForCleverCredentials(router) ?? lookForSamlCredentials(router));
 }
 
 // check for clever credentials
-function lookForCleverCredentials(): AuthCredentials | undefined {
+function lookForCleverCredentials(
+  router: NextRouter
+): AuthCredentials | undefined {
   if (!IS_SERVER) {
     const accessTokenKey = "access_token=";
     if (window?.location?.hash) {
@@ -156,10 +158,12 @@ function lookForCleverCredentials(): AuthCredentials | undefined {
           .split("&")[0];
         const token = `Bearer ${accessToken}`;
 
-        // clear the url hash with replaceState
-        const url = new URL(window.location.href);
-        url.hash = "";
-        window.history.replaceState(null, document.title, url.toString());
+        // Clear Clever hash from URL to avoid re-authentication after sign out.
+        router.replace(
+          { pathname: router.pathname, query: router.query, hash: "" },
+          undefined,
+          { shallow: true }
+        );
 
         return { token, methodType: OPDS1.CleverAuthType };
       }
@@ -174,12 +178,13 @@ function lookForSamlCredentials(
   const { [SAML_LOGIN_QUERY_PARAM]: samlAccessToken } = router.query;
   if (samlAccessToken) {
     if (!IS_SERVER && typeof window !== "undefined") {
-      // clear the browser query using replaceState
-      const url = new URL(window.location.href);
-      if (url.searchParams.has(SAML_LOGIN_QUERY_PARAM)) {
-        url.searchParams.delete(SAML_LOGIN_QUERY_PARAM);
-        window.history.replaceState(null, document.title, url.toString());
-      }
+      // Clear SAML token from URL to avoid re-authentication after sign out.
+      const { [SAML_LOGIN_QUERY_PARAM]: _, ...restQuery } = router.query;
+      router.replace(
+        { pathname: router.pathname, query: restQuery },
+        undefined,
+        { shallow: true }
+      );
     }
 
     return {
