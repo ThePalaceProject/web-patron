@@ -246,18 +246,14 @@ const BookListCTA: React.FC<{ book: AnyBook }> = ({ book }) => {
       book.fulfillmentLinks
     );
 
-    const showableFulfillments = showableLinks.map(getFulfillmentFromLink);
+    const showableFulfillments = showableLinks.map(
+      getFulfillmentFromLink(book)
+    );
     const singleFulfillment =
       showableFulfillments.length === 1 ? showableFulfillments[0] : undefined;
 
     return (
-      <>
-        <CancelOrReturn
-          url={book.revokeUrl}
-          loadingText="Returning..."
-          id={book.id}
-          text="Return"
-        />
+      <Stack>
         {singleFulfillment && !shouldRedirectUser && (
           <FulfillmentButton
             details={singleFulfillment}
@@ -265,7 +261,13 @@ const BookListCTA: React.FC<{ book: AnyBook }> = ({ book }) => {
             isPrimaryAction
           />
         )}
-      </>
+        <CancelOrReturn
+          url={book.revokeUrl}
+          loadingText="Returning..."
+          id={book.id}
+          text="Return"
+        />
+      </Stack>
     );
   }
 

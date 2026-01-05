@@ -1,6 +1,7 @@
 import { fetchBearerToken, fetchBook } from "dataflow/opds1/fetch";
 import ApplicationError from "errors";
 import {
+  AnyBook,
   FulfillableBook,
   FulfillmentLink,
   MediaSupportLevel,
@@ -61,75 +62,77 @@ export type SupportedFulfillment =
 
 export type AnyFullfillment = SupportedFulfillment | UnsupportedFulfillment;
 
-export function getFulfillmentFromLink(link: FulfillmentLink): AnyFullfillment {
-  const { contentType, indirectionType, supportLevel } = link;
+export const getFulfillmentFromLink =
+  (book: AnyBook) =>
+  (link: FulfillmentLink): AnyFullfillment => {
+    const { contentType, indirectionType, supportLevel } = link;
 
-  // don't show fulfillment option if it is unsupported or only allows
-  // a redirect to the companion app.
-  if (supportLevel === "unsupported" || supportLevel === "redirect") {
-    return { type: "unsupported" };
-  }
+    // don't show fulfillment option if it is unsupported or only allows
+    // a redirect to the companion app.
+    if (supportLevel === "unsupported" || supportLevel === "redirect") {
+      return { type: "unsupported" };
+    }
 
-  // TODO: I'm not sure that we need these special "unsupported" cases here,
-  //  since we can set this in the configuration. For example, there might
-  //  be cases in the future in which there is no support in this app, but
-  //  support is present in the mobile apps. It might be better to restrict
-  //  the possible types, depending on whether we directly support it in-app.
-  // there is no support for books with "Libby" DRM
-  // There is no support for books with AxisNow DRM.
-  if (
-    [OPDS1.OverdriveEbookMediaType, OPDS1.AxisNowWebpubMediaType].includes(
-      contentType
-    )
-  ) {
-    return { type: "unsupported" };
-  }
-  switch (contentType) {
-    case OPDS1.PdfMediaType:
-    case OPDS1.Mobi8Mediatype:
-    case OPDS1.MobiPocketMediaType:
-    case OPDS1.EpubMediaType:
-      const typeName = typeMap[contentType].name;
-      const modifier =
-        indirectionType === OPDS1.AdobeDrmMediaType ? "Adobe " : "";
-      return {
-        id: link.url,
-        getLocation: constructGetLocation(
-          indirectionType,
-          contentType,
-          link.url
-        ),
-        type: "download",
-        buttonLabel: `Download ${modifier}${typeName}`,
+    // TODO: I'm not sure that we need these special "unsupported" cases here,
+    //  since we can set this in the configuration. For example, there might
+    //  be cases in the future in which there is no support in this app, but
+    //  support is present in the mobile apps. It might be better to restrict
+    //  the possible types, depending on whether we directly support it in-app.
+    // there is no support for books with "Libby" DRM
+    // There is no support for books with AxisNow DRM.
+    if (
+      [OPDS1.OverdriveEbookMediaType, OPDS1.AxisNowWebpubMediaType].includes(
         contentType
-      };
+      )
+    ) {
+      return { type: "unsupported" };
+    }
+    switch (contentType) {
+      case OPDS1.PdfMediaType:
+      case OPDS1.Mobi8Mediatype:
+      case OPDS1.MobiPocketMediaType:
+      case OPDS1.EpubMediaType:
+        const typeName = typeMap[contentType].name;
+        const modifier =
+          indirectionType === OPDS1.AdobeDrmMediaType ? "Adobe " : "";
+        return {
+          id: link.url,
+          getLocation: constructGetLocation(
+            indirectionType,
+            contentType,
+            link.url
+          ),
+          type: "download",
+          buttonLabel: `Download ${modifier}${typeName}`,
+          contentType
+        };
 
-    case OPDS1.ExternalReaderMediaType:
-    case OPDS1.ExternalReaderMediaTypeUnquoted:
-      return {
-        id: link.url,
-        type: "read-online-external",
-        getLocation: constructGetLocation(
-          indirectionType,
-          contentType,
-          link.url
-        ),
-        buttonLabel: "Read Online"
-      };
+      case OPDS1.ExternalReaderMediaType:
+      case OPDS1.ExternalReaderMediaTypeUnquoted:
+        return {
+          id: link.url,
+          type: "read-online-external",
+          getLocation: constructGetLocation(
+            indirectionType,
+            contentType,
+            link.url
+          ),
+          buttonLabel: "Read Online"
+        };
 
-    case OPDS1.HTMLMediaType:
-      return {
-        id: link.url,
-        type: "read-online-internal",
-        url: link.url,
-        buttonLabel: "Read Online"
-      };
-  }
-  // TODO: track to bugsnag that we have found an unhandled media type
-  return {
-    type: "unsupported"
+      case OPDS1.HTMLMediaType:
+        return {
+          id: link.url,
+          type: "read-online-internal",
+          url: link.url,
+          buttonLabel: bookIsAudiobook(book) ? "Listen" : "Read"
+        };
+    }
+    // TODO: track to bugsnag that we have found an unhandled media type
+    return {
+      type: "unsupported"
+    };
   };
-}
 
 export function getFulfillmentsFromBook(
   book: FulfillableBook
@@ -137,7 +140,7 @@ export function getFulfillmentsFromBook(
   const links = book.fulfillmentLinks;
   const dedupedLinks = dedupeLinks(links);
   const supported = dedupedLinks
-    .map(getFulfillmentFromLink)
+    .map(getFulfillmentFromLink(book))
     .filter(isSupported);
   if (bookIsAudiobook(book)) {
     // only allow read-online-internal, i.e. OPDS1.HTMLMediaType, for now

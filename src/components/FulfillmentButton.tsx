@@ -129,7 +129,7 @@ const ReadOnlineInternal: React.FC<{
   }
   return (
     <Button {...getButtonStyles(isPrimaryAction)} onClick={open}>
-      Read
+      {details?.buttonLabel ?? "Read"}
     </Button>
   );
 };

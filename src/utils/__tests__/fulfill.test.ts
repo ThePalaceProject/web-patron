@@ -7,6 +7,7 @@ import {
   getFulfillmentFromLink
 } from "../fulfill";
 import mockConfig from "test-utils/mockConfig";
+import { fulfillableBook } from "test-utils/fixtures";
 
 describe("fulfill", () => {
   describe("getFulfillmentFromLink", () => {
@@ -20,7 +21,9 @@ describe("fulfill", () => {
       };
 
       test("should return a fulfillment that gets the download url and token by retrieving a bearer token propagation document", async () => {
-        const fulfillment = getFulfillmentFromLink(link) as DownloadFulfillment;
+        const fulfillment = getFulfillmentFromLink(fulfillableBook)(
+          link
+        ) as DownloadFulfillment;
 
         fetchMock.mockResponseOnce(
           /* eslint-disable camelcase */
