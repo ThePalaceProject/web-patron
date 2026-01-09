@@ -197,8 +197,6 @@ function canReturnFulfillableBook(links: OPDSAcquisitionLink[]): boolean {
     // match if there is otherwise a direct link. These won't be present
     // if the book has been locked in to Adobe ACS
     if (!link.indirectionType) return true;
-    // match if html/text provided
-    if (link.contentType === OPDS1.HTMLMediaType) return true;
     // match if it has a link to read online externally.
     if (isExternalReaderMediaType(link.contentType)) return true;
     return false;

@@ -7,7 +7,7 @@ import {
   MediaSupportLevel,
   OPDS1
 } from "interfaces";
-import { DownloadMediaType } from "types/opds1";
+import { DownloadMediaType, ReadOnlineMediaType } from "types/opds1";
 import { bookIsAudiobook } from "utils/book";
 import { APP_CONFIG } from "utils/env";
 import { typeMap } from "utils/file";
@@ -43,11 +43,13 @@ export type ReadInternalFulfillment = {
   type: "read-online-internal";
   id: string;
   url: string;
+  contentType?: string;
   buttonLabel: string;
 };
 export type ReadExternalFulfillment = {
   type: "read-online-external";
   id: string;
+  contentType: ReadOnlineMediaType;
   getLocation: GetLocationWithIndirection;
   buttonLabel: string;
 };
@@ -66,6 +68,7 @@ export const getFulfillmentFromLink =
   (book: AnyBook) =>
   (link: FulfillmentLink): AnyFullfillment => {
     const { contentType, indirectionType, supportLevel } = link;
+    const action = bookIsAudiobook(book) ? "Listen" : "Read";
 
     // don't show fulfillment option if it is unsupported or only allows
     // a redirect to the companion app.
@@ -87,6 +90,7 @@ export const getFulfillmentFromLink =
     ) {
       return { type: "unsupported" };
     }
+
     switch (contentType) {
       case OPDS1.PdfMediaType:
       case OPDS1.Mobi8Mediatype:
@@ -117,16 +121,21 @@ export const getFulfillmentFromLink =
             contentType,
             link.url
           ),
-          buttonLabel: "Read Online"
+          contentType,
+          buttonLabel: `${action} Online`
         };
 
-      case OPDS1.HTMLMediaType:
-        return {
-          id: link.url,
-          type: "read-online-internal",
-          url: link.url,
-          buttonLabel: bookIsAudiobook(book) ? "Listen" : "Read"
-        };
+      /**
+       * TODO: internal reader should have capabilities that persist with the mobile apps for a seamless experience
+       * i.e. saved bookmarks in web carry over to mobile app
+       */
+      // case {internal_type}:
+      //   return {
+      //     id: link.url,
+      //     type: "read-online-internal",
+      //     url: link.url,
+      //     buttonLabel: action
+      //   };
     }
     // TODO: track to bugsnag that we have found an unhandled media type
     return {
@@ -137,17 +146,13 @@ export const getFulfillmentFromLink =
 export function getFulfillmentsFromBook(
   book: FulfillableBook
 ): SupportedFulfillment[] {
+  // if (bookIsAudiobook(book)) return [];
   const links = book.fulfillmentLinks;
   const dedupedLinks = dedupeLinks(links);
   const supported = dedupedLinks
     .map(getFulfillmentFromLink(book))
     .filter(isSupported);
-  if (bookIsAudiobook(book)) {
-    // only allow read-online-internal, i.e. OPDS1.HTMLMediaType, for now
-    return supported.filter(
-      fulfillment => fulfillment.type === "read-online-internal"
-    );
-  }
+
   return supported;
 }
 
