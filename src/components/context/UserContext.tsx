@@ -7,7 +7,7 @@ import { AppAuthMethod, AnyBook, AuthCredentials, Token } from "interfaces";
 import * as React from "react";
 import useSWR from "swr";
 import { BasicTokenAuthType } from "types/opds1";
-import { addHours, isBefore } from "date-fns";
+import { addHours } from "date-fns";
 
 type Status = "authenticated" | "loading" | "unauthenticated";
 export type UserState = {
@@ -52,9 +52,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   const shouldRevalidate = () => {
     if (credentials?.methodType === BasicTokenAuthType) {
       if (typeof credentials?.token !== "string" && credentials?.token) {
-        if (credentials.token?.expirationDate) {
-          return isBefore(credentials?.token?.expirationDate, new Date());
-        }
+        return true;
       }
     }
 
