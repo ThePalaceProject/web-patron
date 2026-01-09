@@ -17,6 +17,7 @@ import useUser from "components/context/UserContext";
 import downloadFile from "dataflow/download";
 import useError from "hooks/useError";
 import useLinkUtils from "hooks/useLinkUtils";
+import Stack from "./Stack";
 
 const FulfillmentButton: React.FC<{
   details: AnyFullfillment;
@@ -77,6 +78,9 @@ const ReadOnlineExternal: React.FC<{
   const [loading, setLoading] = React.useState(false);
   const { error, handleError, clearError } = useError();
 
+  const router = useRouter();
+  const { buildReaderLink } = useLinkUtils();
+
   async function open() {
     setLoading(true);
     clearError();
@@ -88,10 +92,14 @@ const ReadOnlineExternal: React.FC<{
         token
       );
 
+      // Instead of throwing user out to a different tab,
+      // we place them into an embedded iframe within the app
+      const externalLink = buildReaderLink("external", externalReaderUrl);
+
       // we are about to open the book, so send a track event
       track.openBook(trackOpenBookUrl);
+      router.push(externalLink, undefined, { shallow: true });
       setLoading(false);
-      window.open(externalReaderUrl, "__blank");
     } catch (e) {
       setLoading(false);
       handleError(e);
@@ -99,7 +107,7 @@ const ReadOnlineExternal: React.FC<{
   }
 
   return (
-    <>
+    <Stack sx={{ flexWrap: "wrap" }}>
       <Button
         {...getButtonStyles(isPrimaryAction)}
         iconLeft={SvgExternalLink}
@@ -107,10 +115,10 @@ const ReadOnlineExternal: React.FC<{
         loading={loading}
         loadingText="Opening..."
       >
-        {details.buttonLabel}
+        {details?.buttonLabel ?? "Read"}
       </Button>
       {error && <Text sx={{ color: "ui.error" }}>{error}</Text>}
-    </>
+    </Stack>
   );
 };
 
@@ -122,7 +130,7 @@ const ReadOnlineInternal: React.FC<{
   const router = useRouter();
   const { buildReaderLink } = useLinkUtils();
 
-  const internalLink = buildReaderLink(details.url);
+  const internalLink = buildReaderLink("internal", details.url);
   function open() {
     track.openBook(trackOpenBookUrl);
     router.push(internalLink, undefined, { shallow: true });
