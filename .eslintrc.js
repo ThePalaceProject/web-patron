@@ -25,6 +25,7 @@ module.exports = {
     }
   ],
   root: true,
+  ignorePatterns: ["_next", "next-env.d.ts"],
   env: {
     browser: true,
     node: true
