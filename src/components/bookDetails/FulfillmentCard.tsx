@@ -79,25 +79,54 @@ const AccessCard: React.FC<{
 }> = ({ book, links }) => {
   const fulfillments = getFulfillmentsFromBook(book);
 
-  const isFulfillable = fulfillments.length > 0;
+  // visually prioritize internal fulfillments (mirrors apps)
+  const internalFulfillments = fulfillments.filter(
+    details => details.type === "read-online-internal"
+  );
+  const otherFulfillments = fulfillments.filter(
+    details => details.type !== "read-online-internal"
+  );
+
+  const isFulfillableInternally = internalFulfillments.length > 0;
+  const hasOtherFulfillments = otherFulfillments.length > 0;
+
   const redirectUser = shouldRedirectToCompanionApp(links);
 
   return (
     <>
-      <CancelOrReturn
-        url={book.revokeUrl}
-        loadingText="Returning..."
-        id={book.id}
-        text="Return"
-      />
-      {isFulfillable && redirectUser && (
+      {isFulfillableInternally ? (
+        <Stack sx={{ flexWrap: "wrap" }}>
+          {internalFulfillments.map(details => (
+            <FulfillmentButton
+              isPrimaryAction
+              key={details.id}
+              details={details}
+              book={book}
+            />
+          ))}
+          <CancelOrReturn
+            url={book.revokeUrl}
+            loadingText="Returning..."
+            id={book.id}
+            text="Return"
+          />
+        </Stack>
+      ) : (
+        <CancelOrReturn
+          url={book.revokeUrl}
+          loadingText="Returning..."
+          id={book.id}
+          text="Return"
+        />
+      )}
+      {hasOtherFulfillments && redirectUser && (
         <Text variant="text.body.italic">
           If you would rather read on your computer, you can:
         </Text>
       )}
-      {isFulfillable && (
+      {hasOtherFulfillments && (
         <Stack sx={{ flexWrap: "wrap" }}>
-          {fulfillments.map(details => (
+          {otherFulfillments.map(details => (
             <FulfillmentButton
               key={details.id}
               details={details}
