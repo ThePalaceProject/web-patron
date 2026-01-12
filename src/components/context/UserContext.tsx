@@ -3,11 +3,34 @@ import useCredentials from "auth/useCredentials";
 import useLibraryContext from "components/context/LibraryContext";
 import { fetchCollection } from "dataflow/opds1/fetch";
 import { ServerError } from "errors";
-import { AppAuthMethod, AnyBook, AuthCredentials, Token } from "interfaces";
+import {
+  AppAuthMethod,
+  AnyBook,
+  AuthCredentials,
+  Token,
+  OPDS1
+} from "interfaces";
 import * as React from "react";
 import useSWR from "swr";
 import { BasicTokenAuthType } from "types/opds1";
 import { addHours } from "date-fns";
+
+/**
+ * Captures authentication failure context for redirect-based auth methods.
+ * This allows Catch401 to handle auth failures generically without knowing
+ * specific details about each auth method.
+ */
+export interface AuthFailureContext {
+  /** The auth method type that failed (e.g., SAML, Clever) */
+  methodType: AppAuthMethod["type"];
+  /** The server error that caused the failure */
+  error: ServerError;
+  /**
+   * Whether to prevent redirecting back to the page that triggered the failure.
+   * Set to true for redirect-based in order auth methods to avoid infinite loops.
+   */
+  preventRetryToCurrentPage: boolean;
+}
 
 type Status = "authenticated" | "loading" | "unauthenticated";
 export type UserState = {
@@ -21,11 +44,13 @@ export type UserState = {
     method: AppAuthMethod,
     authenticationUrl?: string | undefined
   ) => void;
-  signOut: () => void;
+  signOut: () => AppAuthMethod["type"] | undefined;
   setBook: (book: AnyBook, id?: string) => void;
   error: any;
   token: string | undefined;
   clearCredentials: () => void;
+  authFailureContext: AuthFailureContext | null;
+  credentials: AuthCredentials | undefined;
 };
 
 export const UserContext = React.createContext<UserState | undefined>(
@@ -48,6 +73,8 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   const { credentials, setCredentials, clearCredentials } =
     useCredentials(slug);
   const [error, setError] = React.useState<ServerError | null>(null);
+  const [authFailureContext, setAuthFailureContext] =
+    React.useState<AuthFailureContext | null>(null);
 
   const shouldRevalidate = () => {
     if (credentials?.methodType === BasicTokenAuthType) {
@@ -102,6 +129,18 @@ export const UserProvider = ({ children }: UserProviderProps) => {
         if (err instanceof ServerError && err?.info.status === 401) {
           if (credentials?.methodType !== BasicTokenAuthType) {
             setError(err);
+            // For redirect-based auth methods, capture failure context
+            // This allows Catch401 to prevent infinite retry loops
+            if (
+              credentials?.methodType &&
+              isRedirectBasedAuth(credentials.methodType)
+            ) {
+              setAuthFailureContext({
+                methodType: credentials.methodType,
+                error: err,
+                preventRetryToCurrentPage: true
+              });
+            }
             clearCredentials();
           }
         }
@@ -119,8 +158,10 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   }
 
   function signOut() {
+    const methodType = credentials?.methodType;
     clearCredentials();
     mutate();
+    return methodType;
   }
 
   function setBook(book: AnyBook, id?: string) {
@@ -131,6 +172,13 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     const newData: AnyBook[] = [...withoutOldBook, book];
     mutate(newData);
   }
+
+  // Clear auth failure context when credentials change or on successful auth
+  React.useEffect(() => {
+    if (credentials || data) {
+      setAuthFailureContext(null);
+    }
+  }, [credentials, data]);
 
   /**
    * We should only ever be in one of these three states.
@@ -155,11 +203,26 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     setBook,
     error,
     token: stringifyToken(credentials),
-    clearCredentials
+    clearCredentials,
+    authFailureContext,
+    credentials
   };
 
   return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
 };
+
+/**
+ * Determines if an auth method is redirect-based.
+ * Redirect-based auth methods need special error handling to prevent
+ * infinite loops when redirecting back to protected pages.
+ */
+function isRedirectBasedAuth(
+  methodType: AppAuthMethod["type"] | undefined
+): boolean {
+  return (
+    methodType === OPDS1.SamlAuthType || methodType === OPDS1.CleverAuthType
+  );
+}
 
 export default function useUser() {
   const context = React.useContext(UserContext);
