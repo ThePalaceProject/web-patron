@@ -23,8 +23,6 @@ media_support:
   # External read online type (Like Overdrive)
   text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media": show
   text/html;profile=http://librarysimplified.org/terms/profiles/streaming-media: show
-  # Demarque web reader
-  text/html: show
   # AxisNow document (read online in Webpub Viewer) - not supported in community version
   # application/vnd.librarysimplified.axisnow+json: show
   # Audiobooks
