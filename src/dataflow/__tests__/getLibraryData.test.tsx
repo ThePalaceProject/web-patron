@@ -35,7 +35,7 @@ describe("fetching catalog", () => {
   test("Throws error if catalog is not correct format", async () => {
     fetchMock.mockResponseOnce("something invalid");
     const promise = fetchFeed("a url somewhere");
-    await expect(promise).rejects.toThrowError(ApplicationError);
+    await expect(promise).rejects.toThrow(ApplicationError);
     await expect(promise).rejects.toThrow(
       "Could not parse fetch response into an OPDS Feed or Entry"
     );
@@ -44,7 +44,7 @@ describe("fetching catalog", () => {
   test("Throws error if fetch fails", async () => {
     fetchMock.mockRejectOnce(new Error("Something wrong"));
     const promise = fetchFeed("not a valid url");
-    await expect(promise).rejects.toThrowError(Error);
+    await expect(promise).rejects.toThrow(Error);
     await expect(promise).rejects.toThrowErrorMatchingInlineSnapshot(
       `"Fetch Error: The fetch promise for the requested resource was rejected. This is probably an offline, CORS, or other network error. Requested URL: not a valid url"`
     );
@@ -55,7 +55,7 @@ describe("getAuthDocUrl", () => {
   test("throws PageNotFoundError if no entry found in config file for library", async () => {
     mockConfig({ libraries: {} });
     const promise = getAuthDocUrl("not there slug");
-    await expect(promise).rejects.toThrowError(PageNotFoundError);
+    await expect(promise).rejects.toThrow(PageNotFoundError);
     await expect(promise).rejects.toMatchInlineSnapshot(
       `[Page Not Found Error: Page Not Found: No authentication document url is configured for the library: not there slug.]`
     );
@@ -89,7 +89,7 @@ describe("fetchAuthDocument", () => {
   test("passes fetch errors through", async () => {
     fetchMock.mockRejectOnce(new Error("Something not right"));
     const promise = fetchAuthDocument("/some-url");
-    await expect(promise).rejects.toThrowError(Error);
+    await expect(promise).rejects.toThrow(Error);
     await expect(promise).rejects.toThrowErrorMatchingInlineSnapshot(
       `"Something not right"`
     );
