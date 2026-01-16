@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import extractParam from "dataflow/utils";
 import { useRouter } from "next/router";
 import { Dialog, DialogDismiss } from "@ariakit/react";
 import Button from "components/Button";
@@ -11,13 +10,11 @@ interface ReaderWrapperProps {
   children: (args: {
     loading: boolean;
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-    readUrl?: string;
   }) => React.ReactNode;
 }
 
 const ReaderWrapper = ({ children }: ReaderWrapperProps) => {
-  const { back, query } = useRouter();
-  const readUrl = extractParam(query, "readUrl") as string;
+  const { back } = useRouter();
   const close = () => back();
 
   const [loading, setLoading] = useState(true);
@@ -61,7 +58,7 @@ const ReaderWrapper = ({ children }: ReaderWrapperProps) => {
           <LoadingIndicator />
         </Container>
       )}
-      {children({ loading, setLoading, readUrl: decodeURIComponent(readUrl) })}
+      {children({ loading, setLoading })}
     </Dialog>
   );
 };

@@ -1,4 +1,14 @@
-const ExternalReader = ({ setLoading, loading, readUrl }) => {
+interface ExternalReaderProps {
+  setLoading: (loading: boolean) => void;
+  loading: boolean;
+  readUrl: string;
+}
+
+const ExternalReader = ({
+  setLoading,
+  loading,
+  readUrl
+}: ExternalReaderProps) => {
   return (
     <iframe
       sx={{ flex: 1, visibility: loading ? "hidden" : "visible" }}

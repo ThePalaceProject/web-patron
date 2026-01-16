@@ -1,27 +1,32 @@
-import { NextPage, GetStaticProps, GetStaticPaths } from "next";
-import withAppProps, { AppProps } from "dataflow/withAppProps";
+import { NextPage, GetStaticPaths, GetStaticProps } from "next";
+import { AppProps } from "dataflow/withAppProps";
 import ReaderPageLayout from "components/reader/ReaderPageLayout";
 import ExternalReader from "components/reader/ExternalReader";
+import { getExternalReaderProps } from "components/reader/externalReaderProps";
 
-const ExternalReaderPage: NextPage<AppProps> = props => {
+interface PageProps extends AppProps {
+  readUrl: string;
+}
+
+const ExternalReaderPage: NextPage<PageProps> = props => {
   return (
     <ReaderPageLayout {...props}>
-      {({ loading, setLoading, readUrl }) => (
+      {({ loading, setLoading }) => (
         <ExternalReader
           loading={loading}
           setLoading={setLoading}
-          readUrl={readUrl}
+          readUrl={props.readUrl}
         />
       )}
     </ReaderPageLayout>
   );
 };
 
-export const getStaticProps: GetStaticProps = withAppProps();
+export const getStaticProps: GetStaticProps = getExternalReaderProps;
 
 export const getStaticPaths: GetStaticPaths = async () => ({
   paths: [],
-  fallback: true
+  fallback: "blocking"
 });
 
 export default ExternalReaderPage;
