@@ -27,9 +27,15 @@ export default function useLinkUtils() {
     return buildMultiLibraryLink(`/book/${encodeURIComponent(bookUrl)}`);
   }
 
+  type ReaderType = "internal" | "external";
+  function buildReaderLink(type: ReaderType, href: string): string {
+    return buildMultiLibraryLink(`/read/${type}/${encodeURIComponent(href)}`);
+  }
+
   return {
     buildMultiLibraryLink,
     buildCollectionLink,
-    buildBookLink
+    buildBookLink,
+    buildReaderLink
   };
 }

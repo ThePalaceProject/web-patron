@@ -45,7 +45,7 @@ describe("fetchOPDS", () => {
         status: 418
       })
     );
-    await expect(fetchOPDS("/some-url")).rejects.toThrowError(FetchError);
+    await expect(fetchOPDS("/some-url")).rejects.toThrow(FetchError);
   });
 
   test("throws server error if response not okay", async () => {
@@ -57,7 +57,7 @@ describe("fetchOPDS", () => {
       }),
       { status: 418 }
     );
-    await expect(fetchOPDS("/some-url")).rejects.toThrowError(ServerError);
+    await expect(fetchOPDS("/some-url")).rejects.toThrow(ServerError);
   });
 
   test("parses response into opds feed", async () => {
@@ -69,7 +69,7 @@ describe("fetchOPDS", () => {
 
   test("throws application error if it cannot parse", async () => {
     fetchMock.mockResponseOnce("blah blah blah");
-    await expect(fetchOPDS("/some-url")).rejects.toThrowError(ApplicationError);
+    await expect(fetchOPDS("/some-url")).rejects.toThrow(ApplicationError);
   });
 });
 
@@ -77,7 +77,7 @@ describe("fetchFeed", () => {
   test("throws application error if returned value is not a feed", async () => {
     fetchMock.mockResponseOnce(rawOpdsEntry);
 
-    await expect(fetchFeed("/some-url")).rejects.toThrowError(ApplicationError);
+    await expect(fetchFeed("/some-url")).rejects.toThrow(ApplicationError);
   });
 
   test("doesn't throw if response is feed", async () => {
@@ -92,9 +92,7 @@ describe("fetchEntry", () => {
   test("throws application error if returned value is not an entry", async () => {
     fetchMock.mockResponseOnce(rawOpdsFeed);
 
-    await expect(fetchEntry("/some-url")).rejects.toThrowError(
-      ApplicationError
-    );
+    await expect(fetchEntry("/some-url")).rejects.toThrow(ApplicationError);
   });
 
   test("doesn't throw if response is entry", async () => {
@@ -138,7 +136,7 @@ describe("fetchSearchData", () => {
 
   test("throws error if fetch fails", async () => {
     fetchMock.mockRejectOnce(new Error("Something went wrong"));
-    await expect(fetchSearchData("/somewhere")).rejects.toThrowError(Error);
+    await expect(fetchSearchData("/somewhere")).rejects.toThrow(Error);
   });
 
   test("throws ServerError if response not okay", async () => {
@@ -150,7 +148,7 @@ describe("fetchSearchData", () => {
       }),
       { status: 418 }
     );
-    await expect(fetchSearchData("/blah")).rejects.toThrowError(ServerError);
+    await expect(fetchSearchData("/blah")).rejects.toThrow(ServerError);
   });
 
   test("parses as text if properly fetched", async () => {

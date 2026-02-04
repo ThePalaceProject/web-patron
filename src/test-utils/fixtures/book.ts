@@ -237,6 +237,12 @@ export const externalReadFulfillmentLink: FulfillmentLink = {
   url: "/read-online"
 };
 
+export const internalReadFulfillmentLink: FulfillmentLink = {
+  contentType: "text/html",
+  supportLevel: "show",
+  url: "/read"
+};
+
 export const fulfillableBook = {
   ...book,
   status: "fulfillable",

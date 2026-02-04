@@ -29,7 +29,8 @@
   "exclude": [
     "node_modules",
     "jest.config.js",
-    "cypress"
+    "cypress",
+    "_next"
   ],
   "include": [
     "next-env.d.ts",

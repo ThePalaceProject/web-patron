@@ -13,7 +13,7 @@ import {
 import * as React from "react";
 import useSWR from "swr";
 import { BasicTokenAuthType } from "types/opds1";
-import { addHours, isBefore } from "date-fns";
+import { addHours } from "date-fns";
 
 /**
  * Captures authentication failure context for redirect-based auth methods.
@@ -79,9 +79,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   const shouldRevalidate = () => {
     if (credentials?.methodType === BasicTokenAuthType) {
       if (typeof credentials?.token !== "string" && credentials?.token) {
-        if (credentials.token?.expirationDate) {
-          return isBefore(credentials?.token?.expirationDate, new Date());
-        }
+        return true;
       }
     }
 

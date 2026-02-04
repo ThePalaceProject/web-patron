@@ -33,7 +33,7 @@ describe("downloadFile", () => {
       "this token"
     );
 
-    expect(fetchMock).toBeCalledTimes(2);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
 
     expect(fetchMock).toHaveBeenNthCalledWith(1, "some-url", {
       headers: {
@@ -70,7 +70,7 @@ describe("downloadFile", () => {
       "this token"
     );
 
-    expect(fetchMock).toBeCalledTimes(2);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
 
     expect(fetchMock).toHaveBeenNthCalledWith(1, "some-url", {
       headers: {

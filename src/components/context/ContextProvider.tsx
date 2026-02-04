@@ -23,13 +23,11 @@ const AppContextProvider: React.FC<ProviderProps> = ({ children, library }) => {
   return (
     <SWRConfig value={swrConfig}>
       <ThemeUIProvider theme={theme}>
-        {/* <ReakitProvider> */}
         <LibraryProvider library={library}>
           <UserProvider>
             <CatchFetchErrors>{children}</CatchFetchErrors>
           </UserProvider>
         </LibraryProvider>
-        {/* </ReakitProvider> */}
       </ThemeUIProvider>
     </SWRConfig>
   );

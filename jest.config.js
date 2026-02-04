@@ -188,7 +188,7 @@ module.exports = {
   snapshotFormat: {
     escapeString: true,
     printBasicPrototype: true
-  }
+  },
 
   // A map from regular expressions to paths to transformers
   // transform: undefined,
@@ -205,7 +205,12 @@ module.exports = {
   // verbose: undefined,
 
   // An array of regexp patterns that are matched against all source file paths before re-running tests in watch mode
-  // watchPathIgnorePatterns: [],
+  watchPathIgnorePatterns: [
+    "<rootDir>/.next/",
+    "<rootDir>/_next",
+    "<rootDir>/coverage/",
+    "<rootDir>/node_modules/"
+  ]
 
   // Whether to use watchman for file crawling
   // watchman: true,

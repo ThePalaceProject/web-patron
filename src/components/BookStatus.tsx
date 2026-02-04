@@ -17,6 +17,8 @@ const BookStatus: React.FC<{ book: AnyBook }> = ({ book }) => {
   const companionApp =
     APP_CONFIG.companionApp === "openebooks" ? "Open eBooks" : "Palace";
 
+  const action = book.format === "Audiobook" ? "Listen" : "Read";
+
   const str =
     status === "borrowable"
       ? "Available to borrow"
@@ -27,7 +29,7 @@ const BookStatus: React.FC<{ book: AnyBook }> = ({ book }) => {
           : status === "on-hold"
             ? "Ready to Borrow"
             : status === "fulfillable"
-              ? `Ready to Read${redirectUser ? ` in ${companionApp}` : ""}!`
+              ? `Ready to ${action}${redirectUser ? ` in ${companionApp}` : ""}!`
               : "Unsupported";
 
   return (

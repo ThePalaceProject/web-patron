@@ -59,7 +59,7 @@ test("does not fetch loans if no credentials are present", () => {
   expect(fetchMock).toHaveBeenCalledTimes(0);
 });
 
-const mockReplace = jest.fn(() => {
+const mockReplace = jest.fn((..._args: unknown[]) => {
   window.location.hash = "";
 });
 
