@@ -26,9 +26,7 @@ describe("parseUrl()", () => {
       const url = parseUrl("https://www.secure.com");
 
       expect(url).not.toBeNull();
-      if (url) {
-        expect(url.href).toBe("https://www.secure.com/");
-      }
+      expect(url!.href).toBe("https://www.secure.com/");
     });
   });
 });
