@@ -94,6 +94,36 @@ describe("fetchAuthDocument", () => {
       `"Something not right"`
     );
   });
+
+  test("throws ServerError when response is not ok", async () => {
+    const errorResponse = { title: "Unauthorized", detail: "Access denied" };
+    fetchMock.mockResponseOnce(JSON.stringify(errorResponse), {
+      status: 401,
+      ok: false
+    });
+
+    const promise = fetchAuthDocument("/auth-doc");
+
+    await expect(promise).rejects.toThrow(ApplicationError);
+    await expect(promise).rejects.toThrow("Unauthorized");
+  });
+
+  test("throws ServerError with error response status", async () => {
+    // Create a mock response that's not ok
+    const mockResponse = {
+      ok: false,
+      status: 403,
+      json: jest.fn().mockResolvedValue({ error: "Forbidden" })
+    };
+
+    fetchMock.mockImplementationOnce(() =>
+      Promise.resolve(mockResponse as any)
+    );
+
+    const promise = fetchAuthDocument("/protected-doc");
+
+    await expect(promise).rejects.toThrow(ApplicationError);
+  });
 });
 
 describe("buildLibraryData", () => {

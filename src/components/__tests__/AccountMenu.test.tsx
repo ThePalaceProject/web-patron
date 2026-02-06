@@ -154,4 +154,88 @@ describe("AccountMenu", () => {
     // The first one is in the menu
     expect(signOutButtons[0]).toBeInTheDocument();
   });
+
+  it("shows failed feedback when copy fails", async () => {
+    // Mock clipboard to fail
+    mockClipboardWriteText.mockRejectedValue(
+      new Error("Clipboard API not available")
+    );
+    // Also mock legacy fallback to fail
+    document.execCommand = jest.fn(() => false);
+
+    const { user, getByRole, getByTestId, findByText } = setup({
+      user: { isAuthenticated: true, patronId: "test-patron-12345" },
+      library: { userProfileUrl: null }
+    });
+
+    await user.click(getByRole("button", { name: /account/i }));
+    const patronIdButton = getByTestId("patron-id-menuitem").querySelector(
+      "button"
+    ) as HTMLButtonElement;
+    fireEvent.click(patronIdButton);
+
+    expect(await findByText("Failed")).toBeInTheDocument();
+  });
+
+  it("clears copy status after 2 seconds on success", async () => {
+    jest.useFakeTimers();
+
+    const { user, getByRole, getByTestId, queryByText } = setup({
+      user: { isAuthenticated: true, patronId: "test-patron-12345" },
+      library: { userProfileUrl: null }
+    });
+
+    await user.click(getByRole("button", { name: /account/i }));
+    const patronIdButton = getByTestId("patron-id-menuitem").querySelector(
+      "button"
+    ) as HTMLButtonElement;
+    fireEvent.click(patronIdButton);
+
+    // Wait for "Copied!" to appear
+    await waitFor(() => {
+      expect(queryByText("Copied!")).toBeInTheDocument();
+    });
+
+    // Fast-forward 2 seconds
+    jest.advanceTimersByTime(2000);
+
+    // "Copied!" should be gone
+    expect(queryByText("Copied!")).not.toBeInTheDocument();
+
+    jest.useRealTimers();
+  });
+
+  it("clears copy status after 2 seconds on failure", async () => {
+    jest.useFakeTimers();
+
+    // Mock clipboard to fail
+    mockClipboardWriteText.mockRejectedValue(
+      new Error("Clipboard API not available")
+    );
+    document.execCommand = jest.fn(() => false);
+
+    const { user, getByRole, getByTestId, queryByText } = setup({
+      user: { isAuthenticated: true, patronId: "test-patron-12345" },
+      library: { userProfileUrl: null }
+    });
+
+    await user.click(getByRole("button", { name: /account/i }));
+    const patronIdButton = getByTestId("patron-id-menuitem").querySelector(
+      "button"
+    ) as HTMLButtonElement;
+    fireEvent.click(patronIdButton);
+
+    // Wait for "Failed" to appear
+    await waitFor(() => {
+      expect(queryByText("Failed")).toBeInTheDocument();
+    });
+
+    // Fast-forward 2 seconds
+    jest.advanceTimersByTime(2000);
+
+    // "Failed" should be gone
+    expect(queryByText("Failed")).not.toBeInTheDocument();
+
+    jest.useRealTimers();
+  });
 });
