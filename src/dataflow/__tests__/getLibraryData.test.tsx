@@ -106,7 +106,8 @@ describe("buildLibraryData", () => {
       logoUrl: null,
       colors: null,
       headerLinks: [],
-      shelfUrl: null,
+      shelfUrl: "http://test-cm.com/shelf",
+      userProfileUrl: "http://test-cm.com/patrons/me/",
       authMethods: [],
       libraryLinks: {}
     });

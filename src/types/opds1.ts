@@ -165,10 +165,13 @@ export interface Link {
  */
 export const CatalogRootRel = "start";
 export const ShelfLinkRel = "http://opds-spec.org/shelf";
+export const UserProfileLinkRel =
+  "http://librarysimplified.org/terms/rel/user-profile";
 type AuthDocLinkRelations =
   | typeof SelfRel
   | typeof CatalogRootRel
   | typeof ShelfLinkRel
+  | typeof UserProfileLinkRel
   | "navigation"
   | "logo"
   | "register"
@@ -208,10 +211,8 @@ export interface AuthMethod<T extends AnyAuthType, L extends Link = Link> {
   // https://drafts.opds.io/authentication-for-opds-1.0#312-links
   links?: L[];
 }
-export interface ServerSamlMethod extends AuthMethod<
-  typeof SamlAuthType,
-  SamlIdp
-> {}
+export interface ServerSamlMethod
+  extends AuthMethod<typeof SamlAuthType, SamlIdp> {}
 
 export interface CleverAuthMethod extends AuthMethod<typeof CleverAuthType> {}
 
@@ -230,8 +231,7 @@ export interface BasicAuthMethod extends AuthMethod<typeof BasicAuthType> {
 // TODO: This may need adjustment when we actually implement BasicTokenAuth.
 //  In the mean time, we'll borrow some properties from BasicAuthMethod.
 export interface BasicTokenAuthMethod
-  extends
-    Omit<BasicAuthMethod, "type">,
+  extends Omit<BasicAuthMethod, "type">,
     AuthMethod<typeof BasicTokenAuthType> {}
 
 export interface AuthInput {

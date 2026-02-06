@@ -7,7 +7,7 @@ import BookIcon from "../icons/Book";
 import useLibraryContext from "./context/LibraryContext";
 import { Text } from "./Text";
 import Stack from "./Stack";
-import { SignOut } from "./SignOut";
+import { AccountMenu } from "./AccountMenu";
 import useUser from "components/context/UserContext";
 import useLogin from "auth/useLogin";
 
@@ -118,7 +118,7 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
         My Books
       </NavButton>
       {isAuthenticated ? (
-        <SignOut />
+        <AccountMenu />
       ) : isLoading ? (
         <Button loading />
       ) : (

@@ -12,6 +12,7 @@ export const user: Partial<UserState> = {
   isAuthenticated: false,
   isLoading: false,
   loans: undefined,
+  patronId: undefined,
   refetchLoans: mockRefetchLoans,
   signIn: mockSignIn,
   signOut: mockSignOut,

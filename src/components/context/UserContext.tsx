@@ -13,6 +13,7 @@ import {
 import * as React from "react";
 import useSWR from "swr";
 import { BasicTokenAuthType } from "types/opds1";
+import { PATRON_PROFILE_FIELDS } from "types/patronProfile";
 import { addHours } from "date-fns";
 
 /**
@@ -35,6 +36,7 @@ export interface AuthFailureContext {
 type Status = "authenticated" | "loading" | "unauthenticated";
 export type UserState = {
   loans: AnyBook[] | undefined;
+  patronId: string | undefined;
   status: Status;
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -69,7 +71,7 @@ interface UserProviderProps {
  * those change it will cause a refetch.
  */
 export const UserProvider = ({ children }: UserProviderProps) => {
-  const { shelfUrl, slug } = useLibraryContext();
+  const { shelfUrl, userProfileUrl, slug } = useLibraryContext();
   const { credentials, setCredentials, clearCredentials } =
     useCredentials(slug);
   const [error, setError] = React.useState<ServerError | null>(null);
@@ -148,6 +150,21 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     }
   );
 
+  const { data: profileData } = useSWR(
+    credentials && userProfileUrl ? [userProfileUrl, token] : null,
+    fetchPatronProfile,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      shouldRetryOnError: false,
+      onError: err => {
+        console.warn("Failed to fetch patron profile:", err);
+      }
+    }
+  );
+
+  const patronId = profileData?.[PATRON_PROFILE_FIELDS.authorizationIdentifier];
+
   function signIn(
     token: string | Token,
     method: AppAuthMethod,
@@ -197,6 +214,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     isAuthenticated,
     isLoading,
     loans: isAuthenticated ? (data ?? []) : undefined,
+    patronId,
     refetchLoans: mutate,
     signIn,
     signOut,
@@ -237,6 +255,20 @@ export default function useUser() {
 async function fetchLoans(url: string, token: string) {
   const collection = await fetchCollection(url, token);
   return collection.books;
+}
+
+async function fetchPatronProfile(url: string, token: string) {
+  const response = await fetch(url, {
+    headers: {
+      Authorization: token
+    }
+  });
+
+  if (!response.ok) {
+    throw new ServerError(url, response.status, await response.json());
+  }
+
+  return response.json();
 }
 
 function stringifyToken(
