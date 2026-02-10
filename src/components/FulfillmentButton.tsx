@@ -78,9 +78,6 @@ const ReadOnlineExternal: React.FC<{
   const [loading, setLoading] = React.useState(false);
   const { error, handleError, clearError } = useError();
 
-  const router = useRouter();
-  const { buildReaderLink } = useLinkUtils();
-
   async function open() {
     setLoading(true);
     clearError();
@@ -92,14 +89,10 @@ const ReadOnlineExternal: React.FC<{
         token
       );
 
-      // Instead of throwing user out to a different tab,
-      // we place them into an embedded iframe within the app
-      const externalLink = buildReaderLink("external", externalReaderUrl);
-
       // we are about to open the book, so send a track event
       track.openBook(trackOpenBookUrl);
-      router.push(externalLink, undefined, { shallow: true });
       setLoading(false);
+      window.open(externalReaderUrl);
     } catch (e) {
       setLoading(false);
       handleError(e);
