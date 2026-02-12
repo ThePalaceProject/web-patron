@@ -35,8 +35,10 @@ export const config: AppConfig = {
     // # Adobe Encryption
     "application/vnd.adobe.adept+xml": {
       "application/epub+zip": "redirect-and-show"
-    }
+    },
     // # Bearer Token Exchange
-    // # application/vnd.librarysimplified.bearer-token+json:
+    "application/vnd.librarysimplified.bearer-token+json": {
+      "application/pdf": "redirect"
+    }
   }
 };

@@ -359,6 +359,29 @@ describe("FulfillableBook", () => {
     expect(book.revokeUrl).toBe("/revoke");
   });
 
+  test("does include revokeUrl for indirect acquisitions", () => {
+    mockConfig();
+    const indirectAcquisitionLink = factory.acquisitionLink({
+      rel: OPDSAcquisitionLink.GENERIC_REL,
+      type: OPDS1.BearerTokenMediaType,
+      indirectAcquisitions: [
+        {
+          type: OPDS1.PdfMediaType
+        }
+      ],
+      href: "/pdf"
+    });
+    const entry = factory.entry({
+      ...basicInfo,
+      links: [indirectAcquisitionLink, detailLink, revokeLink]
+    });
+
+    const book = entryToBook(entry, "http://test-url.com") as FulfillableBook;
+
+    expect(book.status).toBe("fulfillable");
+    expect(book.revokeUrl).toBe("/revoke");
+  });
+
   test("infers book format from fulfillable book acquisition link", () => {
     mockConfig();
     const fulfillmentLink = factory.acquisitionLink({
