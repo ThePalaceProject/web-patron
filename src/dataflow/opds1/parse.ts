@@ -30,7 +30,6 @@ import {
 import {
   EPUB_MEDIA_TYPES,
   IncorrectAdobeDrmMediaType,
-  isExternalReaderMediaType,
   PdfMediaType
 } from "types/opds1";
 import { getAppSupportLevel } from "utils/fulfill";
@@ -181,28 +180,6 @@ function buildFulfillmentLink(feedUrl: string) {
   };
 }
 
-/**
- * A book cannot be returned (even with a revoke url) if:
- *  - It is locked in to Adobe ACS
- *  - It is an axisnow book
- *  - It comes from certain vendors
- *
- * We use a heuristic to determine when books can be returned. This may
- * need to be updated in the future.
- */
-function canReturnFulfillableBook(links: OPDSAcquisitionLink[]): boolean {
-  return !!links.map(parseFormat).find(link => {
-    // no AxisNow
-    if (link.contentType === OPDS1.AxisNowWebpubMediaType) return false;
-    // match if there is otherwise a direct link. These won't be present
-    // if the book has been locked in to Adobe ACS
-    if (!link.indirectionType) return true;
-    // match if it has a link to read online externally.
-    if (isExternalReaderMediaType(link.contentType)) return true;
-    return false;
-  });
-}
-
 function findRevokeUrl(links: OPDSLink[]) {
   return links.find(link => link.rel === OPDS1.RevokeLinkRel)?.href ?? null;
 }
@@ -334,7 +311,7 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
       ...book,
       status: "fulfillable",
       fulfillmentLinks: allFulfillmentLinks,
-      revokeUrl: canReturnFulfillableBook(acquisitionLinks) ? revokeUrl : null
+      revokeUrl: revokeUrl
     };
   }
 
