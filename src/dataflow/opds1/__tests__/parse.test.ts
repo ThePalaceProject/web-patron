@@ -305,7 +305,7 @@ describe("FulfillableBook", () => {
     const book = entryToBook(entry, "http://test-url.com") as FulfillableBook;
 
     expect(book.status).toBe("fulfillable");
-    expect(book.revokeUrl).toBe(null);
+    expect(book.revokeUrl).toBe("/revoke");
   });
 
   test("doesn't include revokeUrl for Adobe-only books", () => {
@@ -328,7 +328,7 @@ describe("FulfillableBook", () => {
     const book = entryToBook(entry, "http://test-url.com") as FulfillableBook;
 
     expect(book.status).toBe("fulfillable");
-    expect(book.revokeUrl).toBe(null);
+    expect(book.revokeUrl).toBe("/revoke");
   });
 
   test("does include revokeUrl for books fulfillable outside Adobe or AxisNow", () => {
@@ -351,6 +351,29 @@ describe("FulfillableBook", () => {
     const entry = factory.entry({
       ...basicInfo,
       links: [adobeLink, epubLink, detailLink, revokeLink]
+    });
+
+    const book = entryToBook(entry, "http://test-url.com") as FulfillableBook;
+
+    expect(book.status).toBe("fulfillable");
+    expect(book.revokeUrl).toBe("/revoke");
+  });
+
+  test("does include revokeUrl for indirect acquisitions", () => {
+    mockConfig();
+    const indirectAcquisitionLink = factory.acquisitionLink({
+      rel: OPDSAcquisitionLink.GENERIC_REL,
+      type: OPDS1.BearerTokenMediaType,
+      indirectAcquisitions: [
+        {
+          type: OPDS1.PdfMediaType
+        }
+      ],
+      href: "/pdf"
+    });
+    const entry = factory.entry({
+      ...basicInfo,
+      links: [indirectAcquisitionLink, detailLink, revokeLink]
     });
 
     const book = entryToBook(entry, "http://test-url.com") as FulfillableBook;
