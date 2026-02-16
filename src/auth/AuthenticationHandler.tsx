@@ -3,16 +3,19 @@ import BasicAuthHandler from "./BasicAuthHandler";
 import BasicTokenAuthHandler from "./BasicTokenAuthHandler";
 import CleverAuthHandler from "./CleverAuthHandler";
 import SamlAuthHandler from "./SamlAuthHandler";
+import OidcAuthHandler from "./OidcAuthHandler";
 import {
   ClientBasicMethod,
   ClientBasicTokenMethod,
-  ClientSamlMethod
+  ClientSamlMethod,
+  ClientOidcMethod
 } from "interfaces";
 import {
   BasicAuthType,
   CleverAuthType,
   CleverAuthMethod,
   SamlAuthType,
+  OidcAuthType,
   BasicTokenAuthType
 } from "../types/opds1";
 import track from "../analytics/track";
@@ -22,6 +25,7 @@ type SupportedAuthTypes =
   | typeof BasicAuthType
   | typeof BasicTokenAuthType
   | typeof SamlAuthType
+  | typeof OidcAuthType
   | typeof CleverAuthType;
 
 type SupportedAuthHandlerProps = {
@@ -31,9 +35,11 @@ type SupportedAuthHandlerProps = {
       ? ClientBasicTokenMethod
       : key extends typeof SamlAuthType
         ? ClientSamlMethod
-        : key extends typeof CleverAuthType
-          ? CleverAuthMethod
-          : never;
+        : key extends typeof OidcAuthType
+          ? ClientOidcMethod
+          : key extends typeof CleverAuthType
+            ? CleverAuthMethod
+            : never;
 };
 
 // Canonical map of auth types to their respective handler components.
@@ -47,6 +53,7 @@ export const authHandlers: {
   [BasicAuthType]: BasicAuthHandler,
   [BasicTokenAuthType]: BasicTokenAuthHandler,
   [SamlAuthType]: SamlAuthHandler,
+  [OidcAuthType]: OidcAuthHandler,
   [CleverAuthType]: CleverAuthHandler
 };
 
@@ -68,6 +75,8 @@ const AuthenticationHandler: React.ComponentType<AuthHandlerWrapperProps> = ({
     return <_AuthHandler method={method as ClientBasicMethod} />;
   } else if (method.type === SamlAuthType && typeof method !== "string") {
     return <_AuthHandler method={method as ClientSamlMethod} />;
+  } else if (method.type === OidcAuthType && typeof method !== "string") {
+    return <_AuthHandler method={method as ClientOidcMethod} />;
   } else if (method.type === CleverAuthType && typeof method !== "string") {
     return <_AuthHandler method={method as CleverAuthMethod} />;
   } else {

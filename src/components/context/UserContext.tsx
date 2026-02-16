@@ -220,7 +220,9 @@ function isRedirectBasedAuth(
   methodType: AppAuthMethod["type"] | undefined
 ): boolean {
   return (
-    methodType === OPDS1.SamlAuthType || methodType === OPDS1.CleverAuthType
+    methodType === OPDS1.SamlAuthType ||
+    methodType === OPDS1.OidcAuthType ||
+    methodType === OPDS1.CleverAuthType
   );
 }
 

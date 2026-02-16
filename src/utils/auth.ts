@@ -1,4 +1,9 @@
-import { OPDS1, AppAuthMethod, ClientSamlMethod } from "interfaces";
+import {
+  OPDS1,
+  AppAuthMethod,
+  ClientSamlMethod,
+  ClientOidcMethod
+} from "interfaces";
 
 /**
  * Extracts an array of auth providers from the authentication document,
@@ -11,6 +16,10 @@ export function flattenSamlMethod(
     if (isServerSamlMethod(method)) {
       return [...flattened, ...serverToClientSamlMethods(method)];
     }
+    if (isServerOidcMethod(method)) {
+      const oidcMethod = serverToClientOidcMethod(method);
+      return oidcMethod ? [...flattened, oidcMethod] : flattened;
+    }
     return [...flattened, { ...method, id: method.type }];
   }, []);
 }
@@ -19,6 +28,11 @@ export const isServerSamlMethod = (
   method: OPDS1.ServerAuthMethod
 ): method is OPDS1.ServerSamlMethod =>
   method.type === OPDS1.SamlAuthType && "links" in method;
+
+export const isServerOidcMethod = (
+  method: OPDS1.ServerAuthMethod
+): method is OPDS1.ServerOidcMethod =>
+  method.type === OPDS1.OidcAuthType && "links" in method;
 
 function serverToClientSamlMethods(
   samlMethod: OPDS1.ServerSamlMethod
@@ -31,6 +45,23 @@ function serverToClientSamlMethods(
     type: samlMethod.type,
     description: getEnglishValue(idp.display_names) ?? "Unknown SAML Provider"
   }));
+}
+
+function serverToClientOidcMethod(
+  oidcMethod: OPDS1.ServerOidcMethod
+): ClientOidcMethod | null {
+  if (!oidcMethod.links || oidcMethod.links.length === 0) return null;
+  const link = oidcMethod.links[0]; // First link only
+
+  return {
+    id: link.href, // Use href as unique ID
+    href: link.href,
+    type: oidcMethod.type,
+    description:
+      getEnglishValue(link.display_names) ??
+      oidcMethod.description ??
+      "OIDC Provider"
+  };
 }
 
 export const getEnglishValue = (arr: [{ language: string; value: string }]) =>
