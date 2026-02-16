@@ -10,6 +10,7 @@ import useUser, { UserProvider } from "components/context/UserContext";
 import mockAuthenticatedOnce from "test-utils/mockAuthState";
 import * as swr from "swr";
 import { makeSwrResponse } from "test-utils/mockSwr";
+import { PATRON_PROFILE_FIELDS } from "types/patronProfile";
 
 const mockSWR = jest.spyOn(swr, "default");
 
@@ -215,4 +216,90 @@ test("sign in sets cookie", async () => {
     expect.anything(),
     expect.anything()
   );
+});
+
+test("fetches patron profile when authenticated and userProfileUrl is available", () => {
+  mockAuthenticatedOnce();
+  renderUserContext();
+
+  // Should make two SWR calls: one for loans, one for patron profile
+  expect(mockSWR).toHaveBeenCalledWith(
+    ["/shelf-url", "some-token", "http://opds-spec.org/auth/basic"],
+    expect.anything(),
+    expect.anything()
+  );
+  expect(mockSWR).toHaveBeenCalledWith(
+    ["/user-profile-url", "some-token"],
+    expect.anything(),
+    expect.anything()
+  );
+});
+
+test("does not fetch patron profile when not authenticated", () => {
+  mockAuthenticatedOnce(null);
+  renderUserContext();
+
+  // Should not make any SWR calls for patron profile
+  const profileCalls = (mockSWR as jest.Mock).mock.calls.filter(
+    call => call[0] && call[0][0] === "/user-profile-url"
+  );
+  expect(profileCalls.length).toBe(0);
+});
+
+test("exposes patronId from profile data", () => {
+  mockAuthenticatedOnce();
+
+  // Mock the patron profile SWR call to return profile data
+  mockSWR.mockImplementation((key: any) => {
+    if (key && Array.isArray(key) && key[0] === "/user-profile-url") {
+      return makeSwrResponse({
+        data: {
+          "simplified:authorization_identifier": "patron-123"
+        }
+      }) as any;
+    }
+    return defaultMock as any;
+  });
+
+  let extractedPatronId: string | undefined = undefined;
+  function Extractor() {
+    const { patronId } = useUser();
+    extractedPatronId = patronId;
+    return <div>hello</div>;
+  }
+
+  setup(
+    <UserProvider>
+      <Extractor />
+    </UserProvider>
+  );
+
+  expect(extractedPatronId).toBe("patron-123");
+});
+
+test("patronId is undefined when profile fetch fails", () => {
+  mockAuthenticatedOnce();
+
+  // Mock the patron profile SWR call to return no data
+  mockSWR.mockImplementation((key: any) => {
+    if (key && Array.isArray(key) && key[0] === "/user-profile-url") {
+      return makeSwrResponse({ data: undefined }) as any;
+    }
+    return defaultMock as any;
+  });
+
+  let extractedPatronId: string | undefined = "should-be-undefined";
+  function Extractor() {
+    const { patronId } = useUser();
+    extractedPatronId = patronId;
+    return <div>hello</div>;
+  }
+
+  setup(
+    <UserProvider>
+      <Extractor />
+    </UserProvider>
+  );
+
+  expect(extractedPatronId).toBeUndefined();
 });
