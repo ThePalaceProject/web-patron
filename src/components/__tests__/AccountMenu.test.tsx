@@ -1,5 +1,5 @@
 import * as React from "react";
-import { render, screen, waitFor, fireEvent } from "../../test-utils";
+import { render, waitFor, fireEvent } from "../../test-utils";
 import { AccountMenu } from "../AccountMenu";
 
 function setup(overrideOptions: any = {}) {
@@ -105,9 +105,7 @@ describe("AccountMenu", () => {
     fireEvent.click(patronIdButton);
 
     await waitFor(() => {
-      expect(mockClipboardWriteText).toHaveBeenCalledWith(
-        "test-patron-12345"
-      );
+      expect(mockClipboardWriteText).toHaveBeenCalledWith("test-patron-12345");
     });
   });
 

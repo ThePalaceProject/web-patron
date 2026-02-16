@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useMenuStore, MenuButton, Menu, MenuItem } from "@ariakit/react/menu";
+import { useMenuStore, MenuButton, Menu } from "@ariakit/react/menu";
 import { Icon, IconNames } from "@nypl/design-system-react-components";
 import Account from "../icons/Account";
 import Copy from "../icons/Copy";
@@ -125,7 +125,9 @@ const PatronIdMenuItem: React.FC<PatronIdMenuItemProps> = ({ patronId }) => {
         <span sx={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis" }}>
           Patron&nbsp;ID:&nbsp;{patronId}
         </span>
-        <div sx={{ display: "flex", alignItems: "center", gap: 1, flexShrink: 0 }}>
+        <div
+          sx={{ display: "flex", alignItems: "center", gap: 1, flexShrink: 0 }}
+        >
           {copyStatus === "copied" && (
             <span
               sx={{ fontSize: 0 }}

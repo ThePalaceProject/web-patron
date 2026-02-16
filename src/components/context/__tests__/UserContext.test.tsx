@@ -10,7 +10,6 @@ import useUser, { UserProvider } from "components/context/UserContext";
 import mockAuthenticatedOnce from "test-utils/mockAuthState";
 import * as swr from "swr";
 import { makeSwrResponse } from "test-utils/mockSwr";
-import { PATRON_PROFILE_FIELDS } from "types/patronProfile";
 
 const mockSWR = jest.spyOn(swr, "default");
 

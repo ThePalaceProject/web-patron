@@ -86,8 +86,9 @@ export type LibraryLinks = {
  * The server representation has multiple IDPs nested into the one.
  * We will flatten that out before placing into LibraryData.
  */
-export interface ClientSamlMethod
-  extends OPDS1.AuthMethod<typeof OPDS1.SamlAuthType> {
+export interface ClientSamlMethod extends OPDS1.AuthMethod<
+  typeof OPDS1.SamlAuthType
+> {
   href: string;
   id: string;
 }

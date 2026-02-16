@@ -19,6 +19,12 @@ describe("clipboard utility", () => {
   });
 
   afterEach(() => {
+    // Restore original navigator if needed
+    Object.defineProperty(window, "navigator", {
+      value: originalNavigator,
+      writable: true,
+      configurable: true
+    });
     jest.restoreAllMocks();
   });
 
