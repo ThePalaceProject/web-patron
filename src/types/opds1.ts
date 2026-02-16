@@ -187,8 +187,7 @@ export const BasicAuthType = "http://opds-spec.org/auth/basic";
 export const BasicTokenAuthType =
   "http://thepalaceproject.org/authtype/basic-token";
 export const SamlAuthType = "http://librarysimplified.org/authtype/SAML-2.0";
-export const OidcAuthType =
-  "http://thepalaceproject.org/authtype/OpenIDConnect";
+export const OidcAuthType = "http://palaceproject.io/authtype/OpenIDConnect";
 export const CleverAuthType =
   "http://librarysimplified.org/authtype/OAuth-with-intermediary";
 export const ImplicitGrantAuthType = "http://opds-spec.org/auth/oauth/implicit";

@@ -13,7 +13,7 @@ export const basicAuthId = "http://opds-spec.org/auth/basic";
 export const basicTokenAuthId =
   "http://thepalaceproject.org/authtype/basic-token";
 export const samlAuthId = "http://librarysimplified.org/authtype/SAML-2.0";
-export const oidcAuthId = "http://thepalaceproject.org/authtype/OpenIDConnect";
+export const oidcAuthId = "http://palaceproject.io/authtype/OpenIDConnect";
 
 export const basicTokenAuthenticationUrl =
   "https://exmple.com/patrons/me/token/";

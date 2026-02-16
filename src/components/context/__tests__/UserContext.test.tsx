@@ -182,7 +182,7 @@ test("extracts OIDC tokens when only OIDC is configured", () => {
     [
       "/shelf-url",
       "Bearer oidc-token",
-      "http://thepalaceproject.org/authtype/OpenIDConnect"
+      "http://palaceproject.io/authtype/OpenIDConnect"
     ],
     expect.anything(),
     expect.anything()
