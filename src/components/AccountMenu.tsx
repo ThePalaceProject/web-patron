@@ -40,31 +40,35 @@ export const AccountMenu: React.FC = () => {
           py: 0,
           minWidth: "420px",
           zIndex: 1000,
-          position: "relative",
-          pt: "40px"
+          display: "flex",
+          flexDirection: "column"
         }}
       >
-        {/* Close button in top-right corner */}
-        <Button
-          variant="ghost"
-          color="ui.gray.dark"
-          onClick={menu.hide}
+        {/* Close button header */}
+        <div
           sx={{
-            position: "absolute",
-            top: 2,
-            right: 2,
-            minWidth: "auto",
-            p: 1,
-            zIndex: 1
+            display: "flex",
+            justifyContent: "flex-end",
+            p: 2
           }}
-          aria-label="Close account menu"
         >
-          <Icon
-            decorative={false}
-            name={IconNames.close}
-            sx={{ fontSize: 18 }}
-          />
-        </Button>
+          <Button
+            variant="ghost"
+            color="ui.gray.dark"
+            onClick={menu.hide}
+            sx={{
+              minWidth: "auto",
+              p: 1
+            }}
+            aria-label="Close account menu"
+          >
+            <Icon
+              decorative={false}
+              name={IconNames.close}
+              sx={{ fontSize: 18 }}
+            />
+          </Button>
+        </div>
 
         {/* Patron ID row (only if available) */}
         {patronId && <PatronIdMenuItem patronId={patronId} />}
