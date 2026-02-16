@@ -150,8 +150,26 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     }
   );
 
+  // State to control when to start fetching patron profile
+  // We delay the fetch slightly after authentication to avoid competing with loans fetch
+  const [shouldFetchProfile, setShouldFetchProfile] = React.useState(false);
+
+  // Trigger profile fetch with a small delay after authentication completes
+  React.useEffect(() => {
+    if (credentials && userProfileUrl) {
+      // Wait 300ms after authentication to fetch profile
+      // This ensures it's ready when menu opens but doesn't block critical auth flow
+      const timer = setTimeout(() => {
+        setShouldFetchProfile(true);
+      }, 300);
+      return () => clearTimeout(timer);
+    } else {
+      setShouldFetchProfile(false);
+    }
+  }, [credentials, userProfileUrl]);
+
   const { data: profileData } = useSWR(
-    credentials && userProfileUrl ? [userProfileUrl, token] : null,
+    shouldFetchProfile ? [userProfileUrl, token] : null,
     fetchPatronProfile,
     {
       revalidateOnFocus: false,

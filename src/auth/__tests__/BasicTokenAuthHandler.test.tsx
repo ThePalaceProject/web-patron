@@ -130,6 +130,11 @@ test("submit by clicking login button", async () => {
   expect(loadingButton).toBeInTheDocument();
   expect(loadingButton).toBeDisabled();
 
+  // Advance timers to trigger the delayed profile fetch (300ms delay)
+  await waitFor(() => {
+    jest.advanceTimersByTime(300);
+  });
+
   // assert
   // we wrap this in waitFor because the handleSubmit from react-hook-form has
   // async code in it
@@ -199,12 +204,32 @@ test("fetch new token if token has expired", async () => {
   };
 
   fetchMock
+    // Mock 1: First loans fetch with expired token → 401
     .mockResponseOnce(JSON.stringify(problemdoc), {
       status: 401
     })
+    // Mock 2: First profile fetch with expired token → 401
     .mockResponseOnce(JSON.stringify(problemdoc), {
       status: 401
-    });
+    })
+    // Mock 3: Token refresh endpoint returns new access token
+    .mockResponseOnce(
+      JSON.stringify({
+        accessToken: "newAccessToken123",
+        expiresIn: 3600,
+        tokenType: "Bearer"
+      })
+    )
+    // Mock 4: Loans retry (happens during token update) → succeeds
+    .mockResponseOnce(JSON.stringify(fixtures.loans))
+    // Mock 5: Loans revalidation with new token → succeeds
+    .mockResponseOnce(JSON.stringify(fixtures.loans))
+    // Mock 6: Profile fetch with new token → succeeds
+    .mockResponseOnce(
+      JSON.stringify({
+        "simplified:authorization_identifier": "test-patron-123"
+      })
+    );
 
   setup(
     <UserProvider>
@@ -212,10 +237,30 @@ test("fetch new token if token has expired", async () => {
     </UserProvider>
   );
 
+  // Advance timers to trigger the first delayed profile fetch (300ms delay)
   await waitFor(() => {
-    expect(fetchMock).toHaveBeenCalledTimes(3);
+    jest.advanceTimersByTime(300);
+  });
 
-    // attempt fetch loans with old token
+  // Advance timers again to trigger the profile fetch with new token (another 300ms delay)
+  await waitFor(() => {
+    jest.advanceTimersByTime(300);
+  });
+
+  await waitFor(() => {
+    // Expected fetch sequence (at least 6 calls):
+    // 1. GET /shelf-url with expired token → 401 (mock 1)
+    // 2. GET /user-profile-url with expired token → 401 (mock 2)
+    // 3. POST /patrons/me/token/ → new access token (mock 3)
+    // 4. GET /shelf-url retry during token update → loans data (mock 4)
+    // 5. GET /shelf-url with new token → loans data (mock 5)
+    // 6. GET /user-profile-url with new token → profile data (mock 6)
+    expect(fetchMock).toHaveBeenCalledWith(
+      basicTokenAuthenticationUrl,
+      expect.anything()
+    );
+
+    // Verify loans fetch happened with old token
     expect(fetchMock).toHaveBeenNthCalledWith(1, "/shelf-url", {
       headers: {
         Authorization: firstToken,
@@ -225,14 +270,14 @@ test("fetch new token if token has expired", async () => {
       method: "GET"
     });
 
-    // attempt fetch patron profile with old token (also fails)
+    // Verify profile fetch with old token
     expect(fetchMock).toHaveBeenNthCalledWith(2, "/user-profile-url", {
       headers: {
         Authorization: firstToken
       }
     });
 
-    // get new token with username and password saved in credentials
+    // Verify new token was fetched
     expect(fetchMock).toHaveBeenNthCalledWith(3, basicTokenAuthenticationUrl, {
       headers: {
         Authorization: generateCredentials("1234", "pinpin"),
@@ -240,6 +285,15 @@ test("fetch new token if token has expired", async () => {
       },
       method: "POST"
     });
+
+    // Verify loans eventually got fetched with new token (call 5 or later)
+    const loansCallsWithNewToken = (fetchMock as jest.Mock).mock.calls.filter(
+      (call, index) =>
+        index >= 4 && // After token refresh
+        call[0] === "/shelf-url" &&
+        call[1]?.headers?.Authorization === "Bearer newAccessToken123"
+    );
+    expect(loansCallsWithNewToken.length).toBeGreaterThanOrEqual(1);
   });
 });
 

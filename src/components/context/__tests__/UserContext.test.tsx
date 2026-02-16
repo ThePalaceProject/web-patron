@@ -218,20 +218,37 @@ test("sign in sets cookie", async () => {
 });
 
 test("fetches patron profile when authenticated and userProfileUrl is available", () => {
+  jest.useFakeTimers();
   mockAuthenticatedOnce();
   renderUserContext();
 
-  // Should make two SWR calls: one for loans, one for patron profile
+  // Should make SWR call for loans immediately
   expect(mockSWR).toHaveBeenCalledWith(
     ["/shelf-url", "some-token", "http://opds-spec.org/auth/basic"],
     expect.anything(),
     expect.anything()
   );
+
+  // Initially, profile fetch should be called with null (delayed)
+  expect(mockSWR).toHaveBeenCalledWith(
+    null,
+    expect.anything(),
+    expect.anything()
+  );
+
+  // Fast-forward past the 300ms delay
+  act(() => {
+    jest.advanceTimersByTime(300);
+  });
+
+  // Now profile should be fetched
   expect(mockSWR).toHaveBeenCalledWith(
     ["/user-profile-url", "some-token"],
     expect.anything(),
     expect.anything()
   );
+
+  jest.useRealTimers();
 });
 
 test("does not fetch patron profile when not authenticated", () => {
@@ -246,6 +263,7 @@ test("does not fetch patron profile when not authenticated", () => {
 });
 
 test("exposes patronId from profile data", () => {
+  jest.useFakeTimers();
   mockAuthenticatedOnce();
 
   // Mock the patron profile SWR call to return profile data
@@ -273,10 +291,17 @@ test("exposes patronId from profile data", () => {
     </UserProvider>
   );
 
+  // Fast-forward past the delay to trigger profile fetch
+  act(() => {
+    jest.advanceTimersByTime(300);
+  });
+
   expect(extractedPatronId).toBe("patron-123");
+  jest.useRealTimers();
 });
 
 test("patronId is undefined when profile fetch fails", () => {
+  jest.useFakeTimers();
   mockAuthenticatedOnce();
 
   // Mock the patron profile SWR call to return no data
@@ -300,5 +325,11 @@ test("patronId is undefined when profile fetch fails", () => {
     </UserProvider>
   );
 
+  // Fast-forward past the delay to trigger profile fetch
+  act(() => {
+    jest.advanceTimersByTime(300);
+  });
+
   expect(extractedPatronId).toBeUndefined();
+  jest.useRealTimers();
 });
