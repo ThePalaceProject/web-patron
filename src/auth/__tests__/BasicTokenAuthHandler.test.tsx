@@ -92,6 +92,21 @@ test("submit by clicking login button", async () => {
         new Promise(resolve =>
           setTimeout(() => resolve(JSON.stringify(fixtures.loans)), 1)
         )
+    )
+    .once(
+      // Get patron profile using token
+      () =>
+        new Promise(resolve =>
+          setTimeout(
+            () =>
+              resolve(
+                JSON.stringify({
+                  "simplified:authorization_identifier": "test-patron-123"
+                })
+              ),
+            1
+          )
+        )
     );
 
   const { user } = setup(
@@ -141,7 +156,7 @@ test("submit by clicking login button", async () => {
       new Date(parsed.token.expirationDate).toISOString()
     ).not.toThrow();
 
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
 
     // First call grabs token from /patrons/me/token using username and password
     expect(fetchMock).toHaveBeenNthCalledWith(1, basicTokenAuthenticationUrl, {
@@ -161,6 +176,13 @@ test("submit by clicking login button", async () => {
       },
       method: "GET"
     });
+
+    // Third call to get patron profile with Bearer Token
+    expect(fetchMock).toHaveBeenNthCalledWith(3, "/user-profile-url", {
+      headers: {
+        Authorization: `Bearer ${firstToken}`
+      }
+    });
   });
 });
 
@@ -176,9 +198,13 @@ test("fetch new token if token has expired", async () => {
     status: 401
   };
 
-  fetchMock.mockResponseOnce(JSON.stringify(problemdoc), {
-    status: 401
-  });
+  fetchMock
+    .mockResponseOnce(JSON.stringify(problemdoc), {
+      status: 401
+    })
+    .mockResponseOnce(JSON.stringify(problemdoc), {
+      status: 401
+    });
 
   setup(
     <UserProvider>
@@ -187,9 +213,9 @@ test("fetch new token if token has expired", async () => {
   );
 
   await waitFor(() => {
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
 
-    // attempt fetch with old token
+    // attempt fetch loans with old token
     expect(fetchMock).toHaveBeenNthCalledWith(1, "/shelf-url", {
       headers: {
         Authorization: firstToken,
@@ -199,8 +225,15 @@ test("fetch new token if token has expired", async () => {
       method: "GET"
     });
 
+    // attempt fetch patron profile with old token (also fails)
+    expect(fetchMock).toHaveBeenNthCalledWith(2, "/user-profile-url", {
+      headers: {
+        Authorization: firstToken
+      }
+    });
+
     // get new token with username and password saved in credentials
-    expect(fetchMock).toHaveBeenNthCalledWith(2, basicTokenAuthenticationUrl, {
+    expect(fetchMock).toHaveBeenNthCalledWith(3, basicTokenAuthenticationUrl, {
       headers: {
         Authorization: generateCredentials("1234", "pinpin"),
         "X-Requested-With": "XMLHttpRequest"
