@@ -121,21 +121,21 @@ export interface Link<
   rel: R;
 }
 
-export interface CatalogTemplateLink
-  extends Link<
-    typeof CatalogLinkTemplateRelation,
-    typeof BaseDocumentMediaType
-  > {
+export interface CatalogTemplateLink extends Link<
+  typeof CatalogLinkTemplateRelation,
+  typeof BaseDocumentMediaType
+> {
   templated: true;
 }
 
-export interface AuthDocumentLink
-  extends Link<typeof AuthDocumentRelation, typeof AuthDocumentMediaType> {}
-export interface CatalogRootFeedLink
-  extends Link<
-    typeof CatalogRootRelation,
-    typeof OPDS1.BaseDocumentMediaType
-  > {}
+export interface AuthDocumentLink extends Link<
+  typeof AuthDocumentRelation,
+  typeof AuthDocumentMediaType
+> {}
+export interface CatalogRootFeedLink extends Link<
+  typeof CatalogRootRelation,
+  typeof OPDS1.BaseDocumentMediaType
+> {}
 
 /**
  * Utility types
