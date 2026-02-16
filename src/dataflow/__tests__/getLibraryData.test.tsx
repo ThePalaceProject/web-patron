@@ -98,8 +98,7 @@ describe("fetchAuthDocument", () => {
   test("throws ServerError when response is not ok", async () => {
     const errorResponse = { title: "Unauthorized", detail: "Access denied" };
     fetchMock.mockResponseOnce(JSON.stringify(errorResponse), {
-      status: 401,
-      ok: false
+      status: 401
     });
 
     const promise = fetchAuthDocument("/auth-doc");

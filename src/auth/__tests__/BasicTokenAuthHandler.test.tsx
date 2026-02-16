@@ -287,8 +287,8 @@ test("fetch new token if token has expired", async () => {
     });
 
     // Verify loans eventually got fetched with new token (call 5 or later)
-    const loansCallsWithNewToken = (fetchMock as jest.Mock).mock.calls.filter(
-      (call, index) =>
+    const loansCallsWithNewToken = fetchMock.mock.calls.filter(
+      (call: any, index: number) =>
         index >= 4 && // After token refresh
         call[0] === "/shelf-url" &&
         call[1]?.headers?.Authorization === "Bearer newAccessToken123"
