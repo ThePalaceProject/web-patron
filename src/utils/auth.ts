@@ -6,10 +6,15 @@ import {
 } from "interfaces";
 
 /**
- * Extracts an array of auth providers from the authentication document,
- * and adds an ID to them
+ * Normalizes authentication methods from the OPDS authentication document
+ * into a flat array of client-ready auth methods with unique IDs.
+ *
+ * Handles special cases:
+ * - SAML methods with multiple IdP links are expanded into separate methods
+ * - OIDC methods use only the first link
+ * - All methods get a unique ID (either their href or type)
  */
-export function flattenSamlMethod(
+export function normalizeAuthMethods(
   authDoc: OPDS1.AuthDocument
 ): AppAuthMethod[] {
   return authDoc.authentication.reduce<AppAuthMethod[]>((flattened, method) => {
@@ -64,8 +69,9 @@ function serverToClientOidcMethod(
   };
 }
 
-export const getEnglishValue = (arr: [{ language: string; value: string }]) =>
-  arr.find(item => item.language === "en")?.value;
+export const getEnglishValue = (
+  arr: Array<{ language: string; value: string }>
+) => arr.find(item => item.language === "en")?.value;
 
 export function generateCredentials(username: string, password = "") {
   const btoaStr = btoa(`${username}:${password}`);
