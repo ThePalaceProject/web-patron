@@ -69,15 +69,15 @@ const AuthenticationHandler: React.ComponentType<AuthHandlerWrapperProps> = ({
 }) => {
   const _AuthHandler = authHandlers[method.type];
 
-  if (method.type === BasicTokenAuthType && typeof method !== "string") {
+  if (method.type === BasicTokenAuthType) {
     return <_AuthHandler method={method as ClientBasicTokenMethod} />;
-  } else if (method.type === BasicAuthType && typeof method !== "string") {
+  } else if (method.type === BasicAuthType) {
     return <_AuthHandler method={method as ClientBasicMethod} />;
-  } else if (method.type === SamlAuthType && typeof method !== "string") {
+  } else if (method.type === SamlAuthType) {
     return <_AuthHandler method={method as ClientSamlMethod} />;
-  } else if (method.type === OidcAuthType && typeof method !== "string") {
+  } else if (method.type === OidcAuthType) {
     return <_AuthHandler method={method as ClientOidcMethod} />;
-  } else if (method.type === CleverAuthType && typeof method !== "string") {
+  } else if (method.type === CleverAuthType) {
     return <_AuthHandler method={method as CleverAuthMethod} />;
   } else {
     // We should never get here, but if we do, we want to know about it.

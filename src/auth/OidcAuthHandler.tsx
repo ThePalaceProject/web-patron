@@ -17,7 +17,7 @@ import { Text } from "components/Text";
 const OidcAuthHandler: React.FC<{ method: ClientOidcMethod }> = ({
   method
 }) => {
-  const { token, signOut } = useUser();
+  const { token } = useUser();
   const { fullSuccessUrl } = useLoginRedirectUrl();
   const router = useRouter();
 
@@ -33,7 +33,7 @@ const OidcAuthHandler: React.FC<{ method: ClientOidcMethod }> = ({
     if (!token && urlWithRedirect && !loginError) {
       window.location.href = urlWithRedirect;
     }
-  }, [token, signOut, urlWithRedirect, loginError]);
+  }, [token, urlWithRedirect, loginError]);
 
   // Display error if present
   if (loginError) {

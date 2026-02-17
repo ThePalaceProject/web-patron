@@ -52,6 +52,12 @@ function serverToClientSamlMethods(
   }));
 }
 
+/**
+ * Converts a server-side OIDC method to a client-ready OIDC method.
+ * Uses only the first link from the links array.
+ *
+ * @returns ClientOidcMethod if links exist, null otherwise
+ */
 function serverToClientOidcMethod(
   oidcMethod: OPDS1.ServerOidcMethod
 ): ClientOidcMethod | null {

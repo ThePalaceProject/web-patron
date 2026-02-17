@@ -4,7 +4,7 @@ import { AuthCredentials, OPDS1, AppAuthMethod } from "interfaces";
 import { IS_SERVER } from "utils/env";
 import { NextRouter, useRouter } from "next/router";
 import { generateCredentials } from "utils/auth";
-import { SAML_LOGIN_QUERY_PARAM } from "utils/constants";
+import { REDIRECT_LOGIN_QUERY_PARAM } from "utils/constants";
 import useLogin from "./useLogin";
 import useLibraryContext from "components/context/LibraryContext";
 
@@ -102,11 +102,11 @@ export default function useCredentials(slug: string | null) {
 }
 
 /**
- * COOKIE CREDENDIALS
+ * COOKIE CREDENTIALS
  */
 /**
  * If you pass a librarySlug, the cookie will be scoped to the
- * library you are viewing. This is useful in a multi library setup
+ * library you are viewing. This is useful in a multi library setup.
  */
 function cookieName(librarySlug: string | null): string {
   const AUTH_COOKIE_NAME = "CPW_AUTH_COOKIE";
@@ -183,11 +183,11 @@ function lookForRedirectAuthCredentials(
   router: NextRouter,
   authMethods: AppAuthMethod[]
 ): AuthCredentials | undefined {
-  const { [SAML_LOGIN_QUERY_PARAM]: accessToken } = router.query;
+  const { [REDIRECT_LOGIN_QUERY_PARAM]: accessToken } = router.query;
   if (accessToken) {
     if (!IS_SERVER && typeof window !== "undefined") {
       // Clear token from URL to avoid re-authentication after sign out.
-      const { [SAML_LOGIN_QUERY_PARAM]: _, ...restQuery } = router.query;
+      const { [REDIRECT_LOGIN_QUERY_PARAM]: _, ...restQuery } = router.query;
       router.replace(
         { pathname: router.pathname, query: restQuery },
         undefined,
