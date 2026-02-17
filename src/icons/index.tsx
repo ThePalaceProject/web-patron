@@ -1,7 +1,9 @@
+export { default as Account } from "./Account";
 export { default as ArrowRight } from "./ArrowRight";
 export { default as ArrowForward } from "./ArrowForward";
 export { default as Book } from "./Book";
 export { default as ChevronRight } from "./ChevronRight";
+export { default as Copy } from "./Copy";
 export { default as Download } from "./Download";
 export { default as ExpandMore } from "./ExpandMore";
 export { default as ExternalOpen } from "./ExternalOpen";

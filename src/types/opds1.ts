@@ -165,10 +165,13 @@ export interface Link {
  */
 export const CatalogRootRel = "start";
 export const ShelfLinkRel = "http://opds-spec.org/shelf";
+export const UserProfileLinkRel =
+  "http://librarysimplified.org/terms/rel/user-profile";
 type AuthDocLinkRelations =
   | typeof SelfRel
   | typeof CatalogRootRel
   | typeof ShelfLinkRel
+  | typeof UserProfileLinkRel
   | "navigation"
   | "logo"
   | "register"

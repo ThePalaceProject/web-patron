@@ -216,3 +216,120 @@ test("sign in sets cookie", async () => {
     expect.anything()
   );
 });
+
+test("fetches patron profile when authenticated and userProfileUrl is available", () => {
+  jest.useFakeTimers();
+  mockAuthenticatedOnce();
+  renderUserContext();
+
+  // Should make SWR call for loans immediately
+  expect(mockSWR).toHaveBeenCalledWith(
+    ["/shelf-url", "some-token", "http://opds-spec.org/auth/basic"],
+    expect.anything(),
+    expect.anything()
+  );
+
+  // Initially, profile fetch should be called with null (delayed)
+  expect(mockSWR).toHaveBeenCalledWith(
+    null,
+    expect.anything(),
+    expect.anything()
+  );
+
+  // Fast-forward past the 300ms delay
+  act(() => {
+    jest.advanceTimersByTime(300);
+  });
+
+  // Now profile should be fetched
+  expect(mockSWR).toHaveBeenCalledWith(
+    ["/user-profile-url", "some-token"],
+    expect.anything(),
+    expect.anything()
+  );
+
+  jest.useRealTimers();
+});
+
+test("does not fetch patron profile when not authenticated", () => {
+  mockAuthenticatedOnce(null);
+  renderUserContext();
+
+  // Should not make any SWR calls for patron profile
+  const profileCalls = (mockSWR as jest.Mock).mock.calls.filter(
+    call => call[0] && call[0][0] === "/user-profile-url"
+  );
+  expect(profileCalls.length).toBe(0);
+});
+
+test("exposes patronId from profile data", () => {
+  jest.useFakeTimers();
+  mockAuthenticatedOnce();
+
+  // Mock the patron profile SWR call to return profile data
+  mockSWR.mockImplementation((key: any) => {
+    if (key && Array.isArray(key) && key[0] === "/user-profile-url") {
+      return makeSwrResponse({
+        data: {
+          "simplified:authorization_identifier": "patron-123"
+        }
+      }) as any;
+    }
+    return defaultMock as any;
+  });
+
+  let extractedPatronId: string | undefined = undefined;
+  function Extractor() {
+    const { patronId } = useUser();
+    extractedPatronId = patronId;
+    return <div>hello</div>;
+  }
+
+  setup(
+    <UserProvider>
+      <Extractor />
+    </UserProvider>
+  );
+
+  // Fast-forward past the delay to trigger profile fetch
+  act(() => {
+    jest.advanceTimersByTime(300);
+  });
+
+  expect(extractedPatronId).toBe("patron-123");
+  jest.useRealTimers();
+});
+
+test("patronId is undefined when profile fetch fails", () => {
+  jest.useFakeTimers();
+  mockAuthenticatedOnce();
+
+  // Mock the patron profile SWR call to return no data
+  mockSWR.mockImplementation((key: any) => {
+    if (key && Array.isArray(key) && key[0] === "/user-profile-url") {
+      return makeSwrResponse({ data: undefined }) as any;
+    }
+    return defaultMock as any;
+  });
+
+  let extractedPatronId: string | undefined = "should-be-undefined";
+  function Extractor() {
+    const { patronId } = useUser();
+    extractedPatronId = patronId;
+    return <div>hello</div>;
+  }
+
+  setup(
+    <UserProvider>
+      <Extractor />
+    </UserProvider>
+  );
+
+  // Fast-forward past the delay to trigger profile fetch
+  act(() => {
+    jest.advanceTimersByTime(300);
+  });
+
+  expect(extractedPatronId).toBeUndefined();
+  jest.useRealTimers();
+});

@@ -19,6 +19,14 @@ export const authDoc: OPDS1.AuthDocument = {
     {
       rel: OPDS1.CatalogRootRel,
       href: "/catalog-root"
+    },
+    {
+      rel: OPDS1.ShelfLinkRel,
+      href: "http://test-cm.com/shelf"
+    },
+    {
+      rel: OPDS1.UserProfileLinkRel,
+      href: "http://test-cm.com/patrons/me/"
     }
   ]
 };

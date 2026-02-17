@@ -1,4 +1,6 @@
+import { http, HttpResponse } from "msw";
 import { APP_CONFIG } from "utils/env";
+import { PATRON_PROFILE_FIELDS } from "types/patronProfile";
 
 export const openEBackendUrl = APP_CONFIG.libraries["app"]?.authDocUrl.replace(
   "/groups",
@@ -6,14 +8,13 @@ export const openEBackendUrl = APP_CONFIG.libraries["app"]?.authDocUrl.replace(
 );
 
 export const handlers = [
-  // rest.get("https://my.backend/book", (req, res, ctx) => {
-  //   return res(
-  //     ctx.json({
-  //       title: "Lord of the Rings",
-  //       imageUrl: "/book-cover.jpg",
-  //       description:
-  //         "The Lord of the Rings is an epic high-fantasy novel written by English author and scholar J. R. R. Tolkien."
-  //     })
-  //   );
-  // })
+  http.get("*/patrons/me/", ({ request }) => {
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return new HttpResponse(null, { status: 401 });
+    }
+    return HttpResponse.json({
+      [PATRON_PROFILE_FIELDS.authorizationIdentifier]: "test-patron-id-12345"
+    });
+  })
 ];

@@ -137,6 +137,7 @@ export interface LibraryData {
   libraryLinks: LibraryLinks;
   authMethods: AppAuthMethod[];
   shelfUrl: string | null;
+  userProfileUrl: string | null;
 }
 
 /**

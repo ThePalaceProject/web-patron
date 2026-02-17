@@ -22,7 +22,8 @@ const testLibrary: LibraryData = {
   colors: null,
   headerLinks: [],
   authMethods: [],
-  shelfUrl: "/shelf"
+  shelfUrl: "/shelf",
+  userProfileUrl: null
 };
 
 type MakeContextConfig = {

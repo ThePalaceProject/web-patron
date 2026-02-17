@@ -28,6 +28,7 @@ export const libraryData: LibraryData = {
   ],
   libraryLinks: {},
   shelfUrl: "/shelf-url",
+  userProfileUrl: "/user-profile-url",
   authMethods: [basicAuthMethod, createSamlMethod(0), cleverAuthMethod]
 };
 
