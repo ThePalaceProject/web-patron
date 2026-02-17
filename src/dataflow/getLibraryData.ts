@@ -96,7 +96,7 @@ export function buildLibraryData(
     slug: librarySlug,
     catalogUrl,
     shelfUrl: shelfUrl ?? null,
-    userProfileUrl: userProfileUrl ?? null,
+    userProfileUrl: userProfileUrl,
     catalogName: authDoc.title,
     logoUrl: logoUrl ?? null,
     colors:

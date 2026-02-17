@@ -31,6 +31,7 @@ export const AccountMenu: React.FC = () => {
       <Menu
         store={menu}
         gutter={8}
+        tabIndex={-1}
         sx={{
           backgroundColor: "white",
           borderRadius: 2,
