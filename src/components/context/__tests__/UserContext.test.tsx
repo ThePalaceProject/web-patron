@@ -148,6 +148,161 @@ test("extracts SAML tokens from the url", () => {
   );
 });
 
+test("extracts OIDC tokens when only OIDC is configured", () => {
+  const url = new URL(window.location.href);
+  url.searchParams.set("access_token", "oidc-token");
+  delete (window as any).location;
+  window.location = url as any;
+  useRouterSpy.mockReturnValue({
+    replace: mockReplace,
+    query: { access_token: "oidc-token" },
+    pathname: "/testlib/loans"
+  } as any);
+
+  // Library with only OIDC auth configured
+  setup(<UserProvider>child</UserProvider>, {
+    library: {
+      authMethods: [fixtures.clientOidcMethod]
+    }
+  });
+
+  expect(mockSWR).toHaveBeenCalledWith(
+    null,
+    expect.anything(),
+    expect.anything()
+  );
+
+  expect(Cookie.set).toHaveBeenCalledTimes(1);
+  expect(Cookie.set).toHaveBeenCalledWith(
+    "CPW_AUTH_COOKIE/testlib",
+    str({ token: "Bearer oidc-token", methodType: OPDS1.OidcAuthType })
+  );
+
+  expect(mockSWR).toHaveBeenCalledWith(
+    [
+      "/shelf-url",
+      "Bearer oidc-token",
+      "http://palaceproject.io/authtype/OpenIDConnect"
+    ],
+    expect.anything(),
+    expect.anything()
+  );
+
+  // Should have used router.replace to clear the OIDC token from the URL.
+  expect(mockReplace).toHaveBeenCalledWith(
+    { pathname: "/testlib/loans", query: {} },
+    undefined,
+    { shallow: true }
+  );
+});
+
+test("extracts SAML tokens when only SAML is configured", () => {
+  const url = new URL(window.location.href);
+  url.searchParams.set("access_token", "saml-token");
+  delete (window as any).location;
+  window.location = url as any;
+  useRouterSpy.mockReturnValue({
+    replace: mockReplace,
+    query: { access_token: "saml-token" },
+    pathname: "/testlib/loans"
+  } as any);
+
+  // Library with only SAML auth configured
+  setup(<UserProvider>child</UserProvider>, {
+    library: {
+      authMethods: [fixtures.clientSamlMethod]
+    }
+  });
+
+  expect(Cookie.set).toHaveBeenCalledTimes(1);
+  expect(Cookie.set).toHaveBeenCalledWith(
+    "CPW_AUTH_COOKIE/testlib",
+    str({ token: "Bearer saml-token", methodType: OPDS1.SamlAuthType })
+  );
+
+  expect(mockSWR).toHaveBeenCalledWith(
+    [
+      "/shelf-url",
+      "Bearer saml-token",
+      "http://librarysimplified.org/authtype/SAML-2.0"
+    ],
+    expect.anything(),
+    expect.anything()
+  );
+});
+
+test("uses SAML when it comes first in auth methods (both OIDC and SAML configured)", () => {
+  const url = new URL(window.location.href);
+  url.searchParams.set("access_token", "redirect-token");
+  delete (window as any).location;
+  window.location = url as any;
+  useRouterSpy.mockReturnValue({
+    replace: mockReplace,
+    query: { access_token: "redirect-token" },
+    pathname: "/testlib/loans"
+  } as any);
+
+  // Library with both SAML and OIDC configured - SAML comes first
+  setup(<UserProvider>child</UserProvider>, {
+    library: {
+      authMethods: [fixtures.clientSamlMethod, fixtures.clientOidcMethod]
+    }
+  });
+
+  expect(Cookie.set).toHaveBeenCalledTimes(1);
+  // Should use SAML because it's the first redirect-based auth method
+  expect(Cookie.set).toHaveBeenCalledWith(
+    "CPW_AUTH_COOKIE/testlib",
+    str({ token: "Bearer redirect-token", methodType: OPDS1.SamlAuthType })
+  );
+
+  expect(mockSWR).toHaveBeenCalledWith(
+    [
+      "/shelf-url",
+      "Bearer redirect-token",
+      "http://librarysimplified.org/authtype/SAML-2.0"
+    ],
+    expect.anything(),
+    expect.anything()
+  );
+});
+
+test("uses OIDC when it comes first in auth methods (both OIDC and SAML configured)", () => {
+  const url = new URL(window.location.href);
+  url.searchParams.set("access_token", "redirect-token");
+  delete (window as any).location;
+  window.location = url as any;
+  useRouterSpy.mockReturnValue({
+    replace: mockReplace,
+    query: { access_token: "redirect-token" },
+    pathname: "/testlib/loans"
+  } as any);
+
+  // Library with both OIDC and SAML configured - OIDC comes first
+  setup(<UserProvider>child</UserProvider>, {
+    library: {
+      authMethods: [fixtures.clientOidcMethod, fixtures.clientSamlMethod]
+    }
+  });
+
+  expect(Cookie.set).toHaveBeenCalledTimes(1);
+  // Should use OIDC because it's the first redirect-based auth method
+  expect(Cookie.set).toHaveBeenCalledWith(
+    "CPW_AUTH_COOKIE/testlib",
+    str({ token: "Bearer redirect-token", methodType: OPDS1.OidcAuthType })
+  );
+
+  expect(mockSWR).toHaveBeenCalledWith(
+    [
+      "/shelf-url",
+      "Bearer redirect-token",
+      "http://palaceproject.io/authtype/OpenIDConnect"
+    ],
+    expect.anything(),
+    expect.anything()
+  );
+});
+
 test("sign out clears cookies and data", async () => {
   mockAuthenticatedOnce();
   let extractedSignOut: any = null;

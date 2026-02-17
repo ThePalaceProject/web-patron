@@ -1,6 +1,6 @@
 import { LibraryData, LibraryLinks, OPDS1 } from "interfaces";
 import ApplicationError, { PageNotFoundError, ServerError } from "errors";
-import { flattenSamlMethod } from "utils/auth";
+import { normalizeAuthMethods } from "utils/auth";
 import { APP_CONFIG } from "utils/env";
 
 /**
@@ -88,7 +88,7 @@ export function buildLibraryData(
   const headerLinks =
     authDoc.links?.filter(link => link.rel === "navigation") ?? [];
   const libraryLinks = parseLinks(authDoc.links);
-  const authMethods = flattenSamlMethod(authDoc);
+  const authMethods = normalizeAuthMethods(authDoc);
   const shelfUrl = getShelfUrl(authDoc);
   const userProfileUrl = getUserProfileUrl(authDoc);
   const catalogUrl = getCatalogUrl(authDoc);

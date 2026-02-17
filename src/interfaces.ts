@@ -92,6 +92,12 @@ export interface ClientSamlMethod extends OPDS1.AuthMethod<
   href: string;
   id: string;
 }
+export interface ClientOidcMethod extends OPDS1.AuthMethod<
+  typeof OPDS1.OidcAuthType
+> {
+  href: string;
+  id: string;
+}
 export interface ClientCleverMethod extends OPDS1.CleverAuthMethod {
   id: string;
 }
@@ -108,7 +114,8 @@ export type AppAuthMethod =
   | ClientCleverMethod
   | ClientBasicMethod
   | ClientBasicTokenMethod
-  | ClientSamlMethod;
+  | ClientSamlMethod
+  | ClientOidcMethod;
 
 export type Token = {
   basicToken: string | undefined;

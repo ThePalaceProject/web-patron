@@ -1,11 +1,12 @@
 import * as React from "react";
 import Cookie from "js-cookie";
-import { AuthCredentials, OPDS1 } from "interfaces";
+import { AuthCredentials, OPDS1, AppAuthMethod } from "interfaces";
 import { IS_SERVER } from "utils/env";
 import { NextRouter, useRouter } from "next/router";
 import { generateCredentials } from "utils/auth";
-import { SAML_LOGIN_QUERY_PARAM } from "utils/constants";
+import { REDIRECT_LOGIN_QUERY_PARAM } from "utils/constants";
 import useLogin from "./useLogin";
+import useLibraryContext from "components/context/LibraryContext";
 
 /**
  * This hook:
@@ -20,6 +21,7 @@ import useLogin from "./useLogin";
 export default function useCredentials(slug: string | null) {
   const router = useRouter();
   const { initLogin } = useLogin();
+  const { authMethods } = useLibraryContext();
   const [credentialsState, setCredentialsState] = React.useState<
     AuthCredentials | undefined
   >(getCredentialsCookie(slug));
@@ -84,7 +86,7 @@ export default function useCredentials(slug: string | null) {
 
   // use credentials from browser url if they exist
   const { token: urlToken, methodType: urlMethodType } =
-    getUrlCredentials(router) ?? {};
+    getUrlCredentials(router, authMethods) ?? {};
 
   React.useEffect(() => {
     if (urlToken && urlMethodType) {
@@ -100,11 +102,11 @@ export default function useCredentials(slug: string | null) {
 }
 
 /**
- * COOKIE CREDENDIALS
+ * COOKIE CREDENTIALS
  */
 /**
  * If you pass a librarySlug, the cookie will be scoped to the
- * library you are viewing. This is useful in a multi library setup
+ * library you are viewing. This is useful in a multi library setup.
  */
 function cookieName(librarySlug: string | null): string {
   const AUTH_COOKIE_NAME = "CPW_AUTH_COOKIE";
@@ -136,11 +138,15 @@ export function generateToken(username: string, password?: string) {
 /**
  * URL CREDENTIALS
  */
-function getUrlCredentials(router: NextRouter) {
-  /* TODO: throw error if samlAccessToken and cleverAccessToken exist at the same time as this is an invalid state that shouldn't be reached */
+function getUrlCredentials(
+  router: NextRouter,
+  authMethods: AppAuthMethod[]
+): AuthCredentials | undefined {
+  /* TODO: throw error if access tokens exist at the same time as this is an invalid state that shouldn't be reached */
   return IS_SERVER
     ? undefined
-    : (lookForCleverCredentials(router) ?? lookForSamlCredentials(router));
+    : (lookForCleverCredentials(router) ??
+        lookForRedirectAuthCredentials(router, authMethods));
 }
 
 // check for clever credentials
@@ -171,15 +177,17 @@ function lookForCleverCredentials(
   }
 }
 
-// check for saml credentials
-function lookForSamlCredentials(
-  router: NextRouter
+// check for redirect-based auth credentials (SAML/OIDC)
+// Both use the same query parameter, so we determine which based on library config
+function lookForRedirectAuthCredentials(
+  router: NextRouter,
+  authMethods: AppAuthMethod[]
 ): AuthCredentials | undefined {
-  const { [SAML_LOGIN_QUERY_PARAM]: samlAccessToken } = router.query;
-  if (samlAccessToken) {
+  const { [REDIRECT_LOGIN_QUERY_PARAM]: accessToken } = router.query;
+  if (accessToken) {
     if (!IS_SERVER && typeof window !== "undefined") {
-      // Clear SAML token from URL to avoid re-authentication after sign out.
-      const { [SAML_LOGIN_QUERY_PARAM]: _, ...restQuery } = router.query;
+      // Clear token from URL to avoid re-authentication after sign out.
+      const { [REDIRECT_LOGIN_QUERY_PARAM]: _, ...restQuery } = router.query;
       router.replace(
         { pathname: router.pathname, query: restQuery },
         undefined,
@@ -187,9 +195,18 @@ function lookForSamlCredentials(
       );
     }
 
+    // Determine which redirect auth type to use based on order in authentication document.
+    // We authenticate with the first supported auth type, so use that order here.
+    const redirectAuthMethod = authMethods.find(
+      m => m.type === OPDS1.OidcAuthType || m.type === OPDS1.SamlAuthType
+    );
+
+    // Use the first redirect-based auth method found, or default to SAML for backward compatibility
+    const methodType = redirectAuthMethod?.type ?? OPDS1.SamlAuthType;
+
     return {
-      token: `Bearer ${samlAccessToken}`,
-      methodType: OPDS1.SamlAuthType
+      token: `Bearer ${accessToken}`,
+      methodType
     };
   }
 }

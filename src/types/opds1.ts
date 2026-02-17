@@ -190,6 +190,7 @@ export const BasicAuthType = "http://opds-spec.org/auth/basic";
 export const BasicTokenAuthType =
   "http://thepalaceproject.org/authtype/basic-token";
 export const SamlAuthType = "http://librarysimplified.org/authtype/SAML-2.0";
+export const OidcAuthType = "http://palaceproject.io/authtype/OpenIDConnect";
 export const CleverAuthType =
   "http://librarysimplified.org/authtype/OAuth-with-intermediary";
 export const ImplicitGrantAuthType = "http://opds-spec.org/auth/oauth/implicit";
@@ -200,6 +201,7 @@ export type AnyAuthType =
   | typeof BasicAuthType
   | typeof BasicTokenAuthType
   | typeof SamlAuthType
+  | typeof OidcAuthType
   | typeof CleverAuthType
   | typeof ImplicitGrantAuthType
   | typeof PasswordCredentialsAuthType;
@@ -214,6 +216,11 @@ export interface AuthMethod<T extends AnyAuthType, L extends Link = Link> {
 export interface ServerSamlMethod extends AuthMethod<
   typeof SamlAuthType,
   SamlIdp
+> {}
+
+export interface ServerOidcMethod extends AuthMethod<
+  typeof OidcAuthType,
+  OidcLink
 > {}
 
 export interface CleverAuthMethod extends AuthMethod<typeof CleverAuthType> {}
@@ -252,7 +259,8 @@ export type ServerAuthMethod =
   | CleverAuthMethod
   | BasicAuthMethod
   | BasicTokenAuthMethod
-  | ServerSamlMethod;
+  | ServerSamlMethod
+  | ServerOidcMethod;
 
 export interface Announcement {
   id: string;
@@ -290,6 +298,32 @@ export interface BearerTokenDocument {
  * works when backed by a Circulation Manager
  */
 export type SamlIdp = {
+  privacy_statement_urls: [];
+  logo_urls: [];
+  display_names: [
+    {
+      language: string;
+      value: string;
+    }
+  ];
+  href: string;
+  descriptions: [
+    {
+      language: string;
+      value: string;
+    }
+  ];
+  rel: "authenticate";
+  information_urls: [];
+};
+
+/**
+ * OIDC is an extension on the OPDS1 spec which only
+ * works when backed by a Circulation Manager
+ */
+// TODO: Currently OidcLink is identical to SamlIdp (above). We should
+//  factor out the common properties, if that remains the case.
+export type OidcLink = {
   privacy_statement_urls: [];
   logo_urls: [];
   display_names: [

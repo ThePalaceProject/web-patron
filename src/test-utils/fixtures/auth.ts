@@ -3,6 +3,7 @@ import {
   ClientBasicTokenMethod,
   ClientCleverMethod,
   ClientSamlMethod,
+  ClientOidcMethod,
   CollectionData
 } from "interfaces";
 import { OPDS1 } from "interfaces";
@@ -12,6 +13,7 @@ export const basicAuthId = "http://opds-spec.org/auth/basic";
 export const basicTokenAuthId =
   "http://thepalaceproject.org/authtype/basic-token";
 export const samlAuthId = "http://librarysimplified.org/authtype/SAML-2.0";
+export const oidcAuthId = "http://palaceproject.io/authtype/OpenIDConnect";
 
 export const basicTokenAuthenticationUrl =
   "https://exmple.com/patrons/me/token/";
@@ -79,6 +81,24 @@ export function createSamlMethod(num: number): ClientSamlMethod {
     href: `https://saml-auth.com/${num}`,
     type: OPDS1.SamlAuthType,
     description: `SAML IdP ${num}`,
+    links: [
+      {
+        href: "https://example.com/LoginButton280.png",
+        rel: "logo"
+      }
+    ]
+  };
+}
+
+export const oidcAuthHref = "/oidc-auth-url";
+export const clientOidcMethod: ClientOidcMethod = createOidcMethod(0);
+
+export function createOidcMethod(num: number): ClientOidcMethod {
+  return {
+    id: `id-${num}`,
+    href: `https://oidc-auth.com/${num}`,
+    type: OPDS1.OidcAuthType,
+    description: `OIDC Provider ${num}`,
     links: [
       {
         href: "https://example.com/LoginButton280.png",
