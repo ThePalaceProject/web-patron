@@ -195,23 +195,14 @@ function lookForRedirectAuthCredentials(
       );
     }
 
-    // Determine which redirect auth type is configured
-    const hasOidc = authMethods.some(m => m.type === OPDS1.OidcAuthType);
-    const hasSaml = authMethods.some(m => m.type === OPDS1.SamlAuthType);
+    // Determine which redirect auth type to use based on order in authentication document.
+    // We authenticate with the first supported auth type, so use that order here.
+    const redirectAuthMethod = authMethods.find(
+      m => m.type === OPDS1.OidcAuthType || m.type === OPDS1.SamlAuthType
+    );
 
-    let methodType: typeof OPDS1.SamlAuthType | typeof OPDS1.OidcAuthType;
-    if (hasOidc && !hasSaml) {
-      methodType = OPDS1.OidcAuthType;
-    } else if (hasSaml && !hasOidc) {
-      methodType = OPDS1.SamlAuthType;
-    } else if (hasOidc && hasSaml) {
-      // Both configured - this is rare, but default to SAML for backward compatibility
-      // In practice, most libraries will have only one redirect-based auth method
-      methodType = OPDS1.SamlAuthType;
-    } else {
-      // Neither configured but token present - default to SAML
-      methodType = OPDS1.SamlAuthType;
-    }
+    // Use the first redirect-based auth method found, or default to SAML for backward compatibility
+    const methodType = redirectAuthMethod?.type ?? OPDS1.SamlAuthType;
 
     return {
       token: `Bearer ${accessToken}`,

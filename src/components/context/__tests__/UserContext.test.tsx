@@ -231,7 +231,7 @@ test("extracts SAML tokens when only SAML is configured", () => {
   );
 });
 
-test("defaults to SAML when both OIDC and SAML are configured", () => {
+test("uses SAML when it comes first in auth methods (both OIDC and SAML configured)", () => {
   const url = new URL(window.location.href);
   url.searchParams.set("access_token", "redirect-token");
   delete (window as any).location;
@@ -242,7 +242,7 @@ test("defaults to SAML when both OIDC and SAML are configured", () => {
     pathname: "/testlib/loans"
   } as any);
 
-  // Library with both SAML and OIDC configured
+  // Library with both SAML and OIDC configured - SAML comes first
   setup(<UserProvider>child</UserProvider>, {
     library: {
       authMethods: [fixtures.clientSamlMethod, fixtures.clientOidcMethod]
@@ -250,7 +250,7 @@ test("defaults to SAML when both OIDC and SAML are configured", () => {
   });
 
   expect(Cookie.set).toHaveBeenCalledTimes(1);
-  // Should default to SAML for backward compatibility
+  // Should use SAML because it's the first redirect-based auth method
   expect(Cookie.set).toHaveBeenCalledWith(
     "CPW_AUTH_COOKIE/testlib",
     str({ token: "Bearer redirect-token", methodType: OPDS1.SamlAuthType })
@@ -261,6 +261,42 @@ test("defaults to SAML when both OIDC and SAML are configured", () => {
       "/shelf-url",
       "Bearer redirect-token",
       "http://librarysimplified.org/authtype/SAML-2.0"
+    ],
+    expect.anything(),
+    expect.anything()
+  );
+});
+
+test("uses OIDC when it comes first in auth methods (both OIDC and SAML configured)", () => {
+  const url = new URL(window.location.href);
+  url.searchParams.set("access_token", "redirect-token");
+  delete (window as any).location;
+  window.location = url as any;
+  useRouterSpy.mockReturnValue({
+    replace: mockReplace,
+    query: { access_token: "redirect-token" },
+    pathname: "/testlib/loans"
+  } as any);
+
+  // Library with both OIDC and SAML configured - OIDC comes first
+  setup(<UserProvider>child</UserProvider>, {
+    library: {
+      authMethods: [fixtures.clientOidcMethod, fixtures.clientSamlMethod]
+    }
+  });
+
+  expect(Cookie.set).toHaveBeenCalledTimes(1);
+  // Should use OIDC because it's the first redirect-based auth method
+  expect(Cookie.set).toHaveBeenCalledWith(
+    "CPW_AUTH_COOKIE/testlib",
+    str({ token: "Bearer redirect-token", methodType: OPDS1.OidcAuthType })
+  );
+
+  expect(mockSWR).toHaveBeenCalledWith(
+    [
+      "/shelf-url",
+      "Bearer redirect-token",
+      "http://palaceproject.io/authtype/OpenIDConnect"
     ],
     expect.anything(),
     expect.anything()
