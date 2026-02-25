@@ -313,6 +313,31 @@ describe("reserved", () => {
 describe("FulfillableBook", () => {
   beforeEach(() => mockConfig({ companionApp: "simplye" }));
 
+  const externalReadOnlineBook = mergeBook<FulfillableBook>({
+    status: "fulfillable",
+    revokeUrl: "/revoke",
+    fulfillmentLinks: [
+      {
+        url: "/read-online",
+        contentType: `text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"`,
+        supportLevel: "show"
+      }
+    ]
+  });
+
+  function makeMockTab() {
+    return {
+      document: {
+        title: "",
+        body: { appendChild: jest.fn() },
+        createElement: jest
+          .fn()
+          .mockReturnValue({ textContent: "", style: { cssText: "" } })
+      },
+      location: { href: "" }
+    };
+  }
+
   const downloadableBook = mergeBook<FulfillableBook>({
     status: "fulfillable",
     revokeUrl: "/revoke",
@@ -382,6 +407,9 @@ describe("FulfillableBook", () => {
   });
 
   test("external read online tracks open_book event", async () => {
+    const mockTab = makeMockTab();
+    window.open = jest.fn().mockReturnValue(mockTab);
+
     const readOnlineBook = mergeBook<FulfillableBook>({
       status: "fulfillable",
       revokeUrl: "/revoke",
@@ -405,6 +433,69 @@ describe("FulfillableBook", () => {
     await waitFor(() =>
       expect(fetchMock).toHaveBeenCalledWith("http://track-open-book.com")
     );
+  });
+
+  test("opens a new tab and shows a loading state before the URL resolves", async () => {
+    const mockTab = makeMockTab();
+    window.open = jest.fn().mockReturnValue(mockTab);
+
+    setup(<FulfillmentCard book={externalReadOnlineBook} />);
+    const readOnline = await screen.findByRole("button", {
+      name: "Read Online"
+    });
+
+    fireEvent.click(readOnline);
+
+    expect(window.open).toHaveBeenCalledWith("about:blank", "_blank");
+    expect(mockTab.document.title).toBe("Loading\u2026");
+    expect(mockTab.document.createElement).toHaveBeenCalledWith("p");
+    expect(mockTab.document.body.appendChild).toHaveBeenCalled();
+
+    await waitFor(() => expect(mockTab.location.href).toBe("/read-online"));
+  });
+
+  test("navigates the new tab to the external reader URL", async () => {
+    const mockTab = makeMockTab();
+    window.open = jest.fn().mockReturnValue(mockTab);
+
+    setup(<FulfillmentCard book={externalReadOnlineBook} />);
+    const readOnline = await screen.findByRole("button", {
+      name: "Read Online"
+    });
+
+    fireEvent.click(readOnline);
+
+    await waitFor(() => {
+      expect(mockTab.location.href).toBe("/read-online");
+    });
+  });
+
+  test("falls back to current-tab navigation when the popup is blocked", async () => {
+    // Simulate a blocked popup: window.open() returns null in the browser
+    // when the user has explicitly blocked popups for this site.
+    window.open = jest.fn().mockReturnValue(null);
+
+    // jsdom throws "Not implemented: navigation" if window.location.href is
+    // assigned directly. Replace it with a plain writable object so we can
+    // assert on the fallback navigation without errors.
+    const originalLocation = window.location;
+    delete (window as any).location;
+    (window as any).location = { href: "" };
+
+    setup(<FulfillmentCard book={externalReadOnlineBook} />);
+    const readOnline = await screen.findByRole("button", {
+      name: "Read Online"
+    });
+
+    fireEvent.click(readOnline);
+
+    // With newTab null, the component should fall back to navigating the
+    // current tab to the external reader URL.
+    await waitFor(() => {
+      expect(window.location.href).toBe("/read-online");
+    });
+
+    (window as any).location = originalLocation;
   });
 
   test("correct title and subtitle without redirect", () => {

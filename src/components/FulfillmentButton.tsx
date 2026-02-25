@@ -82,6 +82,19 @@ const ReadOnlineExternal: React.FC<{
     setLoading(true);
     clearError();
     try {
+      // Open a blank tab synchronously before any async work so the browser
+      // treats it as user-initiated, bypassing popup blockers.
+      const newTab = window.open("about:blank", "_blank");
+      // Create a loading page immediately so the user never sees about:blank.
+      if (newTab) {
+        newTab.document.title = "Loading\u2026";
+        const p = newTab.document.createElement("p");
+        p.textContent = "Loading\u2026";
+        p.style.cssText =
+          "font-family:sans-serif;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)";
+        newTab.document.body.appendChild(p);
+      }
+
       // the url may be behind indirection, so we fetch it with the
       // provided function
       const { url: externalReaderUrl } = await details.getLocation(
@@ -92,7 +105,14 @@ const ReadOnlineExternal: React.FC<{
       // we are about to open the book, so send a track event
       track.openBook(trackOpenBookUrl);
       setLoading(false);
-      window.open(externalReaderUrl);
+
+      // newTab can still be null if the user has explicitly blocked popups for
+      // this site. Fall back to navigating the current tab in that case.
+      if (newTab) {
+        newTab.location.href = externalReaderUrl;
+      } else {
+        window.location.href = externalReaderUrl;
+      }
     } catch (e) {
       setLoading(false);
       handleError(e);
