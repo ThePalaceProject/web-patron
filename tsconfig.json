@@ -39,6 +39,8 @@
     "**/*.tsx",
     "next.config.js",
     "public/sw.js",
-    "src/icons/_template.js"
+    "src/config/fetch-config.js",
+    "src/icons/_template.js",
+    "next-i18next.config.js"
   ]
 }
