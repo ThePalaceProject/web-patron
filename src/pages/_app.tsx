@@ -7,12 +7,16 @@ import "@nypl/design-system-react-components/dist/styles.css";
 import "css-overrides.css";
 import track from "analytics/track";
 import { BreadcrumbProvider } from "components/context/BreadcrumbContext";
+<<<<<<< HEAD
 import AppConfigContext from "components/context/AppConfigContext";
 import { initBugsnag } from "analytics/bugsnag";
 import { setMediaSupportConfig } from "utils/fulfill";
 import { setOpds2Enabled } from "dataflow/catalog";
 import type { AppConfig } from "interfaces";
 import FALLBACK_APP_CONFIG from "config/fallbackAppConfig";
+=======
+import { appWithTranslation } from "next-i18next";
+>>>>>>> 7d77daa8 (EKIRJASTO-764 Wrap app with appWithTranslation for i18n context)
 
 const MyApp = (props: AppProps) => {
   const { Component, pageProps } = props;
@@ -56,4 +60,7 @@ export function reportWebVitals(metric: NextWebVitalsMetric) {
   track.webVitals(metric);
 }
 
-export default MyApp;
+// Wrap MyApp component with appWithTranslation to provide i18n context,
+// so we can use translation functions (t) in child components
+// and switch translations based on locales
+export default appWithTranslation(MyApp);
