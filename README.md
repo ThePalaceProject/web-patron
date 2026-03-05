@@ -377,6 +377,19 @@ The E-kirjasto application utilizes the following packages for internationalizat
 - **i18next-cli** a command-line tool for managing translations (development dependency)
 - **eslint-plugin-18next** ESLint plugin that warns about hardcoded strings (development dependency)
 
+### Configuration files
+
+#### `next-i18next.config.js`
+
+This file contains the configuration for the `next-i18next` library, which manages translations in the application.
+
+Key settings:
+
+- **Supported languages**: Finnish (`fi`), Swedish (`sv`) and English (`en`).
+- **Default language**: Finnish (`fi`) is the default and fallback language
+- **Namespaces**: The default namespace is set to `translations`, which contains all translation keys
+- **Translation files path**: Translation files are stored in the `public/locales` directory
+
 # Deploying
 
 This repository includes a Dockerfile, and the master branch is built as an image in Docker Hub in the Hub repository [thepalaceproject/web-patron](https://hub.docker.com/r/thepalaceproject/web-patron). You can deploy the application simply by running the image from Docker Hub. You can either use the `latest` tag in Docker Hub, or a specific version tagged with the version number. There will also be an image tagged `beta` for the most recent code on the `beta` branch.
