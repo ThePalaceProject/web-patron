@@ -1,3 +1,7 @@
 {
-  "hello": "Hej, översättningar!"
+  "hello": "Hej, översättningar!",
+  "languageName.EN": "Engelska",
+  "languageName.FI": "Finska",
+  "languageName.SV": "Svenska",
+  "languageSelector": "Välj sidspråk"
 }

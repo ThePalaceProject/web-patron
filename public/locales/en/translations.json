@@ -1,3 +1,7 @@
 {
-  "hello": "Hello, translations!"
+  "hello": "Hello, translations!",
+  "languageName.EN": "English",
+  "languageName.FI": "Finnish",
+  "languageName.SV": "Swedish",
+  "languageSelector": "Select page language"
 }
