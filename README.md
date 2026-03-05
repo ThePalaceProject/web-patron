@@ -374,6 +374,7 @@ The E-kirjasto application utilizes the following packages for internationalizat
 - **i18next**: an internationalization framework for JavaScript
 - **next-i18next**: a plugin for Next.js that integrates i18next for server-side translations
 - **react-i18next**: React bindings for i18next (peer dependency required by next-i18next)
+- **i18next-cli** a command-line tool for managing translations (development dependency)
 
 # Deploying
 
