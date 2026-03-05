@@ -405,6 +405,23 @@ Key settings:
   - `translations:sync` Sync Finnish and Swedish files with the English file
   - `translations:ci` Fail builds when translations are outdated
 
+### JSON structure for translations files
+
+Translations are stored in flat JSON files named `translations.json`, with one file for each supported language. The JSON files consist of key-value pairs, where the key is a unique identifier for the translation and the value is the actual translated string.  The translation keys within these files can be structured using a dot notation, like `bookDetails.publisher`, but using this structure is optional. Nesting is not used, which makes it easier to retrieve and sort the translations.
+
+Example content of a `translations.json` file:
+
+```json
+{
+  "book": "Book",
+  "bookDetails": "Book details",
+  "bookDetails.publisher": "Publisher",
+  "bookDetails.title": "Title",
+  "bookDetails.author": "Author",
+  "status.availableToBorrow": "This book is available to borrow"
+}
+```
+
 ### Translation process
 
 To extract translation keys from your component source code and to update the `translations.json` files, follow these steps:
