@@ -367,6 +367,12 @@ When creating links using `<Link>`, you don't need to worry about whether it is 
 
 Overview of the translation setup in the E-kirjasto application
 
+### Packages used for translations
+
+The E-kirjasto application utilizes the following packages for internationalization (i18n):
+
+- **i18next**: an internationalization framework for JavaScript
+
 # Deploying
 
 This repository includes a Dockerfile, and the master branch is built as an image in Docker Hub in the Hub repository [thepalaceproject/web-patron](https://hub.docker.com/r/thepalaceproject/web-patron). You can deploy the application simply by running the image from Docker Hub. You can either use the `latest` tag in Docker Hub, or a specific version tagged with the version number. There will also be an image tagged `beta` for the most recent code on the `beta` branch.
