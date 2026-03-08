@@ -22,6 +22,13 @@ export default function useLoginRedirectUrl() {
   const isFullUrl = nextPath?.startsWith("http");
   // if the redirect url is the home page, choose the catalog root instead
   const isHomePage = nextPath === "/";
+  // if the redirect url is the signed-out page, redirect to catalog root instead
+  // (logging in should never return you to the "important security notice" page)
+  const isSignedOutPage = nextPath?.includes("/signed-out");
+  // if the redirect url contains performSignOut, reject it — after OIDC login the CM
+  // would redirect back to that URL, the SignOut effect would fire, and the user would
+  // be signed out immediately
+  const hasPerformSignOut = nextPath?.includes("performSignOut");
 
   // Check if redirect is to an auth-protected page
   const isAuthProtectedPage = nextPath?.includes("/loans");
@@ -37,7 +44,7 @@ export default function useLoginRedirectUrl() {
 
   // Go to catalog root if nextPath is invalid or would cause a loop.
   const successPath =
-    !nextPath || isLoginPath || isHomePage || isFullUrl || wouldCreateLoop
+    !nextPath || isLoginPath || isHomePage || isFullUrl || wouldCreateLoop || isSignedOutPage || hasPerformSignOut
       ? catalogRootPath
       : nextPath;
 
