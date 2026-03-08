@@ -96,6 +96,7 @@ export interface ClientOidcMethod extends OPDS1.AuthMethod<
   typeof OPDS1.OidcAuthType
 > {
   href: string;
+  logoutHref?: string;
   id: string;
 }
 export interface ClientCleverMethod extends OPDS1.CleverAuthMethod {

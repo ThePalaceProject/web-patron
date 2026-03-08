@@ -339,7 +339,7 @@ export type OidcLink = {
       value: string;
     }
   ];
-  rel: "authenticate";
+  rel: "authenticate" | "logout";
   information_urls: [];
 };
 
