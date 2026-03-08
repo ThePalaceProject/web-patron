@@ -143,6 +143,26 @@ test("filters out unsupported method and redirects to first supported auth metho
   );
 });
 
+test("strips performSignOut from login URL query params", () => {
+  setup(<Login />, {
+    library: {
+      ...fixtures.libraryData,
+      authMethods: oneAuthMethod
+    },
+    router: {
+      query: {
+        // performSignOut must not be forwarded — it would trigger an immediate
+        // sign-out on the login page via the SignOut useEffect
+        performSignOut: "true"
+      }
+    }
+  });
+
+  expect(mockPush).toHaveBeenCalledTimes(1);
+  const [loginUrl] = mockPush.mock.calls[0];
+  expect((loginUrl as any).query).not.toHaveProperty("performSignOut");
+});
+
 test("preserves nextUrl query param on redirection", () => {
   setup(<Login />, {
     library: {

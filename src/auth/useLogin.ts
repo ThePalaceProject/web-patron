@@ -19,9 +19,11 @@ export default function useLogin() {
         ? "/[library]/login/[methodId]"
         : "/[library]/login";
 
-      // preserves existing query parameters, but filter out 'error' to prevent loops
-      // (error param comes from backend redirects and should not be copied to login URL)
-      const { error: _, ...cleanQuery } = query;
+      // preserves existing query parameters, but filter out params that must not
+      // travel through the login flow:
+      // - 'error' comes from backend redirects and would cause loops
+      // - 'performSignOut' would trigger an immediate sign-out on the login page
+      const { error: _, performSignOut: __, ...cleanQuery } = query;
       const newQuery = methodId ? { ...cleanQuery, methodId } : cleanQuery;
       // make sure that library is set (it is not already set on home page).
       newQuery.library = slug;
