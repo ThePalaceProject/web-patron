@@ -89,7 +89,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   };
 
   const token = stringifyToken(credentials);
-  const { data, mutate, isValidating } = useSWR(
+  const { data, mutate, isValidating, error: loansError } = useSWR(
     // pass null if there are no credentials or shelfUrl to tell SWR not to fetch at all.
     credentials && shelfUrl ? [shelfUrl, token, credentials?.methodType] : null,
     fetchLoans,
@@ -217,11 +217,19 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 
   /**
    * We should only ever be in one of these three states.
+   *
+   * "loading" covers both the case where SWR is actively fetching AND the brief
+   * window between when credentials are established (from cookie) and when SWR
+   * has started its first fetch (isValidating not yet true). We distinguish this
+   * from "unauthenticated" using loansError: if credentials exist but no fetch
+   * has returned an error yet, we're still loading. This prevents the Sign In
+   * button from flashing briefly on page navigation and stops AuthProtectedRoute
+   * from firing initLogin() before the first fetch result is known.
    */
   const status: Status =
     data && credentials
       ? "authenticated"
-      : credentials && isValidating
+      : credentials && (isValidating || !loansError)
         ? "loading"
         : "unauthenticated";
 
