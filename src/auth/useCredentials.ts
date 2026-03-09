@@ -94,8 +94,19 @@ export default function useCredentials(slug: string | null) {
     }
   }, [urlToken, urlMethodType, setCredentials]);
 
+  // When URL credentials are detected during render, make them available
+  // immediately (before the effect above fires) so that child components like
+  // AuthProtectedRoute don't see an empty token and redirect to login before
+  // the credentials are persisted to state/cookie. React fires child effects
+  // before parent effects, so without this the race would cause a spurious
+  // redirect to the login page on every OIDC/SAML callback.
+  const pendingUrlCredentials: AuthCredentials | undefined =
+    urlToken && urlMethodType
+      ? { token: urlToken, methodType: urlMethodType }
+      : undefined;
+
   return {
-    credentials: credentialsState,
+    credentials: credentialsState ?? pendingUrlCredentials,
     setCredentials,
     clearCredentials: clear
   };
