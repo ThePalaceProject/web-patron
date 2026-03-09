@@ -48,21 +48,36 @@ export const SignOut: React.FC<SignOutProps> = ({
       ) as ClientOidcMethod | undefined;
 
       if (oidcMethod?.logoutHref && token) {
+        // Always clear local credentials first, regardless of whether the
+        // server-side logout succeeds.
+        signOut();
+
+        const signedOutUrl = `${window.location.origin}${buildMultiLibraryLink("/signed-out")}`;
+
         // Build the post-logout redirect URI (where we'll be redirected after logout)
-        const postLogoutRedirectUri = `${window.location.origin}${buildMultiLibraryLink("/")}?performSignOut=true`;
+        const postLogoutRedirectUri = signedOutUrl;
 
         // Construct the logout URL with required parameters
         const logoutUrl = new URL(oidcMethod.logoutHref);
         logoutUrl.searchParams.set("post_logout_redirect_uri", postLogoutRedirectUri);
 
-        // Send the logout request with Authorization header so the backend can
-        // identify the user and invalidate the token
-        const response = await fetch(logoutUrl.toString(), {
-          headers: { Authorization: token }
-        });
+        try {
+          // Send the logout request with Authorization header so the backend can
+          // identify the user and invalidate the token
+          const response = await fetch(logoutUrl.toString(), {
+            headers: { Authorization: token }
+          });
 
-        // Navigate to wherever the server directed us (IdP logout or post_logout_redirect_uri)
-        window.location.href = response.url || postLogoutRedirectUri;
+          // Navigate to wherever the server directed us (IdP logout or post_logout_redirect_uri)
+          window.location.href = response.url || signedOutUrl;
+        } catch {
+          // Alert the user that logout encountered an error, but treat them as
+          // signed out locally since we already cleared credentials above.
+          window.alert(
+            "Sign out encountered an error, but you have been signed out locally."
+          );
+          window.location.href = signedOutUrl;
+        }
         return;
       }
     }
