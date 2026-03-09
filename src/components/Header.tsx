@@ -10,10 +10,15 @@ import Stack from "./Stack";
 import { AccountMenu } from "./AccountMenu";
 import useUser from "components/context/UserContext";
 import useLogin from "auth/useLogin";
+<<<<<<< HEAD
 import ClientOnly from "./ClientOnly";
+=======
+import { useTranslation } from "next-i18next";
+>>>>>>> b1d9ba13 (EKIRJASTO-771 Add example translation)
 
 const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
   const library = useLibraryContext();
+  const { t } = useTranslation();
 
   return (
     <header
@@ -26,6 +31,8 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
       }}
       className={className}
     >
+      {/* Temporary example string to test translations */}
+      <Text>{t("hello")}</Text>
       <Link
         href="/"
         aria-label="Go to catalog home page"
