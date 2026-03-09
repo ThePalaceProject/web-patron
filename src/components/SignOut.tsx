@@ -59,7 +59,10 @@ export const SignOut: React.FC<SignOutProps> = ({
 
         // Construct the logout URL with required parameters
         const logoutUrl = new URL(oidcMethod.logoutHref);
-        logoutUrl.searchParams.set("post_logout_redirect_uri", postLogoutRedirectUri);
+        logoutUrl.searchParams.set(
+          "post_logout_redirect_uri",
+          postLogoutRedirectUri
+        );
 
         try {
           // Send the logout request with Authorization header so the backend can

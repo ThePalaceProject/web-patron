@@ -63,7 +63,9 @@ function serverToClientOidcMethod(
 ): ClientOidcMethod | null {
   if (!oidcMethod.links || oidcMethod.links.length === 0) return null;
 
-  const authenticateLink = oidcMethod.links.find(link => link.rel === "authenticate");
+  const authenticateLink = oidcMethod.links.find(
+    link => link.rel === "authenticate"
+  );
   const logoutLink = oidcMethod.links.find(link => link.rel === "logout");
 
   if (!authenticateLink) return null;
