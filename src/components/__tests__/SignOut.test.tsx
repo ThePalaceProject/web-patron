@@ -2,7 +2,7 @@ import * as React from "react";
 import { jest } from "@jest/globals";
 import { fixtures, screen, setup, waitFor } from "../../test-utils";
 import { SignOut } from "components/SignOut";
-import { OPDS1 } from "interfaces";
+import { OPDS1, ClientOidcMethod } from "interfaces";
 import { mockPush } from "../../test-utils/mockNextRouter";
 import fetchMock from "jest-fetch-mock";
 
@@ -69,7 +69,7 @@ test("signs out on click signout", async () => {
 
 describe("OIDC logout with logout endpoint", () => {
   const logoutHref = "http://example.com/oidc/logout?provider=Test";
-  const oidcMethod = {
+  const oidcMethod: ClientOidcMethod = {
     type: OPDS1.OidcAuthType,
     id: "oidc-1",
     href: "http://example.com/oidc/authenticate",
@@ -82,10 +82,10 @@ describe("OIDC logout with logout endpoint", () => {
       credentials: {
         token: "Bearer test-token",
         methodType: OPDS1.OidcAuthType
-      }
+      } as const
     },
     library: {
-      ...fixtures.library,
+      ...fixtures.libraryData,
       authMethods: [oidcMethod]
     }
   };
@@ -99,7 +99,7 @@ describe("OIDC logout with logout endpoint", () => {
   });
 
   afterEach(() => {
-    window.location = originalLocation;
+    (window as any).location = originalLocation;
   });
 
   test("clears local credentials immediately before fetching logout endpoint", async () => {
@@ -179,7 +179,7 @@ describe("OIDC logout with logout endpoint", () => {
 });
 
 test("falls back to local signout for OIDC without logout link", async () => {
-  const oidcMethod = {
+  const oidcMethod: ClientOidcMethod = {
     type: OPDS1.OidcAuthType,
     id: "oidc-1",
     href: "http://example.com/oidc/authenticate",
@@ -192,10 +192,10 @@ test("falls back to local signout for OIDC without logout link", async () => {
       credentials: {
         token: "Bearer test-token",
         methodType: OPDS1.OidcAuthType
-      }
+      } as const
     },
     library: {
-      ...fixtures.library,
+      ...fixtures.libraryData,
       authMethods: [oidcMethod]
     }
   });

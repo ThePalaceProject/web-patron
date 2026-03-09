@@ -44,7 +44,13 @@ export default function useLoginRedirectUrl() {
 
   // Go to catalog root if nextPath is invalid or would cause a loop.
   const successPath =
-    !nextPath || isLoginPath || isHomePage || isFullUrl || wouldCreateLoop || isSignedOutPage || hasPerformSignOut
+    !nextPath ||
+    isLoginPath ||
+    isHomePage ||
+    isFullUrl ||
+    wouldCreateLoop ||
+    isSignedOutPage ||
+    hasPerformSignOut
       ? catalogRootPath
       : nextPath;
 

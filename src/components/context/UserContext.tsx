@@ -89,7 +89,12 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   };
 
   const token = stringifyToken(credentials);
-  const { data, mutate, isValidating, error: loansError } = useSWR(
+  const {
+    data,
+    mutate,
+    isValidating,
+    error: loansError
+  } = useSWR(
     // pass null if there are no credentials or shelfUrl to tell SWR not to fetch at all.
     credentials && shelfUrl ? [shelfUrl, token, credentials?.methodType] : null,
     fetchLoans,

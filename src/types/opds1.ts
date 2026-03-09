@@ -180,7 +180,8 @@ type AuthDocLinkRelations =
   | "terms-of-service"
   | "about"
   | "alternate"
-  | "authenticate";
+  | "authenticate"
+  | "logout";
 
 export interface AuthDocumentLink extends Link {
   rel: AuthDocLinkRelations;
