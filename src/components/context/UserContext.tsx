@@ -224,12 +224,16 @@ export const UserProvider = ({ children }: UserProviderProps) => {
    * We should only ever be in one of these three states.
    *
    * "loading" covers both the case where SWR is actively fetching AND the brief
-   * window between when credentials are established (from cookie) and when SWR
+   * window between when credentials are established (from storage) and when SWR
    * has started its first fetch (isValidating not yet true). We distinguish this
    * from "unauthenticated" using loansError: if credentials exist but no fetch
    * has returned an error yet, we're still loading. This prevents the Sign In
    * button from flashing briefly on page navigation and stops AuthProtectedRoute
    * from firing initLogin() before the first fetch result is known.
+   *
+   * Note: a non-401 loans fetch error (e.g. network error) sets loansError
+   * without clearing credentials (onError only clears on 401). In that case
+   * `!loansError` becomes false and status falls through to "unauthenticated".
    */
   const status: Status =
     data && credentials

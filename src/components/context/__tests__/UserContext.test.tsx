@@ -82,8 +82,8 @@ test("extracts clever tokens from the url", () => {
   );
 
   expect(Cookie.set).toHaveBeenCalledTimes(1);
-  expect(Cookie.set).toHaveBeenCalledWith(
-    "CPW_AUTH_COOKIE/testlib",
+  expect(Cookie.set).toHaveBeenCalledWith("CPW_AUTH_COOKIE/testlib", "1");
+  expect(localStorage.getItem("CPW_AUTH_COOKIE/testlib")).toBe(
     str({ token: "Bearer fry6H3", methodType: OPDS1.CleverAuthType })
   );
   expect(mockSWR).toHaveBeenCalledWith(
@@ -125,8 +125,8 @@ test("extracts SAML tokens from the url", () => {
   );
 
   expect(Cookie.set).toHaveBeenCalledTimes(1);
-  expect(Cookie.set).toHaveBeenCalledWith(
-    "CPW_AUTH_COOKIE/testlib",
+  expect(Cookie.set).toHaveBeenCalledWith("CPW_AUTH_COOKIE/testlib", "1");
+  expect(localStorage.getItem("CPW_AUTH_COOKIE/testlib")).toBe(
     str({ token: "Bearer saml-token", methodType: OPDS1.SamlAuthType })
   );
 
@@ -173,8 +173,8 @@ test("extracts OIDC tokens when only OIDC is configured", () => {
   );
 
   expect(Cookie.set).toHaveBeenCalledTimes(1);
-  expect(Cookie.set).toHaveBeenCalledWith(
-    "CPW_AUTH_COOKIE/testlib",
+  expect(Cookie.set).toHaveBeenCalledWith("CPW_AUTH_COOKIE/testlib", "1");
+  expect(localStorage.getItem("CPW_AUTH_COOKIE/testlib")).toBe(
     str({ token: "Bearer oidc-token", methodType: OPDS1.OidcAuthType })
   );
 
@@ -215,8 +215,8 @@ test("extracts SAML tokens when only SAML is configured", () => {
   });
 
   expect(Cookie.set).toHaveBeenCalledTimes(1);
-  expect(Cookie.set).toHaveBeenCalledWith(
-    "CPW_AUTH_COOKIE/testlib",
+  expect(Cookie.set).toHaveBeenCalledWith("CPW_AUTH_COOKIE/testlib", "1");
+  expect(localStorage.getItem("CPW_AUTH_COOKIE/testlib")).toBe(
     str({ token: "Bearer saml-token", methodType: OPDS1.SamlAuthType })
   );
 
@@ -250,9 +250,9 @@ test("uses SAML when it comes first in auth methods (both OIDC and SAML configur
   });
 
   expect(Cookie.set).toHaveBeenCalledTimes(1);
+  expect(Cookie.set).toHaveBeenCalledWith("CPW_AUTH_COOKIE/testlib", "1");
   // Should use SAML because it's the first redirect-based auth method
-  expect(Cookie.set).toHaveBeenCalledWith(
-    "CPW_AUTH_COOKIE/testlib",
+  expect(localStorage.getItem("CPW_AUTH_COOKIE/testlib")).toBe(
     str({ token: "Bearer redirect-token", methodType: OPDS1.SamlAuthType })
   );
 
@@ -286,9 +286,9 @@ test("uses OIDC when it comes first in auth methods (both OIDC and SAML configur
   });
 
   expect(Cookie.set).toHaveBeenCalledTimes(1);
+  expect(Cookie.set).toHaveBeenCalledWith("CPW_AUTH_COOKIE/testlib", "1");
   // Should use OIDC because it's the first redirect-based auth method
-  expect(Cookie.set).toHaveBeenCalledWith(
-    "CPW_AUTH_COOKIE/testlib",
+  expect(localStorage.getItem("CPW_AUTH_COOKIE/testlib")).toBe(
     str({ token: "Bearer redirect-token", methodType: OPDS1.OidcAuthType })
   );
 
@@ -328,9 +328,10 @@ test("sign out clears cookies and data", async () => {
   // now sign out
   act(() => extractedSignOut());
 
-  // should have removed cookie
+  // should have removed session marker cookie and localStorage entry
   expect(Cookie.remove).toHaveBeenCalledTimes(1);
   expect(Cookie.remove).toHaveBeenCalledWith("CPW_AUTH_COOKIE/testlib");
+  expect(localStorage.getItem("CPW_AUTH_COOKIE/testlib")).toBeNull();
 
   // data should be revalidated
   expect(mutateMock).toHaveBeenCalledTimes(1);
@@ -360,8 +361,8 @@ test("sign in sets cookie", async () => {
   act(() => extractedSignIn("a-token", { type: "type" }));
 
   expect(mockCookie.set).toHaveBeenCalledTimes(1);
-  expect(mockCookie.set).toHaveBeenCalledWith(
-    "CPW_AUTH_COOKIE/testlib",
+  expect(mockCookie.set).toHaveBeenCalledWith("CPW_AUTH_COOKIE/testlib", "1");
+  expect(localStorage.getItem("CPW_AUTH_COOKIE/testlib")).toBe(
     str({ token: "a-token", methodType: "type" })
   );
 

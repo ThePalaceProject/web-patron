@@ -99,18 +99,14 @@ test("submit by clicking login button", async () => {
   // we wrap this in waitFor because the handleSubmit from react-hook-form has
   // async code in it
   await waitFor(() => {
-    // we set the cookie
+    // session marker cookie set; full credentials stored in localStorage
     expect(Cookie.set).toHaveBeenCalledTimes(1);
-    expect(Cookie.set).toHaveBeenCalledWith(
-      // the library slug is null because we are only running with one library
-      "CPW_AUTH_COOKIE/testlib",
-      JSON.stringify({
-        token,
-        methodType: OPDS1.BasicAuthType
-      })
+    expect(Cookie.set).toHaveBeenCalledWith("CPW_AUTH_COOKIE/testlib", "1");
+    expect(localStorage.getItem("CPW_AUTH_COOKIE/testlib")).toBe(
+      JSON.stringify({ token, methodType: OPDS1.BasicAuthType })
     );
 
-    // we also trigger a loans request with the cookie
+    // we also trigger a loans request with the stored credentials
     expect(fetchMock).toHaveBeenCalledWith("/shelf-url", {
       headers: {
         Authorization: token,
@@ -136,8 +132,10 @@ test("displays client error when inputs are unfilled", async () => {
 });
 
 test("displays server error", async () => {
-  // set fake credentials in the cookie to trigger a fetch
-  mockCookie.get.mockReturnValueOnce(
+  // set fake credentials to trigger a fetch
+  mockCookie.set("CPW_AUTH_COOKIE/testlib", "1");
+  localStorage.setItem(
+    "CPW_AUTH_COOKIE/testlib",
     JSON.stringify({ token: "token", methodType: "/type" })
   );
   const problemdoc: OPDS1.ProblemDocument = {
@@ -225,18 +223,14 @@ test("submits with no password input", async () => {
   // we wrap this in waitFor because the handleSubmit from react-hook-form has
   // async code in it
   await waitFor(() => {
-    // we set the cookie
+    // session marker cookie set; full credentials stored in localStorage
     expect(Cookie.set).toHaveBeenCalledTimes(1);
-    expect(Cookie.set).toHaveBeenCalledWith(
-      // the library slug is null because we are only running with one library
-      "CPW_AUTH_COOKIE/testlib",
-      JSON.stringify({
-        token,
-        methodType: OPDS1.BasicAuthType
-      })
+    expect(Cookie.set).toHaveBeenCalledWith("CPW_AUTH_COOKIE/testlib", "1");
+    expect(localStorage.getItem("CPW_AUTH_COOKIE/testlib")).toBe(
+      JSON.stringify({ token, methodType: OPDS1.BasicAuthType })
     );
 
-    // we also trigger a loans request with the cookie
+    // we also trigger a loans request with the stored credentials
     expect(fetchMock).toHaveBeenCalledWith("/shelf-url", {
       headers: {
         Authorization: token,

@@ -70,8 +70,9 @@ function serverToClientOidcMethod(
 
   if (!authenticateLink) return null;
 
+  // The authenticate link href serves as the unique ID.
   return {
-    id: authenticateLink.href, // Use href as unique ID
+    id: authenticateLink.href,
     href: authenticateLink.href,
     logoutHref: logoutLink?.href,
     type: oidcMethod.type,

@@ -139,13 +139,12 @@ test("submit by clicking login button", async () => {
   // we wrap this in waitFor because the handleSubmit from react-hook-form has
   // async code in it
   await waitFor(() => {
-    // we set the cookie
+    // session marker cookie set; full credentials stored in localStorage
     expect(Cookie.set).toHaveBeenCalledTimes(1);
-    const [credentialsKey, credentialsValue] = (Cookie.set as jest.Mock).mock
-      .calls[0];
-
-    expect(credentialsKey).toEqual("CPW_AUTH_COOKIE/testlib");
-    const parsed = JSON.parse(credentialsValue);
+    expect(Cookie.set).toHaveBeenCalledWith("CPW_AUTH_COOKIE/testlib", "1");
+    const stored = localStorage.getItem("CPW_AUTH_COOKIE/testlib");
+    expect(stored).not.toBeNull();
+    const parsed = JSON.parse(stored!);
     expect(parsed).toMatchObject({
       token: {
         basicToken: basicToken,

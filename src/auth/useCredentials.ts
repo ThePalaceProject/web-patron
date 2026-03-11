@@ -15,7 +15,7 @@ import useLibraryContext from "components/context/LibraryContext";
  *    changes to the credentials causes a re-render. Just
  *    changing the cookie wouldn't do this.
  *  - Searches for credentials embedded in the browser url. If
- *    if finds a token, it extracts it and sets it as the current
+ *    it finds a token, it extracts it and sets it as the current
  *    credentials.
  */
 export default function useCredentials(slug: string | null) {
@@ -24,26 +24,26 @@ export default function useCredentials(slug: string | null) {
   const { authMethods } = useLibraryContext();
   const [credentialsState, setCredentialsState] = React.useState<
     AuthCredentials | undefined
-  >(getCredentialsCookie(slug));
-  // sync up cookie state with react state
+  >(getCredentialStorage(slug));
+  // sync up stored state with react state
   React.useEffect(() => {
-    const cookie = getCredentialsCookie(slug);
-    if (cookie) setCredentialsState(cookie);
+    const stored = getCredentialStorage(slug);
+    if (stored) setCredentialsState(stored);
   }, [slug]);
 
-  // set both cookie and state credentials
+  // set both storage and state credentials
   const setCredentials = React.useCallback(
     (creds: AuthCredentials) => {
       setCredentialsState(creds);
-      setCredentialsCookie(slug, creds);
+      setCredentialStorage(slug, creds);
     },
     [slug]
   );
 
-  // clear both cookie and state credentials
+  // clear both storage and state credentials
   const clear = React.useCallback(() => {
     setCredentialsState(undefined);
-    clearCredentialsCookie(slug);
+    clearCredentialStorage(slug);
   }, [slug]);
 
   // Check for SAML/Clever error in URL and redirect to login with error message.
@@ -94,12 +94,11 @@ export default function useCredentials(slug: string | null) {
     }
   }, [urlToken, urlMethodType, setCredentials]);
 
-  // When URL credentials are detected during render, make them available
-  // immediately (before the effect above fires) so that child components like
-  // AuthProtectedRoute don't see an empty token and redirect to login before
-  // the credentials are persisted to state/cookie. React fires child effects
-  // before parent effects, so without this the race would cause a spurious
-  // redirect to the login page on every OIDC/SAML callback.
+  // URL credentials are exposed synchronously so child components (e.g.
+  // AuthProtectedRoute) don't redirect to login before the useEffect above
+  // persists them to state/storage. React runs child effects before parent
+  // effects, which would otherwise cause a spurious redirect on every
+  // OIDC/SAML callback.
   const pendingUrlCredentials: AuthCredentials | undefined =
     urlToken && urlMethodType
       ? { token: urlToken, methodType: urlMethodType }
@@ -113,33 +112,52 @@ export default function useCredentials(slug: string | null) {
 }
 
 /**
- * COOKIE CREDENTIALS
+ * CREDENTIALS STORAGE
+ *
+ * Desired behavior:
+ *  - No size limit (large OIDC JWTs fit comfortably);
+ *  - Shared across tabs within the same browser session;
+ *  - Automatically expire when the browser is closed.
+ *
+ * Since some credentials (e.g., OIDC bearer token JWTs) can be too large to
+ * store in a cookie, we store our credentials in Local Storage. However,
+ * Local Storage persists across browser sessions. To get the desired
+ * behavior we compliment it with a companion session cookie acting as an
+ * "active" marker. Because session cookies are cleared when the browser is
+ * closed, we check for the marker on load: if it is absent, then thebrowser
+ * was closed, so we discard the inactive localStorage entry.
  */
-/**
- * If you pass a librarySlug, the cookie will be scoped to the
- * library you are viewing. This is useful in a multi library setup.
- */
-function cookieName(librarySlug: string | null): string {
-  const AUTH_COOKIE_NAME = "CPW_AUTH_COOKIE";
-  return `${AUTH_COOKIE_NAME}/${librarySlug}`;
+function storageKey(librarySlug: string | null): string {
+  return `CPW_AUTH_COOKIE/${librarySlug}`;
 }
 
-function getCredentialsCookie(
+function getCredentialStorage(
   librarySlug: string | null
 ): AuthCredentials | undefined {
-  const credentials = Cookie.get(cookieName(librarySlug));
-  return credentials ? JSON.parse(credentials) : undefined;
+  if (IS_SERVER) return undefined;
+  // Absent session marker means the browser was closed; discard stale entry.
+  if (!Cookie.get(storageKey(librarySlug))) {
+    localStorage.removeItem(storageKey(librarySlug));
+    return undefined;
+  }
+  const raw = localStorage.getItem(storageKey(librarySlug));
+  return raw ? JSON.parse(raw) : undefined;
 }
 
-function setCredentialsCookie(
+function setCredentialStorage(
   librarySlug: string | null,
   credentials: AuthCredentials
 ) {
-  Cookie.set(cookieName(librarySlug), JSON.stringify(credentials));
+  if (IS_SERVER) return;
+  localStorage.setItem(storageKey(librarySlug), JSON.stringify(credentials));
+  // Session cookie (no expiry) serves as the activeness marker.
+  Cookie.set(storageKey(librarySlug), "1");
 }
 
-function clearCredentialsCookie(librarySlug: string | null) {
-  Cookie.remove(cookieName(librarySlug));
+function clearCredentialStorage(librarySlug: string | null) {
+  if (IS_SERVER) return;
+  localStorage.removeItem(storageKey(librarySlug));
+  Cookie.remove(storageKey(librarySlug));
 }
 
 export function generateToken(username: string, password?: string) {

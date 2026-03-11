@@ -23,23 +23,24 @@ export default function useLoginRedirectUrl() {
   // if the redirect url is the home page, choose the catalog root instead
   const isHomePage = nextPath === "/";
   // if the redirect url is the signed-out page, redirect to catalog root instead
-  // (logging in should never return you to the "important security notice" page)
   const isSignedOutPage = nextPath?.includes("/signed-out");
-  // if the redirect url contains performSignOut, reject it — after OIDC login the CM
-  // would redirect back to that URL, the SignOut effect would fire, and the user would
-  // be signed out immediately
-  const hasPerformSignOut = nextPath?.includes("performSignOut");
+  const hasPerformSignOut = (() => {
+    if (!nextPath) return false;
+    try {
+      // Use a dummy base so relative paths parse correctly on the server.
+      return new URL(nextPath, "http://x").searchParams.has("performSignOut");
+    } catch {
+      return false;
+    }
+  })();
 
-  // Check if redirect is to an auth-protected page
   const isAuthProtectedPage = nextPath?.includes("/loans");
 
-  // Check if there's a login error (indicates auth just failed).
-  // Check both loginError (from our code) and error (from backend redirect).
+  // loginError is set by our code; error comes from backend redirects.
   const hasLoginError = query.loginError || query.error;
 
-  // If we have an error AND we're trying to redirect to an auth-protected page,
-  // this would create a loop, which we can avoid by redirecting to the
-  // catalog page, if necessary (see below).
+  // Redirecting to a protected page after a login failure would restart the
+  // auth flow and create a loop.
   const wouldCreateLoop = isAuthProtectedPage && hasLoginError;
 
   // Go to catalog root if nextPath is invalid or would cause a loop.

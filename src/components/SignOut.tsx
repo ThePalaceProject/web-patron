@@ -23,14 +23,12 @@ export const SignOut: React.FC<SignOutProps> = ({
   const { buildMultiLibraryLink } = useLinkUtils();
   const { authMethods } = useLibraryContext();
 
-  // Check if we should sign out (from query param after navigation).
-  // This should be the case for SAML, Clever, or OIDC auth after logout redirect.
+  // Handles deferred sign-out: redirect-based auth methods (SAML, Clever, OIDC)
+  // navigate to an unprotected page with performSignOut=true before clearing
+  // credentials, ensuring the auth flow is not restarted mid-signout.
   React.useEffect(() => {
     if (router.query.performSignOut === "true") {
-      // We're on a non-protected page, it's safe to sign out.
       signOut();
-
-      // Redirect to the signed-out warning page.
       router.replace(buildMultiLibraryLink("/signed-out"));
     }
   }, [router.query.performSignOut, signOut, router, buildMultiLibraryLink]);
@@ -48,34 +46,37 @@ export const SignOut: React.FC<SignOutProps> = ({
       ) as ClientOidcMethod | undefined;
 
       if (oidcMethod?.logoutHref && token) {
-        // Always clear local credentials first, regardless of whether the
-        // server-side logout succeeds.
+        // Local credentials are cleared eagerly before the server-side request.
         signOut();
 
         const signedOutUrl = `${window.location.origin}${buildMultiLibraryLink("/signed-out")}`;
 
-        // Build the post-logout redirect URI (where we'll be redirected after logout)
-        const postLogoutRedirectUri = signedOutUrl;
-
-        // Construct the logout URL with required parameters
         const logoutUrl = new URL(oidcMethod.logoutHref);
-        logoutUrl.searchParams.set(
-          "post_logout_redirect_uri",
-          postLogoutRedirectUri
-        );
+        logoutUrl.searchParams.set("post_logout_redirect_uri", signedOutUrl);
 
         try {
-          // Send the logout request with Authorization header so the backend can
-          // identify the user and invalidate the token
+          /**
+           * The Authorization header lets the backend identify and invalidate
+           * the token. redirect: "manual" captures the first redirect without
+           * following the full chain — the chain may include the IdP's
+           * end_session endpoint, which requires a real browser navigation
+           * (with cookies) to terminate the IdP session. For cross-origin
+           * redirects the browser returns an opaque response and the Location
+           * header is unreadable, so we fall back to our own signed-out page.
+           */
           const response = await fetch(logoutUrl.toString(), {
-            headers: { Authorization: token }
+            headers: { Authorization: token },
+            redirect: "manual"
           });
 
-          // Navigate to wherever the server directed us (IdP logout or post_logout_redirect_uri)
-          window.location.href = response.url || signedOutUrl;
+          const targetUrl =
+            response.type !== "opaqueredirect"
+              ? response.url || signedOutUrl
+              : signedOutUrl;
+
+          window.location.href = targetUrl;
         } catch {
-          // Alert the user that logout encountered an error, but treat them as
-          // signed out locally since we already cleared credentials above.
+          // Local sign-out succeeded; notify user that server-side logout failed.
           window.alert(
             "Sign out encountered an error, but you have been signed out locally."
           );
@@ -85,9 +86,8 @@ export const SignOut: React.FC<SignOutProps> = ({
       }
     }
 
-    // For SAML/Clever/OIDC (without logout support), we need to navigate to a page
-    // that doesn't require authentication, so that the page doesn't restart the
-    // authentication flow. For these mechanisms, we explicitly indicate our intention to sign out.
+    // Redirect-based auth methods require navigating to an unprotected page
+    // before clearing credentials to avoid restarting the auth flow.
     if (
       methodType === OPDS1.SamlAuthType ||
       methodType === OPDS1.CleverAuthType ||
@@ -120,12 +120,8 @@ export const SignOut: React.FC<SignOutProps> = ({
           <Button variant="ghost" color="ui.gray.dark" onClick={dialog.hide}>
             Cancel
           </Button>
-          <Button
-            color="ui.error"
-            onClick={signOutAndClose}
-            aria-label="Confirm Sign Out"
-          >
-            Sign out
+          <Button color="ui.error" onClick={signOutAndClose}>
+            Confirm Sign Out
           </Button>
         </Stack>
       </Modal>

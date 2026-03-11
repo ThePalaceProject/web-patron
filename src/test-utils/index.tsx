@@ -25,6 +25,7 @@ expect.addSnapshotSerializer(serializer);
 // standard config mock
 beforeEach(() => {
   mockConfig();
+  localStorage.clear();
 });
 
 // mock the error tracker to prevent unnecessary console logs
