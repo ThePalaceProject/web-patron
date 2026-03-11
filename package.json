@@ -29,7 +29,12 @@
     "type-check": "tsc --noEmit",
     "generate-icons": "npx @svgr/cli --template src/icons/_template.js --typescript --icon --ext tsx --svg-props 'fill=currentColor' -d src/icons src/icons",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "translations:ci": "npx i18next-cli extract --ci --dry-run",
+    "translations:extract": "npx i18next-cli extract",
+    "translations:lint": "npx i18next-cli lint",
+    "translations:status": "npx i18next-cli status",
+    "translations:sync": "npx i18next-cli sync"
   },
   "dependencies": {
     "@ariakit/react": "^0.4.13",

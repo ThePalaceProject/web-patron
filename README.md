@@ -405,6 +405,43 @@ Key settings:
   - `translations:sync` Sync Finnish and Swedish files with the English file
   - `translations:ci` Fail builds when translations are outdated
 
+### Translation process
+
+To extract translation keys from your component source code and to update the `translations.json` files, follow these steps:
+
+1. **Run the `lint` command (optional)**  
+
+    ```bash
+    npm run translations:lint
+    ```
+
+    This command prints a list of hardcoded strings, that are not yet wrapped in the translation function (`t`). These strings probably need to be translated, too.
+
+2. **Run the `extract` command**  
+
+   ```bash
+   npm run translations:extract
+   ```
+
+   This command will scan the specified directories for translation keys used in your components and update the three `translations.json` files in the `public/locales` directory.
+
+3. **Run the `sync` command (optional)**  
+
+   ```bash
+   npm run translations:sync
+   ```
+
+    This command will compare the Finnish (`fi`) and Swedish (`sv`) translation files against the English (`en`) file. It will add any missing keys from the English file to the Finnish and Swedish files and remove any extra keys that are not present in the English file.
+
+4. **Check the output**  
+  After running the commands, check the `translations.json` files that the new translation keys have been added correctly.
+
+5. **Add translations**  
+  Collaborate with the translators and add the translations for the keys in Finnish (`FI`) and Swedish (`SV`) and English (`EN`) to the `translations.json` files.
+
+6. **Save changes**  
+  Verify that the translations are correct and functioning as expected in the application. Then commit the updated translation files.
+
 # Deploying
 
 This repository includes a Dockerfile, and the master branch is built as an image in Docker Hub in the Hub repository [thepalaceproject/web-patron](https://hub.docker.com/r/thepalaceproject/web-patron). You can deploy the application simply by running the image from Docker Hub. You can either use the `latest` tag in Docker Hub, or a specific version tagged with the version number. There will also be an image tagged `beta` for the most recent code on the `beta` branch.
