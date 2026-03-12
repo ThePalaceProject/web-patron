@@ -5,7 +5,6 @@ import BreadcrumbBar from "./BreadcrumbBar";
 import { H2 } from "./Text";
 import { AnyBook } from "interfaces";
 import PageTitle from "./PageTitle";
-import { SignOut } from "./SignOut";
 import useUser from "components/context/UserContext";
 import { PageLoader } from "components/LoadingIndicator";
 import AuthProtectedRoute from "auth/AuthProtectedRoute";
@@ -86,7 +85,6 @@ const Empty = () => {
         <H2 variant="text.headers.tertiary">
           Your books will show up here when you have any loaned or on hold.
         </H2>
-        <SignOut />
       </div>
     </>
   );

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { render, fixtures, fireEvent } from "test-utils";
+import { render, fixtures } from "test-utils";
 import { MyBooks } from "../MyBooks";
 import { FulfillableBook } from "interfaces";
 
@@ -28,28 +28,6 @@ test("displays empty state when empty and signed in", async () => {
       "Your books will show up here when you have any loaned or on hold."
     )
   ).toBeInTheDocument();
-
-  expect(utils.getByText("Sign Out")).toBeInTheDocument();
-});
-
-test("sign out calls sign out", async () => {
-  const utils = render(<MyBooks />, {
-    user: {
-      isAuthenticated: true,
-      loans: undefined,
-      isLoading: false
-    }
-  });
-
-  expect(fixtures.mockSignOut).toHaveBeenCalledTimes(0);
-  const signOut = await utils.findByRole("button", { name: "Sign Out" });
-  fireEvent.click(signOut);
-
-  // now get the confirmation button
-  const realSignOut = utils.getByLabelText("Confirm Sign Out");
-  fireEvent.click(realSignOut);
-
-  expect(fixtures.mockSignOut).toHaveBeenCalledTimes(1);
 });
 
 const books: FulfillableBook[] = [
