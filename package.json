@@ -39,6 +39,7 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@nypl/design-system-react-components": "^0.7.2",
     "@nypl/dgx-svg-icons": "^0.3.12",
+    "@std-uritemplate/std-uritemplate": "^2.0.8",
     "@theme-ui/color": "^0.17.2",
     "@theme-ui/components": "^0.17.2",
     "@theme-ui/core": "^0.17.2",
