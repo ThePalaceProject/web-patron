@@ -6,7 +6,7 @@ import Stack from "./Stack";
 import useUser from "components/context/UserContext";
 import { styleProps } from "./Button/styles";
 import { OPDS1, ClientOidcMethod } from "interfaces";
-import { resolveLink, UriTemplateTerms } from "utils/opds";
+import { normalizeLink, UriTemplateTerms } from "utils/opds";
 import { useRouter } from "next/router";
 import useLinkUtils from "hooks/useLinkUtils";
 import useLibraryContext from "./context/LibraryContext";
@@ -62,13 +62,12 @@ export const SignOut: React.FC<SignOutProps> = ({
          * redirect-URI variable's semantic type; the fallback covers servers
          * that omit that map but still use the conventional variable name.
          */
-        const logoutUrl = resolveLink(
-          oidcMethod.logoutLink,
-          { [UriTemplateTerms.REDIRECT_URI]: signedOutUrl },
-          Object.fromEntries(
+        const { href: logoutUrl } = normalizeLink(oidcMethod.logoutLink, {
+          termValues: { [UriTemplateTerms.REDIRECT_URI]: signedOutUrl },
+          fallbacks: Object.fromEntries(
             SIGNOUT_URI_TEMPLATE_FALLBACK_VARIABLES.map(v => [v, signedOutUrl])
           )
-        );
+        });
 
         try {
           /**
