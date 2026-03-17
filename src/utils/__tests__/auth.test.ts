@@ -9,7 +9,7 @@ import {
   normalizeAuthMethods,
   getEnglishValue
 } from "../auth";
-import { OPDS1 } from "interfaces";
+import { ClientOidcMethod, OPDS1 } from "interfaces";
 
 describe("generateCredentials", () => {
   test("returns basic auth credentials for the username and password", () => {
@@ -182,6 +182,56 @@ describe("normalizeAuthMethods", () => {
       type: OPDS1.OidcAuthType,
       description: "Test OIDC"
     });
+  });
+
+  test("preserves full logoutLink object including template metadata", () => {
+    const logoutLink: OPDS1.OidcLink = {
+      href: "https://oidc.example.com/logout{&post_logout_redirect_uri}",
+      rel: "logout",
+      templated: true,
+      properties: {
+        uri_template_variables: {
+          type: "http://palaceproject.io/terms/uri-template/variables",
+          map: {
+            post_logout_redirect_uri:
+              "http://palaceproject.io/terms/redirect-uri"
+          }
+        }
+      },
+      display_names: [{ language: "en", value: "Test OIDC" }],
+      descriptions: [{ language: "en", value: "Description" }],
+      logo_urls: [],
+      privacy_statement_urls: [],
+      information_urls: []
+    };
+    const authDoc: OPDS1.AuthDocument = {
+      id: "test-auth-doc",
+      title: "Test Library",
+      authentication: [
+        {
+          type: OPDS1.OidcAuthType,
+          description: "OIDC Provider",
+          links: [
+            {
+              href: "https://oidc.example.com",
+              rel: "authenticate",
+              display_names: [{ language: "en", value: "Test OIDC" }],
+              descriptions: [{ language: "en", value: "Description" }],
+              logo_urls: [],
+              privacy_statement_urls: [],
+              information_urls: []
+            },
+            logoutLink
+          ]
+        }
+      ]
+    };
+
+    const result = normalizeAuthMethods(authDoc);
+
+    expect(result).toHaveLength(1);
+    const method = result[0] as ClientOidcMethod;
+    expect(method.logoutLink).toEqual(logoutLink);
   });
 
   test("uses first OIDC link only", () => {

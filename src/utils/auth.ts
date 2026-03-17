@@ -74,7 +74,7 @@ function serverToClientOidcMethod(
   return {
     id: authenticateLink.href,
     href: authenticateLink.href,
-    logoutHref: logoutLink?.href,
+    ...(logoutLink ? { logoutLink } : {}),
     type: oidcMethod.type,
     description:
       getEnglishValue(authenticateLink.display_names) ??

@@ -6,6 +6,7 @@ import Stack from "./Stack";
 import useUser from "components/context/UserContext";
 import { styleProps } from "./Button/styles";
 import { OPDS1, ClientOidcMethod } from "interfaces";
+import { resolveLink, UriTemplateTerms } from "utils/opds";
 import { useRouter } from "next/router";
 import useLinkUtils from "hooks/useLinkUtils";
 import useLibraryContext from "./context/LibraryContext";
@@ -13,6 +14,10 @@ import useLibraryContext from "./context/LibraryContext";
 interface SignOutProps {
   color?: string;
 }
+
+const SIGNOUT_URI_TEMPLATE_FALLBACK_VARIABLES = [
+  "post_logout_redirect_uri"
+] as const;
 
 export const SignOut: React.FC<SignOutProps> = ({
   color = "ui.black"
@@ -45,14 +50,25 @@ export const SignOut: React.FC<SignOutProps> = ({
         m => m.type === OPDS1.OidcAuthType
       ) as ClientOidcMethod | undefined;
 
-      if (oidcMethod?.logoutHref && token) {
+      if (oidcMethod?.logoutLink && token) {
         // Local credentials are cleared eagerly before the server-side request.
         signOut();
 
         const signedOutUrl = `${window.location.origin}${buildMultiLibraryLink("/signed-out")}`;
 
-        const logoutUrl = new URL(oidcMethod.logoutHref);
-        logoutUrl.searchParams.set("post_logout_redirect_uri", signedOutUrl);
+        /*
+         * Resolve the logout URL, expanding any URI template. The term value
+         * map handles servers that use uri_template_variables to declare the
+         * redirect-URI variable's semantic type; the fallback covers servers
+         * that omit that map but still use the conventional variable name.
+         */
+        const logoutUrl = resolveLink(
+          oidcMethod.logoutLink,
+          { [UriTemplateTerms.REDIRECT_URI]: signedOutUrl },
+          Object.fromEntries(
+            SIGNOUT_URI_TEMPLATE_FALLBACK_VARIABLES.map(v => [v, signedOutUrl])
+          )
+        );
 
         try {
           /**
@@ -65,7 +81,7 @@ export const SignOut: React.FC<SignOutProps> = ({
            * header is unreadable, so for now we always navigate to our own
            * signed-out page.
            */
-          await fetch(logoutUrl.toString(), {
+          await fetch(logoutUrl, {
             headers: { Authorization: token },
             redirect: "manual"
           });

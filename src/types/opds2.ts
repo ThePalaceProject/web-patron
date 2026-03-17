@@ -138,6 +138,20 @@ export interface CatalogRootFeedLink extends Link<
 > {}
 
 /**
+ * URI template variable extension (Palace Project).
+ * Maps template variable names to well-known term URIs so clients can resolve
+ * variable values by semantic type rather than by variable name.
+ */
+export interface UriTemplateVariableMap {
+  type: string;
+  map: Record<string, string>;
+}
+
+export interface UriTemplateProperties {
+  uri_template_variables?: UriTemplateVariableMap;
+}
+
+/**
  * Utility types
  */
 export type AnyObject = Record<string, unknown>;

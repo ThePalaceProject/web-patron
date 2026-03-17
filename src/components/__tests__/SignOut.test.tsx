@@ -67,12 +67,32 @@ test("signs out on click signout", async () => {
 });
 
 describe("OIDC logout with logout endpoint", () => {
-  const logoutHref = "http://example.com/oidc/logout?provider=Test";
+  /* eslint-disable camelcase */
+  // snake_case properties are defined by an external API we don't control.
+  const logoutLink: OPDS1.OidcLink = {
+    href: "http://example.com/oidc/logout?provider=Test{&post_logout_redirect_uri}",
+    rel: "logout",
+    templated: true,
+    properties: {
+      uri_template_variables: {
+        type: "http://palaceproject.io/terms/uri-template/variables",
+        map: {
+          post_logout_redirect_uri: "http://palaceproject.io/terms/redirect-uri"
+        }
+      }
+    },
+    privacy_statement_urls: [],
+    logo_urls: [],
+    display_names: [{ language: "en", value: "Test OIDC" }],
+    descriptions: [{ language: "en", value: "Test OIDC" }],
+    information_urls: []
+  };
+  /* eslint-enable camelcase */
   const oidcMethod: ClientOidcMethod = {
     type: OPDS1.OidcAuthType,
     id: "oidc-1",
     href: "http://example.com/oidc/authenticate",
-    logoutHref,
+    logoutLink,
     description: "Test OIDC"
   };
   const oidcUserSetup = {
@@ -102,7 +122,7 @@ describe("OIDC logout with logout endpoint", () => {
   });
 
   test("clears local credentials immediately before fetching logout endpoint", async () => {
-    fetchMock.mockResponseOnce("", { url: logoutHref, status: 200 });
+    fetchMock.mockResponseOnce("", { status: 200 });
 
     const { user } = setup(<SignOut />, oidcUserSetup);
 
@@ -121,7 +141,7 @@ describe("OIDC logout with logout endpoint", () => {
   });
 
   test("uses OIDC logout endpoint and navigates to signed-out page", async () => {
-    fetchMock.mockResponseOnce("", { url: logoutHref, status: 200 });
+    fetchMock.mockResponseOnce("", { status: 200 });
 
     const { user } = setup(<SignOut />, oidcUserSetup);
 
@@ -177,7 +197,7 @@ test("falls back to local signout for OIDC without logout link", async () => {
     type: OPDS1.OidcAuthType,
     id: "oidc-1",
     href: "http://example.com/oidc/authenticate",
-    // No logoutHref
+    // No logoutLink
     description: "Test OIDC"
   };
 

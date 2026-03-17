@@ -342,6 +342,14 @@ export type OidcLink = {
   ];
   rel: "authenticate" | "logout";
   information_urls: [];
+  templated?: boolean;
+  /** Structurally equivalent to OPDS2.UriTemplateProperties (see types/opds2.ts). */
+  properties?: {
+    uri_template_variables?: {
+      type: string;
+      map: Record<string, string>;
+    };
+  };
 };
 
 /**
