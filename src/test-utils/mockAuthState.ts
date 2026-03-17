@@ -39,18 +39,11 @@ const str = JSON.stringify;
 // The storage key used by useCredentials for the test library slug.
 const STORAGE_KEY = "CPW_AUTH_COOKIE/testlib";
 
-export default function mockAuthenticatedOnce(
-  credentials: AuthCredentials | null = creds
-) {
-  if (credentials !== null) {
-    mockCookie.set(STORAGE_KEY, "1");
-    localStorage.setItem(STORAGE_KEY, str(credentials));
-  }
-}
-
 export function mockAuthenticated(credentials: AuthCredentials | null = creds) {
   if (credentials !== null) {
     mockCookie.set(STORAGE_KEY, "1");
     localStorage.setItem(STORAGE_KEY, str(credentials));
   }
 }
+
+export default mockAuthenticated;

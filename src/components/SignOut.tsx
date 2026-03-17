@@ -62,25 +62,20 @@ export const SignOut: React.FC<SignOutProps> = ({
            * end_session endpoint, which requires a real browser navigation
            * (with cookies) to terminate the IdP session. For cross-origin
            * redirects the browser returns an opaque response and the Location
-           * header is unreadable, so we fall back to our own signed-out page.
+           * header is unreadable, so for now we always navigate to our own
+           * signed-out page.
            */
-          const response = await fetch(logoutUrl.toString(), {
+          await fetch(logoutUrl.toString(), {
             headers: { Authorization: token },
             redirect: "manual"
           });
-
-          const targetUrl =
-            response.type !== "opaqueredirect"
-              ? response.url || signedOutUrl
-              : signedOutUrl;
-
-          window.location.href = targetUrl;
-        } catch {
-          // Local sign-out succeeded; notify user that server-side logout failed.
-          window.alert(
-            "Sign out encountered an error, but you have been signed out locally."
-          );
           window.location.href = signedOutUrl;
+        } catch {
+          // Local sign-out succeeded; server-side logout failed. Navigate to
+          // signed-out page with an error flag so the user is informed.
+          const errorUrl = new URL(signedOutUrl);
+          errorUrl.searchParams.set("signoutServerError", "1");
+          window.location.href = errorUrl.toString();
         }
         return;
       }

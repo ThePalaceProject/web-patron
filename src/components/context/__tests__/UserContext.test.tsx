@@ -7,7 +7,7 @@ import { act, fixtures, setup } from "test-utils";
 import Cookie from "js-cookie";
 import * as router from "next/router";
 import useUser, { UserProvider } from "components/context/UserContext";
-import mockAuthenticatedOnce from "test-utils/mockAuthState";
+import mockAuthenticated from "test-utils/mockAuthState";
 import * as swr from "swr";
 import { makeSwrResponse } from "test-utils/mockSwr";
 
@@ -43,7 +43,7 @@ beforeEach(() => {
 });
 
 test("fetches loans when credentials are present", async () => {
-  mockAuthenticatedOnce();
+  mockAuthenticated();
   renderUserContext();
 
   expect(mockSWR).toHaveBeenCalledWith(
@@ -54,7 +54,7 @@ test("fetches loans when credentials are present", async () => {
 });
 
 test("does not fetch loans if no credentials are present", () => {
-  mockAuthenticatedOnce(null);
+  mockAuthenticated(null);
   renderUserContext();
   expect(fetchMock).toHaveBeenCalledTimes(0);
 });
@@ -304,7 +304,7 @@ test("uses OIDC when it comes first in auth methods (both OIDC and SAML configur
 });
 
 test("sign out clears cookies and data", async () => {
-  mockAuthenticatedOnce();
+  mockAuthenticated();
   let extractedSignOut: any = null;
   function Extractor() {
     const { signOut } = useUser();
@@ -375,7 +375,7 @@ test("sign in sets cookie", async () => {
 
 test("fetches patron profile when authenticated and userProfileUrl is available", () => {
   jest.useFakeTimers();
-  mockAuthenticatedOnce();
+  mockAuthenticated();
   renderUserContext();
 
   // Should make SWR call for loans immediately
@@ -408,7 +408,7 @@ test("fetches patron profile when authenticated and userProfileUrl is available"
 });
 
 test("does not fetch patron profile when not authenticated", () => {
-  mockAuthenticatedOnce(null);
+  mockAuthenticated(null);
   renderUserContext();
 
   // Should not make any SWR calls for patron profile
@@ -420,7 +420,7 @@ test("does not fetch patron profile when not authenticated", () => {
 
 test("exposes patronId from profile data", () => {
   jest.useFakeTimers();
-  mockAuthenticatedOnce();
+  mockAuthenticated();
 
   // Mock the patron profile SWR call to return profile data
   mockSWR.mockImplementation((key: any) => {
@@ -458,7 +458,7 @@ test("exposes patronId from profile data", () => {
 
 test("patronId is undefined when profile fetch fails", () => {
   jest.useFakeTimers();
-  mockAuthenticatedOnce();
+  mockAuthenticated();
 
   // Mock the patron profile SWR call to return no data
   mockSWR.mockImplementation((key: any) => {

@@ -8,7 +8,7 @@ import {
   basicTokenAuthenticationUrl,
   basicTokenAuthMethod
 } from "test-utils/fixtures";
-import mockAuthenticatedOnce, {
+import mockAuthenticated, {
   expirationDate,
   firstToken,
   tokenCreds1
@@ -193,7 +193,7 @@ test("submit by clicking login button", async () => {
 test("fetch new token if token has expired", async () => {
   // set credentials to trigger fetch in <UserProvider />
   // expired token returns 401
-  mockAuthenticatedOnce(tokenCreds1);
+  mockAuthenticated(tokenCreds1);
 
   const problemdoc: OPDS1.ProblemDocument = {
     type: "http://librarysimplified.org/terms/problem/patron-auth-access-token-expired",

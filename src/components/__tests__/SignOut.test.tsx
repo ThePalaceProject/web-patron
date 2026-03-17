@@ -1,5 +1,4 @@
 import * as React from "react";
-import { jest } from "@jest/globals";
 import { fixtures, screen, setup, waitFor } from "../../test-utils";
 import { SignOut } from "components/SignOut";
 import { OPDS1, ClientOidcMethod } from "interfaces";
@@ -121,7 +120,7 @@ describe("OIDC logout with logout endpoint", () => {
     });
   });
 
-  test("uses OIDC logout endpoint and navigates to server-returned URL", async () => {
+  test("uses OIDC logout endpoint and navigates to signed-out page", async () => {
     fetchMock.mockResponseOnce("", { url: logoutHref, status: 200 });
 
     const { user } = setup(<SignOut />, oidcUserSetup);
@@ -144,13 +143,12 @@ describe("OIDC logout with logout endpoint", () => {
       ).toBe("Bearer test-token");
     });
 
-    // Should navigate to the URL returned by the server
-    expect(window.location.href).toBe(logoutHref);
+    // Should navigate to our signed-out page (not the logout endpoint URL).
+    expect(window.location.href).toContain("/signed-out");
   });
 
-  test("alerts user and navigates to signed-out page when logout request fails", async () => {
+  test("navigates to signed-out page with error flag when logout request fails", async () => {
     fetchMock.mockRejectOnce(new Error("Network error"));
-    const alertMock = jest.spyOn(window, "alert").mockImplementation(() => {});
 
     const { user } = setup(<SignOut />, oidcUserSetup);
 
@@ -162,19 +160,15 @@ describe("OIDC logout with logout endpoint", () => {
     });
     await user.click(signOutForReal);
 
+    // Should navigate to signed-out page with a serverError flag instead of
+    // showing a window.alert.
     await waitFor(() => {
-      expect(alertMock).toHaveBeenCalledWith(
-        expect.stringContaining("Sign out encountered an error")
-      );
+      expect(window.location.href).toContain("/signed-out");
+      expect(window.location.href).toContain("signoutServerError=1");
     });
-
-    // Should still navigate to signed-out page
-    expect(window.location.href).toContain("/signed-out");
 
     // Local credentials should still have been cleared
     expect(fixtures.mockSignOut).toHaveBeenCalled();
-
-    alertMock.mockRestore();
   });
 });
 

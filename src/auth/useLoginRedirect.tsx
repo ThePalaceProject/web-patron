@@ -22,17 +22,9 @@ export default function useLoginRedirectUrl() {
   const isFullUrl = nextPath?.startsWith("http");
   // if the redirect url is the home page, choose the catalog root instead
   const isHomePage = nextPath === "/";
-  // if the redirect url is the signed-out page, redirect to catalog root instead
-  const isSignedOutPage = nextPath?.includes("/signed-out");
-  const hasPerformSignOut = (() => {
-    if (!nextPath) return false;
-    try {
-      // Use a dummy base so relative paths parse correctly on the server.
-      return new URL(nextPath, "http://x").searchParams.has("performSignOut");
-    } catch {
-      return false;
-    }
-  })();
+
+  const isSignedOutPage = nextPath?.endsWith("/signed-out");
+  const hasPerformSignOut = urlHasPerformSignOut(nextPath);
 
   const isAuthProtectedPage = nextPath?.includes("/loans");
 
@@ -63,4 +55,17 @@ export default function useLoginRedirectUrl() {
     fullSuccessUrl,
     successPath
   };
+}
+
+/*
+ * Helper function to determine if a URL has a 'performSignOut' query parameter.
+ */
+function urlHasPerformSignOut(path: string | null | undefined): boolean {
+  if (!path) return false;
+  try {
+    // Use a dummy base so relative paths parse correctly on the server.
+    return new URL(path, "http://x").searchParams.has("performSignOut");
+  } catch {
+    return false;
+  }
 }

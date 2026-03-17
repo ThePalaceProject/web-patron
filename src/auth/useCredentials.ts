@@ -124,7 +124,7 @@ export default function useCredentials(slug: string | null) {
  * Local Storage persists across browser sessions. To get the desired
  * behavior we compliment it with a companion session cookie acting as an
  * "active" marker. Because session cookies are cleared when the browser is
- * closed, we check for the marker on load: if it is absent, then thebrowser
+ * closed, we check for the marker on load: if it is absent, then the browser
  * was closed, so we discard the inactive localStorage entry.
  */
 function storageKey(librarySlug: string | null): string {
