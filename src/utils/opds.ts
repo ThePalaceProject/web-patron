@@ -52,8 +52,9 @@ export type NormalizeLinkOptions = {
  *   1. The variable's term URI (from properties.uri_template_variables.map)
  *      is used to look up a value in termValues.
  *   2. If that lookup fails, fallbacks[variableName] is used instead.
- *   3. Variables with no resolved value are left undefined and omitted by the
- *      RFC 6570 expansion rules for the relevant operator.
+ *   3. If no value is found and the variable is required (required is true or
+ *      absent), an error is thrown. If required is false, the variable is
+ *      omitted per RFC 6570 expansion rules.
  */
 export function normalizeLink<T extends TemplatedLink>(
   link: T,
@@ -65,10 +66,20 @@ export function normalizeLink<T extends TemplatedLink>(
   const substitutions: Record<string, string | undefined> = {};
 
   for (const varName of extractTemplateVarNames(link.href)) {
-    const termUri = varMap[varName];
+    const varDef = varMap[varName];
     const valueFromTerms =
-      termUri !== undefined ? termValues[termUri] : undefined;
-    substitutions[varName] = valueFromTerms ?? fallbacks[varName];
+      varDef !== undefined ? termValues[varDef.term] : undefined;
+    const value = valueFromTerms ?? fallbacks[varName];
+
+    if (value === undefined) {
+      if (varDef?.required !== false) {
+        throw new Error(
+          `Required URI template variable "${varName}" has no value`
+        );
+      }
+    } else {
+      substitutions[varName] = value;
+    }
   }
 
   const { templated: _, ...rest } = link;

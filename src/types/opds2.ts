@@ -142,9 +142,14 @@ export interface CatalogRootFeedLink extends Link<
  * Maps template variable names to well-known term URIs so clients can resolve
  * variable values by semantic type rather than by variable name.
  */
+export interface UriTemplateVariable {
+  term: string;
+  required?: boolean;
+}
+
 export interface UriTemplateVariableMap {
   type: string;
-  map: Record<string, string>;
+  map: Record<string, UriTemplateVariable>;
 }
 
 export interface UriTemplateProperties {

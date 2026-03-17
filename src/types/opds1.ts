@@ -347,7 +347,7 @@ export type OidcLink = {
   properties?: {
     uri_template_variables?: {
       type: string;
-      map: Record<string, string>;
+      map: Record<string, { term: string; required?: boolean }>;
     };
   };
 };
