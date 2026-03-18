@@ -63,39 +63,26 @@ export function normalizeLink<T extends TemplatedLink>(
   if (!link.templated) return link as unknown as Omit<T, "templated">;
 
   const varMap = link.properties?.uri_template_variables?.map ?? {};
-  const substitutions: Record<string, string | undefined> = {};
 
-  for (const varName of extractTemplateVarNames(link.href)) {
-    const varDef = varMap[varName];
-    const valueFromTerms =
-      varDef !== undefined ? termValues[varDef.term] : undefined;
-    const value = valueFromTerms ?? fallbacks[varName];
-
-    if (value === undefined) {
-      if (varDef?.required !== false) {
+  const substitutions = new Proxy({} as Record<string, string | undefined>, {
+    get(_target, prop: string | symbol) {
+      if (typeof prop !== "string") return undefined;
+      const varDef = varMap[prop];
+      const value =
+        (varDef !== undefined ? termValues[varDef.term] : undefined) ??
+        fallbacks[prop];
+      if (value === undefined && varDef?.required !== false) {
         throw new Error(
-          `Required URI template variable "${varName}" has no value`
+          `Required URI template variable "${prop}" has no value`
         );
       }
-    } else {
-      substitutions[varName] = value;
+      return value;
     }
-  }
+  });
 
   const { templated: _, ...rest } = link;
   return {
     ...rest,
     href: StdUriTemplate.expand(link.href, substitutions)
   } as Omit<T, "templated">;
-}
-
-/** Extracts all variable names from a URI template string. */
-function extractTemplateVarNames(template: string): string[] {
-  const names: string[] = [];
-  for (const match of template.matchAll(/\{[^}]+\}/g)) {
-    // Strip the operator character (if any) and split comma-separated names.
-    const inner = match[0].slice(1, -1).replace(/^[+#./;?&=,!@|]/, "");
-    names.push(...inner.split(",").map(s => s.trim().replace(/\*$/, "")));
-  }
-  return names;
 }
