@@ -26,7 +26,7 @@ export interface TemplatedLink {
  *
  * Example: { [UriTemplateTerms.REDIRECT_URI]: "https://app.example.com/callback" }
  */
-export type TermValueMap = Partial<Record<string, string>>;
+export type TermValueMap = Record<string, string>;
 
 /**
  * Maps variable names to fallback values. Used when the link carries no
@@ -34,7 +34,7 @@ export type TermValueMap = Partial<Record<string, string>>;
  *
  * Example: { post_logout_redirect_uri: "https://app.example.com/signed-out" }
  */
-export type VariableFallbackMap = Partial<Record<string, string>>;
+export type VariableFallbackMap = Record<string, string>;
 
 export type NormalizeLinkOptions = {
   termValues?: TermValueMap;

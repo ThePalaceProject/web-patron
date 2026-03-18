@@ -64,7 +64,7 @@ function urlHasPerformSignOut(path: string | null | undefined): boolean {
   if (!path) return false;
   try {
     // Use a dummy base so relative paths parse correctly on the server.
-    return new URL(path, "http://x").searchParams.has("performSignOut");
+    return new URL(path, "http://localhost").searchParams.has("performSignOut");
   } catch {
     return false;
   }

@@ -15,6 +15,7 @@ import { UserContext, UserState } from "components/context/UserContext";
 import { ThemeUIProvider } from "theme-ui";
 import makeTheme from "theme";
 import mockConfig from "test-utils/mockConfig";
+import mockCookie from "../../__mocks__/js-cookie";
 import track from "analytics/track";
 import "react-intersection-observer/test-utils";
 import "test-utils/mockToDateString";
@@ -26,6 +27,7 @@ expect.addSnapshotSerializer(serializer);
 beforeEach(() => {
   mockConfig();
   localStorage.clear();
+  mockCookie.reset();
 });
 
 // mock the error tracker to prevent unnecessary console logs

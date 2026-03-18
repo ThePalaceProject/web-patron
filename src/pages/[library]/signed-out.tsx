@@ -16,7 +16,7 @@ import useLinkUtils from "hooks/useLinkUtils";
  * Note: This page intentionally does not include the header/layout
  * to avoid showing the "Sign In" button.
  */
-const SignedOutContent: React.FC = () => {
+export const SignedOutContent: React.FC = () => {
   const { isAuthenticated } = useUser();
   const router = useRouter();
   const { buildMultiLibraryLink } = useLinkUtils();
@@ -83,7 +83,7 @@ const SignedOutContent: React.FC = () => {
         </div>
 
         {hasSignoutServerError && (
-          <p sx={{ color: "ui.error", mb: 4 }}>
+          <p role="alert" sx={{ color: "ui.error", mb: 4 }}>
             Sign out encountered an error, but you have been signed out locally.
           </p>
         )}

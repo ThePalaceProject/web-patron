@@ -1,7 +1,9 @@
 /**
  * Stateful js-cookie mock. get, set, and remove operate on a shared
- * in-memory store so they interact correctly. The store is cleared before
- * each test to mirror session-cookie behavior.
+ * in-memory store so they interact correctly.
+ *
+ * Call reset() in a beforeEach (see src/test-utils/index.tsx) to clear the
+ * store between tests.
  */
 const store: Record<string, string> = {};
 
@@ -12,11 +14,10 @@ const mockCookie = {
   }),
   remove: jest.fn((key: string) => {
     delete store[key];
-  })
+  }),
+  reset() {
+    Object.keys(store).forEach(key => delete store[key]);
+  }
 };
-
-beforeEach(() => {
-  Object.keys(store).forEach(key => delete store[key]);
-});
 
 export default mockCookie;
