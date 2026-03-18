@@ -16,7 +16,8 @@ interface SignOutProps {
 }
 
 const SIGNOUT_URI_TEMPLATE_FALLBACK_VARIABLES = [
-  "post_logout_redirect_uri"
+  "post_logout_redirect_uri",
+  "redirect_uri"
 ] as const;
 
 export const SignOut: React.FC<SignOutProps> = ({
