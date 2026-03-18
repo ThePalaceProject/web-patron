@@ -42,28 +42,20 @@ export type NormalizeLinkOptions = {
 };
 
 /**
- * Normalizes a link by resolving any URI template in its href.
- *
- * For non-templated links, returns the link unchanged.
- *
- * For templated links, returns a new link with the href expanded (via full
- * RFC 6570) and the `templated` property removed. Template variables are
- * resolved in order:
- *   1. The variable's term URI (from properties.uri_template_variables.map)
- *      is used to look up a value in termValues.
+ * Expands a URI template string using the provided options, without any link
+ * wrapper. Template variables are resolved in order:
+ *   1. The variable's term URI (from varMap) is used to look up a value in
+ *      termValues.
  *   2. If that lookup fails, fallbacks[variableName] is used instead.
  *   3. If no value is found and the variable is required (required is true or
  *      absent), an error is thrown. If required is false, the variable is
  *      omitted per RFC 6570 expansion rules.
  */
-export function normalizeLink<T extends TemplatedLink>(
-  link: T,
+export function expandTemplatedUri(
+  template: string,
+  varMap: OPDS2.UriTemplateVariableMap["map"],
   { termValues = {}, fallbacks = {} }: NormalizeLinkOptions = {}
-): Omit<T, "templated"> {
-  if (!link.templated) return link as unknown as Omit<T, "templated">;
-
-  const varMap = link.properties?.uri_template_variables?.map ?? {};
-
+): string {
   const substitutions = new Proxy({} as Record<string, string | undefined>, {
     get(_target, prop: string | symbol) {
       if (typeof prop !== "string") return undefined;
@@ -80,9 +72,28 @@ export function normalizeLink<T extends TemplatedLink>(
     }
   });
 
+  return StdUriTemplate.expand(template, substitutions);
+}
+
+/**
+ * Normalizes a link by resolving any URI template in its href.
+ *
+ * For non-templated links, returns the link unchanged.
+ *
+ * For templated links, returns a new link with the href expanded and the
+ * `templated` property removed. Variable resolution is delegated to
+ * expandTemplatedUri.
+ */
+export function normalizeLink<T extends TemplatedLink>(
+  link: T,
+  options: NormalizeLinkOptions = {}
+): Omit<T, "templated"> {
+  if (!link.templated) return link as unknown as Omit<T, "templated">;
+
+  const varMap = link.properties?.uri_template_variables?.map ?? {};
   const { templated: _, ...rest } = link;
   return {
     ...rest,
-    href: StdUriTemplate.expand(link.href, substitutions)
+    href: expandTemplatedUri(link.href, varMap, options)
   } as Omit<T, "templated">;
 }
