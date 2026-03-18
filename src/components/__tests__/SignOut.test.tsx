@@ -169,6 +169,54 @@ describe("OIDC logout with logout endpoint", () => {
     expect(window.location.href).toContain("/signed-out");
   });
 
+  test("navigates to signed-out page with error flag when normalizeLink throws", async () => {
+    /*
+     * A logout link whose template requires a variable that has no value
+     * causes normalizeLink to throw. The catch block must handle it the same
+     * way as a network error: navigate to the signed-out page with the error
+     * flag rather than leaving the user stranded.
+     */
+    const brokenLogoutLink: OPDS1.OidcLink = {
+      ...logoutLink,
+      // Template variable with no fallback and no matching term value.
+      href: "http://example.com/oidc/logout{?unknown_required_param}",
+      /* eslint-disable camelcase */
+      properties: {
+        uri_template_variables: {
+          type: "http://palaceproject.io/terms/uri-template/variables",
+          map: {
+            unknown_required_param: {
+              term: "http://palaceproject.io/terms/some-unknown-term"
+            }
+          }
+        }
+      }
+      /* eslint-enable camelcase */
+    };
+    const brokenOidcMethod: ClientOidcMethod = {
+      ...oidcMethod,
+      logoutLink: brokenLogoutLink
+    };
+
+    const { user } = setup(<SignOut />, {
+      ...oidcUserSetup,
+      library: { ...fixtures.libraryData, authMethods: [brokenOidcMethod] }
+    });
+
+    const signOutBtn = await screen.findByRole("button", { name: "Sign Out" });
+    await user.click(signOutBtn);
+    const signOutForReal = await screen.findByRole("button", {
+      name: "Confirm Sign Out"
+    });
+    await user.click(signOutForReal);
+
+    await waitFor(() => {
+      expect(window.location.href).toContain("/signed-out");
+      expect(window.location.href).toContain("signoutServerError=1");
+    });
+    expect(fixtures.mockSignOut).toHaveBeenCalled();
+  });
+
   test("navigates to signed-out page with error flag when logout request fails", async () => {
     fetchMock.mockRejectOnce(new Error("Network error"));
 

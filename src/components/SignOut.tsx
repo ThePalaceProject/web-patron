@@ -57,20 +57,25 @@ export const SignOut: React.FC<SignOutProps> = ({
 
         const signedOutUrl = `${window.location.origin}${buildMultiLibraryLink("/signed-out")}`;
 
-        /*
-         * Resolve the logout URL, expanding any URI template. The term value
-         * map handles servers that use uri_template_variables to declare the
-         * redirect-URI variable's semantic type; the fallback covers servers
-         * that omit that map but still use the conventional variable name.
-         */
-        const { href: logoutUrl } = normalizeLink(oidcMethod.logoutLink, {
-          termValues: { [UriTemplateTerms.REDIRECT_URI]: signedOutUrl },
-          fallbacks: Object.fromEntries(
-            SIGNOUT_URI_TEMPLATE_FALLBACK_VARIABLES.map(v => [v, signedOutUrl])
-          )
-        });
-
         try {
+          /*
+           * Resolve the logout URL, expanding any URI template. The term value
+           * map handles servers that use uri_template_variables to declare the
+           * redirect-URI variable's semantic type; the fallback covers servers
+           * that omit that map but still use the conventional variable name.
+           * normalizeLink throws when a required template variable has no value,
+           * so it must be inside the try block to be handled like any other
+           * logout failure.
+           */
+          const { href: logoutUrl } = normalizeLink(oidcMethod.logoutLink, {
+            termValues: { [UriTemplateTerms.REDIRECT_URI]: signedOutUrl },
+            fallbacks: Object.fromEntries(
+              SIGNOUT_URI_TEMPLATE_FALLBACK_VARIABLES.map(v => [
+                v,
+                signedOutUrl
+              ])
+            )
+          });
           /**
            * The Authorization header lets the backend identify and invalidate
            * the token. redirect: "manual" captures the first redirect without
