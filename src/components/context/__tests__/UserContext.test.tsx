@@ -456,6 +456,45 @@ test("exposes patronId from profile data", () => {
   jest.useRealTimers();
 });
 
+test("status is unauthenticated when credentials exist but shelfUrl is absent", () => {
+  // Credentials are present but the library has no shelf URL, so SWR key is
+  // null and the fetch never starts. Status must not be stuck at "loading".
+  mockAuthenticated();
+
+  // Real SWR returns undefined data when its key is null. Replicate that so
+  // the status calculation sees no data and can fall through correctly.
+  mockSWR.mockImplementation((key: any) => {
+    if (key === null) {
+      return makeSwrResponse({ data: undefined }) as any;
+    }
+    return defaultMock as any;
+  });
+
+  let extractedStatus: string | undefined;
+  function Extractor() {
+    const { status } = useUser();
+    extractedStatus = status;
+    return <div>hello</div>;
+  }
+
+  setup(
+    <UserProvider>
+      <Extractor />
+    </UserProvider>,
+    {
+      library: {
+        ...fixtures.libraryData,
+        shelfUrl: undefined
+      }
+    }
+  );
+
+  expect(extractedStatus).toBe("unauthenticated");
+
+  // Restore default mock for subsequent tests.
+  mockSWR.mockReturnValue(defaultMock as any);
+});
+
 test("patronId is undefined when profile fetch fails", () => {
   jest.useFakeTimers();
   mockAuthenticated();

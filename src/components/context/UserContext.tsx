@@ -216,10 +216,13 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   }, [credentials, data]);
 
   // We should only ever be in one of these three states.
+  // "loading" requires both credentials and a shelfUrl so that SWR is actually
+  // running; without shelfUrl the key is null and the fetch never starts,
+  // which would leave status permanently stuck at "loading".
   const status: Status =
     data && credentials
       ? "authenticated"
-      : credentials
+      : credentials && shelfUrl
         ? "loading"
         : "unauthenticated";
 
