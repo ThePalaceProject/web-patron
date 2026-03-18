@@ -192,6 +192,29 @@ describe("OIDC logout with logout endpoint", () => {
     // Local credentials should still have been cleared
     expect(fixtures.mockSignOut).toHaveBeenCalled();
   });
+
+  test("navigates to signed-out page with error flag when logout endpoint returns HTTP error", async () => {
+    // redirect: "manual" prevents fetch from throwing on non-2xx status codes,
+    // so the code must check response.ok and throw explicitly. This test
+    // confirms that an HTTP 500 is treated the same as a network failure.
+    fetchMock.mockResponseOnce("", { status: 500 });
+
+    const { user } = setup(<SignOut />, oidcUserSetup);
+
+    const signOutBtn = await screen.findByRole("button", { name: "Sign Out" });
+    await user.click(signOutBtn);
+
+    const signOutForReal = await screen.findByRole("button", {
+      name: "Confirm Sign Out"
+    });
+    await user.click(signOutForReal);
+
+    await waitFor(() => {
+      expect(window.location.href).toContain("/signed-out");
+      expect(window.location.href).toContain("signoutServerError=1");
+    });
+    expect(fixtures.mockSignOut).toHaveBeenCalled();
+  });
 });
 
 test("falls back to local signout for OIDC without logout link", async () => {
