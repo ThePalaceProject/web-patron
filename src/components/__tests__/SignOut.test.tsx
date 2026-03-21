@@ -75,7 +75,7 @@ describe("OIDC logout with logout endpoint", () => {
     templated: true,
     properties: {
       uri_template_variables: {
-        type: "http://palaceproject.io/terms/uri-template/variables",
+        "@type": "http://palaceproject.io/terms/uri-template/variables",
         map: {
           post_logout_redirect_uri: {
             term: "http://palaceproject.io/terms/redirect-uri"
@@ -183,7 +183,7 @@ describe("OIDC logout with logout endpoint", () => {
       /* eslint-disable camelcase */
       properties: {
         uri_template_variables: {
-          type: "http://palaceproject.io/terms/uri-template/variables",
+          "@type": "http://palaceproject.io/terms/uri-template/variables",
           map: {
             unknown_required_param: {
               term: "http://palaceproject.io/terms/some-unknown-term"

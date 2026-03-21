@@ -104,7 +104,7 @@ describe("normalizeLink", () => {
     templated: true as const,
     properties: {
       uri_template_variables: {
-        type: "http://palaceproject.io/terms/uri-template/variables",
+        "@type": "http://palaceproject.io/terms/uri-template/variables",
         map: {
           post_logout_redirect_uri: { term: redirectTerm }
         }

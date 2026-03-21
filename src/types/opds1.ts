@@ -346,7 +346,7 @@ export type OidcLink = {
   /** Structurally equivalent to OPDS2.UriTemplateProperties (see types/opds2.ts). */
   properties?: {
     uri_template_variables?: {
-      type: string;
+      "@type"?: string;
       map: Record<string, { term: string; required?: boolean }>;
     };
   };

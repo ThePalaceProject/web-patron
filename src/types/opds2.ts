@@ -148,7 +148,7 @@ export interface UriTemplateVariable {
 }
 
 export interface UriTemplateVariableMap {
-  type: string;
+  "@type"?: string;
   map: Record<string, UriTemplateVariable>;
 }
 
