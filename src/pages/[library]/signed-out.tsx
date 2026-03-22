@@ -20,7 +20,6 @@ export const SignedOutContent: React.FC = () => {
   const { isAuthenticated } = useUser();
   const router = useRouter();
   const { buildMultiLibraryLink } = useLinkUtils();
-  const hasSignoutServerError = router.query.signoutServerError === "1";
 
   // If user somehow gets to this page while signed in, redirect them to the
   // library's home page. They shouldn't be here, if signed in.
@@ -81,12 +80,6 @@ export const SignedOutContent: React.FC = () => {
             ensure that you are fully signed out.
           </p>
         </div>
-
-        {hasSignoutServerError && (
-          <p role="alert" sx={{ color: "ui.error", mb: 4 }}>
-            Sign out encountered an error, but you have been signed out locally.
-          </p>
-        )}
 
         <Link href="/">
           <Button aria-label="Return to Catalog">Return to Catalog</Button>

@@ -169,12 +169,12 @@ describe("OIDC logout with logout endpoint", () => {
     expect(window.location.href).toContain("/signed-out");
   });
 
-  test("navigates to signed-out page with error flag when normalizeLink throws", async () => {
+  test("navigates to signed-out page when normalizeLink throws", async () => {
     /*
      * A logout link whose template requires a variable that has no value
      * causes normalizeLink to throw. The catch block must handle it the same
-     * way as a network error: navigate to the signed-out page with the error
-     * flag rather than leaving the user stranded.
+     * way as a network error: navigate to the signed-out page rather than
+     * leaving the user stranded.
      */
     const brokenLogoutLink: OPDS1.OidcLink = {
       ...logoutLink,
@@ -212,12 +212,11 @@ describe("OIDC logout with logout endpoint", () => {
 
     await waitFor(() => {
       expect(window.location.href).toContain("/signed-out");
-      expect(window.location.href).toContain("signoutServerError=1");
     });
     expect(fixtures.mockSignOut).toHaveBeenCalled();
   });
 
-  test("navigates to signed-out page with error flag when logout request fails", async () => {
+  test("navigates to signed-out page when logout request fails", async () => {
     fetchMock.mockRejectOnce(new Error("Network error"));
 
     const { user } = setup(<SignOut />, oidcUserSetup);
@@ -230,18 +229,15 @@ describe("OIDC logout with logout endpoint", () => {
     });
     await user.click(signOutForReal);
 
-    // Should navigate to signed-out page with a serverError flag instead of
-    // showing a window.alert.
     await waitFor(() => {
       expect(window.location.href).toContain("/signed-out");
-      expect(window.location.href).toContain("signoutServerError=1");
     });
 
     // Local credentials should still have been cleared
     expect(fixtures.mockSignOut).toHaveBeenCalled();
   });
 
-  test("navigates to signed-out page with error flag when logout endpoint returns HTTP error", async () => {
+  test("navigates to signed-out page when logout endpoint returns HTTP error", async () => {
     // redirect: "manual" prevents fetch from throwing on non-2xx status codes,
     // so the code must check response.ok and throw explicitly. This test
     // confirms that an HTTP 500 is treated the same as a network failure.
@@ -259,7 +255,6 @@ describe("OIDC logout with logout endpoint", () => {
 
     await waitFor(() => {
       expect(window.location.href).toContain("/signed-out");
-      expect(window.location.href).toContain("signoutServerError=1");
     });
     expect(fixtures.mockSignOut).toHaveBeenCalled();
   });

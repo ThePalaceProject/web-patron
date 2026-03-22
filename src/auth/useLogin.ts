@@ -4,6 +4,7 @@ import { LOGIN_REDIRECT_QUERY_PARAM } from "utils/constants";
 import { UrlObject } from "url";
 import { IS_SERVER } from "utils/env";
 import useLibraryContext from "components/context/LibraryContext";
+import * as _ from "lodash";
 
 export default function useLogin() {
   const { query, push, asPath, isReady } = useRouter();
@@ -23,7 +24,7 @@ export default function useLogin() {
       // travel through the login flow:
       // - 'error' comes from backend redirects and would cause loops
       // - 'performSignOut' would trigger an immediate sign-out on the login page
-      const { error: _, performSignOut: __, ...cleanQuery } = query;
+      const cleanQuery = _.omit(query, ["error", "performSignOut"]);
       const newQuery = methodId ? { ...cleanQuery, methodId } : cleanQuery;
       // make sure that library is set (it is not already set on home page).
       newQuery.library = slug;

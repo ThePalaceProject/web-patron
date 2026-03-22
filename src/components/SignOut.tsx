@@ -97,13 +97,12 @@ export const SignOut: React.FC<SignOutProps> = ({
           if (!response.ok && response.type !== "opaqueredirect") {
             throw new Error(`Logout endpoint returned ${response.status}`);
           }
-          window.location.href = signedOutUrl;
         } catch {
-          // Local sign-out succeeded; server-side logout failed. Navigate to
-          // signed-out page with an error flag so the user is informed.
-          const errorUrl = new URL(signedOutUrl);
-          errorUrl.searchParams.set("signoutServerError", "1");
-          window.location.href = errorUrl.toString();
+          // TODO: For now, we swallow the server-side logout failure, since
+          //  the browser has already dropped its local Palace credentials. In
+          //  the future, we can report the error here.
+        } finally {
+          window.location.href = signedOutUrl;
         }
         return;
       }
