@@ -39,5 +39,8 @@ wallaby.js
 # typescript
 tsconfig.tsbuildinfo
 
+# should be generated at build time
+src/_version.json
+
 # storybook
 storybook-static

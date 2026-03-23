@@ -160,6 +160,31 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Create version file in source root
+        run: |
+          pip install dunamai --quiet
+          python - <<'EOF'
+          import json
+          from pathlib import Path
+
+          try:
+              from dunamai import Version
+              v = Version.from_git()
+              data = {
+                  "version": v.serialize(style="semver"),
+                  "commit": v.commit,
+                  "branch": v.branch,
+              }
+          except Exception:
+              data = {"version": None, "commit": None, "branch": None}
+
+          output_path = Path("src/_version.json")
+          output_path.parent.mkdir(parents=True, exist_ok=True)
+          with output_path.open("w") as f:
+              json.dump(data, f, indent=2)
+          print(json.dumps(data, indent=2))
+          EOF
+
       - name: Generate tags for Docker image
         id: docker-image-tags
         uses: docker/metadata-action@v5
