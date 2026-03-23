@@ -1,6 +1,6 @@
 import * as React from "react";
 import { screen, setup } from "test-utils";
-import { SignedOutContent } from "../signed-out";
+import { SignedOutContent } from "pages/[library]/signed-out";
 
 test("renders signed out page", () => {
   setup(<SignedOutContent />);

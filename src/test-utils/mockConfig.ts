@@ -8,5 +8,4 @@ export default function mockConfig(custom?: Partial<AppConfig>) {
     ...custom
   };
   (env.APP_CONFIG as any) = config;
-  (process.env.APP_CONFIG as any) = JSON.stringify(config);
 }
