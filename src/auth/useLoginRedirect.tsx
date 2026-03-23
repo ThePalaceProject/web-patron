@@ -23,21 +23,27 @@ export default function useLoginRedirectUrl() {
   // if the redirect url is the home page, choose the catalog root instead
   const isHomePage = nextPath === "/";
 
-  // Check if redirect is to an auth-protected page
+  const isSignedOutPage = nextPath?.endsWith("/signed-out");
+  const hasPerformSignOut = urlHasPerformSignOut(nextPath);
+
   const isAuthProtectedPage = nextPath?.includes("/loans");
 
-  // Check if there's a login error (indicates auth just failed).
-  // Check both loginError (from our code) and error (from backend redirect).
+  // loginError is set by our code; error comes from backend redirects.
   const hasLoginError = query.loginError || query.error;
 
-  // If we have an error AND we're trying to redirect to an auth-protected page,
-  // this would create a loop, which we can avoid by redirecting to the
-  // catalog page, if necessary (see below).
+  // Redirecting to a protected page after a login failure would restart the
+  // auth flow and create a loop.
   const wouldCreateLoop = isAuthProtectedPage && hasLoginError;
 
   // Go to catalog root if nextPath is invalid or would cause a loop.
   const successPath =
-    !nextPath || isLoginPath || isHomePage || isFullUrl || wouldCreateLoop
+    !nextPath ||
+    isLoginPath ||
+    isHomePage ||
+    isFullUrl ||
+    wouldCreateLoop ||
+    isSignedOutPage ||
+    hasPerformSignOut
       ? catalogRootPath
       : nextPath;
 
@@ -49,4 +55,17 @@ export default function useLoginRedirectUrl() {
     fullSuccessUrl,
     successPath
   };
+}
+
+/*
+ * Helper function to determine if a URL has a 'performSignOut' query parameter.
+ */
+function urlHasPerformSignOut(path: string | null | undefined): boolean {
+  if (!path) return false;
+  try {
+    // Use a dummy base so relative paths parse correctly on the server.
+    return new URL(path, "http://localhost").searchParams.has("performSignOut");
+  } catch {
+    return false;
+  }
 }

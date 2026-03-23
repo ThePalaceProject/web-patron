@@ -1,6 +1,9 @@
 import * as React from "react";
 import { fixtures, screen, setup, waitFor } from "../../test-utils";
 import { SignOut } from "components/SignOut";
+import { OPDS1, ClientOidcMethod } from "interfaces";
+import { mockPush } from "../../test-utils/mockNextRouter";
+import fetchMock from "jest-fetch-mock";
 
 test("Shows button", () => {
   setup(<SignOut />);
@@ -61,4 +64,235 @@ test("signs out on click signout", async () => {
   expect(fixtures.mockSignOut).toHaveBeenCalledTimes(0);
   await user.click(signOutForReal);
   expect(fixtures.mockSignOut).toHaveBeenCalledTimes(1);
+});
+
+describe("OIDC logout with logout endpoint", () => {
+  /* eslint-disable camelcase */
+  // snake_case properties are defined by an external API we don't control.
+  const logoutLink: OPDS1.OidcLink = {
+    href: "http://example.com/oidc/logout?provider=Test{&post_logout_redirect_uri}",
+    rel: "logout",
+    templated: true,
+    properties: {
+      uri_template_variables: {
+        "@type": "http://palaceproject.io/terms/uri-template/variables",
+        map: {
+          post_logout_redirect_uri: {
+            term: "http://palaceproject.io/terms/redirect-uri"
+          }
+        }
+      }
+    },
+    privacy_statement_urls: [],
+    logo_urls: [],
+    display_names: [{ language: "en", value: "Test OIDC" }],
+    descriptions: [{ language: "en", value: "Test OIDC" }],
+    information_urls: []
+  };
+  /* eslint-enable camelcase */
+  const oidcMethod: ClientOidcMethod = {
+    type: OPDS1.OidcAuthType,
+    id: "oidc-1",
+    href: "http://example.com/oidc/authenticate",
+    logoutLink,
+    description: "Test OIDC"
+  };
+  const oidcUserSetup = {
+    user: {
+      token: "Bearer test-token",
+      credentials: {
+        token: "Bearer test-token",
+        methodType: OPDS1.OidcAuthType
+      } as const
+    },
+    library: {
+      ...fixtures.libraryData,
+      authMethods: [oidcMethod]
+    }
+  };
+
+  let originalLocation: Location;
+
+  beforeEach(() => {
+    originalLocation = window.location;
+    delete (window as any).location;
+    window.location = { ...originalLocation, href: "" } as any;
+  });
+
+  afterEach(() => {
+    (window as any).location = originalLocation;
+  });
+
+  test("clears local credentials immediately before fetching logout endpoint", async () => {
+    fetchMock.mockResponseOnce("", { status: 200 });
+
+    const { user } = setup(<SignOut />, oidcUserSetup);
+
+    const signOutBtn = await screen.findByRole("button", { name: "Sign Out" });
+    await user.click(signOutBtn);
+
+    const signOutForReal = await screen.findByRole("button", {
+      name: "Confirm Sign Out"
+    });
+    await user.click(signOutForReal);
+
+    // signOut() should have been called (clears credentials) before the fetch completes
+    await waitFor(() => {
+      expect(fixtures.mockSignOut).toHaveBeenCalled();
+    });
+  });
+
+  test("uses OIDC logout endpoint and navigates to signed-out page", async () => {
+    fetchMock.mockResponseOnce("", { status: 200 });
+
+    const { user } = setup(<SignOut />, oidcUserSetup);
+
+    const signOutBtn = await screen.findByRole("button", { name: "Sign Out" });
+    await user.click(signOutBtn);
+
+    const signOutForReal = await screen.findByRole("button", {
+      name: "Confirm Sign Out"
+    });
+    await user.click(signOutForReal);
+
+    // Should fetch the logout endpoint with an Authorization Bearer header
+    await waitFor(() => {
+      const [fetchedUrl, fetchOptions] = fetchMock.mock.calls[0];
+      expect(fetchedUrl).toContain("http://example.com/oidc/logout");
+      expect(fetchedUrl).toContain("post_logout_redirect_uri=");
+      expect(
+        (fetchOptions?.headers as Record<string, string>)?.Authorization
+      ).toBe("Bearer test-token");
+    });
+
+    // Should navigate to our signed-out page (not the logout endpoint URL).
+    expect(window.location.href).toContain("/signed-out");
+  });
+
+  test("navigates to signed-out page when normalizeLink throws", async () => {
+    /*
+     * A logout link whose template requires a variable that has no value
+     * causes normalizeLink to throw. The catch block must handle it the same
+     * way as a network error: navigate to the signed-out page rather than
+     * leaving the user stranded.
+     */
+    const brokenLogoutLink: OPDS1.OidcLink = {
+      ...logoutLink,
+      // Template variable with no fallback and no matching term value.
+      href: "http://example.com/oidc/logout{?unknown_required_param}",
+      /* eslint-disable camelcase */
+      properties: {
+        uri_template_variables: {
+          "@type": "http://palaceproject.io/terms/uri-template/variables",
+          map: {
+            unknown_required_param: {
+              term: "http://palaceproject.io/terms/some-unknown-term"
+            }
+          }
+        }
+      }
+      /* eslint-enable camelcase */
+    };
+    const brokenOidcMethod: ClientOidcMethod = {
+      ...oidcMethod,
+      logoutLink: brokenLogoutLink
+    };
+
+    const { user } = setup(<SignOut />, {
+      ...oidcUserSetup,
+      library: { ...fixtures.libraryData, authMethods: [brokenOidcMethod] }
+    });
+
+    const signOutBtn = await screen.findByRole("button", { name: "Sign Out" });
+    await user.click(signOutBtn);
+    const signOutForReal = await screen.findByRole("button", {
+      name: "Confirm Sign Out"
+    });
+    await user.click(signOutForReal);
+
+    await waitFor(() => {
+      expect(window.location.href).toContain("/signed-out");
+    });
+    expect(fixtures.mockSignOut).toHaveBeenCalled();
+  });
+
+  test("navigates to signed-out page when logout request fails", async () => {
+    fetchMock.mockRejectOnce(new Error("Network error"));
+
+    const { user } = setup(<SignOut />, oidcUserSetup);
+
+    const signOutBtn = await screen.findByRole("button", { name: "Sign Out" });
+    await user.click(signOutBtn);
+
+    const signOutForReal = await screen.findByRole("button", {
+      name: "Confirm Sign Out"
+    });
+    await user.click(signOutForReal);
+
+    await waitFor(() => {
+      expect(window.location.href).toContain("/signed-out");
+    });
+
+    // Local credentials should still have been cleared
+    expect(fixtures.mockSignOut).toHaveBeenCalled();
+  });
+
+  test("navigates to signed-out page when logout endpoint returns HTTP error", async () => {
+    // redirect: "manual" prevents fetch from throwing on non-2xx status codes,
+    // so the code must check response.ok and throw explicitly. This test
+    // confirms that an HTTP 500 is treated the same as a network failure.
+    fetchMock.mockResponseOnce("", { status: 500 });
+
+    const { user } = setup(<SignOut />, oidcUserSetup);
+
+    const signOutBtn = await screen.findByRole("button", { name: "Sign Out" });
+    await user.click(signOutBtn);
+
+    const signOutForReal = await screen.findByRole("button", {
+      name: "Confirm Sign Out"
+    });
+    await user.click(signOutForReal);
+
+    await waitFor(() => {
+      expect(window.location.href).toContain("/signed-out");
+    });
+    expect(fixtures.mockSignOut).toHaveBeenCalled();
+  });
+});
+
+test("falls back to local signout for OIDC without logout link", async () => {
+  const oidcMethod: ClientOidcMethod = {
+    type: OPDS1.OidcAuthType,
+    id: "oidc-1",
+    href: "http://example.com/oidc/authenticate",
+    // No logoutLink
+    description: "Test OIDC"
+  };
+
+  const { user } = setup(<SignOut />, {
+    user: {
+      credentials: {
+        token: "Bearer test-token",
+        methodType: OPDS1.OidcAuthType
+      } as const
+    },
+    library: {
+      ...fixtures.libraryData,
+      authMethods: [oidcMethod]
+    }
+  });
+
+  const signOut = await screen.findByRole("button", { name: "Sign Out" });
+  await user.click(signOut);
+
+  const signOutForReal = await screen.findByRole("button", {
+    name: "Confirm Sign Out"
+  });
+  await user.click(signOutForReal);
+
+  // Should use the redirect-based signout flow (navigate with performSignOut=true)
+  // The router mock will have been called
+  await waitFor(() => {
+    expect(mockPush).toHaveBeenCalled();
+  });
 });

@@ -64,6 +64,44 @@ describe("redirects when user becomes authenticated", () => {
     });
   });
 
+  test("does not redirect to a URL containing performSignOut", () => {
+    render(<LoginWrapper />, {
+      user: {
+        isAuthenticated: true
+      },
+      router: {
+        query: {
+          nextUrl: "/testlib/?performSignOut=true"
+        }
+      }
+    });
+
+    expect(mockPush).toHaveBeenCalledTimes(1);
+    // redirects to catalog root — the performSignOut URL would re-trigger sign-out
+    expect(mockPush).toHaveBeenCalledWith("/testlib", undefined, {
+      shallow: true
+    });
+  });
+
+  test("does not redirect to signed-out page after re-login", () => {
+    render(<LoginWrapper />, {
+      user: {
+        isAuthenticated: true
+      },
+      router: {
+        query: {
+          nextUrl: "/testlib/signed-out"
+        }
+      }
+    });
+
+    expect(mockPush).toHaveBeenCalledTimes(1);
+    // redirects to catalog root instead of signed-out page
+    expect(mockPush).toHaveBeenCalledWith("/testlib", undefined, {
+      shallow: true
+    });
+  });
+
   test("does not redirect to login page (create infinite loop)", () => {
     render(<LoginWrapper />, {
       user: {

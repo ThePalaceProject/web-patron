@@ -8,7 +8,7 @@ import {
   basicTokenAuthenticationUrl,
   basicTokenAuthMethod
 } from "test-utils/fixtures";
-import mockAuthenticatedOnce, {
+import mockAuthenticated, {
   expirationDate,
   firstToken,
   tokenCreds1
@@ -139,13 +139,12 @@ test("submit by clicking login button", async () => {
   // we wrap this in waitFor because the handleSubmit from react-hook-form has
   // async code in it
   await waitFor(() => {
-    // we set the cookie
+    // session marker cookie set; full credentials stored in localStorage
     expect(Cookie.set).toHaveBeenCalledTimes(1);
-    const [credentialsKey, credentialsValue] = (Cookie.set as jest.Mock).mock
-      .calls[0];
-
-    expect(credentialsKey).toEqual("CPW_AUTH_COOKIE/testlib");
-    const parsed = JSON.parse(credentialsValue);
+    expect(Cookie.set).toHaveBeenCalledWith("CPW_AUTH_COOKIE/testlib", "1");
+    const stored = localStorage.getItem("CPW_AUTH_COOKIE/testlib");
+    expect(stored).not.toBeNull();
+    const parsed = JSON.parse(stored!);
     expect(parsed).toMatchObject({
       token: {
         basicToken: basicToken,
@@ -194,7 +193,7 @@ test("submit by clicking login button", async () => {
 test("fetch new token if token has expired", async () => {
   // set credentials to trigger fetch in <UserProvider />
   // expired token returns 401
-  mockAuthenticatedOnce(tokenCreds1);
+  mockAuthenticated(tokenCreds1);
 
   const problemdoc: OPDS1.ProblemDocument = {
     type: "http://librarysimplified.org/terms/problem/patron-auth-access-token-expired",

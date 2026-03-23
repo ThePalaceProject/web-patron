@@ -180,7 +180,8 @@ type AuthDocLinkRelations =
   | "terms-of-service"
   | "about"
   | "alternate"
-  | "authenticate";
+  | "authenticate"
+  | "logout";
 
 export interface AuthDocumentLink extends Link {
   rel: AuthDocLinkRelations;
@@ -339,8 +340,16 @@ export type OidcLink = {
       value: string;
     }
   ];
-  rel: "authenticate";
+  rel: "authenticate" | "logout";
   information_urls: [];
+  templated?: boolean;
+  /** Structurally equivalent to OPDS2.UriTemplateProperties (see types/opds2.ts). */
+  properties?: {
+    uri_template_variables?: {
+      "@type"?: string;
+      map: Record<string, { term: string; required?: boolean }>;
+    };
+  };
 };
 
 /**

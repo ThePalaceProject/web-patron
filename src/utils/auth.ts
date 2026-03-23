@@ -11,7 +11,7 @@ import {
  *
  * Handles special cases:
  * - SAML methods with multiple IdP links are expanded into separate methods
- * - OIDC methods use only the first link
+ * - OIDC methods extract authenticate and optional logout links
  * - All methods get a unique ID (either their href or type)
  */
 export function normalizeAuthMethods(
@@ -54,7 +54,7 @@ function serverToClientSamlMethods(
 
 /**
  * Converts a server-side OIDC method to a client-ready OIDC method.
- * Uses only the first link from the links array.
+ * Extracts the authenticate link and optional logout link.
  *
  * @returns ClientOidcMethod if links exist, null otherwise
  */
@@ -62,14 +62,22 @@ function serverToClientOidcMethod(
   oidcMethod: OPDS1.ServerOidcMethod
 ): ClientOidcMethod | null {
   if (!oidcMethod.links || oidcMethod.links.length === 0) return null;
-  const link = oidcMethod.links[0]; // First link only
 
+  const authenticateLink = oidcMethod.links.find(
+    link => link.rel === "authenticate"
+  );
+  const logoutLink = oidcMethod.links.find(link => link.rel === "logout");
+
+  if (!authenticateLink) return null;
+
+  // The authenticate link href serves as the unique ID.
   return {
-    id: link.href, // Use href as unique ID
-    href: link.href,
+    id: authenticateLink.href,
+    href: authenticateLink.href,
+    ...(logoutLink ? { logoutLink } : {}),
     type: oidcMethod.type,
     description:
-      getEnglishValue(link.display_names) ??
+      getEnglishValue(authenticateLink.display_names) ??
       oidcMethod.description ??
       "OIDC Provider"
   };

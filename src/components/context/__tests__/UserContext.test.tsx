@@ -7,7 +7,7 @@ import { act, fixtures, setup } from "test-utils";
 import Cookie from "js-cookie";
 import * as router from "next/router";
 import useUser, { UserProvider } from "components/context/UserContext";
-import mockAuthenticatedOnce from "test-utils/mockAuthState";
+import mockAuthenticated from "test-utils/mockAuthState";
 import * as swr from "swr";
 import { makeSwrResponse } from "test-utils/mockSwr";
 
@@ -43,7 +43,7 @@ beforeEach(() => {
 });
 
 test("fetches loans when credentials are present", async () => {
-  mockAuthenticatedOnce();
+  mockAuthenticated();
   renderUserContext();
 
   expect(mockSWR).toHaveBeenCalledWith(
@@ -54,7 +54,7 @@ test("fetches loans when credentials are present", async () => {
 });
 
 test("does not fetch loans if no credentials are present", () => {
-  mockAuthenticatedOnce(null);
+  mockAuthenticated(null);
   renderUserContext();
   expect(fetchMock).toHaveBeenCalledTimes(0);
 });
@@ -82,8 +82,8 @@ test("extracts clever tokens from the url", () => {
   );
 
   expect(Cookie.set).toHaveBeenCalledTimes(1);
-  expect(Cookie.set).toHaveBeenCalledWith(
-    "CPW_AUTH_COOKIE/testlib",
+  expect(Cookie.set).toHaveBeenCalledWith("CPW_AUTH_COOKIE/testlib", "1");
+  expect(localStorage.getItem("CPW_AUTH_COOKIE/testlib")).toBe(
     str({ token: "Bearer fry6H3", methodType: OPDS1.CleverAuthType })
   );
   expect(mockSWR).toHaveBeenCalledWith(
@@ -125,8 +125,8 @@ test("extracts SAML tokens from the url", () => {
   );
 
   expect(Cookie.set).toHaveBeenCalledTimes(1);
-  expect(Cookie.set).toHaveBeenCalledWith(
-    "CPW_AUTH_COOKIE/testlib",
+  expect(Cookie.set).toHaveBeenCalledWith("CPW_AUTH_COOKIE/testlib", "1");
+  expect(localStorage.getItem("CPW_AUTH_COOKIE/testlib")).toBe(
     str({ token: "Bearer saml-token", methodType: OPDS1.SamlAuthType })
   );
 
@@ -173,8 +173,8 @@ test("extracts OIDC tokens when only OIDC is configured", () => {
   );
 
   expect(Cookie.set).toHaveBeenCalledTimes(1);
-  expect(Cookie.set).toHaveBeenCalledWith(
-    "CPW_AUTH_COOKIE/testlib",
+  expect(Cookie.set).toHaveBeenCalledWith("CPW_AUTH_COOKIE/testlib", "1");
+  expect(localStorage.getItem("CPW_AUTH_COOKIE/testlib")).toBe(
     str({ token: "Bearer oidc-token", methodType: OPDS1.OidcAuthType })
   );
 
@@ -215,8 +215,8 @@ test("extracts SAML tokens when only SAML is configured", () => {
   });
 
   expect(Cookie.set).toHaveBeenCalledTimes(1);
-  expect(Cookie.set).toHaveBeenCalledWith(
-    "CPW_AUTH_COOKIE/testlib",
+  expect(Cookie.set).toHaveBeenCalledWith("CPW_AUTH_COOKIE/testlib", "1");
+  expect(localStorage.getItem("CPW_AUTH_COOKIE/testlib")).toBe(
     str({ token: "Bearer saml-token", methodType: OPDS1.SamlAuthType })
   );
 
@@ -250,9 +250,9 @@ test("uses SAML when it comes first in auth methods (both OIDC and SAML configur
   });
 
   expect(Cookie.set).toHaveBeenCalledTimes(1);
+  expect(Cookie.set).toHaveBeenCalledWith("CPW_AUTH_COOKIE/testlib", "1");
   // Should use SAML because it's the first redirect-based auth method
-  expect(Cookie.set).toHaveBeenCalledWith(
-    "CPW_AUTH_COOKIE/testlib",
+  expect(localStorage.getItem("CPW_AUTH_COOKIE/testlib")).toBe(
     str({ token: "Bearer redirect-token", methodType: OPDS1.SamlAuthType })
   );
 
@@ -286,9 +286,9 @@ test("uses OIDC when it comes first in auth methods (both OIDC and SAML configur
   });
 
   expect(Cookie.set).toHaveBeenCalledTimes(1);
+  expect(Cookie.set).toHaveBeenCalledWith("CPW_AUTH_COOKIE/testlib", "1");
   // Should use OIDC because it's the first redirect-based auth method
-  expect(Cookie.set).toHaveBeenCalledWith(
-    "CPW_AUTH_COOKIE/testlib",
+  expect(localStorage.getItem("CPW_AUTH_COOKIE/testlib")).toBe(
     str({ token: "Bearer redirect-token", methodType: OPDS1.OidcAuthType })
   );
 
@@ -304,7 +304,7 @@ test("uses OIDC when it comes first in auth methods (both OIDC and SAML configur
 });
 
 test("sign out clears cookies and data", async () => {
-  mockAuthenticatedOnce();
+  mockAuthenticated();
   let extractedSignOut: any = null;
   function Extractor() {
     const { signOut } = useUser();
@@ -328,9 +328,10 @@ test("sign out clears cookies and data", async () => {
   // now sign out
   act(() => extractedSignOut());
 
-  // should have removed cookie
+  // should have removed session marker cookie and localStorage entry
   expect(Cookie.remove).toHaveBeenCalledTimes(1);
   expect(Cookie.remove).toHaveBeenCalledWith("CPW_AUTH_COOKIE/testlib");
+  expect(localStorage.getItem("CPW_AUTH_COOKIE/testlib")).toBeNull();
 
   // data should be revalidated
   expect(mutateMock).toHaveBeenCalledTimes(1);
@@ -360,8 +361,8 @@ test("sign in sets cookie", async () => {
   act(() => extractedSignIn("a-token", { type: "type" }));
 
   expect(mockCookie.set).toHaveBeenCalledTimes(1);
-  expect(mockCookie.set).toHaveBeenCalledWith(
-    "CPW_AUTH_COOKIE/testlib",
+  expect(mockCookie.set).toHaveBeenCalledWith("CPW_AUTH_COOKIE/testlib", "1");
+  expect(localStorage.getItem("CPW_AUTH_COOKIE/testlib")).toBe(
     str({ token: "a-token", methodType: "type" })
   );
 
@@ -374,7 +375,7 @@ test("sign in sets cookie", async () => {
 
 test("fetches patron profile when authenticated and userProfileUrl is available", () => {
   jest.useFakeTimers();
-  mockAuthenticatedOnce();
+  mockAuthenticated();
   renderUserContext();
 
   // Should make SWR call for loans immediately
@@ -407,7 +408,7 @@ test("fetches patron profile when authenticated and userProfileUrl is available"
 });
 
 test("does not fetch patron profile when not authenticated", () => {
-  mockAuthenticatedOnce(null);
+  mockAuthenticated(null);
   renderUserContext();
 
   // Should not make any SWR calls for patron profile
@@ -419,7 +420,7 @@ test("does not fetch patron profile when not authenticated", () => {
 
 test("exposes patronId from profile data", () => {
   jest.useFakeTimers();
-  mockAuthenticatedOnce();
+  mockAuthenticated();
 
   // Mock the patron profile SWR call to return profile data
   mockSWR.mockImplementation((key: any) => {
@@ -455,9 +456,48 @@ test("exposes patronId from profile data", () => {
   jest.useRealTimers();
 });
 
+test("status is unauthenticated when credentials exist but shelfUrl is absent", () => {
+  // Credentials are present but the library has no shelf URL, so SWR key is
+  // null and the fetch never starts. Status must not be stuck at "loading".
+  mockAuthenticated();
+
+  // Real SWR returns undefined data when its key is null. Replicate that so
+  // the status calculation sees no data and can fall through correctly.
+  mockSWR.mockImplementation((key: any) => {
+    if (key === null) {
+      return makeSwrResponse({ data: undefined }) as any;
+    }
+    return defaultMock as any;
+  });
+
+  let extractedStatus: string | undefined;
+  function Extractor() {
+    const { status } = useUser();
+    extractedStatus = status;
+    return <div>hello</div>;
+  }
+
+  setup(
+    <UserProvider>
+      <Extractor />
+    </UserProvider>,
+    {
+      library: {
+        ...fixtures.libraryData,
+        shelfUrl: undefined
+      }
+    }
+  );
+
+  expect(extractedStatus).toBe("unauthenticated");
+
+  // Restore default mock for subsequent tests.
+  mockSWR.mockReturnValue(defaultMock as any);
+});
+
 test("patronId is undefined when profile fetch fails", () => {
   jest.useFakeTimers();
-  mockAuthenticatedOnce();
+  mockAuthenticated();
 
   // Mock the patron profile SWR call to return no data
   mockSWR.mockImplementation((key: any) => {

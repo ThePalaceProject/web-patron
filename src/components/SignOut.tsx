@@ -5,30 +5,36 @@ import Button from "./Button";
 import Stack from "./Stack";
 import useUser from "components/context/UserContext";
 import { styleProps } from "./Button/styles";
-import { OPDS1 } from "interfaces";
+import { OPDS1, ClientOidcMethod } from "interfaces";
+import { normalizeLink, UriTemplateTerms } from "utils/opds";
 import { useRouter } from "next/router";
 import useLinkUtils from "hooks/useLinkUtils";
+import useLibraryContext from "./context/LibraryContext";
 
 interface SignOutProps {
   color?: string;
 }
 
+const SIGNOUT_URI_TEMPLATE_FALLBACK_VARIABLES = [
+  "post_logout_redirect_uri",
+  "redirect_uri"
+] as const;
+
 export const SignOut: React.FC<SignOutProps> = ({
   color = "ui.black"
 }: SignOutProps) => {
   const dialog = useDialogStore();
-  const { signOut, credentials } = useUser();
+  const { signOut, credentials, token } = useUser();
   const router = useRouter();
   const { buildMultiLibraryLink } = useLinkUtils();
+  const { authMethods } = useLibraryContext();
 
-  // Check if we should sign out (from query param after navigation).
-  // This should be the case only for SAML or Clever auth.
+  // Handles deferred sign-out: redirect-based auth methods (SAML, Clever, OIDC)
+  // navigate to an unprotected page with performSignOut=true before clearing
+  // credentials, ensuring the auth flow is not restarted mid-signout.
   React.useEffect(() => {
     if (router.query.performSignOut === "true") {
-      // We're on a non-protected page, it's safe to sign out.
       signOut();
-
-      // Redirect to the signed-out warning page.
       router.replace(buildMultiLibraryLink("/signed-out"));
     }
   }, [router.query.performSignOut, signOut, router, buildMultiLibraryLink]);
@@ -39,12 +45,75 @@ export const SignOut: React.FC<SignOutProps> = ({
 
     dialog.hide();
 
-    // For SAML/Clever auth, we need to navigate to a page that doesn't require
-    // authentication, so that the page doesn't restart the authentication flow.
-    // For these mechanisms, we explicitly indicate our intention to sign out.
+    // For OIDC auth with logout support, redirect to the logout endpoint
+    if (methodType === OPDS1.OidcAuthType) {
+      const oidcMethod = authMethods.find(
+        m => m.type === OPDS1.OidcAuthType
+      ) as ClientOidcMethod | undefined;
+
+      if (oidcMethod?.logoutLink && token) {
+        // Local credentials are cleared eagerly before the server-side request.
+        signOut();
+
+        const signedOutUrl = `${window.location.origin}${buildMultiLibraryLink("/signed-out")}`;
+
+        try {
+          /*
+           * Resolve the logout URL, expanding any URI template. The term value
+           * map handles servers that use uri_template_variables to declare the
+           * redirect-URI variable's semantic type; the fallback covers servers
+           * that omit that map but still use the conventional variable name.
+           * normalizeLink throws when a required template variable has no value,
+           * so it must be inside the try block to be handled like any other
+           * logout failure.
+           */
+          const { href: logoutUrl } = normalizeLink(oidcMethod.logoutLink, {
+            termValues: { [UriTemplateTerms.REDIRECT_URI]: signedOutUrl },
+            fallbacks: Object.fromEntries(
+              SIGNOUT_URI_TEMPLATE_FALLBACK_VARIABLES.map(v => [
+                v,
+                signedOutUrl
+              ])
+            )
+          });
+          /**
+           * The Authorization header lets the backend identify and invalidate
+           * the token. redirect: "manual" captures the first redirect without
+           * following the full chain — the chain may include the IdP's
+           * end_session endpoint, which requires a real browser navigation
+           * (with cookies) to terminate the IdP session. For cross-origin
+           * redirects the browser returns an opaque response and the Location
+           * header is unreadable, so we always navigate to our own signed-out
+           * page regardless of the redirect destination.
+           *
+           * redirect: "manual" also prevents fetch from throwing on non-2xx
+           * status codes, so we check response.ok explicitly and throw to
+           * reach the catch block on HTTP errors (e.g. 500).
+           */
+          const response = await fetch(logoutUrl, {
+            headers: { Authorization: token },
+            redirect: "manual"
+          });
+          if (!response.ok && response.type !== "opaqueredirect") {
+            throw new Error(`Logout endpoint returned ${response.status}`);
+          }
+        } catch {
+          // TODO: For now, we swallow the server-side logout failure, since
+          //  the browser has already dropped its local Palace credentials. In
+          //  the future, we can report the error here.
+        } finally {
+          window.location.href = signedOutUrl;
+        }
+        return;
+      }
+    }
+
+    // Redirect-based auth methods require navigating to an unprotected page
+    // before clearing credentials to avoid restarting the auth flow.
     if (
       methodType === OPDS1.SamlAuthType ||
-      methodType === OPDS1.CleverAuthType
+      methodType === OPDS1.CleverAuthType ||
+      methodType === OPDS1.OidcAuthType
     ) {
       const targetUrl = buildMultiLibraryLink("/");
       await router.push({
@@ -73,12 +142,8 @@ export const SignOut: React.FC<SignOutProps> = ({
           <Button variant="ghost" color="ui.gray.dark" onClick={dialog.hide}>
             Cancel
           </Button>
-          <Button
-            color="ui.error"
-            onClick={signOutAndClose}
-            aria-label="Confirm Sign Out"
-          >
-            Sign out
+          <Button color="ui.error" onClick={signOutAndClose}>
+            Confirm Sign Out
           </Button>
         </Stack>
       </Modal>
