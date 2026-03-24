@@ -20,7 +20,10 @@ describe("readVersionInfo", () => {
   describe("GIT_COMMIT_SHA", () => {
     test("uses commit from _version.json without calling git", () => {
       const execSync = jest.fn();
-      const { GIT_COMMIT_SHA } = readVersionInfo({ commit: "abc123" }, execSync);
+      const { GIT_COMMIT_SHA } = readVersionInfo(
+        { commit: "abc123" },
+        execSync
+      );
       expect(GIT_COMMIT_SHA).toBe("abc123");
       expect(execSync).not.toHaveBeenCalledWith("git rev-parse HEAD");
     });
@@ -35,7 +38,9 @@ describe("readVersionInfo", () => {
     });
 
     test("is null when _version.json and git both fail", () => {
-      const execSync = jest.fn(() => { throw new Error("git not found"); });
+      const execSync = jest.fn(() => {
+        throw new Error("git not found");
+      });
       const { GIT_COMMIT_SHA } = readVersionInfo({}, execSync);
       expect(GIT_COMMIT_SHA).toBeNull();
     });
@@ -44,9 +49,14 @@ describe("readVersionInfo", () => {
   describe("GIT_BRANCH", () => {
     test("uses branch from _version.json without calling git", () => {
       const execSync = jest.fn();
-      const { GIT_BRANCH } = readVersionInfo({ branch: "my-feature" }, execSync);
+      const { GIT_BRANCH } = readVersionInfo(
+        { branch: "my-feature" },
+        execSync
+      );
       expect(GIT_BRANCH).toBe("my-feature");
-      expect(execSync).not.toHaveBeenCalledWith("git rev-parse --abbrev-ref HEAD");
+      expect(execSync).not.toHaveBeenCalledWith(
+        "git rev-parse --abbrev-ref HEAD"
+      );
     });
 
     test("falls back to git when branch is absent from _version.json", () => {
@@ -59,7 +69,9 @@ describe("readVersionInfo", () => {
     });
 
     test("is null when _version.json and git both fail", () => {
-      const execSync = jest.fn(() => { throw new Error("git not found"); });
+      const execSync = jest.fn(() => {
+        throw new Error("git not found");
+      });
       const { GIT_BRANCH } = readVersionInfo({}, execSync);
       expect(GIT_BRANCH).toBeNull();
     });
