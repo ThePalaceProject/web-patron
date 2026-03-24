@@ -162,22 +162,21 @@ jobs:
 
       - name: Create version file in source root
         run: |
-          pip install dunamai --quiet
-          python - <<'EOF'
+          python3.12 -m pip install dunamai==1.26.0
+          python3.12 - <<'EOF'
           import json
           from pathlib import Path
 
           try:
-              from dunamai import Version
+              from dunamai import Version, Style
               v = Version.from_git()
               data = {
-                  "version": v.serialize(style="semver"),
+                  "version": v.serialize(style=Style.SemVer),
                   "commit": v.commit,
                   "branch": v.branch,
               }
           except Exception as e:
-              print(f"dunamai failed: {e}", flush=True)
-              data = {"version": None, "commit": None, "branch": None}
+              raise SystemExit(f"dunamai failed: {e}") from e
 
           output_path = Path("src/_version.json")
           output_path.parent.mkdir(parents=True, exist_ok=True)
