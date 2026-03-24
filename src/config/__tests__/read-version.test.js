@@ -15,7 +15,8 @@ describe("readVersionInfo", () => {
 
     test("falls back to git describe when version is absent", () => {
       const execSync = jest.fn(cmd => {
-        if (cmd === "git describe --tags --long --abbrev=9") return "v0.2.7-36-g9308063ca\n";
+        if (cmd === "git describe --tags --long --abbrev=9")
+          return "v0.2.7-36-g9308063ca\n";
         return "";
       });
       const { APP_VERSION } = readVersionInfo({}, execSync);
@@ -24,7 +25,8 @@ describe("readVersionInfo", () => {
 
     test("returns bare tag when exactly on a tagged commit", () => {
       const execSync = jest.fn(cmd => {
-        if (cmd === "git describe --tags --long --abbrev=9") return "v0.2.7-0-g9308063ca\n";
+        if (cmd === "git describe --tags --long --abbrev=9")
+          return "v0.2.7-0-g9308063ca\n";
         return "";
       });
       const { APP_VERSION } = readVersionInfo({}, execSync);
@@ -33,7 +35,8 @@ describe("readVersionInfo", () => {
 
     test("is null when version is absent and git describe fails", () => {
       const execSync = jest.fn(cmd => {
-        if (cmd === "git describe --tags --long --abbrev=9") throw new Error("no tags");
+        if (cmd === "git describe --tags --long --abbrev=9")
+          throw new Error("no tags");
         return "";
       });
       const { APP_VERSION } = readVersionInfo({}, execSync);

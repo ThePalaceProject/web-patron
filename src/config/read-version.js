@@ -16,7 +16,9 @@ function readVersionInfo(
     (() => {
       try {
         // "git describe --tags --long --abbrev=9" → e.g. "v0.2.7-36-g9308063ca"
-        const desc = execSync("git describe --tags --long --abbrev=9").toString().trim();
+        const desc = execSync("git describe --tags --long --abbrev=9")
+          .toString()
+          .trim();
         const match = desc.match(/^v?(.+)-(\d+)-g([0-9a-f]+)$/);
         if (!match) return null;
         const [, tag, distance, sha] = match;
