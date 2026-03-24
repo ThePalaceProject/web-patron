@@ -69,10 +69,10 @@ const config = {
   env: {
     CONFIG_FILE: CONFIG_FILE,
     REACT_AXE: REACT_AXE,
-    APP_VERSION,
+    APP_VERSION: APP_VERSION ?? undefined,
     BUILD_ID,
-    GIT_BRANCH,
-    GIT_COMMIT_SHA,
+    GIT_BRANCH: GIT_BRANCH ?? undefined,
+    GIT_COMMIT_SHA: GIT_COMMIT_SHA ?? undefined,
     RELEASE_STAGE,
     APP_CONFIG: JSON.stringify(APP_CONFIG)
   },

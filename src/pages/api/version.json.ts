@@ -6,15 +6,13 @@ export type VersionInfo = {
   branch: string | null;
 };
 
-const versionInfo: VersionInfo = { version: null, commit: null, branch: null };
-try {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  Object.assign(versionInfo, require("../../_version.json"));
-} catch {}
-
 export default function handler(
   _req: NextApiRequest,
   res: NextApiResponse<VersionInfo>
 ): void {
-  res.status(200).json(versionInfo);
+  res.status(200).json({
+    version: process.env.APP_VERSION || null,
+    commit: process.env.GIT_COMMIT_SHA || null,
+    branch: process.env.GIT_BRANCH || null
+  });
 }
