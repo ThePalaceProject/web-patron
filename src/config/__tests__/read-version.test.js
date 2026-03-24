@@ -7,12 +7,36 @@ const { readVersionInfo } = require("../read-version");
 describe("readVersionInfo", () => {
   describe("APP_VERSION", () => {
     test("uses version from _version.json", () => {
-      const { APP_VERSION } = readVersionInfo({ version: "1.2.3" });
+      const execSync = jest.fn();
+      const { APP_VERSION } = readVersionInfo({ version: "1.2.3" }, execSync);
       expect(APP_VERSION).toBe("1.2.3");
+      expect(execSync).not.toHaveBeenCalledWith("git describe --tags --long");
     });
 
-    test("is null when version is absent", () => {
-      const { APP_VERSION } = readVersionInfo({});
+    test("falls back to git describe when version is absent", () => {
+      const execSync = jest.fn(cmd => {
+        if (cmd === "git describe --tags --long --abbrev=9") return "v0.2.7-36-g9308063ca\n";
+        return "";
+      });
+      const { APP_VERSION } = readVersionInfo({}, execSync);
+      expect(APP_VERSION).toBe("0.2.7-post.36+9308063ca");
+    });
+
+    test("returns bare tag when exactly on a tagged commit", () => {
+      const execSync = jest.fn(cmd => {
+        if (cmd === "git describe --tags --long --abbrev=9") return "v0.2.7-0-g9308063ca\n";
+        return "";
+      });
+      const { APP_VERSION } = readVersionInfo({}, execSync);
+      expect(APP_VERSION).toBe("0.2.7");
+    });
+
+    test("is null when version is absent and git describe fails", () => {
+      const execSync = jest.fn(cmd => {
+        if (cmd === "git describe --tags --long --abbrev=9") throw new Error("no tags");
+        return "";
+      });
+      const { APP_VERSION } = readVersionInfo({}, execSync);
       expect(APP_VERSION).toBeNull();
     });
   });
@@ -31,10 +55,27 @@ describe("readVersionInfo", () => {
     test("falls back to git when commit is absent from _version.json", () => {
       const execSync = jest.fn(cmd => {
         if (cmd === "git rev-parse HEAD") return "deadbeef\n";
+        if (cmd === "git status --porcelain") return "";
         return "main\n";
       });
       const { GIT_COMMIT_SHA } = readVersionInfo({}, execSync);
       expect(GIT_COMMIT_SHA).toBe("deadbeef");
+    });
+
+    test("appends .dirty to the sha when the worktree is unclean", () => {
+      const execSync = jest.fn(cmd => {
+        if (cmd === "git rev-parse HEAD") return "deadbeef\n";
+        if (cmd === "git status --porcelain") return " M src/foo.ts\n";
+        return "main\n";
+      });
+      const { GIT_COMMIT_SHA } = readVersionInfo({}, execSync);
+      expect(GIT_COMMIT_SHA).toBe("deadbeef.dirty");
+    });
+
+    test("does not check worktree state when commit comes from _version.json", () => {
+      const execSync = jest.fn();
+      readVersionInfo({ commit: "abc123" }, execSync);
+      expect(execSync).not.toHaveBeenCalledWith("git status --porcelain");
     });
 
     test("is null when _version.json and git both fail", () => {

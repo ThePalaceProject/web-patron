@@ -11,13 +11,30 @@ function readVersionInfo(
   versionJson = {},
   execSync = require("child_process").execSync
 ) {
-  const APP_VERSION = versionJson.version || null;
+  const APP_VERSION =
+    versionJson.version ||
+    (() => {
+      try {
+        // "git describe --tags --long --abbrev=9" → e.g. "v0.2.7-36-g9308063ca"
+        const desc = execSync("git describe --tags --long --abbrev=9").toString().trim();
+        const match = desc.match(/^v?(.+)-(\d+)-g([0-9a-f]+)$/);
+        if (!match) return null;
+        const [, tag, distance, sha] = match;
+        // Mirror dunamai's semver style: 39.0.0 if on a tag, else 39.0.0-post.36+<sha>
+        return distance === "0" ? tag : `${tag}-post.${distance}+${sha}`;
+      } catch {
+        return null;
+      }
+    })();
 
   const GIT_COMMIT_SHA =
     versionJson.commit ||
     (() => {
       try {
-        return execSync("git rev-parse HEAD").toString().trim();
+        const sha = execSync("git rev-parse HEAD").toString().trim();
+        const dirty =
+          execSync("git status --porcelain").toString().trim() !== "";
+        return dirty ? `${sha}.dirty` : sha;
       } catch {
         return null;
       }
