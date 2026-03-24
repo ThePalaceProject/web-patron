@@ -55,7 +55,7 @@ describe("GET /api/version.json", () => {
   ];
 
   test.each(cases)("responds 200 with %s", (_label, mockJson, expected) => {
-    jest.doMock("../../../_version.json", () => mockJson);
+    jest.doMock("../../../_version.json", () => mockJson, { virtual: true });
     const handler = loadHandler();
     const { status, json } = makeRes();
     handler({}, { status });
@@ -64,9 +64,13 @@ describe("GET /api/version.json", () => {
   });
 
   test("responds 200 with all-null fields when _version.json is absent", () => {
-    jest.doMock("../../../_version.json", () => {
-      throw new Error("ENOENT: no such file or directory");
-    });
+    jest.doMock(
+      "../../../_version.json",
+      () => {
+        throw new Error("ENOENT: no such file or directory");
+      },
+      { virtual: true }
+    );
     const handler = loadHandler();
     const { status, json } = makeRes();
     handler({}, { status });
