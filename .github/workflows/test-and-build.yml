@@ -175,7 +175,8 @@ jobs:
                   "commit": v.commit,
                   "branch": v.branch,
               }
-          except Exception:
+          except Exception as e:
+              print(f"dunamai failed: {e}", flush=True)
               data = {"version": None, "commit": None, "branch": None}
 
           output_path = Path("src/_version.json")
