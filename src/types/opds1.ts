@@ -299,23 +299,14 @@ export interface BearerTokenDocument {
  * works when backed by a Circulation Manager
  */
 export type SamlIdp = {
-  privacy_statement_urls: [];
-  logo_urls: [];
-  display_names: [
-    {
-      language: string;
-      value: string;
-    }
-  ];
   href: string;
-  descriptions: [
-    {
-      language: string;
-      value: string;
-    }
-  ];
-  rel: "authenticate";
-  information_urls: [];
+  rel: "authenticate" | "logout";
+  display_names?: Array<{ language: string; value: string }>;
+  descriptions?: Array<{ language: string; value: string }>;
+  privacy_statement_urls?: [];
+  logo_urls?: [];
+  information_urls?: [];
+  templated?: boolean;
 };
 
 /**
