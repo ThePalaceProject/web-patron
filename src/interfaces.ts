@@ -91,6 +91,7 @@ export interface ClientSamlMethod extends OPDS1.AuthMethod<
 > {
   href: string;
   id: string;
+  logoutLink?: OPDS1.SamlIdp;
 }
 export interface ClientOidcMethod extends OPDS1.AuthMethod<
   typeof OPDS1.OidcAuthType

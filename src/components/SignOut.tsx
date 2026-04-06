@@ -5,8 +5,8 @@ import Button from "./Button";
 import Stack from "./Stack";
 import useUser from "components/context/UserContext";
 import { styleProps } from "./Button/styles";
-import { OPDS1, ClientOidcMethod } from "interfaces";
-import { normalizeLink, UriTemplateTerms } from "utils/opds";
+import { OPDS1, ClientOidcMethod, ClientSamlMethod } from "interfaces";
+import { normalizeLink, UriTemplateTerms, TemplatedLink } from "utils/opds";
 import { useRouter } from "next/router";
 import useLinkUtils from "hooks/useLinkUtils";
 import useLibraryContext from "./context/LibraryContext";
@@ -19,6 +19,40 @@ const SIGNOUT_URI_TEMPLATE_FALLBACK_VARIABLES = [
   "post_logout_redirect_uri",
   "redirect_uri"
 ] as const;
+
+/*
+ * Calls the server-side logout endpoint (with Authorization header and URI
+ * template expansion), then navigates to signedOutUrl. Swallows any server
+ * error because credentials have already been cleared locally before this
+ * is called.
+ */
+async function performLogoutRequest(
+  logoutLink: TemplatedLink,
+  token: string,
+  signedOutUrl: string
+): Promise<void> {
+  try {
+    const { href: logoutUrl } = normalizeLink(logoutLink, {
+      termValues: { [UriTemplateTerms.REDIRECT_URI]: signedOutUrl },
+      fallbacks: Object.fromEntries(
+        SIGNOUT_URI_TEMPLATE_FALLBACK_VARIABLES.map(v => [v, signedOutUrl])
+      )
+    });
+    const response = await fetch(logoutUrl, {
+      headers: { Authorization: token },
+      redirect: "manual"
+    });
+    if (!response.ok && response.type !== "opaqueredirect") {
+      throw new Error(`Logout endpoint returned ${response.status}`);
+    }
+  } catch {
+    // TODO: For now, we swallow the server-side logout failure, since
+    //  the browser has already dropped its local Palace credentials. In
+    //  the future, we can report the error here.
+  } finally {
+    window.location.href = signedOutUrl;
+  }
+}
 
 export const SignOut: React.FC<SignOutProps> = ({
   color = "ui.black"
@@ -45,65 +79,30 @@ export const SignOut: React.FC<SignOutProps> = ({
 
     dialog.hide();
 
-    // For OIDC auth with logout support, redirect to the logout endpoint
+    // For OIDC or SAML auth with a server-side logout endpoint, call it before
+    // navigating to the signed-out page.
     if (methodType === OPDS1.OidcAuthType) {
       const oidcMethod = authMethods.find(
         m => m.type === OPDS1.OidcAuthType
       ) as ClientOidcMethod | undefined;
 
       if (oidcMethod?.logoutLink && token) {
-        // Local credentials are cleared eagerly before the server-side request.
         signOut();
-
         const signedOutUrl = `${window.location.origin}${buildMultiLibraryLink("/signed-out")}`;
+        await performLogoutRequest(oidcMethod.logoutLink, token, signedOutUrl);
+        return;
+      }
+    }
 
-        try {
-          /*
-           * Resolve the logout URL, expanding any URI template. The term value
-           * map handles servers that use uri_template_variables to declare the
-           * redirect-URI variable's semantic type; the fallback covers servers
-           * that omit that map but still use the conventional variable name.
-           * normalizeLink throws when a required template variable has no value,
-           * so it must be inside the try block to be handled like any other
-           * logout failure.
-           */
-          const { href: logoutUrl } = normalizeLink(oidcMethod.logoutLink, {
-            termValues: { [UriTemplateTerms.REDIRECT_URI]: signedOutUrl },
-            fallbacks: Object.fromEntries(
-              SIGNOUT_URI_TEMPLATE_FALLBACK_VARIABLES.map(v => [
-                v,
-                signedOutUrl
-              ])
-            )
-          });
-          /**
-           * The Authorization header lets the backend identify and invalidate
-           * the token. redirect: "manual" captures the first redirect without
-           * following the full chain — the chain may include the IdP's
-           * end_session endpoint, which requires a real browser navigation
-           * (with cookies) to terminate the IdP session. For cross-origin
-           * redirects the browser returns an opaque response and the Location
-           * header is unreadable, so we always navigate to our own signed-out
-           * page regardless of the redirect destination.
-           *
-           * redirect: "manual" also prevents fetch from throwing on non-2xx
-           * status codes, so we check response.ok explicitly and throw to
-           * reach the catch block on HTTP errors (e.g. 500).
-           */
-          const response = await fetch(logoutUrl, {
-            headers: { Authorization: token },
-            redirect: "manual"
-          });
-          if (!response.ok && response.type !== "opaqueredirect") {
-            throw new Error(`Logout endpoint returned ${response.status}`);
-          }
-        } catch {
-          // TODO: For now, we swallow the server-side logout failure, since
-          //  the browser has already dropped its local Palace credentials. In
-          //  the future, we can report the error here.
-        } finally {
-          window.location.href = signedOutUrl;
-        }
+    if (methodType === OPDS1.SamlAuthType) {
+      const samlMethod = authMethods.find(
+        m => m.type === OPDS1.SamlAuthType
+      ) as ClientSamlMethod | undefined;
+
+      if (samlMethod?.logoutLink && token) {
+        signOut();
+        const signedOutUrl = `${window.location.origin}${buildMultiLibraryLink("/signed-out")}`;
+        await performLogoutRequest(samlMethod.logoutLink, token, signedOutUrl);
         return;
       }
     }
