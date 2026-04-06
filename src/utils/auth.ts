@@ -43,13 +43,15 @@ function serverToClientSamlMethods(
   samlMethod: OPDS1.ServerSamlMethod
 ): ClientSamlMethod[] {
   if (!samlMethod.links) return [];
-  return samlMethod.links.map(idp => ({
-    // use the href as the id for saml methods because there can be >1 saml method
-    id: idp.href,
-    href: idp.href,
-    type: samlMethod.type,
-    description: getEnglishValue(idp.display_names) ?? "Unknown SAML Provider"
-  }));
+  return samlMethod.links
+    .filter(link => link.rel === "authenticate")
+    .map(idp => ({
+      // use the href as the id for saml methods because there can be >1 saml method
+      id: idp.href,
+      href: idp.href,
+      type: samlMethod.type,
+      description: getEnglishValue(idp.display_names) ?? "Unknown SAML Provider"
+    }));
 }
 
 /**
@@ -84,8 +86,8 @@ function serverToClientOidcMethod(
 }
 
 export const getEnglishValue = (
-  arr: Array<{ language: string; value: string }>
-) => arr.find(item => item.language === "en")?.value;
+  arr: Array<{ language: string; value: string }> | undefined
+) => arr?.find(item => item.language === "en")?.value;
 
 export function generateCredentials(username: string, password = "") {
   const btoaStr = btoa(`${username}:${password}`);

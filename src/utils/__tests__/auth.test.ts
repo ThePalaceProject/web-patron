@@ -377,6 +377,45 @@ describe("normalizeAuthMethods", () => {
     expect(result[0].description).toBe("OIDC Provider");
   });
 
+  test("normalizeAuthMethods uses only the 'authenticate' link", () => {
+    const authDoc: OPDS1.AuthDocument = {
+      id: "test-auth-doc",
+      title: "Test Library",
+      authentication: [
+        {
+          type: OPDS1.SamlAuthType,
+          description: "SAML Provider",
+          links: [
+            {
+              href: "https://saml-sp.example.com/saml/authenticate",
+              rel: "authenticate",
+              display_names: [{ language: "en", value: "Identity Provider" }],
+              descriptions: [],
+              logo_urls: [],
+              privacy_statement_urls: [],
+              information_urls: []
+            },
+            {
+              href: "https://saml-sp.example.com/saml/logout{?redirect_uri}",
+              rel: "logout",
+              templated: true
+            }
+          ]
+        }
+      ]
+    };
+
+    const result = normalizeAuthMethods(authDoc);
+
+    expect(result).toHaveLength(1);
+    expect(result[0]).toEqual({
+      id: "https://saml-sp.example.com/saml/authenticate",
+      href: "https://saml-sp.example.com/saml/authenticate",
+      type: OPDS1.SamlAuthType,
+      description: "Identity Provider"
+    });
+  });
+
   test("expands multiple SAML IdPs into separate methods", () => {
     const authDoc: OPDS1.AuthDocument = {
       id: "test-auth-doc",
