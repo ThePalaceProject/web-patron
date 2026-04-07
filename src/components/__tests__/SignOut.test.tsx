@@ -1,7 +1,7 @@
 import * as React from "react";
 import { fixtures, screen, setup, waitFor } from "../../test-utils";
 import { SignOut } from "components/SignOut";
-import { OPDS1, ClientOidcMethod } from "interfaces";
+import { OPDS1, ClientOidcMethod, ClientSamlMethod } from "interfaces";
 import { mockPush } from "../../test-utils/mockNextRouter";
 import fetchMock from "jest-fetch-mock";
 
@@ -260,6 +260,135 @@ describe("OIDC logout with logout endpoint", () => {
   });
 });
 
+describe("SAML logout with logout endpoint", () => {
+  /* eslint-disable camelcase */
+  const logoutLink: OPDS1.SamlIdp = {
+    href: "http://example.com/saml/logout?provider=Test{&redirect_uri}",
+    rel: "logout",
+    templated: true,
+    display_names: [{ language: "en", value: "Test SAML" }],
+    descriptions: [{ language: "en", value: "Test SAML" }],
+    privacy_statement_urls: [],
+    logo_urls: [],
+    information_urls: []
+  };
+  /* eslint-enable camelcase */
+  const samlMethod: ClientSamlMethod = {
+    type: OPDS1.SamlAuthType,
+    id: "http://example.com/saml/authenticate",
+    href: "http://example.com/saml/authenticate",
+    logoutLink,
+    description: "Test SAML"
+  };
+  const samlUserSetup = {
+    user: {
+      token: "Bearer test-token",
+      credentials: {
+        token: "Bearer test-token",
+        methodType: OPDS1.SamlAuthType
+      } as const
+    },
+    library: {
+      ...fixtures.libraryData,
+      authMethods: [samlMethod]
+    }
+  };
+
+  let originalLocation: Location;
+
+  beforeEach(() => {
+    originalLocation = window.location;
+    delete (window as any).location;
+    window.location = { ...originalLocation, href: "" } as any;
+  });
+
+  afterEach(() => {
+    (window as any).location = originalLocation;
+  });
+
+  test("clears local credentials immediately before fetching logout endpoint", async () => {
+    fetchMock.mockResponseOnce("", { status: 200 });
+
+    const { user } = setup(<SignOut />, samlUserSetup);
+
+    const signOutBtn = await screen.findByRole("button", { name: "Sign Out" });
+    await user.click(signOutBtn);
+
+    const signOutForReal = await screen.findByRole("button", {
+      name: "Confirm Sign Out"
+    });
+    await user.click(signOutForReal);
+
+    await waitFor(() => {
+      expect(fixtures.mockSignOut).toHaveBeenCalled();
+    });
+  });
+
+  test("uses SAML logout endpoint and navigates to signed-out page", async () => {
+    fetchMock.mockResponseOnce("", { status: 200 });
+
+    const { user } = setup(<SignOut />, samlUserSetup);
+
+    const signOutBtn = await screen.findByRole("button", { name: "Sign Out" });
+    await user.click(signOutBtn);
+
+    const signOutForReal = await screen.findByRole("button", {
+      name: "Confirm Sign Out"
+    });
+    await user.click(signOutForReal);
+
+    await waitFor(() => {
+      const [fetchedUrl, fetchOptions] = fetchMock.mock.calls[0];
+      expect(fetchedUrl).toContain("http://example.com/saml/logout");
+      expect(fetchedUrl).toContain("redirect_uri=");
+      expect(
+        (fetchOptions?.headers as Record<string, string>)?.Authorization
+      ).toBe("Bearer test-token");
+    });
+
+    expect(window.location.href).toContain("/signed-out");
+  });
+
+  test("navigates to signed-out page when logout request fails", async () => {
+    fetchMock.mockRejectOnce(new Error("Network error"));
+
+    const { user } = setup(<SignOut />, samlUserSetup);
+
+    const signOutBtn = await screen.findByRole("button", { name: "Sign Out" });
+    await user.click(signOutBtn);
+
+    const signOutForReal = await screen.findByRole("button", {
+      name: "Confirm Sign Out"
+    });
+    await user.click(signOutForReal);
+
+    await waitFor(() => {
+      expect(window.location.href).toContain("/signed-out");
+    });
+
+    expect(fixtures.mockSignOut).toHaveBeenCalled();
+  });
+
+  test("navigates to signed-out page when logout endpoint returns HTTP error", async () => {
+    fetchMock.mockResponseOnce("", { status: 500 });
+
+    const { user } = setup(<SignOut />, samlUserSetup);
+
+    const signOutBtn = await screen.findByRole("button", { name: "Sign Out" });
+    await user.click(signOutBtn);
+
+    const signOutForReal = await screen.findByRole("button", {
+      name: "Confirm Sign Out"
+    });
+    await user.click(signOutForReal);
+
+    await waitFor(() => {
+      expect(window.location.href).toContain("/signed-out");
+    });
+    expect(fixtures.mockSignOut).toHaveBeenCalled();
+  });
+});
+
 test("falls back to local signout for OIDC without logout link", async () => {
   const oidcMethod: ClientOidcMethod = {
     type: OPDS1.OidcAuthType,
@@ -292,6 +421,42 @@ test("falls back to local signout for OIDC without logout link", async () => {
 
   // Should use the redirect-based signout flow (navigate with performSignOut=true)
   // The router mock will have been called
+  await waitFor(() => {
+    expect(mockPush).toHaveBeenCalled();
+  });
+});
+
+test("falls back to redirect-based signout for SAML without logout link", async () => {
+  const samlMethod: ClientSamlMethod = {
+    type: OPDS1.SamlAuthType,
+    id: "http://example.com/saml/authenticate",
+    href: "http://example.com/saml/authenticate",
+    // No logoutLink
+    description: "Test SAML"
+  };
+
+  const { user } = setup(<SignOut />, {
+    user: {
+      credentials: {
+        token: "Bearer test-token",
+        methodType: OPDS1.SamlAuthType
+      } as const
+    },
+    library: {
+      ...fixtures.libraryData,
+      authMethods: [samlMethod]
+    }
+  });
+
+  const signOut = await screen.findByRole("button", { name: "Sign Out" });
+  await user.click(signOut);
+
+  const signOutForReal = await screen.findByRole("button", {
+    name: "Confirm Sign Out"
+  });
+  await user.click(signOutForReal);
+
+  // Should use the redirect-based signout flow (navigate with performSignOut=true)
   await waitFor(() => {
     expect(mockPush).toHaveBeenCalled();
   });
