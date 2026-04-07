@@ -15,7 +15,8 @@ module.exports = {
   testEnvironment: "node",
   testMatch: [
     "**/config/**/?(*.)+(spec|test).[tj]s?(x)",
-    "**/pages/api/**/?(*.)+(spec|test).[tj]s?(x)"
+    "**/pages/api/**/?(*.)+(spec|test).[tj]s?(x)",
+    "**/server/**/?(*.)+(spec|test).[tj]s?(x)"
   ],
   testPathIgnorePatterns: ["/node_modules/", "/.next/"],
   // No setup files for Node.js tests - these are browser-specific
