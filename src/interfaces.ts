@@ -63,8 +63,9 @@ export type LibrariesConfig = Record<
  */
 export interface RegistryConfig {
   url: string;
-  refreshMinInterval?: number; // seconds, default 60
-  refreshMaxInterval?: number; // seconds, default 300
+  refreshMinInterval?: number;  // seconds, default 60
+  refreshMaxInterval?: number;  // seconds, default 300
+  fullRefreshInterval?: number; // seconds, default 86400 (24 h)
 }
 
 export interface ComplaintData {
