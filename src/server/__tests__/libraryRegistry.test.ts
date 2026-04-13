@@ -233,8 +233,8 @@ describe("fetchRegistryLibraries", () => {
     const result = await fetchRegistryLibraries(REGISTRY_URL);
 
     expect(result).toEqual({
-      "urn:uuid:abc": { title: "Library A", authDocUrl: "https://a.example.com/auth" },
-      "urn:uuid:def": { title: "Library B", authDocUrl: "https://b.example.com/auth" }
+      "uuid-abc": { title: "Library A", authDocUrl: "https://a.example.com/auth" },
+      "uuid-def": { title: "Library B", authDocUrl: "https://b.example.com/auth" }
     });
   });
 
@@ -253,8 +253,8 @@ describe("fetchRegistryLibraries", () => {
     const result = await fetchRegistryLibraries(REGISTRY_URL);
 
     expect(Object.keys(result)).toHaveLength(2);
-    expect(result["urn:uuid:p1"]).toBeDefined();
-    expect(result["urn:uuid:p2"]).toBeDefined();
+    expect(result["uuid-p1"]).toBeDefined();
+    expect(result["uuid-p2"]).toBeDefined();
     expect(global.fetch).toHaveBeenCalledTimes(2);
   });
 
@@ -267,7 +267,7 @@ describe("fetchRegistryLibraries", () => {
 
     const result = await fetchRegistryLibraries(REGISTRY_URL);
 
-    expect(Object.keys(result)).toEqual(["urn:uuid:abc"]);
+    expect(Object.keys(result)).toEqual(["uuid-abc"]);
   });
 
   it("returns empty result for a feed with no catalogs", async () => {
@@ -282,6 +282,22 @@ describe("fetchRegistryLibraries", () => {
   it("throws when the response is not ok", async () => {
     global.fetch = mockFetchError(503, "Service Unavailable") as unknown as typeof fetch;
     await expect(fetchRegistryLibraries(REGISTRY_URL)).rejects.toThrow("503");
+  });
+
+  it("skips and warns on entries whose computed slug is not URL-safe", async () => {
+    const feed = makePagedFeed([
+      { id: "valid-library",   title: "Valid",   authDocUrl: "https://v.example.com/auth" },
+      { id: "bad/slug/here",   title: "Bad Slug", authDocUrl: "https://b.example.com/auth" }
+    ]);
+    global.fetch = mockFetchSuccess(feed) as unknown as typeof fetch;
+    const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => undefined);
+
+    const result = await fetchRegistryLibraries(REGISTRY_URL);
+
+    expect(Object.keys(result)).toEqual(["valid-library"]);
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("invalid slug")
+    );
   });
 });
 
@@ -326,7 +342,7 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
       makeConfig({ registries: [makeIncrementalConfig()] })
     );
 
-    expect(result["urn:uuid:a"]).toBeDefined();
+    expect(result["uuid-a"]).toBeDefined();
   });
 
   it("incremental crawl stops mid-page when an entry is old", async () => {
@@ -358,9 +374,9 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
     );
 
     // C is new and should be present; A (old) stops the crawl on the page.
-    expect(result["urn:uuid:c"]).toBeDefined();
+    expect(result["uuid-c"]).toBeDefined();
     // B was cached from the first fetch and not seen in incremental (not replaced).
-    expect(result["urn:uuid:b"]).toBeDefined();
+    expect(result["uuid-b"]).toBeDefined();
   });
 
   it("incremental that reaches end of feed replaces cache (deletions applied)", async () => {
@@ -392,8 +408,8 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
 
     // reachedEnd = true (no next link), so cache is replaced.
     // A triggered the stop (not accumulated), so both A and B are gone.
-    expect(result["urn:uuid:a"]).toBeUndefined();
-    expect(result["urn:uuid:b"]).toBeUndefined();
+    expect(result["uuid-a"]).toBeUndefined();
+    expect(result["uuid-b"]).toBeUndefined();
   });
 
   it("full crawl after fullRefreshInterval replaces cache", async () => {
@@ -419,8 +435,8 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
 
     const result = await getLibraries(makeConfig({ registries: [config] }));
 
-    expect(result["urn:uuid:a"]).toBeDefined();
-    expect(result["urn:uuid:b"]).toBeUndefined();
+    expect(result["uuid-a"]).toBeDefined();
+    expect(result["uuid-b"]).toBeUndefined();
   });
 
   it("second fetch within fullRefreshInterval uses incrementalUrl", async () => {
@@ -491,8 +507,8 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
     const result = await getLibraries(makeConfig({ registries: [makeIncrementalConfig()] }));
 
     // Both B (empty date) and C (new) should be collected.
-    expect(result["urn:uuid:b"]).toBeDefined();
-    expect(result["urn:uuid:c"]).toBeDefined();
+    expect(result["uuid-b"]).toBeDefined();
+    expect(result["uuid-c"]).toBeDefined();
   });
 
   it("retains cached state when registry fetch fails", async () => {
@@ -507,7 +523,7 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
 
     const result = await getLibraries(makeConfig({ registries: [makeIncrementalConfig()] }));
 
-    expect(result["urn:uuid:cached"]).toBeDefined();
+    expect(result["uuid-cached"]).toBeDefined();
   });
 
   it("retains incrementalUrl in state after a failed fetch", async () => {
@@ -556,7 +572,7 @@ describe("getLibraries", () => {
 
     const result = await getLibraries(makeConfig({ registries: [makeRegistryConfig()] }));
 
-    expect(result["urn:uuid:reg"]).toBeDefined();
+    expect(result["uuid-reg"]).toBeDefined();
   });
 
   it("static libraries override registry libraries with the same key", async () => {
@@ -566,12 +582,12 @@ describe("getLibraries", () => {
     global.fetch = mockFetchSuccess(feed) as unknown as typeof fetch;
 
     const config = makeConfig({
-      libraries: { "urn:uuid:shared": { title: "Static Version", authDocUrl: "https://static.example.com/auth" } },
+      libraries: { "uuid-shared": { title: "Static Version", authDocUrl: "https://static.example.com/auth" } },
       registries: [makeRegistryConfig()]
     });
 
     const result = await getLibraries(config);
-    expect(result["urn:uuid:shared"]?.title).toBe("Static Version");
+    expect(result["uuid-shared"]?.title).toBe("Static Version");
   });
 
   it("gives earlier registries precedence over later ones for the same key", async () => {
@@ -592,7 +608,7 @@ describe("getLibraries", () => {
     });
 
     const result = await getLibraries(config);
-    expect(result["urn:uuid:shared"]?.title).toBe("First Registry");
+    expect(result["uuid-shared"]?.title).toBe("First Registry");
   });
 
   it("does not re-fetch before min interval has elapsed", async () => {

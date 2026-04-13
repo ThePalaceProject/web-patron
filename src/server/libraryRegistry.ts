@@ -6,7 +6,7 @@ import {
   DEFAULT_REGISTRY_FULL_REFRESH_INTERVAL,
   DEFAULT_REGISTRY_FETCH_TIMEOUT
 } from "constants/registry";
-import { computeSlug } from "utils/librarySlug";
+import { computeSlug, validateSlug } from "utils/librarySlug";
 
 // ---------------------------------------------------------------------------
 // Internal state types
@@ -172,6 +172,14 @@ async function crawlRegistryFeed(
       }
 
       const slug = computeSlug(catalog);
+      if (!validateSlug(slug)) {
+        console.warn(
+          `Skipping library with invalid slug "${slug}" ` +
+            `(id: ${catalog.metadata.id}): ${catalog.metadata.title}`
+        );
+        continue;
+      }
+
       accumulated[slug] = {
         title: catalog.metadata.title,
         authDocUrl: authDocLink.href
