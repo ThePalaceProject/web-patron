@@ -212,9 +212,81 @@ export async function fetchRegistryLibraries(
   return result.libraries;
 }
 
+/*
+ * Refreshes a single registry cache entry if the data is stale. Sets
+ * lastAttemptedFetch synchronously (before any await) so that subsequent
+ * requests arriving during the async crawl see the in-progress attempt and
+ * skip the duplicate. Errors are logged and swallowed; the existing cached
+ * state is retained.
+ */
+async function refreshRegistry(
+  registryConfig: RegistryConfig,
+  nowSeconds: number
+): Promise<void> {
+  const isFirstFetch = !registryCaches.has(registryConfig.url);
+  const existing = registryCaches.get(registryConfig.url) ?? emptyState;
+
+  if (!shouldRefresh(existing, registryConfig, nowSeconds)) return;
+
+  const fullRefreshInterval =
+    registryConfig.fullRefreshInterval ?? DEFAULT_REGISTRY_FULL_REFRESH_INTERVAL;
+
+  const needsFullCrawl =
+    isFirstFetch ||
+    existing.lastFullFetch == null ||
+    nowSeconds - existing.lastFullFetch >= fullRefreshInterval;
+
+  const canIncremental = !needsFullCrawl && existing.incrementalUrl != null;
+
+  const startUrl = canIncremental ? (existing.incrementalUrl ?? registryConfig.url) : registryConfig.url;
+  const stopBefore = canIncremental ? existing.lastSuccessfulFetch : null;
+  const attemptTime = nowSeconds;
+
+  registryCaches.set(registryConfig.url, {
+    ...existing,
+    lastAttemptedFetch: attemptTime
+  });
+
+  try {
+    const result = await crawlRegistryFeed(startUrl, stopBefore);
+
+    if (isFirstFetch && result.incrementalUrl == null) {
+      console.warn(
+        `Registry at ${registryConfig.url} has no order=modified facet; ` +
+          `incremental fetching is not supported. Full crawls will run every refresh.`
+      );
+    }
+
+    /*
+     * reachedEnd = true: complete view observed (full crawl or incremental
+     * that reached the last page). Replace the cache entirely so deleted
+     * libraries are removed.
+     *
+     * reachedEnd = false: partial view. Overlay new/updated entries onto the
+     * existing cache; unvisited entries are preserved.
+     */
+    const mergedLibraries = result.reachedEnd
+      ? result.libraries
+      : { ...existing.libraries, ...result.libraries };
+
+    registryCaches.set(registryConfig.url, {
+      libraries:           mergedLibraries,
+      lastSuccessfulFetch: attemptTime,
+      lastAttemptedFetch:  attemptTime,
+      lastFullFetch:       result.reachedEnd ? attemptTime : existing.lastFullFetch,
+      incrementalUrl:      result.incrementalUrl ?? existing.incrementalUrl
+    });
+  } catch (err) {
+    console.error(
+      `Failed to refresh registry ${registryConfig.url}:`,
+      err instanceof Error ? err.message : err
+    );
+  }
+}
+
 /**
- * Returns the current merged library list, refreshing from each configured
- * registry if the data is stale. Incremental refreshes (stopping at entries
+ * Returns the current merged library list, refreshing all configured registries
+ * in parallel if their data is stale. Incremental refreshes (stopping at entries
  * older than lastSuccessfulFetch) are used when the feed advertises an
  * order=modified facet. Full crawls replace the cache; partial crawls merge
  * new entries into it. On failure, the existing cached state is retained.
@@ -231,67 +303,9 @@ export async function getLibraries(config: AppConfig): Promise<LibrariesConfig> 
 
   const nowSeconds = Date.now() / 1000;
 
-  for (const registryConfig of registries) {
-    const isFirstFetch = !registryCaches.has(registryConfig.url);
-    const existing = registryCaches.get(registryConfig.url) ?? emptyState;
-
-    if (!shouldRefresh(existing, registryConfig, nowSeconds)) continue;
-
-    const fullRefreshInterval =
-      registryConfig.fullRefreshInterval ?? DEFAULT_REGISTRY_FULL_REFRESH_INTERVAL;
-
-    const needsFullCrawl =
-      isFirstFetch ||
-      existing.lastFullFetch == null ||
-      nowSeconds - existing.lastFullFetch >= fullRefreshInterval;
-
-    const canIncremental = !needsFullCrawl && existing.incrementalUrl != null;
-
-    const startUrl = canIncremental ? (existing.incrementalUrl ?? registryConfig.url) : registryConfig.url;
-    const stopBefore = canIncremental ? existing.lastSuccessfulFetch : null;
-    const attemptTime = nowSeconds;
-
-    registryCaches.set(registryConfig.url, {
-      ...existing,
-      lastAttemptedFetch: attemptTime
-    });
-
-    try {
-      const result = await crawlRegistryFeed(startUrl, stopBefore);
-
-      if (isFirstFetch && result.incrementalUrl == null) {
-        console.warn(
-          `Registry at ${registryConfig.url} has no order=modified facet; ` +
-            `incremental fetching is not supported. Full crawls will run every refresh.`
-        );
-      }
-
-      /*
-       * reachedEnd = true: complete view observed (full crawl or incremental
-       * that reached the last page). Replace the cache entirely so deleted
-       * libraries are removed.
-       *
-       * reachedEnd = false: partial view. Overlay new/updated entries onto the
-       * existing cache; unvisited entries are preserved.
-       */
-      const mergedLibraries = result.reachedEnd
-        ? result.libraries
-        : { ...existing.libraries, ...result.libraries };
-
-      registryCaches.set(registryConfig.url, {
-        libraries:           mergedLibraries,
-        lastSuccessfulFetch: attemptTime,
-        lastAttemptedFetch:  attemptTime,
-        lastFullFetch:       result.reachedEnd ? attemptTime : existing.lastFullFetch,
-        incrementalUrl:      result.incrementalUrl ?? existing.incrementalUrl
-      });
-    } catch (err) {
-      console.error(
-        `Failed to refresh registry ${registryConfig.url}:`,
-        err instanceof Error ? err.message : err
-      );
-    }
-  }
+  await Promise.allSettled(
+    registries.map(registryConfig => refreshRegistry(registryConfig, nowSeconds))
+  );
 
   // Merge: earlier registries override later ones; static libraries override all.
   let mergedRegistryLibraries: LibrariesConfig = {};
