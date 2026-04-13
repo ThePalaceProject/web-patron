@@ -284,6 +284,19 @@ describe("fetchRegistryLibraries", () => {
     await expect(fetchRegistryLibraries(REGISTRY_URL)).rejects.toThrow("503");
   });
 
+  it("throws when a subsequent page fetch fails", async () => {
+    const PAGE_2_URL = `${REGISTRY_URL}?offset=100`;
+    global.fetch = mockFetchByUrl({
+      [REGISTRY_URL]: makePagedFeed(
+        [{ id: "urn:uuid:p1", title: "P1", authDocUrl: "https://p1.example.com/auth" }],
+        { nextHref: PAGE_2_URL }
+      ),
+      [PAGE_2_URL]: { status: 503, statusText: "Service Unavailable" }
+    }) as unknown as typeof fetch;
+
+    await expect(fetchRegistryLibraries(REGISTRY_URL)).rejects.toThrow("503");
+  });
+
   it("skips and warns on entries whose computed slug is not URL-safe", async () => {
     const feed = makePagedFeed([
       { id: "valid-library",   title: "Valid",   authDocUrl: "https://v.example.com/auth" },
