@@ -77,12 +77,12 @@ function findIncrementalUrl(feed: OPDS2.LibraryRegistryFeed): string | null {
  * Crawls the paginated OPDS2 feed starting at `startUrl`, collecting library
  * entries.
  *
- * Full crawl (stopBeforeSeconds === null): follows all rel="next" links.
+ * Full crawl (stopBefore === null): follows all rel="next" links.
  *
- * Incremental crawl (stopBeforeSeconds is a Unix timestamp in seconds): stops
- * as soon as an entry's metadata.updated parses to a value at or before that
- * timestamp, because the feed is sorted newest-first. Entries with
- * unparseable updated values are always collected.
+ * Incremental crawl (stopBefore is a Unix timestamp in seconds): stops as soon
+ * as an entry's metadata.updated parses to a value at or before that timestamp,
+ * because the feed is sorted newest-first. Entries with unparseable updated
+ * values are always collected.
  *
  * reachedEnd is true when no rel="next" link was present on the final page
  * fetched, meaning the complete current feed state was observed. This holds
@@ -91,14 +91,16 @@ function findIncrementalUrl(feed: OPDS2.LibraryRegistryFeed): string | null {
  */
 async function crawlRegistryFeed(
   startUrl: string,
-  stopBeforeSeconds: number | null
+  stopBefore: number | null
 ): Promise<CrawlResult> {
   const accumulated: LibrariesConfig = {};
-  let currentUrl = startUrl;
+  let nextUrl: string | null = startUrl;
+  let isFirstPage = true;
   let incrementalUrl: string | null = null;
+  let effectiveStop = stopBefore;
 
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
+  while (nextUrl) {
+    const currentUrl = nextUrl;
     const response = await fetch(currentUrl);
     if (!response.ok) {
       if (response.status === 404) {
@@ -112,34 +114,27 @@ async function crawlRegistryFeed(
     const feed = (await response.json()) as OPDS2.LibraryRegistryFeed;
 
     // Read facets from the first page only.
-    if (currentUrl === startUrl) {
+    if (isFirstPage) {
+      isFirstPage = false;
       incrementalUrl = findIncrementalUrl(feed);
       // Defensive: if called in incremental mode but the facet is gone, treat as full.
-      if (incrementalUrl == null && stopBeforeSeconds !== null) {
-        stopBeforeSeconds = null;
-      }
+      if (incrementalUrl == null) effectiveStop = null;
     }
 
-    const nextLink = feed.links?.find(l => l.rel === OPDS2.PaginationNextRelation);
+    nextUrl = feed.links?.find(l => l.rel === OPDS2.PaginationNextRelation)?.href ?? null;
 
-    if (!feed.catalogs || feed.catalogs.length === 0) {
-      if (!nextLink) return { libraries: accumulated, reachedEnd: true, incrementalUrl };
-      currentUrl = nextLink.href;
-      continue;
-    }
-
-    for (const catalog of feed.catalogs) {
+    for (const catalog of feed.catalogs ?? []) {
       const updatedSeconds = Date.parse(catalog.metadata.updated) / 1000;
 
       if (
-        stopBeforeSeconds !== null &&
+        effectiveStop !== null &&
         Number.isFinite(updatedSeconds) &&
-        updatedSeconds <= stopBeforeSeconds
+        updatedSeconds <= effectiveStop
       ) {
         // Stop early. If this is already the last page we still have full coverage.
         return {
           libraries: accumulated,
-          reachedEnd: !nextLink,
+          reachedEnd: !nextUrl,
           incrementalUrl
         };
       }
@@ -160,10 +155,9 @@ async function crawlRegistryFeed(
         authDocUrl: authDocLink.href
       };
     }
-
-    if (!nextLink) return { libraries: accumulated, reachedEnd: true, incrementalUrl };
-    currentUrl = nextLink.href;
   }
+
+  return { libraries: accumulated, reachedEnd: true, incrementalUrl };
 }
 
 // ---------------------------------------------------------------------------
@@ -240,7 +234,7 @@ export async function getLibraries(config: AppConfig): Promise<LibrariesConfig> 
 
     const canIncremental = !needsFullCrawl && existing.incrementalUrl != null;
 
-    const startUrl   = canIncremental ? existing.incrementalUrl! : registryConfig.url;
+    const startUrl = canIncremental ? (existing.incrementalUrl ?? registryConfig.url) : registryConfig.url;
     const stopBefore = canIncremental ? existing.lastSuccessfulFetch : null;
     const attemptTime = nowSeconds;
 
