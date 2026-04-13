@@ -19,3 +19,6 @@ export const REGISTRY_CRAWLABLE_PAGE_SIZE = 100;
  * Default: 24 hours.
  */
 export const DEFAULT_REGISTRY_FULL_REFRESH_INTERVAL = 86400;
+
+/** Seconds before an individual registry page fetch is aborted. */
+export const DEFAULT_REGISTRY_FETCH_TIMEOUT = 10;

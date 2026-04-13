@@ -613,3 +613,102 @@ describe("getLibraries", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });
+
+// ---------------------------------------------------------------------------
+// fetch timeout
+// ---------------------------------------------------------------------------
+
+describe("fetch timeout", () => {
+  beforeEach(() => resetRegistryCaches());
+
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.restoreAllMocks();
+  });
+
+  /** Returns a fetch mock whose response promise never resolves but rejects on abort. */
+  function mockHangingFetch(): { mock: jest.Mock; capturedSignal: () => AbortSignal | undefined } {
+    let signal: AbortSignal | undefined;
+    const mock = jest.fn().mockImplementation((_url: string, init: RequestInit) => {
+      signal = init?.signal as AbortSignal | undefined;
+      return new Promise<Response>((_resolve, reject) => {
+        signal?.addEventListener("abort", () =>
+          reject(new DOMException("The operation was aborted.", "AbortError"))
+        );
+      });
+    });
+    return { mock, capturedSignal: () => signal };
+  }
+
+  it("aborts a hung page fetch after the configured timeout", async () => {
+    jest.useFakeTimers();
+    const { mock, capturedSignal } = mockHangingFetch();
+    global.fetch = mock as unknown as typeof fetch;
+
+    const crawlPromise = fetchRegistryLibraries(REGISTRY_URL, 10);
+    // Attach the rejection handler before advancing timers so the rejection
+    // is not unhandled at the point the abort fires.
+    const assertion = expect(crawlPromise).rejects.toThrow();
+
+    await jest.advanceTimersByTimeAsync(10_001);
+    await assertion;
+
+    expect(capturedSignal()?.aborted).toBe(true);
+  });
+
+  it("clears the timeout after a successful fetch (no timer leak)", async () => {
+    jest.useFakeTimers();
+    const feed = makePagedFeed([
+      { id: "urn:uuid:a", title: "A", authDocUrl: "https://a.example.com/auth" }
+    ]);
+    global.fetch = mockFetchSuccess(feed) as unknown as typeof fetch;
+
+    await fetchRegistryLibraries(REGISTRY_URL, 10);
+
+    expect(jest.getTimerCount()).toBe(0);
+  });
+
+  it("uses the timeout field from RegistryConfig", async () => {
+    jest.useFakeTimers();
+    jest.spyOn(Date, "now").mockReturnValue(1_000_000 * 1000);
+
+    const { mock, capturedSignal } = mockHangingFetch();
+    global.fetch = mock as unknown as typeof fetch;
+
+    const config = makeConfig({
+      registries: [makeRegistryConfig({ timeout: 5 })]
+    });
+
+    // getLibraries swallows the error and returns empty; we care about the signal.
+    const resultPromise = getLibraries(config);
+    await jest.advanceTimersByTimeAsync(5_001);
+    await resultPromise;
+
+    expect(capturedSignal()?.aborted).toBe(true);
+  });
+
+  it("passes an abort signal to each page fetch in a multi-page crawl", async () => {
+    const PAGE_2_URL = `${REGISTRY_URL}?offset=100`;
+    const signals: (AbortSignal | undefined)[] = [];
+
+    global.fetch = jest.fn().mockImplementation((url: string, init: RequestInit) => {
+      signals.push(init?.signal as AbortSignal | undefined);
+      const body =
+        url === REGISTRY_URL
+          ? makePagedFeed(
+              [{ id: "urn:uuid:p1", title: "P1", authDocUrl: "https://p1.example.com/auth" }],
+              { nextHref: PAGE_2_URL }
+            )
+          : makePagedFeed([
+              { id: "urn:uuid:p2", title: "P2", authDocUrl: "https://p2.example.com/auth" }
+            ]);
+      return Promise.resolve({ ok: true, status: 200, statusText: "OK", json: async () => body });
+    }) as unknown as typeof fetch;
+
+    await fetchRegistryLibraries(REGISTRY_URL);
+
+    expect(signals).toHaveLength(2);
+    expect(signals[0]).toBeInstanceOf(AbortSignal);
+    expect(signals[1]).toBeInstanceOf(AbortSignal);
+  });
+});

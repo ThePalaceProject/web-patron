@@ -3,7 +3,8 @@ import { OPDS2 } from "interfaces";
 import {
   DEFAULT_REGISTRY_REFRESH_MIN_INTERVAL,
   DEFAULT_REGISTRY_REFRESH_MAX_INTERVAL,
-  DEFAULT_REGISTRY_FULL_REFRESH_INTERVAL
+  DEFAULT_REGISTRY_FULL_REFRESH_INTERVAL,
+  DEFAULT_REGISTRY_FETCH_TIMEOUT
 } from "constants/registry";
 import { computeSlug } from "utils/librarySlug";
 
@@ -104,7 +105,8 @@ function findIncrementalUrl(feed: OPDS2.LibraryRegistryFeed): string | null {
  */
 async function crawlRegistryFeed(
   startUrl: string,
-  stopBefore: number | null
+  stopBefore: number | null,
+  timeoutMs: number
 ): Promise<CrawlResult> {
   const accumulated: LibrariesConfig = {};
   let nextUrl: string | null = startUrl;
@@ -114,7 +116,14 @@ async function crawlRegistryFeed(
 
   while (nextUrl) {
     const currentUrl = nextUrl;
-    const response = await fetch(currentUrl);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    let response: Response;
+    try {
+      response = await fetch(currentUrl, { signal: controller.signal });
+    } finally {
+      clearTimeout(timeoutId);
+    }
     if (!response.ok) {
       if (response.status === 404) {
         console.warn(`Registry feed not found at: ${currentUrl}`);
@@ -206,9 +215,10 @@ export function shouldRefresh(
  * libraries. Does not read or write the module-level cache.
  */
 export async function fetchRegistryLibraries(
-  url: string
+  url: string,
+  timeoutSeconds = DEFAULT_REGISTRY_FETCH_TIMEOUT
 ): Promise<LibrariesConfig> {
-  const result = await crawlRegistryFeed(url, null);
+  const result = await crawlRegistryFeed(url, null, timeoutSeconds * 1000);
   return result.libraries;
 }
 
@@ -238,8 +248,9 @@ async function refreshRegistry(
 
   const canIncremental = !needsFullCrawl && existing.incrementalUrl != null;
 
-  const startUrl = canIncremental ? (existing.incrementalUrl ?? registryConfig.url) : registryConfig.url;
+  const startUrl = canIncremental ? (existing.incrementalUrl as string) : registryConfig.url;
   const stopBefore = canIncremental ? existing.lastSuccessfulFetch : null;
+  const timeoutMs = (registryConfig.timeout ?? DEFAULT_REGISTRY_FETCH_TIMEOUT) * 1000;
   const attemptTime = nowSeconds;
 
   registryCaches.set(registryConfig.url, {
@@ -248,7 +259,7 @@ async function refreshRegistry(
   });
 
   try {
-    const result = await crawlRegistryFeed(startUrl, stopBefore);
+    const result = await crawlRegistryFeed(startUrl, stopBefore, timeoutMs);
 
     if (isFirstFetch && result.incrementalUrl == null) {
       console.warn(

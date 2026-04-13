@@ -63,6 +63,7 @@ export interface RegistryConfig {
   refreshMinInterval?: number;  // seconds, default 60
   refreshMaxInterval?: number;  // seconds, default 300
   fullRefreshInterval?: number; // seconds, default 86400 (24 h)
+  timeout?: number;             // seconds, default 10
 }
 
 export interface ComplaintData {
