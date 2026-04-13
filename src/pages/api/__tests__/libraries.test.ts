@@ -38,9 +38,10 @@ const VALID_APP_CONFIG = JSON.stringify({
 function makeRes() {
   const json = jest.fn();
   const status = jest.fn(() => ({ json }));
-  return { status, json } as unknown as NextApiResponse<
+  const res = { status } as unknown as NextApiResponse<
     LibrariesResponse | LibrariesErrorResponse
   >;
+  return { res, json };
 }
 
 // ---------------------------------------------------------------------------
@@ -71,11 +72,11 @@ describe("GET /api/libraries", () => {
       }
     });
 
-    const res = makeRes();
+    const { res, json } = makeRes();
     await handler({} as NextApiRequest, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith({
+    expect(json).toHaveBeenCalledWith({
       libraries: expect.arrayContaining([
         {
           id: "urn:uuid:abc",
@@ -96,21 +97,21 @@ describe("GET /api/libraries", () => {
   it("returns an empty array when there are no libraries", async () => {
     mockGetLibraries.mockResolvedValue({});
 
-    const res = makeRes();
+    const { res, json } = makeRes();
     await handler({} as NextApiRequest, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith({ libraries: [] });
+    expect(json).toHaveBeenCalledWith({ libraries: [] });
   });
 
   it("returns 500 when APP_CONFIG is not set", async () => {
     delete process.env.APP_CONFIG;
 
-    const res = makeRes();
+    const { res, json } = makeRes();
     await handler({} as NextApiRequest, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
-    expect((res.json as jest.Mock).mock.calls[0][0]).toMatchObject({
+    expect(json.mock.calls[0][0]).toMatchObject({
       error: expect.stringContaining("APP_CONFIG")
     });
   });
@@ -118,11 +119,11 @@ describe("GET /api/libraries", () => {
   it("returns 500 when APP_CONFIG is invalid JSON", async () => {
     process.env.APP_CONFIG = "not-valid-json{{{";
 
-    const res = makeRes();
+    const { res, json } = makeRes();
     await handler({} as NextApiRequest, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
-    expect((res.json as jest.Mock).mock.calls[0][0]).toMatchObject({
+    expect(json.mock.calls[0][0]).toMatchObject({
       error: expect.stringContaining("parsed")
     });
   });
@@ -130,11 +131,11 @@ describe("GET /api/libraries", () => {
   it("returns 500 when getLibraries throws", async () => {
     mockGetLibraries.mockRejectedValue(new Error("Registry unavailable"));
 
-    const res = makeRes();
+    const { res, json } = makeRes();
     await handler({} as NextApiRequest, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
-    expect((res.json as jest.Mock).mock.calls[0][0]).toMatchObject({
+    expect(json.mock.calls[0][0]).toMatchObject({
       error: expect.any(String)
     });
   });
@@ -148,11 +149,10 @@ describe("GET /api/libraries", () => {
       "urn:uuid:missing": undefined
     });
 
-    const res = makeRes();
+    const { res, json } = makeRes();
     await handler({} as NextApiRequest, res);
 
-    const { libraries } = (res.json as jest.Mock).mock
-      .calls[0][0] as LibrariesResponse;
+    const { libraries } = json.mock.calls[0][0] as LibrariesResponse;
     expect(libraries).toHaveLength(1);
     expect(libraries[0].id).toBe("urn:uuid:valid");
   });
