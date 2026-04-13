@@ -11,18 +11,31 @@ import { computeSlug } from "utils/librarySlug";
 // Internal state types
 // ---------------------------------------------------------------------------
 
+/*
+ * All timestamps are Unix seconds. lastSuccessfulFetch is updated on any successful
+ * crawl; lastFullFetch only when reachedEnd is true (complete feed traversal).
+ * incrementalUrl === null within a cached entry means the registry does not advertise
+ * an order=modified facet (distinct from a registry absent from the map, which has
+ * never been fetched at all).
+ */
 interface RegistryState {
   libraries: LibrariesConfig;
-  lastSuccessfulFetch: number | null; // Unix seconds — updated on every success
-  lastAttemptedFetch:  number | null; // Unix seconds
-  lastFullFetch:       number | null; // Unix seconds — updated when reachedEnd is true
-  incrementalUrl:      string | null; // order=modified URL from facets; null = not supported
+  lastSuccessfulFetch: number | null;
+  lastAttemptedFetch: number | null;
+  lastFullFetch: number | null;
+  incrementalUrl: string | null;
 }
 
+/*
+ * reachedEnd: true when the final page fetched had no rel="next" link, meaning the
+ * complete current feed state was observed.
+ * incrementalUrl: the order=modified facet URL read from the first page, or null if
+ * the feed does not advertise one.
+ */
 interface CrawlResult {
   libraries: LibrariesConfig;
-  reachedEnd: boolean;           // true ↔ no rel="next" on the last page fetched
-  incrementalUrl: string | null; // order=modified URL from first-page facets, or null
+  reachedEnd: boolean;
+  incrementalUrl: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -189,8 +202,8 @@ export function shouldRefresh(
 }
 
 /**
- * Fetches the library list from a registry URL (full crawl, no early stop).
- * Retained for backward compatibility and direct use in tests.
+ * Performs a full crawl of the registry feed at `url` and returns all discovered
+ * libraries. Does not read or write the module-level cache.
  */
 export async function fetchRegistryLibraries(
   url: string

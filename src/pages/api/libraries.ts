@@ -56,7 +56,7 @@ export default async function handler(
       )
       .map(([id, lib]) => ({
         id,
-        slug: id, // In Release 1, slug === id; later releases may differ.
+        slug: id,
         title: lib.title,
         authDocUrl: lib.authDocUrl
       }));
