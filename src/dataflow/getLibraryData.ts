@@ -2,12 +2,15 @@ import { LibraryData, LibraryLinks, OPDS1 } from "interfaces";
 import ApplicationError, { PageNotFoundError, ServerError } from "errors";
 import { normalizeAuthMethods } from "utils/auth";
 import { APP_CONFIG } from "utils/env";
+import { getLibraries } from "server/libraryRegistry";
 
 /**
  * Interprets the app config to return the auth document url.
+ * Uses getLibraries so registry-sourced libraries (not present in the static
+ * build-time config) are included in the lookup.
  */
 export async function getAuthDocUrl(librarySlug: string): Promise<string> {
-  const libraries = APP_CONFIG.libraries;
+  const libraries = await getLibraries(APP_CONFIG);
 
   const authDocUrl =
     librarySlug in libraries ? libraries[librarySlug]?.authDocUrl : undefined;

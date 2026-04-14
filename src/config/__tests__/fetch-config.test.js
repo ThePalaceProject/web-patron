@@ -350,11 +350,6 @@ registries:
 media_support: {}
       `;
 
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ catalogs: [] })
-      });
-
       const config = await parseConfig(yamlConfig);
 
       expect(config.registries).toEqual([
@@ -364,6 +359,7 @@ media_support: {}
           refreshMaxInterval: 600
         }
       ]);
+      expect(fetch).not.toHaveBeenCalled();
     });
 
     test("applies default intervals when not specified", async () => {
@@ -375,11 +371,6 @@ registries:
 media_support: {}
       `;
 
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ catalogs: [] })
-      });
-
       const config = await parseConfig(yamlConfig);
 
       expect(config.registries).toEqual([
@@ -389,6 +380,7 @@ media_support: {}
           refreshMaxInterval: 300
         }
       ]);
+      expect(fetch).not.toHaveBeenCalled();
     });
 
     test("parses multiple registries", async () => {
@@ -405,16 +397,6 @@ registries:
 media_support: {}
       `;
 
-      fetch
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ catalogs: [] })
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ catalogs: [] })
-        });
-
       const config = await parseConfig(yamlConfig);
 
       expect(config.registries).toHaveLength(2);
@@ -424,6 +406,7 @@ media_support: {}
       expect(config.registries[1].url).toBe(
         "https://registry2.example.com/libraries"
       );
+      expect(fetch).not.toHaveBeenCalled();
     });
 
     test("throws error if registries is not an array", async () => {
@@ -483,7 +466,7 @@ media_support: {}
   });
 
   describe("hybrid config (static libraries + registries)", () => {
-    test("fetches from registries and includes libraries", async () => {
+    test("registries are stored in config; no build-time fetch occurs", async () => {
       const yamlConfig = `
 instance_name: Test Instance
 libraries: {}
@@ -492,53 +475,20 @@ registries:
 media_support: {}
       `;
 
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          catalogs: [
-            {
-              metadata: {
-                id: "registry-lib-1",
-                title: "Registry Library 1"
-              },
-              links: [
-                {
-                  type: "application/vnd.opds.authentication.v1.0+json",
-                  href: "https://example.com/registry-lib-1/auth"
-                }
-              ]
-            },
-            {
-              metadata: {
-                id: "registry-lib-2",
-                title: "Registry Library 2"
-              },
-              links: [
-                {
-                  type: "application/vnd.opds.authentication.v1.0+json",
-                  href: "https://example.com/registry-lib-2/auth"
-                }
-              ]
-            }
-          ]
-        })
-      });
-
       const config = await parseConfig(yamlConfig);
 
-      expect(config.libraries).toEqual({
-        "registry-lib-1": {
-          title: "Registry Library 1",
-          authDocUrl: "https://example.com/registry-lib-1/auth"
-        },
-        "registry-lib-2": {
-          title: "Registry Library 2",
-          authDocUrl: "https://example.com/registry-lib-2/auth"
+      expect(config.libraries).toEqual({});
+      expect(config.registries).toEqual([
+        {
+          url: "https://registry.example.com/libraries",
+          refreshMinInterval: 60,
+          refreshMaxInterval: 300
         }
-      });
+      ]);
+      expect(fetch).not.toHaveBeenCalled();
     });
 
-    test("static libraries override registry libraries with same slug", async () => {
+    test("static libraries are present at build time; registry libraries are runtime-only", async () => {
       const yamlConfig = `
 instance_name: Test Instance
 libraries:
@@ -550,156 +500,12 @@ registries:
 media_support: {}
       `;
 
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          catalogs: [
-            {
-              metadata: {
-                id: "shared-slug",
-                title: "Registry Library"
-              },
-              links: [
-                {
-                  type: "application/vnd.opds.authentication.v1.0+json",
-                  href: "https://example.com/registry/auth"
-                }
-              ]
-            },
-            {
-              metadata: {
-                id: "registry-only",
-                title: "Registry Only Library"
-              },
-              links: [
-                {
-                  type: "application/vnd.opds.authentication.v1.0+json",
-                  href: "https://example.com/registry-only/auth"
-                }
-              ]
-            }
-          ]
-        })
-      });
-
       const config = await parseConfig(yamlConfig);
 
       expect(config.libraries).toEqual({
         "shared-slug": {
           title: "Static Override Library",
           authDocUrl: "https://example.com/static-override/auth"
-        },
-        "registry-only": {
-          title: "Registry Only Library",
-          authDocUrl: "https://example.com/registry-only/auth"
-        }
-      });
-    });
-
-    test("combines libraries from multiple registries", async () => {
-      const yamlConfig = `
-instance_name: Test Instance
-libraries: {}
-registries:
-  - url: https://registry1.example.com/libraries
-  - url: https://registry2.example.com/libraries
-media_support: {}
-      `;
-
-      fetch
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({
-            catalogs: [
-              {
-                metadata: {
-                  id: "lib-from-reg1",
-                  title: "Library from Registry 1"
-                },
-                links: [
-                  {
-                    type: "application/vnd.opds.authentication.v1.0+json",
-                    href: "https://example.com/reg1-lib/auth"
-                  }
-                ]
-              }
-            ]
-          })
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({
-            catalogs: [
-              {
-                metadata: {
-                  id: "lib-from-reg2",
-                  title: "Library from Registry 2"
-                },
-                links: [
-                  {
-                    type: "application/vnd.opds.authentication.v1.0+json",
-                    href: "https://example.com/reg2-lib/auth"
-                  }
-                ]
-              }
-            ]
-          })
-        });
-
-      const config = await parseConfig(yamlConfig);
-
-      expect(config.libraries).toEqual({
-        "lib-from-reg1": {
-          title: "Library from Registry 1",
-          authDocUrl: "https://example.com/reg1-lib/auth"
-        },
-        "lib-from-reg2": {
-          title: "Library from Registry 2",
-          authDocUrl: "https://example.com/reg2-lib/auth"
-        }
-      });
-    });
-
-    test("combines registries and static libraries", async () => {
-      const yamlConfig = `
-instance_name: Test Instance
-libraries:
-  static-lib: https://example.com/static/auth
-registries:
-  - url: https://registry.example.com/libraries
-media_support: {}
-      `;
-
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          catalogs: [
-            {
-              metadata: {
-                id: "registry-lib",
-                title: "Registry Library"
-              },
-              links: [
-                {
-                  type: "application/vnd.opds.authentication.v1.0+json",
-                  href: "https://example.com/registry/auth"
-                }
-              ]
-            }
-          ]
-        })
-      });
-
-      const config = await parseConfig(yamlConfig);
-
-      expect(config.libraries).toEqual({
-        "static-lib": {
-          title: "static-lib",
-          authDocUrl: "https://example.com/static/auth"
-        },
-        "registry-lib": {
-          title: "Registry Library",
-          authDocUrl: "https://example.com/registry/auth"
         }
       });
       expect(config.registries).toEqual([
@@ -709,6 +515,58 @@ media_support: {}
           refreshMaxInterval: 300
         }
       ]);
+      expect(fetch).not.toHaveBeenCalled();
+    });
+
+    test("multiple registries are all stored in config", async () => {
+      const yamlConfig = `
+instance_name: Test Instance
+libraries: {}
+registries:
+  - url: https://registry1.example.com/libraries
+  - url: https://registry2.example.com/libraries
+media_support: {}
+      `;
+
+      const config = await parseConfig(yamlConfig);
+
+      expect(config.libraries).toEqual({});
+      expect(config.registries).toHaveLength(2);
+      expect(config.registries[0].url).toBe(
+        "https://registry1.example.com/libraries"
+      );
+      expect(config.registries[1].url).toBe(
+        "https://registry2.example.com/libraries"
+      );
+      expect(fetch).not.toHaveBeenCalled();
+    });
+
+    test("combines static libraries with registries config", async () => {
+      const yamlConfig = `
+instance_name: Test Instance
+libraries:
+  static-lib: https://example.com/static/auth
+registries:
+  - url: https://registry.example.com/libraries
+media_support: {}
+      `;
+
+      const config = await parseConfig(yamlConfig);
+
+      expect(config.libraries).toEqual({
+        "static-lib": {
+          title: "static-lib",
+          authDocUrl: "https://example.com/static/auth"
+        }
+      });
+      expect(config.registries).toEqual([
+        {
+          url: "https://registry.example.com/libraries",
+          refreshMinInterval: 60,
+          refreshMaxInterval: 300
+        }
+      ]);
+      expect(fetch).not.toHaveBeenCalled();
     });
   });
 
@@ -719,26 +577,6 @@ instance_name: Test Instance
 libraries: https://registry.example.com/libraries
 media_support: {}
       `;
-
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          catalogs: [
-            {
-              metadata: {
-                id: "test-lib",
-                title: "Test Library"
-              },
-              links: [
-                {
-                  type: "application/vnd.opds.authentication.v1.0+json",
-                  href: "https://example.com/test-lib/auth"
-                }
-              ]
-            }
-          ]
-        })
-      });
 
       await parseConfig(yamlConfig);
 
@@ -754,42 +592,51 @@ media_support: {}
       );
     });
 
-    test("fetches libraries from registry when using string format", async () => {
+    test("treats string libraries URL as a runtime registry entry; no build-time fetch", async () => {
       const yamlConfig = `
 instance_name: Test Instance
 libraries: https://registry.example.com/libraries
 media_support: {}
       `;
 
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          catalogs: [
-            {
-              metadata: {
-                id: "test-lib",
-                title: "Test Library"
-              },
-              links: [
-                {
-                  type: "application/vnd.opds.authentication.v1.0+json",
-                  href: "https://example.com/test-lib/auth"
-                }
-              ]
-            }
-          ]
-        })
-      });
+      const config = await parseConfig(yamlConfig);
+
+      expect(config.libraries).toEqual({});
+      expect(config.registries).toEqual([
+        {
+          url: "https://registry.example.com/libraries",
+          refreshMinInterval: 60,
+          refreshMaxInterval: 300
+        }
+      ]);
+      expect(fetch).not.toHaveBeenCalled();
+    });
+
+    test("deprecated URL is appended after any explicit registries entries", async () => {
+      const yamlConfig = `
+instance_name: Test Instance
+libraries: https://deprecated.example.com/libraries
+registries:
+  - url: https://explicit.example.com/libraries
+    refreshMinInterval: 120
+    refreshMaxInterval: 600
+media_support: {}
+      `;
 
       const config = await parseConfig(yamlConfig);
 
-      expect(config.libraries).toEqual({
-        "test-lib": {
-          title: "Test Library",
-          authDocUrl: "https://example.com/test-lib/auth"
+      expect(config.registries).toEqual([
+        {
+          url: "https://explicit.example.com/libraries",
+          refreshMinInterval: 120,
+          refreshMaxInterval: 600
+        },
+        {
+          url: "https://deprecated.example.com/libraries",
+          refreshMinInterval: 60,
+          refreshMaxInterval: 300
         }
-      });
-      expect(config.registries).toEqual([]);
+      ]);
     });
   });
 
@@ -816,15 +663,11 @@ registries:
 media_support: {}
       `;
 
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ catalogs: [] })
-      });
-
       const config = await parseConfig(yamlConfig);
 
       expect(config.libraries).toEqual({});
       expect(config.registries).toHaveLength(1);
+      expect(fetch).not.toHaveBeenCalled();
     });
   });
 });
