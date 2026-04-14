@@ -10,7 +10,6 @@ import ApplicationError, { PageNotFoundError } from "errors";
 import rawCatalog from "test-utils/fixtures/raw-opds-feed";
 import { fixtures } from "test-utils";
 import { OPDS1 } from "interfaces";
-import mockConfig from "test-utils/mockConfig";
 import { fetchFeed } from "dataflow/opds1/fetch";
 import { getLibraries } from "server/libraryRegistry";
 
@@ -18,7 +17,9 @@ jest.mock("server/libraryRegistry", () => ({
   getLibraries: jest.fn()
 }));
 
-const mockGetLibraries = getLibraries as jest.MockedFunction<typeof getLibraries>;
+const mockGetLibraries = getLibraries as jest.MockedFunction<
+  typeof getLibraries
+>;
 
 describe("fetching catalog", () => {
   test("calls fetch with catalog url", async () => {

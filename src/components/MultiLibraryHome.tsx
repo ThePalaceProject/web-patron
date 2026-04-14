@@ -23,11 +23,13 @@ const MultiLibraryHome: React.FC = () => {
 
   if (!data || error) return null;
 
-  const sorted = [...data.libraries].sort((a: ClientLibrary, b: ClientLibrary) => {
-    const titleA = a.title || a.slug;
-    const titleB = b.title || b.slug;
-    return titleA.localeCompare(titleB);
-  });
+  const sorted = [...data.libraries].sort(
+    (a: ClientLibrary, b: ClientLibrary) => {
+      const titleA = a.title || a.slug;
+      const titleB = b.title || b.slug;
+      return titleA.localeCompare(titleB);
+    }
+  );
 
   if (sorted.length === 0) return null;
 

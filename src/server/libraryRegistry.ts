@@ -54,9 +54,9 @@ const registryCaches = new Map<string, RegistryState>();
 const emptyState: RegistryState = {
   libraries: {},
   lastSuccessfulFetch: null,
-  lastAttemptedFetch:  null,
-  lastFullFetch:       null,
-  incrementalUrl:      null
+  lastAttemptedFetch: null,
+  lastFullFetch: null,
+  incrementalUrl: null
 };
 
 // ---------------------------------------------------------------------------
@@ -143,7 +143,9 @@ async function crawlRegistryFeed(
       if (incrementalUrl == null) effectiveStop = null;
     }
 
-    nextUrl = feed.links?.find(l => l.rel === OPDS2.PaginationNextRelation)?.href ?? null;
+    nextUrl =
+      feed.links?.find(l => l.rel === OPDS2.PaginationNextRelation)?.href ??
+      null;
 
     for (const catalog of feed.catalogs ?? []) {
       const updatedSeconds = Date.parse(catalog.metadata.updated) / 1000;
@@ -248,7 +250,8 @@ async function refreshRegistry(
   if (!shouldRefresh(existing, registryConfig, nowSeconds)) return;
 
   const fullRefreshInterval =
-    registryConfig.fullRefreshInterval ?? DEFAULT_REGISTRY_FULL_REFRESH_INTERVAL;
+    registryConfig.fullRefreshInterval ??
+    DEFAULT_REGISTRY_FULL_REFRESH_INTERVAL;
 
   const needsFullCrawl =
     isFirstFetch ||
@@ -257,9 +260,12 @@ async function refreshRegistry(
 
   const canIncremental = !needsFullCrawl && existing.incrementalUrl != null;
 
-  const startUrl = canIncremental ? (existing.incrementalUrl as string) : registryConfig.url;
+  const startUrl = canIncremental
+    ? (existing.incrementalUrl as string)
+    : registryConfig.url;
   const stopBefore = canIncremental ? existing.lastSuccessfulFetch : null;
-  const timeoutMs = (registryConfig.timeout ?? DEFAULT_REGISTRY_FETCH_TIMEOUT) * 1000;
+  const timeoutMs =
+    (registryConfig.timeout ?? DEFAULT_REGISTRY_FETCH_TIMEOUT) * 1000;
   const attemptTime = nowSeconds;
 
   registryCaches.set(registryConfig.url, {
@@ -290,11 +296,11 @@ async function refreshRegistry(
       : { ...existing.libraries, ...result.libraries };
 
     registryCaches.set(registryConfig.url, {
-      libraries:           mergedLibraries,
+      libraries: mergedLibraries,
       lastSuccessfulFetch: attemptTime,
-      lastAttemptedFetch:  attemptTime,
-      lastFullFetch:       result.reachedEnd ? attemptTime : existing.lastFullFetch,
-      incrementalUrl:      result.incrementalUrl ?? existing.incrementalUrl
+      lastAttemptedFetch: attemptTime,
+      lastFullFetch: result.reachedEnd ? attemptTime : existing.lastFullFetch,
+      incrementalUrl: result.incrementalUrl ?? existing.incrementalUrl
     });
   } catch (err) {
     console.error(
@@ -316,7 +322,9 @@ async function refreshRegistry(
  *   2. First registry in registries array
  *   3. Subsequent registries
  */
-export async function getLibraries(config: AppConfig): Promise<LibrariesConfig> {
+export async function getLibraries(
+  config: AppConfig
+): Promise<LibrariesConfig> {
   const { registries = [], libraries: staticLibraries } = config;
 
   if (registries.length === 0) return staticLibraries;
@@ -324,7 +332,9 @@ export async function getLibraries(config: AppConfig): Promise<LibrariesConfig> 
   const nowSeconds = Date.now() / 1000;
 
   await Promise.allSettled(
-    registries.map(registryConfig => refreshRegistry(registryConfig, nowSeconds))
+    registries.map(registryConfig =>
+      refreshRegistry(registryConfig, nowSeconds)
+    )
   );
 
   // Merge: earlier registries override later ones; static libraries override all.
@@ -332,7 +342,10 @@ export async function getLibraries(config: AppConfig): Promise<LibrariesConfig> 
   for (let i = registries.length - 1; i >= 0; i--) {
     const state = registryCaches.get(registries[i].url);
     if (state?.libraries) {
-      mergedRegistryLibraries = { ...mergedRegistryLibraries, ...state.libraries };
+      mergedRegistryLibraries = {
+        ...mergedRegistryLibraries,
+        ...state.libraries
+      };
     }
   }
 

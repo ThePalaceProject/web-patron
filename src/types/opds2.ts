@@ -42,7 +42,8 @@ export interface Group extends Collection<GroupMetadata> {
 export const SortFacetType = "http://palaceproject.io/terms/rel/sort";
 
 /** Property key marking a facet link as the default option for its group. */
-export const FacetDefaultProperty = "http://palaceproject.io/terms/facet/default";
+export const FacetDefaultProperty =
+  "http://palaceproject.io/terms/facet/default";
 
 export interface FacetGroupMetadata {
   title: string;
@@ -115,10 +116,10 @@ export const CatalogLinkTemplateRelation =
   "http://librarysimplified.org/rel/registry/library";
 export const CatalogRootRelation = "http://opds-spec.org/catalog";
 
-export const PaginationNextRelation  = "next";
+export const PaginationNextRelation = "next";
 export const PaginationFirstRelation = "first";
-export const PaginationPrevRelation  = "previous";
-export const PaginationLastRelation  = "last";
+export const PaginationPrevRelation = "previous";
+export const PaginationLastRelation = "last";
 
 export type PaginationLinkRelation =
   | typeof PaginationNextRelation

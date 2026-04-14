@@ -12,13 +12,16 @@ jest.mock("utils/env");
 const mockedSWR = useSWR as jest.MockedFunction<typeof useSWR>;
 
 function mockLibraries(libraries: LibrariesResponse["libraries"]) {
-  mockedSWR.mockReturnValue(
-    makeSwrResponse<any>({ data: { libraries } })
-  );
+  mockedSWR.mockReturnValue(makeSwrResponse<any>({ data: { libraries } }));
 }
 
 function lib(slug: string, title?: string) {
-  return { id: `urn:${slug}`, slug, title: title ?? slug, authDocUrl: `https://example.com/${slug}/auth` };
+  return {
+    id: `urn:${slug}`,
+    slug,
+    title: title ?? slug,
+    authDocUrl: `https://example.com/${slug}/auth`
+  };
 }
 
 describe("MultiLibraryHome", () => {
@@ -46,11 +49,7 @@ describe("MultiLibraryHome", () => {
   });
 
   it("displays libraries sorted by slug when no title is provided", () => {
-    mockLibraries([
-      lib("zebra"),
-      lib("alpha"),
-      lib("middle")
-    ]);
+    mockLibraries([lib("zebra"), lib("alpha"), lib("middle")]);
 
     render(<MultiLibraryHome />);
 
@@ -78,12 +77,7 @@ describe("MultiLibraryHome", () => {
   });
 
   it("handles quoted numeric slugs with leading zeros correctly", () => {
-    mockLibraries([
-      lib("020"),
-      lib("003"),
-      lib("001"),
-      lib("100")
-    ]);
+    mockLibraries([lib("020"), lib("003"), lib("001"), lib("100")]);
 
     render(<MultiLibraryHome />);
 
@@ -110,7 +104,10 @@ describe("MultiLibraryHome", () => {
 
   it("returns null on fetch error", () => {
     mockedSWR.mockReturnValue(
-      makeSwrResponse<any>({ data: undefined, error: new Error("fetch failed") })
+      makeSwrResponse<any>({
+        data: undefined,
+        error: new Error("fetch failed")
+      })
     );
 
     const { container } = render(<MultiLibraryHome />);

@@ -11,7 +11,7 @@ import {
   getLibraries,
   resetRegistryCaches
 } from "../libraryRegistry";
-import type { AppConfig, LibrariesConfig, RegistryConfig } from "interfaces";
+import type { AppConfig, RegistryConfig } from "interfaces";
 import {
   DEFAULT_REGISTRY_REFRESH_MIN_INTERVAL,
   DEFAULT_REGISTRY_REFRESH_MAX_INTERVAL
@@ -21,26 +21,28 @@ import {
 // Test infrastructure
 // ---------------------------------------------------------------------------
 
-const REGISTRY_URL   = "https://registry.example.com/libraries";
+const REGISTRY_URL = "https://registry.example.com/libraries";
 const REGISTRY_URL_2 = "https://registry2.example.com/libraries";
 const INCREMENTAL_URL = `${REGISTRY_URL}?order=modified`;
 
 /** Minimal AppConfig for test use. */
 function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
   return {
-    instanceName:  "Test",
-    gtmId:         null,
+    instanceName: "Test",
+    gtmId: null,
     bugsnagApiKey: null,
-    companionApp:  "simplye",
-    showMedium:    true,
-    openebooks:    null,
-    mediaSupport:  {},
-    libraries:     {},
+    companionApp: "simplye",
+    showMedium: true,
+    openebooks: null,
+    mediaSupport: {},
+    libraries: {},
     ...overrides
   };
 }
 
-function makeRegistryConfig(overrides: Partial<RegistryConfig> = {}): RegistryConfig {
+function makeRegistryConfig(
+  overrides: Partial<RegistryConfig> = {}
+): RegistryConfig {
   return { url: REGISTRY_URL, ...overrides };
 }
 
@@ -59,7 +61,11 @@ function makePagedFeed(
 ) {
   const links: object[] = [];
   if (options.nextHref) {
-    links.push({ rel: "next", href: options.nextHref, type: "application/opds+json" });
+    links.push({
+      rel: "next",
+      href: options.nextHref,
+      type: "application/opds+json"
+    });
   }
 
   const facets: object[] = [];
@@ -81,7 +87,11 @@ function makePagedFeed(
   }
 
   return {
-    metadata: { adobe_vendor_id: "", title: "Registry", numberOfItems: catalogs.length },
+    metadata: {
+      adobe_vendor_id: "", // eslint-disable-line camelcase
+      title: "Registry",
+      numberOfItems: catalogs.length
+    },
     links,
     facets,
     catalogs: catalogs.map(({ id, title, authDocUrl, updated }) => ({
@@ -143,7 +153,10 @@ function mockFetchSuccess(body: unknown): jest.Mock {
   });
 }
 
-function mockFetchError(status = 500, statusText = "Internal Server Error"): jest.Mock {
+function mockFetchError(
+  status = 500,
+  statusText = "Internal Server Error"
+): jest.Mock {
   return jest.fn().mockResolvedValue({
     ok: false,
     status,
@@ -159,10 +172,12 @@ function mockFetchError(status = 500, statusText = "Internal Server Error"): jes
 describe("shouldRefresh", () => {
   const NOW = 1_000_000;
 
-  function makeState(overrides: {
-    lastSuccessfulFetch?: number | null;
-    lastAttemptedFetch?: number | null;
-  } = {}) {
+  function makeState(
+    overrides: {
+      lastSuccessfulFetch?: number | null;
+      lastAttemptedFetch?: number | null;
+    } = {}
+  ) {
     return {
       libraries: {},
       lastSuccessfulFetch: null,
@@ -206,12 +221,21 @@ describe("shouldRefresh", () => {
   });
 
   it("respects custom min and max intervals from config", () => {
-    const config = makeRegistryConfig({ refreshMinInterval: 10, refreshMaxInterval: 30 });
+    const config = makeRegistryConfig({
+      refreshMinInterval: 10,
+      refreshMaxInterval: 30
+    });
 
-    const freshState = makeState({ lastSuccessfulFetch: NOW - 29, lastAttemptedFetch: NOW - 11 });
+    const freshState = makeState({
+      lastSuccessfulFetch: NOW - 29,
+      lastAttemptedFetch: NOW - 11
+    });
     expect(shouldRefresh(freshState, config, NOW)).toBe(false);
 
-    const staleState = makeState({ lastSuccessfulFetch: NOW - 31, lastAttemptedFetch: NOW - 11 });
+    const staleState = makeState({
+      lastSuccessfulFetch: NOW - 31,
+      lastAttemptedFetch: NOW - 11
+    });
     expect(shouldRefresh(staleState, config, NOW)).toBe(true);
   });
 });
@@ -225,16 +249,32 @@ describe("fetchRegistryLibraries", () => {
 
   it("returns a LibrariesConfig from a valid single-page feed", async () => {
     const feed = makePagedFeed([
-      { id: "urn:uuid:abc", title: "Library A", authDocUrl: "https://a.example.com/auth" },
-      { id: "urn:uuid:def", title: "Library B", authDocUrl: "https://b.example.com/auth" }
+      {
+        id: "urn:uuid:abc",
+        title: "Library A",
+        authDocUrl: "https://a.example.com/auth"
+      },
+      {
+        id: "urn:uuid:def",
+        title: "Library B",
+        authDocUrl: "https://b.example.com/auth"
+      }
     ]);
     global.fetch = mockFetchSuccess(feed) as unknown as typeof fetch;
 
     const result = await fetchRegistryLibraries(REGISTRY_URL);
 
     expect(result).toEqual({
-      "urn:uuid:abc": { id: "urn:uuid:abc", title: "Library A", authDocUrl: "https://a.example.com/auth" },
-      "urn:uuid:def": { id: "urn:uuid:def", title: "Library B", authDocUrl: "https://b.example.com/auth" }
+      "urn:uuid:abc": {
+        id: "urn:uuid:abc",
+        title: "Library A",
+        authDocUrl: "https://a.example.com/auth"
+      },
+      "urn:uuid:def": {
+        id: "urn:uuid:def",
+        title: "Library B",
+        authDocUrl: "https://b.example.com/auth"
+      }
     });
   });
 
@@ -242,11 +282,21 @@ describe("fetchRegistryLibraries", () => {
     const PAGE_2_URL = `${REGISTRY_URL}?offset=100`;
     global.fetch = mockFetchByUrl({
       [REGISTRY_URL]: makePagedFeed(
-        [{ id: "urn:uuid:p1", title: "Page 1 Lib", authDocUrl: "https://p1.example.com/auth" }],
+        [
+          {
+            id: "urn:uuid:p1",
+            title: "Page 1 Lib",
+            authDocUrl: "https://p1.example.com/auth"
+          }
+        ],
         { nextHref: PAGE_2_URL }
       ),
       [PAGE_2_URL]: makePagedFeed([
-        { id: "urn:uuid:p2", title: "Page 2 Lib", authDocUrl: "https://p2.example.com/auth" }
+        {
+          id: "urn:uuid:p2",
+          title: "Page 2 Lib",
+          authDocUrl: "https://p2.example.com/auth"
+        }
       ])
     }) as unknown as typeof fetch;
 
@@ -260,7 +310,11 @@ describe("fetchRegistryLibraries", () => {
 
   it("skips catalogs missing an auth document link", async () => {
     const feed = makePagedFeed([
-      { id: "urn:uuid:abc", title: "Library A", authDocUrl: "https://a.example.com/auth" },
+      {
+        id: "urn:uuid:abc",
+        title: "Library A",
+        authDocUrl: "https://a.example.com/auth"
+      },
       { id: "urn:uuid:no-auth", title: "No Auth Library" }
     ]);
     global.fetch = mockFetchSuccess(feed) as unknown as typeof fetch;
@@ -280,7 +334,10 @@ describe("fetchRegistryLibraries", () => {
   });
 
   it("throws when the response is not ok", async () => {
-    global.fetch = mockFetchError(503, "Service Unavailable") as unknown as typeof fetch;
+    global.fetch = mockFetchError(
+      503,
+      "Service Unavailable"
+    ) as unknown as typeof fetch;
     await expect(fetchRegistryLibraries(REGISTRY_URL)).rejects.toThrow("503");
   });
 
@@ -288,7 +345,13 @@ describe("fetchRegistryLibraries", () => {
     const PAGE_2_URL = `${REGISTRY_URL}?offset=100`;
     global.fetch = mockFetchByUrl({
       [REGISTRY_URL]: makePagedFeed(
-        [{ id: "urn:uuid:p1", title: "P1", authDocUrl: "https://p1.example.com/auth" }],
+        [
+          {
+            id: "urn:uuid:p1",
+            title: "P1",
+            authDocUrl: "https://p1.example.com/auth"
+          }
+        ],
         { nextHref: PAGE_2_URL }
       ),
       [PAGE_2_URL]: { status: 503, statusText: "Service Unavailable" }
@@ -299,11 +362,17 @@ describe("fetchRegistryLibraries", () => {
 
   it("skips and warns on entries whose computed slug is not valid", async () => {
     const feed = makePagedFeed([
-      { id: "valid-library",   title: "Valid",   authDocUrl: "https://v.example.com/auth" },
+      {
+        id: "valid-library",
+        title: "Valid",
+        authDocUrl: "https://v.example.com/auth"
+      },
       { id: "", title: "Empty Slug", authDocUrl: "https://b.example.com/auth" }
     ]);
     global.fetch = mockFetchSuccess(feed) as unknown as typeof fetch;
-    const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => undefined);
+    const warnSpy = jest
+      .spyOn(console, "warn")
+      .mockImplementation(() => undefined);
 
     const result = await fetchRegistryLibraries(REGISTRY_URL);
 
@@ -330,7 +399,9 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
 
   afterEach(() => jest.restoreAllMocks());
 
-  function makeIncrementalConfig(overrides: Partial<RegistryConfig> = {}): RegistryConfig {
+  function makeIncrementalConfig(
+    overrides: Partial<RegistryConfig> = {}
+  ): RegistryConfig {
     return makeRegistryConfig({
       refreshMinInterval: 1,
       refreshMaxInterval: 1,
@@ -346,7 +417,14 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
 
   it("single-page full crawl sets reachedEnd, incrementalUrl from facets", async () => {
     const feed = makePagedFeed(
-      [{ id: "urn:uuid:a", title: "A", authDocUrl: "https://a.example.com/auth", updated: NEW_TIMESTAMP }],
+      [
+        {
+          id: "urn:uuid:a",
+          title: "A",
+          authDocUrl: "https://a.example.com/auth",
+          updated: NEW_TIMESTAMP
+        }
+      ],
       { incrementalFacetHref: INCREMENTAL_URL }
     );
     global.fetch = mockFetchSuccess(feed) as unknown as typeof fetch;
@@ -361,8 +439,18 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
   it("incremental crawl stops mid-page when an entry is old", async () => {
     const initialFeed = makePagedFeed(
       [
-        { id: "urn:uuid:a", title: "A", authDocUrl: "https://a.example.com/auth", updated: NEW_TIMESTAMP },
-        { id: "urn:uuid:b", title: "B", authDocUrl: "https://b.example.com/auth", updated: NEW_TIMESTAMP }
+        {
+          id: "urn:uuid:a",
+          title: "A",
+          authDocUrl: "https://a.example.com/auth",
+          updated: NEW_TIMESTAMP
+        },
+        {
+          id: "urn:uuid:b",
+          title: "B",
+          authDocUrl: "https://b.example.com/auth",
+          updated: NEW_TIMESTAMP
+        }
       ],
       { incrementalFacetHref: INCREMENTAL_URL }
     );
@@ -373,10 +461,23 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
 
     const incrementalFeed = makePagedFeed(
       [
-        { id: "urn:uuid:c", title: "C (new)", authDocUrl: "https://c.example.com/auth", updated: NEW_TIMESTAMP },
-        { id: "urn:uuid:a", title: "A (old)", authDocUrl: "https://a.example.com/auth", updated: OLD_TIMESTAMP }
+        {
+          id: "urn:uuid:c",
+          title: "C (new)",
+          authDocUrl: "https://c.example.com/auth",
+          updated: NEW_TIMESTAMP
+        },
+        {
+          id: "urn:uuid:a",
+          title: "A (old)",
+          authDocUrl: "https://a.example.com/auth",
+          updated: OLD_TIMESTAMP
+        }
       ],
-      { incrementalFacetHref: INCREMENTAL_URL, nextHref: `${INCREMENTAL_URL}&offset=100` }
+      {
+        incrementalFacetHref: INCREMENTAL_URL,
+        nextHref: `${INCREMENTAL_URL}&offset=100`
+      }
     );
     global.fetch = mockFetchByUrl({
       [INCREMENTAL_URL]: incrementalFeed
@@ -395,8 +496,18 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
   it("incremental that reaches end of feed replaces cache (deletions applied)", async () => {
     const initialFeed = makePagedFeed(
       [
-        { id: "urn:uuid:a", title: "A", authDocUrl: "https://a.example.com/auth", updated: NEW_TIMESTAMP },
-        { id: "urn:uuid:b", title: "B", authDocUrl: "https://b.example.com/auth", updated: NEW_TIMESTAMP }
+        {
+          id: "urn:uuid:a",
+          title: "A",
+          authDocUrl: "https://a.example.com/auth",
+          updated: NEW_TIMESTAMP
+        },
+        {
+          id: "urn:uuid:b",
+          title: "B",
+          authDocUrl: "https://b.example.com/auth",
+          updated: NEW_TIMESTAMP
+        }
       ],
       { incrementalFacetHref: INCREMENTAL_URL }
     );
@@ -407,7 +518,12 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
     // Incremental feed: A is old (triggers stop), but no next link → reachedEnd.
     const incrementalFeed = makePagedFeed(
       [
-        { id: "urn:uuid:a", title: "A", authDocUrl: "https://a.example.com/auth", updated: OLD_TIMESTAMP }
+        {
+          id: "urn:uuid:a",
+          title: "A",
+          authDocUrl: "https://a.example.com/auth",
+          updated: OLD_TIMESTAMP
+        }
       ],
       { incrementalFacetHref: INCREMENTAL_URL } // no nextHref
     );
@@ -428,8 +544,18 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
   it("full crawl after fullRefreshInterval replaces cache", async () => {
     const initialFeed = makePagedFeed(
       [
-        { id: "urn:uuid:a", title: "A", authDocUrl: "https://a.example.com/auth", updated: NEW_TIMESTAMP },
-        { id: "urn:uuid:b", title: "B", authDocUrl: "https://b.example.com/auth", updated: NEW_TIMESTAMP }
+        {
+          id: "urn:uuid:a",
+          title: "A",
+          authDocUrl: "https://a.example.com/auth",
+          updated: NEW_TIMESTAMP
+        },
+        {
+          id: "urn:uuid:b",
+          title: "B",
+          authDocUrl: "https://b.example.com/auth",
+          updated: NEW_TIMESTAMP
+        }
       ],
       { incrementalFacetHref: INCREMENTAL_URL }
     );
@@ -441,10 +567,19 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
 
     // Full refresh feed: only A.
     const fullFeed = makePagedFeed(
-      [{ id: "urn:uuid:a", title: "A", authDocUrl: "https://a.example.com/auth", updated: NEW_TIMESTAMP }],
+      [
+        {
+          id: "urn:uuid:a",
+          title: "A",
+          authDocUrl: "https://a.example.com/auth",
+          updated: NEW_TIMESTAMP
+        }
+      ],
       { incrementalFacetHref: INCREMENTAL_URL }
     );
-    global.fetch = mockFetchByUrl({ [REGISTRY_URL]: fullFeed }) as unknown as typeof fetch;
+    global.fetch = mockFetchByUrl({
+      [REGISTRY_URL]: fullFeed
+    }) as unknown as typeof fetch;
 
     const result = await getLibraries(makeConfig({ registries: [config] }));
 
@@ -454,7 +589,14 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
 
   it("second fetch within fullRefreshInterval uses incrementalUrl", async () => {
     const initialFeed = makePagedFeed(
-      [{ id: "urn:uuid:a", title: "A", authDocUrl: "https://a.example.com/auth", updated: NEW_TIMESTAMP }],
+      [
+        {
+          id: "urn:uuid:a",
+          title: "A",
+          authDocUrl: "https://a.example.com/auth",
+          updated: NEW_TIMESTAMP
+        }
+      ],
       { incrementalFacetHref: INCREMENTAL_URL }
     );
     await doFirstFetch(initialFeed);
@@ -462,7 +604,9 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
     jest.spyOn(Date, "now").mockReturnValue((NOW_SECONDS + 2) * 1000);
 
     const fetchMock = mockFetchByUrl({
-      [INCREMENTAL_URL]: makePagedFeed([], { incrementalFacetHref: INCREMENTAL_URL })
+      [INCREMENTAL_URL]: makePagedFeed([], {
+        incrementalFacetHref: INCREMENTAL_URL
+      })
     }) as unknown as typeof fetch;
     global.fetch = fetchMock;
 
@@ -473,7 +617,14 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
 
   it("first fetch always uses registryConfig.url regardless of incrementalUrl", async () => {
     const feed = makePagedFeed(
-      [{ id: "urn:uuid:a", title: "A", authDocUrl: "https://a.example.com/auth", updated: NEW_TIMESTAMP }],
+      [
+        {
+          id: "urn:uuid:a",
+          title: "A",
+          authDocUrl: "https://a.example.com/auth",
+          updated: NEW_TIMESTAMP
+        }
+      ],
       { incrementalFacetHref: INCREMENTAL_URL }
     );
     const fetchMock = mockFetchSuccess(feed) as unknown as typeof fetch;
@@ -486,11 +637,19 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
 
   it("logs warning on first fetch when no order=modified facet found", async () => {
     const feed = makePagedFeed(
-      [{ id: "urn:uuid:a", title: "A", authDocUrl: "https://a.example.com/auth" }]
+      [
+        {
+          id: "urn:uuid:a",
+          title: "A",
+          authDocUrl: "https://a.example.com/auth"
+        }
+      ]
       // no incrementalFacetHref
     );
     global.fetch = mockFetchSuccess(feed) as unknown as typeof fetch;
-    const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => undefined);
+    const warnSpy = jest
+      .spyOn(console, "warn")
+      .mockImplementation(() => undefined);
 
     await getLibraries(makeConfig({ registries: [makeIncrementalConfig()] }));
 
@@ -501,7 +660,14 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
 
   it("entry with empty updated string is not treated as a stop signal", async () => {
     const initialFeed = makePagedFeed(
-      [{ id: "urn:uuid:a", title: "A", authDocUrl: "https://a.example.com/auth", updated: NEW_TIMESTAMP }],
+      [
+        {
+          id: "urn:uuid:a",
+          title: "A",
+          authDocUrl: "https://a.example.com/auth",
+          updated: NEW_TIMESTAMP
+        }
+      ],
       { incrementalFacetHref: INCREMENTAL_URL }
     );
     await doFirstFetch(initialFeed);
@@ -510,14 +676,28 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
 
     const incrementalFeed = makePagedFeed(
       [
-        { id: "urn:uuid:b", title: "B (no date)", authDocUrl: "https://b.example.com/auth", updated: "" },
-        { id: "urn:uuid:c", title: "C (new)", authDocUrl: "https://c.example.com/auth", updated: NEW_TIMESTAMP }
+        {
+          id: "urn:uuid:b",
+          title: "B (no date)",
+          authDocUrl: "https://b.example.com/auth",
+          updated: ""
+        },
+        {
+          id: "urn:uuid:c",
+          title: "C (new)",
+          authDocUrl: "https://c.example.com/auth",
+          updated: NEW_TIMESTAMP
+        }
       ],
       { incrementalFacetHref: INCREMENTAL_URL }
     );
-    global.fetch = mockFetchByUrl({ [INCREMENTAL_URL]: incrementalFeed }) as unknown as typeof fetch;
+    global.fetch = mockFetchByUrl({
+      [INCREMENTAL_URL]: incrementalFeed
+    }) as unknown as typeof fetch;
 
-    const result = await getLibraries(makeConfig({ registries: [makeIncrementalConfig()] }));
+    const result = await getLibraries(
+      makeConfig({ registries: [makeIncrementalConfig()] })
+    );
 
     // Both B (empty date) and C (new) should be collected.
     expect(result["urn:uuid:b"]).toBeDefined();
@@ -526,7 +706,14 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
 
   it("retains cached state when registry fetch fails", async () => {
     const initialFeed = makePagedFeed(
-      [{ id: "urn:uuid:cached", title: "Cached", authDocUrl: "https://cached.example.com/auth", updated: NEW_TIMESTAMP }],
+      [
+        {
+          id: "urn:uuid:cached",
+          title: "Cached",
+          authDocUrl: "https://cached.example.com/auth",
+          updated: NEW_TIMESTAMP
+        }
+      ],
       { incrementalFacetHref: INCREMENTAL_URL }
     );
     await doFirstFetch(initialFeed);
@@ -534,14 +721,23 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
     jest.spyOn(Date, "now").mockReturnValue((NOW_SECONDS + 2) * 1000);
     global.fetch = mockFetchError() as unknown as typeof fetch;
 
-    const result = await getLibraries(makeConfig({ registries: [makeIncrementalConfig()] }));
+    const result = await getLibraries(
+      makeConfig({ registries: [makeIncrementalConfig()] })
+    );
 
     expect(result["urn:uuid:cached"]).toBeDefined();
   });
 
   it("retains incrementalUrl in state after a failed fetch", async () => {
     const initialFeed = makePagedFeed(
-      [{ id: "urn:uuid:a", title: "A", authDocUrl: "https://a.example.com/auth", updated: NEW_TIMESTAMP }],
+      [
+        {
+          id: "urn:uuid:a",
+          title: "A",
+          authDocUrl: "https://a.example.com/auth",
+          updated: NEW_TIMESTAMP
+        }
+      ],
       { incrementalFacetHref: INCREMENTAL_URL }
     );
     await doFirstFetch(initialFeed);
@@ -553,7 +749,9 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
     // The next successful fetch should still use incrementalUrl (not the base URL).
     jest.spyOn(Date, "now").mockReturnValue((NOW_SECONDS + 4) * 1000);
     const fetchMock = mockFetchByUrl({
-      [INCREMENTAL_URL]: makePagedFeed([], { incrementalFacetHref: INCREMENTAL_URL })
+      [INCREMENTAL_URL]: makePagedFeed([], {
+        incrementalFacetHref: INCREMENTAL_URL
+      })
     }) as unknown as typeof fetch;
     global.fetch = fetchMock;
 
@@ -571,7 +769,9 @@ describe("getLibraries", () => {
 
   it("returns static libraries when no registries are configured", async () => {
     const config = makeConfig({
-      libraries: { "my-lib": { title: "My Lib", authDocUrl: "https://my.lib/auth" } }
+      libraries: {
+        "my-lib": { title: "My Lib", authDocUrl: "https://my.lib/auth" }
+      }
     });
     const result = await getLibraries(config);
     expect(result).toEqual(config.libraries);
@@ -579,23 +779,38 @@ describe("getLibraries", () => {
 
   it("fetches from registry and returns merged libraries", async () => {
     const feed = makePagedFeed([
-      { id: "urn:uuid:reg", title: "Registry Lib", authDocUrl: "https://r.example.com/auth" }
+      {
+        id: "urn:uuid:reg",
+        title: "Registry Lib",
+        authDocUrl: "https://r.example.com/auth"
+      }
     ]);
     global.fetch = mockFetchSuccess(feed) as unknown as typeof fetch;
 
-    const result = await getLibraries(makeConfig({ registries: [makeRegistryConfig()] }));
+    const result = await getLibraries(
+      makeConfig({ registries: [makeRegistryConfig()] })
+    );
 
     expect(result["urn:uuid:reg"]).toBeDefined();
   });
 
   it("static libraries override registry libraries with the same key", async () => {
     const feed = makePagedFeed([
-      { id: "urn:uuid:shared", title: "Registry Version", authDocUrl: "https://r.example.com/auth" }
+      {
+        id: "urn:uuid:shared",
+        title: "Registry Version",
+        authDocUrl: "https://r.example.com/auth"
+      }
     ]);
     global.fetch = mockFetchSuccess(feed) as unknown as typeof fetch;
 
     const config = makeConfig({
-      libraries: { "urn:uuid:shared": { title: "Static Version", authDocUrl: "https://static.example.com/auth" } },
+      libraries: {
+        "urn:uuid:shared": {
+          title: "Static Version",
+          authDocUrl: "https://static.example.com/auth"
+        }
+      },
       registries: [makeRegistryConfig()]
     });
 
@@ -605,19 +820,41 @@ describe("getLibraries", () => {
 
   it("gives earlier registries precedence over later ones for the same key", async () => {
     const feed1 = makePagedFeed([
-      { id: "urn:uuid:shared", title: "First Registry", authDocUrl: "https://r1.example.com/auth" }
+      {
+        id: "urn:uuid:shared",
+        title: "First Registry",
+        authDocUrl: "https://r1.example.com/auth"
+      }
     ]);
     const feed2 = makePagedFeed([
-      { id: "urn:uuid:shared", title: "Second Registry", authDocUrl: "https://r2.example.com/auth" }
+      {
+        id: "urn:uuid:shared",
+        title: "Second Registry",
+        authDocUrl: "https://r2.example.com/auth"
+      }
     ]);
 
-    const multiMock = jest.fn()
-      .mockResolvedValueOnce({ ok: true, status: 200, statusText: "OK", json: async () => feed1 })
-      .mockResolvedValueOnce({ ok: true, status: 200, statusText: "OK", json: async () => feed2 });
+    const multiMock = jest
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        statusText: "OK",
+        json: async () => feed1
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        statusText: "OK",
+        json: async () => feed2
+      });
     global.fetch = multiMock as unknown as typeof fetch;
 
     const config = makeConfig({
-      registries: [makeRegistryConfig(), makeRegistryConfig({ url: REGISTRY_URL_2 })]
+      registries: [
+        makeRegistryConfig(),
+        makeRegistryConfig({ url: REGISTRY_URL_2 })
+      ]
     });
 
     const result = await getLibraries(config);
@@ -632,7 +869,9 @@ describe("getLibraries", () => {
     global.fetch = fetchMock as unknown as typeof fetch;
 
     const config = makeConfig({
-      registries: [makeRegistryConfig({ refreshMinInterval: 60, refreshMaxInterval: 1 })]
+      registries: [
+        makeRegistryConfig({ refreshMinInterval: 60, refreshMaxInterval: 1 })
+      ]
     });
 
     await getLibraries(config);
@@ -656,16 +895,21 @@ describe("fetch timeout", () => {
   });
 
   /** Returns a fetch mock whose response promise never resolves but rejects on abort. */
-  function mockHangingFetch(): { mock: jest.Mock; capturedSignal: () => AbortSignal | undefined } {
+  function mockHangingFetch(): {
+    mock: jest.Mock;
+    capturedSignal: () => AbortSignal | undefined;
+  } {
     let signal: AbortSignal | undefined;
-    const mock = jest.fn().mockImplementation((_url: string, init: RequestInit) => {
-      signal = init?.signal as AbortSignal | undefined;
-      return new Promise<Response>((_resolve, reject) => {
-        signal?.addEventListener("abort", () =>
-          reject(new DOMException("The operation was aborted.", "AbortError"))
-        );
+    const mock = jest
+      .fn()
+      .mockImplementation((_url: string, init: RequestInit) => {
+        signal = init?.signal as AbortSignal | undefined;
+        return new Promise<Response>((_resolve, reject) => {
+          signal?.addEventListener("abort", () =>
+            reject(new DOMException("The operation was aborted.", "AbortError"))
+          );
+        });
       });
-    });
     return { mock, capturedSignal: () => signal };
   }
 
@@ -720,19 +964,36 @@ describe("fetch timeout", () => {
     const PAGE_2_URL = `${REGISTRY_URL}?offset=100`;
     const signals: (AbortSignal | undefined)[] = [];
 
-    global.fetch = jest.fn().mockImplementation((url: string, init: RequestInit) => {
-      signals.push(init?.signal as AbortSignal | undefined);
-      const body =
-        url === REGISTRY_URL
-          ? makePagedFeed(
-              [{ id: "urn:uuid:p1", title: "P1", authDocUrl: "https://p1.example.com/auth" }],
-              { nextHref: PAGE_2_URL }
-            )
-          : makePagedFeed([
-              { id: "urn:uuid:p2", title: "P2", authDocUrl: "https://p2.example.com/auth" }
-            ]);
-      return Promise.resolve({ ok: true, status: 200, statusText: "OK", json: async () => body });
-    }) as unknown as typeof fetch;
+    global.fetch = jest
+      .fn()
+      .mockImplementation((url: string, init: RequestInit) => {
+        signals.push(init?.signal as AbortSignal | undefined);
+        const body =
+          url === REGISTRY_URL
+            ? makePagedFeed(
+                [
+                  {
+                    id: "urn:uuid:p1",
+                    title: "P1",
+                    authDocUrl: "https://p1.example.com/auth"
+                  }
+                ],
+                { nextHref: PAGE_2_URL }
+              )
+            : makePagedFeed([
+                {
+                  id: "urn:uuid:p2",
+                  title: "P2",
+                  authDocUrl: "https://p2.example.com/auth"
+                }
+              ]);
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          statusText: "OK",
+          json: async () => body
+        });
+      }) as unknown as typeof fetch;
 
     await fetchRegistryLibraries(REGISTRY_URL);
 
