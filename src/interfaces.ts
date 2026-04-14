@@ -54,7 +54,7 @@ export type MediaSupportLevel =
 export type LibraryRegistryBase = string;
 export type LibrariesConfig = Record<
   string,
-  { title: string; authDocUrl: string } | undefined
+  { id?: string; title: string; authDocUrl: string } | undefined
 >;
 
 /** Per-registry configuration for runtime library fetching. */

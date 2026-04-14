@@ -181,6 +181,7 @@ async function crawlRegistryFeed(
       }
 
       accumulated[slug] = {
+        id: catalog.metadata.id,
         title: catalog.metadata.title,
         authDocUrl: authDocLink.href
       };

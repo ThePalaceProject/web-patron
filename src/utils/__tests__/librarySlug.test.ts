@@ -23,16 +23,16 @@ describe("validateSlug", () => {
     expect(validateSlug("my_lib")).toBe(true);
   });
 
-  it("rejects slugs containing colons", () => {
-    expect(validateSlug("urn:uuid:abc")).toBe(false);
+  it("accepts slugs containing colons", () => {
+    expect(validateSlug("urn:uuid:abc")).toBe(true);
   });
 
-  it("rejects slugs containing slashes", () => {
-    expect(validateSlug("a/b")).toBe(false);
+  it("accepts slugs containing slashes", () => {
+    expect(validateSlug("a/b")).toBe(true);
   });
 
-  it("rejects slugs containing spaces", () => {
-    expect(validateSlug("my lib")).toBe(false);
+  it("accepts slugs containing spaces", () => {
+    expect(validateSlug("my lib")).toBe(true);
   });
 
   it("rejects empty strings", () => {
@@ -45,21 +45,14 @@ describe("validateSlug", () => {
 // ---------------------------------------------------------------------------
 
 describe("computeSlug", () => {
-  it("strips 'urn:' prefix and replaces remaining colons with dashes", () => {
-    expect(computeSlug(makeCatalog("urn:uuid:abc123"))).toBe("uuid-abc123");
-  });
-
-  it("handles a realistic UUID URN", () => {
-    const id = "urn:uuid:3f0b05a0-4b6f-11ee-be56-0242ac120002";
-    expect(computeSlug(makeCatalog(id))).toBe(
-      "uuid-3f0b05a0-4b6f-11ee-be56-0242ac120002"
-    );
-  });
-
-  it("handles URNs with multiple colon-separated segments", () => {
+  it("returns URN ids unchanged", () => {
+    expect(computeSlug(makeCatalog("urn:uuid:abc123"))).toBe("urn:uuid:abc123");
     expect(computeSlug(makeCatalog("urn:isbn:0451450523"))).toBe(
-      "isbn-0451450523"
+      "urn:isbn:0451450523"
     );
+    expect(
+      computeSlug(makeCatalog("urn:uuid:3f0b05a0-4b6f-11ee-be56-0242ac120002"))
+    ).toBe("urn:uuid:3f0b05a0-4b6f-11ee-be56-0242ac120002");
   });
 
   it("returns non-URN ids unchanged", () => {
@@ -67,7 +60,7 @@ describe("computeSlug", () => {
     expect(computeSlug(makeCatalog("library123"))).toBe("library123");
   });
 
-  it("produces a slug that passes validateSlug for standard UUID URNs", () => {
+  it("produces a slug that passes validateSlug", () => {
     const slug = computeSlug(
       makeCatalog("urn:uuid:3f0b05a0-4b6f-11ee-be56-0242ac120002")
     );

@@ -56,6 +56,18 @@ async function fetchConfigFile(configFileUrl) {
 }
 
 /**
+ * Computes a URL-safe slug from a library catalog id.
+ * Mirrors the logic in src/utils/librarySlug.ts — keep in sync with that file.
+ */
+function computeSlug(id) {
+  let slug = id;
+  if (slug.startsWith("urn:")) {
+    slug = slug.slice(4).replace(/:/g, "-");
+  }
+  return slug;
+}
+
+/**
  * Fetches an object of libraries from a library registry
  */
 async function fetchLibrariesFromRegistry(registryBase) {
@@ -80,10 +92,11 @@ async function fetchLibrariesFromRegistry(registryBase) {
       );
     }
     const authDocUrl = authDocLink.href;
+    const slug = computeSlug(catalog.metadata.id);
     const library = { title: catalog.metadata.title, authDocUrl };
     return {
       ...record,
-      [catalog.metadata.id]: library
+      [slug]: library
     };
   }, {});
 }

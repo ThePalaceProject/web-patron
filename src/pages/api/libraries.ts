@@ -54,9 +54,9 @@ export default async function handler(
         (entry): entry is [string, NonNullable<(typeof entry)[1]>] =>
           entry[1] != null
       )
-      .map(([id, lib]) => ({
-        id,
-        slug: id,
+      .map(([slug, lib]) => ({
+        id: lib.id ?? slug,
+        slug,
         title: lib.title,
         authDocUrl: lib.authDocUrl
       }));

@@ -62,11 +62,13 @@ describe("GET /api/libraries", () => {
 
   it("returns 200 with an array of client-safe library objects", async () => {
     mockGetLibraries.mockResolvedValue({
-      "urn:uuid:abc": {
+      "uuid-abc": {
+        id: "urn:uuid:abc",
         title: "Library A",
         authDocUrl: "https://a.example.com/auth"
       },
-      "urn:uuid:def": {
+      "uuid-def": {
+        id: "urn:uuid:def",
         title: "Library B",
         authDocUrl: "https://b.example.com/auth"
       }
@@ -80,13 +82,13 @@ describe("GET /api/libraries", () => {
       libraries: expect.arrayContaining([
         {
           id: "urn:uuid:abc",
-          slug: "urn:uuid:abc",
+          slug: "uuid-abc",
           title: "Library A",
           authDocUrl: "https://a.example.com/auth"
         },
         {
           id: "urn:uuid:def",
-          slug: "urn:uuid:def",
+          slug: "uuid-def",
           title: "Library B",
           authDocUrl: "https://b.example.com/auth"
         }
@@ -142,11 +144,12 @@ describe("GET /api/libraries", () => {
 
   it("filters out undefined library entries", async () => {
     mockGetLibraries.mockResolvedValue({
-      "urn:uuid:valid": {
+      "uuid-valid": {
+        id: "urn:uuid:valid",
         title: "Valid",
         authDocUrl: "https://v.example.com/auth"
       },
-      "urn:uuid:missing": undefined
+      "uuid-missing": undefined
     });
 
     const { res, json } = makeRes();
@@ -155,5 +158,6 @@ describe("GET /api/libraries", () => {
     const { libraries } = json.mock.calls[0][0] as LibrariesResponse;
     expect(libraries).toHaveLength(1);
     expect(libraries[0].id).toBe("urn:uuid:valid");
+    expect(libraries[0].slug).toBe("uuid-valid");
   });
 });
