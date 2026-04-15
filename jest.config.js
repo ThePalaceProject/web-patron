@@ -163,8 +163,8 @@ module.exports = {
     "/.next/",
     // These run separately with jest.config.node.js (via test:ci)
     "/src/config/__tests__/",
-    "/src/pages/api/__tests__/",
-    "/src/server/__tests__/"
+    "/src/server/__tests__/",
+    "/tests/pages/"
   ],
 
   // The regexp pattern or array of patterns that Jest uses to detect test files

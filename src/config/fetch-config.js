@@ -55,7 +55,6 @@ async function fetchConfigFile(configFileUrl) {
   }
 }
 
-
 /**
  * Creates a LibrariesConfig from the object in the config file.
  * Supports two formats:
@@ -196,7 +195,11 @@ async function parseConfig(raw) {
     );
     registries = [
       ...registries,
-      { url: unparsed.libraries, refreshMinInterval: 60, refreshMaxInterval: 300 }
+      {
+        url: unparsed.libraries,
+        refreshMinInterval: 60,
+        refreshMaxInterval: 300
+      }
     ];
   }
 

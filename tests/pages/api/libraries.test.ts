@@ -6,7 +6,10 @@
  */
 
 import type { NextApiRequest, NextApiResponse } from "next";
-import type { LibrariesResponse, LibrariesErrorResponse } from "../libraries";
+import type {
+  LibrariesResponse,
+  LibrariesErrorResponse
+} from "pages/api/libraries";
 
 // Mock the registry module so we can control what getLibraries returns.
 jest.mock("server/libraryRegistry", () => ({
@@ -14,7 +17,7 @@ jest.mock("server/libraryRegistry", () => ({
 }));
 
 import { getLibraries } from "server/libraryRegistry";
-import handler from "../libraries";
+import handler from "pages/api/libraries";
 
 const mockGetLibraries = getLibraries as jest.MockedFunction<
   typeof getLibraries
