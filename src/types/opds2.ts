@@ -38,7 +38,29 @@ export interface Group extends Collection<GroupMetadata> {
   groups: Feed<GroupMetadata>[];
 }
 
-type LibraryRegistryFeedMetadata = { adobe_vendor_id: string; title: string };
+/** URI identifying the sort facet group in a Library Registry feed. */
+export const SortFacetType = "http://palaceproject.io/terms/rel/sort";
+
+/** Property key marking a facet link as the default option for its group. */
+export const FacetDefaultProperty =
+  "http://palaceproject.io/terms/facet/default";
+
+export interface FacetGroupMetadata {
+  title: string;
+  "@type"?: string; // e.g. SortFacetType
+}
+
+export interface FacetGroup {
+  metadata: FacetGroupMetadata;
+  links: Link[]; // the active facet link has rel === "self"
+}
+
+type LibraryRegistryFeedMetadata = {
+  adobe_vendor_id: string;
+  title: string;
+  numberOfItems?: number;
+};
+
 export interface LibraryRegistryFeed extends Feed<LibraryRegistryFeedMetadata> {
   links: Link[];
   /**
@@ -47,6 +69,7 @@ export interface LibraryRegistryFeed extends Feed<LibraryRegistryFeedMetadata> {
    * in an array. A generic LibraryRegistryFeed has a list of all catalogs
    */
   catalogs?: CatalogEntry[];
+  facets?: FacetGroup[];
 }
 
 type CatalogEntryMetadata = {
@@ -93,10 +116,22 @@ export const CatalogLinkTemplateRelation =
   "http://librarysimplified.org/rel/registry/library";
 export const CatalogRootRelation = "http://opds-spec.org/catalog";
 
+export const PaginationNextRelation = "next";
+export const PaginationFirstRelation = "first";
+export const PaginationPrevRelation = "previous";
+export const PaginationLastRelation = "last";
+
+export type PaginationLinkRelation =
+  | typeof PaginationNextRelation
+  | typeof PaginationFirstRelation
+  | typeof PaginationPrevRelation
+  | typeof PaginationLastRelation;
+
 export type AnyLinkRelation =
   | typeof CatalogLinkTemplateRelation
   | typeof CatalogRootRelation
   | typeof AuthDocumentRelation
+  | PaginationLinkRelation
   | "self"
   | "search"
   | "registry";

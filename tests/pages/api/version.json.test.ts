@@ -5,8 +5,8 @@
  * (jest.config.node.js) because this is a server-side handler.
  */
 
-import type { VersionInfo } from "../version.json";
-import handler from "../version.json";
+import type { VersionInfo } from "pages/api/version.json";
+import handler from "pages/api/version.json";
 
 describe("GET /api/version.json", () => {
   const originalEnv = process.env;

@@ -10,8 +10,16 @@ import ApplicationError, { PageNotFoundError } from "errors";
 import rawCatalog from "test-utils/fixtures/raw-opds-feed";
 import { fixtures } from "test-utils";
 import { OPDS1 } from "interfaces";
-import mockConfig from "test-utils/mockConfig";
 import { fetchFeed } from "dataflow/opds1/fetch";
+import { getLibraries } from "server/libraryRegistry";
+
+jest.mock("server/libraryRegistry", () => ({
+  getLibraries: jest.fn()
+}));
+
+const mockGetLibraries = getLibraries as jest.MockedFunction<
+  typeof getLibraries
+>;
 
 describe("fetching catalog", () => {
   test("calls fetch with catalog url", async () => {
@@ -52,8 +60,8 @@ describe("fetching catalog", () => {
 });
 
 describe("getAuthDocUrl", () => {
-  test("throws PageNotFoundError if no entry found in config file for library", async () => {
-    mockConfig({ libraries: {} });
+  test("throws PageNotFoundError if library is not found", async () => {
+    mockGetLibraries.mockResolvedValueOnce({});
     const promise = getAuthDocUrl("not there slug");
     await expect(promise).rejects.toThrow(PageNotFoundError);
     await expect(promise).rejects.toMatchInlineSnapshot(
@@ -61,13 +69,24 @@ describe("getAuthDocUrl", () => {
     );
   });
 
-  test("returns url for existing library in config file", async () => {
-    mockConfig({
-      libraries: { hello: { title: "hello", authDocUrl: "http://library.com" } }
+  test("returns url for a static library", async () => {
+    mockGetLibraries.mockResolvedValueOnce({
+      hello: { title: "hello", authDocUrl: "http://library.com" }
     });
-
     const promise = getAuthDocUrl("hello");
     await expect(promise).resolves.toBe("http://library.com");
+  });
+
+  test("returns url for a library sourced from a registry", async () => {
+    mockGetLibraries.mockResolvedValueOnce({
+      "uuid-abc": {
+        id: "urn:uuid:abc",
+        title: "Registry Lib",
+        authDocUrl: "https://reg.example.com/auth"
+      }
+    });
+    const url = await getAuthDocUrl("uuid-abc");
+    expect(url).toBe("https://reg.example.com/auth");
   });
 });
 

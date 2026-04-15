@@ -56,39 +56,6 @@ async function fetchConfigFile(configFileUrl) {
 }
 
 /**
- * Fetches an object of libraries from a library registry
- */
-async function fetchLibrariesFromRegistry(registryBase) {
-  const response = await fetch(registryBase);
-  if (!response.ok) {
-    throw new Error("Could not fetch registry base at: " + registryBase);
-  }
-  const registryFeed = await response.json();
-  if (!registryFeed.catalogs) {
-    throw new Error(
-      "Registry feed did not contain any catalogs at url: " + registryBase
-    );
-  }
-
-  return registryFeed.catalogs.reduce((record, catalog) => {
-    const authDocLink = catalog.links.find(
-      link => link.type === "application/vnd.opds.authentication.v1.0+json"
-    );
-    if (!authDocLink) {
-      throw new AppSetupError(
-        `Invalid Registry Feed: Catalog ${catalog.metadata.title} is missing an auth document link at registry url: ${registryBase}`
-      );
-    }
-    const authDocUrl = authDocLink.href;
-    const library = { title: catalog.metadata.title, authDocUrl };
-    return {
-      ...record,
-      [catalog.metadata.id]: library
-    };
-  }, {});
-}
-
-/**
  * Creates a LibrariesConfig from the object in the config file.
  * Supports two formats:
  * 1. String format: slug maps to auth doc URL (slug becomes title)
@@ -211,44 +178,35 @@ async function parseConfig(raw) {
   const openebooks = unparsed.openebooks;
   const defaultLibrary = openebooks ? openebooks.default_library : undefined;
 
-  // Parse registries array configuration
-  const registries = unparsed.registries
+  // Parse registries array configuration.
+  let registries = unparsed.registries
     ? parseRegistriesConfig(unparsed.registries)
     : [];
 
-  // Build libraries from multiple sources
-  let libraries = {};
-
-  // 1. First, fetch from registries array (if present)
-  if (registries.length > 0) {
-    for (const registry of registries) {
-      const registryLibraries = await fetchLibrariesFromRegistry(registry.url);
-      // Merge registry libraries - later registries don't override earlier ones
-      libraries = { ...registryLibraries, ...libraries };
-    }
-  }
-
-  // 2. Handle deprecated string format for libraries (for backward compatibility)
+  // Handle deprecated string format: treat the URL as a runtime registry entry.
+  // Libraries are no longer fetched at build time; they are fetched at runtime
+  // via the same path as the registries array.
   if (typeof unparsed.libraries === "string") {
-    // DEPRECATED: String format for libraries is deprecated in favor of registries array
     console.warn(
       "WARNING: Using a string for 'libraries' in config is deprecated. " +
         "Please migrate to the 'registries' array format. " +
         "See community-config.yml for migration instructions. " +
-        "String format will continue to work but fetches at build-time only."
+        "The URL is treated as a runtime registry; libraries are fetched at runtime, not build time."
     );
-    const deprecatedRegistryLibraries = await fetchLibrariesFromRegistry(
-      unparsed.libraries
-    );
-    // Merge with existing libraries - deprecated format doesn't override registries
-    libraries = { ...libraries, ...deprecatedRegistryLibraries };
+    registries = [
+      ...registries,
+      {
+        url: unparsed.libraries,
+        refreshMinInterval: 60,
+        refreshMaxInterval: 300
+      }
+    ];
   }
 
-  // 3. Finally, overlay static libraries (these take precedence)
+  // Apply static libraries (these take precedence over registry libraries at runtime).
+  let libraries = {};
   if (unparsed.libraries && typeof unparsed.libraries === "object") {
-    const staticLibraries = makeLibrariesConfig(unparsed.libraries);
-    // Static libraries override registry libraries
-    libraries = { ...libraries, ...staticLibraries };
+    libraries = makeLibrariesConfig(unparsed.libraries);
   }
 
   // otherwise assume the file is properly structured.

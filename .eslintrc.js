@@ -1,7 +1,7 @@
 module.exports = {
   overrides: [
     {
-      files: ["**/__tests__/**/*.{ts,tsx}", "src/test-utils/**/*.{ts,tsx}"],
+      files: ["**/__tests__/**/*.{ts,tsx}", "tests/**/*.{ts,tsx}", "src/test-utils/**/*.{ts,tsx}"],
       rules: { "react/display-name": "off" }
     },
     {
