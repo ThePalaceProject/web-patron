@@ -34,8 +34,7 @@ const VALID_APP_CONFIG = JSON.stringify({
   companionApp: "simplye",
   showMedium: true,
   openebooks: null,
-  mediaSupport: {},
-  libraries: {}
+  mediaSupport: {}
 });
 
 function makeRes() {

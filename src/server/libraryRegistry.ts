@@ -7,6 +7,7 @@ import {
   DEFAULT_REGISTRY_FETCH_TIMEOUT
 } from "constants/registry";
 import { computeSlug, validateSlug } from "utils/librarySlug";
+import { getStaticLibraries } from "./staticLibraries";
 
 // ---------------------------------------------------------------------------
 // Internal state types
@@ -325,7 +326,8 @@ async function refreshRegistry(
 export async function getLibraries(
   config: AppConfig
 ): Promise<LibrariesConfig> {
-  const { registries = [], libraries: staticLibraries } = config;
+  const { registries = [] } = config;
+  const staticLibraries = await getStaticLibraries();
 
   if (registries.length === 0) return staticLibraries;
 

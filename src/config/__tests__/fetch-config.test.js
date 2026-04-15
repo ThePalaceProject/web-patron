@@ -26,7 +26,10 @@ describe("fetch-config", () => {
   });
 
   describe("static libraries config (object format)", () => {
-    test("parses static libraries from object", async () => {
+    // Static library entries are validated and resolved at runtime by
+    // src/server/staticLibraries.ts. fetch-config always outputs libraries: {}.
+
+    test("outputs empty libraries regardless of object-format libraries in config", async () => {
       const yamlConfig = `
 instance_name: Test Instance
 libraries:
@@ -37,16 +40,6 @@ media_support: {}
 
       const config = await parseConfig(yamlConfig);
 
-      expect(config.libraries).toEqual({
-        "main-street": {
-          title: "main-street",
-          authDocUrl: "https://example.com/main-street/auth"
-        },
-        "lyr-reads": {
-          title: "lyr-reads",
-          authDocUrl: "https://example.com/lyr-reads/auth"
-        }
-      });
       expect(config.registries).toEqual([]);
     });
 
@@ -59,282 +52,7 @@ media_support: {}
 
       const config = await parseConfig(yamlConfig);
 
-      expect(config.libraries).toEqual({});
       expect(config.registries).toEqual([]);
-    });
-  });
-
-  describe("enhanced library config format (object with authDocUrl/title)", () => {
-    test("parses library with object format and custom title", async () => {
-      const yamlConfig = `
-instance_name: Test Instance
-libraries:
-  main-lib:
-    authDocUrl: https://example.com/main/auth
-    title: "Main Library"
-media_support: {}
-      `;
-
-      const config = await parseConfig(yamlConfig);
-
-      expect(config.libraries).toEqual({
-        "main-lib": {
-          title: "Main Library",
-          authDocUrl: "https://example.com/main/auth"
-        }
-      });
-    });
-
-    test("parses library with object format without title (uses slug)", async () => {
-      const yamlConfig = `
-instance_name: Test Instance
-libraries:
-  my-library:
-    authDocUrl: https://example.com/my-library/auth
-media_support: {}
-      `;
-
-      const config = await parseConfig(yamlConfig);
-
-      expect(config.libraries).toEqual({
-        "my-library": {
-          title: "my-library",
-          authDocUrl: "https://example.com/my-library/auth"
-        }
-      });
-    });
-
-    test("mixes string and object formats in same config", async () => {
-      const yamlConfig = `
-instance_name: Test Instance
-libraries:
-  simple-lib: https://example.com/simple/auth
-  custom-lib:
-    authDocUrl: https://example.com/custom/auth
-    title: "Custom Library"
-  another-lib:
-    authDocUrl: https://example.com/another/auth
-media_support: {}
-      `;
-
-      const config = await parseConfig(yamlConfig);
-
-      expect(config.libraries).toEqual({
-        "simple-lib": {
-          title: "simple-lib",
-          authDocUrl: "https://example.com/simple/auth"
-        },
-        "custom-lib": {
-          title: "Custom Library",
-          authDocUrl: "https://example.com/custom/auth"
-        },
-        "another-lib": {
-          title: "another-lib",
-          authDocUrl: "https://example.com/another/auth"
-        }
-      });
-    });
-
-    test("throws error for null value", async () => {
-      const yamlConfig = `
-instance_name: Test Instance
-libraries:
-  bad-lib: null
-media_support: {}
-      `;
-
-      await expect(parseConfig(yamlConfig)).rejects.toThrow(
-        "CONFIG_FILE.libraries['bad-lib'] cannot be null or undefined"
-      );
-    });
-
-    test("throws error for empty string value", async () => {
-      const yamlConfig = `
-instance_name: Test Instance
-libraries:
-  bad-lib: ""
-media_support: {}
-      `;
-
-      await expect(parseConfig(yamlConfig)).rejects.toThrow(
-        "CONFIG_FILE.libraries['bad-lib'] cannot be an empty string"
-      );
-    });
-
-    test("throws error for whitespace-only string value", async () => {
-      const yamlConfig = `
-instance_name: Test Instance
-libraries:
-  bad-lib: "   "
-media_support: {}
-      `;
-
-      await expect(parseConfig(yamlConfig)).rejects.toThrow(
-        "CONFIG_FILE.libraries['bad-lib'] cannot be an empty string"
-      );
-    });
-
-    test("throws error for object missing authDocUrl", async () => {
-      const yamlConfig = `
-instance_name: Test Instance
-libraries:
-  bad-lib:
-    title: "My Library"
-media_support: {}
-      `;
-
-      await expect(parseConfig(yamlConfig)).rejects.toThrow(
-        "CONFIG_FILE.libraries['bad-lib'] must have an 'authDocUrl' property with a valid URL string"
-      );
-    });
-
-    test("throws error for object with non-string authDocUrl", async () => {
-      const yamlConfig = `
-instance_name: Test Instance
-libraries:
-  bad-lib:
-    authDocUrl: 12345
-media_support: {}
-      `;
-
-      await expect(parseConfig(yamlConfig)).rejects.toThrow(
-        "CONFIG_FILE.libraries['bad-lib'] must have an 'authDocUrl' property with a valid URL string"
-      );
-    });
-
-    test("throws error for object with empty string authDocUrl", async () => {
-      const yamlConfig = `
-instance_name: Test Instance
-libraries:
-  bad-lib:
-    authDocUrl: ""
-media_support: {}
-      `;
-
-      await expect(parseConfig(yamlConfig)).rejects.toThrow(
-        "CONFIG_FILE.libraries['bad-lib'].authDocUrl cannot be an empty string"
-      );
-    });
-
-    test("throws error for object with whitespace-only authDocUrl", async () => {
-      const yamlConfig = `
-instance_name: Test Instance
-libraries:
-  bad-lib:
-    authDocUrl: "  "
-media_support: {}
-      `;
-
-      await expect(parseConfig(yamlConfig)).rejects.toThrow(
-        "CONFIG_FILE.libraries['bad-lib'].authDocUrl cannot be an empty string"
-      );
-    });
-
-    test("throws error for object with non-string title", async () => {
-      const yamlConfig = `
-instance_name: Test Instance
-libraries:
-  bad-lib:
-    authDocUrl: https://example.com/auth
-    title: 123
-media_support: {}
-      `;
-
-      await expect(parseConfig(yamlConfig)).rejects.toThrow(
-        "CONFIG_FILE.libraries['bad-lib'].title must be a string"
-      );
-    });
-
-    test("throws error for object with empty string title", async () => {
-      const yamlConfig = `
-instance_name: Test Instance
-libraries:
-  bad-lib:
-    authDocUrl: https://example.com/auth
-    title: ""
-media_support: {}
-      `;
-
-      await expect(parseConfig(yamlConfig)).rejects.toThrow(
-        "CONFIG_FILE.libraries['bad-lib'].title cannot be an empty string"
-      );
-    });
-
-    test("throws error for object with whitespace-only title", async () => {
-      const yamlConfig = `
-instance_name: Test Instance
-libraries:
-  bad-lib:
-    authDocUrl: https://example.com/auth
-    title: "   "
-media_support: {}
-      `;
-
-      await expect(parseConfig(yamlConfig)).rejects.toThrow(
-        "CONFIG_FILE.libraries['bad-lib'].title cannot be an empty string"
-      );
-    });
-
-    test("throws error for number value", async () => {
-      const yamlConfig = `
-instance_name: Test Instance
-libraries:
-  bad-lib: 12345
-media_support: {}
-      `;
-
-      await expect(parseConfig(yamlConfig)).rejects.toThrow(
-        "CONFIG_FILE.libraries['bad-lib'] must be either a string (auth doc URL) or an object with 'authDocUrl' property"
-      );
-    });
-
-    test("throws error for boolean value", async () => {
-      const yamlConfig = `
-instance_name: Test Instance
-libraries:
-  bad-lib: true
-media_support: {}
-      `;
-
-      await expect(parseConfig(yamlConfig)).rejects.toThrow(
-        "CONFIG_FILE.libraries['bad-lib'] must be either a string (auth doc URL) or an object with 'authDocUrl' property"
-      );
-    });
-
-    test("throws error for array value", async () => {
-      const yamlConfig = `
-instance_name: Test Instance
-libraries:
-  bad-lib:
-    - https://example.com/auth
-media_support: {}
-      `;
-
-      await expect(parseConfig(yamlConfig)).rejects.toThrow(
-        "CONFIG_FILE.libraries['bad-lib'] must have an 'authDocUrl' property with a valid URL string"
-      );
-    });
-
-    test("ignores extra keys in object format", async () => {
-      const yamlConfig = `
-instance_name: Test Instance
-libraries:
-  my-lib:
-    authDocUrl: https://example.com/auth
-    title: "My Library"
-    extra_field: "ignored"
-    another_field: 123
-media_support: {}
-      `;
-
-      const config = await parseConfig(yamlConfig);
-
-      expect(config.libraries).toEqual({
-        "my-lib": {
-          title: "My Library",
-          authDocUrl: "https://example.com/auth"
-        }
-      });
     });
   });
 
@@ -477,7 +195,6 @@ media_support: {}
 
       const config = await parseConfig(yamlConfig);
 
-      expect(config.libraries).toEqual({});
       expect(config.registries).toEqual([
         {
           url: "https://registry.example.com/libraries",
@@ -488,7 +205,7 @@ media_support: {}
       expect(fetch).not.toHaveBeenCalled();
     });
 
-    test("static libraries are present at build time; registry libraries are runtime-only", async () => {
+    test("static library entries do not appear in build output; registry config is stored", async () => {
       const yamlConfig = `
 instance_name: Test Instance
 libraries:
@@ -502,12 +219,6 @@ media_support: {}
 
       const config = await parseConfig(yamlConfig);
 
-      expect(config.libraries).toEqual({
-        "shared-slug": {
-          title: "Static Override Library",
-          authDocUrl: "https://example.com/static-override/auth"
-        }
-      });
       expect(config.registries).toEqual([
         {
           url: "https://registry.example.com/libraries",
@@ -530,7 +241,6 @@ media_support: {}
 
       const config = await parseConfig(yamlConfig);
 
-      expect(config.libraries).toEqual({});
       expect(config.registries).toHaveLength(2);
       expect(config.registries[0].url).toBe(
         "https://registry1.example.com/libraries"
@@ -541,7 +251,7 @@ media_support: {}
       expect(fetch).not.toHaveBeenCalled();
     });
 
-    test("combines static libraries with registries config", async () => {
+    test("static library entries are omitted from build output; registries config is stored", async () => {
       const yamlConfig = `
 instance_name: Test Instance
 libraries:
@@ -553,12 +263,6 @@ media_support: {}
 
       const config = await parseConfig(yamlConfig);
 
-      expect(config.libraries).toEqual({
-        "static-lib": {
-          title: "static-lib",
-          authDocUrl: "https://example.com/static/auth"
-        }
-      });
       expect(config.registries).toEqual([
         {
           url: "https://registry.example.com/libraries",
@@ -601,7 +305,6 @@ media_support: {}
 
       const config = await parseConfig(yamlConfig);
 
-      expect(config.libraries).toEqual({});
       expect(config.registries).toEqual([
         {
           url: "https://registry.example.com/libraries",
@@ -651,7 +354,6 @@ media_support: {}
 
       const config = await parseConfig(yamlConfig);
 
-      expect(config.libraries).toBeDefined();
       expect(config.registries).toEqual([]);
     });
 
@@ -665,7 +367,6 @@ media_support: {}
 
       const config = await parseConfig(yamlConfig);
 
-      expect(config.libraries).toEqual({});
       expect(config.registries).toHaveLength(1);
       expect(fetch).not.toHaveBeenCalled();
     });
