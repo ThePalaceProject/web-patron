@@ -1,6 +1,3 @@
-const withTM = require("next-transpile-modules")([
-  "@thepalaceproject/webpub-viewer"
-]);
 const {
   BugsnagBuildReporterPlugin,
   BugsnagSourceMapUploaderPlugin
@@ -66,6 +63,7 @@ log(`Media Support: `, APP_CONFIG.mediaSupport);
 log(`Libraries: (resolved at runtime from ${CONFIG_FILE})`);
 
 const config = {
+  transpilePackages: ["@thepalaceproject/webpub-viewer"],
   env: {
     CONFIG_FILE: CONFIG_FILE,
     REACT_AXE: REACT_AXE,
@@ -129,7 +127,7 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true"
 });
 module.exports = {
-  ...withTM(withBundleAnalyzer(config)),
+  ...withBundleAnalyzer(config),
   distDir: "_next",
   generateBuildId: async () => {
     if (process.env.BUILD_ID) {
