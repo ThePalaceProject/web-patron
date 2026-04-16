@@ -102,7 +102,7 @@ describe("MultiLibraryHome", () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it("returns null on fetch error", () => {
+  it("displays an error message on fetch error", () => {
     mockedSWR.mockReturnValue(
       makeSwrResponse<any>({
         data: undefined,
@@ -110,8 +110,12 @@ describe("MultiLibraryHome", () => {
       })
     );
 
-    const { container } = render(<MultiLibraryHome />);
-    expect(container.firstChild).toBeNull();
+    render(<MultiLibraryHome />);
+    expect(
+      screen.getByText(
+        "Unable to load static libraries from configuration file."
+      )
+    ).toBeInTheDocument();
   });
 
   it("displays instance name in heading", () => {

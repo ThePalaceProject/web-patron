@@ -15,6 +15,7 @@ import YAML from "yaml";
 import type { LibrariesConfig } from "interfaces";
 import { AppSetupError } from "errors";
 import { isHttpUrl } from "utils/parse";
+import { DEFAULT_REGISTRY_FETCH_TIMEOUT } from "constants/registry";
 
 // ---------------------------------------------------------------------------
 // Validation helpers
@@ -114,7 +115,17 @@ export async function getStaticLibraries(): Promise<LibrariesConfig> {
 
   let text: string;
   if (isHttpUrl(configFile)) {
-    const res = await fetch(configFile);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(
+      () => controller.abort(),
+      DEFAULT_REGISTRY_FETCH_TIMEOUT * 1000
+    );
+    let res: Response;
+    try {
+      res = await fetch(configFile, { signal: controller.signal });
+    } finally {
+      clearTimeout(timeoutId);
+    }
     if (!res.ok) {
       throw new Error(`Could not fetch config file at: ${configFile}`);
     }
