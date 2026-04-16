@@ -3,7 +3,7 @@
  *
  * Returns the current list of available libraries. For configs that specify
  * a `registries` array, libraries are fetched at runtime and cached
- * server-side. For configs with only static `libraries`, the build-time
+ * server-side. For configs with only static `libraries`, the runtime-loaded
  * list is returned directly.
  *
  * Only client-safe fields are included in the response; full registry
