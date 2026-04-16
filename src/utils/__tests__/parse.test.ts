@@ -1,4 +1,4 @@
-import { parseUrl } from "utils/parse";
+import { parseUrl, isHttpUrl } from "utils/parse";
 
 describe("parseUrl()", () => {
   describe("Invalid URL", () => {
@@ -28,5 +28,19 @@ describe("parseUrl()", () => {
       expect(url).not.toBeNull();
       expect(url!.href).toBe("https://www.secure.com/");
     });
+  });
+});
+
+describe("isHttpUrl()", () => {
+  test.each([
+    ["https://www.example.com", true],
+    ["http://www.example.com", true],
+    ["ftp://www.example.com", false],
+    ["file:///etc/passwd", false],
+    ["no-protocol", false],
+    ["#$%", false],
+    ["", false]
+  ])("%s → %s", (input, expected) => {
+    expect(isHttpUrl(input)).toBe(expected);
   });
 });

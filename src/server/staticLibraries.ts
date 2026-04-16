@@ -14,6 +14,7 @@ import { readFileSync } from "fs";
 import YAML from "yaml";
 import type { LibrariesConfig } from "interfaces";
 import { AppSetupError } from "errors";
+import { isHttpUrl } from "utils/parse";
 
 // ---------------------------------------------------------------------------
 // Validation helpers
@@ -112,7 +113,7 @@ export async function getStaticLibraries(): Promise<LibrariesConfig> {
   }
 
   let text: string;
-  if (configFile.startsWith("http")) {
+  if (isHttpUrl(configFile)) {
     const res = await fetch(configFile);
     if (!res.ok) {
       throw new Error(`Could not fetch config file at: ${configFile}`);
