@@ -19,7 +19,6 @@ export { OPDS1 };
 export type AppConfig = {
   instanceName: string;
   mediaSupport: MediaSupportConfig;
-  libraries: LibrariesConfig;
   registries?: RegistryConfig[];
   companionApp: "simplye" | "openebooks";
   showMedium: boolean;

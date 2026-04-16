@@ -63,7 +63,7 @@ log(
 );
 log(`Open eBooks Config: `, APP_CONFIG.openebooks);
 log(`Media Support: `, APP_CONFIG.mediaSupport);
-log(`Libraries: `, APP_CONFIG.libraries);
+log(`Libraries: (resolved at runtime from ${CONFIG_FILE})`);
 
 const config = {
   env: {

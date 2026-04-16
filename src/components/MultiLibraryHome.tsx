@@ -21,7 +21,9 @@ const MultiLibraryHome: React.FC = () => {
     fetchLibraries
   );
 
-  if (!data || error) return null;
+  if (error)
+    return <p>Unable to load static libraries from configuration file.</p>;
+  if (!data?.libraries) return null;
 
   const sorted = [...data.libraries].sort(
     (a: ClientLibrary, b: ClientLibrary) => {

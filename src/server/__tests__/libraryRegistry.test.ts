@@ -16,6 +16,14 @@ import {
   DEFAULT_REGISTRY_REFRESH_MIN_INTERVAL,
   DEFAULT_REGISTRY_REFRESH_MAX_INTERVAL
 } from "constants/registry";
+import { resetStaticLibrariesCache } from "../staticLibraries";
+
+jest.mock("../staticLibraries", () => ({
+  getStaticLibraries: jest.fn().mockResolvedValue({}),
+  resetStaticLibrariesCache: jest.fn()
+}));
+
+import { getStaticLibraries } from "../staticLibraries";
 
 // ---------------------------------------------------------------------------
 // Test infrastructure
@@ -35,7 +43,6 @@ function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     showMedium: true,
     openebooks: null,
     mediaSupport: {},
-    libraries: {},
     ...overrides
   };
 }
@@ -765,16 +772,20 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
 // ---------------------------------------------------------------------------
 
 describe("getLibraries", () => {
-  beforeEach(() => resetRegistryCaches());
+  beforeEach(() => {
+    resetRegistryCaches();
+    resetStaticLibrariesCache();
+    (getStaticLibraries as jest.Mock).mockResolvedValue({});
+  });
 
   it("returns static libraries when no registries are configured", async () => {
-    const config = makeConfig({
-      libraries: {
-        "my-lib": { title: "My Lib", authDocUrl: "https://my.lib/auth" }
-      }
-    });
-    const result = await getLibraries(config);
-    expect(result).toEqual(config.libraries);
+    const staticLibs = {
+      "my-lib": { title: "My Lib", authDocUrl: "https://my.lib/auth" }
+    };
+    (getStaticLibraries as jest.Mock).mockResolvedValue(staticLibs);
+
+    const result = await getLibraries(makeConfig());
+    expect(result).toEqual(staticLibs);
   });
 
   it("fetches from registry and returns merged libraries", async () => {
@@ -804,17 +815,16 @@ describe("getLibraries", () => {
     ]);
     global.fetch = mockFetchSuccess(feed) as unknown as typeof fetch;
 
-    const config = makeConfig({
-      libraries: {
-        "urn:uuid:shared": {
-          title: "Static Version",
-          authDocUrl: "https://static.example.com/auth"
-        }
-      },
-      registries: [makeRegistryConfig()]
+    (getStaticLibraries as jest.Mock).mockResolvedValue({
+      "urn:uuid:shared": {
+        title: "Static Version",
+        authDocUrl: "https://static.example.com/auth"
+      }
     });
 
-    const result = await getLibraries(config);
+    const result = await getLibraries(
+      makeConfig({ registries: [makeRegistryConfig()] })
+    );
     expect(result["urn:uuid:shared"]?.title).toBe("Static Version");
   });
 
