@@ -89,6 +89,7 @@ The app can then be run with `npm run start`, and it will pick up the env from y
 
 The following environment variables can be set to further configure the application.
 
+- Set `SKIP_BUILD_TIME_CHECKS=true` to skip ESLint and TypeScript checks during `next build`. Useful in deployment environments where CI has already validated the code and faster startup is desired. Defaults to `false`.
 - Set `AXE_TEST=true` to run the application with `react-axe` enabled (only works when `NODE_ENV` is "development").
 - Set `ANALYZE=true` to generate bundle analysis files inside `.next/analyze` which will show bundle sizes for server and client, as well as composition.
 
