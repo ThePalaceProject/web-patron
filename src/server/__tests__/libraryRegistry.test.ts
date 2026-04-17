@@ -893,6 +893,94 @@ describe("getLibraries", () => {
 });
 
 // ---------------------------------------------------------------------------
+// concurrent first-fetch coalescing
+// ---------------------------------------------------------------------------
+
+describe("concurrent first-fetch coalescing", () => {
+  beforeEach(() => {
+    resetRegistryCaches();
+    (getStaticLibraries as jest.Mock).mockResolvedValue({});
+  });
+
+  it("concurrent getLibraries calls both receive the fetched libraries, not an empty list", async () => {
+    /*
+     * Simulate the Next.js ISR race: two getStaticProps calls arrive before
+     * the registry has been fetched. The first call starts the crawl and sets
+     * lastAttemptedFetch; without pendingRefreshes the second call would see
+     * lastAttemptedFetch within minInterval, skip the refresh, and return an
+     * empty library list.
+     *
+     * Gate the fetch behind a promise so both calls are in-flight when the
+     * network response arrives.
+     */
+    let resolveFetch!: () => void;
+    const fetchGate = new Promise<void>(resolve => {
+      resolveFetch = resolve;
+    });
+
+    const feed = makePagedFeed([
+      {
+        id: "urn:uuid:abc",
+        title: "Library A",
+        authDocUrl: "https://a.example.com/auth"
+      }
+    ]);
+
+    const fetchMock = jest.fn().mockReturnValue(
+      fetchGate.then(() => ({
+        ok: true,
+        status: 200,
+        statusText: "OK",
+        json: async () => feed
+      }))
+    );
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    const config = makeConfig({ registries: [makeRegistryConfig()] });
+
+    const p1 = getLibraries(config);
+    const p2 = getLibraries(config);
+    resolveFetch();
+
+    const [result1, result2] = await Promise.all([p1, p2]);
+
+    expect(result1["urn:uuid:abc"]).toBeDefined();
+    expect(result2["urn:uuid:abc"]).toBeDefined();
+    // Only one network request despite two concurrent callers.
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("concurrent callers both get an empty result when the in-progress crawl fails", async () => {
+    let resolveFetch!: () => void;
+    const fetchGate = new Promise<void>(resolve => {
+      resolveFetch = resolve;
+    });
+
+    const fetchMock = jest.fn().mockReturnValue(
+      fetchGate.then(() => ({
+        ok: false,
+        status: 503,
+        statusText: "Service Unavailable",
+        json: async () => ({})
+      }))
+    );
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    const config = makeConfig({ registries: [makeRegistryConfig()] });
+
+    const p1 = getLibraries(config);
+    const p2 = getLibraries(config);
+    resolveFetch();
+
+    const [result1, result2] = await Promise.all([p1, p2]);
+
+    expect(result1).toEqual({});
+    expect(result2).toEqual({});
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // fetch timeout
 // ---------------------------------------------------------------------------
 
