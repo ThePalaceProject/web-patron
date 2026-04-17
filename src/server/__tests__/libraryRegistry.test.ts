@@ -949,6 +949,35 @@ describe("concurrent first-fetch coalescing", () => {
     // Only one network request despite two concurrent callers.
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
+
+  it("concurrent callers both get an empty result when the in-progress crawl fails", async () => {
+    let resolveFetch!: () => void;
+    const fetchGate = new Promise<void>(resolve => {
+      resolveFetch = resolve;
+    });
+
+    const fetchMock = jest.fn().mockReturnValue(
+      fetchGate.then(() => ({
+        ok: false,
+        status: 503,
+        statusText: "Service Unavailable",
+        json: async () => ({})
+      }))
+    );
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    const config = makeConfig({ registries: [makeRegistryConfig()] });
+
+    const p1 = getLibraries(config);
+    const p2 = getLibraries(config);
+    resolveFetch();
+
+    const [result1, result2] = await Promise.all([p1, p2]);
+
+    expect(result1).toEqual({});
+    expect(result2).toEqual({});
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
 });
 
 // ---------------------------------------------------------------------------
