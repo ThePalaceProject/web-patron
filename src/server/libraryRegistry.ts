@@ -52,6 +52,17 @@ interface CrawlResult {
  */
 const registryCaches = new Map<string, RegistryState>();
 
+/*
+ * Tracks crawls that are currently in-progress. Used to coalesce concurrent
+ * requests: if a crawl for a URL is already running, latecomers await the
+ * same promise rather than returning an empty cache immediately. Without this,
+ * the Next.js ISR fallback can fire two simultaneous getStaticProps calls —
+ * the first starts the crawl (setting lastAttemptedFetch), and the second
+ * sees lastAttemptedFetch within minInterval, skips the refresh, and returns
+ * an empty library list, causing a spurious 404 on the very first page load.
+ */
+const pendingRefreshes = new Map<string, Promise<void>>();
+
 const emptyState: RegistryState = {
   libraries: {},
   lastSuccessfulFetch: null,
@@ -240,11 +251,23 @@ export async function fetchRegistryLibraries(
  * requests arriving during the async crawl see the in-progress attempt and
  * skip the duplicate. Errors are logged and swallowed; the existing cached
  * state is retained.
+ *
+ * If a crawl for this URL is already in-progress (tracked in pendingRefreshes),
+ * this function awaits that crawl instead of starting a new one. This prevents
+ * the race where a concurrent request skips the refresh (because
+ * lastAttemptedFetch is set) and reads an empty cache before the first crawl
+ * has completed.
  */
 async function refreshRegistry(
   registryConfig: RegistryConfig,
   nowSeconds: number
 ): Promise<void> {
+  const pending = pendingRefreshes.get(registryConfig.url);
+  if (pending) {
+    await pending;
+    return;
+  }
+
   const isFirstFetch = !registryCaches.has(registryConfig.url);
   const existing = registryCaches.get(registryConfig.url) ?? emptyState;
 
@@ -274,40 +297,53 @@ async function refreshRegistry(
     lastAttemptedFetch: attemptTime
   });
 
-  try {
-    const result = await crawlRegistryFeed(startUrl, stopBefore, timeoutMs);
+  // Wrap the crawl in a named promise so concurrent callers can await it.
+  // All synchronous setup above runs before the first await, so
+  // pendingRefreshes is populated before the event loop can schedule another
+  // call to this function.
+  const crawlPromise = (async () => {
+    try {
+      const result = await crawlRegistryFeed(startUrl, stopBefore, timeoutMs);
 
-    if (isFirstFetch && result.incrementalUrl == null) {
-      console.warn(
-        `Registry at ${registryConfig.url} has no order=modified facet; ` +
-          `incremental fetching is not supported. Full crawls will run every refresh.`
+      if (isFirstFetch && result.incrementalUrl == null) {
+        console.warn(
+          `Registry at ${registryConfig.url} has no order=modified facet; ` +
+            `incremental fetching is not supported. Full crawls will run every refresh.`
+        );
+      }
+
+      /*
+       * reachedEnd = true: complete view observed (full crawl or incremental
+       * that reached the last page). Replace the cache entirely so deleted
+       * libraries are removed.
+       *
+       * reachedEnd = false: partial view. Overlay new/updated entries onto the
+       * existing cache; unvisited entries are preserved.
+       */
+      const mergedLibraries = result.reachedEnd
+        ? result.libraries
+        : { ...existing.libraries, ...result.libraries };
+
+      registryCaches.set(registryConfig.url, {
+        libraries: mergedLibraries,
+        lastSuccessfulFetch: attemptTime,
+        lastAttemptedFetch: attemptTime,
+        lastFullFetch: result.reachedEnd ? attemptTime : existing.lastFullFetch,
+        incrementalUrl: result.incrementalUrl ?? existing.incrementalUrl
+      });
+    } catch (err) {
+      console.error(
+        `Failed to refresh registry ${registryConfig.url}:`,
+        err instanceof Error ? err.message : err
       );
     }
+  })();
 
-    /*
-     * reachedEnd = true: complete view observed (full crawl or incremental
-     * that reached the last page). Replace the cache entirely so deleted
-     * libraries are removed.
-     *
-     * reachedEnd = false: partial view. Overlay new/updated entries onto the
-     * existing cache; unvisited entries are preserved.
-     */
-    const mergedLibraries = result.reachedEnd
-      ? result.libraries
-      : { ...existing.libraries, ...result.libraries };
-
-    registryCaches.set(registryConfig.url, {
-      libraries: mergedLibraries,
-      lastSuccessfulFetch: attemptTime,
-      lastAttemptedFetch: attemptTime,
-      lastFullFetch: result.reachedEnd ? attemptTime : existing.lastFullFetch,
-      incrementalUrl: result.incrementalUrl ?? existing.incrementalUrl
-    });
-  } catch (err) {
-    console.error(
-      `Failed to refresh registry ${registryConfig.url}:`,
-      err instanceof Error ? err.message : err
-    );
+  pendingRefreshes.set(registryConfig.url, crawlPromise);
+  try {
+    await crawlPromise;
+  } finally {
+    pendingRefreshes.delete(registryConfig.url);
   }
 }
 
@@ -357,4 +393,5 @@ export async function getLibraries(
 /** Clears all in-memory registry caches. Intended for use in tests only. */
 export function resetRegistryCaches(): void {
   registryCaches.clear();
+  pendingRefreshes.clear();
 }
