@@ -252,11 +252,10 @@ export async function fetchRegistryLibraries(
  * skip the duplicate. Errors are logged and swallowed; the existing cached
  * state is retained.
  *
- * If a crawl for this URL is already in-progress (tracked in pendingRefreshes),
- * this function awaits that crawl instead of starting a new one. This prevents
- * the race where a concurrent request skips the refresh (because
- * lastAttemptedFetch is set) and reads an empty cache before the first crawl
- * has completed.
+ * If a crawl for this URL is already in progress, await it, rather than
+ * returning stale data or starting a new one. This prevents the race where
+ * a concurrent request skips the refresh and reads an empty cache before
+ * the first crawl has completed.
  */
 async function refreshRegistry(
   registryConfig: RegistryConfig,
@@ -297,11 +296,12 @@ async function refreshRegistry(
     lastAttemptedFetch: attemptTime
   });
 
-  // Wrap the crawl in a named promise so concurrent callers can await it.
-  // All synchronous setup above runs before the first await, so
-  // pendingRefreshes is populated before the event loop can schedule another
-  // call to this function.
-  const crawlPromise = (async () => {
+  // Register the crawl promise before starting the crawl so that any
+  // concurrent caller arriving after this point is guaranteed to find it.
+  let startCrawl!: () => void;
+  const crawlPromise = new Promise<void>(resolve => {
+    startCrawl = resolve;
+  }).then(async () => {
     try {
       const result = await crawlRegistryFeed(startUrl, stopBefore, timeoutMs);
 
@@ -337,10 +337,11 @@ async function refreshRegistry(
         err instanceof Error ? err.message : err
       );
     }
-  })();
+  });
 
-  pendingRefreshes.set(registryConfig.url, crawlPromise);
   try {
+    pendingRefreshes.set(registryConfig.url, crawlPromise);
+    startCrawl();
     await crawlPromise;
   } finally {
     pendingRefreshes.delete(registryConfig.url);
@@ -390,7 +391,13 @@ export async function getLibraries(
   return { ...mergedRegistryLibraries, ...staticLibraries };
 }
 
-/** Clears all in-memory registry caches. Intended for use in tests only. */
+/**
+ * Clears all in-memory registry caches. Intended for use in tests only.
+ *
+ * Note: clearing pendingRefreshes while a crawl is still in-progress will
+ * cause the next caller to start a new crawl rather than await the original.
+ * Avoid calling this mid-flight in tests that have already kicked off a crawl.
+ */
 export function resetRegistryCaches(): void {
   registryCaches.clear();
   pendingRefreshes.clear();
