@@ -21,5 +21,13 @@ module.exports = {
   testPathIgnorePatterns: ["/node_modules/", "/.next/"],
   // No setup files for Node.js tests - these are browser-specific
   setupFiles: [],
-  setupFilesAfterEnv: []
+  setupFilesAfterEnv: [],
+  transform: {
+    "^.+\\.(js|ts)$": [
+      "babel-jest",
+      {
+        presets: [["next/babel"]]
+      }
+    ]
+  }
 };

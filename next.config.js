@@ -1,6 +1,3 @@
-const withTM = require("next-transpile-modules")([
-  "@thepalaceproject/webpub-viewer"
-]);
 const {
   BugsnagBuildReporterPlugin,
   BugsnagSourceMapUploaderPlugin
@@ -65,7 +62,12 @@ log(`Open eBooks Config: `, APP_CONFIG.openebooks);
 log(`Media Support: `, APP_CONFIG.mediaSupport);
 log(`Libraries: (resolved at runtime from ${CONFIG_FILE})`);
 
+const SKIP_BUILD_TIME_CHECKS = process.env.SKIP_BUILD_TIME_CHECKS === "true";
+
 const config = {
+  transpilePackages: ["@thepalaceproject/webpub-viewer"],
+  eslint: { ignoreDuringBuilds: SKIP_BUILD_TIME_CHECKS },
+  typescript: { ignoreBuildErrors: SKIP_BUILD_TIME_CHECKS },
   env: {
     CONFIG_FILE: CONFIG_FILE,
     REACT_AXE: REACT_AXE,
@@ -129,7 +131,7 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true"
 });
 module.exports = {
-  ...withTM(withBundleAnalyzer(config)),
+  ...withBundleAnalyzer(config),
   distDir: "_next",
   generateBuildId: async () => {
     if (process.env.BUILD_ID) {

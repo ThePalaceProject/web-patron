@@ -15,6 +15,7 @@ COPY . ./
 RUN rm -rf .git
 
 ENV PORT=3000 \
+    SKIP_BUILD_TIME_CHECKS=false \
     NODE_ENV=production
 EXPOSE $PORT
 

@@ -192,8 +192,23 @@ module.exports = {
     printBasicPrototype: true
   },
 
-  // A map from regular expressions to paths to transformers
-  // transform: undefined,
+  // Use babel-jest with the Next.js preset for TSX/JSX transforms.
+  // Defined here (not in babel.config.js) so the Next.js build can use SWC.
+  transform: {
+    "^.+\\.(js|jsx|ts|tsx)$": [
+      "babel-jest",
+      {
+        presets: [
+          [
+            "next/babel",
+            {
+              "preset-react": { runtime: "automatic", importSource: "theme-ui" }
+            }
+          ]
+        ]
+      }
+    ]
+  },
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
   // transformIgnorePatterns: [
