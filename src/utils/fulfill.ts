@@ -4,13 +4,20 @@ import {
   AnyBook,
   FulfillableBook,
   FulfillmentLink,
+  MediaSupportConfig,
   MediaSupportLevel,
   OPDS1
 } from "interfaces";
 import { DownloadMediaType, ReadOnlineMediaType } from "types/opds1";
 import { bookIsAudiobook } from "utils/book";
-import { APP_CONFIG } from "utils/env";
 import { typeMap } from "utils/file";
+
+let _mediaSupport: MediaSupportConfig = {};
+
+/** Sets the media support config. Called once at app startup from _app.tsx. */
+export function setMediaSupportConfig(config: MediaSupportConfig): void {
+  _mediaSupport = config;
+}
 
 /**
  * Fulfilling a book requires a couple pieces of information:
@@ -229,18 +236,17 @@ export function getAppSupportLevel(
   contentType: OPDS1.AnyBookMediaType,
   indirectionType: OPDS1.IndirectAcquisitionType | undefined
 ): MediaSupportLevel {
-  const { mediaSupport } = APP_CONFIG;
   const defaultSupportLevel: MediaSupportLevel =
-    mediaSupport?.default ?? "unsupported";
+    _mediaSupport?.default ?? "unsupported";
 
   // if there is indirection, we search through the dictionary nested inside the
   // indirectionType
   if (indirectionType) {
-    const supportLevel = mediaSupport[indirectionType]?.[contentType];
+    const supportLevel = _mediaSupport[indirectionType]?.[contentType];
     return supportLevel ?? defaultSupportLevel;
   }
 
-  return mediaSupport[contentType] ?? defaultSupportLevel;
+  return _mediaSupport[contentType] ?? defaultSupportLevel;
 }
 
 /**

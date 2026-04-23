@@ -1,7 +1,7 @@
 import { LibraryData, LibraryLinks, OPDS1 } from "interfaces";
 import ApplicationError, { PageNotFoundError, ServerError } from "errors";
 import { normalizeAuthMethods } from "utils/auth";
-import { APP_CONFIG } from "utils/env";
+import { getAppConfig } from "server/appConfig";
 import { getLibraries } from "server/libraryRegistry";
 
 /**
@@ -10,7 +10,8 @@ import { getLibraries } from "server/libraryRegistry";
  * build-time config) are included in the lookup.
  */
 export async function getAuthDocUrl(librarySlug: string): Promise<string> {
-  const libraries = await getLibraries(APP_CONFIG);
+  const appConfig = await getAppConfig();
+  const libraries = await getLibraries(appConfig);
 
   const authDocUrl =
     librarySlug in libraries ? libraries[librarySlug]?.authDocUrl : undefined;

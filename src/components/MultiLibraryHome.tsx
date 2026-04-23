@@ -3,7 +3,7 @@ import { ThemeUIProvider } from "theme-ui";
 import { Themed } from "@theme-ui/mdx";
 import * as React from "react";
 import useSWR from "swr";
-import { APP_CONFIG } from "utils/env";
+import { useAppConfig } from "components/context/AppConfigContext";
 import theme from "theme/theme";
 import LibraryHomeLink from "./LibraryHomeLink";
 import type { ClientLibrary, LibrariesResponse } from "pages/api/libraries";
@@ -15,7 +15,7 @@ async function fetchLibraries(url: string): Promise<LibrariesResponse> {
 }
 
 const MultiLibraryHome: React.FC = () => {
-  const { instanceName } = APP_CONFIG;
+  const { instanceName } = useAppConfig();
   const { data, error } = useSWR<LibrariesResponse>(
     "/api/libraries",
     fetchLibraries

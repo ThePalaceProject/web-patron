@@ -1,13 +1,11 @@
 import * as React from "react";
 import { render, screen } from "test-utils";
 import MultiLibraryHome from "../MultiLibraryHome";
-import * as envModule from "utils/env";
 import useSWR from "swr";
 import { makeSwrResponse } from "test-utils/mockSwr";
 import type { LibrariesResponse } from "pages/api/libraries";
 
 jest.mock("swr");
-jest.mock("utils/env");
 
 const mockedSWR = useSWR as jest.MockedFunction<typeof useSWR>;
 
@@ -25,10 +23,6 @@ function lib(slug: string, title?: string) {
 }
 
 describe("MultiLibraryHome", () => {
-  beforeEach(() => {
-    (envModule.APP_CONFIG as any) = { instanceName: "Test Instance" };
-  });
-
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -119,10 +113,11 @@ describe("MultiLibraryHome", () => {
   });
 
   it("displays instance name in heading", () => {
-    (envModule.APP_CONFIG as any) = { instanceName: "My Custom Instance" };
     mockLibraries([lib("test", "Test Library")]);
 
-    render(<MultiLibraryHome />);
+    render(<MultiLibraryHome />, {
+      appConfig: { instanceName: "My Custom Instance" }
+    });
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
       "My Custom Instance Home"

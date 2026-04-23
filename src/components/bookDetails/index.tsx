@@ -20,10 +20,11 @@ import useSWR from "swr";
 import { fetchBook } from "dataflow/opds1/fetch";
 import useUser from "components/context/UserContext";
 import useBreadcrumbContext from "components/context/BreadcrumbContext";
-import { APP_CONFIG } from "utils/env";
+import { useAppConfig } from "components/context/AppConfigContext";
 import { getAuthors } from "utils/book";
 
 export const BookDetails: React.FC = () => {
+  const { companionApp, showMedium } = useAppConfig();
   const { query } = useRouter();
   const bookUrl = extractParam(query, "bookUrl");
   const { data, error } = useSWR(bookUrl ?? null, fetchBook);
@@ -60,7 +61,7 @@ export const BookDetails: React.FC = () => {
           <div sx={{ flex: ["1 1 auto", 0.33], mr: [0, 4], mb: [3, 0] }}>
             <BookCover book={book} sx={{ maxWidth: [180, "initial"] }} />
 
-            {APP_CONFIG.companionApp === "simplye" && (
+            {companionApp === "simplye" && (
               <SimplyECallout sx={{ display: ["none", "block"] }} />
             )}
           </div>
@@ -81,7 +82,7 @@ export const BookDetails: React.FC = () => {
               by&nbsp;
               {getAuthors(book)?.join(", ") ?? "Unknown"}
             </Text>
-            {APP_CONFIG.showMedium && <MediumIndicator book={book} />}
+            {showMedium && <MediumIndicator book={book} />}
             <FulfillmentCard book={book} sx={{ mt: 3 }} />
             <Summary book={book} />
             <dl

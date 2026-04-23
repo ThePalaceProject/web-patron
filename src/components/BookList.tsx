@@ -27,7 +27,7 @@ import {
 } from "utils/fulfill";
 import BookStatus from "components/BookStatus";
 import Link from "./Link";
-import { APP_CONFIG } from "utils/env";
+import { useAppConfig } from "components/context/AppConfigContext";
 
 const ListLoadingIndicator = () => (
   <div
@@ -110,6 +110,7 @@ export const BookList: React.FC<{
 export const BookListItem: React.FC<{
   book: AnyBook;
 }> = ({ book: collectionBook }) => {
+  const { showMedium } = useAppConfig();
   const { loans } = useUser();
   // if the book exists in loans, use that version
   const loanedBook = loans?.find(loan => loan.id === collectionBook.id);
@@ -147,7 +148,7 @@ export const BookListItem: React.FC<{
               height: [141, 141, 219]
             }}
           >
-            <BookCover book={book} showMedium={APP_CONFIG.showMedium} />
+            <BookCover book={book} showMedium={showMedium} />
           </div>
         </Link>
         <Stack direction="column" sx={{ alignItems: "flex-start" }}>

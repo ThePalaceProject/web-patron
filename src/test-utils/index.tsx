@@ -1,7 +1,7 @@
 import * as React from "react";
 import { render } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { LibraryData } from "../interfaces";
+import { AppConfig, LibraryData } from "../interfaces";
 import "./mockScrollTo";
 import * as fixtures from "./fixtures";
 import userEvent from "@testing-library/user-event";
@@ -19,6 +19,8 @@ import mockCookie from "../../__mocks__/js-cookie";
 import track from "analytics/track";
 import "react-intersection-observer/test-utils";
 import "test-utils/mockToDateString";
+import AppConfigContext from "components/context/AppConfigContext";
+import { getCurrentTestConfig } from "test-utils/mockConfig";
 
 enableFetchMocks();
 expect.addSnapshotSerializer(serializer);
@@ -47,6 +49,7 @@ type CustomRenderOptions = Parameters<typeof render>[1] & {
   router?: Partial<NextRouter>;
   library?: Partial<LibraryData>;
   user?: Partial<UserState>;
+  appConfig?: Partial<AppConfig>;
 };
 /**
  * Our custom render function wraps components in mocked versions of our
@@ -65,6 +68,11 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
     ...options?.user
   };
 
+  const appConfig: AppConfig = {
+    ...getCurrentTestConfig(),
+    ...options?.appConfig
+  };
+
   interface AllTheProvidersProps {
     children: React.ReactNode;
   }
@@ -72,13 +80,15 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
   const AllTheProviders = ({ children }: AllTheProvidersProps) => {
     return (
       <MockNextRouterContextProvider router={options?.router}>
-        <ThemeUIProvider theme={theme}>
-          <LibraryProvider library={library}>
-            <UserContext.Provider value={user}>
-              <BreadcrumbProvider>{children}</BreadcrumbProvider>
-            </UserContext.Provider>
-          </LibraryProvider>
-        </ThemeUIProvider>
+        <AppConfigContext.Provider value={appConfig}>
+          <ThemeUIProvider theme={theme}>
+            <LibraryProvider library={library}>
+              <UserContext.Provider value={user}>
+                <BreadcrumbProvider>{children}</BreadcrumbProvider>
+              </UserContext.Provider>
+            </LibraryProvider>
+          </ThemeUIProvider>
+        </AppConfigContext.Provider>
       </MockNextRouterContextProvider>
     );
   };

@@ -10,8 +10,8 @@
  * metadata remains server-side.
  */
 import type { NextApiRequest, NextApiResponse } from "next";
-import type { AppConfig } from "interfaces";
 import { getLibraries } from "server/libraryRegistry";
+import { getAppConfig } from "server/appConfig";
 
 export interface ClientLibrary {
   id: string;
@@ -32,21 +32,8 @@ export default async function handler(
   _req: NextApiRequest,
   res: NextApiResponse<LibrariesResponse | LibrariesErrorResponse>
 ): Promise<void> {
-  const appConfigStr = process.env.APP_CONFIG;
-  if (!appConfigStr) {
-    res.status(500).json({ error: "APP_CONFIG is not configured." });
-    return;
-  }
-
-  let appConfig: AppConfig;
   try {
-    appConfig = JSON.parse(appConfigStr) as AppConfig;
-  } catch {
-    res.status(500).json({ error: "APP_CONFIG could not be parsed." });
-    return;
-  }
-
-  try {
+    const appConfig = await getAppConfig();
     const libraries = await getLibraries(appConfig);
 
     const clientLibraries: ClientLibrary[] = Object.entries(libraries)

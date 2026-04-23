@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BugsnagErrorBoundary } from "analytics/bugsnag";
+import { getBugsnagErrorBoundary } from "analytics/bugsnag";
 import ErrorComponent from "components/Error";
 
 export type FallbackProps = {
@@ -68,7 +68,8 @@ export const ErrorBoundary: React.FC<{
   fallback?: React.ComponentType<FallbackProps>;
   children?: React.ReactNode;
 }> = ({ children, fallback: Fallback = DefaultFallback }) => {
-  if (!BugsnagErrorBoundary) {
+  const BugsnagBoundary = getBugsnagErrorBoundary();
+  if (!BugsnagBoundary) {
     return (
       <DefaultErrorBoundary FallbackComponent={Fallback}>
         {children}
@@ -76,9 +77,7 @@ export const ErrorBoundary: React.FC<{
     );
   }
   return (
-    <BugsnagErrorBoundary FallbackComponent={Fallback}>
-      {children}
-    </BugsnagErrorBoundary>
+    <BugsnagBoundary FallbackComponent={Fallback}>{children}</BugsnagBoundary>
   );
 };
 
@@ -87,7 +86,8 @@ export default function withErrorBoundary<T>(
   Fallback: React.ComponentType<FallbackProps> = DefaultFallback
 ) {
   const Wrapped = (props: any) => {
-    if (!BugsnagErrorBoundary) {
+    const BugsnagBoundary = getBugsnagErrorBoundary();
+    if (!BugsnagBoundary) {
       return (
         <DefaultErrorBoundary FallbackComponent={Fallback}>
           <Component {...props} />
@@ -95,9 +95,9 @@ export default function withErrorBoundary<T>(
       );
     }
     return (
-      <BugsnagErrorBoundary FallbackComponent={Fallback}>
+      <BugsnagBoundary FallbackComponent={Fallback}>
         <Component {...props} />
-      </BugsnagErrorBoundary>
+      </BugsnagBoundary>
     );
   };
 
