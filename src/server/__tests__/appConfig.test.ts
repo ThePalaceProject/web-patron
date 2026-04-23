@@ -652,7 +652,10 @@ describe("config parsing", () => {
       const yaml =
         "staticLibraries:\n  my-lib:\n    authDocUrl: https://example.com/auth\n    title: My Library";
       expect((await load(yaml)).staticLibraries).toEqual({
-        "my-lib": { title: "My Library", authDocUrl: "https://example.com/auth" }
+        "my-lib": {
+          title: "My Library",
+          authDocUrl: "https://example.com/auth"
+        }
       });
     });
 
