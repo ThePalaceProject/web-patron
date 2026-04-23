@@ -47,6 +47,16 @@ const RawConfigSchema = type({
   "openebooks?": { default_library: "string" }
 });
 
+const DEFAULT_MIN_INTERVAL = 60;
+const DEFAULT_MAX_INTERVAL = 300;
+
+const VALID_MEDIA_SUPPORT_VALUES = new Set<string>([
+  "show",
+  "redirect",
+  "redirect-and-show",
+  "unsupported"
+]);
+
 // ---------------------------------------------------------------------------
 // Parsing helpers
 // ---------------------------------------------------------------------------
@@ -102,10 +112,9 @@ function parseLibraryEntry(
 }
 
 function parseLibrariesConfig(raw: Record<string, unknown>): LibrariesConfig {
-  return Object.keys(raw).reduce<LibrariesConfig>((acc, slug) => {
-    acc[slug] = parseLibraryEntry(slug, raw[slug]);
-    return acc;
-  }, {});
+  return Object.fromEntries(
+    Object.keys(raw).map(slug => [slug, parseLibraryEntry(slug, raw[slug])])
+  );
 }
 
 function parseYaml(input: Record<string, unknown>): AppConfig {
@@ -123,10 +132,7 @@ function parseYaml(input: Record<string, unknown>): AppConfig {
     ? { defaultLibrary: result.openebooks.default_library }
     : null;
 
-  const DEFAULT_MIN_INTERVAL = 60;
-  const DEFAULT_MAX_INTERVAL = 300;
-
-  let registries: RegistryConfig[] = (result.registries ?? []).map(r => ({
+  const baseRegistries: RegistryConfig[] = (result.registries ?? []).map(r => ({
     url: r.url,
     refreshMinInterval: r.refreshMinInterval ?? DEFAULT_MIN_INTERVAL,
     refreshMaxInterval: r.refreshMaxInterval ?? DEFAULT_MAX_INTERVAL
@@ -139,15 +145,19 @@ function parseYaml(input: Record<string, unknown>): AppConfig {
         "Please migrate to the 'registries' array format. " +
         "See the 'Libraries and Registries Configuration Settings' section in README.md."
     );
-    registries = [
-      ...registries,
-      {
-        url: result.libraries,
-        refreshMinInterval: DEFAULT_MIN_INTERVAL,
-        refreshMaxInterval: DEFAULT_MAX_INTERVAL
-      }
-    ];
   }
+
+  const registries: RegistryConfig[] =
+    typeof result.libraries === "string"
+      ? [
+          ...baseRegistries,
+          {
+            url: result.libraries,
+            refreshMinInterval: DEFAULT_MIN_INTERVAL,
+            refreshMaxInterval: DEFAULT_MAX_INTERVAL
+          }
+        ]
+      : baseRegistries;
 
   // Object-format libraries: static slug → authDocUrl entries baked into the config.
   const staticLibraries =
@@ -156,6 +166,15 @@ function parseYaml(input: Record<string, unknown>): AppConfig {
     !Array.isArray(result.libraries)
       ? parseLibrariesConfig(result.libraries as Record<string, unknown>)
       : undefined;
+
+  for (const [mime, level] of Object.entries(result.media_support ?? {})) {
+    if (!VALID_MEDIA_SUPPORT_VALUES.has(level)) {
+      throw new AppSetupError(
+        `CONFIG_FILE.media_support['${mime}'] has unrecognized value "${level}". ` +
+          `Valid values: ${[...VALID_MEDIA_SUPPORT_VALUES].join(", ")}.`
+      );
+    }
+  }
 
   return {
     instanceName:
@@ -206,7 +225,7 @@ export async function getAppConfig(): Promise<AppConfig> {
       res = await fetch(configFile, { signal: controller.signal });
     } catch (e) {
       throw new AppSetupError(
-        `Could not reach config file at: ${configFile}: ${(e as Error).message}`
+        `Could not reach config file at: ${configFile}: ${e instanceof Error ? e.message : String(e)}`
       );
     } finally {
       clearTimeout(timeoutId);
@@ -224,8 +243,13 @@ export async function getAppConfig(): Promise<AppConfig> {
     text = readFileSync(resolved, "utf8");
   }
 
-  const raw = YAML.parse(text) as Record<string, unknown>;
-  cached = parseYaml(raw);
+  const raw: unknown = YAML.parse(text);
+  if (raw == null || typeof raw !== "object" || Array.isArray(raw)) {
+    throw new AppSetupError(
+      "Config file must be a YAML mapping (key: value pairs), not a null value, scalar, or sequence."
+    );
+  }
+  cached = parseYaml(raw as Record<string, unknown>);
   return cached;
 }
 

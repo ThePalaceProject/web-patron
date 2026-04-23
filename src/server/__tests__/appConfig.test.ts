@@ -96,6 +96,21 @@ describe("getAppConfig", () => {
     expect(config.instanceName).toBe("My Catalog");
   });
 
+  // --- YAML structure ---
+
+  it.each([
+    ["null", "~"],
+    ["a bare scalar", "just a string"],
+    ["a sequence", "- item1\n- item2"]
+  ])(
+    "throws AppSetupError when the config file is %s rather than a mapping",
+    async (_label, yaml) => {
+      process.env.CONFIG_FILE = "/etc/app/config.yml";
+      mockFile(yaml);
+      await expect(getAppConfig()).rejects.toThrow(AppSetupError);
+    }
+  );
+
   // --- HTTP URL ---
 
   it("fetches config from an http URL", async () => {
@@ -140,6 +155,15 @@ describe("getAppConfig", () => {
     global.fetch = mockFetchText("", false, 503) as unknown as typeof fetch;
 
     await expect(getAppConfig()).rejects.toThrow(AppSetupError);
+  });
+
+  it("includes a non-Error rejection value in the error message", async () => {
+    process.env.CONFIG_FILE = "https://example.com/config.yml";
+    global.fetch = jest
+      .fn()
+      .mockRejectedValue("network failure") as unknown as typeof fetch;
+
+    await expect(getAppConfig()).rejects.toThrow("network failure");
   });
 
   // --- Fetch timeout ---
@@ -436,6 +460,34 @@ describe("config parsing", () => {
       expect((await load(yaml)).mediaSupport).toEqual({
         "application/epub+zip": "show"
       });
+    });
+
+    it.each(["show", "redirect", "redirect-and-show", "unsupported"])(
+      "accepts the valid value '%s'",
+      async level => {
+        const yaml = `media_support:\n  application/epub+zip: ${level}`;
+        await expect(load(yaml)).resolves.not.toThrow();
+      }
+    );
+
+    it("throws AppSetupError for an unrecognized value", async () => {
+      await expect(
+        load(`media_support:\n  application/epub+zip: invalid-mode`)
+      ).rejects.toThrow(AppSetupError);
+    });
+
+    it("error message names the MIME type and the bad value", async () => {
+      await expect(
+        load(`media_support:\n  application/epub+zip: invalid-mode`)
+      ).rejects.toThrow(
+        `CONFIG_FILE.media_support['application/epub+zip'] has unrecognized value "invalid-mode"`
+      );
+    });
+
+    it("error message lists all valid values", async () => {
+      await expect(
+        load(`media_support:\n  application/epub+zip: invalid-mode`)
+      ).rejects.toThrow("show, redirect, redirect-and-show, unsupported");
     });
   });
 
