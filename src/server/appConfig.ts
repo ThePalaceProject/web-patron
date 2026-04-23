@@ -1,6 +1,4 @@
 /**
- * @jest-environment node
- *
  * Provides the parsed app configuration from the config file, read once
  * at runtime on first access. The result is cached for the lifetime of the
  * server process.
