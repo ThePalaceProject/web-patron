@@ -47,6 +47,7 @@
     "@theme-ui/match-media": "^0.17.2",
     "@theme-ui/mdx": "^0.17.2",
     "@thepalaceproject/webpub-viewer": "^0.1.0",
+    "arktype": "^2.2.0",
     "chalk": "^4.1.0",
     "date-fns": "^4.1.0",
     "deepmerge": "^4.2.2",

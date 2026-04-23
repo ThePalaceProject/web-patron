@@ -39,6 +39,8 @@ __To have your library added to the demo, register it with NYPL's Library Regist
   <!-- * [Demo](#community-demo) -->
 - [Configuring the App](#configuring-the-app)
   - [Configuration File](#configuration-file)
+    - [Configuration Options](#configuration-options)
+    - [Media Support](#media-support)
   - [Environment Variables](#environment-variables)
   - [Manager, Registry, and Application Configurations](#manager--registry--and-application-configurations)
   - [Libraries and Registries Configuration Settings](#libraries-and-registries-configuration-settings)
@@ -65,9 +67,30 @@ __To have your library added to the demo, register it with NYPL's Library Regist
 
 ## Configuration File
 
-To deploy the application, there are a few configuration variables that need to be set up. Most notably, the app needs to know what libraries to support and the url for each library's Circulation Manager backend. This is called the authentication document url, and each library the app runs has a unique authentication document url. Additionally, the app needs to know which media formats to support, and how. Finally, there are a few other variables that can be configured.
+The app is configured with a YAML file. Point the app at it by setting the `CONFIG_FILE` environment variable to a local path or HTTP(S) URL. `./community-config.yml` is a fully-annotated example covering all options.
 
-The production configuration is defined in a YAML config file. You can find more details on the options in the `./community-config.yml` file. To run the app, you must tell it where to find the config file. This is done via the `CONFIG_FILE` environment variable. If you don't set anything, the sample config is used. See [environment variables](#environment-variables) below for more information.
+### Configuration Options
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `instance_name` | string | `"Patron Web Catalog"` | Name used in error tracking and debug output. Not patron-facing. |
+| `companion_app` | `"simplye"` \| `"openebooks"` | `"simplye"` | Selects which companion mobile app to reference in redirect prompts. |
+| `show_medium` | boolean | `true` | Whether to display the medium (e-book, audiobook, etc.) label on book cards. |
+| `bugsnag_api_key` | string | — | Bugsnag project API key. Omit to disable error tracking. |
+| `gtmId` | string | — | Google Tag Manager container ID (e.g. `GTM-XXXX`). Omit to disable analytics. |
+| `media_support` | mapping | `{}` | Per-MIME-type rendering mode. See [Media Support](#media-support) below. |
+| `libraries` | mapping or string | — | Static library definitions, or a deprecated registry URL string. See [Libraries and Registries Configuration Settings](#libraries-and-registries-configuration-settings). |
+| `registries` | list | `[]` | One or more library registry URLs fetched at runtime. See [Libraries and Registries Configuration Settings](#libraries-and-registries-configuration-settings). |
+
+### Media Support
+
+Each entry in `media_support` maps a MIME type to one of three rendering modes:
+
+- **`show`** — Read the book in the web app.
+- **`redirect`** — Display a prompt directing the patron to the companion mobile app.
+- **`redirect-and-show`** — Offer both options.
+
+Any MIME type not listed is treated as unsupported and hidden from patrons. See `community-config.yml` for a full list of common types and their recommended settings.
 
 ## Environment Variables
 
