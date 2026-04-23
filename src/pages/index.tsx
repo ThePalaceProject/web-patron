@@ -1,5 +1,5 @@
 import * as React from "react";
-import { GetStaticProps, GetStaticPropsResult, NextPage } from "next";
+import { GetServerSideProps, NextPage } from "next";
 import OpenEbooksLandingPage from "components/OpenEbooksLanding";
 import MultiLibraryHome from "components/MultiLibraryHome";
 import withAppProps, { AppProps } from "dataflow/withAppProps";
@@ -17,28 +17,26 @@ const HomePage: NextPage<HomeProps> = ({ appConfig, ...rest }) => {
   return <MultiLibraryHome />;
 };
 
-export const getStaticProps: GetStaticProps<HomeProps> = async ctx => {
+export const getServerSideProps: GetServerSideProps<HomeProps> = async ctx => {
   let appConfig: AppConfig;
   try {
     appConfig = await getAppConfig();
   } catch (e) {
     if (e instanceof AppSetupError) {
-      return { props: { appConfig: FALLBACK_APP_CONFIG }, revalidate: 1 };
+      return { props: { appConfig: FALLBACK_APP_CONFIG } };
     }
     throw e;
   }
   if (appConfig.openebooks) {
-    const innerGSP = withAppProps(
+    const fetchProps = withAppProps(
       undefined,
       appConfig.openebooks.defaultLibrary
     );
-    const result = await innerGSP(ctx);
-    if ("props" in result) {
-      return { ...result, props: { ...result.props, appConfig } };
-    }
-    return result as GetStaticPropsResult<HomeProps>;
+    const result = await fetchProps(ctx as never);
+    if ("redirect" in result || "notFound" in result) return result;
+    return { props: { ...(await result.props), appConfig } };
   }
-  return { props: { appConfig }, revalidate: 60 * 60 };
+  return { props: { appConfig } };
 };
 
 export default HomePage;
