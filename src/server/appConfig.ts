@@ -40,7 +40,8 @@ const RawConfigSchema = type({
   "gtmId?": "string",
   "registries?": RegistryEntrySchema.array(),
   "libraries?": "string | Record<string, unknown>",
-  "media_support?": "Record<string, string>",
+  "staticLibraries?": "Record<string, unknown>",
+  "media_support?": "Record<string, string | Record<string, string>>",
   // eslint-disable-next-line camelcase
   "openebooks?": { default_library: "string" }
 });
@@ -60,19 +61,17 @@ const VALID_MEDIA_SUPPORT_VALUES = new Set<string>([
 // ---------------------------------------------------------------------------
 
 function parseLibraryEntry(
+  field: string,
   slug: string,
   value: unknown
 ): { title: string; authDocUrl: string } {
+  const path = `CONFIG_FILE.${field}['${slug}']`;
   if (value == null) {
-    throw new AppSetupError(
-      `CONFIG_FILE.libraries['${slug}'] cannot be null or undefined`
-    );
+    throw new AppSetupError(`${path} cannot be null or undefined`);
   }
   if (typeof value === "string") {
     if (value.trim() === "") {
-      throw new AppSetupError(
-        `CONFIG_FILE.libraries['${slug}'] cannot be an empty string`
-      );
+      throw new AppSetupError(`${path} cannot be an empty string`);
     }
     return { title: slug, authDocUrl: value };
   }
@@ -80,38 +79,38 @@ function parseLibraryEntry(
     const entry = value as Record<string, unknown>;
     if (!("authDocUrl" in entry) || typeof entry.authDocUrl !== "string") {
       throw new AppSetupError(
-        `CONFIG_FILE.libraries['${slug}'] must have an 'authDocUrl' property with a valid URL string`
+        `${path} must have an 'authDocUrl' property with a valid URL string`
       );
     }
     if (entry.authDocUrl.trim() === "") {
-      throw new AppSetupError(
-        `CONFIG_FILE.libraries['${slug}'].authDocUrl cannot be an empty string`
-      );
+      throw new AppSetupError(`${path}.authDocUrl cannot be an empty string`);
     }
     let title = slug;
     if ("title" in entry) {
       if (typeof entry.title !== "string") {
-        throw new AppSetupError(
-          `CONFIG_FILE.libraries['${slug}'].title must be a string`
-        );
+        throw new AppSetupError(`${path}.title must be a string`);
       }
       if (entry.title.trim() === "") {
-        throw new AppSetupError(
-          `CONFIG_FILE.libraries['${slug}'].title cannot be an empty string`
-        );
+        throw new AppSetupError(`${path}.title cannot be an empty string`);
       }
       title = entry.title;
     }
     return { title, authDocUrl: entry.authDocUrl };
   }
   throw new AppSetupError(
-    `CONFIG_FILE.libraries['${slug}'] must be either a string (auth doc URL) or an object with 'authDocUrl' property`
+    `${path} must be either a string (auth doc URL) or an object with 'authDocUrl' property`
   );
 }
 
-function parseLibrariesConfig(raw: Record<string, unknown>): LibrariesConfig {
+function parseLibrariesConfig(
+  field: string,
+  raw: Record<string, unknown>
+): LibrariesConfig {
   return Object.fromEntries(
-    Object.keys(raw).map(slug => [slug, parseLibraryEntry(slug, raw[slug])])
+    Object.keys(raw).map(slug => [
+      slug,
+      parseLibraryEntry(field, slug, raw[slug])
+    ])
   );
 }
 
@@ -157,21 +156,61 @@ function parseYaml(input: Record<string, unknown>): AppConfig {
         ]
       : baseRegistries;
 
-  // Object-format libraries: static slug → authDocUrl entries baked into the config.
-  const staticLibraries =
-    result.libraries &&
+  const librariesIsObject =
+    result.libraries != null &&
     typeof result.libraries === "object" &&
-    !Array.isArray(result.libraries)
-      ? parseLibrariesConfig(result.libraries as Record<string, unknown>)
-      : undefined;
+    !Array.isArray(result.libraries);
 
-  for (const [mime, level] of Object.entries(result.media_support ?? {})) {
-    if (!VALID_MEDIA_SUPPORT_VALUES.has(level)) {
+  // Deprecated: object-form `libraries` specifies static libraries inline.
+  if (librariesIsObject) {
+    if (result.staticLibraries != null) {
       throw new AppSetupError(
-        `CONFIG_FILE.media_support['${mime}'] has unrecognized value "${level}". ` +
-          `Valid values: ${[...VALID_MEDIA_SUPPORT_VALUES].join(", ")}.`
+        "CONFIG_FILE: 'staticLibraries' and the object form of 'libraries' cannot both be set. " +
+          "Remove 'libraries' and use 'staticLibraries' instead."
       );
     }
+    console.warn(
+      "WARNING: Using an object for 'libraries' to define static libraries is deprecated. " +
+        "Please rename it to 'staticLibraries'. " +
+        "See the 'Libraries and Registries Configuration Settings' section in README.md."
+    );
+  }
+
+  const staticLibraries = result.staticLibraries
+    ? parseLibrariesConfig(
+        "staticLibraries",
+        result.staticLibraries as Record<string, unknown>
+      )
+    : librariesIsObject
+      ? parseLibrariesConfig(
+          "libraries",
+          result.libraries as Record<string, unknown>
+        )
+      : undefined;
+
+  /**
+   * Validates all string leaf values within a media_support entry, recursing
+   * into nested objects so indirect media types are covered at any depth.
+   */
+  function validateMediaSupportValue(
+    path: string,
+    value: string | Record<string, string>
+  ): void {
+    if (typeof value === "string") {
+      if (!VALID_MEDIA_SUPPORT_VALUES.has(value)) {
+        throw new AppSetupError(
+          `CONFIG_FILE.${path} has unrecognized value "${value}". ` +
+            `Valid values: ${[...VALID_MEDIA_SUPPORT_VALUES].join(", ")}.`
+        );
+      }
+    } else {
+      for (const [key, subValue] of Object.entries(value)) {
+        validateMediaSupportValue(`${path}['${key}']`, subValue);
+      }
+    }
+  }
+  for (const [mime, level] of Object.entries(result.media_support ?? {})) {
+    validateMediaSupportValue(`media_support['${mime}']`, level);
   }
 
   return {

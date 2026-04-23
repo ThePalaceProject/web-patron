@@ -210,10 +210,8 @@ module.exports = {
     ]
   },
 
-  // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-  // transformIgnorePatterns: [
-  //   "/node_modules/"
-  // ],
+  // arktype and its ark*/@ark/* dependencies ship as ESM and must be transformed.
+  transformIgnorePatterns: ["/node_modules/(?!(arktype|arkregex|@ark)/)"],
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
   // unmockedModulePathPatterns: undefined,

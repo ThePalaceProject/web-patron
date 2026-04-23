@@ -118,8 +118,7 @@
     "msw": "^2.6.5",
     "prettier": "^3.6.2",
     "react-is": "^18.2.0",
-    "typescript": "^5.9.3",
-    "webpack-bugsnag-plugins": "^1.8.0"
+    "typescript": "^5.9.3"
   },
   "prettier": {
     "arrowParens": "avoid",
