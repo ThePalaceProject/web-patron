@@ -4,9 +4,7 @@ import OpenEbooksLandingPage from "components/OpenEbooksLanding";
 import MultiLibraryHome from "components/MultiLibraryHome";
 import withAppProps, { AppProps } from "dataflow/withAppProps";
 import { getAppConfig } from "server/appConfig";
-import { AppSetupError } from "errors";
 import type { AppConfig } from "interfaces";
-import FALLBACK_APP_CONFIG from "config/fallbackAppConfig";
 
 type HomeProps = AppProps & { appConfig: AppConfig };
 
@@ -18,15 +16,7 @@ const HomePage: NextPage<HomeProps> = ({ appConfig, ...rest }) => {
 };
 
 export const getServerSideProps: GetServerSideProps<HomeProps> = async ctx => {
-  let appConfig: AppConfig;
-  try {
-    appConfig = await getAppConfig();
-  } catch (e) {
-    if (e instanceof AppSetupError) {
-      return { props: { appConfig: FALLBACK_APP_CONFIG } };
-    }
-    throw e;
-  }
+  const appConfig = await getAppConfig();
   if (appConfig.openebooks) {
     const fetchProps = withAppProps(
       undefined,
