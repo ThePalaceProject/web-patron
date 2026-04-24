@@ -9,9 +9,11 @@ RUN apk add --no-cache git
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-ENV NODE_ENV=production
 # Ensure CI checks pass before build.
-RUN npm run test:ci && npm run type-check && npm run lint && npm run build
+RUN npm run test:ci && npm run type-check && npm run lint
+# Note: We must set `NODE_ENV` after the CI checks, but before the build.
+ENV NODE_ENV=production
+RUN npm run build
 
 FROM node:20.18.1-alpine AS runner
 WORKDIR /app
