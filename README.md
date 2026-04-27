@@ -79,8 +79,9 @@ The app is configured with a YAML file. Point the app at it by setting the `CONF
 | `bugsnag_api_key` | string | — | Bugsnag project API key. Omit to disable error tracking. |
 | `gtmId` | string | — | Google Tag Manager container ID (e.g. `GTM-XXXX`). Omit to disable analytics. |
 | `media_support` | mapping | `{}` | Per-MIME-type rendering mode. See [Media Support](#media-support) below. |
-| `libraries` | mapping or string | — | Static library definitions, or a deprecated registry URL string. See [Libraries and Registries Configuration Settings](#libraries-and-registries-configuration-settings). |
+| `staticLibraries` | mapping | — | Static library definitions. See [Libraries and Registries Configuration Settings](#libraries-and-registries-configuration-settings). |
 | `registries` | list | `[]` | One or more library registry URLs fetched at runtime. See [Libraries and Registries Configuration Settings](#libraries-and-registries-configuration-settings). |
+| `libraries` | mapping or string | — | **Deprecated.** Use `staticLibraries` (mapping) or `registries` (string). See [Libraries and Registries Configuration Settings](#libraries-and-registries-configuration-settings). |
 
 ### Media Support
 
@@ -112,7 +113,6 @@ The app can then be run with `npm run start`, and it will pick up the env from y
 
 The following environment variables can be set to further configure the application.
 
-- Set `SKIP_BUILD_TIME_CHECKS=true` to skip ESLint and TypeScript checks during `next build`. Useful in deployment environments where CI has already validated the code and faster startup is desired. Defaults to `false`.
 - Set `AXE_TEST=true` to run the application with `react-axe` enabled (only works when `NODE_ENV` is "development").
 - Set `ANALYZE=true` to generate bundle analysis files inside `.next/analyze` which will show bundle sizes for server and client, as well as composition.
 
@@ -133,7 +133,7 @@ Define libraries directly in your configuration file as a dictionary mapping lib
 
 **Simple Format:**
 ```yaml
-libraries:
+staticLibraries:
   my-library: https://circulation.example.com/my-library/authentication_document
   another-lib: https://circulation.example.com/another-lib/authentication_document
 ```
@@ -143,7 +143,7 @@ libraries:
 You can also specify a custom display title for each library that will appear on the multi-library selection page:
 
 ```yaml
-libraries:
+staticLibraries:
   my-library:
     authDocUrl: https://circulation.example.com/my-library/authentication_document
     title: "My Public Library"
@@ -185,7 +185,7 @@ registries:
 Combine static libraries with registry-based libraries. Static library definitions always take precedence over registry entries when slugs conflict:
 
 ```yaml
-libraries:
+staticLibraries:
   featured-library:
     authDocUrl: https://circulation.example.com/featured/authentication_document
     title: "Featured Library"
@@ -195,17 +195,35 @@ registries:
 
 In this example, if the registry also contains a library with slug `featured-library`, the static definition will be used instead.
 
-#### Deprecated Format
+#### Deprecated Formats
 
-**⚠️ The following format is deprecated, but is still supported for backward compatibility:**
+**⚠️ The following formats are deprecated, but are temporarily supported for backward compatibility:**
 
+Using an object for `libraries` to define static libraries:
 ```yaml
+# DEPRECATED — rename to staticLibraries
+libraries:
+  my-library: https://circulation.example.com/my-library/authentication_document
+```
+
+Using a string for `libraries` to specify a registry URL:
+```yaml
+# DEPRECATED — use registries array instead
 libraries: https://registry.example.com/libraries
 ```
 
-This string format fetches libraries from a registry at build time only. Please migrate to the `registries` array format shown above for better control and future runtime fetching support.
+**Migration from object `libraries`:**
+```yaml
+# OLD (deprecated):
+libraries:
+  my-library: https://circulation.example.com/my-library/authentication_document
 
-**Migration Example:**
+# NEW (recommended):
+staticLibraries:
+  my-library: https://circulation.example.com/my-library/authentication_document
+```
+
+**Migration from string `libraries`:**
 ```yaml
 # OLD (deprecated):
 libraries: https://registry.thepalaceproject.org/libraries

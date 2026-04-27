@@ -2,7 +2,6 @@ import Bugsnag from "@bugsnag/js";
 import ApplicationError, { ServerError } from "errors";
 /* eslint-disable camelcase */
 import { NextWebVitalsMetric } from "next/app";
-import { APP_CONFIG } from "utils/env";
 
 type PageData = {
   path: string;
@@ -75,7 +74,7 @@ function error(
     console.error(`Base Error:\n${e.baseError}`);
   }
   // track to bugsnag
-  if (APP_CONFIG.bugsnagApiKey) {
+  if (Bugsnag.isStarted()) {
     Bugsnag.notify(e, event => {
       // set severity
       event.severity = severity;

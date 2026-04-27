@@ -603,5 +603,145 @@ describe("config parsing", () => {
     ])("throws AppSetupError for %s", async (_label, yaml, expectedMessage) => {
       await expect(load(yaml)).rejects.toThrow(expectedMessage);
     });
+
+    it("emits a deprecation warning when an object is used", async () => {
+      const warnSpy = jest
+        .spyOn(console, "warn")
+        .mockImplementation(() => undefined);
+      await load("libraries:\n  my-lib: https://example.com/auth");
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining("deprecated")
+      );
+      warnSpy.mockRestore();
+    });
+
+    it("throws AppSetupError when both libraries object and staticLibraries are set", async () => {
+      const yaml = [
+        "libraries:",
+        "  my-lib: https://example.com/auth",
+        "staticLibraries:",
+        "  other-lib: https://other.example.com/auth"
+      ].join("\n");
+      await expect(load(yaml)).rejects.toThrow(
+        "'staticLibraries' and the object form of 'libraries' cannot both be set"
+      );
+    });
+  });
+
+  // --- staticLibraries ---
+
+  describe("staticLibraries", () => {
+    it("is undefined when staticLibraries is absent", async () => {
+      expect((await load(MINIMAL_YAML)).staticLibraries).toBeUndefined();
+    });
+
+    it("is an empty object when staticLibraries is an empty object", async () => {
+      expect((await load("staticLibraries: {}")).staticLibraries).toEqual({});
+    });
+
+    it("parses a string-format entry (auth doc URL, slug as title)", async () => {
+      expect(
+        (await load("staticLibraries:\n  my-lib: https://example.com/auth"))
+          .staticLibraries
+      ).toEqual({
+        "my-lib": { title: "my-lib", authDocUrl: "https://example.com/auth" }
+      });
+    });
+
+    it("parses an object-format entry with authDocUrl and title", async () => {
+      const yaml =
+        "staticLibraries:\n  my-lib:\n    authDocUrl: https://example.com/auth\n    title: My Library";
+      expect((await load(yaml)).staticLibraries).toEqual({
+        "my-lib": {
+          title: "My Library",
+          authDocUrl: "https://example.com/auth"
+        }
+      });
+    });
+
+    it("uses slug as title when title is absent from object-format entry", async () => {
+      const yaml =
+        "staticLibraries:\n  my-lib:\n    authDocUrl: https://example.com/auth";
+      expect((await load(yaml)).staticLibraries?.["my-lib"]?.title).toBe(
+        "my-lib"
+      );
+    });
+
+    it("parses multiple entries", async () => {
+      const yaml =
+        "staticLibraries:\n  lib-a: https://a.example.com/auth\n  lib-b: https://b.example.com/auth";
+      const { staticLibraries } = await load(yaml);
+      expect(Object.keys(staticLibraries!)).toHaveLength(2);
+      expect(staticLibraries?.["lib-a"]?.authDocUrl).toBe(
+        "https://a.example.com/auth"
+      );
+      expect(staticLibraries?.["lib-b"]?.authDocUrl).toBe(
+        "https://b.example.com/auth"
+      );
+    });
+
+    it("does not emit a deprecation warning", async () => {
+      const warnSpy = jest
+        .spyOn(console, "warn")
+        .mockImplementation(() => undefined);
+      await load("staticLibraries:\n  my-lib: https://example.com/auth");
+      expect(warnSpy).not.toHaveBeenCalled();
+      warnSpy.mockRestore();
+    });
+
+    it.each([
+      [
+        "null entry",
+        "staticLibraries:\n  bad-lib: null",
+        "CONFIG_FILE.staticLibraries['bad-lib'] cannot be null or undefined"
+      ],
+      [
+        "empty string entry",
+        `staticLibraries:\n  bad-lib: ""`,
+        "CONFIG_FILE.staticLibraries['bad-lib'] cannot be an empty string"
+      ],
+      [
+        "whitespace-only string entry",
+        `staticLibraries:\n  bad-lib: "   "`,
+        "CONFIG_FILE.staticLibraries['bad-lib'] cannot be an empty string"
+      ],
+      [
+        "object missing authDocUrl",
+        "staticLibraries:\n  bad-lib:\n    title: My Library",
+        "CONFIG_FILE.staticLibraries['bad-lib'] must have an 'authDocUrl' property with a valid URL string"
+      ],
+      [
+        "object with non-string authDocUrl",
+        "staticLibraries:\n  bad-lib:\n    authDocUrl: 12345",
+        "CONFIG_FILE.staticLibraries['bad-lib'] must have an 'authDocUrl' property with a valid URL string"
+      ],
+      [
+        "object with empty authDocUrl",
+        `staticLibraries:\n  bad-lib:\n    authDocUrl: ""`,
+        "CONFIG_FILE.staticLibraries['bad-lib'].authDocUrl cannot be an empty string"
+      ],
+      [
+        "object with non-string title",
+        "staticLibraries:\n  bad-lib:\n    authDocUrl: https://example.com/auth\n    title: 123",
+        "CONFIG_FILE.staticLibraries['bad-lib'].title must be a string"
+      ],
+      [
+        "object with empty title",
+        `staticLibraries:\n  bad-lib:\n    authDocUrl: https://example.com/auth\n    title: ""`,
+        "CONFIG_FILE.staticLibraries['bad-lib'].title cannot be an empty string"
+      ],
+      [
+        "numeric entry",
+        "staticLibraries:\n  bad-lib: 12345",
+        "CONFIG_FILE.staticLibraries['bad-lib'] must be either a string (auth doc URL) or an object with 'authDocUrl' property"
+      ],
+      [
+        "boolean entry",
+        "staticLibraries:\n  bad-lib: true",
+        "CONFIG_FILE.staticLibraries['bad-lib'] must be either a string (auth doc URL) or an object with 'authDocUrl' property"
+      ]
+    ])("throws AppSetupError for %s", async (_label, yaml, expectedMessage) => {
+      await expect(load(yaml)).rejects.toThrow(expectedMessage);
+    });
   });
 });

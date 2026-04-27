@@ -1,5 +1,5 @@
-// Jest configuration for Node.js tests (build-time scripts)
-// This config is used for testing Node.js modules that don't run in the browser
+// Jest configuration for server-side Node.js tests.
+// Uses modern fake timers, no browser setup files, and the node test environment.
 
 module.exports = {
   clearMocks: true,

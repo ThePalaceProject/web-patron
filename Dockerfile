@@ -1,23 +1,29 @@
-FROM node:20.18.1-alpine
-
-RUN apk update && apk add git
-
+FROM node:20.18.1-alpine AS deps
 WORKDIR /app
-
-# Copy package files and install Node dependencies.
-ENV NPM_CONFIG_LOGLEVEL=warn
 COPY package*.json .npmrc ./
 RUN npm ci
 
-# Copy the entire directory.
-COPY . ./
+FROM node:20.18.1-alpine AS builder
+# git is used by read-version.js as a fallback when _version.json is absent
+RUN apk add --no-cache git
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+ENV NODE_ENV=production
+RUN npm run build
 
-RUN rm -rf .git
-
-ENV PORT=3000 \
-    SKIP_BUILD_TIME_CHECKS=false \
-    NODE_ENV=production
-EXPOSE $PORT
-
-# We need to build at container startup to get the latest libraries from the registry.
-CMD ["npm", "run", "build-and-start"]
+FROM node:20.18.1-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production \
+    PORT=3000
+# CONFIG_FILE must be supplied at container runtime as an environment variable.
+# Set it to the path or URL of your YAML config file, e.g.:
+#   docker run -e CONFIG_FILE=/run/secrets/config.yml ...
+# The server throws AppSetupError on the first request if this is not set.
+# standalone bundle contains server.js and a pruned node_modules;
+# static and public must be copied alongside it
+COPY --from=builder /app/_next/standalone ./
+COPY --from=builder /app/_next/static ./_next/static
+COPY --from=builder /app/public ./public
+EXPOSE 3000
+CMD ["node", "server.js"]

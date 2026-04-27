@@ -8,35 +8,48 @@ import {
   GIT_BRANCH,
   GIT_COMMIT_SHA,
   NODE_ENV,
-  RELEASE_STAGE,
-  APP_CONFIG
+  RELEASE_STAGE
 } from "utils/env";
+import type { AppConfig } from "interfaces";
 
-if (APP_CONFIG.bugsnagApiKey) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let _bugsnagErrorBoundary: React.ComponentType<any> | undefined;
+
+/**
+ * Initializes Bugsnag with the runtime app config. Idempotent — no-op if
+ * already started. Called once from _app.tsx before the first render.
+ */
+export function initBugsnag(config: AppConfig): void {
+  if (Bugsnag.isStarted()) return;
+  if (!config.bugsnagApiKey) return;
+
   Bugsnag.start({
-    apiKey: APP_CONFIG.bugsnagApiKey,
+    apiKey: config.bugsnagApiKey,
     appVersion: BUILD_ID,
     plugins: [new BugsnagPluginReact()],
     appType: IS_SERVER ? "node" : "browser",
-    // the release stage is based on the github branch it is deployed from.
     releaseStage: RELEASE_STAGE,
     metadata: {
       App: {
         "Node Env": NODE_ENV,
         "Git Branch": GIT_BRANCH,
         "Git Commit SHA": GIT_COMMIT_SHA,
-        "Instance Name": APP_CONFIG.instanceName
+        "Instance Name": config.instanceName
       },
       "App Config": {
-        "Config File": APP_CONFIG,
+        "Config File": config,
         "Config File Source": CONFIG_FILE
       }
     }
   });
+
+  _bugsnagErrorBoundary =
+    Bugsnag.getPlugin("react")?.createErrorBoundary(React);
 }
 
-export const BugsnagErrorBoundary = APP_CONFIG.bugsnagApiKey
-  ? Bugsnag.getPlugin("react")?.createErrorBoundary(React)
-  : undefined;
+/** Returns the Bugsnag React error boundary, or undefined if not yet initialized. */
+export function getBugsnagErrorBoundary() {
+  return _bugsnagErrorBoundary;
+}
 
 export default Bugsnag;

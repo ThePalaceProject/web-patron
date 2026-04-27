@@ -1,11 +1,25 @@
 import { AppConfig } from "interfaces";
 import { fixtures } from "test-utils";
-import * as env from "utils/env";
+import { setMediaSupportConfig } from "utils/fulfill";
 
+let _currentTestConfig: AppConfig = fixtures.config;
+
+/** Returns the app config currently active for this test. */
+export function getCurrentTestConfig(): AppConfig {
+  return _currentTestConfig;
+}
+
+/**
+ * Sets the active app config for the current test. Updates the media support
+ * singleton (used by parse/fulfill utilities) and the shared config used by
+ * the render() test wrapper. Call in beforeEach or at the top of a test.
+ */
 export default function mockConfig(custom?: Partial<AppConfig>) {
-  const config = {
+  const config: AppConfig = {
     ...fixtures.config,
     ...custom
   };
-  (env.APP_CONFIG as any) = config;
+  _currentTestConfig = config;
+  setMediaSupportConfig(config.mediaSupport);
+  return config;
 }

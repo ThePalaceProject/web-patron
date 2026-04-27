@@ -5,17 +5,18 @@ import { availabilityString, bookIsFulfillable } from "utils/book";
 import { ScreenReaderOnly, Text } from "components/Text";
 import { shouldRedirectToCompanionApp } from "utils/fulfill";
 import SvgPhone from "icons/Phone";
-import { APP_CONFIG } from "utils/env";
+import { useAppConfig } from "components/context/AppConfigContext";
 
 const BookStatus: React.FC<{ book: AnyBook }> = ({ book }) => {
+  const { companionApp } = useAppConfig();
   const { status } = book;
 
   const redirectUser = bookIsFulfillable(book)
     ? shouldRedirectToCompanionApp(book.fulfillmentLinks)
     : false;
 
-  const companionApp =
-    APP_CONFIG.companionApp === "openebooks" ? "Open eBooks" : "Palace";
+  const companionAppName =
+    companionApp === "openebooks" ? "Open eBooks" : "Palace";
 
   const action = book.format === "Audiobook" ? "Listen" : "Read";
 
@@ -29,7 +30,7 @@ const BookStatus: React.FC<{ book: AnyBook }> = ({ book }) => {
           : status === "on-hold"
             ? "Ready to Borrow"
             : status === "fulfillable"
-              ? `Ready to ${action}${redirectUser ? ` in ${companionApp}` : ""}!`
+              ? `Ready to ${action}${redirectUser ? ` in ${companionAppName}` : ""}!`
               : "Unsupported";
 
   return (

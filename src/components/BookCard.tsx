@@ -5,7 +5,7 @@ import BookCover from "./BookCover";
 import { truncateString } from "../utils/string";
 import { H3, P } from "./Text";
 import { AnyBook } from "interfaces";
-import { APP_CONFIG } from "utils/env";
+import { useAppConfig } from "components/context/AppConfigContext";
 
 export const BOOK_WIDTH = 187;
 export const BOOK_HEIGHT = 365;
@@ -16,6 +16,7 @@ const BookCard = React.forwardRef<
   HTMLLIElement,
   { book: AnyBook; className?: string }
 >(({ book, className }, ref) => {
+  const { showMedium } = useAppConfig();
   const authors = getAuthors(book, 2);
 
   // if the book url is undefined, there is no sense displaying it.
@@ -40,7 +41,7 @@ const BookCard = React.forwardRef<
         )}`}
         sx={{ "&:hover": { textDecoration: "none" } }}
       >
-        <BookCover book={book} showMedium={APP_CONFIG.showMedium} />
+        <BookCover book={book} showMedium={showMedium} />
         <div sx={{ flex: "1 1 auto" }} />
         <H3 sx={{ m: 0, mt: 1, fontSize: -1 }}>
           {truncateString(book.title, twoLines, false)}

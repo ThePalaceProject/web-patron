@@ -5,13 +5,14 @@ import withAppProps, { AppProps } from "dataflow/withAppProps";
 import LoginWrapper from "auth/LoginWrapper";
 import Login from "auth/Login";
 import OpenEbooksLoginPicker from "auth/OpenEbooksLoginPicker";
-import { APP_CONFIG } from "utils/env";
+import { useAppConfig } from "components/context/AppConfigContext";
 
 const LoginPage: NextPage<AppProps> = ({ library, error }) => {
+  const { openebooks } = useAppConfig();
   return (
     <LayoutPage library={library} error={error}>
       <LoginWrapper>
-        {APP_CONFIG.openebooks ? <OpenEbooksLoginPicker /> : <Login />}
+        {openebooks ? <OpenEbooksLoginPicker /> : <Login />}
       </LoginWrapper>
     </LayoutPage>
   );

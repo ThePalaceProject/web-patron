@@ -7,9 +7,10 @@ import { NavButton } from "./Button";
 import SvgPhone from "icons/Phone";
 import IosBadge from "./storeBadges/IosBadge";
 import GooglePlayBadge from "./storeBadges/GooglePlayBadge";
-import { APP_CONFIG } from "utils/env";
+import { useAppConfig } from "components/context/AppConfigContext";
 
 const Footer: React.FC<{ className?: string }> = ({ className }) => {
+  const { companionApp } = useAppConfig();
   const library = useLibraryContext();
   const {
     helpEmail,
@@ -100,7 +101,7 @@ const Footer: React.FC<{ className?: string }> = ({ className }) => {
         </FooterList>
       </div>
       <div sx={{ flex: "1 1 0" }} />
-      {APP_CONFIG.companionApp === "simplye" && <DownloadSimplyECallout />}
+      {companionApp === "simplye" && <DownloadSimplyECallout />}
     </footer>
   );
 };

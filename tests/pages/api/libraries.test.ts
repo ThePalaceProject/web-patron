@@ -10,24 +10,32 @@ import type {
   LibrariesResponse,
   LibrariesErrorResponse
 } from "pages/api/libraries";
+import type { AppConfig } from "interfaces";
 
-// Mock the registry module so we can control what getLibraries returns.
+// Mock both server modules so we can control their behavior.
 jest.mock("server/libraryRegistry", () => ({
   getLibraries: jest.fn()
 }));
+jest.mock("server/appConfig", () => ({
+  getAppConfig: jest.fn()
+}));
 
 import { getLibraries } from "server/libraryRegistry";
+import { getAppConfig } from "server/appConfig";
 import handler from "pages/api/libraries";
 
 const mockGetLibraries = getLibraries as jest.MockedFunction<
   typeof getLibraries
+>;
+const mockGetAppConfig = getAppConfig as jest.MockedFunction<
+  typeof getAppConfig
 >;
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-const VALID_APP_CONFIG = JSON.stringify({
+const VALID_APP_CONFIG: AppConfig = {
   instanceName: "Test",
   gtmId: null,
   bugsnagApiKey: null,
@@ -35,7 +43,7 @@ const VALID_APP_CONFIG = JSON.stringify({
   showMedium: true,
   openebooks: null,
   mediaSupport: {}
-});
+};
 
 function makeRes() {
   const json = jest.fn();
@@ -51,15 +59,9 @@ function makeRes() {
 // ---------------------------------------------------------------------------
 
 describe("GET /api/libraries", () => {
-  const originalEnv = process.env;
-
   beforeEach(() => {
-    process.env = { ...originalEnv, APP_CONFIG: VALID_APP_CONFIG };
+    mockGetAppConfig.mockResolvedValue(VALID_APP_CONFIG);
     jest.clearAllMocks();
-  });
-
-  afterEach(() => {
-    process.env = originalEnv;
   });
 
   it("returns 200 with an array of client-safe library objects", async () => {
@@ -108,27 +110,15 @@ describe("GET /api/libraries", () => {
     expect(json).toHaveBeenCalledWith({ libraries: [] });
   });
 
-  it("returns 500 when APP_CONFIG is not set", async () => {
-    delete process.env.APP_CONFIG;
+  it("returns 500 when config loading fails", async () => {
+    mockGetAppConfig.mockRejectedValue(new Error("CONFIG_FILE not set"));
 
     const { res, json } = makeRes();
     await handler({} as NextApiRequest, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(json.mock.calls[0][0]).toMatchObject({
-      error: expect.stringContaining("APP_CONFIG")
-    });
-  });
-
-  it("returns 500 when APP_CONFIG is invalid JSON", async () => {
-    process.env.APP_CONFIG = "not-valid-json{{{";
-
-    const { res, json } = makeRes();
-    await handler({} as NextApiRequest, res);
-
-    expect(res.status).toHaveBeenCalledWith(500);
-    expect(json.mock.calls[0][0]).toMatchObject({
-      error: expect.stringContaining("parsed")
+      error: expect.any(String)
     });
   });
 

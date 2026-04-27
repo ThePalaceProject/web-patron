@@ -64,16 +64,15 @@ companion_app: simplye
 # There are three ways to configure libraries:
 #
 # 1. STATIC LIBRARIES (recommended for a few known libraries):
-#    Define libraries as a dictionary mapping slug to authentication document URL.
-#    These libraries are available immediately at build time.
+#    Define libraries as a mapping from slug to authentication document URL.
+#    These libraries are served directly from the running application.
 #
-libraries:
+staticLibraries:
   main-street-city: https://demo.thepalaceproject.org/GA0000/authentication_document
+#
 # 2. RUNTIME LIBRARY REGISTRIES (recommended for dynamic library lists):
 #    Define one or more library registry URLs that will be fetched at runtime.
 #    This allows libraries to be added/removed without rebuilding the application.
-#    NOTE: Runtime fetching is implemented in Release 1. In Release 0, this config
-#    is parsed but registries are not yet fetched at runtime.
 #
 # registries:
 #   - url: https://registry.thepalaceproject.org/libraries
@@ -93,28 +92,20 @@ libraries:
 #    Combine static libraries with runtime registries. Static libraries always
 #    take precedence over registry libraries if there are slug conflicts.
 #
-# libraries:
+# staticLibraries:
 #   featured-lib: https://example.com/featured/auth
 # registries:
 #   - url: https://registry.thepalaceproject.org/libraries
 #
-# DEPRECATED FORMAT (still supported for backward compatibility):
-# Using a string for 'libraries' is deprecated. This format fetches the registry
-# at BUILD TIME only, not runtime. Please migrate to the 'registries' array format.
+# DEPRECATED FORMATS (temporarily supported for backward compatibility):
 #
-# libraries: https://registry.thepalaceproject.org/libraries  # DEPRECATED
+# Using an object for 'libraries' to define static libraries is deprecated.
+# Rename it to 'staticLibraries':
 #
-# MIGRATION INSTRUCTIONS:
-# If you're currently using the string format:
-#   OLD (deprecated):
-#     libraries: https://registry.thepalaceproject.org/libraries
+#   libraries:                                         # DEPRECATED
+#     my-library: https://example.com/auth_document   # DEPRECATED
 #
-#   NEW (recommended):
-#     registries:
-#       - url: https://registry.thepalaceproject.org/libraries
-#         refreshMinInterval: 60
-#         refreshMaxInterval: 300
+# Using a string for 'libraries' to specify a registry URL is deprecated.
+# Migrate to the 'registries' array format:
 #
-# After updating to the new format:
-# 1. With Release 0: Libraries still fetched at build time (no behavior change)
-# 2. With Release 1: Libraries fetched at runtime (no rebuild needed for library changes)
+#   libraries: https://registry.thepalaceproject.org/libraries  # DEPRECATED
