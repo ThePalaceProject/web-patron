@@ -20,6 +20,7 @@ export type AppConfig = {
   instanceName: string;
   mediaSupport: MediaSupportConfig;
   registries?: RegistryConfig[];
+  staticLibraries?: LibrariesConfig;
   companionApp: "simplye" | "openebooks";
   showMedium: boolean;
   gtmId: string | null;

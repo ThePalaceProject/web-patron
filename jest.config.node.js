@@ -19,6 +19,8 @@ module.exports = {
     "**/server/**/?(*.)+(spec|test).[tj]s?(x)"
   ],
   testPathIgnorePatterns: ["/node_modules/", "/.next/"],
+  // arktype and its ark*/@ark/* dependencies ship as ESM and must be transformed.
+  transformIgnorePatterns: ["/node_modules/(?!(arktype|arkregex|@ark)/)"],
   // No setup files for Node.js tests - these are browser-specific
   setupFiles: [],
   setupFilesAfterEnv: [],
