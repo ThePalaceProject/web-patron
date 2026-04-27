@@ -145,10 +145,10 @@ You can also specify a custom display title for each library that will appear on
 ```yaml
 static_libraries:
   my-library:
-    authDocUrl: https://circulation.example.com/my-library/authentication_document
+    auth_doc_url: https://circulation.example.com/my-library/authentication_document
     title: "My Public Library"
   another-lib:
-    authDocUrl: https://circulation.example.com/another-lib/authentication_document
+    auth_doc_url: https://circulation.example.com/another-lib/authentication_document
     title: "Community Reading Center"
 ```
 
@@ -166,8 +166,8 @@ Instead of hardcoding libraries, you can configure the app to fetch library info
 ```yaml
 registries:
   - url: https://registry.thepalaceproject.org/libraries/qa
-    refreshMinInterval: 60      # Seconds between fetch attempts (default: 60)
-    refreshMaxInterval: 300     # Seconds before forcing refresh (default: 300)
+    refresh_min_interval: 60    # Seconds between fetch attempts (default: 60)
+    refresh_max_interval: 300   # Seconds before forcing refresh (default: 300)
 ```
 
 **Multiple Registries:**
@@ -187,7 +187,7 @@ Combine static libraries with registry-based libraries. Static library definitio
 ```yaml
 static_libraries:
   featured-library:
-    authDocUrl: https://circulation.example.com/featured/authentication_document
+    auth_doc_url: https://circulation.example.com/featured/authentication_document
     title: "Featured Library"
 registries:
   - url: https://registry.thepalaceproject.org/libraries/qa

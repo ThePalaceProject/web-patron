@@ -6,7 +6,11 @@
 
 import path from "path";
 import type { AppConfig } from "interfaces";
-import { getAppConfig, resetAppConfigCache } from "../appConfig";
+import {
+  getAppConfig,
+  normalizeConfigKeys,
+  resetAppConfigCache
+} from "../appConfig";
 import { AppSetupError } from "errors";
 import { DEFAULT_REGISTRY_FETCH_TIMEOUT } from "constants/registry";
 
@@ -48,6 +52,71 @@ beforeEach(() => {
 afterEach(() => {
   process.env = originalEnv;
 });
+
+// ---------------------------------------------------------------------------
+// normalizeConfigKeys
+// ---------------------------------------------------------------------------
+
+/* eslint-disable camelcase */
+describe("normalizeConfigKeys", () => {
+  it.each([
+    ["returns object unchanged when key is absent", {}, ["fooBar"], {}],
+    [
+      "returns object unchanged when camelCase key is already present",
+      { fooBar: 42 },
+      ["fooBar"],
+      { fooBar: 42 }
+    ],
+    [
+      "renames snake_case key to camelCase",
+      { foo_bar: 42 },
+      ["fooBar"],
+      { fooBar: 42 }
+    ],
+    [
+      "does not touch keys not in camelKeys",
+      { other_key: 1, fooBar: 2 },
+      ["fooBar"],
+      { other_key: 1, fooBar: 2 }
+    ],
+    [
+      "does not throw for a single-word key that is present",
+      { registries: [] },
+      ["registries"],
+      { registries: [] }
+    ]
+  ])("%s", (_label, input, keys, expected) => {
+    expect(normalizeConfigKeys(input as Record<string, unknown>, keys)).toEqual(
+      expected
+    );
+  });
+
+  it("renames all matching snake_case keys when multiple camelKeys are given", () => {
+    expect(
+      normalizeConfigKeys({ foo_bar: 1, baz_qux: "x" }, ["fooBar", "bazQux"])
+    ).toEqual({ fooBar: 1, bazQux: "x" });
+  });
+
+  it.each([
+    ["fooBar", { fooBar: 1, foo_bar: 2 }],
+    ["gtmId", { gtmId: "a", gtm_id: "b" }],
+    ["refreshMinInterval", { refreshMinInterval: 30, refresh_min_interval: 60 }]
+  ])(
+    "throws AppSetupError when both %s and its snake_case equivalent are set",
+    (camelKey, input) => {
+      expect(() =>
+        normalizeConfigKeys(input as Record<string, unknown>, [camelKey])
+      ).toThrow(AppSetupError);
+    }
+  );
+
+  it("error message includes both conflicting key names", () => {
+    expect(() =>
+      normalizeConfigKeys({ fooBar: 1, foo_bar: 2 }, ["fooBar"])
+    ).toThrow("'foo_bar' and 'fooBar'");
+  });
+});
+/* eslint-enable camelcase */
 
 // ---------------------------------------------------------------------------
 // getAppConfig — environment and I/O behaviour
@@ -623,7 +692,7 @@ describe("config parsing", () => {
         "  other-lib: https://other.example.com/auth"
       ].join("\n");
       await expect(load(yaml)).rejects.toThrow(
-        "'staticLibraries' and the object form of 'libraries' cannot both be set"
+        "'static_libraries' and the object form of 'libraries' cannot both be set"
       );
     });
   });
@@ -693,52 +762,52 @@ describe("config parsing", () => {
       [
         "null entry",
         "staticLibraries:\n  bad-lib: null",
-        "CONFIG_FILE.staticLibraries['bad-lib'] cannot be null or undefined"
+        "CONFIG_FILE.static_libraries['bad-lib'] cannot be null or undefined"
       ],
       [
         "empty string entry",
         `staticLibraries:\n  bad-lib: ""`,
-        "CONFIG_FILE.staticLibraries['bad-lib'] cannot be an empty string"
+        "CONFIG_FILE.static_libraries['bad-lib'] cannot be an empty string"
       ],
       [
         "whitespace-only string entry",
         `staticLibraries:\n  bad-lib: "   "`,
-        "CONFIG_FILE.staticLibraries['bad-lib'] cannot be an empty string"
+        "CONFIG_FILE.static_libraries['bad-lib'] cannot be an empty string"
       ],
       [
         "object missing authDocUrl",
         "staticLibraries:\n  bad-lib:\n    title: My Library",
-        "CONFIG_FILE.staticLibraries['bad-lib'] must have an 'authDocUrl' property with a valid URL string"
+        "CONFIG_FILE.static_libraries['bad-lib'] must have an 'authDocUrl' property with a valid URL string"
       ],
       [
         "object with non-string authDocUrl",
         "staticLibraries:\n  bad-lib:\n    authDocUrl: 12345",
-        "CONFIG_FILE.staticLibraries['bad-lib'] must have an 'authDocUrl' property with a valid URL string"
+        "CONFIG_FILE.static_libraries['bad-lib'] must have an 'authDocUrl' property with a valid URL string"
       ],
       [
         "object with empty authDocUrl",
         `staticLibraries:\n  bad-lib:\n    authDocUrl: ""`,
-        "CONFIG_FILE.staticLibraries['bad-lib'].authDocUrl cannot be an empty string"
+        "CONFIG_FILE.static_libraries['bad-lib'].authDocUrl cannot be an empty string"
       ],
       [
         "object with non-string title",
         "staticLibraries:\n  bad-lib:\n    authDocUrl: https://example.com/auth\n    title: 123",
-        "CONFIG_FILE.staticLibraries['bad-lib'].title must be a string"
+        "CONFIG_FILE.static_libraries['bad-lib'].title must be a string"
       ],
       [
         "object with empty title",
         `staticLibraries:\n  bad-lib:\n    authDocUrl: https://example.com/auth\n    title: ""`,
-        "CONFIG_FILE.staticLibraries['bad-lib'].title cannot be an empty string"
+        "CONFIG_FILE.static_libraries['bad-lib'].title cannot be an empty string"
       ],
       [
         "numeric entry",
         "staticLibraries:\n  bad-lib: 12345",
-        "CONFIG_FILE.staticLibraries['bad-lib'] must be either a string (auth doc URL) or an object with 'authDocUrl' property"
+        "CONFIG_FILE.static_libraries['bad-lib'] must be either a string (auth doc URL) or an object with 'authDocUrl' property"
       ],
       [
         "boolean entry",
         "staticLibraries:\n  bad-lib: true",
-        "CONFIG_FILE.staticLibraries['bad-lib'] must be either a string (auth doc URL) or an object with 'authDocUrl' property"
+        "CONFIG_FILE.static_libraries['bad-lib'] must be either a string (auth doc URL) or an object with 'authDocUrl' property"
       ]
     ])("throws AppSetupError for %s", async (_label, yaml, expectedMessage) => {
       await expect(load(yaml)).rejects.toThrow(expectedMessage);

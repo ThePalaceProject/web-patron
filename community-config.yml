@@ -67,7 +67,7 @@ companion_app: simplye
 #    Define libraries as a mapping from slug to authentication document URL.
 #    These libraries are served directly from the running application.
 #
-staticLibraries:
+static_libraries:
   main-street-city: https://demo.thepalaceproject.org/GA0000/authentication_document
 #
 # 2. RUNTIME LIBRARY REGISTRIES (recommended for dynamic library lists):
@@ -76,23 +76,23 @@ staticLibraries:
 #
 # registries:
 #   - url: https://registry.thepalaceproject.org/libraries
-#     refreshMinInterval: 60   # Minimum seconds between fetch attempts (default: 60)
-#     refreshMaxInterval: 300  # Maximum seconds after last successful fetch before auto-refresh (default: 300)
+#     refresh_min_interval: 60  # Minimum seconds between fetch attempts (default: 60)
+#     refresh_max_interval: 300 # Maximum seconds after last successful fetch before auto-refresh (default: 300)
 #
 # You can also define multiple registries (earlier registries take precedence for slug conflicts):
 # registries:
 #   - url: https://registry.thepalaceproject.org/libraries
-#     refreshMinInterval: 60
-#     refreshMaxInterval: 300
+#     refresh_min_interval: 60
+#     refresh_max_interval: 300
 #   - url: https://regional-registry.example.com/libraries
-#     refreshMinInterval: 120
-#     refreshMaxInterval: 600
+#     refresh_min_interval: 120
+#     refresh_max_interval: 600
 #
 # 3. HYBRID (static + registries):
 #    Combine static libraries with runtime registries. Static libraries always
 #    take precedence over registry libraries if there are slug conflicts.
 #
-# staticLibraries:
+# static_libraries:
 #   featured-lib: https://example.com/featured/auth
 # registries:
 #   - url: https://registry.thepalaceproject.org/libraries
@@ -100,7 +100,7 @@ staticLibraries:
 # DEPRECATED FORMATS (temporarily supported for backward compatibility):
 #
 # Using an object for 'libraries' to define static libraries is deprecated.
-# Rename it to 'staticLibraries':
+# Rename it to 'static_libraries':
 #
 #   libraries:                                         # DEPRECATED
 #     my-library: https://example.com/auth_document   # DEPRECATED
