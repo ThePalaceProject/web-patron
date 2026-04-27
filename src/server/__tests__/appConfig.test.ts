@@ -813,4 +813,79 @@ describe("config parsing", () => {
       await expect(load(yaml)).rejects.toThrow(expectedMessage);
     });
   });
+
+  // --- key form tolerance ---
+
+  describe("key form tolerance", () => {
+    const SNAKE_YAML = [
+      "instance_name: Test Instance",
+      "companion_app: openebooks",
+      "show_medium: false",
+      "bugsnag_api_key: key-abc",
+      "gtm_id: GTM-TEST",
+      "static_libraries:",
+      "  my-lib:",
+      "    auth_doc_url: https://example.com/auth",
+      "    title: My Library",
+      "media_support:",
+      "  application/epub+zip: show",
+      "registries:",
+      "  - url: https://registry.example.com",
+      "    refresh_min_interval: 30",
+      "    refresh_max_interval: 120",
+      "openebooks:",
+      "  default_library: my-lib"
+    ].join("\n");
+
+    const CAMEL_YAML = [
+      "instanceName: Test Instance",
+      "companionApp: openebooks",
+      "showMedium: false",
+      "bugsnagApiKey: key-abc",
+      "gtmId: GTM-TEST",
+      "staticLibraries:",
+      "  my-lib:",
+      "    authDocUrl: https://example.com/auth",
+      "    title: My Library",
+      "mediaSupport:",
+      "  application/epub+zip: show",
+      "registries:",
+      "  - url: https://registry.example.com",
+      "    refreshMinInterval: 30",
+      "    refreshMaxInterval: 120",
+      "openebooks:",
+      "  defaultLibrary: my-lib"
+    ].join("\n");
+
+    it.each([
+      ["snake_case", SNAKE_YAML],
+      ["camelCase", CAMEL_YAML]
+    ])(
+      "parses all top-level keys from %s YAML into identical config",
+      async (_form, yaml) => {
+        expect(await load(yaml)).toEqual({
+          instanceName: "Test Instance",
+          companionApp: "openebooks",
+          showMedium: false,
+          bugsnagApiKey: "key-abc",
+          gtmId: "GTM-TEST",
+          staticLibraries: {
+            "my-lib": {
+              title: "My Library",
+              authDocUrl: "https://example.com/auth"
+            }
+          },
+          mediaSupport: { "application/epub+zip": "show" },
+          registries: [
+            {
+              url: "https://registry.example.com",
+              refreshMinInterval: 30,
+              refreshMaxInterval: 120
+            }
+          ],
+          openebooks: { defaultLibrary: "my-lib" }
+        });
+      }
+    );
+  });
 });
