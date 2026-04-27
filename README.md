@@ -77,11 +77,11 @@ The app is configured with a YAML file. Point the app at it by setting the `CONF
 | `companion_app` | `"simplye"` \| `"openebooks"` | `"simplye"` | Selects which companion mobile app to reference in redirect prompts. |
 | `show_medium` | boolean | `true` | Whether to display the medium (e-book, audiobook, etc.) label on book cards. |
 | `bugsnag_api_key` | string | — | Bugsnag project API key. Omit to disable error tracking. |
-| `gtmId` | string | — | Google Tag Manager container ID (e.g. `GTM-XXXX`). Omit to disable analytics. |
+| `gtm_id` | string | — | Google Tag Manager container ID (e.g. `GTM-XXXX`). Omit to disable analytics. |
 | `media_support` | mapping | `{}` | Per-MIME-type rendering mode. See [Media Support](#media-support) below. |
-| `staticLibraries` | mapping | — | Static library definitions. See [Libraries and Registries Configuration Settings](#libraries-and-registries-configuration-settings). |
+| `static_libraries` | mapping | — | Static library definitions. See [Libraries and Registries Configuration Settings](#libraries-and-registries-configuration-settings). |
 | `registries` | list | `[]` | One or more library registry URLs fetched at runtime. See [Libraries and Registries Configuration Settings](#libraries-and-registries-configuration-settings). |
-| `libraries` | mapping or string | — | **Deprecated.** Use `staticLibraries` (mapping) or `registries` (string). See [Libraries and Registries Configuration Settings](#libraries-and-registries-configuration-settings). |
+| `libraries` | mapping or string | — | **Deprecated.** Use `static_libraries` (mapping) or `registries` (string). See [Libraries and Registries Configuration Settings](#libraries-and-registries-configuration-settings). |
 
 ### Media Support
 
@@ -133,7 +133,7 @@ Define libraries directly in your configuration file as a dictionary mapping lib
 
 **Simple Format:**
 ```yaml
-staticLibraries:
+static_libraries:
   my-library: https://circulation.example.com/my-library/authentication_document
   another-lib: https://circulation.example.com/another-lib/authentication_document
 ```
@@ -143,7 +143,7 @@ staticLibraries:
 You can also specify a custom display title for each library that will appear on the multi-library selection page:
 
 ```yaml
-staticLibraries:
+static_libraries:
   my-library:
     authDocUrl: https://circulation.example.com/my-library/authentication_document
     title: "My Public Library"
@@ -185,7 +185,7 @@ registries:
 Combine static libraries with registry-based libraries. Static library definitions always take precedence over registry entries when slugs conflict:
 
 ```yaml
-staticLibraries:
+static_libraries:
   featured-library:
     authDocUrl: https://circulation.example.com/featured/authentication_document
     title: "Featured Library"
@@ -201,7 +201,7 @@ In this example, if the registry also contains a library with slug `featured-lib
 
 Using an object for `libraries` to define static libraries:
 ```yaml
-# DEPRECATED — rename to staticLibraries
+# DEPRECATED — rename to static_libraries
 libraries:
   my-library: https://circulation.example.com/my-library/authentication_document
 ```
@@ -219,7 +219,7 @@ libraries:
   my-library: https://circulation.example.com/my-library/authentication_document
 
 # NEW (recommended):
-staticLibraries:
+static_libraries:
   my-library: https://circulation.example.com/my-library/authentication_document
 ```
 

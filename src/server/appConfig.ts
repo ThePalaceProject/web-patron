@@ -37,10 +37,10 @@ const RawConfigSchema = type({
   "companion_app?": "string",
   "show_medium?": "boolean",
   "bugsnag_api_key?": "string",
-  "gtmId?": "string",
+  "gtm_id?": "string",
   "registries?": RegistryEntrySchema.array(),
   "libraries?": "string | Record<string, unknown>",
-  "staticLibraries?": "Record<string, unknown>",
+  "static_libraries?": "Record<string, unknown>",
   "media_support?": "Record<string, string | Record<string, string>>",
   // eslint-disable-next-line camelcase
   "openebooks?": { default_library: "string" }
@@ -163,7 +163,7 @@ function parseYaml(input: Record<string, unknown>): AppConfig {
 
   // Deprecated: object-form `libraries` specifies static libraries inline.
   if (librariesIsObject) {
-    if (result.staticLibraries != null) {
+    if (result.static_libraries != null) {
       throw new AppSetupError(
         "CONFIG_FILE: 'staticLibraries' and the object form of 'libraries' cannot both be set. " +
           "Remove 'libraries' and use 'staticLibraries' instead."
@@ -176,10 +176,10 @@ function parseYaml(input: Record<string, unknown>): AppConfig {
     );
   }
 
-  const staticLibraries = result.staticLibraries
+  const staticLibraries = result.static_libraries
     ? parseLibrariesConfig(
-        "staticLibraries",
-        result.staticLibraries as Record<string, unknown>
+        "static_libraries",
+        result.static_libraries as Record<string, unknown>
       )
     : librariesIsObject
       ? parseLibrariesConfig(
@@ -222,7 +222,7 @@ function parseYaml(input: Record<string, unknown>): AppConfig {
     staticLibraries,
     mediaSupport: (result.media_support as MediaSupportConfig) ?? {},
     bugsnagApiKey: result.bugsnag_api_key ?? null,
-    gtmId: result.gtmId ?? null,
+    gtmId: result.gtm_id ?? null,
     companionApp,
     showMedium,
     openebooks
