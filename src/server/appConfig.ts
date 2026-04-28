@@ -33,17 +33,16 @@ const RegistryEntrySchema = type({
 
 const RawConfigSchema = type({
   // Intentionally permissive: any non-string value silently defaults.
-  "instance_name?": "unknown",
-  "companion_app?": "string",
-  "show_medium?": "boolean",
-  "bugsnag_api_key?": "string",
+  "instanceName?": "unknown",
+  "companionApp?": "string",
+  "showMedium?": "boolean",
+  "bugsnagApiKey?": "string",
   "gtmId?": "string",
   "registries?": RegistryEntrySchema.array(),
   "libraries?": "string | Record<string, unknown>",
   "staticLibraries?": "Record<string, unknown>",
-  "media_support?": "Record<string, string | Record<string, string>>",
-  // eslint-disable-next-line camelcase
-  "openebooks?": { default_library: "string" }
+  "mediaSupport?": "Record<string, string | Record<string, string>>",
+  "openebooks?": { defaultLibrary: "string" }
 });
 
 const DEFAULT_MIN_INTERVAL = 60;
@@ -59,6 +58,31 @@ const VALID_MEDIA_SUPPORT_VALUES = new Set<string>([
 // ---------------------------------------------------------------------------
 // Parsing helpers
 // ---------------------------------------------------------------------------
+
+// Accepts either the camelCase or snake_case form of each listed key, renaming
+// it to camelCase before returning. Throws if both forms are present.
+export function normalizeConfigKeys(
+  obj: Record<string, unknown>,
+  camelKeys: readonly string[]
+): Record<string, unknown> {
+  const out = { ...obj };
+  for (const camelKey of camelKeys) {
+    const snakeKey = camelKey.replace(/([A-Z])/g, c => `_${c.toLowerCase()}`);
+    if (snakeKey === camelKey) continue;
+    const hasSnake = snakeKey in out;
+    const hasCamel = camelKey in out;
+    if (hasSnake && hasCamel) {
+      throw new AppSetupError(
+        `CONFIG_FILE: '${snakeKey}' and '${camelKey}' cannot both be set; use one form only.`
+      );
+    }
+    if (hasSnake) {
+      out[camelKey] = out[snakeKey];
+      delete out[snakeKey];
+    }
+  }
+  return out;
+}
 
 function parseLibraryEntry(
   field: string,
@@ -76,7 +100,9 @@ function parseLibraryEntry(
     return { title: slug, authDocUrl: value };
   }
   if (typeof value === "object" && !Array.isArray(value)) {
-    const entry = value as Record<string, unknown>;
+    const entry = normalizeConfigKeys(value as Record<string, unknown>, [
+      "authDocUrl"
+    ]);
     if (!("authDocUrl" in entry) || typeof entry.authDocUrl !== "string") {
       throw new AppSetupError(
         `${path} must have an 'authDocUrl' property with a valid URL string`
@@ -115,18 +141,46 @@ function parseLibrariesConfig(
 }
 
 function parseYaml(input: Record<string, unknown>): AppConfig {
-  const result = RawConfigSchema(input);
+  const normalized = normalizeConfigKeys(input, [
+    "instanceName",
+    "companionApp",
+    "showMedium",
+    "bugsnagApiKey",
+    "gtmId",
+    "staticLibraries",
+    "mediaSupport"
+  ]);
+  if (Array.isArray(normalized.registries)) {
+    normalized.registries = normalized.registries.map(r =>
+      r !== null && typeof r === "object" && !Array.isArray(r)
+        ? normalizeConfigKeys(r as Record<string, unknown>, [
+            "refreshMinInterval",
+            "refreshMaxInterval"
+          ])
+        : r
+    );
+  }
+  if (
+    normalized.openebooks !== null &&
+    typeof normalized.openebooks === "object"
+  ) {
+    normalized.openebooks = normalizeConfigKeys(
+      normalized.openebooks as Record<string, unknown>,
+      ["defaultLibrary"]
+    );
+  }
+  const result = RawConfigSchema(normalized);
   if (result instanceof type.errors) {
     throw new AppSetupError(`Invalid config file:\n${result.summary}`);
   }
 
   const companionApp =
-    result.companion_app === "openebooks" ? "openebooks" : "simplye";
+    result.companionApp === "openebooks" ? "openebooks" : "simplye";
 
-  const showMedium = result.show_medium !== false;
+  const showMedium = result.showMedium !== false;
 
   const openebooks = result.openebooks
-    ? { defaultLibrary: result.openebooks.default_library }
+    ? { defaultLibrary: result.openebooks.defaultLibrary }
     : null;
 
   const baseRegistries: RegistryConfig[] = (result.registries ?? []).map(r => ({
@@ -165,20 +219,20 @@ function parseYaml(input: Record<string, unknown>): AppConfig {
   if (librariesIsObject) {
     if (result.staticLibraries != null) {
       throw new AppSetupError(
-        "CONFIG_FILE: 'staticLibraries' and the object form of 'libraries' cannot both be set. " +
-          "Remove 'libraries' and use 'staticLibraries' instead."
+        "CONFIG_FILE: 'static_libraries' and the object form of 'libraries' cannot both be set. " +
+          "Remove 'libraries' and use 'static_libraries' instead."
       );
     }
     console.warn(
       "WARNING: Using an object for 'libraries' to define static libraries is deprecated. " +
-        "Please rename it to 'staticLibraries'. " +
+        "Please rename it to 'static_libraries'. " +
         "See the 'Libraries and Registries Configuration Settings' section in README.md."
     );
   }
 
   const staticLibraries = result.staticLibraries
     ? parseLibrariesConfig(
-        "staticLibraries",
+        "static_libraries",
         result.staticLibraries as Record<string, unknown>
       )
     : librariesIsObject
@@ -209,19 +263,19 @@ function parseYaml(input: Record<string, unknown>): AppConfig {
       }
     }
   }
-  for (const [mime, level] of Object.entries(result.media_support ?? {})) {
+  for (const [mime, level] of Object.entries(result.mediaSupport ?? {})) {
     validateMediaSupportValue(`media_support['${mime}']`, level);
   }
 
   return {
     instanceName:
-      typeof result.instance_name === "string"
-        ? result.instance_name
+      typeof result.instanceName === "string"
+        ? result.instanceName
         : "Patron Web Catalog",
     registries,
     staticLibraries,
-    mediaSupport: (result.media_support as MediaSupportConfig) ?? {},
-    bugsnagApiKey: result.bugsnag_api_key ?? null,
+    mediaSupport: (result.mediaSupport as MediaSupportConfig) ?? {},
+    bugsnagApiKey: result.bugsnagApiKey ?? null,
     gtmId: result.gtmId ?? null,
     companionApp,
     showMedium,
