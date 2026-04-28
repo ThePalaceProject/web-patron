@@ -58,6 +58,54 @@ describe("book details page", () => {
     }
   });
 
+  test("shows metadata in correct order", () => {
+    /** Audiobook contains all possible metadata that might appear on screen */
+    mockSwr({
+      data: fixtures.audiobook
+    });
+    setup(<BookDetails />);
+    const terms = screen.getAllByRole("term");
+    const defintions = screen.getAllByRole("definition");
+
+    // 1. Format
+    expect(terms[0]).toHaveTextContent("Format:");
+    expect(defintions[0]).toHaveTextContent("Audiobook");
+
+    // 2. Audience
+    expect(terms[1]).toHaveTextContent("Audience:");
+    expect(defintions[1]).toHaveTextContent("Adult");
+
+    // 3. Categories
+    expect(terms[2]).toHaveTextContent("Categories:");
+    expect(defintions[2]).toHaveTextContent(
+      "Fiction, Literary Fiction, Women Detectives"
+    );
+
+    // 4. Language
+    expect(terms[3]).toHaveTextContent("Language:");
+    expect(defintions[3]).toHaveTextContent("English");
+
+    // 5. Narrators
+    expect(terms[4]).toHaveTextContent("Narrators:");
+    expect(defintions[4]).toHaveTextContent("Simon Brett");
+
+    // 6. Duration
+    expect(terms[5]).toHaveTextContent("Duration:");
+    expect(defintions[5]).toHaveTextContent("6 hours, 1 minute");
+
+    // 7. Published
+    expect(terms[6]).toHaveTextContent("Published:");
+    expect(defintions[6]).toHaveTextContent("April 7, 2026");
+
+    // 8. Publisher
+    expect(terms[7]).toHaveTextContent("Publisher:");
+    expect(defintions[7]).toHaveTextContent("Dreamscape Media");
+
+    // 9. Distributor
+    expect(terms[8]).toHaveTextContent("Distributor:");
+    expect(defintions[8]).toHaveTextContent("Palace Marketplace");
+  });
+
   test("shows categories", () => {
     mockSwr({
       data: fixtures.book
@@ -79,6 +127,23 @@ describe("book details page", () => {
     expect(screen.queryByText("Categories:")).toBeFalsy();
   });
 
+  test("shows audience", () => {
+    mockSwr({ data: fixtures.book });
+    setup(<BookDetails />);
+    const audience = fixtures.book.audience as string;
+    expect(screen.getByText(audience)).toBeInTheDocument();
+    expect(screen.getByText("Audience:")).toBeInTheDocument();
+  });
+
+  test("shows formatted language", () => {
+    mockSwr({ data: fixtures.book });
+    setup(<BookDetails />);
+    const language = fixtures.book.language as string;
+    expect(language).toBe("en");
+    expect(screen.getByText("English")).toBeInTheDocument();
+    expect(screen.getByText("Language:")).toBeInTheDocument();
+  });
+
   test("shows publisher", () => {
     mockSwr({ data: fixtures.book });
     setup(<BookDetails />);
@@ -94,13 +159,13 @@ describe("book details page", () => {
     const providerName = fixtures.book.providerName as string;
 
     expect(screen.getByText(providerName)).toBeInTheDocument();
-    expect(screen.getByText("Distributed by:")).toBeInTheDocument();
+    expect(screen.getByText("Distributor:")).toBeInTheDocument();
   });
 
   test("shows book format", () => {
     mockSwr({ data: fixtures.book });
     setup(<BookDetails />);
-    expect(screen.getByText("Book format:")).toBeInTheDocument();
+    expect(screen.getByText("Format:")).toBeInTheDocument();
     expect(screen.getByText("ePub")).toBeInTheDocument();
   });
 
@@ -211,6 +276,26 @@ describe("book details page", () => {
     expect(
       screen.getByLabelText(`Current location: ${fixtures.book.title}`)
     ).toBeInTheDocument();
+  });
+
+  describe("Audiobook", () => {
+    beforeEach(() => {
+      mockSwr({ data: fixtures.audiobook });
+    });
+
+    it("renders duration", () => {
+      setup(<BookDetails />);
+      const duration = fixtures.audiobook.duration as string;
+      expect(screen.getByText(duration)).toBeInTheDocument();
+      expect(screen.getByText("Duration:")).toBeInTheDocument();
+    });
+
+    it("renders narrators", () => {
+      setup(<BookDetails />);
+      const narrators = fixtures.audiobook.narrators as string[];
+      expect(screen.getByText(narrators[0])).toBeInTheDocument();
+      expect(screen.getByText("Narrators:")).toBeInTheDocument();
+    });
   });
 });
 

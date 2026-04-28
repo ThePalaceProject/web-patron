@@ -161,3 +161,11 @@ export function getMedium(book: AnyBook): BookMedium | "" {
     ? book.raw["$"]["schema:additionalType"].value
     : "";
 }
+
+export function getLanguageLabel(book: AnyBook): string | undefined {
+  if (book?.language) {
+    const languageNames = new Intl.DisplayNames(["en"], { type: "language" });
+    return languageNames.of(book.language.trim());
+  }
+  return undefined;
+}

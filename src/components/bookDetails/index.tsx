@@ -21,7 +21,7 @@ import { fetchBook } from "dataflow/opds1/fetch";
 import useUser from "components/context/UserContext";
 import useBreadcrumbContext from "components/context/BreadcrumbContext";
 import { useAppConfig } from "components/context/AppConfigContext";
-import { getAuthors } from "utils/book";
+import { getAuthors, getLanguageLabel } from "utils/book";
 
 export const BookDetails: React.FC = () => {
   const { companionApp, showMedium } = useAppConfig();
@@ -93,17 +93,24 @@ export const BookDetails: React.FC = () => {
                 mt: 2
               }}
             >
-              <DetailField heading="Publisher" details={book.publisher} />
-              <DetailField heading="Published" details={book.published} />
+              <DetailField heading="Format" details={book.format} />
+              <DetailField heading="Audience" details={book.audience} />
               <DetailField
                 heading="Categories"
                 details={book.categories?.join(", ")}
               />
               <DetailField
-                heading="Distributed by"
-                details={book.providerName}
+                heading="Language"
+                details={getLanguageLabel(book)}
               />
-              <DetailField heading="Book format" details={book.format} />
+              <DetailField
+                heading="Narrators"
+                details={book.narrators?.join(", ")}
+              />
+              <DetailField heading="Duration" details={book.duration} />
+              <DetailField heading="Published" details={book.published} />
+              <DetailField heading="Publisher" details={book.publisher} />
+              <DetailField heading="Distributor" details={book.providerName} />
             </dl>
             <ReportProblem book={book} />
           </div>
