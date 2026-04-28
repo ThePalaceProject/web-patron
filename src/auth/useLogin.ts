@@ -7,7 +7,7 @@ import useLibraryContext from "components/context/LibraryContext";
 import * as _ from "lodash";
 
 export default function useLogin() {
-  const { query, push, asPath, isReady } = useRouter();
+  const { query, replace, asPath, isReady } = useRouter();
   const { slug } = useLibraryContext();
 
   const getLoginUrl = React.useCallback(
@@ -57,10 +57,10 @@ export default function useLogin() {
       const urlObject = getLoginUrl(methodId, error, useCurrentPageAsRedirect);
       if (!IS_SERVER) {
         // redirect to the login page
-        push(urlObject, undefined, { shallow: true });
+        replace(urlObject, undefined, { shallow: true });
       }
     },
-    [push, getLoginUrl]
+    [replace, getLoginUrl]
   );
 
   // the login url without any method selected

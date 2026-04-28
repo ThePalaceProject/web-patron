@@ -10,7 +10,7 @@ import {
 import BorrowOrReserve from "components/BorrowOrReserve";
 import * as fetch from "dataflow/opds1/fetch";
 import { ServerError } from "errors";
-import { mockPush } from "test-utils/mockNextRouter";
+import { mockReplace } from "test-utils/mockNextRouter";
 
 test("shows correct button for borrowable book", async () => {
   setup(<BorrowOrReserve isBorrow url="/url" />);
@@ -69,7 +69,7 @@ test("redirects to login when not signed in", async () => {
   const button = await screen.findByRole("button", {
     name: "Borrow this book"
   });
-  expect(mockPush).toHaveBeenCalledTimes(0);
+  expect(mockReplace).toHaveBeenCalledTimes(0);
 
   await user.click(button);
 
@@ -85,7 +85,7 @@ test("redirects to login when not signed in", async () => {
   expect(mockedFetchBook).not.toHaveBeenCalled();
 
   // redirects to login
-  expect(mockPush).toHaveBeenCalledWith(
+  expect(mockReplace).toHaveBeenCalledWith(
     {
       pathname: "/[library]/login",
       query: { library: "testlib", nextUrl: "/testlib" }
