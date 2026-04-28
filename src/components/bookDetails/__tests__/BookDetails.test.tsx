@@ -58,6 +58,54 @@ describe("book details page", () => {
     }
   });
 
+  test("shows metadata in correct order", () => {
+    /** Audiobook contains all possible metadata that might appear on screen */
+    mockSwr({
+      data: fixtures.audiobook
+    });
+    setup(<BookDetails />);
+    const terms = screen.getAllByRole("term");
+    const defintions = screen.getAllByRole("definition");
+
+    // 1. Format
+    expect(terms[0]).toHaveTextContent("Format:");
+    expect(defintions[0]).toHaveTextContent("Audiobook");
+
+    // 2. Audience
+    expect(terms[1]).toHaveTextContent("Audience:");
+    expect(defintions[1]).toHaveTextContent("Adult");
+
+    // 3. Categories
+    expect(terms[2]).toHaveTextContent("Categories:");
+    expect(defintions[2]).toHaveTextContent(
+      "Fiction, Literary Fiction, Women Detectives"
+    );
+
+    // 4. Language
+    expect(terms[3]).toHaveTextContent("Language:");
+    expect(defintions[3]).toHaveTextContent("English");
+
+    // 5. Narrators
+    expect(terms[4]).toHaveTextContent("Narrators:");
+    expect(defintions[4]).toHaveTextContent("Simon Brett");
+
+    // 6. Duration
+    expect(terms[5]).toHaveTextContent("Duration:");
+    expect(defintions[5]).toHaveTextContent("6 hours, 1 minute");
+
+    // 7. Published
+    expect(terms[6]).toHaveTextContent("Published:");
+    expect(defintions[6]).toHaveTextContent("April 7, 2026");
+
+    // 8. Publisher
+    expect(terms[7]).toHaveTextContent("Publisher:");
+    expect(defintions[7]).toHaveTextContent("Dreamscape Media");
+
+    // 9. Distributor
+    expect(terms[8]).toHaveTextContent("Distributor:");
+    expect(defintions[8]).toHaveTextContent("Palace Marketplace");
+  });
+
   test("shows categories", () => {
     mockSwr({
       data: fixtures.book
@@ -93,7 +141,7 @@ describe("book details page", () => {
     const language = fixtures.book.language as string;
     expect(language).toBe("en");
     expect(screen.getByText("English")).toBeInTheDocument();
-    expect(screen.getByText("Audience:")).toBeInTheDocument();
+    expect(screen.getByText("Language:")).toBeInTheDocument();
   });
 
   test("shows publisher", () => {

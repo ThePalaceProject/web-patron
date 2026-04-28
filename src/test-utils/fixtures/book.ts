@@ -202,6 +202,7 @@ export const audiobook: Book = {
   duration: "6 hours, 1 minute",
   narrators: ["Simon Brett"],
   audience: "Adult",
+  language: "en",
   raw: {
     $: { "schema:additionalType": { value: "http://schema.org/Audiobook" } },
     category: [

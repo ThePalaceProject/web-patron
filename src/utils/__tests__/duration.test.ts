@@ -5,7 +5,7 @@ test("returns 0 minutes for 0 seconds", () => {
   expect(formatDuration(0)).toBe("0 minutes");
 });
 
-test("floors sub-minute durations to 0 minutes", () => {
+test("rounds sub-minute seconds up", () => {
   expect(formatDuration(59)).toBe("1 minute");
 });
 
