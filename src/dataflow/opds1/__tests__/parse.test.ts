@@ -133,9 +133,67 @@ test("extracts basic book info", () => {
     }
   });
 
+  const audiobookEntry = factory.entry({
+    id: "urn:isbn:9798349165658",
+    title: "A Disorganized Death",
+    authors: [factory.contributor({ name: "Simon Brett" })],
+    contributors: [factory.contributor({ name: "Simon Brett", role: "nrt" })],
+    summary: factory.summary({
+      content:
+        "Professional declutterer Ellen Curtis doesn’t do house clearances. So when Tamara Nicklin, owner of a local gastropub, asks Ellen to clear her late father’s house, she’s not interested . . . even when Tamara admits that the real reason she wants to hire Ellen is to find his missing will."
+    }),
+    categories: [
+      factory.category({ label: "Fiction" }),
+      factory.category({ label: "Literary Fiction" }),
+      factory.category({ label: "Women Detectives" }),
+      factory.category({ scheme: "http://schema.org/audience", label: "Adult" })
+    ],
+    links: [
+      largeImageLink,
+      thumbImageLink,
+      openAccessLink,
+      borrowLink,
+      fulfillmentLink,
+      collectionLink,
+      detailLink,
+      trackOpenBookLink
+    ],
+    issued: "2026-04-07",
+    publisher: "Dreamscape Media",
+    language: "en",
+    unparsed: {
+      "dcterms:duration": [
+        {
+          _: "21611.0",
+          $ns: {
+            uri: "http://purl.org/dc/terms/",
+            local: "duration"
+          }
+        }
+      ],
+      "bibframe:distribution": [
+        {
+          $: {
+            "bibframe:ProviderName": {
+              name: "bibframe:ProviderName",
+              value: "Palace Marketplace",
+              prefix: "bibframe",
+              local: "ProviderName",
+              uri: "http://bibframe.org/vocab/"
+            }
+          },
+          $ns: {
+            uri: "http://bibframe.org/vocab/",
+            local: "distribution"
+          }
+        }
+      ]
+    }
+  });
+
   const acquisitionFeed = factory.acquisitionFeed({
     id: "some id",
-    entries: [entry],
+    entries: [entry, audiobookEntry],
     unparsed: "unparsed data",
     links: []
   });
@@ -148,6 +206,7 @@ test("extracts basic book info", () => {
   );
   expect(collection.raw).toBe("unparsed data");
 
+  /** BOOK */
   const book = collection.lanes[0].books[0];
 
   expect(book.id).toBe(entry.id);
@@ -178,6 +237,13 @@ test("extracts basic book info", () => {
   expect(book.copies).toBe(borrowLink.copies);
   expect(book.status).toBe("unsupported");
   expect(book.trackOpenBookUrl).toBe("/track-open");
+
+  /** AUDIOBOOK */
+  const audiobook = collection.lanes[0].books[1];
+  expect(audiobook.audience).toBe("Adult");
+  expect(audiobook.narrators?.length).toBe(1);
+  expect(audiobook.narrators?.[0]).toBe("Simon Brett");
+  expect(audiobook.duration).toBe("6 hours, 1 minute");
 });
 
 const basicInfo = {

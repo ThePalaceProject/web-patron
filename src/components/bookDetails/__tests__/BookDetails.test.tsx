@@ -79,6 +79,23 @@ describe("book details page", () => {
     expect(screen.queryByText("Categories:")).toBeFalsy();
   });
 
+  test("shows audience", () => {
+    mockSwr({ data: fixtures.book });
+    setup(<BookDetails />);
+    const audience = fixtures.book.audience as string;
+    expect(screen.getByText(audience)).toBeInTheDocument();
+    expect(screen.getByText("Audience:")).toBeInTheDocument();
+  });
+
+  test("shows formatted language", () => {
+    mockSwr({ data: fixtures.book });
+    setup(<BookDetails />);
+    const language = fixtures.book.language as string;
+    expect(language).toBe("en");
+    expect(screen.getByText("English")).toBeInTheDocument();
+    expect(screen.getByText("Audience:")).toBeInTheDocument();
+  });
+
   test("shows publisher", () => {
     mockSwr({ data: fixtures.book });
     setup(<BookDetails />);
@@ -94,13 +111,13 @@ describe("book details page", () => {
     const providerName = fixtures.book.providerName as string;
 
     expect(screen.getByText(providerName)).toBeInTheDocument();
-    expect(screen.getByText("Distributed by:")).toBeInTheDocument();
+    expect(screen.getByText("Distributor:")).toBeInTheDocument();
   });
 
   test("shows book format", () => {
     mockSwr({ data: fixtures.book });
     setup(<BookDetails />);
-    expect(screen.getByText("Book format:")).toBeInTheDocument();
+    expect(screen.getByText("Format:")).toBeInTheDocument();
     expect(screen.getByText("ePub")).toBeInTheDocument();
   });
 
@@ -211,6 +228,26 @@ describe("book details page", () => {
     expect(
       screen.getByLabelText(`Current location: ${fixtures.book.title}`)
     ).toBeInTheDocument();
+  });
+
+  describe("Audiobook", () => {
+    beforeEach(() => {
+      mockSwr({ data: fixtures.audiobook });
+    });
+
+    it("renders duration", () => {
+      setup(<BookDetails />);
+      const duration = fixtures.audiobook.duration as string;
+      expect(screen.getByText(duration)).toBeInTheDocument();
+      expect(screen.getByText("Duration:")).toBeInTheDocument();
+    });
+
+    it("renders narrators", () => {
+      setup(<BookDetails />);
+      const narrators = fixtures.audiobook.narrators as string[];
+      expect(screen.getByText(narrators[0])).toBeInTheDocument();
+      expect(screen.getByText("Narrators:")).toBeInTheDocument();
+    });
   });
 });
 
