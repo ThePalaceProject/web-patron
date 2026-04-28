@@ -80,8 +80,10 @@ export const book: Book = {
   imageUrl: "https://dlotdqc6pnwqb.cloudfront.net/3M/crrmnr9/cover.jpg",
   publisher: "Penguin Publishing Group",
   published: "February 29, 2016",
-  categories: ["Children", "10-12", "Fiction", "Adventure", "Fantasy"],
+  categories: ["10-12", "Fiction", "Adventure", "Fantasy"],
+  audience: "Children",
   providerName: "Overdrive",
+  language: "en",
   format: "ePub",
   raw: {
     $: { "schema:additionalType": { value: "http://schema.org/EBook" } },
@@ -126,6 +128,95 @@ export const book: Book = {
         $: {
           "bibframe:ProviderName": {
             value: "Overdrive"
+          }
+        }
+      }
+    ],
+    link: [
+      {
+        $: {
+          rel: { value: "issues" },
+          href: { value: "/report-url" }
+        }
+      },
+      {
+        $: {
+          rel: { value: "http://librarysimplified.org/terms/rel/revoke" },
+          href: { value: "http://example.com/revoke" }
+        }
+      },
+      {
+        $: {
+          rel: {
+            value: "related"
+          },
+          href: {
+            value: "/related-url"
+          }
+        }
+      },
+      {
+        "opds:indirectAcquisition": [
+          {
+            $: {
+              type: {
+                local: "type",
+                name: "type",
+                value: "application/vnd.adobe.adept+xml"
+              }
+            },
+            "opds:indirectAcquisition": [
+              {
+                $: {
+                  type: {
+                    local: "type",
+                    name: "type",
+                    value: "application/epub+zip"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+};
+
+export const audiobook: Book = {
+  id: "urn:isbn:9798349165658",
+  relatedUrl: "http://related-url",
+  trackOpenBookUrl: "/track-open-book",
+  url: "http://test-book-url",
+  title: "A Disorganized Death",
+  authors: ["Simon Brett"],
+  contributors: ["Simon Brett"],
+  summary:
+    "Professional declutterer Ellen Curtis doesn’t do house clearances. So when Tamara Nicklin, owner of a local gastropub, asks Ellen to clear her late father’s house, she’s not interested . . . even when Tamara admits that the real reason she wants to hire Ellen is to find his missing will.",
+  imageUrl: "https://dlotdqc6pnwqb.cloudfront.net/3M/crrmnr9/cover.jpg",
+  publisher: "Dreamscape Media",
+  published: "April 7, 2026",
+  categories: ["Fiction", "Literary Fiction", "Women Detectives"],
+  providerName: "Palace Marketplace",
+  format: "Audiobook",
+  duration: "6 hours, 1 minute",
+  narrators: ["Simon Brett"],
+  audience: "Adult",
+  raw: {
+    $: { "schema:additionalType": { value: "http://schema.org/Audiobook" } },
+    category: [
+      {
+        $: {
+          scheme: { value: "http://schema.org/audience" },
+          label: { value: "Adult" }
+        }
+      }
+    ],
+    "bibframe:distribution": [
+      {
+        $: {
+          "bibframe:ProviderName": {
+            value: "Palace Marketplace"
           }
         }
       }
