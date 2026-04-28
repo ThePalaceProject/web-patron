@@ -206,6 +206,8 @@ test("extracts basic book info", () => {
   );
   expect(collection.raw).toBe("unparsed data");
 
+  expect(collection.lanes[0].books.length).toBe(2);
+
   /** BOOK */
   const book = collection.lanes[0].books[0];
 
@@ -244,6 +246,9 @@ test("extracts basic book info", () => {
   expect(audiobook.narrators?.length).toBe(1);
   expect(audiobook.narrators?.[0]).toBe("Simon Brett");
   expect(audiobook.duration).toBe("6 hours, 1 minute");
+  // Audience should be removed from categories
+  expect(audiobook.categories?.length).toBe(3);
+  expect(audiobook.categories).not.toContain("Adult");
 });
 
 const basicInfo = {

@@ -248,7 +248,12 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
 
   const categories = entry.categories
     .filter(category => !!category.label)
+    .filter(category => category.scheme !== "http://schema.org/audience")
     .map(category => category.label);
+
+  const audience = entry.categories.find(
+    c => c.scheme === "http://schema.org/audience"
+  )?.label;
 
   const acquisitionLinks = entry.links.filter(isAcquisitionLink);
 
@@ -294,10 +299,6 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
   const bibframeTags = entryToBibframeData(entry);
   const providerName = getProviderName(bibframeTags);
   const duration = getDuration(entry);
-
-  const audience = entry.categories.find(
-    c => c.scheme === "http://schema.org/audience"
-  )?.label;
 
   const book: Book = {
     id: entry.id,
