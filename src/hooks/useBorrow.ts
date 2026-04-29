@@ -4,11 +4,13 @@ import useUser from "components/context/UserContext";
 import useLibraryContext from "components/context/LibraryContext";
 import useError from "hooks/useError";
 import useLogin from "auth/useLogin";
+import { useRouter } from "next/router";
 
 export default function useBorrow(isBorrow: boolean) {
+  const router = useRouter();
   const { catalogUrl } = useLibraryContext();
   const { setBook, token } = useUser();
-  const { initLogin } = useLogin();
+  const { getLoginUrl } = useLogin();
   const isUnmounted = React.useRef(false);
   const [isLoading, setLoading] = React.useState(false);
   const { error, handleError, setErrorString, clearError } = useError();
@@ -19,7 +21,9 @@ export default function useBorrow(isBorrow: boolean) {
   const borrowOrReserve = async (url: string) => {
     clearError();
     if (!token) {
-      initLogin();
+      // Use push (not initLogin's replace) so the book page is preserved in
+      // history and the back button returns here after sign-in or cancel.
+      router.push(getLoginUrl(), undefined, { shallow: true });
       setErrorString("You must be signed in to borrow this book.");
       return;
     }
