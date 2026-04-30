@@ -10,7 +10,7 @@ import {
 import BorrowOrReserve from "components/BorrowOrReserve";
 import * as fetch from "dataflow/opds1/fetch";
 import { ServerError } from "errors";
-import { mockPush } from "test-utils/mockNextRouter";
+import { mockPush, mockReplace } from "test-utils/mockNextRouter";
 
 test("shows correct button for borrowable book", async () => {
   setup(<BorrowOrReserve isBorrow url="/url" />);
@@ -84,6 +84,11 @@ test("redirects to login when not signed in", async () => {
   // doesn't call the borrow book
   expect(mockedFetchBook).not.toHaveBeenCalled();
 
+  /**
+   * To ensure browser history is properly maintained,
+   * assert that the Next.js router pushes a new entry onto the stack
+   * and does not replace (as it does for other redirections to login)
+   */
   // redirects to login
   expect(mockPush).toHaveBeenCalledWith(
     {
@@ -93,6 +98,8 @@ test("redirects to login when not signed in", async () => {
     undefined,
     { shallow: true }
   );
+
+  expect(mockReplace).not.toHaveBeenCalled();
 });
 
 test("catches and displays server errors", async () => {
