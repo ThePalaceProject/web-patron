@@ -16,6 +16,14 @@ export const mockPush = jest
 >;
 Router.push = mockPush;
 
+export const mockReplace = jest
+  .fn()
+  .mockImplementation(async () => true) as jest.MockedFunction<
+  typeof Router.replace
+>;
+
+Router.replace = mockReplace;
+
 export const MockNextRouterContextProvider: React.FC<{
   router?: Partial<NextRouter>;
   children?: React.ReactNode;
@@ -32,7 +40,7 @@ export const MockNextRouterContextProvider: React.FC<{
     // default as path is the home page
     asPath = `/${libraryData.slug}`,
     push = mockPush,
-    replace = jest.fn().mockImplementation(async () => true),
+    replace = mockReplace,
     reload = jest.fn().mockImplementation(() => null),
     back = jest.fn().mockImplementation(() => null),
     prefetch = jest.fn().mockImplementation(async () => undefined),

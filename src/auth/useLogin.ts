@@ -1,13 +1,16 @@
 import * as React from "react";
-import { useRouter } from "next/router";
+import { useRouter, type NextRouter } from "next/router";
 import { LOGIN_REDIRECT_QUERY_PARAM } from "utils/constants";
 import { UrlObject } from "url";
 import { IS_SERVER } from "utils/env";
 import useLibraryContext from "components/context/LibraryContext";
 import * as _ from "lodash";
 
+/** A navigate function — `router.push` or `router.replace` from `next/router`. */
+type Navigate = NextRouter["push"] | NextRouter["replace"];
+
 export default function useLogin() {
-  const { query, push, asPath, isReady } = useRouter();
+  const { query, replace, asPath, isReady } = useRouter();
   const { slug } = useLibraryContext();
 
   const getLoginUrl = React.useCallback(
@@ -53,14 +56,19 @@ export default function useLogin() {
   // an error can be passed in from a previous login attempt to show on
   // the login screen. It will be passed to the page as a url query param.
   const initLogin = React.useCallback(
-    (methodId?: string, error?: string, useCurrentPageAsRedirect = true) => {
+    (
+      methodId?: string,
+      error?: string,
+      useCurrentPageAsRedirect = true,
+      navigate: Navigate = replace
+    ) => {
       const urlObject = getLoginUrl(methodId, error, useCurrentPageAsRedirect);
       if (!IS_SERVER) {
         // redirect to the login page
-        push(urlObject, undefined, { shallow: true });
+        navigate(urlObject, undefined, { shallow: true });
       }
     },
-    [push, getLoginUrl]
+    [replace, getLoginUrl]
   );
 
   // the login url without any method selected

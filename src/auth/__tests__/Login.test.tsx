@@ -2,7 +2,7 @@ import { AppAuthMethod } from "interfaces";
 import * as React from "react";
 import { screen, setup, fixtures } from "test-utils";
 import Login from "../Login";
-import { mockPush } from "test-utils/mockNextRouter";
+import { mockReplace } from "test-utils/mockNextRouter";
 import { unsupportedAuthMethod } from "test-utils/fixtures";
 
 test("shows warning if there is no auth method configured", async () => {
@@ -75,8 +75,8 @@ test("redirects to /[methodId] when one method configured", () => {
     }
   });
 
-  expect(mockPush).toHaveBeenCalledTimes(1);
-  expect(mockPush).toHaveBeenCalledWith(
+  expect(mockReplace).toHaveBeenCalledTimes(1);
+  expect(mockReplace).toHaveBeenCalledWith(
     {
       pathname: "/[library]/login/[methodId]",
       query: {
@@ -99,8 +99,8 @@ test("redirects to /[methodId] and uses first supported auth method when multipl
   });
 
   // first supported auth method is client-basic-token
-  expect(mockPush).toHaveBeenCalledTimes(1);
-  expect(mockPush).toHaveBeenCalledWith(
+  expect(mockReplace).toHaveBeenCalledTimes(1);
+  expect(mockReplace).toHaveBeenCalledWith(
     {
       pathname: "/[library]/login/[methodId]",
       query: {
@@ -128,8 +128,8 @@ test("filters out unsupported method and redirects to first supported auth metho
   });
 
   // first supported auth method is client-basic-token
-  expect(mockPush).toHaveBeenCalledTimes(1);
-  expect(mockPush).toHaveBeenCalledWith(
+  expect(mockReplace).toHaveBeenCalledTimes(1);
+  expect(mockReplace).toHaveBeenCalledWith(
     {
       pathname: "/[library]/login/[methodId]",
       query: {
@@ -158,8 +158,8 @@ test("strips performSignOut from login URL query params", () => {
     }
   });
 
-  expect(mockPush).toHaveBeenCalledTimes(1);
-  const [loginUrl] = mockPush.mock.calls[0];
+  expect(mockReplace).toHaveBeenCalledTimes(1);
+  const [loginUrl] = mockReplace.mock.calls[0];
   expect((loginUrl as any).query).not.toHaveProperty("performSignOut");
 });
 
@@ -177,8 +177,8 @@ test("preserves nextUrl query param on redirection", () => {
     }
   });
 
-  expect(mockPush).toHaveBeenCalledTimes(1);
-  expect(mockPush).toHaveBeenCalledWith(
+  expect(mockReplace).toHaveBeenCalledTimes(1);
+  expect(mockReplace).toHaveBeenCalledWith(
     {
       pathname: "/[library]/login/[methodId]",
       query: {
