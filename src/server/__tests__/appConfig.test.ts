@@ -392,26 +392,59 @@ describe("config parsing", () => {
   // --- bugsnagApiKey ---
 
   describe("bugsnagApiKey", () => {
-    it("is null when absent", async () => {
+    it("is null when BUGSNAG_API_KEY env var is not set", async () => {
+      delete process.env.BUGSNAG_API_KEY;
       expect((await load(MINIMAL_YAML)).bugsnagApiKey).toBeNull();
     });
 
-    it("uses the string value of bugsnag_api_key", async () => {
-      expect((await load(`bugsnag_api_key: abc123`)).bugsnagApiKey).toBe(
-        "abc123"
-      );
+    it("reads from the BUGSNAG_API_KEY env var", async () => {
+      process.env.BUGSNAG_API_KEY = "env-key-123";
+      expect((await load(MINIMAL_YAML)).bugsnagApiKey).toBe("env-key-123");
+    });
+
+    describe("deprecation warning when bugsnag_api_key is in config file", () => {
+      test.each<[string, string | undefined, string | null]>([
+        ["env var set — uses env var", "env-key", "env-key"],
+        ["env var absent — bugsnagApiKey is null", undefined, null]
+      ])("%s", async (_label, envValue, expectedKey) => {
+        if (envValue !== undefined) {
+          process.env.BUGSNAG_API_KEY = envValue;
+        } else {
+          delete process.env.BUGSNAG_API_KEY;
+        }
+        const spy = jest.spyOn(console, "warn").mockImplementation(() => {});
+        const config = await load("bugsnag_api_key: yaml-key");
+        expect(spy).toHaveBeenCalledWith(
+          expect.stringContaining("BUGSNAG_API_KEY")
+        );
+        if (envValue === undefined) {
+          expect(spy).toHaveBeenCalledWith(
+            expect.stringContaining("Bugsnag will not be configured")
+          );
+        } else {
+          expect(spy).not.toHaveBeenCalledWith(
+            expect.stringContaining("Bugsnag will not be configured")
+          );
+        }
+        expect(config.bugsnagApiKey).toBe(expectedKey);
+        spy.mockRestore();
+      });
     });
   });
 
-  // --- gtmId ---
+  // --- gtmId (deprecated) ---
 
-  describe("gtmId", () => {
-    it("is null when absent", async () => {
-      expect((await load(MINIMAL_YAML)).gtmId).toBeNull();
+  describe("gtmId (deprecated)", () => {
+    it("does not appear in config when absent", async () => {
+      expect(await load(MINIMAL_YAML)).not.toHaveProperty("gtmId");
     });
 
-    it("uses the string value of gtmId", async () => {
-      expect((await load(`gtmId: GTM-XXXX`)).gtmId).toBe("GTM-XXXX");
+    it("logs a deprecation warning and ignores the value when gtm_id is set", async () => {
+      const spy = jest.spyOn(console, "warn").mockImplementation(() => {});
+      const config = await load("gtm_id: GTM-XXXX");
+      expect(spy).toHaveBeenCalledWith(expect.stringContaining("GTM_ID"));
+      expect(config).not.toHaveProperty("gtmId");
+      spy.mockRestore();
     });
   });
 
@@ -821,8 +854,6 @@ describe("config parsing", () => {
       "instance_name: Test Instance",
       "companion_app: openebooks",
       "show_medium: false",
-      "bugsnag_api_key: key-abc",
-      "gtm_id: GTM-TEST",
       "static_libraries:",
       "  my-lib:",
       "    auth_doc_url: https://example.com/auth",
@@ -841,8 +872,6 @@ describe("config parsing", () => {
       "instanceName: Test Instance",
       "companionApp: openebooks",
       "showMedium: false",
-      "bugsnagApiKey: key-abc",
-      "gtmId: GTM-TEST",
       "staticLibraries:",
       "  my-lib:",
       "    authDocUrl: https://example.com/auth",
@@ -863,12 +892,10 @@ describe("config parsing", () => {
     ])(
       "parses all top-level keys from %s YAML into identical config",
       async (_form, yaml) => {
-        expect(await load(yaml)).toEqual({
+        expect(await load(yaml)).toMatchObject({
           instanceName: "Test Instance",
           companionApp: "openebooks",
           showMedium: false,
-          bugsnagApiKey: "key-abc",
-          gtmId: "GTM-TEST",
           staticLibraries: {
             "my-lib": {
               title: "My Library",

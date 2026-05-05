@@ -29,7 +29,6 @@ const INCREMENTAL_URL = `${REGISTRY_URL}?order=modified`;
 function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
   return {
     instanceName: "Test",
-    gtmId: null,
     bugsnagApiKey: null,
     companionApp: "simplye",
     showMedium: true,
