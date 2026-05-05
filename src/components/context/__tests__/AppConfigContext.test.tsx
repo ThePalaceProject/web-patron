@@ -45,7 +45,6 @@ describe("useAppConfig", () => {
 
   test.each<[string, Partial<AppConfig>]>([
     ["instanceName", { instanceName: "Custom Library" }],
-    ["gtmId", { gtmId: "GTM-XXXX" }],
     ["bugsnagApiKey", { bugsnagApiKey: "abc123" }],
     ["companionApp", { companionApp: "openebooks" }],
     ["showMedium", { showMedium: false }]

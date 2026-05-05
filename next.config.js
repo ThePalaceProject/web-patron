@@ -29,6 +29,8 @@ log(`APP_VERSION: ${APP_VERSION}`);
 log(`NODE_ENV: ${NODE_ENV}`);
 log(`RELEASE_STAGE: ${RELEASE_STAGE}`);
 log(`BUILD_ID: ${BUILD_ID}`);
+log(`BUGSNAG_API_KEY: ${process.env.BUGSNAG_API_KEY ?? "(not set)"}`);
+log(`GTM_ID: ${process.env.GTM_ID ?? "(not set)"}`);
 
 const config = {
   output: "standalone",
