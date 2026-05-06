@@ -97,7 +97,6 @@ function makePagedFeed(
       links: authDocUrl
         ? [
             {
-              rel: "http://opds-spec.org/auth/document",
               type: "application/vnd.opds.authentication.v1.0+json",
               href: authDocUrl
             }
@@ -250,12 +249,12 @@ describe("fetchRegistryLibraries", () => {
       {
         id: "urn:uuid:abc",
         title: "Library A",
-        authDocUrl: "https://a.example.com/auth"
+        authDocUrl: "https://a.example.com/"
       },
       {
         id: "urn:uuid:def",
         title: "Library B",
-        authDocUrl: "https://b.example.com/auth"
+        authDocUrl: "https://b.example.com/"
       }
     ]);
     global.fetch = mockFetchSuccess(feed) as unknown as typeof fetch;
@@ -266,12 +265,12 @@ describe("fetchRegistryLibraries", () => {
       "urn:uuid:abc": {
         id: "urn:uuid:abc",
         title: "Library A",
-        authDocUrl: "https://a.example.com/auth"
+        authDocUrl: "https://a.example.com/"
       },
       "urn:uuid:def": {
         id: "urn:uuid:def",
         title: "Library B",
-        authDocUrl: "https://b.example.com/auth"
+        authDocUrl: "https://b.example.com/"
       }
     });
   });
@@ -284,7 +283,7 @@ describe("fetchRegistryLibraries", () => {
           {
             id: "urn:uuid:p1",
             title: "Page 1 Lib",
-            authDocUrl: "https://p1.example.com/auth"
+            authDocUrl: "https://p1.example.com/"
           }
         ],
         { nextHref: PAGE_2_URL }
@@ -293,7 +292,7 @@ describe("fetchRegistryLibraries", () => {
         {
           id: "urn:uuid:p2",
           title: "Page 2 Lib",
-          authDocUrl: "https://p2.example.com/auth"
+          authDocUrl: "https://p2.example.com/"
         }
       ])
     }) as unknown as typeof fetch;
@@ -311,7 +310,7 @@ describe("fetchRegistryLibraries", () => {
       {
         id: "urn:uuid:abc",
         title: "Library A",
-        authDocUrl: "https://a.example.com/auth"
+        authDocUrl: "https://a.example.com/"
       },
       { id: "urn:uuid:no-auth", title: "No Auth Library" }
     ]);
@@ -347,7 +346,7 @@ describe("fetchRegistryLibraries", () => {
           {
             id: "urn:uuid:p1",
             title: "P1",
-            authDocUrl: "https://p1.example.com/auth"
+            authDocUrl: "https://p1.example.com/"
           }
         ],
         { nextHref: PAGE_2_URL }
@@ -363,9 +362,10 @@ describe("fetchRegistryLibraries", () => {
       {
         id: "valid-library",
         title: "Valid",
-        authDocUrl: "https://v.example.com/auth"
+        authDocUrl: "https://v.example.com/"
       },
-      { id: "", title: "Empty Slug", authDocUrl: "https://b.example.com/auth" }
+      // Empty id: computeSlug falls back to "" via metadata.id, which is invalid.
+      { id: "", title: "Empty Slug", authDocUrl: "https://b.example.com/" }
     ]);
     global.fetch = mockFetchSuccess(feed) as unknown as typeof fetch;
     const warnSpy = jest
@@ -419,7 +419,7 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
         {
           id: "urn:uuid:a",
           title: "A",
-          authDocUrl: "https://a.example.com/auth",
+          authDocUrl: "https://a.example.com/",
           updated: NEW_TIMESTAMP
         }
       ],
@@ -440,13 +440,13 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
         {
           id: "urn:uuid:a",
           title: "A",
-          authDocUrl: "https://a.example.com/auth",
+          authDocUrl: "https://a.example.com/",
           updated: NEW_TIMESTAMP
         },
         {
           id: "urn:uuid:b",
           title: "B",
-          authDocUrl: "https://b.example.com/auth",
+          authDocUrl: "https://b.example.com/",
           updated: NEW_TIMESTAMP
         }
       ],
@@ -462,13 +462,13 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
         {
           id: "urn:uuid:c",
           title: "C (new)",
-          authDocUrl: "https://c.example.com/auth",
+          authDocUrl: "https://c.example.com/",
           updated: NEW_TIMESTAMP
         },
         {
           id: "urn:uuid:a",
           title: "A (old)",
-          authDocUrl: "https://a.example.com/auth",
+          authDocUrl: "https://a.example.com/",
           updated: OLD_TIMESTAMP
         }
       ],
@@ -497,13 +497,13 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
         {
           id: "urn:uuid:a",
           title: "A",
-          authDocUrl: "https://a.example.com/auth",
+          authDocUrl: "https://a.example.com/",
           updated: NEW_TIMESTAMP
         },
         {
           id: "urn:uuid:b",
           title: "B",
-          authDocUrl: "https://b.example.com/auth",
+          authDocUrl: "https://b.example.com/",
           updated: NEW_TIMESTAMP
         }
       ],
@@ -519,7 +519,7 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
         {
           id: "urn:uuid:a",
           title: "A",
-          authDocUrl: "https://a.example.com/auth",
+          authDocUrl: "https://a.example.com/",
           updated: OLD_TIMESTAMP
         }
       ],
@@ -545,13 +545,13 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
         {
           id: "urn:uuid:a",
           title: "A",
-          authDocUrl: "https://a.example.com/auth",
+          authDocUrl: "https://a.example.com/",
           updated: NEW_TIMESTAMP
         },
         {
           id: "urn:uuid:b",
           title: "B",
-          authDocUrl: "https://b.example.com/auth",
+          authDocUrl: "https://b.example.com/",
           updated: NEW_TIMESTAMP
         }
       ],
@@ -569,7 +569,7 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
         {
           id: "urn:uuid:a",
           title: "A",
-          authDocUrl: "https://a.example.com/auth",
+          authDocUrl: "https://a.example.com/",
           updated: NEW_TIMESTAMP
         }
       ],
@@ -591,7 +591,7 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
         {
           id: "urn:uuid:a",
           title: "A",
-          authDocUrl: "https://a.example.com/auth",
+          authDocUrl: "https://a.example.com/",
           updated: NEW_TIMESTAMP
         }
       ],
@@ -619,7 +619,7 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
         {
           id: "urn:uuid:a",
           title: "A",
-          authDocUrl: "https://a.example.com/auth",
+          authDocUrl: "https://a.example.com/",
           updated: NEW_TIMESTAMP
         }
       ],
@@ -639,7 +639,7 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
         {
           id: "urn:uuid:a",
           title: "A",
-          authDocUrl: "https://a.example.com/auth"
+          authDocUrl: "https://a.example.com/"
         }
       ]
       // no incrementalFacetHref
@@ -662,7 +662,7 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
         {
           id: "urn:uuid:a",
           title: "A",
-          authDocUrl: "https://a.example.com/auth",
+          authDocUrl: "https://a.example.com/",
           updated: NEW_TIMESTAMP
         }
       ],
@@ -677,13 +677,13 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
         {
           id: "urn:uuid:b",
           title: "B (no date)",
-          authDocUrl: "https://b.example.com/auth",
+          authDocUrl: "https://b.example.com/",
           updated: ""
         },
         {
           id: "urn:uuid:c",
           title: "C (new)",
-          authDocUrl: "https://c.example.com/auth",
+          authDocUrl: "https://c.example.com/",
           updated: NEW_TIMESTAMP
         }
       ],
@@ -708,7 +708,7 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
         {
           id: "urn:uuid:cached",
           title: "Cached",
-          authDocUrl: "https://cached.example.com/auth",
+          authDocUrl: "https://cached.example.com/",
           updated: NEW_TIMESTAMP
         }
       ],
@@ -732,7 +732,7 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
         {
           id: "urn:uuid:a",
           title: "A",
-          authDocUrl: "https://a.example.com/auth",
+          authDocUrl: "https://a.example.com/",
           updated: NEW_TIMESTAMP
         }
       ],
@@ -781,7 +781,7 @@ describe("getLibraries", () => {
       {
         id: "urn:uuid:reg",
         title: "Registry Lib",
-        authDocUrl: "https://r.example.com/auth"
+        authDocUrl: "https://r.example.com/"
       }
     ]);
     global.fetch = mockFetchSuccess(feed) as unknown as typeof fetch;
@@ -798,7 +798,7 @@ describe("getLibraries", () => {
       {
         id: "urn:uuid:shared",
         title: "Registry Version",
-        authDocUrl: "https://r.example.com/auth"
+        authDocUrl: "https://r.example.com/"
       }
     ]);
     global.fetch = mockFetchSuccess(feed) as unknown as typeof fetch;
@@ -822,14 +822,14 @@ describe("getLibraries", () => {
       {
         id: "urn:uuid:shared",
         title: "First Registry",
-        authDocUrl: "https://r1.example.com/auth"
+        authDocUrl: "https://r1.example.com/"
       }
     ]);
     const feed2 = makePagedFeed([
       {
         id: "urn:uuid:shared",
         title: "Second Registry",
-        authDocUrl: "https://r2.example.com/auth"
+        authDocUrl: "https://r2.example.com/"
       }
     ]);
 
@@ -862,7 +862,7 @@ describe("getLibraries", () => {
 
   it("does not re-fetch before min interval has elapsed", async () => {
     const feed = makePagedFeed([
-      { id: "urn:uuid:a", title: "A", authDocUrl: "https://a.example.com/auth" }
+      { id: "urn:uuid:a", title: "A", authDocUrl: "https://a.example.com/" }
     ]);
     const fetchMock = mockFetchSuccess(feed);
     global.fetch = fetchMock as unknown as typeof fetch;
@@ -910,7 +910,7 @@ describe("concurrent first-fetch coalescing", () => {
       {
         id: "urn:uuid:abc",
         title: "Library A",
-        authDocUrl: "https://a.example.com/auth"
+        authDocUrl: "https://a.example.com/"
       }
     ]);
 
@@ -1018,7 +1018,7 @@ describe("fetch timeout", () => {
   it("clears the timeout after a successful fetch (no timer leak)", async () => {
     jest.useFakeTimers();
     const feed = makePagedFeed([
-      { id: "urn:uuid:a", title: "A", authDocUrl: "https://a.example.com/auth" }
+      { id: "urn:uuid:a", title: "A", authDocUrl: "https://a.example.com/" }
     ]);
     global.fetch = mockFetchSuccess(feed) as unknown as typeof fetch;
 
@@ -1061,7 +1061,7 @@ describe("fetch timeout", () => {
                   {
                     id: "urn:uuid:p1",
                     title: "P1",
-                    authDocUrl: "https://p1.example.com/auth"
+                    authDocUrl: "https://p1.example.com/"
                   }
                 ],
                 { nextHref: PAGE_2_URL }
@@ -1070,7 +1070,7 @@ describe("fetch timeout", () => {
                 {
                   id: "urn:uuid:p2",
                   title: "P2",
-                  authDocUrl: "https://p2.example.com/auth"
+                  authDocUrl: "https://p2.example.com/"
                 }
               ]);
         return Promise.resolve({
