@@ -5,7 +5,6 @@ describe("FALLBACK_APP_CONFIG", () => {
     ["instanceName", ""],
     ["companionApp", "simplye"],
     ["showMedium", true],
-    ["gtmId", null],
     ["bugsnagApiKey", null],
     ["openebooks", null]
   ])("%s defaults to %p", (field, expected) => {

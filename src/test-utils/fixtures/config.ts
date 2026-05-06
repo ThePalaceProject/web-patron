@@ -2,7 +2,6 @@ import { AppConfig } from "interfaces";
 
 export const config: AppConfig = {
   instanceName: "Test Instance",
-  gtmId: null,
   bugsnagApiKey: null,
   companionApp: "simplye",
   showMedium: true,

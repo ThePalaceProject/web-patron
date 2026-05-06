@@ -49,11 +49,11 @@ media_support:
 # default is "simplye"
 companion_app: simplye
 
-# BUGSNAG: defines the bugsnag api key to integrate error tracking
-# bugsnag_api_key: xxx
+# BUGSNAG: set the BUGSNAG_API_KEY environment variable to integrate error tracking.
+# (Setting bugsnag_api_key in this file is deprecated and will be ignored.)
 
-# GOOGLE TAG MANAGER: defines the google tag manager id to integrate web analytics
-# gtm_id: xxx
+# GOOGLE TAG MANAGER: set the GTM_ID environment variable to integrate web analytics.
+# (Setting gtm_id in this file is deprecated and will be ignored.)
 
 # There are also some environment variables that can be set in the .env.local
 # file. They are set there because they're for development, not production

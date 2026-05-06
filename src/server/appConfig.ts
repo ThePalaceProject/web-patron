@@ -36,8 +36,6 @@ const RawConfigSchema = type({
   "instanceName?": "unknown",
   "companionApp?": "string",
   "showMedium?": "boolean",
-  "bugsnagApiKey?": "string",
-  "gtmId?": "string",
   "registries?": RegistryEntrySchema.array(),
   "libraries?": "string | Record<string, unknown>",
   "staticLibraries?": "Record<string, unknown>",
@@ -150,6 +148,25 @@ function parseYaml(input: Record<string, unknown>): AppConfig {
     "staticLibraries",
     "mediaSupport"
   ]);
+
+  if ("bugsnagApiKey" in normalized) {
+    const envIsSet = Boolean(process.env.BUGSNAG_API_KEY);
+    console.warn(
+      "CONFIG_FILE: 'bugsnag_api_key' / 'bugsnagApiKey' is deprecated. " +
+        "Set the BUGSNAG_API_KEY environment variable instead. " +
+        "The value in the config file is ignored." +
+        (envIsSet
+          ? ""
+          : " BUGSNAG_API_KEY is not set — Bugsnag will not be configured.")
+    );
+  }
+  if ("gtmId" in normalized) {
+    console.warn(
+      "CONFIG_FILE: 'gtm_id' / 'gtmId' is deprecated. " +
+        "Set the GTM_ID environment variable instead. " +
+        "The value in the config file is ignored."
+    );
+  }
   if (Array.isArray(normalized.registries)) {
     normalized.registries = normalized.registries.map(r =>
       r !== null && typeof r === "object" && !Array.isArray(r)
@@ -275,8 +292,7 @@ function parseYaml(input: Record<string, unknown>): AppConfig {
     registries,
     staticLibraries,
     mediaSupport: (result.mediaSupport as MediaSupportConfig) ?? {},
-    bugsnagApiKey: result.bugsnagApiKey ?? null,
-    gtmId: result.gtmId ?? null,
+    bugsnagApiKey: process.env.BUGSNAG_API_KEY ?? null,
     companionApp,
     showMedium,
     openebooks

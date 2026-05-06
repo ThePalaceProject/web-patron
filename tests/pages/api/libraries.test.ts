@@ -37,7 +37,6 @@ const mockGetAppConfig = getAppConfig as jest.MockedFunction<
 
 const VALID_APP_CONFIG: AppConfig = {
   instanceName: "Test",
-  gtmId: null,
   bugsnagApiKey: null,
   companionApp: "simplye",
   showMedium: true,
