@@ -56,6 +56,7 @@ const CleverAuthHandler: React.FC<{ method: OPDS1.CleverAuthMethod }> = ({
 
     if (hasRedirectFlag && !hasCancelFlag) {
       // First return from Clever without completing auth.
+      sessionStorage.removeItem(CLEVER_REDIRECT_FLAG);
       sessionStorage.setItem(CLEVER_CANCEL_FLAG, "1");
       setCancelDetected(true);
       return;
@@ -71,15 +72,45 @@ const CleverAuthHandler: React.FC<{ method: OPDS1.CleverAuthMethod }> = ({
 
     if (!cancelDetected) {
       sessionStorage.setItem(CLEVER_REDIRECT_FLAG, "1");
+
+      /*
+       * Safari restores pages from bfcache on browser-back without re-running
+       * React effects. Listen for pageshow so we can detect this case and show
+       * cancel UI instead of leaving the spinner running indefinitely.
+       */
+      const handlePageShow = (event: PageTransitionEvent) => {
+        if (
+          event.persisted &&
+          !!sessionStorage.getItem(CLEVER_REDIRECT_FLAG) &&
+          !sessionStorage.getItem(CLEVER_CANCEL_FLAG)
+        ) {
+          sessionStorage.removeItem(CLEVER_REDIRECT_FLAG);
+          sessionStorage.setItem(CLEVER_CANCEL_FLAG, "1");
+          setCancelDetected(true);
+        }
+      };
+      window.addEventListener("pageshow", handlePageShow);
+
       window.location.href = authUrl;
-      // Cleanup runs on normal React unmount (e.g. client-side nav away).
-      // Hard navigation via window.location.href bypasses this, so the flag
-      // persists for the browser-back case.
+
       return () => {
         sessionStorage.removeItem(CLEVER_REDIRECT_FLAG);
+        window.removeEventListener("pageshow", handlePageShow);
       };
     }
   }, [token, authUrl, cancelDetected]);
+
+  const handleTryAgain = () => {
+    sessionStorage.removeItem(CLEVER_REDIRECT_FLAG);
+    sessionStorage.removeItem(CLEVER_CANCEL_FLAG);
+    setCancelDetected(false);
+  };
+
+  const handleCancel = () => {
+    sessionStorage.removeItem(CLEVER_REDIRECT_FLAG);
+    sessionStorage.removeItem(CLEVER_CANCEL_FLAG);
+    setCancelDetected(true);
+  };
 
   if (cancelDetected) {
     return (
@@ -94,23 +125,18 @@ const CleverAuthHandler: React.FC<{ method: OPDS1.CleverAuthMethod }> = ({
         }}
       >
         <Text sx={{ fontSize: 2 }}>Login was cancelled.</Text>
-        <Button
-          onClick={() => {
-            sessionStorage.removeItem(CLEVER_REDIRECT_FLAG);
-            sessionStorage.removeItem(CLEVER_CANCEL_FLAG);
-            setCancelDetected(false);
-          }}
-        >
-          Try Again
-        </Button>
+        <Button onClick={handleTryAgain}>Try Again</Button>
       </Stack>
     );
   }
 
   return (
-    <Stack direction="column" sx={{ alignItems: "center" }}>
-      <LoadingIndicator />
-      Logging in with Clever...
+    <Stack direction="column" sx={{ alignItems: "center", gap: 3 }}>
+      <Stack direction="column" sx={{ alignItems: "center" }}>
+        <LoadingIndicator />
+        Logging in with Clever...
+      </Stack>
+      <Button onClick={handleCancel}>Cancel</Button>
     </Stack>
   );
 };

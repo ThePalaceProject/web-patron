@@ -50,6 +50,7 @@ const OidcAuthHandler: React.FC<{ method: ClientOidcMethod }> = ({
 
     if (hasRedirectFlag && !hasCancelFlag && !loginError) {
       // First return from OIDC provider without completing auth.
+      sessionStorage.removeItem(redirectFlagKey);
       sessionStorage.setItem(cancelFlagKey, "1");
       setCancelDetected(true);
       return;
@@ -65,12 +66,30 @@ const OidcAuthHandler: React.FC<{ method: ClientOidcMethod }> = ({
 
     if (urlWithRedirect && !loginError && !cancelDetected) {
       sessionStorage.setItem(redirectFlagKey, "1");
+
+      /*
+       * Safari restores pages from bfcache on browser-back without re-running
+       * React effects. Listen for pageshow so we can detect this case and show
+       * cancel UI instead of leaving the spinner running indefinitely.
+       */
+      const handlePageShow = (event: PageTransitionEvent) => {
+        if (
+          event.persisted &&
+          !!sessionStorage.getItem(redirectFlagKey) &&
+          !sessionStorage.getItem(cancelFlagKey)
+        ) {
+          sessionStorage.removeItem(redirectFlagKey);
+          sessionStorage.setItem(cancelFlagKey, "1");
+          setCancelDetected(true);
+        }
+      };
+      window.addEventListener("pageshow", handlePageShow);
+
       window.location.href = urlWithRedirect;
-      // Cleanup runs on normal React unmount (e.g. client-side nav away).
-      // Hard navigation via window.location.href bypasses this, so the flag
-      // persists for the browser-back case.
+
       return () => {
         sessionStorage.removeItem(redirectFlagKey);
+        window.removeEventListener("pageshow", handlePageShow);
       };
     }
   }, [
@@ -94,6 +113,12 @@ const OidcAuthHandler: React.FC<{ method: ClientOidcMethod }> = ({
         { shallow: true }
       );
     }
+  };
+
+  const handleCancel = () => {
+    sessionStorage.removeItem(redirectFlagKey);
+    sessionStorage.removeItem(cancelFlagKey);
+    setCancelDetected(true);
   };
 
   // Display error if present
@@ -137,9 +162,12 @@ const OidcAuthHandler: React.FC<{ method: ClientOidcMethod }> = ({
 
   // Show loading state while redirecting
   return (
-    <Stack direction="column" sx={{ alignItems: "center" }}>
-      <LoadingIndicator />
-      Logging in with {method.description}...
+    <Stack direction="column" sx={{ alignItems: "center", gap: 3 }}>
+      <Stack direction="column" sx={{ alignItems: "center" }}>
+        <LoadingIndicator />
+        Logging in with {method.description}...
+      </Stack>
+      <Button onClick={handleCancel}>Cancel</Button>
     </Stack>
   );
 };

@@ -1,5 +1,6 @@
 import ApplicationError from "errors";
 import * as React from "react";
+import { act } from "@testing-library/react";
 import { fixtures, screen, setup, waitFor } from "test-utils";
 import CleverAuthHandler from "../CleverAuthHandler";
 
@@ -112,4 +113,46 @@ test("proceeds with redirect when navigating back to sign in after cancel", asyn
   await waitFor(() => {
     expect(window.location.href).toContain("oauth_authenticate");
   });
+});
+
+test("shows cancel UI when Safari restores page from bfcache after redirect", async () => {
+  const utils = setup(
+    <CleverAuthHandler method={fixtures.cleverAuthMethod} />,
+    { user: { token: undefined } }
+  );
+
+  // Wait for the effect to run and set the redirect flag.
+  await waitFor(() => {
+    expect(sessionStorage.getItem("cpw-clever-redirect")).toBe("1");
+  });
+
+  // Simulate Safari restoring this page from bfcache.
+  act(() => {
+    const event = new Event("pageshow");
+    Object.defineProperty(event, "persisted", { value: true });
+    window.dispatchEvent(event);
+  });
+
+  await waitFor(() => {
+    expect(utils.getByText("Login was cancelled.")).toBeInTheDocument();
+  });
+  expect(utils.getByRole("button", { name: "Try Again" })).toBeInTheDocument();
+});
+
+test('clicking "Cancel" while redirecting shows cancel UI', async () => {
+  const utils = setup(
+    <CleverAuthHandler method={fixtures.cleverAuthMethod} />,
+    { user: { token: undefined } }
+  );
+
+  await waitFor(() => {
+    expect(utils.getByRole("button", { name: "Cancel" })).toBeInTheDocument();
+  });
+
+  await utils.user.click(utils.getByRole("button", { name: "Cancel" }));
+
+  await waitFor(() => {
+    expect(utils.getByText("Login was cancelled.")).toBeInTheDocument();
+  });
+  expect(utils.getByRole("button", { name: "Try Again" })).toBeInTheDocument();
 });
