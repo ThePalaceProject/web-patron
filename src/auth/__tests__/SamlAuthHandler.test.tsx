@@ -4,6 +4,9 @@ import SamlAuthHandler from "../SamlAuthHandler";
 
 // we import the unwrapped render here because we don't need the context providers
 
+const samlRedirectKey = `cpw-saml-redirect-${fixtures.clientSamlMethod.id}`;
+const samlCancelKey = `cpw-saml-cancelled-${fixtures.clientSamlMethod.id}`;
+
 test("shows loader while redirecting", () => {
   const utils = render(<SamlAuthHandler method={fixtures.clientSamlMethod} />);
   expect(utils.getByText("Logging in with SAML IdP 0...")).toBeInTheDocument();
@@ -14,6 +17,7 @@ beforeEach(() => {
   const location = new URL("http://test-domain.com");
   delete (window as any).location;
   (window as any).location = location;
+  sessionStorage.clear();
 });
 
 test("redirects to proper auth url", async () => {
@@ -95,5 +99,64 @@ test('clicking "Try Again" clears error and attempts SAML redirect', async () =>
       undefined,
       { shallow: true }
     );
+  });
+});
+
+test("shows cancel UI when user returns after pressing back from SAML IdP", async () => {
+  sessionStorage.setItem(samlRedirectKey, "1");
+
+  const utils = render(<SamlAuthHandler method={fixtures.clientSamlMethod} />, {
+    user: { token: undefined }
+  });
+
+  await waitFor(() => {
+    expect(utils.getByText("Login was cancelled.")).toBeInTheDocument();
+  });
+  expect(utils.getByRole("button", { name: "Try Again" })).toBeInTheDocument();
+});
+
+test("does not redirect to SAML IdP when cancel is detected", async () => {
+  sessionStorage.setItem(samlRedirectKey, "1");
+
+  render(<SamlAuthHandler method={fixtures.clientSamlMethod} />, {
+    user: { token: undefined }
+  });
+
+  // Give effects time to run; href should remain unchanged.
+  await waitFor(() => {
+    expect(window.location.href).toBe("http://test-domain.com/");
+  });
+});
+
+test('clicking "Try Again" after cancel clears flags and redirects', async () => {
+  sessionStorage.setItem(samlRedirectKey, "1");
+
+  const utils = render(<SamlAuthHandler method={fixtures.clientSamlMethod} />, {
+    user: { token: undefined }
+  });
+
+  await waitFor(() => {
+    expect(utils.getByText("Login was cancelled.")).toBeInTheDocument();
+  });
+
+  utils.getByRole("button", { name: "Try Again" }).click();
+
+  await waitFor(() => {
+    expect(window.location.href).toContain("saml-auth.com");
+  });
+});
+
+test("proceeds with redirect when navigating back to sign in after cancel", async () => {
+  // Simulates the user seeing cancel UI and then clicking "Sign In" in the header,
+  // which causes the handler to remount with both flags already set.
+  sessionStorage.setItem(samlRedirectKey, "1");
+  sessionStorage.setItem(samlCancelKey, "1");
+
+  render(<SamlAuthHandler method={fixtures.clientSamlMethod} />, {
+    user: { token: undefined }
+  });
+
+  await waitFor(() => {
+    expect(window.location.href).toContain("saml-auth.com");
   });
 });

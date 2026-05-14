@@ -13,6 +13,7 @@ beforeEach(() => {
   const location = new URL("http://test-domain.com");
   delete (window as any).location;
   (window as any).location = location;
+  sessionStorage.clear();
 });
 
 test("redirects to proper auth url", async () => {
@@ -46,4 +47,69 @@ test("throws error if there is no authenticate link in library data", async () =
       )
     ).toThrowError(ApplicationError);
   }
+});
+
+test("shows cancel UI when user returns after pressing back from Clever", async () => {
+  sessionStorage.setItem("cpw-clever-redirect", "1");
+
+  const utils = setup(
+    <CleverAuthHandler method={fixtures.cleverAuthMethod} />,
+    {
+      user: { token: undefined }
+    }
+  );
+
+  await waitFor(() => {
+    expect(utils.getByText("Login was cancelled.")).toBeInTheDocument();
+  });
+  expect(utils.getByRole("button", { name: "Try Again" })).toBeInTheDocument();
+});
+
+test("does not redirect to Clever when cancel is detected", async () => {
+  sessionStorage.setItem("cpw-clever-redirect", "1");
+
+  setup(<CleverAuthHandler method={fixtures.cleverAuthMethod} />, {
+    user: { token: undefined }
+  });
+
+  // Give effects time to run; href should remain unchanged.
+  await waitFor(() => {
+    expect(window.location.href).toBe("http://test-domain.com/");
+  });
+});
+
+test('clicking "Try Again" after Clever cancel clears flags and redirects', async () => {
+  sessionStorage.setItem("cpw-clever-redirect", "1");
+
+  const utils = setup(
+    <CleverAuthHandler method={fixtures.cleverAuthMethod} />,
+    {
+      user: { token: undefined }
+    }
+  );
+
+  await waitFor(() => {
+    expect(utils.getByText("Login was cancelled.")).toBeInTheDocument();
+  });
+
+  await utils.user.click(utils.getByRole("button", { name: "Try Again" }));
+
+  await waitFor(() => {
+    expect(window.location.href).toContain("oauth_authenticate");
+  });
+});
+
+test("proceeds with redirect when navigating back to sign in after cancel", async () => {
+  // Simulates the user seeing cancel UI and then clicking "Sign In" in the header,
+  // which causes the handler to remount with both flags already set.
+  sessionStorage.setItem("cpw-clever-redirect", "1");
+  sessionStorage.setItem("cpw-clever-cancelled", "1");
+
+  setup(<CleverAuthHandler method={fixtures.cleverAuthMethod} />, {
+    user: { token: undefined }
+  });
+
+  await waitFor(() => {
+    expect(window.location.href).toContain("oauth_authenticate");
+  });
 });

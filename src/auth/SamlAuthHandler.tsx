@@ -17,7 +17,7 @@ import { Text } from "components/Text";
 const SamlAuthHandler: React.FC<{ method: ClientSamlMethod }> = ({
   method
 }) => {
-  const { token, signOut } = useUser();
+  const { token } = useUser();
   const { fullSuccessUrl } = useLoginRedirectUrl();
   const router = useRouter();
 
@@ -28,12 +28,73 @@ const SamlAuthHandler: React.FC<{ method: ClientSamlMethod }> = ({
     fullSuccessUrl
   )}`;
 
+  // Two sessionStorage flags track redirect state across hard page navigations.
+  // redirectFlagKey: set before leaving for the SAML IdP.
+  // cancelFlagKey: set when the user returns without completing auth.
+  // When only the redirect flag is set, we show cancel UI and set the cancel flag.
+  // When both are set, the user is intentionally navigating back to sign in,
+  // so we clear both and proceed with a new redirect.
+  const redirectFlagKey = `cpw-saml-redirect-${method.id}`;
+  const cancelFlagKey = `cpw-saml-cancelled-${method.id}`;
+  const [cancelDetected, setCancelDetected] = React.useState(false);
+
   React.useEffect(() => {
-    // Redirect to SAML provider if not already signed in and no current error.
-    if (!token && urlWithRedirect && !loginError) {
-      window.location.href = urlWithRedirect;
+    if (token) {
+      sessionStorage.removeItem(redirectFlagKey);
+      sessionStorage.removeItem(cancelFlagKey);
+      return;
     }
-  }, [token, signOut, urlWithRedirect, loginError]);
+
+    const hasRedirectFlag = !!sessionStorage.getItem(redirectFlagKey);
+    const hasCancelFlag = !!sessionStorage.getItem(cancelFlagKey);
+
+    if (hasRedirectFlag && !hasCancelFlag && !loginError) {
+      // First return from SAML IdP without completing auth.
+      sessionStorage.setItem(cancelFlagKey, "1");
+      setCancelDetected(true);
+      return;
+    }
+
+    if (hasRedirectFlag && hasCancelFlag && !cancelDetected) {
+      // User already saw the cancel screen and is intentionally navigating
+      // back to sign in (e.g. clicked Sign In in the header). Clear both
+      // flags and fall through to redirect.
+      sessionStorage.removeItem(redirectFlagKey);
+      sessionStorage.removeItem(cancelFlagKey);
+    }
+
+    if (urlWithRedirect && !loginError && !cancelDetected) {
+      sessionStorage.setItem(redirectFlagKey, "1");
+      window.location.href = urlWithRedirect;
+      // Cleanup runs on normal React unmount (e.g. client-side nav away).
+      // Hard navigation via window.location.href bypasses this, so the flag
+      // persists for the browser-back case.
+      return () => {
+        sessionStorage.removeItem(redirectFlagKey);
+      };
+    }
+  }, [
+    token,
+    urlWithRedirect,
+    loginError,
+    cancelDetected,
+    redirectFlagKey,
+    cancelFlagKey
+  ]);
+
+  const handleTryAgain = () => {
+    sessionStorage.removeItem(redirectFlagKey);
+    sessionStorage.removeItem(cancelFlagKey);
+    setCancelDetected(false);
+    if (loginError) {
+      const { loginError: _, ...restQuery } = router.query;
+      router.replace(
+        { pathname: router.pathname, query: restQuery },
+        undefined,
+        { shallow: true }
+      );
+    }
+  };
 
   // Display error if present
   if (loginError) {
@@ -50,19 +111,26 @@ const SamlAuthHandler: React.FC<{ method: ClientSamlMethod }> = ({
         }}
       >
         <Text sx={{ color: "ui.error", fontSize: 2 }}>{loginError}</Text>
-        <Button
-          onClick={() => {
-            // Clear error and retry by removing loginError from URL
-            const { loginError: _, ...restQuery } = router.query;
-            router.replace(
-              { pathname: router.pathname, query: restQuery },
-              undefined,
-              { shallow: true }
-            );
-          }}
-        >
-          Try Again
-        </Button>
+        <Button onClick={handleTryAgain}>Try Again</Button>
+      </Stack>
+    );
+  }
+
+  // Display cancel UI if the user returned without completing auth.
+  if (cancelDetected) {
+    return (
+      <Stack
+        direction="column"
+        sx={{
+          alignItems: "center",
+          gap: 3,
+          maxWidth: 500,
+          margin: "0 auto",
+          textAlign: "center"
+        }}
+      >
+        <Text sx={{ fontSize: 2 }}>Login was cancelled.</Text>
+        <Button onClick={handleTryAgain}>Try Again</Button>
       </Stack>
     );
   }
