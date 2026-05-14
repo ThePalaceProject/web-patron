@@ -1,12 +1,15 @@
 import * as React from "react";
 import { act } from "@testing-library/react";
-import { fixtures, render, waitFor } from "test-utils";
-import OidcAuthHandler from "../OidcAuthHandler";
+import { fixtures, render, setup, waitFor } from "test-utils";
+import OidcAuthHandler, {
+  oidcRedirectFlag,
+  oidcCancelFlag
+} from "../OidcAuthHandler";
 
 // we import the unwrapped render here because we don't need the context providers
 
-const oidcRedirectKey = `cpw-oidc-redirect-${fixtures.clientOidcMethod.id}`;
-const oidcCancelKey = `cpw-oidc-cancelled-${fixtures.clientOidcMethod.id}`;
+const oidcRedirectKey = oidcRedirectFlag(fixtures.clientOidcMethod.id);
+const oidcCancelKey = oidcCancelFlag(fixtures.clientOidcMethod.id);
 
 test("shows loader while redirecting", () => {
   const utils = render(<OidcAuthHandler method={fixtures.clientOidcMethod} />);
@@ -78,7 +81,7 @@ test("does not redirect to OIDC provider when error is present", () => {
 
 test('clicking "Try Again" clears error and attempts OIDC redirect', async () => {
   const mockReplace = jest.fn();
-  const utils = render(<OidcAuthHandler method={fixtures.clientOidcMethod} />, {
+  const utils = setup(<OidcAuthHandler method={fixtures.clientOidcMethod} />, {
     router: {
       query: {
         loginError: "Authentication failed",
@@ -90,8 +93,7 @@ test('clicking "Try Again" clears error and attempts OIDC redirect', async () =>
     user: { token: undefined }
   });
 
-  const tryAgainButton = utils.getByRole("button", { name: "Try Again" });
-  tryAgainButton.click();
+  await utils.user.click(utils.getByRole("button", { name: "Try Again" }));
 
   await waitFor(() => {
     expect(mockReplace).toHaveBeenCalledWith(
@@ -134,7 +136,7 @@ test("does not redirect to OIDC provider when cancel is detected", async () => {
 test('clicking "Try Again" after cancel clears flags and redirects', async () => {
   sessionStorage.setItem(oidcRedirectKey, "1");
 
-  const utils = render(<OidcAuthHandler method={fixtures.clientOidcMethod} />, {
+  const utils = setup(<OidcAuthHandler method={fixtures.clientOidcMethod} />, {
     user: { token: undefined }
   });
 
@@ -142,7 +144,7 @@ test('clicking "Try Again" after cancel clears flags and redirects', async () =>
     expect(utils.getByText("Login was cancelled.")).toBeInTheDocument();
   });
 
-  utils.getByRole("button", { name: "Try Again" }).click();
+  await utils.user.click(utils.getByRole("button", { name: "Try Again" }));
 
   await waitFor(() => {
     expect(window.location.href).toContain("oidc-auth.com");
@@ -188,7 +190,7 @@ test("shows cancel UI when Safari restores page from bfcache after redirect", as
 });
 
 test('clicking "Cancel" while redirecting shows cancel UI', async () => {
-  const utils = render(<OidcAuthHandler method={fixtures.clientOidcMethod} />, {
+  const utils = setup(<OidcAuthHandler method={fixtures.clientOidcMethod} />, {
     user: { token: undefined }
   });
 
@@ -196,7 +198,7 @@ test('clicking "Cancel" while redirecting shows cancel UI', async () => {
     expect(utils.getByRole("button", { name: "Cancel" })).toBeInTheDocument();
   });
 
-  utils.getByRole("button", { name: "Cancel" }).click();
+  await utils.user.click(utils.getByRole("button", { name: "Cancel" }));
 
   await waitFor(() => {
     expect(utils.getByText("Login was cancelled.")).toBeInTheDocument();

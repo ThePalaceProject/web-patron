@@ -1,12 +1,15 @@
 import * as React from "react";
 import { act } from "@testing-library/react";
-import { fixtures, render, waitFor } from "test-utils";
-import SamlAuthHandler from "../SamlAuthHandler";
+import { fixtures, render, setup, waitFor } from "test-utils";
+import SamlAuthHandler, {
+  samlRedirectFlag,
+  samlCancelFlag
+} from "../SamlAuthHandler";
 
 // we import the unwrapped render here because we don't need the context providers
 
-const samlRedirectKey = `cpw-saml-redirect-${fixtures.clientSamlMethod.id}`;
-const samlCancelKey = `cpw-saml-cancelled-${fixtures.clientSamlMethod.id}`;
+const samlRedirectKey = samlRedirectFlag(fixtures.clientSamlMethod.id);
+const samlCancelKey = samlCancelFlag(fixtures.clientSamlMethod.id);
 
 test("shows loader while redirecting", () => {
   const utils = render(<SamlAuthHandler method={fixtures.clientSamlMethod} />);
@@ -76,7 +79,7 @@ test("does not redirect to SAML IdP when error is present", () => {
 
 test('clicking "Try Again" clears error and attempts SAML redirect', async () => {
   const mockReplace = jest.fn();
-  const utils = render(<SamlAuthHandler method={fixtures.clientSamlMethod} />, {
+  const utils = setup(<SamlAuthHandler method={fixtures.clientSamlMethod} />, {
     router: {
       query: {
         loginError: "Authentication failed",
@@ -88,8 +91,7 @@ test('clicking "Try Again" clears error and attempts SAML redirect', async () =>
     user: { token: undefined }
   });
 
-  const tryAgainButton = utils.getByRole("button", { name: "Try Again" });
-  tryAgainButton.click();
+  await utils.user.click(utils.getByRole("button", { name: "Try Again" }));
 
   await waitFor(() => {
     expect(mockReplace).toHaveBeenCalledWith(
@@ -132,7 +134,7 @@ test("does not redirect to SAML IdP when cancel is detected", async () => {
 test('clicking "Try Again" after cancel clears flags and redirects', async () => {
   sessionStorage.setItem(samlRedirectKey, "1");
 
-  const utils = render(<SamlAuthHandler method={fixtures.clientSamlMethod} />, {
+  const utils = setup(<SamlAuthHandler method={fixtures.clientSamlMethod} />, {
     user: { token: undefined }
   });
 
@@ -140,7 +142,7 @@ test('clicking "Try Again" after cancel clears flags and redirects', async () =>
     expect(utils.getByText("Login was cancelled.")).toBeInTheDocument();
   });
 
-  utils.getByRole("button", { name: "Try Again" }).click();
+  await utils.user.click(utils.getByRole("button", { name: "Try Again" }));
 
   await waitFor(() => {
     expect(window.location.href).toContain("saml-auth.com");
@@ -186,7 +188,7 @@ test("shows cancel UI when Safari restores page from bfcache after redirect", as
 });
 
 test('clicking "Cancel" while redirecting shows cancel UI', async () => {
-  const utils = render(<SamlAuthHandler method={fixtures.clientSamlMethod} />, {
+  const utils = setup(<SamlAuthHandler method={fixtures.clientSamlMethod} />, {
     user: { token: undefined }
   });
 
@@ -194,7 +196,7 @@ test('clicking "Cancel" while redirecting shows cancel UI', async () => {
     expect(utils.getByRole("button", { name: "Cancel" })).toBeInTheDocument();
   });
 
-  utils.getByRole("button", { name: "Cancel" }).click();
+  await utils.user.click(utils.getByRole("button", { name: "Cancel" }));
 
   await waitFor(() => {
     expect(utils.getByText("Login was cancelled.")).toBeInTheDocument();
