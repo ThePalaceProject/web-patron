@@ -1,6 +1,7 @@
 import useLogin from "auth/useLogin";
 import useUser from "components/context/UserContext";
 import { PageLoader } from "components/LoadingIndicator";
+import { useRouter } from "next/router";
 import React from "react";
 
 /**
@@ -14,12 +15,18 @@ interface Props {
 const AuthProtectedRoute = ({ children }: Props) => {
   const { isLoading, isAuthenticated, token, error } = useUser();
   const { initLogin } = useLogin();
+  const { query } = useRouter();
+
+  // An 'error' query param indicates the IdP redirected back with a failure.
+  // Passing it as loginError prevents the auth handler from immediately
+  // re-redirecting to the IdP, breaking an otherwise infinite loop.
+  const idpError = typeof query.error === "string" ? query.error : undefined;
 
   React.useEffect(() => {
     if ((!token || error) && !isLoading) {
-      initLogin();
+      initLogin(undefined, idpError);
     }
-  }, [initLogin, token, error, isLoading]);
+  }, [initLogin, token, error, isLoading, idpError]);
 
   if (isAuthenticated) {
     return <>{children}</>;

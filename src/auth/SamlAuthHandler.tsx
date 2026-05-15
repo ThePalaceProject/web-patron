@@ -8,7 +8,11 @@ import useLoginRedirectUrl from "auth/useLoginRedirect";
 import { clientOnly } from "components/ClientOnly";
 import extractParam from "dataflow/utils";
 import Button from "components/Button";
-import { Text } from "components/Text";
+import { useRedirectCancelDetection } from "auth/useRedirectCancelDetection";
+import { AuthFeedbackPanel } from "auth/AuthFeedbackPanel";
+
+export const samlRedirectFlag = (id: string) => `cpw-saml-redirect-${id}`;
+export const samlCancelFlag = (id: string) => `cpw-saml-cancelled-${id}`;
 
 /**
  * The SAML Auth handler sends you off to an external website to complete
@@ -17,61 +21,46 @@ import { Text } from "components/Text";
 const SamlAuthHandler: React.FC<{ method: ClientSamlMethod }> = ({
   method
 }) => {
-  const { token, signOut } = useUser();
+  const { token } = useUser();
   const { fullSuccessUrl } = useLoginRedirectUrl();
   const router = useRouter();
-
-  // Extract login error from query params, if present.
   const loginError = extractParam(router.query, "loginError");
 
-  const urlWithRedirect = `${method.href}&redirect_uri=${encodeURIComponent(
-    fullSuccessUrl
-  )}`;
+  const authUrl = `${method.href}&redirect_uri=${encodeURIComponent(fullSuccessUrl)}`;
 
-  React.useEffect(() => {
-    // Redirect to SAML provider if not already signed in and no current error.
-    if (!token && urlWithRedirect && !loginError) {
-      window.location.href = urlWithRedirect;
-    }
-  }, [token, signOut, urlWithRedirect, loginError]);
+  const { cancelDetected, handleTryAgain, handleCancel } =
+    useRedirectCancelDetection({
+      authUrl,
+      redirectFlagKey: samlRedirectFlag(method.id),
+      cancelFlagKey: samlCancelFlag(method.id),
+      loginError,
+      token
+    });
 
-  // Display error if present
   if (loginError) {
     return (
-      <Stack
-        direction="column"
-        sx={{
-          alignItems: "center",
-          gap: 3,
-          maxWidth: 500,
-          margin: "0 auto",
-          textAlign: "center",
-          textWrap: "balance"
-        }}
-      >
-        <Text sx={{ color: "ui.error", fontSize: 2 }}>{loginError}</Text>
-        <Button
-          onClick={() => {
-            // Clear error and retry by removing loginError from URL
-            const { loginError: _, ...restQuery } = router.query;
-            router.replace(
-              { pathname: router.pathname, query: restQuery },
-              undefined,
-              { shallow: true }
-            );
-          }}
-        >
-          Try Again
-        </Button>
-      </Stack>
+      <AuthFeedbackPanel
+        message={loginError}
+        isError
+        onTryAgain={handleTryAgain}
+      />
     );
   }
-
-  // Show loading state while redirecting
+  if (cancelDetected) {
+    return (
+      <AuthFeedbackPanel
+        message="Login was cancelled."
+        onTryAgain={handleTryAgain}
+      />
+    );
+  }
   return (
-    <Stack direction="column" sx={{ alignItems: "center" }}>
-      <LoadingIndicator />
-      Logging in with {method.description}...
+    <Stack direction="column" sx={{ alignItems: "center", gap: 3 }}>
+      <Stack direction="column" sx={{ alignItems: "center" }}>
+        <LoadingIndicator />
+        Logging in with {method.description}...
+      </Stack>
+      <Button onClick={handleCancel}>Cancel</Button>
     </Stack>
   );
 };
