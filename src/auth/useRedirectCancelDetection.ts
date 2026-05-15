@@ -27,11 +27,13 @@ export function useRedirectCancelDetection({
   handleCancel: () => void;
 } {
   const router = useRouter();
-  const [cancelDetected, setCancelDetected] = React.useState(
-    () =>
+  const [cancelDetected, setCancelDetected] = React.useState(() => {
+    if (typeof window === "undefined") return false;
+    return (
       !sessionStorage.getItem(redirectFlagKey) &&
       !!sessionStorage.getItem(cancelFlagKey)
-  );
+    );
+  });
 
   React.useEffect(() => {
     if (token) {
