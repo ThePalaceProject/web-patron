@@ -1,22 +1,55 @@
 import * as React from "react";
 import { screen, setup } from "../../test-utils";
+import { mockPush } from "test-utils/mockNextRouter";
 import Layout from "../Layout";
 
 describe("Layout nav + structure", () => {
-  test("Library icon button navigates home", () => {
-    setup(<Layout>Child</Layout>);
-    const homeButton = screen.getByLabelText(
-      "Library catalog, back to homepage"
-    );
+  describe("Navbar", () => {
+    test("Library icon button navigates home", async () => {
+      const { user } = setup(<Layout>Child</Layout>);
+      const homeButton = screen.getByLabelText(
+        "Library catalog, back to homepage"
+      );
 
-    // the home button should navigate to "/"
-    expect(homeButton.closest("a")).toHaveAttribute("href", "/testlib");
-  });
+      // the home button should navigate to "/"
+      expect(homeButton.closest("a")).toHaveAttribute("href", "/testlib");
+      await user.click(homeButton);
+      expect(mockPush).toHaveBeenCalledWith(
+        "/testlib",
+        "/testlib",
+        expect.objectContaining({
+          scroll: true,
+          shallow: true,
+          locale: undefined
+        })
+      );
+    });
 
-  test("my books navigates to /loans", () => {
-    setup(<Layout>Child</Layout>);
-    const myBooks = screen.getAllByRole("link", { name: "My Books" });
-    myBooks.forEach(ln => expect(ln).toHaveAttribute("href", "/testlib/loans"));
+    test("Home nav button navigates home", async () => {
+      const { user } = setup(<Layout>Child</Layout>);
+      const homeButton = screen.getByRole("link", {
+        name: "XYZ Public Library Home"
+      });
+      expect(homeButton).toHaveAttribute("href", "/testlib");
+      await user.click(homeButton);
+      expect(mockPush).toHaveBeenCalledWith(
+        "/testlib",
+        "/testlib",
+        expect.objectContaining({
+          scroll: true,
+          shallow: true,
+          locale: undefined
+        })
+      );
+    });
+
+    test("my books navigates to /loans", () => {
+      setup(<Layout>Child</Layout>);
+      const myBooks = screen.getAllByRole("link", { name: "My Books" });
+      myBooks.forEach(ln =>
+        expect(ln).toHaveAttribute("href", "/testlib/loans")
+      );
+    });
   });
 
   test("displays children within main", () => {

@@ -63,7 +63,7 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
 };
 
 const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
-  const { helpWebsite, libraryWebsite } = library.libraryLinks;
+  const { helpWebsite } = library.libraryLinks;
   const libraryName = library.catalogName;
   const { isAuthenticated, isLoading } = useUser();
   const { baseLoginUrl } = useLogin();
@@ -87,6 +87,16 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
           {link.title}
         </AnchorButton>
       ))}
+
+      <NavButton
+        variant="ghost"
+        color="ui.black"
+        href="/"
+        sx={{ whiteSpace: "initial" }}
+      >
+        {`${libraryName} Home`}
+      </NavButton>
+
       {helpWebsite && (
         <AnchorButton
           variant="ghost"
@@ -97,17 +107,7 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
           Help
         </AnchorButton>
       )}
-      {libraryWebsite && (
-        <AnchorButton
-          variant="ghost"
-          color="ui.black"
-          href={libraryWebsite.href}
-          title="help"
-          sx={{ whiteSpace: "initial" }}
-        >
-          {libraryWebsite.title ?? `${libraryName} Home`}
-        </AnchorButton>
-      )}
+
       <NavButton
         variant="ghost"
         color="ui.black"
