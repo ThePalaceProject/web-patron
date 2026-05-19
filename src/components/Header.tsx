@@ -27,7 +27,7 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
     >
       <Link
         href="/"
-        aria-label="Library catalog, back to homepage"
+        aria-label="Go to catalog home page"
         sx={{
           display: "flex",
           flexDirection: "column",
@@ -64,7 +64,6 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
 
 const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
   const { helpWebsite } = library.libraryLinks;
-  const libraryName = library.catalogName;
   const { isAuthenticated, isLoading } = useUser();
   const { baseLoginUrl } = useLogin();
 
@@ -94,7 +93,7 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
         href="/"
         sx={{ whiteSpace: "initial" }}
       >
-        {`${libraryName} Home`}
+        Catalog
       </NavButton>
 
       {helpWebsite && (
@@ -117,6 +116,7 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
       >
         My Books
       </NavButton>
+
       {isAuthenticated ? (
         <AccountMenu />
       ) : isLoading ? (

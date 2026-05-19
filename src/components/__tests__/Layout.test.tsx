@@ -5,15 +5,18 @@ import Layout from "../Layout";
 
 describe("Layout nav + structure", () => {
   describe("Navbar", () => {
-    test("Library icon button navigates home", async () => {
+    test("Library icon button navigates to web catalog home", async () => {
       const { user } = setup(<Layout>Child</Layout>);
-      const homeButton = screen.getByLabelText(
-        "Library catalog, back to homepage"
+      const libraryIconButton = screen.getByLabelText(
+        "Go to catalog home page"
       );
 
-      // the home button should navigate to "/"
-      expect(homeButton.closest("a")).toHaveAttribute("href", "/testlib");
-      await user.click(homeButton);
+      // the home button should navigate to the catalog home page ("/testlib") for t
+      expect(libraryIconButton.closest("a")).toHaveAttribute(
+        "href",
+        "/testlib"
+      );
+      await user.click(libraryIconButton);
       expect(mockPush).toHaveBeenCalledWith(
         "/testlib",
         "/testlib",
@@ -25,13 +28,11 @@ describe("Layout nav + structure", () => {
       );
     });
 
-    test("Home nav button navigates home", async () => {
+    test("Catalog nav button navigates to web catalog home", async () => {
       const { user } = setup(<Layout>Child</Layout>);
-      const homeButton = screen.getByRole("link", {
-        name: "XYZ Public Library Home"
-      });
-      expect(homeButton).toHaveAttribute("href", "/testlib");
-      await user.click(homeButton);
+      const catalogButton = screen.getByRole("link", { name: "Catalog" });
+      expect(catalogButton).toHaveAttribute("href", "/testlib");
+      await user.click(catalogButton);
       expect(mockPush).toHaveBeenCalledWith(
         "/testlib",
         "/testlib",
