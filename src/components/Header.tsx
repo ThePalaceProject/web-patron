@@ -75,6 +75,15 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
         justifyContent: ["center", "flex-end"]
       }}
     >
+      <NavButton
+        variant="ghost"
+        color="ui.black"
+        href="/"
+        sx={{ whiteSpace: "initial" }}
+      >
+        Catalog
+      </NavButton>
+
       {library?.headerLinks?.map(link => (
         <AnchorButton
           variant="ghost"
@@ -86,15 +95,6 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
           {link.title}
         </AnchorButton>
       ))}
-
-      <NavButton
-        variant="ghost"
-        color="ui.black"
-        href="/"
-        sx={{ whiteSpace: "initial" }}
-      >
-        Catalog
-      </NavButton>
 
       {helpWebsite && (
         <AnchorButton

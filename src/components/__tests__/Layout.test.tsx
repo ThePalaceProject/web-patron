@@ -11,7 +11,7 @@ describe("Layout nav + structure", () => {
         "Go to catalog home page"
       );
 
-      // the home button should navigate to the catalog home page ("/testlib") for t
+      // the home button should navigate to the catalog home page ("/testlib")
       expect(libraryIconButton.closest("a")).toHaveAttribute(
         "href",
         "/testlib"
