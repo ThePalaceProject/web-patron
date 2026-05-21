@@ -27,7 +27,7 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
     >
       <Link
         href="/"
-        aria-label="Library catalog, back to homepage"
+        aria-label="Go to catalog home page"
         sx={{
           display: "flex",
           flexDirection: "column",
@@ -63,8 +63,7 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
 };
 
 const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
-  const { helpWebsite, libraryWebsite } = library.libraryLinks;
-  const libraryName = library.catalogName;
+  const { helpWebsite } = library.libraryLinks;
   const { isAuthenticated, isLoading } = useUser();
   const { baseLoginUrl } = useLogin();
 
@@ -76,6 +75,15 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
         justifyContent: ["center", "flex-end"]
       }}
     >
+      <NavButton
+        variant="ghost"
+        color="ui.black"
+        href="/"
+        sx={{ whiteSpace: "initial" }}
+      >
+        Catalog
+      </NavButton>
+
       {library?.headerLinks?.map(link => (
         <AnchorButton
           variant="ghost"
@@ -87,6 +95,7 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
           {link.title}
         </AnchorButton>
       ))}
+
       {helpWebsite && (
         <AnchorButton
           variant="ghost"
@@ -97,17 +106,7 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
           Help
         </AnchorButton>
       )}
-      {libraryWebsite && (
-        <AnchorButton
-          variant="ghost"
-          color="ui.black"
-          href={libraryWebsite.href}
-          title="help"
-          sx={{ whiteSpace: "initial" }}
-        >
-          {libraryWebsite.title ?? `${libraryName} Home`}
-        </AnchorButton>
-      )}
+
       <NavButton
         variant="ghost"
         color="ui.black"
@@ -117,6 +116,7 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
       >
         My Books
       </NavButton>
+
       {isAuthenticated ? (
         <AccountMenu />
       ) : isLoading ? (
