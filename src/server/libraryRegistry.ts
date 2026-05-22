@@ -44,23 +44,28 @@ interface CrawlResult {
 // ---------------------------------------------------------------------------
 
 /*
- * In-memory cache keyed by registry URL. Persists across API requests within
- * a single server instance. A registry absent from this map has never been
- * fetched (distinct from one with incrementalUrl === null, which means it was
- * fetched but does not advertise an order=modified facet).
+ * Next.js bundles each page and API route independently, so module-level
+ * variables would not be shared across bundle contexts (instrumentation,
+ * api/libraries, ISR page handlers, etc.) running in the same process.
+ * Storing state on `global` gives all bundle instances a single shared object.
  */
-const registryCaches = new Map<string, RegistryState>();
+interface RegistryModuleState {
+  registryCaches: Map<string, RegistryState>;
+  pendingRefreshes: Map<string, Promise<void>>;
+}
 
-/*
- * Tracks crawls that are currently in-progress. Used to coalesce concurrent
- * requests: if a crawl for a URL is already running, latecomers await the
- * same promise rather than returning an empty cache immediately. Without this,
- * the Next.js ISR fallback can fire two simultaneous getStaticProps calls —
- * the first starts the crawl (setting lastAttemptedFetch), and the second
- * sees lastAttemptedFetch within minInterval, skips the refresh, and returns
- * an empty library list, causing a spurious 404 on the very first page load.
- */
-const pendingRefreshes = new Map<string, Promise<void>>();
+declare const global: typeof globalThis & {
+  __cpwRegistryState?: RegistryModuleState;
+};
+
+if (!global.__cpwRegistryState) {
+  global.__cpwRegistryState = {
+    registryCaches: new Map<string, RegistryState>(),
+    pendingRefreshes: new Map<string, Promise<void>>()
+  };
+}
+
+const { registryCaches, pendingRefreshes } = global.__cpwRegistryState;
 
 const emptyState: RegistryState = {
   libraries: {},

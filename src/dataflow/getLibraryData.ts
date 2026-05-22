@@ -1,17 +1,72 @@
-import { LibraryData, LibraryLinks, OPDS1 } from "interfaces";
+import { AppConfig, LibraryData, LibraryLinks, OPDS1 } from "interfaces";
 import ApplicationError, { PageNotFoundError, ServerError } from "errors";
 import { normalizeAuthMethods } from "utils/auth";
 import { getAppConfig } from "server/appConfig";
 import { getLibraries } from "server/libraryRegistry";
 
+// ---------------------------------------------------------------------------
+// Auth document cache
+// ---------------------------------------------------------------------------
+
+/*
+ * Caches fetched auth documents by URL for AUTH_DOC_CACHE_TTL_SECONDS.
+ * Multiple ISR route rebuilds for the same library (index, loans, book, etc.)
+ * all resolve to the same auth document URL; without caching they each issue an
+ * independent upstream fetch in quick succession. The cache prevents that burst
+ * and also limits load on auth document servers during high-traffic periods.
+ *
+ * pendingAuthDocFetches coalesces concurrent requests for the same URL so that
+ * exactly one in-flight fetch exists at a time, matching the pattern used by
+ * libraryRegistry.ts for registry crawls.
+ *
+ * Stored on `global` for the same reason as libraryRegistry.ts: Next.js bundles
+ * each route independently, so module-level Maps would not be shared across
+ * bundle contexts in the same process.
+ */
+interface AuthDocCacheEntry {
+  doc: OPDS1.AuthDocument;
+  fetchedAt: number;
+}
+
+interface AuthDocModuleState {
+  authDocCache: Map<string, AuthDocCacheEntry>;
+  pendingAuthDocFetches: Map<string, Promise<OPDS1.AuthDocument>>;
+}
+
+declare const global: typeof globalThis & {
+  __cpwAuthDocState?: AuthDocModuleState;
+};
+
+if (!global.__cpwAuthDocState) {
+  global.__cpwAuthDocState = {
+    authDocCache: new Map<string, AuthDocCacheEntry>(),
+    pendingAuthDocFetches: new Map<string, Promise<OPDS1.AuthDocument>>()
+  };
+}
+
+const { authDocCache, pendingAuthDocFetches } = global.__cpwAuthDocState;
+const AUTH_DOC_CACHE_TTL_SECONDS = 3600;
+
+/** Clears the auth document cache. Intended for use in tests only. */
+export function resetAuthDocCache(): void {
+  authDocCache.clear();
+  pendingAuthDocFetches.clear();
+}
+
 /**
  * Interprets the app config to return the auth document url.
  * Uses getLibraries so registry-sourced libraries (not present in the static
  * build-time config) are included in the lookup.
+ *
+ * Accepts an already-fetched AppConfig to avoid a redundant getAppConfig()
+ * call when the caller has already loaded it.
  */
-export async function getAuthDocUrl(librarySlug: string): Promise<string> {
-  const appConfig = await getAppConfig();
-  const libraries = await getLibraries(appConfig);
+export async function getAuthDocUrl(
+  librarySlug: string,
+  appConfig?: AppConfig
+): Promise<string> {
+  const config = appConfig ?? (await getAppConfig());
+  const libraries = await getLibraries(config);
 
   const authDocUrl =
     librarySlug in libraries ? libraries[librarySlug]?.authDocUrl : undefined;
@@ -24,19 +79,40 @@ export async function getAuthDocUrl(librarySlug: string): Promise<string> {
 }
 
 /**
- * Fetches an auth document from the supplied url and returns it
- * as a parsed AuthDocument
+ * Fetches an auth document from the supplied url and returns it as a parsed
+ * AuthDocument. Results are cached for AUTH_DOC_CACHE_TTL_SECONDS; concurrent
+ * requests for the same URL share a single in-flight fetch.
  */
 export async function fetchAuthDocument(
   url: string
 ): Promise<OPDS1.AuthDocument> {
-  const response = await fetch(url);
-  if (!response.ok) {
-    const details = await response.json();
-    throw new ServerError(url, response.status, details);
+  const now = Date.now() / 1000;
+
+  const cached = authDocCache.get(url);
+  if (cached && now - cached.fetchedAt < AUTH_DOC_CACHE_TTL_SECONDS) {
+    return cached.doc;
   }
-  const json = await response.json();
-  return json;
+
+  const pending = pendingAuthDocFetches.get(url);
+  if (pending) return pending;
+
+  const fetchPromise = (async () => {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        const details = await response.json();
+        throw new ServerError(url, response.status, details);
+      }
+      const doc: OPDS1.AuthDocument = await response.json();
+      authDocCache.set(url, { doc, fetchedAt: Date.now() / 1000 });
+      return doc;
+    } finally {
+      pendingAuthDocFetches.delete(url);
+    }
+  })();
+
+  pendingAuthDocFetches.set(url, fetchPromise);
+  return fetchPromise;
 }
 
 /**

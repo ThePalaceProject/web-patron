@@ -10,15 +10,21 @@ jest.mock("server/appConfig", () => ({
   getAppConfig: jest.fn()
 }));
 
+jest.mock("server/libraryRegistry", () => ({
+  getLibraries: jest.fn()
+}));
+
 import * as http from "node:http";
 import { EventEmitter } from "node:events";
 import { register } from "../../instrumentation";
 import { getAppConfig } from "server/appConfig";
+import { getLibraries } from "server/libraryRegistry";
 
 type EmitFn = (event: string | symbol, ...args: unknown[]) => boolean;
 const serverProto = http.Server.prototype as unknown as { emit: EmitFn };
 
 const mockGetAppConfig = getAppConfig as jest.Mock;
+const mockGetLibraries = getLibraries as jest.Mock;
 
 const originalEnv = process.env;
 let savedFetch: typeof globalThis.fetch;
@@ -59,6 +65,7 @@ describe("register", () => {
   it("calls getAppConfig when NEXT_RUNTIME is 'nodejs'", async () => {
     process.env.NEXT_RUNTIME = "nodejs";
     mockGetAppConfig.mockResolvedValue({});
+    mockGetLibraries.mockResolvedValue({});
     await register();
     expect(mockGetAppConfig).toHaveBeenCalledTimes(1);
   });
@@ -66,7 +73,35 @@ describe("register", () => {
   it("resolves without error when getAppConfig succeeds", async () => {
     process.env.NEXT_RUNTIME = "nodejs";
     mockGetAppConfig.mockResolvedValue({});
+    mockGetLibraries.mockResolvedValue({});
     await expect(register()).resolves.toBeUndefined();
+  });
+
+  it("calls getLibraries with the appConfig returned by getAppConfig", async () => {
+    process.env.NEXT_RUNTIME = "nodejs";
+    const fakeConfig = { registries: [], staticLibraries: {} };
+    mockGetAppConfig.mockResolvedValue(fakeConfig);
+    mockGetLibraries.mockResolvedValue({});
+    await register();
+    expect(mockGetLibraries).toHaveBeenCalledWith(fakeConfig);
+  });
+
+  it("does not call getLibraries when getAppConfig fails", async () => {
+    process.env.NEXT_RUNTIME = "nodejs";
+    const exitSpy = jest
+      .spyOn(process, "exit")
+      .mockImplementation(() => undefined as never);
+    jest.spyOn(console, "error").mockImplementation(() => undefined);
+    mockGetAppConfig.mockRejectedValue(new Error("bad config"));
+    await register();
+    expect(mockGetLibraries).not.toHaveBeenCalled();
+    exitSpy.mockRestore();
+  });
+
+  it("does not call getLibraries when NEXT_RUNTIME is not 'nodejs'", async () => {
+    delete process.env.NEXT_RUNTIME;
+    await register();
+    expect(mockGetLibraries).not.toHaveBeenCalled();
   });
 
   it("does not patch http.Server.prototype.emit when NEXT_RUNTIME is not 'nodejs'", async () => {
@@ -131,6 +166,7 @@ describe("HTTP request logging", () => {
     logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
     process.env.NEXT_RUNTIME = "nodejs";
     mockGetAppConfig.mockResolvedValue({});
+    mockGetLibraries.mockResolvedValue({});
     await register();
   });
 
@@ -207,6 +243,7 @@ describe("outbound fetch logging", () => {
     logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
     process.env.NEXT_RUNTIME = "nodejs";
     mockGetAppConfig.mockResolvedValue({});
+    mockGetLibraries.mockResolvedValue({});
     await register();
   });
 
