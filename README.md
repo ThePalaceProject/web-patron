@@ -44,6 +44,7 @@ __To have your library added to the demo, register it with NYPL's Library Regist
   - [Environment Variables](#environment-variables)
   - [Manager, Registry, and Application Configurations](#manager--registry--and-application-configurations)
   - [Libraries and Registries Configuration Settings](#libraries-and-registries-configuration-settings)
+  - [Authentication Document Caching](#authentication-document-caching)
 - [Development](#development)
   - [Contributing](#contributing)
   - [Installing Dependencies](#installing-dependencies)
@@ -79,6 +80,7 @@ The app is configured with a YAML file. Point the app at it by setting the `CONF
 | `media_support` | mapping | `{}` | Per-MIME-type rendering mode. See [Media Support](#media-support) below. |
 | `static_libraries` | mapping | — | Static library definitions. See [Libraries and Registries Configuration Settings](#libraries-and-registries-configuration-settings). |
 | `registries` | list | `[]` | One or more library registry URLs fetched at runtime. See [Libraries and Registries Configuration Settings](#libraries-and-registries-configuration-settings). |
+| `authentication_documents` | mapping | — | Controls server-side caching of auth documents. See [Authentication Document Caching](#authentication-document-caching). |
 
 #### Deprecated Configuration Options
 
@@ -239,6 +241,25 @@ libraries: https://registry.thepalaceproject.org/libraries
 registries:
   - url: https://registry.thepalaceproject.org/libraries
 ```
+
+## Authentication Document Caching
+
+Each library's authentication document is fetched on demand as pages are generated and cached server-side. The `authentication_documents` section controls how long that cache stays fresh.
+
+```yaml
+authentication_documents:
+  refresh_min_interval: 60    # Minimum seconds between re-fetch attempts (default: 60)
+  refresh_max_interval: 300   # Seconds before a cached auth doc is considered stale (default: 300)
+```
+
+Both keys are optional; omitting the section entirely uses the defaults shown above.
+
+| Key | Default | Description |
+|-----|---------|-------------|
+| `refresh_min_interval` | `60` | Minimum number of seconds that must pass between successive fetch attempts for the same auth document, even if the cached copy is stale. This prevents hammering a slow or unavailable upstream endpoint. |
+| `refresh_max_interval` | `300` | Number of seconds after the last *successful* fetch before the cached auth document is considered stale and a new fetch is attempted. |
+
+These settings mirror the `refresh_min_interval` / `refresh_max_interval` fields available on each entry in the `registries` list.
 
 # Development
 

@@ -41,7 +41,8 @@ const VALID_APP_CONFIG: AppConfig = {
   companionApp: "simplye",
   showMedium: true,
   openebooks: null,
-  mediaSupport: {}
+  mediaSupport: {},
+  authenticationDocuments: null
 };
 
 function makeRes() {

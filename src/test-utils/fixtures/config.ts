@@ -6,6 +6,7 @@ export const config: AppConfig = {
   companionApp: "simplye",
   showMedium: true,
   openebooks: null,
+  authenticationDocuments: null,
   mediaSupport: {
     "application/epub+zip": "show",
     "application/kepub+zip": "show",

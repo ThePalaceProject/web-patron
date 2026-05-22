@@ -6,7 +6,8 @@ const FALLBACK_APP_CONFIG: AppConfig = {
   companionApp: "simplye",
   showMedium: true,
   bugsnagApiKey: null,
-  openebooks: null
+  openebooks: null,
+  authenticationDocuments: null
 };
 
 export default FALLBACK_APP_CONFIG;

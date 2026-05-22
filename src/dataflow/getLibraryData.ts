@@ -1,31 +1,46 @@
-import { AppConfig, LibraryData, LibraryLinks, OPDS1 } from "interfaces";
+import {
+  AppConfig,
+  AuthDocConfig,
+  LibraryData,
+  LibraryLinks,
+  OPDS1
+} from "interfaces";
 import ApplicationError, { PageNotFoundError, ServerError } from "errors";
 import { normalizeAuthMethods } from "utils/auth";
 import { getAppConfig } from "server/appConfig";
 import { getLibraries } from "server/libraryRegistry";
+import {
+  DEFAULT_AUTH_DOC_REFRESH_MIN_INTERVAL,
+  DEFAULT_AUTH_DOC_REFRESH_MAX_INTERVAL
+} from "constants/registry";
 
 // ---------------------------------------------------------------------------
 // Auth document cache
 // ---------------------------------------------------------------------------
 
 /*
- * Caches fetched auth documents by URL for AUTH_DOC_CACHE_TTL_SECONDS.
- * Multiple ISR route rebuilds for the same library (index, loans, book, etc.)
- * all resolve to the same auth document URL; without caching they each issue an
- * independent upstream fetch in quick succession. The cache prevents that burst
- * and also limits load on auth document servers during high-traffic periods.
+ * Caches fetched auth documents by URL. Multiple ISR route rebuilds for the
+ * same library (index, loans, book, etc.) all resolve to the same auth document
+ * URL; without caching they each issue an independent upstream fetch in quick
+ * succession.
+ *
+ * The cache is keyed by URL and stores the last successful fetch time alongside
+ * the last attempt time (whether successful or not). refreshMinInterval prevents
+ * hammering a re-fetch after a failed attempt; refreshMaxInterval controls how
+ * long a cached doc is considered fresh. Both mirror the semantics of the
+ * registry refresh config.
  *
  * pendingAuthDocFetches coalesces concurrent requests for the same URL so that
- * exactly one in-flight fetch exists at a time, matching the pattern used by
- * libraryRegistry.ts for registry crawls.
+ * exactly one in-flight fetch exists at a time.
  *
  * Stored on `global` for the same reason as libraryRegistry.ts: Next.js bundles
  * each route independently, so module-level Maps would not be shared across
  * bundle contexts in the same process.
  */
 interface AuthDocCacheEntry {
-  doc: OPDS1.AuthDocument;
-  fetchedAt: number;
+  doc: OPDS1.AuthDocument | null; // null until first successful fetch
+  lastSuccessfulFetch: number | null; // null until first successful fetch
+  lastAttemptedFetch: number | null; // set before each fetch attempt
 }
 
 interface AuthDocModuleState {
@@ -45,12 +60,34 @@ if (!global.__cpwAuthDocState) {
 }
 
 const { authDocCache, pendingAuthDocFetches } = global.__cpwAuthDocState;
-const AUTH_DOC_CACHE_TTL_SECONDS = 3600;
 
 /** Clears the auth document cache. Intended for use in tests only. */
 export function resetAuthDocCache(): void {
   authDocCache.clear();
   pendingAuthDocFetches.clear();
+}
+
+function shouldRefreshAuthDoc(
+  entry: AuthDocCacheEntry | undefined,
+  config: AuthDocConfig,
+  nowSeconds: number
+): boolean {
+  const minInterval =
+    config.refreshMinInterval ?? DEFAULT_AUTH_DOC_REFRESH_MIN_INTERVAL;
+  const maxInterval =
+    config.refreshMaxInterval ?? DEFAULT_AUTH_DOC_REFRESH_MAX_INTERVAL;
+
+  /*
+   * Throttle re-fetches only when a cached doc exists. Without a cached doc
+   * there is nothing to return, so the minInterval guard is bypassed and we
+   * always attempt a fetch.
+   */
+  if (entry?.lastAttemptedFetch != null && entry.doc != null) {
+    if (nowSeconds - entry.lastAttemptedFetch < minInterval) return false;
+  }
+
+  if (!entry || entry.lastSuccessfulFetch == null) return true;
+  return nowSeconds - entry.lastSuccessfulFetch >= maxInterval;
 }
 
 /**
@@ -80,21 +117,33 @@ export async function getAuthDocUrl(
 
 /**
  * Fetches an auth document from the supplied url and returns it as a parsed
- * AuthDocument. Results are cached for AUTH_DOC_CACHE_TTL_SECONDS; concurrent
- * requests for the same URL share a single in-flight fetch.
+ * AuthDocument. Concurrent requests for the same URL share a single in-flight
+ * fetch. Sequential requests consult shouldRefreshAuthDoc: fresh cached docs are
+ * returned immediately; stale docs trigger a re-fetch.
  */
 export async function fetchAuthDocument(
-  url: string
+  url: string,
+  authDocConfig: AuthDocConfig = {}
 ): Promise<OPDS1.AuthDocument> {
   const now = Date.now() / 1000;
 
-  const cached = authDocCache.get(url);
-  if (cached && now - cached.fetchedAt < AUTH_DOC_CACHE_TTL_SECONDS) {
-    return cached.doc;
-  }
-
   const pending = pendingAuthDocFetches.get(url);
   if (pending) return pending;
+
+  const entry = authDocCache.get(url);
+  if (!shouldRefreshAuthDoc(entry, authDocConfig, now) && entry?.doc != null) {
+    return entry.doc;
+  }
+
+  /*
+   * Set lastAttemptedFetch synchronously so that sequential requests arriving
+   * within refreshMinInterval after this fetch completes are throttled.
+   */
+  authDocCache.set(url, {
+    doc: entry?.doc ?? null,
+    lastSuccessfulFetch: entry?.lastSuccessfulFetch ?? null,
+    lastAttemptedFetch: now
+  });
 
   const fetchPromise = (async () => {
     try {
@@ -104,7 +153,11 @@ export async function fetchAuthDocument(
         throw new ServerError(url, response.status, details);
       }
       const doc: OPDS1.AuthDocument = await response.json();
-      authDocCache.set(url, { doc, fetchedAt: Date.now() / 1000 });
+      authDocCache.set(url, {
+        doc,
+        lastSuccessfulFetch: now,
+        lastAttemptedFetch: now
+      });
       return doc;
     } finally {
       pendingAuthDocFetches.delete(url);

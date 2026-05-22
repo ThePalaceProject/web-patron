@@ -22,3 +22,9 @@ export const DEFAULT_REGISTRY_FULL_REFRESH_INTERVAL = 86400;
 
 /** Seconds before an individual registry page fetch is aborted. */
 export const DEFAULT_REGISTRY_FETCH_TIMEOUT = 10;
+
+/** Minimum seconds between auth document re-fetch attempts. */
+export const DEFAULT_AUTH_DOC_REFRESH_MIN_INTERVAL = 60;
+
+/** Maximum seconds since last successful auth document fetch before re-fetching. */
+export const DEFAULT_AUTH_DOC_REFRESH_MAX_INTERVAL = 300;

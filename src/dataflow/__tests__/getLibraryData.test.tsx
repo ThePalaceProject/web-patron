@@ -118,6 +118,68 @@ describe("fetchAuthDocument", () => {
     expect(result).toEqual({ cached: true });
   });
 
+  describe("refresh intervals", () => {
+    const T0 = 1_000_000_000; // arbitrary fixed base time in ms
+
+    afterEach(() => jest.restoreAllMocks());
+
+    test("re-fetches when refreshMaxInterval has elapsed", async () => {
+      jest.spyOn(Date, "now").mockReturnValue(T0);
+      fetchMock.mockResponseOnce(JSON.stringify({ v: 1 }));
+      await fetchAuthDocument("/auth-doc", {
+        refreshMinInterval: 5,
+        refreshMaxInterval: 10
+      });
+
+      jest.spyOn(Date, "now").mockReturnValue(T0 + 11_000);
+      fetchMock.mockResponseOnce(JSON.stringify({ v: 2 }));
+      const result = await fetchAuthDocument("/auth-doc", {
+        refreshMinInterval: 5,
+        refreshMaxInterval: 10
+      });
+
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(result).toEqual({ v: 2 });
+    });
+
+    test("does not re-fetch within refreshMinInterval", async () => {
+      jest.spyOn(Date, "now").mockReturnValue(T0);
+      fetchMock.mockResponseOnce(JSON.stringify({ v: 1 }));
+      await fetchAuthDocument("/auth-doc", {
+        refreshMinInterval: 30,
+        refreshMaxInterval: 10
+      });
+
+      // maxInterval elapsed but minInterval has not
+      jest.spyOn(Date, "now").mockReturnValue(T0 + 15_000);
+      const result = await fetchAuthDocument("/auth-doc", {
+        refreshMinInterval: 30,
+        refreshMaxInterval: 10
+      });
+
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({ v: 1 });
+    });
+
+    test("retries a failed first fetch even within refreshMinInterval", async () => {
+      jest.spyOn(Date, "now").mockReturnValue(T0);
+      fetchMock.mockRejectOnce(new Error("down"));
+      await fetchAuthDocument("/auth-doc", { refreshMinInterval: 30 }).catch(
+        () => {}
+      );
+
+      // Still within minInterval but no cached doc — should retry.
+      jest.spyOn(Date, "now").mockReturnValue(T0 + 5_000);
+      fetchMock.mockResponseOnce(JSON.stringify({ recovered: true }));
+      const result = await fetchAuthDocument("/auth-doc", {
+        refreshMinInterval: 30
+      });
+
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(result).toEqual({ recovered: true });
+    });
+  });
+
   test("coalesces concurrent requests for the same url", async () => {
     fetchMock.mockResponseOnce(JSON.stringify({ coalesced: true }));
     const [r1, r2, r3] = await Promise.all([
