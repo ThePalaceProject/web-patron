@@ -60,16 +60,16 @@ export type LibrariesConfig = Record<
 /** Per-registry configuration for runtime library fetching. */
 export interface RegistryConfig {
   url: string;
-  refreshMinInterval?: number; // seconds, default 60
-  refreshMaxInterval?: number; // seconds, default 300
-  fullRefreshInterval?: number; // seconds, default 86400 (24 h)
-  timeout?: number; // seconds, default 10
+  refreshMinInterval?: number;
+  refreshMaxInterval?: number;
+  fullRefreshInterval?: number;
+  timeout?: number;
 }
 
 /** Global configuration for authentication document caching. */
 export interface AuthDocConfig {
-  refreshMinInterval?: number; // seconds between re-fetch attempts, default 60
-  refreshMaxInterval?: number; // seconds before cached doc is considered stale, default 3600
+  refreshMinInterval?: number;
+  refreshMaxInterval?: number;
 }
 
 export interface ComplaintData {
