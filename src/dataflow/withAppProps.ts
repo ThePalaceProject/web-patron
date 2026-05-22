@@ -33,8 +33,11 @@ export default function withAppProps(
         );
 
       const appConfig = await getAppConfig();
-      const authDocUrl = await getAuthDocUrl(librarySlug);
-      const authDocument = await fetchAuthDocument(authDocUrl);
+      const authDocUrl = await getAuthDocUrl(librarySlug, appConfig);
+      const authDocument = await fetchAuthDocument(
+        authDocUrl,
+        appConfig.authenticationDocuments ?? undefined
+      );
       const library = buildLibraryData(authDocument, librarySlug);
       // fetch the static props for the page
       const pageResult = (await pageGetStaticProps?.(ctx)) ?? { props: {} };

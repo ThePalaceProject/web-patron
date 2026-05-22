@@ -34,6 +34,7 @@ function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     showMedium: true,
     openebooks: null,
     mediaSupport: {},
+    authenticationDocuments: null,
     ...overrides
   };
 }

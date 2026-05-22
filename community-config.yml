@@ -109,3 +109,12 @@ static_libraries:
 # Migrate to the 'registries' array format:
 #
 #   libraries: https://registry.thepalaceproject.org/libraries  # DEPRECATED
+#
+# AUTHENTICATION DOCUMENT CACHING
+#
+# Controls how long each library's authentication document is cached server-side.
+# Auth documents are fetched on demand when a library page is first generated via ISR.
+#
+# authentication_documents:
+#   refresh_min_interval: 60   # Minimum seconds between re-fetch attempts (default: 60)
+#   refresh_max_interval: 300  # Seconds before a cached auth doc is considered stale (default: 300)

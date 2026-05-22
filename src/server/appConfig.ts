@@ -31,6 +31,11 @@ const RegistryEntrySchema = type({
   "refreshMaxInterval?": "number"
 });
 
+const AuthDocConfigSchema = type({
+  "refreshMinInterval?": "number",
+  "refreshMaxInterval?": "number"
+});
+
 const RawConfigSchema = type({
   // Intentionally permissive: any non-string value silently defaults.
   "instanceName?": "unknown",
@@ -39,6 +44,7 @@ const RawConfigSchema = type({
   "registries?": RegistryEntrySchema.array(),
   "libraries?": "string | Record<string, unknown>",
   "staticLibraries?": "Record<string, unknown>",
+  "authenticationDocuments?": AuthDocConfigSchema,
   "mediaSupport?": "Record<string, string | Record<string, string>>",
   "openebooks?": { defaultLibrary: "string" }
 });
@@ -146,6 +152,7 @@ function parseYaml(input: Record<string, unknown>): AppConfig {
     "bugsnagApiKey",
     "gtmId",
     "staticLibraries",
+    "authenticationDocuments",
     "mediaSupport"
   ]);
 
@@ -175,6 +182,15 @@ function parseYaml(input: Record<string, unknown>): AppConfig {
             "refreshMaxInterval"
           ])
         : r
+    );
+  }
+  if (
+    normalized.authenticationDocuments !== null &&
+    typeof normalized.authenticationDocuments === "object"
+  ) {
+    normalized.authenticationDocuments = normalizeConfigKeys(
+      normalized.authenticationDocuments as Record<string, unknown>,
+      ["refreshMinInterval", "refreshMaxInterval"]
     );
   }
   if (
@@ -284,6 +300,13 @@ function parseYaml(input: Record<string, unknown>): AppConfig {
     validateMediaSupportValue(`media_support['${mime}']`, level);
   }
 
+  const authenticationDocuments = result.authenticationDocuments
+    ? {
+        refreshMinInterval: result.authenticationDocuments.refreshMinInterval,
+        refreshMaxInterval: result.authenticationDocuments.refreshMaxInterval
+      }
+    : null;
+
   return {
     instanceName:
       typeof result.instanceName === "string"
@@ -291,6 +314,7 @@ function parseYaml(input: Record<string, unknown>): AppConfig {
         : "Patron Web Catalog",
     registries,
     staticLibraries,
+    authenticationDocuments,
     mediaSupport: (result.mediaSupport as MediaSupportConfig) ?? {},
     bugsnagApiKey: process.env.BUGSNAG_API_KEY ?? null,
     companionApp,

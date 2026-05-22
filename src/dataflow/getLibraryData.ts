@@ -1,17 +1,109 @@
-import { LibraryData, LibraryLinks, OPDS1 } from "interfaces";
+import {
+  AppConfig,
+  AuthDocConfig,
+  LibraryData,
+  LibraryLinks,
+  OPDS1
+} from "interfaces";
 import ApplicationError, { PageNotFoundError, ServerError } from "errors";
 import { normalizeAuthMethods } from "utils/auth";
 import { getAppConfig } from "server/appConfig";
 import { getLibraries } from "server/libraryRegistry";
+import {
+  DEFAULT_AUTH_DOC_REFRESH_MIN_INTERVAL,
+  DEFAULT_AUTH_DOC_REFRESH_MAX_INTERVAL
+} from "constants/registry";
+
+// ---------------------------------------------------------------------------
+// Auth document cache
+// ---------------------------------------------------------------------------
+
+/*
+ * Caches fetched auth documents by URL. Multiple ISR route rebuilds for the
+ * same library (index, loans, book, etc.) all resolve to the same auth document
+ * URL; without caching they each issue an independent upstream fetch in quick
+ * succession.
+ *
+ * The cache is keyed by URL and stores the last successful fetch time alongside
+ * the last attempt time (whether successful or not). refreshMinInterval prevents
+ * hammering a re-fetch after a failed attempt; refreshMaxInterval controls how
+ * long a cached doc is considered fresh. Both mirror the semantics of the
+ * registry refresh config.
+ *
+ * pendingAuthDocFetches coalesces concurrent requests for the same URL so that
+ * exactly one in-flight fetch exists at a time.
+ *
+ * Stored on `global` for the same reason as libraryRegistry.ts: Next.js bundles
+ * each route independently, so module-level Maps would not be shared across
+ * bundle contexts in the same process.
+ */
+interface AuthDocCacheEntry {
+  doc: OPDS1.AuthDocument | null; // null until first successful fetch
+  lastSuccessfulFetch: number | null; // null until first successful fetch
+  lastAttemptedFetch: number | null; // set before each fetch attempt
+}
+
+interface AuthDocModuleState {
+  authDocCache: Map<string, AuthDocCacheEntry>;
+  pendingAuthDocFetches: Map<string, Promise<OPDS1.AuthDocument>>;
+}
+
+declare const global: typeof globalThis & {
+  __cpwAuthDocState?: AuthDocModuleState;
+};
+
+if (!global.__cpwAuthDocState) {
+  global.__cpwAuthDocState = {
+    authDocCache: new Map<string, AuthDocCacheEntry>(),
+    pendingAuthDocFetches: new Map<string, Promise<OPDS1.AuthDocument>>()
+  };
+}
+
+const { authDocCache, pendingAuthDocFetches } = global.__cpwAuthDocState;
+
+/** Clears the auth document cache. Intended for use in tests only. */
+export function resetAuthDocCache(): void {
+  authDocCache.clear();
+  pendingAuthDocFetches.clear();
+}
+
+function shouldRefreshAuthDoc(
+  entry: AuthDocCacheEntry | undefined,
+  config: AuthDocConfig,
+  nowSeconds: number
+): boolean {
+  const minInterval =
+    config.refreshMinInterval ?? DEFAULT_AUTH_DOC_REFRESH_MIN_INTERVAL;
+  const maxInterval =
+    config.refreshMaxInterval ?? DEFAULT_AUTH_DOC_REFRESH_MAX_INTERVAL;
+
+  /*
+   * Throttle re-fetches only when a cached doc exists. Without a cached doc
+   * there is nothing to return, so the minInterval guard is bypassed and we
+   * always attempt a fetch.
+   */
+  if (entry?.lastAttemptedFetch != null && entry.doc != null) {
+    if (nowSeconds - entry.lastAttemptedFetch < minInterval) return false;
+  }
+
+  if (!entry || entry.lastSuccessfulFetch == null) return true;
+  return nowSeconds - entry.lastSuccessfulFetch >= maxInterval;
+}
 
 /**
  * Interprets the app config to return the auth document url.
  * Uses getLibraries so registry-sourced libraries (not present in the static
  * build-time config) are included in the lookup.
+ *
+ * Accepts an already-fetched AppConfig to avoid a redundant getAppConfig()
+ * call when the caller has already loaded it.
  */
-export async function getAuthDocUrl(librarySlug: string): Promise<string> {
-  const appConfig = await getAppConfig();
-  const libraries = await getLibraries(appConfig);
+export async function getAuthDocUrl(
+  librarySlug: string,
+  appConfig?: AppConfig
+): Promise<string> {
+  const config = appConfig ?? (await getAppConfig());
+  const libraries = await getLibraries(config);
 
   const authDocUrl =
     librarySlug in libraries ? libraries[librarySlug]?.authDocUrl : undefined;
@@ -24,19 +116,56 @@ export async function getAuthDocUrl(librarySlug: string): Promise<string> {
 }
 
 /**
- * Fetches an auth document from the supplied url and returns it
- * as a parsed AuthDocument
+ * Fetches an auth document from the supplied url and returns it as a parsed
+ * AuthDocument. Concurrent requests for the same URL share a single in-flight
+ * fetch. Sequential requests consult shouldRefreshAuthDoc: fresh cached docs are
+ * returned immediately; stale docs trigger a re-fetch.
  */
 export async function fetchAuthDocument(
-  url: string
+  url: string,
+  authDocConfig: AuthDocConfig = {}
 ): Promise<OPDS1.AuthDocument> {
-  const response = await fetch(url);
-  if (!response.ok) {
-    const details = await response.json();
-    throw new ServerError(url, response.status, details);
+  const now = Date.now() / 1000;
+
+  const pending = pendingAuthDocFetches.get(url);
+  if (pending) return pending;
+
+  const entry = authDocCache.get(url);
+  if (!shouldRefreshAuthDoc(entry, authDocConfig, now) && entry?.doc != null) {
+    return entry.doc;
   }
-  const json = await response.json();
-  return json;
+
+  /*
+   * Set lastAttemptedFetch synchronously so that sequential requests arriving
+   * within refreshMinInterval after this fetch completes are throttled.
+   */
+  authDocCache.set(url, {
+    doc: entry?.doc ?? null,
+    lastSuccessfulFetch: entry?.lastSuccessfulFetch ?? null,
+    lastAttemptedFetch: now
+  });
+
+  const fetchPromise = (async () => {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        const details = await response.json();
+        throw new ServerError(url, response.status, details);
+      }
+      const doc: OPDS1.AuthDocument = await response.json();
+      authDocCache.set(url, {
+        doc,
+        lastSuccessfulFetch: now,
+        lastAttemptedFetch: now
+      });
+      return doc;
+    } finally {
+      pendingAuthDocFetches.delete(url);
+    }
+  })();
+
+  pendingAuthDocFetches.set(url, fetchPromise);
+  return fetchPromise;
 }
 
 /**

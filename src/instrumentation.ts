@@ -43,8 +43,19 @@ export async function register() {
     }
 
     const { getAppConfig } = await import("server/appConfig");
+    const { getLibraries } = await import("server/libraryRegistry");
     try {
-      await getAppConfig();
+      const appConfig = await getAppConfig();
+      /*
+       * Pre-warm the registry cache before any requests are served.
+       * getLibraries() sets pendingRefreshes synchronously before its first
+       * await, so concurrent first-request handlers (including ISR
+       * getStaticProps workers) find the in-progress crawl and coalesce onto
+       * it via pendingRefreshes rather than starting independent duplicates.
+       * Registry fetch errors are swallowed inside refreshRegistry, so this
+       * call will not throw.
+       */
+      void getLibraries(appConfig);
     } catch (e) {
       // Next.js does not exit on register() errors, so we must do it ourselves.
       console.error(e instanceof Error ? e.message : String(e));
