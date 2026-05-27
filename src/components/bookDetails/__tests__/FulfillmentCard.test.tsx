@@ -663,3 +663,80 @@ describe("FulfillableBook", () => {
     expect(fetchMock).toHaveBeenCalledWith("/new-location");
   });
 });
+
+describe("Preview button", () => {
+  test("shown for borrowable book with previewUrl", () => {
+    const book = mergeBook<BorrowableBook>({
+      status: "borrowable",
+      borrowUrl: "/borrow",
+      previewUrl: "/preview"
+    });
+    setup(<FulfillmentCard book={book} />);
+    expect(screen.getByRole("button", { name: "Preview" })).toBeInTheDocument();
+  });
+
+  test("not shown for borrowable book without previewUrl", () => {
+    const book = mergeBook<BorrowableBook>({
+      status: "borrowable",
+      borrowUrl: "/borrow",
+      previewUrl: null
+    });
+    setup(<FulfillmentCard book={book} />);
+    expect(
+      screen.queryByRole("button", { name: "Preview" })
+    ).not.toBeInTheDocument();
+  });
+
+  test("shown for reservable book with previewUrl", () => {
+    const book = mergeBook<ReservableBook>({
+      status: "reservable",
+      reserveUrl: "/reserve",
+      previewUrl: "/preview"
+    });
+    setup(<FulfillmentCard book={book} />);
+    expect(screen.getByRole("button", { name: "Preview" })).toBeInTheDocument();
+  });
+
+  test("shown for on-hold book with previewUrl", () => {
+    const book = mergeBook<OnHoldBook>({
+      status: "on-hold",
+      borrowUrl: "/borrow",
+      previewUrl: "/preview"
+    });
+    setup(<FulfillmentCard book={book} />);
+    expect(
+      screen.queryByRole("button", { name: "Preview" })
+    ).toBeInTheDocument();
+  });
+
+  test("shown for reserved book with previewUrl", () => {
+    const book = mergeBook<ReservedBook>({
+      status: "reserved",
+      revokeUrl: "/revoke",
+      previewUrl: "/preview"
+    });
+    setup(<FulfillmentCard book={book} />);
+    expect(
+      screen.queryByRole("button", { name: "Preview" })
+    ).toBeInTheDocument();
+  });
+
+  test("not shown for fulfillable (borrowed) book even with previewUrl", () => {
+    const book = mergeBook<FulfillableBook>({
+      status: "fulfillable",
+      revokeUrl: "/revoke",
+      previewUrl: "/preview",
+      fulfillmentLinks: [
+        {
+          url: "/epub",
+          contentType: "application/epub+zip",
+          supportLevel: "show"
+        }
+      ]
+    });
+    setup(<FulfillmentCard book={book} />);
+    expect(
+      screen.queryByRole("button", { name: "Preview" })
+    ).not.toBeInTheDocument();
+  });
+});

@@ -165,3 +165,37 @@ test("calls set book after borrowing", async () => {
 
   await waitFor(() => expect(fixtures.mockSetBook).toHaveBeenCalledTimes(1));
 });
+
+describe("Preview button", () => {
+  test("renders Preview button when previewUrl is provided", () => {
+    setup(<BorrowOrReserve isBorrow url="/borrow" previewUrl="/preview" />);
+    expect(
+      screen.getByRole("button", { name: "Borrow this book" })
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Preview" })).toBeInTheDocument();
+  });
+
+  test("does not render Preview button when previewUrl is omitted", () => {
+    setup(<BorrowOrReserve isBorrow url="/borrow" />);
+    expect(
+      screen.queryByRole("button", { name: "Preview" })
+    ).not.toBeInTheDocument();
+  });
+
+  test("does not render Preview button when previewUrl is null", () => {
+    setup(<BorrowOrReserve isBorrow url="/borrow" previewUrl={null} />);
+    expect(
+      screen.queryByRole("button", { name: "Preview" })
+    ).not.toBeInTheDocument();
+  });
+
+  test("renders Preview button for reserve variant when previewUrl is provided", () => {
+    setup(
+      <BorrowOrReserve isBorrow={false} url="/reserve" previewUrl="/preview" />
+    );
+    expect(
+      screen.getByRole("button", { name: "Reserve this book" })
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Preview" })).toBeInTheDocument();
+  });
+});

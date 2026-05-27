@@ -73,6 +73,9 @@ function isRelatedLink(link: OPDSLink) {
 function isTrackOpenBookLink(link: OPDSLink) {
   return link.rel === TrackOpenBookRel;
 }
+function isHtmlPreviewLink(link: OPDSLink) {
+  return link.rel === "preview" && link.type === OPDS1.HTMLMediaType;
+}
 
 /**
  * Utils
@@ -295,6 +298,7 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
   const revokeUrl = findRevokeUrl(entry.links);
 
   const trackOpenBookLink = entry.links.find(isTrackOpenBookLink);
+  const previewUrl = entry.links.find(isHtmlPreviewLink)?.href ?? null;
 
   const bibframeTags = entryToBibframeData(entry);
   const providerName = getProviderName(bibframeTags);
@@ -328,6 +332,7 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
     url: detailUrl,
     relatedUrl: relatedLink?.href ?? null,
     trackOpenBookUrl: trackOpenBookLink?.href ?? null,
+    previewUrl: previewUrl,
     format: format,
     raw: entry.unparsed
   };

@@ -41,15 +41,28 @@ const FulfillmentContent: React.FC<{
   book: AnyBook;
 }> = ({ book }) => {
   if (bookIsBorrowable(book)) {
-    return <BorrowOrReserve url={book.borrowUrl} isBorrow />;
+    return (
+      <BorrowOrReserve
+        isBorrow
+        url={book.borrowUrl}
+        previewUrl={book.previewUrl}
+      />
+    );
   }
   if (bookIsReservable(book)) {
-    return <BorrowOrReserve url={book.reserveUrl} isBorrow={false} />;
+    return (
+      <BorrowOrReserve
+        isBorrow={false}
+        url={book.reserveUrl}
+        previewUrl={book.previewUrl}
+      />
+    );
   }
   if (bookIsReserved(book)) {
     return (
       <CancelOrReturn
         url={book.revokeUrl}
+        previewUrl={book.previewUrl}
         text="Cancel Reservation"
         loadingText="Cancelling..."
         id={book.id}
@@ -57,7 +70,13 @@ const FulfillmentContent: React.FC<{
     );
   }
   if (bookIsOnHold(book)) {
-    return <BorrowOrReserve url={book.borrowUrl} isBorrow />;
+    return (
+      <BorrowOrReserve
+        url={book.borrowUrl}
+        previewUrl={book.previewUrl}
+        isBorrow
+      />
+    );
   }
   if (bookIsFulfillable(book)) {
     return <AccessCard links={book.fulfillmentLinks} book={book} />;

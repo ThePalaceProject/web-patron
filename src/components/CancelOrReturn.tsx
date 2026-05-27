@@ -5,13 +5,16 @@ import { fetchBook } from "dataflow/opds1/fetch";
 import Button from "components/Button";
 import { Text } from "components/Text";
 import useError from "hooks/useError";
+import PreviewButton from "./PreviewButton";
+import Stack from "./Stack";
 
 const CancelOrReturn: React.FC<{
   text: string;
   loadingText: string;
   url: string | null;
   id: string;
-}> = ({ text, loadingText, url, id }) => {
+  previewUrl?: string | null;
+}> = ({ text, loadingText, url, id, previewUrl }) => {
   const { token, setBook } = useUser();
   const { catalogUrl } = useLibraryContext();
   const [loading, setLoading] = React.useState(false);
@@ -34,23 +37,26 @@ const CancelOrReturn: React.FC<{
   }
   if (!url) return null;
   return (
-    <>
-      <Button
-        onClick={() => cancelReservation(url)}
-        loading={loading}
-        loadingText={loadingText}
-        variant="ghost"
-        color="ui.gray.light"
-        sx={{
-          bg: "ui.gray.light",
-          color: "ui.gray.dark",
-          "&:hover,&:focus": { color: "ui.gray.dark" }
-        }}
-      >
-        {text}
-      </Button>
+    <Stack direction="column" sx={{ alignItems: "flex-start" }}>
+      <Stack>
+        <Button
+          onClick={() => cancelReservation(url)}
+          loading={loading}
+          loadingText={loadingText}
+          variant="ghost"
+          color="ui.gray.light"
+          sx={{
+            bg: "ui.gray.light",
+            color: "ui.gray.dark",
+            "&:hover,&:focus": { color: "ui.gray.dark" }
+          }}
+        >
+          {text}
+        </Button>
+        {previewUrl && <PreviewButton previewUrl={previewUrl} />}
+      </Stack>
       {error && <Text>{error}</Text>}
-    </>
+    </Stack>
   );
 };
 

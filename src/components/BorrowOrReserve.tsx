@@ -3,12 +3,14 @@ import useBorrow from "hooks/useBorrow";
 import Button from "./Button";
 import { Text } from "./Text";
 import Stack from "components/Stack";
+import PreviewButton from "./PreviewButton";
 
 const BorrowOrReserve: React.FC<{
   isBorrow: boolean;
   url: string;
   className?: string;
-}> = ({ isBorrow, url, className }) => {
+  previewUrl?: string | null;
+}> = ({ isBorrow, url, className, previewUrl }) => {
   const { isLoading, loadingText, buttonLabel, borrowOrReserve, error } =
     useBorrow(isBorrow);
   return (
@@ -17,13 +19,16 @@ const BorrowOrReserve: React.FC<{
       sx={{ alignItems: "flex-start" }}
       className={className}
     >
-      <Button
-        onClick={() => borrowOrReserve(url)}
-        loading={isLoading}
-        loadingText={loadingText}
-      >
-        {buttonLabel}
-      </Button>
+      <Stack>
+        <Button
+          onClick={() => borrowOrReserve(url)}
+          loading={isLoading}
+          loadingText={loadingText}
+        >
+          {buttonLabel}
+        </Button>
+        {previewUrl && <PreviewButton previewUrl={previewUrl} />}
+      </Stack>
       {error && <Text sx={{ color: "ui.error" }}>{error}</Text>}
     </Stack>
   );
