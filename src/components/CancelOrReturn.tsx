@@ -4,19 +4,19 @@ import useUser from "components/context/UserContext";
 import { fetchBook } from "dataflow/opds1/fetch";
 import Button from "components/Button";
 import useError from "hooks/useError";
-import { useFulfillmentStackError } from "components/layouts/FulfillmentStack";
+import { useFulfillmentButtonStackError } from "components/layouts/FulfillmentButtonStack";
 
 const CancelOrReturn: React.FC<{
   text: string;
   loadingText: string;
-  url: string | null;
+  revokeUrl: string | null;
   id: string;
-}> = ({ text, loadingText, url, id }) => {
+}> = ({ text, loadingText, revokeUrl, id }) => {
   const { token, setBook } = useUser();
   const { catalogUrl } = useLibraryContext();
   const [loading, setLoading] = React.useState(false);
   const { error, handleError, setErrorString, clearError } = useError();
-  const { setError } = useFulfillmentStackError();
+  const { setError } = useFulfillmentButtonStackError();
 
   React.useEffect(() => {
     setError(error ?? null);
@@ -38,11 +38,11 @@ const CancelOrReturn: React.FC<{
     setLoading(false);
   }
 
-  if (!url) return null;
+  if (!revokeUrl) return null;
 
   return (
     <Button
-      onClick={() => cancelReservation(url)}
+      onClick={() => cancelReservation(revokeUrl)}
       loading={loading}
       loadingText={loadingText}
       variant="ghost"

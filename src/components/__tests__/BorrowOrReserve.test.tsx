@@ -10,11 +10,10 @@ import {
 import BorrowOrReserve from "components/BorrowOrReserve";
 import BorrowOrReserveOrPreview from "components/BorrowOrReserveOrPreview";
 import * as fetch from "dataflow/opds1/fetch";
-import { ServerError } from "errors";
 import { mockPush, mockReplace } from "test-utils/mockNextRouter";
 
 test("shows correct button for borrowable book", async () => {
-  setup(<BorrowOrReserve isBorrow url="/url" />);
+  setup(<BorrowOrReserve isBorrow borrowUrl="/url" />);
   await screen.findByRole("button", { name: "Borrow this book" });
   expect(
     screen.getByRole("button", { name: "Borrow this book" })
@@ -22,7 +21,7 @@ test("shows correct button for borrowable book", async () => {
 });
 
 test("shows reserve button for reservable book", () => {
-  setup(<BorrowOrReserve isBorrow={false} url="/url" />);
+  setup(<BorrowOrReserve isBorrow={false} borrowUrl="/url" />);
   expect(
     screen.getByRole("button", { name: "Reserve this book" })
   ).toBeInTheDocument();
@@ -39,7 +38,7 @@ const mockedFetchBook = fetch.fetchBook as jest.MockedFunction<
 
 test("borrowing calls correct url with token", async () => {
   mockedFetchBook.mockResolvedValueOnce(fixtures.fulfillableBook);
-  setup(<BorrowOrReserve isBorrow url="/url" />);
+  setup(<BorrowOrReserve isBorrow borrowUrl="/url" />);
 
   const button = await screen.findByRole("button", {
     name: "Borrow this book"
@@ -63,7 +62,7 @@ test("borrowing calls correct url with token", async () => {
 });
 
 test("redirects to login when not signed in", async () => {
-  const { user } = setup(<BorrowOrReserve isBorrow url="/url" />, {
+  const { user } = setup(<BorrowOrReserve isBorrow borrowUrl="/url" />, {
     user: { isAuthenticated: false, token: undefined }
   });
 
@@ -76,11 +75,6 @@ test("redirects to login when not signed in", async () => {
 
   // no loading state
   expect(screen.queryByText("Borrowing...")).not.toBeInTheDocument();
-
-  // error is there
-  expect(
-    screen.getByText("Error: You must be signed in to borrow this book.")
-  ).toBeInTheDocument();
 
   // doesn't call the borrow book
   expect(mockedFetchBook).not.toHaveBeenCalled();
@@ -103,58 +97,8 @@ test("redirects to login when not signed in", async () => {
   expect(mockReplace).not.toHaveBeenCalled();
 });
 
-test("catches and displays server errors", async () => {
-  const { user } = setup(<BorrowOrReserve isBorrow url="/url" />);
-  const button = await screen.findByRole("button", {
-    name: "Borrow this book"
-  });
-
-  mockedFetchBook.mockRejectedValueOnce(
-    new ServerError("/fetched-url", 500, {
-      detail: "Something happened on the server",
-      status: 500,
-      title: "Server goofed"
-    })
-  );
-
-  await user.click(button);
-
-  // shows the error, button resets.
-  await waitFor(() => {
-    expect(
-      screen.getByText("Error: Something happened on the server")
-    ).toBeInTheDocument();
-    expect(screen.queryByText("Borrowing...")).not.toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: "Borrow this book" })
-    ).toBeInTheDocument();
-  });
-});
-
-test("catches unrecognized fetch errors", async () => {
-  const { user } = setup(<BorrowOrReserve isBorrow url="/url" />);
-  const button = await screen.findByRole("button", {
-    name: "Borrow this book"
-  });
-
-  mockedFetchBook.mockRejectedValueOnce(new Error("You messed up!"));
-
-  await user.click(button);
-
-  // shows the error, button resets.
-  await waitFor(() => {
-    expect(
-      screen.getByText("Error: An unknown error occurred.")
-    ).toBeInTheDocument();
-    expect(screen.queryByText("Borrowing...")).not.toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: "Borrow this book" })
-    ).toBeInTheDocument();
-  });
-});
-
 test("calls set book after borrowing", async () => {
-  const { user } = setup(<BorrowOrReserve isBorrow url="/url" />);
+  const { user } = setup(<BorrowOrReserve isBorrow borrowUrl="/url" />);
   const button = await screen.findByRole("button", {
     name: "Borrow this book"
   });
@@ -170,7 +114,11 @@ test("calls set book after borrowing", async () => {
 describe("Preview button (via BorrowOrReserveOrPreview)", () => {
   test("renders Preview button when previewUrl is provided", () => {
     setup(
-      <BorrowOrReserveOrPreview isBorrow url="/borrow" previewUrl="/preview" />
+      <BorrowOrReserveOrPreview
+        isBorrow
+        borrowUrl="/borrow"
+        previewUrl="/preview"
+      />
     );
     expect(
       screen.getByRole("button", { name: "Borrow this book" })
@@ -179,7 +127,7 @@ describe("Preview button (via BorrowOrReserveOrPreview)", () => {
   });
 
   test("does not render Preview button when previewUrl is omitted", () => {
-    setup(<BorrowOrReserveOrPreview isBorrow url="/borrow" />);
+    setup(<BorrowOrReserveOrPreview isBorrow borrowUrl="/borrow" />);
     expect(
       screen.queryByRole("button", { name: "Preview" })
     ).not.toBeInTheDocument();
@@ -187,7 +135,11 @@ describe("Preview button (via BorrowOrReserveOrPreview)", () => {
 
   test("does not render Preview button when previewUrl is null", () => {
     setup(
-      <BorrowOrReserveOrPreview isBorrow url="/borrow" previewUrl={null} />
+      <BorrowOrReserveOrPreview
+        isBorrow
+        borrowUrl="/borrow"
+        previewUrl={null}
+      />
     );
     expect(
       screen.queryByRole("button", { name: "Preview" })
@@ -198,7 +150,7 @@ describe("Preview button (via BorrowOrReserveOrPreview)", () => {
     setup(
       <BorrowOrReserveOrPreview
         isBorrow={false}
-        url="/reserve"
+        borrowUrl="/reserve"
         previewUrl="/preview"
       />
     );

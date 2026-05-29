@@ -215,21 +215,23 @@ const Description: React.FC<{
 
 const BookListCTA: React.FC<{ book: AnyBook }> = ({ book }) => {
   if (bookIsBorrowable(book)) {
-    return <BorrowOrReserveOrPreview url={book.borrowUrl} isBorrow />;
+    return <BorrowOrReserveOrPreview borrowUrl={book.borrowUrl} isBorrow />;
   }
 
   if (bookIsReservable(book)) {
-    return <BorrowOrReserveOrPreview url={book.reserveUrl} isBorrow={false} />;
+    return (
+      <BorrowOrReserveOrPreview borrowUrl={book.reserveUrl} isBorrow={false} />
+    );
   }
 
   if (bookIsOnHold(book)) {
-    return <BorrowOrReserveOrPreview url={book.borrowUrl} isBorrow />;
+    return <BorrowOrReserveOrPreview borrowUrl={book.borrowUrl} isBorrow />;
   }
 
   if (bookIsReserved(book)) {
     return (
       <CancelOrReturnOrPreview
-        url={book.revokeUrl}
+        revokeUrl={book.revokeUrl}
         id={book.id}
         text="Cancel Reservation"
         loadingText="Cancelling..."
@@ -263,7 +265,7 @@ const BookListCTA: React.FC<{ book: AnyBook }> = ({ book }) => {
           />
         )}
         <CancelOrReturnOrPreview
-          url={book.revokeUrl}
+          revokeUrl={book.revokeUrl}
           loadingText="Returning..."
           id={book.id}
           text="Return"

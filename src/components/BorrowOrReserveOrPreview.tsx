@@ -1,18 +1,18 @@
 import * as React from "react";
-import FulfillmentStack from "components/layouts/FulfillmentStack";
+import FulfillmentButtonStack from "components/layouts/FulfillmentButtonStack";
 import BorrowOrReserve from "./BorrowOrReserve";
 import PreviewButton from "./PreviewButton";
 
 const BorrowOrReserveOrPreview: React.FC<{
   isBorrow: boolean;
-  url: string;
+  borrowUrl: string;
   previewUrl?: string | null;
   className?: string;
-}> = ({ isBorrow, url, previewUrl, className }) => (
-  <FulfillmentStack className={className}>
-    <BorrowOrReserve isBorrow={isBorrow} url={url} />
+}> = ({ isBorrow, borrowUrl, previewUrl, className }) => (
+  <FulfillmentButtonStack className={className}>
+    <BorrowOrReserve isBorrow={isBorrow} borrowUrl={borrowUrl} />
     <PreviewButton previewUrl={previewUrl} />
-  </FulfillmentStack>
+  </FulfillmentButtonStack>
 );
 
 export default BorrowOrReserveOrPreview;

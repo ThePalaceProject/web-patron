@@ -2,18 +2,19 @@ import * as React from "react";
 import Button from "components/Button";
 import SvgExternalLink from "icons/ExternalOpen";
 import { openPendingTab } from "utils/window";
-import { useFulfillmentStackError } from "components/layouts/FulfillmentStack";
+import { useFulfillmentButtonStackError } from "components/layouts/FulfillmentButtonStack";
 
 const PreviewButton: React.FC<{ previewUrl?: string | null }> = ({
   previewUrl
 }) => {
-  const { setError } = useFulfillmentStackError();
+  const { setError } = useFulfillmentButtonStackError();
 
   function open() {
     setError(null);
     try {
+      if (!previewUrl) throw Error();
       const tab = openPendingTab();
-      tab.navigate(previewUrl as string);
+      tab.navigate(previewUrl);
     } catch {
       setError("Error: Could not open preview.");
     }

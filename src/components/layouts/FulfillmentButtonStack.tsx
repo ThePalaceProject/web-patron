@@ -2,13 +2,17 @@ import * as React from "react";
 import Stack from "components/Stack";
 import { Text } from "components/Text";
 
-type FulfillmentStackErrorCtx = { setError: (msg: string | null) => void };
-const NOOP: FulfillmentStackErrorCtx = { setError: () => undefined };
-const Ctx = React.createContext<FulfillmentStackErrorCtx>(NOOP);
+type FulfillmentButtonStackErrorCtx = {
+  setError: (msg: string | null) => void;
+};
 
-export const useFulfillmentStackError = () => React.useContext(Ctx);
+const Ctx = React.createContext<FulfillmentButtonStackErrorCtx>({
+  setError: () => undefined
+});
 
-const FulfillmentStack: React.FC<{
+export const useFulfillmentButtonStackError = () => React.useContext(Ctx);
+
+const FulfillmentButtonStack: React.FC<{
   className?: string;
   children: React.ReactNode;
 }> = ({ className, children }) => {
@@ -27,4 +31,4 @@ const FulfillmentStack: React.FC<{
   );
 };
 
-export default FulfillmentStack;
+export default FulfillmentButtonStack;

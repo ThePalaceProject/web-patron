@@ -12,8 +12,7 @@ function assertHttpsUrl(url: string): void {
 }
 
 /**
- * Opens a blank placeholder tab synchronously (to satisfy popup-blocker
- * heuristics) and returns a handle to navigate it once the real URL is ready.
+ * Opens a blank tab synchronous so the browser treats it as user-initiated, bypassing popup blockers.
  * Sets opener=null to prevent tabnabbing and injects a no-referrer meta tag.
  * Falls back to same-tab navigation when popups are blocked.
  */

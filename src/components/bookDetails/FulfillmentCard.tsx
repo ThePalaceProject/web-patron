@@ -44,7 +44,7 @@ const FulfillmentContent: React.FC<{
     return (
       <BorrowOrReserveOrPreview
         isBorrow
-        url={book.borrowUrl}
+        borrowUrl={book.borrowUrl}
         previewUrl={book.previewUrl}
       />
     );
@@ -53,7 +53,7 @@ const FulfillmentContent: React.FC<{
     return (
       <BorrowOrReserveOrPreview
         isBorrow={false}
-        url={book.reserveUrl}
+        borrowUrl={book.reserveUrl}
         previewUrl={book.previewUrl}
       />
     );
@@ -61,7 +61,7 @@ const FulfillmentContent: React.FC<{
   if (bookIsReserved(book)) {
     return (
       <CancelOrReturnOrPreview
-        url={book.revokeUrl}
+        revokeUrl={book.revokeUrl}
         previewUrl={book.previewUrl}
         text="Cancel Reservation"
         loadingText="Cancelling..."
@@ -72,7 +72,7 @@ const FulfillmentContent: React.FC<{
   if (bookIsOnHold(book)) {
     return (
       <BorrowOrReserveOrPreview
-        url={book.borrowUrl}
+        borrowUrl={book.borrowUrl}
         previewUrl={book.previewUrl}
         isBorrow
       />
@@ -124,7 +124,7 @@ const AccessCard: React.FC<{
             />
           ))}
           <CancelOrReturnOrPreview
-            url={book.revokeUrl}
+            revokeUrl={book.revokeUrl}
             loadingText="Returning..."
             id={book.id}
             text="Return"
@@ -132,7 +132,7 @@ const AccessCard: React.FC<{
         </Stack>
       ) : (
         <CancelOrReturnOrPreview
-          url={book.revokeUrl}
+          revokeUrl={book.revokeUrl}
           loadingText="Returning..."
           id={book.id}
           text="Return"
