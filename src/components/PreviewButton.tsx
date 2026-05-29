@@ -13,7 +13,7 @@ const PreviewButton: React.FC<{ previewUrl?: string | null }> = ({
     setError(null);
     const tab = openPendingTab();
     try {
-      tab.navigate(previewUrl);
+      tab.navigate(previewUrl as string);
     } catch {
       tab.close();
       setError("Error: Could not open preview.");
