@@ -13,13 +13,13 @@ import Button from "./Button";
 import LoadingIndicator from "./LoadingIndicator";
 import { H2, P, ScreenReaderOnly, Text } from "./Text";
 import BookCover from "./BookCover";
-import BorrowOrReserve from "./BorrowOrReserve";
+import BorrowOrReserveOrPreview from "./BorrowOrReserveOrPreview";
+import CancelOrReturnOrPreview from "./CancelOrReturnOrPreview";
 import { AnyBook, CollectionData, LaneData } from "interfaces";
 import { fetchCollection } from "dataflow/opds1/fetch";
 import useSWRInfinite from "swr/infinite";
 import useUser from "components/context/UserContext";
 import Stack from "components/Stack";
-import CancelOrReturn from "components/CancelOrReturn";
 import FulfillmentButton from "components/FulfillmentButton";
 import {
   getFulfillmentFromLink,
@@ -215,21 +215,23 @@ const Description: React.FC<{
 
 const BookListCTA: React.FC<{ book: AnyBook }> = ({ book }) => {
   if (bookIsBorrowable(book)) {
-    return <BorrowOrReserve url={book.borrowUrl} isBorrow />;
+    return <BorrowOrReserveOrPreview borrowUrl={book.borrowUrl} isBorrow />;
   }
 
   if (bookIsReservable(book)) {
-    return <BorrowOrReserve url={book.reserveUrl} isBorrow={false} />;
+    return (
+      <BorrowOrReserveOrPreview borrowUrl={book.reserveUrl} isBorrow={false} />
+    );
   }
 
   if (bookIsOnHold(book)) {
-    return <BorrowOrReserve url={book.borrowUrl} isBorrow />;
+    return <BorrowOrReserveOrPreview borrowUrl={book.borrowUrl} isBorrow />;
   }
 
   if (bookIsReserved(book)) {
     return (
-      <CancelOrReturn
-        url={book.revokeUrl}
+      <CancelOrReturnOrPreview
+        revokeUrl={book.revokeUrl}
         id={book.id}
         text="Cancel Reservation"
         loadingText="Cancelling..."
@@ -262,8 +264,8 @@ const BookListCTA: React.FC<{ book: AnyBook }> = ({ book }) => {
             isPrimaryAction
           />
         )}
-        <CancelOrReturn
-          url={book.revokeUrl}
+        <CancelOrReturnOrPreview
+          revokeUrl={book.revokeUrl}
           loadingText="Returning..."
           id={book.id}
           text="Return"

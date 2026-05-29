@@ -21,6 +21,7 @@ import fetchMock from "jest-fetch-mock";
 import * as fetch from "dataflow/opds1/fetch";
 import { ServerError } from "errors";
 import { MOCK_DATE_STRING } from "test-utils/mockToDateString";
+import { makeMockTab } from "test-utils/mockTab";
 
 jest.mock("downloadjs");
 window.open = jest.fn();
@@ -318,25 +319,12 @@ describe("FulfillableBook", () => {
     revokeUrl: "/revoke",
     fulfillmentLinks: [
       {
-        url: "/read-online",
+        url: "https://example.com/read-online",
         contentType: `text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"`,
         supportLevel: "show"
       }
     ]
   });
-
-  function makeMockTab() {
-    return {
-      document: {
-        title: "",
-        body: { appendChild: jest.fn() },
-        createElement: jest
-          .fn()
-          .mockReturnValue({ textContent: "", style: { cssText: "" } })
-      },
-      location: { href: "" }
-    };
-  }
 
   const downloadableBook = mergeBook<FulfillableBook>({
     status: "fulfillable",
@@ -447,11 +435,14 @@ describe("FulfillableBook", () => {
     fireEvent.click(readOnline);
 
     expect(window.open).toHaveBeenCalledWith("about:blank", "_blank");
+    expect(mockTab.opener).toBeNull();
     expect(mockTab.document.title).toBe("Loading\u2026");
     expect(mockTab.document.createElement).toHaveBeenCalledWith("p");
     expect(mockTab.document.body.appendChild).toHaveBeenCalled();
 
-    await waitFor(() => expect(mockTab.location.href).toBe("/read-online"));
+    await waitFor(() =>
+      expect(mockTab.location.href).toBe("https://example.com/read-online")
+    );
   });
 
   test("navigates the new tab to the external reader URL", async () => {
@@ -466,7 +457,7 @@ describe("FulfillableBook", () => {
     fireEvent.click(readOnline);
 
     await waitFor(() => {
-      expect(mockTab.location.href).toBe("/read-online");
+      expect(mockTab.location.href).toBe("https://example.com/read-online");
     });
   });
 
@@ -492,7 +483,7 @@ describe("FulfillableBook", () => {
     // With newTab null, the component should fall back to navigating the
     // current tab to the external reader URL.
     await waitFor(() => {
-      expect(window.location.href).toBe("/read-online");
+      expect(window.location.href).toBe("https://example.com/read-online");
     });
 
     (window as any).location = originalLocation;
@@ -661,5 +652,82 @@ describe("FulfillableBook", () => {
 
     // we try the rejected url without headers
     expect(fetchMock).toHaveBeenCalledWith("/new-location");
+  });
+});
+
+describe("Preview button", () => {
+  test("shown for borrowable book with previewUrl", () => {
+    const book = mergeBook<BorrowableBook>({
+      status: "borrowable",
+      borrowUrl: "/borrow",
+      previewUrl: "/preview"
+    });
+    setup(<FulfillmentCard book={book} />);
+    expect(screen.getByRole("button", { name: "Preview" })).toBeInTheDocument();
+  });
+
+  test("not shown for borrowable book without previewUrl", () => {
+    const book = mergeBook<BorrowableBook>({
+      status: "borrowable",
+      borrowUrl: "/borrow",
+      previewUrl: null
+    });
+    setup(<FulfillmentCard book={book} />);
+    expect(
+      screen.queryByRole("button", { name: "Preview" })
+    ).not.toBeInTheDocument();
+  });
+
+  test("shown for reservable book with previewUrl", () => {
+    const book = mergeBook<ReservableBook>({
+      status: "reservable",
+      reserveUrl: "/reserve",
+      previewUrl: "/preview"
+    });
+    setup(<FulfillmentCard book={book} />);
+    expect(screen.getByRole("button", { name: "Preview" })).toBeInTheDocument();
+  });
+
+  test("shown for on-hold book with previewUrl", () => {
+    const book = mergeBook<OnHoldBook>({
+      status: "on-hold",
+      borrowUrl: "/borrow",
+      previewUrl: "/preview"
+    });
+    setup(<FulfillmentCard book={book} />);
+    expect(
+      screen.queryByRole("button", { name: "Preview" })
+    ).toBeInTheDocument();
+  });
+
+  test("shown for reserved book with previewUrl", () => {
+    const book = mergeBook<ReservedBook>({
+      status: "reserved",
+      revokeUrl: "/revoke",
+      previewUrl: "/preview"
+    });
+    setup(<FulfillmentCard book={book} />);
+    expect(
+      screen.queryByRole("button", { name: "Preview" })
+    ).toBeInTheDocument();
+  });
+
+  test("not shown for fulfillable (borrowed) book even with previewUrl", () => {
+    const book = mergeBook<FulfillableBook>({
+      status: "fulfillable",
+      revokeUrl: "/revoke",
+      previewUrl: "/preview",
+      fulfillmentLinks: [
+        {
+          url: "/epub",
+          contentType: "application/epub+zip",
+          supportLevel: "show"
+        }
+      ]
+    });
+    setup(<FulfillmentCard book={book} />);
+    expect(
+      screen.queryByRole("button", { name: "Preview" })
+    ).not.toBeInTheDocument();
   });
 });

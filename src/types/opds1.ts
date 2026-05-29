@@ -17,6 +17,7 @@ export const BorrowLinkRel = "http://opds-spec.org/acquisition/borrow";
 export const RevokeLinkRel = "http://librarysimplified.org/terms/rel/revoke";
 export const TrackOpenBookRel =
   "http://librarysimplified.org/terms/rel/analytics/open-book";
+export const PreviewRel = "preview";
 export type AnyLinkRelation =
   | typeof SelfRel
   | typeof AuthDocLinkRelation

@@ -219,6 +219,7 @@ export type Book<Status = EmptyObject> = Readonly<
     relatedUrl: string | null;
     raw?: any;
     trackOpenBookUrl: string | null;
+    previewUrl: string | null;
   }
 >;
 

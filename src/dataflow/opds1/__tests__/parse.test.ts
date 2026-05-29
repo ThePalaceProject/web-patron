@@ -798,3 +798,65 @@ test("extracts inferred Audiobook format from indirect acquisition links", () =>
   const book = entryToBook(entry, "http://test-url.com");
   expect(book.format).toBe("Audiobook");
 });
+
+describe("previewUrl", () => {
+  test("populates previewUrl from rel=preview type=text/html link", () => {
+    mockConfig();
+    const previewLink = factory.opdsLink({
+      rel: "preview",
+      type: OPDS1.HTMLMediaType,
+      href: "/preview.html"
+    });
+    const entry = factory.entry({
+      ...basicInfo,
+      links: [detailLink, previewLink]
+    });
+    const book = entryToBook(entry, "http://test-url.com");
+    expect(book.previewUrl).toBe("/preview.html");
+  });
+
+  test("returns null when no preview link is present", () => {
+    mockConfig();
+    const entry = factory.entry({
+      ...basicInfo,
+      links: [detailLink]
+    });
+    const book = entryToBook(entry, "http://test-url.com");
+    expect(book.previewUrl).toBeNull();
+  });
+
+  test("ignores rel=preview links with non-HTML type", () => {
+    mockConfig();
+    const audioPreviewLink = factory.opdsLink({
+      rel: "preview",
+      type: "audio/mpeg",
+      href: "/preview.mp3"
+    });
+    const entry = factory.entry({
+      ...basicInfo,
+      links: [detailLink, audioPreviewLink]
+    });
+    const book = entryToBook(entry, "http://test-url.com");
+    expect(book.previewUrl).toBeNull();
+  });
+
+  test("picks the text/html link when both audio and html previews exist", () => {
+    mockConfig();
+    const audioPreviewLink = factory.opdsLink({
+      rel: "preview",
+      type: "audio/mpeg",
+      href: "/preview.mp3"
+    });
+    const htmlPreviewLink = factory.opdsLink({
+      rel: "preview",
+      type: OPDS1.HTMLMediaType,
+      href: "/preview.html"
+    });
+    const entry = factory.entry({
+      ...basicInfo,
+      links: [detailLink, audioPreviewLink, htmlPreviewLink]
+    });
+    const book = entryToBook(entry, "http://test-url.com");
+    expect(book.previewUrl).toBe("/preview.html");
+  });
+});
