@@ -9,7 +9,8 @@ import {
 import withErrorBoundary from "../ErrorBoundary";
 import Stack from "components/Stack";
 import { Text } from "components/Text";
-import BorrowOrReserve from "components/BorrowOrReserve";
+import BorrowOrReserveOrPreview from "components/BorrowOrReserveOrPreview";
+import CancelOrReturnOrPreview from "components/CancelOrReturnOrPreview";
 import FulfillmentButton from "components/FulfillmentButton";
 import {
   getFulfillmentsFromBook,
@@ -17,7 +18,6 @@ import {
 } from "utils/fulfill";
 import BookStatus from "components/BookStatus";
 import { AnyBook, FulfillableBook, FulfillmentLink } from "interfaces";
-import CancelOrReturn from "components/CancelOrReturn";
 
 const FulfillmentCard: React.FC<{ book: AnyBook }> = ({ book }) => {
   return (
@@ -42,7 +42,7 @@ const FulfillmentContent: React.FC<{
 }> = ({ book }) => {
   if (bookIsBorrowable(book)) {
     return (
-      <BorrowOrReserve
+      <BorrowOrReserveOrPreview
         isBorrow
         url={book.borrowUrl}
         previewUrl={book.previewUrl}
@@ -51,7 +51,7 @@ const FulfillmentContent: React.FC<{
   }
   if (bookIsReservable(book)) {
     return (
-      <BorrowOrReserve
+      <BorrowOrReserveOrPreview
         isBorrow={false}
         url={book.reserveUrl}
         previewUrl={book.previewUrl}
@@ -60,7 +60,7 @@ const FulfillmentContent: React.FC<{
   }
   if (bookIsReserved(book)) {
     return (
-      <CancelOrReturn
+      <CancelOrReturnOrPreview
         url={book.revokeUrl}
         previewUrl={book.previewUrl}
         text="Cancel Reservation"
@@ -71,7 +71,7 @@ const FulfillmentContent: React.FC<{
   }
   if (bookIsOnHold(book)) {
     return (
-      <BorrowOrReserve
+      <BorrowOrReserveOrPreview
         url={book.borrowUrl}
         previewUrl={book.previewUrl}
         isBorrow
@@ -123,7 +123,7 @@ const AccessCard: React.FC<{
               book={book}
             />
           ))}
-          <CancelOrReturn
+          <CancelOrReturnOrPreview
             url={book.revokeUrl}
             loadingText="Returning..."
             id={book.id}
@@ -131,7 +131,7 @@ const AccessCard: React.FC<{
           />
         </Stack>
       ) : (
-        <CancelOrReturn
+        <CancelOrReturnOrPreview
           url={book.revokeUrl}
           loadingText="Returning..."
           id={book.id}

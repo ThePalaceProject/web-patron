@@ -1,36 +1,28 @@
 import * as React from "react";
 import useBorrow from "hooks/useBorrow";
 import Button from "./Button";
-import { Text } from "./Text";
-import Stack from "components/Stack";
-import PreviewButton from "./PreviewButton";
+import { useFulfillmentStackError } from "components/layouts/FulfillmentStack";
 
 const BorrowOrReserve: React.FC<{
   isBorrow: boolean;
   url: string;
-  className?: string;
-  previewUrl?: string | null;
-}> = ({ isBorrow, url, className, previewUrl }) => {
+}> = ({ isBorrow, url }) => {
   const { isLoading, loadingText, buttonLabel, borrowOrReserve, error } =
     useBorrow(isBorrow);
+  const { setError } = useFulfillmentStackError();
+
+  React.useEffect(() => {
+    setError(error ?? null);
+  }, [error, setError]);
+
   return (
-    <Stack
-      direction="column"
-      sx={{ alignItems: "flex-start" }}
-      className={className}
+    <Button
+      onClick={() => borrowOrReserve(url)}
+      loading={isLoading}
+      loadingText={loadingText}
     >
-      <Stack>
-        <Button
-          onClick={() => borrowOrReserve(url)}
-          loading={isLoading}
-          loadingText={loadingText}
-        >
-          {buttonLabel}
-        </Button>
-        {previewUrl && <PreviewButton previewUrl={previewUrl} />}
-      </Stack>
-      {error && <Text sx={{ color: "ui.error" }}>{error}</Text>}
-    </Stack>
+      {buttonLabel}
+    </Button>
   );
 };
 

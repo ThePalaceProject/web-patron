@@ -8,6 +8,7 @@ import {
   waitForElementToBeRemoved
 } from "test-utils";
 import BorrowOrReserve from "components/BorrowOrReserve";
+import BorrowOrReserveOrPreview from "components/BorrowOrReserveOrPreview";
 import * as fetch from "dataflow/opds1/fetch";
 import { ServerError } from "errors";
 import { mockPush, mockReplace } from "test-utils/mockNextRouter";
@@ -166,9 +167,11 @@ test("calls set book after borrowing", async () => {
   await waitFor(() => expect(fixtures.mockSetBook).toHaveBeenCalledTimes(1));
 });
 
-describe("Preview button", () => {
+describe("Preview button (via BorrowOrReserveOrPreview)", () => {
   test("renders Preview button when previewUrl is provided", () => {
-    setup(<BorrowOrReserve isBorrow url="/borrow" previewUrl="/preview" />);
+    setup(
+      <BorrowOrReserveOrPreview isBorrow url="/borrow" previewUrl="/preview" />
+    );
     expect(
       screen.getByRole("button", { name: "Borrow this book" })
     ).toBeInTheDocument();
@@ -176,14 +179,16 @@ describe("Preview button", () => {
   });
 
   test("does not render Preview button when previewUrl is omitted", () => {
-    setup(<BorrowOrReserve isBorrow url="/borrow" />);
+    setup(<BorrowOrReserveOrPreview isBorrow url="/borrow" />);
     expect(
       screen.queryByRole("button", { name: "Preview" })
     ).not.toBeInTheDocument();
   });
 
   test("does not render Preview button when previewUrl is null", () => {
-    setup(<BorrowOrReserve isBorrow url="/borrow" previewUrl={null} />);
+    setup(
+      <BorrowOrReserveOrPreview isBorrow url="/borrow" previewUrl={null} />
+    );
     expect(
       screen.queryByRole("button", { name: "Preview" })
     ).not.toBeInTheDocument();
@@ -191,7 +196,11 @@ describe("Preview button", () => {
 
   test("renders Preview button for reserve variant when previewUrl is provided", () => {
     setup(
-      <BorrowOrReserve isBorrow={false} url="/reserve" previewUrl="/preview" />
+      <BorrowOrReserveOrPreview
+        isBorrow={false}
+        url="/reserve"
+        previewUrl="/preview"
+      />
     );
     expect(
       screen.getByRole("button", { name: "Reserve this book" })

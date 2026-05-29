@@ -30,7 +30,8 @@ import {
 import {
   EPUB_MEDIA_TYPES,
   IncorrectAdobeDrmMediaType,
-  PdfMediaType
+  PdfMediaType,
+  PreviewRel
 } from "types/opds1";
 import { getAppSupportLevel } from "utils/fulfill";
 import { TrackOpenBookRel } from "types/opds1";
@@ -74,7 +75,7 @@ function isTrackOpenBookLink(link: OPDSLink) {
   return link.rel === TrackOpenBookRel;
 }
 function isHtmlPreviewLink(link: OPDSLink) {
-  return link.rel === "preview" && link.type === OPDS1.HTMLMediaType;
+  return link.rel === PreviewRel && link.type === OPDS1.HTMLMediaType;
 }
 
 /**

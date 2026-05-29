@@ -318,7 +318,7 @@ describe("FulfillableBook", () => {
     revokeUrl: "/revoke",
     fulfillmentLinks: [
       {
-        url: "/read-online",
+        url: "https://example.com/read-online",
         contentType: `text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"`,
         supportLevel: "show"
       }
@@ -327,12 +327,18 @@ describe("FulfillableBook", () => {
 
   function makeMockTab() {
     return {
+      opener: undefined as null | undefined,
+      close: jest.fn(),
       document: {
         title: "",
+        head: { appendChild: jest.fn() },
         body: { appendChild: jest.fn() },
-        createElement: jest
-          .fn()
-          .mockReturnValue({ textContent: "", style: { cssText: "" } })
+        createElement: jest.fn().mockReturnValue({
+          textContent: "",
+          style: { cssText: "" },
+          name: "",
+          content: ""
+        })
       },
       location: { href: "" }
     };
@@ -447,11 +453,14 @@ describe("FulfillableBook", () => {
     fireEvent.click(readOnline);
 
     expect(window.open).toHaveBeenCalledWith("about:blank", "_blank");
+    expect(mockTab.opener).toBeNull();
     expect(mockTab.document.title).toBe("Loading\u2026");
     expect(mockTab.document.createElement).toHaveBeenCalledWith("p");
     expect(mockTab.document.body.appendChild).toHaveBeenCalled();
 
-    await waitFor(() => expect(mockTab.location.href).toBe("/read-online"));
+    await waitFor(() =>
+      expect(mockTab.location.href).toBe("https://example.com/read-online")
+    );
   });
 
   test("navigates the new tab to the external reader URL", async () => {
@@ -466,7 +475,7 @@ describe("FulfillableBook", () => {
     fireEvent.click(readOnline);
 
     await waitFor(() => {
-      expect(mockTab.location.href).toBe("/read-online");
+      expect(mockTab.location.href).toBe("https://example.com/read-online");
     });
   });
 
@@ -492,7 +501,7 @@ describe("FulfillableBook", () => {
     // With newTab null, the component should fall back to navigating the
     // current tab to the external reader URL.
     await waitFor(() => {
-      expect(window.location.href).toBe("/read-online");
+      expect(window.location.href).toBe("https://example.com/read-online");
     });
 
     (window as any).location = originalLocation;
