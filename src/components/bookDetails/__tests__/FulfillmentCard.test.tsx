@@ -21,6 +21,7 @@ import fetchMock from "jest-fetch-mock";
 import * as fetch from "dataflow/opds1/fetch";
 import { ServerError } from "errors";
 import { MOCK_DATE_STRING } from "test-utils/mockToDateString";
+import { makeMockTab } from "test-utils/mockTab";
 
 jest.mock("downloadjs");
 window.open = jest.fn();
@@ -324,25 +325,6 @@ describe("FulfillableBook", () => {
       }
     ]
   });
-
-  function makeMockTab() {
-    return {
-      opener: undefined as null | undefined,
-      close: jest.fn(),
-      document: {
-        title: "",
-        head: { appendChild: jest.fn() },
-        body: { appendChild: jest.fn() },
-        createElement: jest.fn().mockReturnValue({
-          textContent: "",
-          style: { cssText: "" },
-          name: "",
-          content: ""
-        })
-      },
-      location: { href: "" }
-    };
-  }
 
   const downloadableBook = mergeBook<FulfillableBook>({
     status: "fulfillable",

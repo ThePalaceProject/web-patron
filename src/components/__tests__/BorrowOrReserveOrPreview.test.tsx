@@ -3,6 +3,7 @@ import { screen, setup, waitFor } from "test-utils";
 import BorrowOrReserveOrPreview from "components/BorrowOrReserveOrPreview";
 import * as fetch from "dataflow/opds1/fetch";
 import { ServerError } from "errors";
+import { makeMockTab } from "test-utils/mockTab";
 
 (fetch as any).fetchBook = jest.fn();
 const mockedFetchBook = fetch.fetchBook as jest.MockedFunction<
@@ -10,25 +11,6 @@ const mockedFetchBook = fetch.fetchBook as jest.MockedFunction<
 >;
 
 window.open = jest.fn();
-
-function makeMockTab() {
-  return {
-    opener: undefined as null | undefined,
-    close: jest.fn(),
-    document: {
-      title: "",
-      head: { appendChild: jest.fn() },
-      body: { appendChild: jest.fn() },
-      createElement: jest.fn().mockReturnValue({
-        textContent: "",
-        style: { cssText: "" },
-        name: "",
-        content: ""
-      })
-    },
-    location: { href: "" }
-  };
-}
 
 beforeEach(() => {
   jest.clearAllMocks();
