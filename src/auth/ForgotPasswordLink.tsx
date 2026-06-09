@@ -10,9 +10,7 @@ const ForgotPasswordLink: React.FC = () => {
   if (!resetPassword?.href) return null;
 
   return (
-    <ExternalLink href={resetPassword.href} target="_blank">
-      Forgot your password?
-    </ExternalLink>
+    <ExternalLink href={resetPassword.href}>Forgot your password?</ExternalLink>
   );
 };
 
