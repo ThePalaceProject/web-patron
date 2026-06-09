@@ -8,7 +8,7 @@ const ExternalLink: React.FC<React.ComponentPropsWithoutRef<"a">> = ({
 }) => (
   <AnchorButton
     variant="link"
-    target="__blank"
+    target="_blank"
     rel="noopener noreferrer"
     {...props}
   >

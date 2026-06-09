@@ -30,7 +30,7 @@ test("shows external links when present in state w/ apropriate attributes", () =
     expect(lnk).toBeInTheDocument();
     expect(lnk).toHaveAttribute("href", "/wherever");
     expect(lnk).toHaveAttribute("rel", "noopener noreferrer");
-    expect(lnk).toHaveAttribute("target", "__blank");
+    expect(lnk).toHaveAttribute("target", "_blank");
   };
   expectExternalLink("Library Homepage (Opens in a new tab)");
   expectExternalLink("Need a library card? (Opens in a new tab)");
