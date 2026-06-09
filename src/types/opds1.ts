@@ -168,11 +168,14 @@ export const CatalogRootRel = "start";
 export const ShelfLinkRel = "http://opds-spec.org/shelf";
 export const UserProfileLinkRel =
   "http://librarysimplified.org/terms/rel/user-profile";
+export const PasswordResetLinkRel =
+  "http://librarysimplified.org/terms/rel/patron-password-reset";
 type AuthDocLinkRelations =
   | typeof SelfRel
   | typeof CatalogRootRel
   | typeof ShelfLinkRel
   | typeof UserProfileLinkRel
+  | typeof PasswordResetLinkRel
   | "navigation"
   | "logo"
   | "register"

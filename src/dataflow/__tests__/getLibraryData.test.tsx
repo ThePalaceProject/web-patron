@@ -326,6 +326,10 @@ describe("buildLibraryData", () => {
         href: "/register"
       },
       {
+        rel: OPDS1.PasswordResetLinkRel,
+        href: "/reset-password"
+      },
+      {
         rel: "logo",
         href: "/logo"
       },
@@ -381,6 +385,10 @@ describe("buildLibraryData", () => {
       helpEmail: {
         rel: "help",
         href: "helpEmail"
+      },
+      resetPassword: {
+        rel: OPDS1.PasswordResetLinkRel,
+        href: "/reset-password"
       }
     });
 

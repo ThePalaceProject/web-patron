@@ -85,6 +85,7 @@ export type LibraryLinks = {
   about?: OPDS1.Link;
   privacyPolicy?: OPDS1.Link;
   registration?: OPDS1.Link;
+  resetPassword?: OPDS1.Link;
 };
 
 /**

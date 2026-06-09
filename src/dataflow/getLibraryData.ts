@@ -264,6 +264,8 @@ function parseLinks(links: OPDS1.AuthDocumentLink[] | undefined): LibraryLinks {
         if (link.type === OPDS1.HTMLMediaType)
           return { ...links, helpWebsite: link };
         return { ...links, helpEmail: link };
+      case OPDS1.PasswordResetLinkRel:
+        return { ...links, resetPassword: link };
       case "register":
       case "logo":
       case "navigation":

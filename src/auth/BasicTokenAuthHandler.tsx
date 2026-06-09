@@ -6,6 +6,7 @@ import FormInput from "components/form/FormInput";
 import { modalButtonStyles } from "components/Modal";
 import { ClientBasicTokenMethod } from "interfaces";
 import { generateToken } from "auth/useCredentials";
+import ForgotPasswordLink from "auth/ForgotPasswordLink";
 import useUser from "components/context/UserContext";
 import ApplicationError, { ServerError } from "errors";
 import { Keyboard } from "types/opds1";
@@ -151,6 +152,8 @@ const BasicTokenAuthHandler: React.FC<{
       >
         Login
       </Button>
+
+      <ForgotPasswordLink />
     </form>
   );
 };
