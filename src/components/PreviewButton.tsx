@@ -24,8 +24,8 @@ const PreviewButton: React.FC<{ previewUrl?: string | null }> = ({
 
   return (
     <Button
-      variant="ghost"
-      color="ui.gray.extraDark"
+      variant="outlined"
+      // color="ui.gray.extraDark"
       iconLeft={SvgExternalLink}
       onClick={open}
     >

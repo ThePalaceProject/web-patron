@@ -48,6 +48,12 @@ const variants = {
         fontWeight: "light",
         lineHeight: 3
       },
+      medium: {
+        fontFamily: "body",
+        fontSize: 0,
+        fontWeight: "medium",
+        lineHeight: 3
+      },
       bold: {
         fontFamily: "body",
         fontSize: 0,
@@ -92,6 +98,16 @@ const variants = {
       clip: "rect(0,0,0,0)",
       whiteSpace: "nowrap",
       border: 0
+    }
+  },
+  badges: {
+    primary: {
+      borderRadius: "50%",
+      height: "28px",
+      width: "28px",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center"
     }
   }
 };

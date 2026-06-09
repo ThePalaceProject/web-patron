@@ -22,6 +22,7 @@ import useUser from "components/context/UserContext";
 import useBreadcrumbContext from "components/context/BreadcrumbContext";
 import { useAppConfig } from "components/context/AppConfigContext";
 import { getAuthors, getLanguageLabel } from "utils/book";
+import Stack from "components/Stack";
 
 export const BookDetails: React.FC = () => {
   const { companionApp, showMedium } = useAppConfig();
@@ -72,18 +73,24 @@ export const BookDetails: React.FC = () => {
               flexDirection: "column"
             }}
           >
-            <H1 sx={{ m: 0 }}>
-              <ScreenReaderOnly>Book title: </ScreenReaderOnly>
-              {book.title}
-              {book.subtitle && `: ${book.subtitle}`}
-            </H1>
+            <Stack direction="column">
+              <H1 sx={{ m: 0 }}>
+                <ScreenReaderOnly>Book title: </ScreenReaderOnly>
+                {book.title}
+                {book.subtitle && `: ${book.subtitle}`}
+              </H1>
 
-            <Text variant="text.callouts.regular">
-              by&nbsp;
-              {getAuthors(book)?.join(", ") ?? "Unknown"}
-            </Text>
-            {showMedium && <MediumIndicator book={book} />}
-            <FulfillmentCard book={book} sx={{ mt: 3 }} />
+              <Text variant="text.callouts.regular">
+                by&nbsp;
+                {getAuthors(book)?.join(", ") ?? "Unknown"}
+              </Text>
+              {showMedium && (
+                <div sx={{ my: 2 }}>
+                  <MediumIndicator book={book} />
+                </div>
+              )}
+              <FulfillmentCard book={book} sx={{ mt: 3 }} />
+            </Stack>
             <Summary book={book} />
             <dl
               sx={{

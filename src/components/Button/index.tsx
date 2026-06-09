@@ -7,7 +7,7 @@ import LoadingIndicator from "components/LoadingIndicator";
 import { Text } from "components/Text";
 import { FontAwesomeIconProps } from "@fortawesome/react-fontawesome";
 
-export type ButtonVariant = "filled" | "ghost" | "link";
+export type ButtonVariant = "filled" | "ghost" | "link" | "outlined";
 export type IconButtonVariant = "input";
 export type ButtonSize = "sm" | "md" | "lg";
 type ButtonOwnProps = {
@@ -166,7 +166,7 @@ export const InputIconButton = ({
 };
 
 const defaultVariant = "filled";
-const defaultColor = "brand.primary";
+const defaultColor = "ui.black";
 const defaultSize = "md";
 
 export default Button;

@@ -21,7 +21,11 @@ const ui = {
     extraExtraLight: "#fafafa"
   },
   blue: {
-    focus: "#007AFF"
+    focus: "#007AFF",
+    light: "#43BAE6"
+  },
+  green: {
+    success: "#32855D"
   }
 };
 

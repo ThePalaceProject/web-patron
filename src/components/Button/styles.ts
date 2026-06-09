@@ -5,7 +5,7 @@ import { ButtonSize, ButtonVariant, IconButtonVariant } from "./index";
 export const sizes = {
   sm: {},
   md: {
-    height: 32,
+    height: 40,
     minWidth: 32,
     fontSize: "-1",
     px: 3
@@ -77,7 +77,7 @@ export const styleProps = (
       const textColor = color === "ui.white" ? "ui.black" : "ui.white";
       return {
         // sets the text style
-        variant: "text.body.regular",
+        variant: "text.body.medium",
         ...buttonBase,
         ...sizes[size],
         bg: color,
@@ -134,6 +134,25 @@ export const styleProps = (
           color
         }
       };
+
+    case "outlined": {
+      return {
+        variant: "text.body.medium",
+        ...buttonBase,
+        ...sizes[size],
+        borderWidth: 1,
+        borderColor: color,
+        borderStyle: "solid",
+        bg: "ui.white",
+        color: color,
+        fill: color,
+        "&:focus,&:hover": {
+          bg: lightness(color, 0.9),
+          color: color,
+          textDecoration: "none"
+        }
+      };
+    }
 
     default:
       throw new Error(`You chose an unimplemented Button Variant: ${variant}`);

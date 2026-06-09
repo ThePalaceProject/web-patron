@@ -61,7 +61,8 @@ function getButtonStyles(isPrimaryAction: boolean) {
   return isPrimaryAction
     ? ({
         variant: "filled",
-        color: "brand.primary"
+        // color: "brand.primary"
+        color: "ui.black"
       } as const)
     : ({
         variant: "ghost",

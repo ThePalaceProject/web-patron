@@ -77,7 +77,8 @@ const Search: React.FC<SearchProps> = ({ className, ...props }) => {
         sx={{
           borderRight: "none",
           borderTopRightRadius: 0,
-          borderBottomRightRadius: 0
+          borderBottomRightRadius: 0,
+          borderRadius: "8px 0 0 8px"
         }}
         {...props}
       />
@@ -86,7 +87,8 @@ const Search: React.FC<SearchProps> = ({ className, ...props }) => {
         color="ui.black"
         sx={{
           height: "initial",
-          flex: "1 0 auto"
+          flex: "1 0 auto",
+          borderRadius: "0 8px 8px 0"
         }}
         iconLeft={SvgSearch}
       >

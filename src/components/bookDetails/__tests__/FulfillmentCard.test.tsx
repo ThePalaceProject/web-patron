@@ -68,7 +68,7 @@ describe("BorrowableBook", () => {
       user: { isAuthenticated: true }
     });
     const borrowButton = await screen.findByRole("button", {
-      name: "Borrow this book"
+      name: "Borrow"
     });
     expect(borrowButton).toBeInTheDocument();
 
@@ -109,7 +109,7 @@ describe("OnHoldBook", () => {
     setup(<FulfillmentCard book={onHoldBook} />, {
       user: { isAuthenticated: true }
     });
-    const borrowButton = await screen.findByText("Borrow this book");
+    const borrowButton = await screen.findByText("Borrow");
     expect(borrowButton).toBeInTheDocument();
 
     // click borrow
@@ -186,9 +186,7 @@ describe("ReservableBook", () => {
       copies: undefined
     });
     setup(<FulfillmentCard book={bookWithQueue} />);
-    expect(
-      screen.getByRole("button", { name: "Reserve this book" })
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Reserve" })).toBeInTheDocument();
     expect(screen.getByText("Unavailable")).toBeInTheDocument();
   });
 
@@ -202,7 +200,7 @@ describe("ReservableBook", () => {
     setup(<FulfillmentCard book={reservableBook} />, {
       user: { isAuthenticated: true }
     });
-    const reserveButton = await screen.findByText("Reserve this book");
+    const reserveButton = await screen.findByText("Reserve");
     expect(reserveButton).toBeInTheDocument();
 
     // click borrow
@@ -374,7 +372,7 @@ describe("FulfillableBook", () => {
     expect(mockSetBook).toHaveBeenCalledWith(unborrowed, downloadableBook.id);
   });
 
-  test("shows read online button for external read online links", async () => {
+  test("shows read button for external web reader links", async () => {
     const readOnlineBook = mergeBook<FulfillableBook>({
       status: "fulfillable",
       revokeUrl: "/revoke",
@@ -389,12 +387,12 @@ describe("FulfillableBook", () => {
     setup(<FulfillmentCard book={readOnlineBook} />);
 
     const readOnline = await screen.findByRole("button", {
-      name: "Read Online"
+      name: "Read"
     });
     expect(readOnline).toBeInTheDocument();
   });
 
-  test("external read online tracks open_book event", async () => {
+  test("external web reader link tracks open_book event", async () => {
     const mockTab = makeMockTab();
     window.open = jest.fn().mockReturnValue(mockTab);
 
@@ -412,7 +410,7 @@ describe("FulfillableBook", () => {
     });
     setup(<FulfillmentCard book={readOnlineBook} />);
     const readOnline = await screen.findByRole("button", {
-      name: "Read Online"
+      name: "Read"
     });
 
     // no calls until we click the button
@@ -429,7 +427,7 @@ describe("FulfillableBook", () => {
 
     setup(<FulfillmentCard book={externalReadOnlineBook} />);
     const readOnline = await screen.findByRole("button", {
-      name: "Read Online"
+      name: "Read"
     });
 
     fireEvent.click(readOnline);
@@ -451,7 +449,7 @@ describe("FulfillableBook", () => {
 
     setup(<FulfillmentCard book={externalReadOnlineBook} />);
     const readOnline = await screen.findByRole("button", {
-      name: "Read Online"
+      name: "Read"
     });
 
     fireEvent.click(readOnline);
@@ -475,7 +473,7 @@ describe("FulfillableBook", () => {
 
     setup(<FulfillmentCard book={externalReadOnlineBook} />);
     const readOnline = await screen.findByRole("button", {
-      name: "Read Online"
+      name: "Read"
     });
 
     fireEvent.click(readOnline);
@@ -491,12 +489,11 @@ describe("FulfillableBook", () => {
 
   test("correct title and subtitle without redirect", () => {
     setup(<FulfillmentCard book={downloadableBook} />);
-    expect(screen.getByText("Ready to Read!")).toBeInTheDocument();
     expect(
       screen.getByText(`You have this book on loan until ${MOCK_DATE_STRING}.`)
     ).toBeInTheDocument();
     expect(
-      screen.queryByText("Ready to Read in Palace!")
+      screen.queryByText("Also available to read in the Palace App.")
     ).not.toBeInTheDocument();
   });
   const bookWithRedirect = mergeBook<FulfillableBook>({
@@ -515,8 +512,9 @@ describe("FulfillableBook", () => {
       companionApp: "simplye"
     });
     setup(<FulfillmentCard book={bookWithRedirect} />);
-    expect(screen.queryByText("Ready to Read!")).not.toBeInTheDocument();
-    expect(screen.getByText("Ready to Read in Palace!")).toBeInTheDocument();
+    expect(
+      screen.getByText("Available to read in the Palace App.")
+    ).toBeInTheDocument();
     expect(
       screen.getByText("If you would rather read on your computer, you can:")
     ).toBeInTheDocument();
@@ -527,7 +525,7 @@ describe("FulfillableBook", () => {
     mockConfig({ companionApp: "openebooks" });
     setup(<FulfillmentCard book={bookWithRedirect} />);
     expect(
-      screen.getByText("Ready to Read in Open eBooks!")
+      screen.getByText("Available to read in Open eBooks.")
     ).toBeInTheDocument();
   });
 
@@ -589,7 +587,7 @@ describe("FulfillableBook", () => {
     });
 
     setup(<FulfillmentCard book={bookWithIndirect} />);
-    const downloadButton = await screen.findByText("Read Online");
+    const downloadButton = await screen.findByText("Read");
     expect(downloadButton).toBeInTheDocument();
 
     fireEvent.click(downloadButton);
@@ -652,6 +650,68 @@ describe("FulfillableBook", () => {
 
     // we try the rejected url without headers
     expect(fetchMock).toHaveBeenCalledWith("/new-location");
+  });
+
+  describe("book status", () => {
+    test("should prompt users to read on the Palace App when a book has no internal or external web reader links present", () => {
+      const book = mergeBook<FulfillableBook>({
+        status: "fulfillable",
+        revokeUrl: "/revoke",
+        fulfillmentLinks: [
+          {
+            url: "/epub",
+            contentType: "application/epub+zip",
+            supportLevel: "redirect-and-show"
+          }
+        ]
+      });
+      setup(<FulfillmentCard book={book} />);
+      expect(
+        screen.getByText("Available to read in the Palace App.")
+      ).toBeInTheDocument();
+    });
+
+    test("should prompt users to read online or in the Palace App when a book can be read in an external web reader or downloaded", () => {
+      const book = mergeBook<FulfillableBook>({
+        status: "fulfillable",
+        revokeUrl: "/revoke",
+        fulfillmentLinks: [
+          {
+            url: "/epub",
+            contentType: "application/epub+zip",
+            supportLevel: "redirect"
+          },
+          {
+            url: "/overdrive-read-online",
+            contentType: `text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"`,
+            supportLevel: "show"
+          }
+        ]
+      });
+      setup(<FulfillmentCard book={book} />);
+      expect(
+        screen.getByText("Also available to read in the Palace App.")
+      ).toBeInTheDocument();
+    });
+
+    test("should also render text from BookStatus component if only an external web reader link is provided", () => {
+      const book = mergeBook<FulfillableBook>({
+        status: "fulfillable",
+        revokeUrl: "/revoke",
+        fulfillmentLinks: [
+          {
+            url: "/overdrive-read-online",
+            contentType: `text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"`,
+            supportLevel: "show"
+          }
+        ]
+      });
+      setup(<FulfillmentCard book={book} />);
+      expect(screen.getByText("Ready to Read!")).toBeInTheDocument();
+      expect(
+        screen.getByText("Also available to read in the Palace App.")
+      ).toBeInTheDocument();
+    });
   });
 });
 

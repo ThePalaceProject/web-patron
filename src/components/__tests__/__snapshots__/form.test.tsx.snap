@@ -18,7 +18,7 @@ exports[`renders as expected 1`] = `
 }
 
 .emotion-1 {
-  border-radius: 2px;
+  border-radius: 8px;
   border: 1px solid #bdbdbd;
   padding-left: 8px;
   padding-right: 8px;

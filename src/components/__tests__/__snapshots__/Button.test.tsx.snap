@@ -4,7 +4,7 @@ exports[`LinkButton renders correct element 1`] = `
 .emotion-0 {
   font-family: 'Open Sans',Helvetica,Arial,sans-serif;
   font-size: 0.875rem;
-  font-weight: 300;
+  font-weight: 500;
   line-height: 1.5;
   display: inline-flex;
   -webkit-appearance: none;
@@ -25,12 +25,12 @@ exports[`LinkButton renders correct element 1`] = `
   padding-left: 16px;
   padding-right: 16px;
   border: 0;
-  border-radius: 2px;
+  border-radius: 8px;
   cursor: pointer;
   -webkit-text-decoration: none;
   text-decoration: none;
-  background-color: var(--theme-ui-colors-brand-primary);
-  height: 32px;
+  background-color: var(--theme-ui-colors-ui-black);
+  height: 40px;
   min-width: 32px;
   color: var(--theme-ui-colors-ui-white);
   fill: var(--theme-ui-colors-ui-white);
@@ -38,7 +38,7 @@ exports[`LinkButton renders correct element 1`] = `
 
 .emotion-0:focus,
 .emotion-0:hover {
-  background-color: #2d6da3;
+  background-color: #000;
   color: var(--theme-ui-colors-ui-white);
   -webkit-text-decoration: none;
   text-decoration: none;
@@ -49,7 +49,7 @@ exports[`LinkButton renders correct element 1`] = `
 }
 
 .emotion-0:active {
-  background-color: #285f8f;
+  background-color: #000;
 }
 
 .emotion-0:disabled {
@@ -73,7 +73,7 @@ exports[`NavButton renders correct element 1`] = `
   color: var(--theme-ui-colors-ui-white);
   font-family: 'Open Sans',Helvetica,Arial,sans-serif;
   font-size: 0.875rem;
-  font-weight: 300;
+  font-weight: 500;
   line-height: 1.5;
   display: inline-flex;
   -webkit-appearance: none;
@@ -94,10 +94,10 @@ exports[`NavButton renders correct element 1`] = `
   padding-left: 16px;
   padding-right: 16px;
   border: 0;
-  border-radius: 2px;
+  border-radius: 8px;
   cursor: pointer;
-  background-color: var(--theme-ui-colors-brand-primary);
-  height: 32px;
+  background-color: var(--theme-ui-colors-ui-black);
+  height: 40px;
   min-width: 32px;
   fill: var(--theme-ui-colors-ui-white);
 }
@@ -110,7 +110,7 @@ exports[`NavButton renders correct element 1`] = `
 
 .emotion-0:focus,
 .emotion-0:hover {
-  background-color: #2d6da3;
+  background-color: #000;
   color: var(--theme-ui-colors-ui-white);
   -webkit-text-decoration: none;
   text-decoration: none;
@@ -121,7 +121,7 @@ exports[`NavButton renders correct element 1`] = `
 }
 
 .emotion-0:active {
-  background-color: #285f8f;
+  background-color: #000;
 }
 
 .emotion-0:disabled {
@@ -142,7 +142,7 @@ exports[`variants filled (default) 1`] = `
 .emotion-0 {
   font-family: 'Open Sans',Helvetica,Arial,sans-serif;
   font-size: 0.875rem;
-  font-weight: 300;
+  font-weight: 500;
   line-height: 1.5;
   display: inline-flex;
   -webkit-appearance: none;
@@ -163,12 +163,12 @@ exports[`variants filled (default) 1`] = `
   padding-left: 16px;
   padding-right: 16px;
   border: 0;
-  border-radius: 2px;
+  border-radius: 8px;
   cursor: pointer;
   -webkit-text-decoration: none;
   text-decoration: none;
-  background-color: var(--theme-ui-colors-brand-primary);
-  height: 32px;
+  background-color: var(--theme-ui-colors-ui-black);
+  height: 40px;
   min-width: 32px;
   color: var(--theme-ui-colors-ui-white);
   fill: var(--theme-ui-colors-ui-white);
@@ -176,7 +176,7 @@ exports[`variants filled (default) 1`] = `
 
 .emotion-0:focus,
 .emotion-0:hover {
-  background-color: #2d6da3;
+  background-color: #000;
   color: var(--theme-ui-colors-ui-white);
   -webkit-text-decoration: none;
   text-decoration: none;
@@ -187,7 +187,7 @@ exports[`variants filled (default) 1`] = `
 }
 
 .emotion-0:active {
-  background-color: #285f8f;
+  background-color: #000;
 }
 
 .emotion-0:disabled {
@@ -229,21 +229,21 @@ exports[`variants ghost 1`] = `
   padding-left: 16px;
   padding-right: 16px;
   border: 0;
-  border-radius: 2px;
+  border-radius: 8px;
   cursor: pointer;
   -webkit-text-decoration: none;
   text-decoration: none;
   background-color: transparent;
-  height: 32px;
+  height: 40px;
   min-width: 32px;
-  color: var(--theme-ui-colors-brand-primary);
-  fill: var(--theme-ui-colors-brand-primary);
+  color: var(--theme-ui-colors-ui-black);
+  fill: var(--theme-ui-colors-ui-black);
 }
 
 .emotion-0:focus,
 .emotion-0:hover {
-  background-color: #d7e7f4;
-  color: var(--theme-ui-colors-brand-primary);
+  background-color: #e6e6e6;
+  color: var(--theme-ui-colors-ui-black);
   -webkit-text-decoration: none;
   text-decoration: none;
 }
@@ -281,7 +281,7 @@ exports[`variants link 1`] = `
   padding-left: 16px;
   padding-right: 16px;
   border: 0;
-  border-radius: 2px;
+  border-radius: 8px;
   cursor: pointer;
   -webkit-text-decoration: underline;
   text-decoration: underline;
@@ -290,13 +290,13 @@ exports[`variants link 1`] = `
   font-size: 1rem;
   font-weight: 300;
   line-height: 1.5;
-  color: var(--theme-ui-colors-brand-primary);
+  color: var(--theme-ui-colors-ui-black);
   padding: 0;
-  fill: var(--theme-ui-colors-brand-primary);
+  fill: var(--theme-ui-colors-ui-black);
 }
 
 .emotion-0:hover {
-  color: var(--theme-ui-colors-brand-primary);
+  color: var(--theme-ui-colors-ui-black);
 }
 
 <button

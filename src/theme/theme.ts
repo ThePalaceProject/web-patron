@@ -4,9 +4,9 @@ import typography from "./typography";
 import variants from "./variants";
 import styles from "./styles";
 
-const radii = [0, 2, 4] as Overloadable<number[], number>;
-radii.card = radii[2];
-radii.button = radii[1];
+const radii = [0, 2, 4, 8] as Overloadable<number[], number>;
+radii.card = radii[3];
+radii.button = radii[3];
 
 const borders = {
   solid: `1px solid ${colors.ui.gray.medium}`
