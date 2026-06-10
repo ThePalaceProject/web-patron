@@ -6,11 +6,13 @@ import { Text } from "components/Text";
 export const AuthFeedbackPanel = ({
   message,
   isError = false,
-  onTryAgain
+  onTryAgain,
+  secondaryAction
 }: {
   message: string;
   isError?: boolean;
   onTryAgain: () => void;
+  secondaryAction?: { label: string; onClick: () => void };
 }) => (
   <Stack
     direction="column"
@@ -27,5 +29,10 @@ export const AuthFeedbackPanel = ({
       {message}
     </Text>
     <Button onClick={onTryAgain}>Try Again</Button>
+    {secondaryAction && (
+      <Button variant="ghost" onClick={secondaryAction.onClick}>
+        {secondaryAction.label}
+      </Button>
+    )}
   </Stack>
 );

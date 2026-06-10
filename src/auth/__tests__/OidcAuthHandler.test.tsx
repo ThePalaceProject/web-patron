@@ -32,7 +32,7 @@ test("redirects to proper auth url", async () => {
   });
   await waitFor(() => {
     expect(window.location.href).toBe(
-      "https://oidc-auth.com/0&redirect_uri=http%3A%2F%2Ftest-domain.com%2Ftestlib"
+      "https://oidc-auth.com/0?redirect_uri=http%3A%2F%2Ftest-domain.com%2Ftestlib"
     );
   });
 });
@@ -204,4 +204,66 @@ test('clicking "Cancel" while redirecting shows cancel UI', async () => {
     expect(utils.getByText("Login was cancelled.")).toBeInTheDocument();
   });
   expect(utils.getByRole("button", { name: "Try Again" })).toBeInTheDocument();
+});
+
+test('shows "Use a different account" button on error state', () => {
+  const utils = render(<OidcAuthHandler method={fixtures.clientOidcMethod} />, {
+    router: { query: { loginError: "Authentication failed" } },
+    user: { token: undefined }
+  });
+  expect(
+    utils.getByRole("button", { name: "Use a different account" })
+  ).toBeInTheDocument();
+});
+
+test('shows "Use a different account" button on cancel state', async () => {
+  sessionStorage.setItem(oidcRedirectKey, "1");
+
+  const utils = render(<OidcAuthHandler method={fixtures.clientOidcMethod} />, {
+    user: { token: undefined }
+  });
+
+  await waitFor(() => {
+    expect(utils.getByText("Login was cancelled.")).toBeInTheDocument();
+  });
+  expect(
+    utils.getByRole("button", { name: "Use a different account" })
+  ).toBeInTheDocument();
+});
+
+test('clicking "Use a different account" from error state redirects with prompt=select_account', async () => {
+  const utils = setup(<OidcAuthHandler method={fixtures.clientOidcMethod} />, {
+    router: { query: { loginError: "Authentication failed" } },
+    user: { token: undefined }
+  });
+
+  await utils.user.click(
+    utils.getByRole("button", { name: "Use a different account" })
+  );
+
+  expect(window.location.href).toContain("prompt=select_account");
+  expect(window.location.href).toContain("oidc-auth.com");
+  expect(sessionStorage.getItem(oidcRedirectKey)).toBeNull();
+  expect(sessionStorage.getItem(oidcCancelKey)).toBeNull();
+});
+
+test('clicking "Use a different account" from cancel state redirects with prompt=select_account', async () => {
+  sessionStorage.setItem(oidcRedirectKey, "1");
+
+  const utils = setup(<OidcAuthHandler method={fixtures.clientOidcMethod} />, {
+    user: { token: undefined }
+  });
+
+  await waitFor(() => {
+    expect(utils.getByText("Login was cancelled.")).toBeInTheDocument();
+  });
+
+  await utils.user.click(
+    utils.getByRole("button", { name: "Use a different account" })
+  );
+
+  expect(window.location.href).toContain("prompt=select_account");
+  expect(window.location.href).toContain("oidc-auth.com");
+  expect(sessionStorage.getItem(oidcRedirectKey)).toBeNull();
+  expect(sessionStorage.getItem(oidcCancelKey)).toBeNull();
 });
