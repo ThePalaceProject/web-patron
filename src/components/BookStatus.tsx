@@ -1,19 +1,11 @@
 import * as React from "react";
 import { MediumIcon } from "components/MediumIndicator";
 import { AnyBook } from "interfaces";
-import { availabilityString, bookIsFulfillable } from "utils/book";
+import { availabilityString } from "utils/book";
 import { ScreenReaderOnly, Text } from "components/Text";
-import { shouldRedirectToCompanionApp } from "utils/fulfill";
-import SvgPhone from "icons/Phone";
 
 const BookStatus: React.FC<{ book: AnyBook }> = ({ book }) => {
   const { status } = book;
-
-  const redirectUser = bookIsFulfillable(book)
-    ? shouldRedirectToCompanionApp(book.fulfillmentLinks)
-    : false;
-
-  const action = book.format === "Audiobook" ? "Listen" : "Read";
 
   const str =
     status === "borrowable"
@@ -24,20 +16,13 @@ const BookStatus: React.FC<{ book: AnyBook }> = ({ book }) => {
           ? "Reserved"
           : status === "on-hold"
             ? "Ready to Borrow"
-            : status === "fulfillable" && !redirectUser
-              ? `Ready to ${action}!`
-              : "Unsupported";
+            : "Unsupported";
 
   return (
     <div>
-      {(status !== "fulfillable" ||
-        (status === "fulfillable" && !redirectUser)) && (
+      {status !== "fulfillable" && (
         <div sx={{ display: "flex", alignItems: "center" }}>
-          {redirectUser ? (
-            <SvgPhone sx={{ fontSize: 24 }} />
-          ) : (
-            <MediumIcon book={book} sx={{ mr: 1 }} />
-          )}
+          <MediumIcon book={book} sx={{ mr: 1 }} />
           <Text variant="text.body.bold" sx={{ fontWeight: 600 }}>
             <ScreenReaderOnly>Book Status: </ScreenReaderOnly>
             {str}

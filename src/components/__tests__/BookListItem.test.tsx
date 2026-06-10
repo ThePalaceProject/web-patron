@@ -321,6 +321,7 @@ describe("FulfillableBook", () => {
       availability: undefined
     });
     setup(<BookListItem book={withoutAvailability} />);
-    expect(screen.queryByText("Ready to Read!")).toBeInTheDocument();
+    // BookStatus no longer displays this status text
+    expect(screen.queryByText("Ready to Read!")).not.toBeInTheDocument();
   });
 });

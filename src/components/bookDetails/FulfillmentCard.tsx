@@ -116,7 +116,7 @@ const AccessCard: React.FC<{
   const companionAppName =
     companionApp === "openebooks" ? "Open eBooks" : "the Palace App";
 
-  const bookStatus = `${isFulfillableInWebCatalog ? "Also available" : "Available"} to ${action} in ${companionAppName}.`;
+  const bookStatus = `${isFulfillableInWebCatalog && redirectUser ? "Also available" : "Available"} to ${action}${redirectUser ? ` in ${companionAppName}` : ""}.`;
 
   return (
     <>

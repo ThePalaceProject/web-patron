@@ -535,7 +535,7 @@ describe("FulfillableBook", () => {
       availability: undefined
     });
     setup(<FulfillmentCard book={withoutAvailability} />);
-    expect(screen.getByText("Ready to Read!")).toBeInTheDocument();
+    expect(screen.getByText("Available to read.")).toBeInTheDocument();
   });
 
   test("shows download options", async () => {
@@ -652,8 +652,8 @@ describe("FulfillableBook", () => {
     expect(fetchMock).toHaveBeenCalledWith("/new-location");
   });
 
-  describe("book status", () => {
-    test("should prompt users to read on the Palace App when a book has no internal or external web reader links present", () => {
+  describe("book access status", () => {
+    test("should prompt users to read on the Palace App when a book has a redirect links", () => {
       const book = mergeBook<FulfillableBook>({
         status: "fulfillable",
         revokeUrl: "/revoke",
@@ -661,7 +661,7 @@ describe("FulfillableBook", () => {
           {
             url: "/epub",
             contentType: "application/epub+zip",
-            supportLevel: "redirect-and-show"
+            supportLevel: "redirect"
           }
         ]
       });
@@ -671,7 +671,25 @@ describe("FulfillableBook", () => {
       ).toBeInTheDocument();
     });
 
-    test("should prompt users to read online or in the Palace App when a book can be read in an external web reader or downloaded", () => {
+    test("should alert user that book is also available in companion app if book has a single redirect-and-show link", () => {
+      const book = mergeBook<FulfillableBook>({
+        status: "fulfillable",
+        revokeUrl: "/revoke",
+        fulfillmentLinks: [
+          {
+            url: "/overdrive-read-online",
+            contentType: `text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"`,
+            supportLevel: "redirect-and-show"
+          }
+        ]
+      });
+      setup(<FulfillmentCard book={book} />);
+      expect(
+        screen.getByText("Also available to read in the Palace App.")
+      ).toBeInTheDocument();
+    });
+
+    test("should prompt users to read online or in the Palace App when a book has multiple redirect/redirect-and-show links", () => {
       const book = mergeBook<FulfillableBook>({
         status: "fulfillable",
         revokeUrl: "/revoke",
@@ -684,7 +702,7 @@ describe("FulfillableBook", () => {
           {
             url: "/overdrive-read-online",
             contentType: `text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"`,
-            supportLevel: "show"
+            supportLevel: "redirect-and-show"
           }
         ]
       });
@@ -694,24 +712,45 @@ describe("FulfillableBook", () => {
       ).toBeInTheDocument();
     });
 
-    test("should also render text from BookStatus component if only an external web reader link is provided", () => {
+    test("should alert user that that book is available to read when only a show link", () => {
       const book = mergeBook<FulfillableBook>({
         status: "fulfillable",
         revokeUrl: "/revoke",
         fulfillmentLinks: [
           {
-            url: "/overdrive-read-online",
-            contentType: `text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"`,
+            url: "/epub",
+            contentType: "application/epub+zip",
             supportLevel: "show"
           }
         ]
       });
       setup(<FulfillmentCard book={book} />);
-      expect(screen.getByText("Ready to Read!")).toBeInTheDocument();
-      expect(
-        screen.getByText("Also available to read in the Palace App.")
-      ).toBeInTheDocument();
+      expect(screen.getByText("Available to read.")).toBeInTheDocument();
     });
+  });
+
+  test("should prompt users to listen if format is Audiobook", () => {
+    const book = mergeBook<FulfillableBook>({
+      status: "fulfillable",
+      revokeUrl: "/revoke",
+      format: "Audiobook",
+      fulfillmentLinks: [
+        {
+          url: "/epub",
+          contentType: "application/epub+zip",
+          supportLevel: "redirect"
+        },
+        {
+          url: "/overdrive-read-online",
+          contentType: `text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"`,
+          supportLevel: "redirect-and-show"
+        }
+      ]
+    });
+    setup(<FulfillmentCard book={book} />);
+    expect(
+      screen.getByText("Also available to listen to in the Palace App.")
+    ).toBeInTheDocument();
   });
 });
 
