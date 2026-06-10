@@ -653,7 +653,7 @@ describe("FulfillableBook", () => {
   });
 
   describe("book access status", () => {
-    test("should prompt users to read on the Palace App when a book has a redirect links", () => {
+    test("should prompt users to read on the Palace App when a book has a redirect link", () => {
       const book = mergeBook<FulfillableBook>({
         status: "fulfillable",
         revokeUrl: "/revoke",
@@ -712,7 +712,7 @@ describe("FulfillableBook", () => {
       ).toBeInTheDocument();
     });
 
-    test("should alert user that that book is available to read when only a show link", () => {
+    test("should alert user that that book is available to read when only a show link is present", () => {
       const book = mergeBook<FulfillableBook>({
         status: "fulfillable",
         revokeUrl: "/revoke",
