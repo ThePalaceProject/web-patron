@@ -334,3 +334,34 @@ test("displays error when credentials are invalid", async () => {
   // Credentials should not be set
   expect(Cookie.set).not.toHaveBeenCalled();
 });
+
+describe("Forgot password link", () => {
+  test("displays forgot password link when library provides a reset url", async () => {
+    setup(<BasicTokenAuthHandler method={basicTokenAuthMethod} />, {
+      library: {
+        libraryLinks: {
+          resetPassword: {
+            rel: OPDS1.PasswordResetLinkRel,
+            href: "https://example.com/reset"
+          }
+        }
+      }
+    });
+
+    const link = await screen.findByRole("link", {
+      name: /forgot your password/i
+    });
+    expect(link).toHaveAttribute("href", "https://example.com/reset");
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", "noopener noreferrer");
+  });
+
+  test("does not display forgot password link when no reset url is provided", async () => {
+    setup(<BasicTokenAuthHandler method={basicTokenAuthMethod} />);
+
+    await screen.findByLabelText("Barcode input");
+    expect(
+      screen.queryByRole("link", { name: /forgot your password/i })
+    ).not.toBeInTheDocument();
+  });
+});
