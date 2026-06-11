@@ -2,7 +2,7 @@
 
 exports[`TextInput renders properly and passes styles through 1`] = `
 .emotion-0 {
-  border-radius: 2px;
+  border-radius: 8px;
   border: 1px solid #bdbdbd;
   padding-left: 8px;
   padding-right: 8px;
@@ -48,7 +48,7 @@ exports[`TextInput renders properly and passes styles through 1`] = `
 
 exports[`type textarea renders properly and passes styles throug 1`] = `
 .emotion-0 {
-  border-radius: 2px;
+  border-radius: 8px;
   border: 1px solid #bdbdbd;
   padding-left: 8px;
   padding-right: 8px;

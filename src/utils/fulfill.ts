@@ -129,7 +129,7 @@ export const getFulfillmentFromLink =
             link.url
           ),
           contentType,
-          buttonLabel: `${action} Online`
+          buttonLabel: action
         };
 
       /**

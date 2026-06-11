@@ -23,12 +23,7 @@ const PreviewButton: React.FC<{ previewUrl?: string | null }> = ({
   if (!previewUrl) return null;
 
   return (
-    <Button
-      variant="ghost"
-      color="ui.gray.extraDark"
-      iconLeft={SvgExternalLink}
-      onClick={open}
-    >
+    <Button variant="outlined" iconLeft={SvgExternalLink} onClick={open}>
       Preview
     </Button>
   );

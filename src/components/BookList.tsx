@@ -21,10 +21,7 @@ import useSWRInfinite from "swr/infinite";
 import useUser from "components/context/UserContext";
 import Stack from "components/Stack";
 import FulfillmentButton from "components/FulfillmentButton";
-import {
-  getFulfillmentFromLink,
-  shouldRedirectToCompanionApp
-} from "utils/fulfill";
+import { getFulfillmentFromLink } from "utils/fulfill";
 import BookStatus from "components/BookStatus";
 import Link from "./Link";
 import { useAppConfig } from "components/context/AppConfigContext";
@@ -241,12 +238,10 @@ const BookListCTA: React.FC<{ book: AnyBook }> = ({ book }) => {
 
   if (bookIsFulfillable(book)) {
     // we will show a fulfillment button if there is only one option
-    // and we are not supposed to redirect the user to the companion app
+    // we want to surface any internal or external web reader links,
+    // so no need to hide links even if we want to redirect user to companion app
     const showableLinks = book.fulfillmentLinks.filter(
       link => link.supportLevel === "show"
-    );
-    const shouldRedirectUser = shouldRedirectToCompanionApp(
-      book.fulfillmentLinks
     );
 
     const showableFulfillments = showableLinks.map(
@@ -257,7 +252,7 @@ const BookListCTA: React.FC<{ book: AnyBook }> = ({ book }) => {
 
     return (
       <Stack>
-        {singleFulfillment && !shouldRedirectUser && (
+        {singleFulfillment && (
           <FulfillmentButton
             details={singleFulfillment}
             book={book}

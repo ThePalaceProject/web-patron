@@ -1,26 +1,13 @@
 import * as React from "react";
 import { MediumIcon } from "components/MediumIndicator";
 import { AnyBook } from "interfaces";
-import { availabilityString, bookIsFulfillable } from "utils/book";
+import { availabilityString } from "utils/book";
 import { ScreenReaderOnly, Text } from "components/Text";
-import { shouldRedirectToCompanionApp } from "utils/fulfill";
-import SvgPhone from "icons/Phone";
-import { useAppConfig } from "components/context/AppConfigContext";
 
 const BookStatus: React.FC<{ book: AnyBook }> = ({ book }) => {
-  const { companionApp } = useAppConfig();
   const { status } = book;
 
-  const redirectUser = bookIsFulfillable(book)
-    ? shouldRedirectToCompanionApp(book.fulfillmentLinks)
-    : false;
-
-  const companionAppName =
-    companionApp === "openebooks" ? "Open eBooks" : "Palace";
-
-  const action = book.format === "Audiobook" ? "Listen" : "Read";
-
-  const str =
+  const unfillableReason =
     status === "borrowable"
       ? "Available to borrow"
       : status === "reservable"
@@ -29,23 +16,19 @@ const BookStatus: React.FC<{ book: AnyBook }> = ({ book }) => {
           ? "Reserved"
           : status === "on-hold"
             ? "Ready to Borrow"
-            : status === "fulfillable"
-              ? `Ready to ${action}${redirectUser ? ` in ${companionAppName}` : ""}!`
-              : "Unsupported";
+            : "Unsupported";
 
   return (
     <div>
-      <div sx={{ display: "flex", alignItems: "center" }}>
-        {redirectUser ? (
-          <SvgPhone sx={{ fontSize: 24 }} />
-        ) : (
+      {status !== "fulfillable" && (
+        <div sx={{ display: "flex", alignItems: "center" }}>
           <MediumIcon book={book} sx={{ mr: 1 }} />
-        )}
-        <Text variant="text.body.bold" sx={{ fontWeight: 600 }}>
-          <ScreenReaderOnly>Book Status: </ScreenReaderOnly>
-          {str}
-        </Text>
-      </div>
+          <Text variant="text.body.bold" sx={{ fontWeight: 600 }}>
+            <ScreenReaderOnly>Book Status: </ScreenReaderOnly>
+            {unfillableReason}
+          </Text>
+        </div>
+      )}
       <AvailabilityString book={book} />
     </div>
   );

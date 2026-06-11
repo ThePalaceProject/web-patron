@@ -16,7 +16,7 @@ export default function useBorrow(isBorrow: boolean) {
   const { error, handleError, setErrorString, clearError } = useError();
 
   const loadingText = isBorrow ? "Borrowing..." : "Reserving...";
-  const buttonLabel = isBorrow ? "Borrow this book" : "Reserve this book";
+  const buttonLabel = isBorrow ? "Borrow" : "Reserve";
 
   const borrowOrReserve = async (url: string) => {
     clearError();

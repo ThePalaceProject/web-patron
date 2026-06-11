@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as _ from "lodash";
 import {
   bookIsBorrowable,
   bookIsReservable,
@@ -18,6 +19,7 @@ import {
 } from "utils/fulfill";
 import BookStatus from "components/BookStatus";
 import { AnyBook, FulfillableBook, FulfillmentLink } from "interfaces";
+import { useAppConfig } from "components/context/AppConfigContext";
 
 const FulfillmentCard: React.FC<{ book: AnyBook }> = ({ book }) => {
   return (
@@ -96,26 +98,31 @@ const AccessCard: React.FC<{
   book: FulfillableBook;
   links: readonly FulfillmentLink[];
 }> = ({ book, links }) => {
+  const { companionApp } = useAppConfig();
   const fulfillments = getFulfillmentsFromBook(book);
 
-  // visually prioritize internal fulfillments (mirrors apps)
-  const internalFulfillments = fulfillments.filter(
-    details => details.type === "read-online-internal"
-  );
-  const otherFulfillments = fulfillments.filter(
-    details => details.type !== "read-online-internal"
+  // visually prioritize internal and external readers (mirrors apps)
+  const [webCatalogFulfillments, otherFulfillments] = _.partition(
+    fulfillments,
+    details =>
+      ["read-online-internal", "read-online-external"].includes(details.type)
   );
 
-  const isFulfillableInternally = internalFulfillments.length > 0;
+  const isFulfillableInWebCatalog = webCatalogFulfillments.length > 0;
   const hasOtherFulfillments = otherFulfillments.length > 0;
 
   const redirectUser = shouldRedirectToCompanionApp(links);
+  const action = book.format === "Audiobook" ? "listen to" : "read";
+  const companionAppName =
+    companionApp === "openebooks" ? "Open eBooks" : "the Palace App";
+
+  const bookStatus = `${isFulfillableInWebCatalog && redirectUser ? "Also available" : "Available"} to ${action}${redirectUser ? ` in ${companionAppName}` : ""}.`;
 
   return (
     <>
-      {isFulfillableInternally ? (
+      {isFulfillableInWebCatalog ? (
         <Stack sx={{ flexWrap: "wrap" }}>
-          {internalFulfillments.map(details => (
+          {webCatalogFulfillments.map(details => (
             <FulfillmentButton
               isPrimaryAction
               key={details.id}
@@ -138,6 +145,9 @@ const AccessCard: React.FC<{
           text="Return"
         />
       )}
+
+      <Text variant="text.body.italic">{bookStatus}</Text>
+
       {hasOtherFulfillments && redirectUser && (
         <Text variant="text.body.italic">
           If you would rather read on your computer, you can:

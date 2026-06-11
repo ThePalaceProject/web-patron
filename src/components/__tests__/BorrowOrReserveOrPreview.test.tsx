@@ -24,17 +24,13 @@ test("renders borrow button and preview button when both urls provided", () => {
       previewUrl="https://example.com/preview"
     />
   );
-  expect(
-    screen.getByRole("button", { name: "Borrow this book" })
-  ).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Borrow" })).toBeInTheDocument();
   expect(screen.getByRole("button", { name: "Preview" })).toBeInTheDocument();
 });
 
 test("preview button does not render when preview url is excluded", () => {
   setup(<BorrowOrReserveOrPreview isBorrow borrowUrl="/borrow" />);
-  expect(
-    screen.queryByRole("button", { name: "Borrow this book" })
-  ).toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Borrow" })).toBeInTheDocument();
   expect(
     screen.queryByRole("button", { name: "Preview" })
   ).not.toBeInTheDocument();
@@ -44,9 +40,7 @@ test("preview button does not render when preview url is null", () => {
   setup(
     <BorrowOrReserveOrPreview isBorrow borrowUrl="/borrow" previewUrl={null} />
   );
-  expect(
-    screen.queryByRole("button", { name: "Borrow this book" })
-  ).toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Borrow" })).toBeInTheDocument();
   expect(
     screen.queryByRole("button", { name: "Preview" })
   ).not.toBeInTheDocument();
@@ -60,7 +54,7 @@ describe("BorrowOrReserve error handling", () => {
     );
 
     const button = await screen.findByRole("button", {
-      name: "Borrow this book"
+      name: "Borrow"
     });
     await user.click(button);
 
@@ -74,7 +68,7 @@ describe("BorrowOrReserve error handling", () => {
       <BorrowOrReserveOrPreview isBorrow borrowUrl="/url" />
     );
     const button = await screen.findByRole("button", {
-      name: "Borrow this book"
+      name: "Borrow"
     });
 
     mockedFetchBook.mockRejectedValueOnce(
@@ -99,7 +93,7 @@ describe("BorrowOrReserve error handling", () => {
       <BorrowOrReserveOrPreview isBorrow borrowUrl="/url" />
     );
     const button = await screen.findByRole("button", {
-      name: "Borrow this book"
+      name: "Borrow"
     });
 
     mockedFetchBook.mockRejectedValueOnce(new Error("You messed up!"));

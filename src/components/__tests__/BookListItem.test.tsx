@@ -56,7 +56,7 @@ describe("BorrowableBook", () => {
     });
 
     // click borrow
-    fireEvent.click(screen.getByText("Borrow this book"));
+    fireEvent.click(screen.getByText("Borrow"));
     expect(mockFetchBook).toHaveBeenCalledTimes(1);
     expect(mockFetchBook).toHaveBeenCalledWith(
       "/borrow",
@@ -108,7 +108,7 @@ describe("OnHoldBook", () => {
     });
 
     // click borrow
-    fireEvent.click(screen.getByText("Borrow this book"));
+    fireEvent.click(screen.getByText("Borrow"));
     expect(mockFetchBook).toHaveBeenCalledTimes(1);
     expect(mockFetchBook).toHaveBeenCalledWith(
       "/borrow",
@@ -149,7 +149,7 @@ describe("ReservableBook", () => {
   test("displays reserve button", () => {
     setup(<BookListItem book={reservableBook} />);
     const reserveButton = screen.getByRole("button", {
-      name: "Reserve this book"
+      name: "Reserve"
     });
     expect(reserveButton).toBeInTheDocument();
   });
@@ -167,7 +167,7 @@ describe("ReservableBook", () => {
     });
 
     // click borrow
-    fireEvent.click(screen.getByText("Reserve this book"));
+    fireEvent.click(screen.getByText("Reserve"));
     expect(mockFetchBook).toHaveBeenCalledTimes(1);
     expect(mockFetchBook).toHaveBeenCalledWith(
       "/reserve",
@@ -321,6 +321,6 @@ describe("FulfillableBook", () => {
       availability: undefined
     });
     setup(<BookListItem book={withoutAvailability} />);
-    expect(screen.getByText("Ready to Read!")).toBeInTheDocument();
+    expect(screen.queryByText("Book Availability:")).not.toBeInTheDocument();
   });
 });

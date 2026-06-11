@@ -14,17 +14,13 @@ import { mockPush, mockReplace } from "test-utils/mockNextRouter";
 
 test("shows correct button for borrowable book", async () => {
   setup(<BorrowOrReserve isBorrow borrowUrl="/url" />);
-  await screen.findByRole("button", { name: "Borrow this book" });
-  expect(
-    screen.getByRole("button", { name: "Borrow this book" })
-  ).toBeInTheDocument();
+  await screen.findByRole("button", { name: "Borrow" });
+  expect(screen.getByRole("button", { name: "Borrow" })).toBeInTheDocument();
 });
 
 test("shows reserve button for reservable book", () => {
   setup(<BorrowOrReserve isBorrow={false} borrowUrl="/url" />);
-  expect(
-    screen.getByRole("button", { name: "Reserve this book" })
-  ).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Reserve" })).toBeInTheDocument();
 });
 
 /**
@@ -41,7 +37,7 @@ test("borrowing calls correct url with token", async () => {
   setup(<BorrowOrReserve isBorrow borrowUrl="/url" />);
 
   const button = await screen.findByRole("button", {
-    name: "Borrow this book"
+    name: "Borrow"
   });
 
   fireEvent.click(button);
@@ -67,7 +63,7 @@ test("redirects to login when not signed in", async () => {
   });
 
   const button = await screen.findByRole("button", {
-    name: "Borrow this book"
+    name: "Borrow"
   });
   expect(mockPush).toHaveBeenCalledTimes(0);
 
@@ -100,7 +96,7 @@ test("redirects to login when not signed in", async () => {
 test("calls set book after borrowing", async () => {
   const { user } = setup(<BorrowOrReserve isBorrow borrowUrl="/url" />);
   const button = await screen.findByRole("button", {
-    name: "Borrow this book"
+    name: "Borrow"
   });
 
   mockedFetchBook.mockResolvedValueOnce(fixtures.fulfillableBook);
@@ -120,9 +116,7 @@ describe("Preview button (via BorrowOrReserveOrPreview)", () => {
         previewUrl="/preview"
       />
     );
-    expect(
-      screen.getByRole("button", { name: "Borrow this book" })
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Borrow" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Preview" })).toBeInTheDocument();
   });
 
@@ -154,9 +148,7 @@ describe("Preview button (via BorrowOrReserveOrPreview)", () => {
         previewUrl="/preview"
       />
     );
-    expect(
-      screen.getByRole("button", { name: "Reserve this book" })
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Reserve" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Preview" })).toBeInTheDocument();
   });
 });

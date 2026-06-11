@@ -6,7 +6,7 @@ import * as React from "react";
  */
 
 const styles = {
-  borderRadius: 1,
+  borderRadius: 3,
   border: "solid",
   px: 2,
   py: 1,
