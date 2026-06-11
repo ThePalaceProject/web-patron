@@ -26,7 +26,12 @@ const OidcAuthHandler: React.FC<{ method: ClientOidcMethod }> = ({
   const router = useRouter();
   const loginError = extractParam(router.query, "loginError");
 
-  const authUrl = `${method.href}&redirect_uri=${encodeURIComponent(fullSuccessUrl)}`;
+  const authUrl = appendSearchParam(
+    method.href,
+    "redirect_uri",
+    fullSuccessUrl
+  );
+  const altAuthUrl = appendSearchParam(authUrl, "prompt", "select_account");
 
   const { cancelDetected, handleTryAgain, handleCancel } =
     useRedirectCancelDetection({
@@ -37,12 +42,24 @@ const OidcAuthHandler: React.FC<{ method: ClientOidcMethod }> = ({
       token
     });
 
+  const handleSwitchAccount = React.useCallback(() => {
+    sessionStorage.removeItem(oidcRedirectFlag(method.id));
+    sessionStorage.removeItem(oidcCancelFlag(method.id));
+    window.location.href = altAuthUrl;
+  }, [altAuthUrl, method.id]);
+
+  const switchAccountAction = React.useMemo(
+    () => ({ label: "Use a different account", onClick: handleSwitchAccount }),
+    [handleSwitchAccount]
+  );
+
   if (loginError) {
     return (
       <AuthFeedbackPanel
         message={loginError}
         isError
         onTryAgain={handleTryAgain}
+        secondaryAction={switchAccountAction}
       />
     );
   }
@@ -51,6 +68,7 @@ const OidcAuthHandler: React.FC<{ method: ClientOidcMethod }> = ({
       <AuthFeedbackPanel
         message="Login was cancelled."
         onTryAgain={handleTryAgain}
+        secondaryAction={switchAccountAction}
       />
     );
   }
@@ -64,5 +82,11 @@ const OidcAuthHandler: React.FC<{ method: ClientOidcMethod }> = ({
     </Stack>
   );
 };
+
+function appendSearchParam(href: string, name: string, value: string): string {
+  const url = new URL(href);
+  url.searchParams.set(name, value);
+  return url.toString();
+}
 
 export default clientOnly(OidcAuthHandler);
