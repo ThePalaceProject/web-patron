@@ -7,7 +7,7 @@ import { ScreenReaderOnly, Text } from "components/Text";
 const BookStatus: React.FC<{ book: AnyBook }> = ({ book }) => {
   const { status } = book;
 
-  const str =
+  const unfillableReason =
     status === "borrowable"
       ? "Available to borrow"
       : status === "reservable"
@@ -25,7 +25,7 @@ const BookStatus: React.FC<{ book: AnyBook }> = ({ book }) => {
           <MediumIcon book={book} sx={{ mr: 1 }} />
           <Text variant="text.body.bold" sx={{ fontWeight: 600 }}>
             <ScreenReaderOnly>Book Status: </ScreenReaderOnly>
-            {str}
+            {unfillableReason}
           </Text>
         </div>
       )}

@@ -1,5 +1,5 @@
 import { SystemStyleObject } from "@styled-system/css";
-import { darken, lightness } from "@theme-ui/color";
+import { lightness } from "@theme-ui/color";
 import { ButtonSize, ButtonVariant, IconButtonVariant } from "./index";
 
 export const sizes = {
@@ -84,7 +84,7 @@ export const styleProps = (
         color: textColor,
         fill: textColor,
         "&:focus,&:hover": {
-          bg: darken(color, 0.05),
+          bg: lightness(color, 0.2),
           color: textColor,
           textDecoration: "none"
         },
@@ -92,7 +92,7 @@ export const styleProps = (
           boxShadow: "focus"
         },
         "&:active": {
-          bg: darken(color, 0.1)
+          bg: lightness(color, 0.2)
         },
         "&:disabled": {
           bg: "ui.gray.light",
