@@ -23,6 +23,7 @@ const method: ClientBasicMethod = {
 const noPasswordMethod: ClientBasicMethod = {
   ...method,
   inputs: {
+    login: {},
     password: {
       keyboard: Keyboard.NoInput
     }

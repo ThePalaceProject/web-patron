@@ -90,7 +90,7 @@ function serverToClientOidcMethod(
 }
 
 export const getEnglishValue = (
-  arr: Array<{ language: string; value: string }> | undefined
+  arr: Array<{ language?: string; value: string }> | undefined
 ) => arr?.find(item => item.language === "en")?.value;
 
 export function generateCredentials(username: string, password = "") {
