@@ -331,6 +331,15 @@ describe("fetchRegistryLibraries", () => {
     expect(result).toEqual({});
   });
 
+  it("throws when the response body is not a valid OPDS2 feed", async () => {
+    global.fetch = mockFetchSuccess({
+      wrong: "shape"
+    }) as unknown as typeof fetch;
+    await expect(fetchRegistryLibraries(REGISTRY_URL)).rejects.toThrow(
+      "not a valid OPDS2 feed"
+    );
+  });
+
   it("throws when the response is not ok", async () => {
     global.fetch = mockFetchError(
       503,

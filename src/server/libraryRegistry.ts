@@ -1,3 +1,4 @@
+import { type } from "arktype";
 import type { AppConfig, LibrariesConfig, RegistryConfig } from "interfaces";
 import { OPDS2 } from "interfaces";
 import {
@@ -7,6 +8,7 @@ import {
   DEFAULT_REGISTRY_FETCH_TIMEOUT
 } from "constants/registry";
 import { computeSlug, validateSlug } from "utils/librarySlug";
+import { RegistryFeedSchema } from "validation/registryFeed";
 
 // ---------------------------------------------------------------------------
 // Internal state types
@@ -149,7 +151,15 @@ async function crawlRegistryFeed(
       );
     }
 
-    const feed = (await response.json()) as OPDS2.LibraryRegistryFeed;
+    const json = await response.json();
+    const validated = RegistryFeedSchema(json);
+    if (validated instanceof type.errors) {
+      throw new Error(
+        `Registry response from ${currentUrl} is not a valid OPDS2 feed: ` +
+          validated.summary
+      );
+    }
+    const feed = json as OPDS2.LibraryRegistryFeed;
 
     // Read facets from the first page only.
     if (isFirstPage) {

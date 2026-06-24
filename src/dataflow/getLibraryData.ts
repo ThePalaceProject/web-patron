@@ -1,3 +1,4 @@
+import { type } from "arktype";
 import {
   AppConfig,
   AuthDocConfig,
@@ -13,6 +14,7 @@ import {
   DEFAULT_AUTH_DOC_REFRESH_MIN_INTERVAL,
   DEFAULT_AUTH_DOC_REFRESH_MAX_INTERVAL
 } from "constants/registry";
+import { AuthDocumentSchema } from "validation/authDocument";
 
 // ---------------------------------------------------------------------------
 // Auth document cache
@@ -152,7 +154,17 @@ export async function fetchAuthDocument(
         const details = await response.json();
         throw new ServerError(url, response.status, details);
       }
-      const doc: OPDS1.AuthDocument = await response.json();
+      const json = await response.json();
+      const validated = AuthDocumentSchema(json);
+      if (validated instanceof type.errors) {
+        throw new ApplicationError({
+          title: "Invalid Authentication Document",
+          detail:
+            `Response from ${url} is not a valid authentication document: ` +
+            validated.summary
+        });
+      }
+      const doc: OPDS1.AuthDocument = json;
       authDocCache.set(url, {
         doc,
         lastSuccessfulFetch: now,
