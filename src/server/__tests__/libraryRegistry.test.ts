@@ -94,7 +94,13 @@ function makePagedFeed(
     links,
     facets,
     catalogs: catalogs.map(({ id, title, authDocUrl, updated }) => ({
-      metadata: { id, title, updated: updated ?? "", description: "" },
+      metadata: {
+        id,
+        title,
+        updated: updated ?? "",
+        modified: updated ?? "",
+        description: ""
+      },
       links: authDocUrl
         ? [
             {

@@ -1,24 +1,31 @@
 /* eslint-disable camelcase */
 import { OPDS1 } from "interfaces";
+
 /**
  * OPDS 2.0 DATA TYPES
- * Currently only used for support of a Library Regristry, which is
- * an OPDS 2 Feed of OPDS 2 Catalogs from which we extract the catalog root url
  *
- * This is a working document that still has more to fill in.
+ * Library Registry types are derived from the ArkType schemas in
+ * validation/registryFeed.ts (aligned with what the Palace Library Registry
+ * actually produces). Generic OPDS 2 structural types (Collection, Feed, etc.)
+ * remain hand-written.
  */
 
+// Schema-derived types for registry feed validation.
+export type {
+  CatalogEntry,
+  CatalogEntryMetadata,
+  FacetGroup,
+  FacetGroupMetadata,
+  FeedMetadata,
+  RegistryFeed as LibraryRegistryFeed
+} from "validation/registryFeed";
+
 export interface Collection<M extends AnyObject = AnyObject> {
-  /**
-   * Must comply with "application/opds+json", but that is
-   * not necessarily marked as the type
-   */
   metadata: M;
   links: Link[];
 }
-// a feed is a collection since it has metadata, links and sub collections.
+
 export interface Feed<M extends AnyObject = AnyObject> extends Collection<M> {
-  // sub collections of with roles "navigation", "publication", "group"
   navigation?: NavigationLink[];
   publications?: Publication[];
   groups?: Group[];
@@ -29,84 +36,35 @@ export interface NavigationLink extends Link {
 
 type GroupMetadata = { title: string };
 export interface Group extends Collection<GroupMetadata> {
-  /**
-   * For when a catalog has more than one collection of
-   * navigation or publications. It contains an array of
-   * Feeds
-   *
-   */
   groups: Feed<GroupMetadata>[];
 }
 
 /** URI identifying the sort facet group in a Library Registry feed. */
 export const SortFacetType = "http://palaceproject.io/terms/rel/sort";
 
+/** URI identifying the availability facet group in a Library Registry feed. */
+export const AvailabilityFacetType =
+  "http://palaceproject.io/terms/rel/availability";
+
 /** Property key marking a facet link as the default option for its group. */
 export const FacetDefaultProperty =
-  "http://palaceproject.io/terms/facet/default";
+  "http://palaceproject.io/terms/properties/default";
 
-export interface FacetGroupMetadata {
-  title: string;
-  "@type"?: string; // e.g. SortFacetType
-}
+/** Facet link property: the query parameter value for this facet. */
+export const FacetValueProperty = "http://palaceproject.io/terms/facet/value";
 
-export interface FacetGroup {
-  metadata: FacetGroupMetadata;
-  links: Link[]; // the active facet link has rel === "self"
-}
+/** Facet group property: the query parameter name this group controls. */
+export const FacetParamProperty = "http://palaceproject.io/terms/facet/param";
 
-type LibraryRegistryFeedMetadata = {
-  adobe_vendor_id: string;
-  title: string;
-  numberOfItems?: number;
-};
+/** Facet link property: logical group linking related sort variants. */
+export const FacetGroupProperty = "http://palaceproject.io/terms/facet/group";
 
-export interface LibraryRegistryFeed extends Feed<LibraryRegistryFeedMetadata> {
-  links: Link[];
-  /**
-   * When you fetch a templated url from a LibraryRegistryFeed, you
-   * get back another LibraryRegistryFeed, but with a single catalog
-   * in an array. A generic LibraryRegistryFeed has a list of all catalogs
-   */
-  catalogs?: CatalogEntry[];
-  facets?: FacetGroup[];
-}
-
-type CatalogEntryMetadata = {
-  updated: string;
-  description: string;
-  id: string;
-  title: string;
-};
-export interface CatalogEntry extends Feed<CatalogEntryMetadata> {
-  /**
-   * The CatalogEntry is a Feed which describes an OPDS Catalog (v1 or v2).
-   * It contains a link to an AuthDocument, thus marking it the top level descriptor
-   * for a library with an authentication boundary. The AuthDocument and CatalogRootLink
-   * are nested within Links.
-   *
-   * Since there is no way in typescript to describe an array that must contain
-   * certain elements, this just extends Feed.
-   */
-}
-
-/**
- * Publications must either be:
- * a Readium Web Publication with no restrictions in terms of access
- * (no payment, no credentials required, no limitations whatsoever),
- * or an OPDS Publication
- */
 export type Publication = ReadiumWebPub | OPDSPublication;
 
 export interface ReadiumWebPub extends Collection {
   readingOrder: any[];
 }
-export interface OPDSPublication extends Collection {
-  /**
-   * An OPDS Publication is basically a ReadiumWebPub without
-   * the requirement that it contain a readingOrder collection
-   */
-}
+export interface OPDSPublication extends Collection {}
 
 /**
  * Links

@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /**
  * @jest-environment node
  *
@@ -10,14 +11,20 @@ import { RegistryFeedSchema } from "validation/registryFeed";
 
 function minimal() {
   return {
-    metadata: { title: "Test Registry" },
+    metadata: { title: "Test Registry", adobe_vendor_id: null }, // eslint-disable-line camelcase -- from external API
     links: []
   };
 }
 
 function catalogEntry(id: string, title: string) {
   return {
-    metadata: { id, title, updated: new Date().toISOString(), description: "" },
+    metadata: {
+      id,
+      title,
+      updated: new Date().toISOString(),
+      modified: new Date().toISOString(), // from external API
+      description: ""
+    },
     links: [
       {
         href: `https://${id}.example.com/auth`,
@@ -45,13 +52,29 @@ describe("RegistryFeedSchema", () => {
     expect(result instanceof type.errors).toBe(false);
   });
 
-  it("accepts a feed with facets", () => {
+  it("accepts a feed with facets including @type and properties", () => {
     const feed = {
       ...minimal(),
       facets: [
         {
-          metadata: { title: "Sort" },
-          links: [{ href: "/sort?order=modified", rel: "self" }]
+          metadata: {
+            title: "Sort by",
+            "@type": "http://palaceproject.io/terms/rel/sort",
+            "http://palaceproject.io/terms/facet/param": "order"
+          },
+          links: [
+            {
+              href: "/libraries?order=modified",
+              title: "Most recently modified first",
+              type: "application/opds+json",
+              rel: "self",
+              properties: {
+                "http://palaceproject.io/terms/facet/value": "modified",
+                "http://palaceproject.io/terms/properties/default": true,
+                "http://palaceproject.io/terms/facet/group": "modified"
+              }
+            }
+          ]
         }
       ]
     };
@@ -59,11 +82,71 @@ describe("RegistryFeedSchema", () => {
     expect(result instanceof type.errors).toBe(false);
   });
 
-  it("accepts a feed with pagination links", () => {
+  it("accepts a paginated feed with numberOfItems", () => {
     const feed = {
-      metadata: { title: "Registry", adobe_vendor_id: "vendor" }, // eslint-disable-line camelcase -- from external API
-      links: [{ href: "/page2", rel: "next", type: "application/opds+json" }],
+      metadata: {
+        title: "Libraries",
+        adobe_vendor_id: "VENDORID",
+        numberOfItems: 42
+      }, // eslint-disable-line camelcase -- from external API
+      links: [
+        { href: "/page1", rel: "first", type: "application/opds+json" },
+        { href: "/page2", rel: "next", type: "application/opds+json" }
+      ],
       catalogs: [catalogEntry("urn:uuid:a", "A")]
+    };
+    const result = RegistryFeedSchema(feed);
+    expect(result instanceof type.errors).toBe(false);
+  });
+
+  it("accepts catalog entries with images", () => {
+    const feed = {
+      ...minimal(),
+      catalogs: [
+        {
+          ...catalogEntry("urn:uuid:x", "X"),
+          images: [
+            {
+              href: "https://example.com/logo.png",
+              rel: "http://opds-spec.org/image/thumbnail",
+              type: "image/png"
+            }
+          ]
+        }
+      ]
+    };
+    const result = RegistryFeedSchema(feed);
+    expect(result instanceof type.errors).toBe(false);
+  });
+
+  it("accepts links with properties (hyperlink validation status)", () => {
+    const feed = {
+      ...minimal(),
+      catalogs: [
+        {
+          metadata: {
+            id: "urn:uuid:a",
+            title: "A",
+            updated: "2024-01-01T00:00:00Z",
+            modified: "2024-01-01T00:00:00Z"
+          },
+          links: [
+            {
+              href: "https://example.com/auth",
+              type: "application/vnd.opds.authentication.v1.0+json",
+              rel: "http://opds-spec.org/auth/document"
+            },
+            {
+              href: "mailto:help@example.com",
+              rel: "help",
+              properties: {
+                "http://librarysimplified.org/rel/registry/validation-status":
+                  "confirmed"
+              }
+            }
+          ]
+        }
+      ]
     };
     const result = RegistryFeedSchema(feed);
     expect(result instanceof type.errors).toBe(false);
