@@ -209,7 +209,8 @@ describe("RegistryFeedSchema", () => {
           metadata: {
             id: "x",
             title: "X",
-            updated: "2024-01-01T00:00:00Z"
+            updated: "2024-01-01T00:00:00Z",
+            modified: "2024-01-01T00:00:00Z"
           }
         }
       ]
