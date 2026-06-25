@@ -151,15 +151,15 @@ async function crawlRegistryFeed(
       );
     }
 
-    const json = await response.json();
-    const validated = RegistryFeedSchema(json);
+    const validated = RegistryFeedSchema(await response.json());
+    // Plain Error here, since it should never propagate to the client.
     if (validated instanceof type.errors) {
       throw new Error(
         `Registry response from ${currentUrl} is not a valid OPDS2 feed: ` +
           validated.summary
       );
     }
-    const feed = json as OPDS2.LibraryRegistryFeed;
+    const feed = validated as OPDS2.LibraryRegistryFeed;
 
     // Read facets from the first page only.
     if (isFirstPage) {

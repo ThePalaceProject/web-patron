@@ -84,19 +84,24 @@ export const AuthenticationInputSchema = type({
   "barcode_format?": "string"
 });
 
-// Matches PM's AuthenticationInputs.
+// PM's AuthenticationInputs requires both login and password, but
+// third-party CMs may omit one. Keep both optional to avoid rejecting
+// an entire auth document over a missing sub-field.
 export const AuthenticationInputsSchema = type({
-  login: AuthenticationInputSchema,
-  password: AuthenticationInputSchema
+  "login?": AuthenticationInputSchema,
+  "password?": AuthenticationInputSchema
 });
 
 // Matches PM's PalaceAuthentication (Authentication + AuthenticationExtension).
+// Auth method links use AuthenticateLinkSchema because SAML/OIDC authenticate
+// links carry localized extensions (display_names, descriptions, etc.).
+// Plain links (e.g. logout) still pass since those fields are optional.
 export const AuthenticationSchema = type({
   type: "string",
   "description?": "string",
   "labels?": AuthenticationLabelsSchema,
   "inputs?": AuthenticationInputsSchema,
-  "links?": LinkSchema.array()
+  "links?": AuthenticateLinkSchema.array()
 });
 
 // -- Document-level fields --------------------------------------------------
@@ -146,7 +151,6 @@ export const AuthDocumentSchema = type({
 
 // -- Derived types ----------------------------------------------------------
 
-export type AuthDocumentLink = typeof LinkSchema.infer;
 export type AuthenticateLink = typeof AuthenticateLinkSchema.infer;
 export type LocalizedValue = typeof LocalizedValueSchema.infer;
 export type AuthenticationLabels = typeof AuthenticationLabelsSchema.infer;

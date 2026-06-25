@@ -41,7 +41,7 @@ describe("AuthDocumentSchema", () => {
           type: "http://opds-spec.org/auth/basic",
           description: "Basic Auth",
           labels: { login: "Barcode", password: "PIN" },
-          inputs: { login: { keyboard: "Default" }, password: {} }
+          inputs: { login: { keyboard: "Default" } }
         },
         {
           type: "http://librarysimplified.org/authtype/SAML-2.0",

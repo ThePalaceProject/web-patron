@@ -154,8 +154,7 @@ export async function fetchAuthDocument(
         const details = await response.json();
         throw new ServerError(url, response.status, details);
       }
-      const json = await response.json();
-      const validated = AuthDocumentSchema(json);
+      const validated = AuthDocumentSchema(await response.json());
       if (validated instanceof type.errors) {
         throw new ApplicationError({
           title: "Invalid Authentication Document",
@@ -164,7 +163,7 @@ export async function fetchAuthDocument(
             validated.summary
         });
       }
-      const doc: OPDS1.AuthDocument = json;
+      const doc = validated as OPDS1.AuthDocument;
       authDocCache.set(url, {
         doc,
         lastSuccessfulFetch: now,
