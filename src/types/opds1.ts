@@ -163,7 +163,36 @@ export interface Link {
 
 /**
  * Auth Document
+ *
+ * Simple leaf types are derived from the ArkType schemas in
+ * validation/authDocument.ts (aligned with Palace Manager Pydantic models).
+ * Compound types that use CPW-specific narrowing (discriminated auth method
+ * union, AuthDocument itself) remain hand-written interfaces here.
  */
+
+// Schema-derived types — single source of truth for these shapes.
+export type {
+  AuthenticateLink,
+  Authentication,
+  AuthenticationInput,
+  AuthenticationInputs,
+  AuthenticationLabels,
+  Features,
+  LocalizedValue,
+  PublicKey,
+  WebColorScheme
+} from "validation/authDocument";
+
+// Local import so the interfaces below can reference the derived types.
+import type {
+  AuthenticationInputs,
+  AuthenticationLabels,
+  Features,
+  LocalizedValue,
+  PublicKey,
+  WebColorScheme
+} from "validation/authDocument";
+
 export const CatalogRootRel = "start";
 export const ShelfLinkRel = "http://opds-spec.org/shelf";
 export const UserProfileLinkRel =
@@ -211,6 +240,15 @@ export type AnyAuthType =
   | typeof ImplicitGrantAuthType
   | typeof PasswordCredentialsAuthType;
 
+/**
+ * CPW-specific narrowing of auth methods by their type discriminant.
+ *
+ * The schema-derived Authentication type matches what the Palace Manager
+ * sends: a single shape with optional fields. These interfaces narrow the
+ * type field to a specific literal so downstream code can discriminate on
+ * auth method kind.
+ */
+
 // https://drafts.opds.io/authentication-for-opds-1.0
 export interface AuthMethod<T extends AnyAuthType, L extends Link = Link> {
   type: T;
@@ -231,15 +269,8 @@ export interface ServerOidcMethod extends AuthMethod<
 export interface CleverAuthMethod extends AuthMethod<typeof CleverAuthType> {}
 
 export interface BasicAuthMethod extends AuthMethod<typeof BasicAuthType> {
-  inputs?: {
-    login?: AuthInput;
-    password?: AuthInput;
-  };
-
-  labels: {
-    login: string;
-    password: string;
-  };
+  inputs?: AuthenticationInputs;
+  labels: AuthenticationLabels;
 }
 
 // TODO: This may need adjustment when we actually implement BasicTokenAuth.
@@ -248,10 +279,6 @@ export interface BasicTokenAuthMethod
   extends
     Omit<BasicAuthMethod, "type">,
     AuthMethod<typeof BasicTokenAuthType> {}
-
-export interface AuthInput {
-  keyboard?: Keyboard;
-}
 
 export enum Keyboard {
   Default = "Default",
@@ -272,18 +299,24 @@ export interface Announcement {
   content: string;
 }
 
+/**
+ * Aligned with PM's PalaceAuthenticationDocument. Fields marked "Palace
+ * extension" are emitted by Palace Manager but not part of the base
+ * Authentication for OPDS 1.0 spec.
+ */
 export interface AuthDocument {
   id: string;
   title: string;
-  // used to display text prompt to authenticating user
   description?: string;
   links?: AuthDocumentLink[];
   authentication: ServerAuthMethod[];
+  // Palace extensions
   announcements?: Announcement[];
-  web_color_scheme?: {
-    primary?: string;
-    secondary?: string;
-  };
+  color_scheme?: string;
+  web_color_scheme?: WebColorScheme;
+  service_description?: string;
+  public_key?: PublicKey;
+  features?: Features;
 }
 
 /**
@@ -299,44 +332,31 @@ export interface BearerTokenDocument {
 }
 
 /**
- * SAML is an extension on the OPDS1 spec which only
- * works when backed by a Circulation Manager
+ * SAML/OIDC authenticate links.
+ *
+ * Narrow the schema-derived AuthenticateLink with the specific rel values
+ * used by SAML and OIDC providers. The localized-value arrays match PM's
+ * AuthenticateLink model (palace.opds.authentication.document).
  */
 export type SamlIdp = {
   href: string;
   rel: "authenticate" | "logout";
-  display_names?: Array<{ language: string; value: string }>;
-  descriptions?: Array<{ language: string; value: string }>;
-  privacy_statement_urls?: [];
-  logo_urls?: [];
-  information_urls?: [];
+  display_names?: LocalizedValue[];
+  descriptions?: LocalizedValue[];
+  privacy_statement_urls?: LocalizedValue[];
+  logo_urls?: LocalizedValue[];
+  information_urls?: LocalizedValue[];
   templated?: boolean;
 };
 
-/**
- * OIDC is an extension on the OPDS1 spec which only
- * works when backed by a Circulation Manager
- */
-// TODO: Currently OidcLink is identical to SamlIdp (above). We should
-//  factor out the common properties, if that remains the case.
 export type OidcLink = {
-  privacy_statement_urls: [];
-  logo_urls: [];
-  display_names: [
-    {
-      language: string;
-      value: string;
-    }
-  ];
   href: string;
-  descriptions: [
-    {
-      language: string;
-      value: string;
-    }
-  ];
   rel: "authenticate" | "logout";
-  information_urls: [];
+  display_names?: LocalizedValue[];
+  descriptions?: LocalizedValue[];
+  privacy_statement_urls?: LocalizedValue[];
+  logo_urls?: LocalizedValue[];
+  information_urls?: LocalizedValue[];
   templated?: boolean;
   /** Structurally equivalent to OPDS2.UriTemplateProperties (see types/opds2.ts). */
   properties?: {

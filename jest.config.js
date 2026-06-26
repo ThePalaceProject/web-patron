@@ -164,6 +164,7 @@ module.exports = {
     // These run separately with jest.config.node.js (via test:ci)
     "/src/config/__tests__/",
     "/src/server/__tests__/",
+    "/tests/validation/",
     "/tests/pages/"
   ],
 

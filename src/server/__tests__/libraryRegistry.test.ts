@@ -94,7 +94,13 @@ function makePagedFeed(
     links,
     facets,
     catalogs: catalogs.map(({ id, title, authDocUrl, updated }) => ({
-      metadata: { id, title, updated: updated ?? "", description: "" },
+      metadata: {
+        id,
+        title,
+        updated: updated ?? "",
+        modified: updated ?? "",
+        description: ""
+      },
       links: authDocUrl
         ? [
             {
@@ -329,6 +335,15 @@ describe("fetchRegistryLibraries", () => {
     const result = await fetchRegistryLibraries(REGISTRY_URL);
 
     expect(result).toEqual({});
+  });
+
+  it("throws when the response body is not a valid OPDS2 feed", async () => {
+    global.fetch = mockFetchSuccess({
+      wrong: "shape"
+    }) as unknown as typeof fetch;
+    await expect(fetchRegistryLibraries(REGISTRY_URL)).rejects.toThrow(
+      "not a valid OPDS2 feed"
+    );
   });
 
   it("throws when the response is not ok", async () => {

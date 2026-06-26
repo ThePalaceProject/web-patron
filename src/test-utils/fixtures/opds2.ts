@@ -29,6 +29,7 @@ const catalogRootFeedLink: OPDS2.CatalogRootFeedLink = {
 export const catalogEntry: OPDS2.CatalogEntry = {
   metadata: {
     updated: "catalog updated",
+    modified: "catalog updated",
     description: "catalog entry description",
     id: "catalog entry id",
     title: "catalog entry title"

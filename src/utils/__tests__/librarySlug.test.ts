@@ -10,7 +10,13 @@ function makeCatalog(
   links: OPDS2.CatalogEntry["links"] = []
 ): OPDS2.CatalogEntry {
   return {
-    metadata: { id, title: "Test Library", updated: "", description: "" },
+    metadata: {
+      id,
+      title: "Test Library",
+      updated: "",
+      modified: "",
+      description: ""
+    },
     links
   };
 }
