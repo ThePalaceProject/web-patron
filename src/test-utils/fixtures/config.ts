@@ -1,4 +1,5 @@
 import { AppConfig } from "interfaces";
+import { DEFAULT_ITEM_LANDING_SLUG } from "constants/app";
 
 export const config: AppConfig = {
   instanceName: "Test Instance",
@@ -7,6 +8,7 @@ export const config: AppConfig = {
   showMedium: true,
   openebooks: null,
   authenticationDocuments: null,
+  itemLandingSlugs: [DEFAULT_ITEM_LANDING_SLUG],
   mediaSupport: {
     "application/epub+zip": "show",
     "application/kepub+zip": "show",

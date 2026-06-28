@@ -118,3 +118,23 @@ static_libraries:
 # authentication_documents:
 #   refresh_min_interval: 60   # Minimum seconds between re-fetch attempts (default: 60)
 #   refresh_max_interval: 300  # Seconds before a cached auth doc is considered stale (default: 300)
+#
+# ITEM LANDING SLUGS
+#
+# The path segments reserved for the cross-library item landing page
+# (/_item_/{workId} by default). The slugs are resolved at runtime, so
+# overriding them here moves the landing page without a rebuild. Every listed
+# slug serves the page, which allows migrating from one slug to another with
+# both active until the migration is complete; an empty list disables the
+# landing page. A library whose slug matches an active value is shadowed by
+# the landing page; such collisions are logged as warnings.
+#
+# Slugs equal to a path segment reserved by Next.js ("api", "_next") can never
+# serve the landing page; such entries are disabled and an error is logged.
+#
+# A single value or a list is accepted:
+#
+# item_landing_slugs: _item_
+# item_landing_slugs:
+#   - _item_
+#   - item

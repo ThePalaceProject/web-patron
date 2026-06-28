@@ -26,6 +26,8 @@ export type AppConfig = {
   showMedium: boolean;
   bugsnagApiKey: string | null;
   openebooks: OpenEbooksConfig | null;
+  /** Reserved item landing path segments. See constants/app.ts. */
+  itemLandingSlugs: string[];
 };
 
 export type OpenEbooksConfig = {

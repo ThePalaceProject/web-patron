@@ -11,6 +11,7 @@ import type {
   LibrariesErrorResponse
 } from "pages/api/libraries";
 import type { AppConfig } from "interfaces";
+import { DEFAULT_ITEM_LANDING_SLUG } from "constants/app";
 
 // Mock both server modules so we can control their behavior.
 jest.mock("server/libraryRegistry", () => ({
@@ -43,7 +44,8 @@ const VALID_APP_CONFIG: AppConfig = {
   showMedium: true,
   openebooks: null,
   mediaSupport: {},
-  authenticationDocuments: null
+  authenticationDocuments: null,
+  itemLandingSlugs: [DEFAULT_ITEM_LANDING_SLUG]
 };
 
 function makeRes() {
