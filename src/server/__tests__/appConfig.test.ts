@@ -13,6 +13,7 @@ import {
 } from "../appConfig";
 import { AppSetupError } from "errors";
 import { DEFAULT_REGISTRY_FETCH_TIMEOUT } from "constants/registry";
+import { expectAndSuppressConsole } from "test-utils/suppressConsole";
 
 jest.mock("fs", () => ({ readFileSync: jest.fn() }));
 
@@ -515,6 +516,17 @@ describe("config parsing", () => {
   // --- deprecated string libraries field ---
 
   describe("deprecated libraries field", () => {
+    let warnSpy: jest.SpyInstance;
+    beforeEach(() => {
+      warnSpy = expectAndSuppressConsole(
+        "warn",
+        "WARNING: Using a string for 'libraries' in config is deprecated. " +
+          "Please migrate to the 'registries' array format. " +
+          "See the 'Libraries and Registries Configuration Settings' section in README.md."
+      );
+    });
+    afterEach(() => warnSpy.mockRestore());
+
     it("adds a string libraries value as a registry entry", async () => {
       const config = await load(`libraries: https://old.example.com/libs`);
       expect(config.registries).toEqual([
@@ -527,14 +539,10 @@ describe("config parsing", () => {
     });
 
     it("emits a deprecation warning when string libraries is used", async () => {
-      const warnSpy = jest
-        .spyOn(console, "warn")
-        .mockImplementation(() => undefined);
       await load(`libraries: https://old.example.com/libs`);
       expect(warnSpy).toHaveBeenCalledWith(
         expect.stringContaining("deprecated")
       );
-      warnSpy.mockRestore();
     });
 
     it("appends the string libraries entry after explicit registries", async () => {
@@ -596,6 +604,20 @@ describe("config parsing", () => {
   // --- libraries ---
 
   describe("libraries", () => {
+    let warnSpy: jest.SpyInstance;
+    beforeEach(() => {
+      warnSpy = expectAndSuppressConsole(
+        "warn",
+        "WARNING: Using a string for 'libraries' in config is deprecated. " +
+          "Please migrate to the 'registries' array format. " +
+          "See the 'Libraries and Registries Configuration Settings' section in README.md.",
+        "WARNING: Using an object for 'libraries' to define static libraries is deprecated. " +
+          "Please rename it to 'static_libraries'. " +
+          "See the 'Libraries and Registries Configuration Settings' section in README.md."
+      );
+    });
+    afterEach(() => warnSpy.mockRestore());
+
     it.each([
       ["absent", MINIMAL_YAML],
       [
@@ -707,14 +729,10 @@ describe("config parsing", () => {
     });
 
     it("emits a deprecation warning when an object is used", async () => {
-      const warnSpy = jest
-        .spyOn(console, "warn")
-        .mockImplementation(() => undefined);
       await load("libraries:\n  my-lib: https://example.com/auth");
       expect(warnSpy).toHaveBeenCalledWith(
         expect.stringContaining("deprecated")
       );
-      warnSpy.mockRestore();
     });
 
     it("throws AppSetupError when both libraries object and staticLibraries are set", async () => {

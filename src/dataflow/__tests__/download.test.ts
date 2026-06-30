@@ -1,8 +1,19 @@
 import { describe, expect, test } from "@jest/globals";
 import fetchMock from "jest-fetch-mock";
 import downloadFile from "../download";
+import { expectAndSuppressConsole } from "test-utils/suppressConsole";
 
 describe("downloadFile", () => {
+  beforeEach(() => {
+    expectAndSuppressConsole(
+      "warn",
+      "only proceeded after retry without X-Requested-With header. " +
+        "Distributor may not allow X-Requested-With for CORS."
+    );
+  });
+
+  afterEach(() => jest.restoreAllMocks());
+
   test("should fetch the url with the supplied token", async () => {
     fetchMock.mockResponseOnce("nice job");
 

@@ -16,6 +16,7 @@ import {
   DEFAULT_REGISTRY_REFRESH_MIN_INTERVAL,
   DEFAULT_REGISTRY_REFRESH_MAX_INTERVAL
 } from "constants/registry";
+import { expectAndSuppressConsole } from "test-utils/suppressConsole";
 
 // ---------------------------------------------------------------------------
 // Test infrastructure
@@ -249,7 +250,18 @@ describe("shouldRefresh", () => {
 // ---------------------------------------------------------------------------
 
 describe("fetchRegistryLibraries", () => {
-  beforeEach(() => resetRegistryCaches());
+  let warnSpy: jest.SpyInstance;
+
+  beforeEach(() => {
+    resetRegistryCaches();
+    warnSpy = expectAndSuppressConsole(
+      "warn",
+      "Skipping library missing auth document link:",
+      "Skipping library with invalid slug"
+    );
+  });
+
+  afterEach(() => warnSpy.mockRestore());
 
   it("returns a LibrariesConfig from a valid single-page feed", async () => {
     const feed = makePagedFeed([
@@ -384,9 +396,6 @@ describe("fetchRegistryLibraries", () => {
       { id: "", title: "Empty Slug", authDocUrl: "https://b.example.com/" }
     ]);
     global.fetch = mockFetchSuccess(feed) as unknown as typeof fetch;
-    const warnSpy = jest
-      .spyOn(console, "warn")
-      .mockImplementation(() => undefined);
 
     const result = await fetchRegistryLibraries(REGISTRY_URL);
 
@@ -406,9 +415,22 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
   const OLD_TIMESTAMP = new Date((NOW_SECONDS - 1000) * 1000).toISOString();
   const NEW_TIMESTAMP = new Date((NOW_SECONDS + 1000) * 1000).toISOString();
 
+  let warnSpy: jest.SpyInstance;
+
   beforeEach(() => {
     resetRegistryCaches();
     jest.spyOn(Date, "now").mockReturnValue(NOW_SECONDS * 1000);
+    warnSpy = expectAndSuppressConsole(
+      "warn",
+      "has no order=modified facet; incremental fetching is not supported. " +
+        "Full crawls will run every refresh."
+    );
+    expectAndSuppressConsole(
+      "error",
+      "Failed to refresh registry",
+      "Registry fetch failed for",
+      "500 Internal Server Error"
+    );
   });
 
   afterEach(() => jest.restoreAllMocks());
@@ -661,9 +683,6 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
       // no incrementalFacetHref
     );
     global.fetch = mockFetchSuccess(feed) as unknown as typeof fetch;
-    const warnSpy = jest
-      .spyOn(console, "warn")
-      .mockImplementation(() => undefined);
 
     await getLibraries(makeConfig({ registries: [makeIncrementalConfig()] }));
 
@@ -779,9 +798,18 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
 // ---------------------------------------------------------------------------
 
 describe("getLibraries", () => {
+  let warnSpy: jest.SpyInstance;
+
   beforeEach(() => {
     resetRegistryCaches();
+    warnSpy = expectAndSuppressConsole(
+      "warn",
+      "has no order=modified facet; incremental fetching is not supported. " +
+        "Full crawls will run every refresh."
+    );
   });
+
+  afterEach(() => warnSpy.mockRestore());
 
   it("returns static libraries when no registries are configured", async () => {
     const staticLibraries = {
@@ -904,7 +932,20 @@ describe("getLibraries", () => {
 describe("concurrent first-fetch coalescing", () => {
   beforeEach(() => {
     resetRegistryCaches();
+    expectAndSuppressConsole(
+      "warn",
+      "has no order=modified facet; incremental fetching is not supported. " +
+        "Full crawls will run every refresh."
+    );
+    expectAndSuppressConsole(
+      "error",
+      "Failed to refresh registry",
+      "Registry fetch failed for",
+      "503 Service Unavailable"
+    );
   });
+
+  afterEach(() => jest.restoreAllMocks());
 
   it("concurrent getLibraries calls both receive the fetched libraries, not an empty list", async () => {
     /*
@@ -989,7 +1030,14 @@ describe("concurrent first-fetch coalescing", () => {
 // ---------------------------------------------------------------------------
 
 describe("fetch timeout", () => {
-  beforeEach(() => resetRegistryCaches());
+  beforeEach(() => {
+    resetRegistryCaches();
+    expectAndSuppressConsole(
+      "error",
+      "Failed to refresh registry",
+      "The operation was aborted."
+    );
+  });
 
   afterEach(() => {
     jest.useRealTimers();
