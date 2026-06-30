@@ -1,6 +1,7 @@
 import * as React from "react";
 import { render, waitFor, fireEvent } from "../../test-utils";
 import { AccountMenu } from "../AccountMenu";
+import { expectAndSuppressConsole } from "../../test-utils/suppressConsole";
 
 function setup(overrideOptions: any = {}) {
   const userEvent = require("@testing-library/user-event").default;
@@ -160,6 +161,11 @@ describe("AccountMenu", () => {
     );
     // Also mock legacy fallback to fail
     document.execCommand = jest.fn(() => false);
+    const errorSpy = expectAndSuppressConsole(
+      "error",
+      "Clipboard API failed:",
+      "Error: Clipboard API not available"
+    );
 
     const { user, getByRole, getByTestId, findByText } = setup({
       user: { isAuthenticated: true, patronId: "test-patron-12345" },
@@ -173,6 +179,7 @@ describe("AccountMenu", () => {
     fireEvent.click(patronIdButton);
 
     expect(await findByText("Failed")).toBeInTheDocument();
+    errorSpy.mockRestore();
   });
 
   it("clears copy status after 2 seconds on success", async () => {
@@ -211,6 +218,11 @@ describe("AccountMenu", () => {
       new Error("Clipboard API not available")
     );
     document.execCommand = jest.fn(() => false);
+    const errorSpy = expectAndSuppressConsole(
+      "error",
+      "Clipboard API failed:",
+      "Error: Clipboard API not available"
+    );
 
     const { user, getByRole, getByTestId, queryByText } = setup({
       user: { isAuthenticated: true, patronId: "test-patron-12345" },
@@ -234,6 +246,7 @@ describe("AccountMenu", () => {
     // "Failed" should be gone
     expect(queryByText("Failed")).not.toBeInTheDocument();
 
+    errorSpy.mockRestore();
     jest.useRealTimers();
   });
 });

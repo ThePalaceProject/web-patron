@@ -23,6 +23,7 @@ jest.mock("server/appConfig", () => ({
 import { getLibraries } from "server/libraryRegistry";
 import { getAppConfig } from "server/appConfig";
 import handler from "pages/api/libraries";
+import { expectAndSuppressConsole } from "test-utils/suppressConsole";
 
 const mockGetLibraries = getLibraries as jest.MockedFunction<
   typeof getLibraries
@@ -59,10 +60,20 @@ function makeRes() {
 // ---------------------------------------------------------------------------
 
 describe("GET /api/libraries", () => {
+  let errorSpy: jest.SpyInstance;
+
   beforeEach(() => {
+    errorSpy = expectAndSuppressConsole(
+      "error",
+      "GET /api/libraries failed:",
+      "Error: CONFIG_FILE not set",
+      "Error: Registry unavailable"
+    );
     mockGetAppConfig.mockResolvedValue(VALID_APP_CONFIG);
     jest.clearAllMocks();
   });
+
+  afterEach(() => errorSpy.mockRestore());
 
   it("returns 200 with an array of client-safe library objects", async () => {
     mockGetLibraries.mockResolvedValue({
