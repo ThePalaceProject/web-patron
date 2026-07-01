@@ -53,6 +53,9 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: "${{ needs.node_setup.outputs.node_version }}" }
 
+      - name: Pin npm version
+        run: npm install -g npm@11.17.0
+
       - uses: actions/cache@v4
         env:
           cache-name: cache-node-modules
@@ -82,6 +85,9 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: "${{ needs.node_setup.outputs.node_version }}" }
 
+      - name: Pin npm version
+        run: npm install -g npm@11.17.0
+
       - uses: actions/cache@v4
         env:
           cache-name: cache-node-modules
@@ -100,24 +106,34 @@ jobs:
         run: node_modules/typescript/bin/tsc --noEmit
 
   test:
-    name: Test & Coverage
-    needs: node_setup
+    name: Test & Coverage (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
     env:
       CI: true
+
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20, 24, 26]
+
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with: { node-version: "${{ needs.node_setup.outputs.node_version }}" }
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with: { node-version: "${{ matrix.node-version }}" }
+
+      - name: Pin npm version
+        run: npm install -g npm@11.17.0
 
       - uses: actions/cache@v4
         env:
           cache-name: cache-node-modules
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node-version }}-
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
@@ -129,6 +145,7 @@ jobs:
         run: npm run test:ci -- --coverage
 
       - name: Coveralls Report
+        if: matrix.node-version == 20
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
