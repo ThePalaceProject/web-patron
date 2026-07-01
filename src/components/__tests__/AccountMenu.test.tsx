@@ -1,5 +1,5 @@
 import * as React from "react";
-import { render, waitFor, fireEvent } from "../../test-utils";
+import { render, waitFor, fireEvent, act } from "../../test-utils";
 import { AccountMenu } from "../AccountMenu";
 
 function setup(overrideOptions: any = {}) {
@@ -170,7 +170,7 @@ describe("AccountMenu", () => {
     const patronIdButton = getByTestId("patron-id-menuitem").querySelector(
       "button"
     ) as HTMLButtonElement;
-    fireEvent.click(patronIdButton);
+    await user.click(patronIdButton);
 
     expect(await findByText("Failed")).toBeInTheDocument();
   });
@@ -187,7 +187,7 @@ describe("AccountMenu", () => {
     const patronIdButton = getByTestId("patron-id-menuitem").querySelector(
       "button"
     ) as HTMLButtonElement;
-    fireEvent.click(patronIdButton);
+    await user.click(patronIdButton);
 
     // Wait for "Copied!" to appear
     await waitFor(() => {
@@ -195,7 +195,7 @@ describe("AccountMenu", () => {
     });
 
     // Fast-forward 2 seconds
-    jest.advanceTimersByTime(2000);
+    await act(async () => jest.advanceTimersByTime(2000));
 
     // "Copied!" should be gone
     expect(queryByText("Copied!")).not.toBeInTheDocument();
@@ -221,7 +221,7 @@ describe("AccountMenu", () => {
     const patronIdButton = getByTestId("patron-id-menuitem").querySelector(
       "button"
     ) as HTMLButtonElement;
-    fireEvent.click(patronIdButton);
+    await user.click(patronIdButton);
 
     // Wait for "Failed" to appear
     await waitFor(() => {
@@ -229,7 +229,7 @@ describe("AccountMenu", () => {
     });
 
     // Fast-forward 2 seconds
-    jest.advanceTimersByTime(2000);
+    await act(async () => jest.advanceTimersByTime(2000));
 
     // "Failed" should be gone
     expect(queryByText("Failed")).not.toBeInTheDocument();
