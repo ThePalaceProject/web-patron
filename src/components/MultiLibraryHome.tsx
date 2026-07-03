@@ -38,6 +38,54 @@ function fuzzyMatchIndices(query: string, target: string): number[] | null {
   return qi === q.length ? indices : null;
 }
 
+export type MatchResult = { score: number; matchIndices: number[] };
+
+/**
+ * Scores how well `query` matches `target` and returns the character indices
+ * to highlight, anchored to the best match position.
+ *
+ * Tiers (higher is better):
+ *   100 — exact match
+ *    80 — target starts with query
+ *    60 — any word in target starts with query
+ *    40 — target contains query as a substring
+ *    20 — fuzzy (all query chars appear in order)
+ *     0 — no match
+ */
+export function scoreMatch(query: string, target: string): MatchResult {
+  const noMatch: MatchResult = { score: 0, matchIndices: [] };
+  if (!query) return noMatch;
+
+  const q = query.toLowerCase();
+  const t = target.toLowerCase();
+  const contiguous = (start: number) =>
+    Array.from({ length: q.length }, (_, i) => start + i);
+
+  if (t.startsWith(q)) {
+    return { score: t === q ? 100 : 80, matchIndices: contiguous(0) };
+  }
+
+  let offset = 0;
+  while (offset < t.length) {
+    while (offset < t.length && /\W/.test(t[offset])) offset++;
+    const wordStart = offset;
+    while (offset < t.length && /\w/.test(t[offset])) offset++;
+    if (offset > wordStart && t.slice(wordStart, offset).startsWith(q)) {
+      return { score: 60, matchIndices: contiguous(wordStart) };
+    }
+  }
+
+  const substringIdx = t.indexOf(q);
+  if (substringIdx !== -1) {
+    return { score: 40, matchIndices: contiguous(substringIdx) };
+  }
+
+  const fuzzyIndices = fuzzyMatchIndices(query, target);
+  return fuzzyIndices !== null
+    ? { score: 20, matchIndices: fuzzyIndices }
+    : noMatch;
+}
+
 /** Renders `text` with matched characters wrapped in <mark> for search highlighting. */
 const HighlightedText: React.FC<{ text: string; matchIndices: number[] }> = ({
   text,
@@ -100,17 +148,29 @@ const MultiLibraryHome: React.FC = () => {
 
   if (sorted.length === 0) return null;
 
-  const filteredWithIndices = sorted.flatMap(lib => {
+  const filteredWithScores = sorted.flatMap(lib => {
     const displayText = lib.title || lib.slug;
-    const matchIndices = fuzzyMatchIndices(filterQuery, displayText);
-    return matchIndices !== null ? [{ lib, displayText, matchIndices }] : [];
+    const { score, matchIndices } = filterQuery
+      ? scoreMatch(filterQuery, displayText)
+      : { score: 0, matchIndices: [] };
+    if (filterQuery && score === 0) return [];
+    return [{ lib, displayText, matchIndices, score }];
   });
 
-  const resultCount = filteredWithIndices.length;
+  const displayed = filterQuery
+    ? [...filteredWithScores].sort(
+        (a, b) =>
+          b.score - a.score || a.displayText.localeCompare(b.displayText)
+      )
+    : filteredWithScores;
+
+  const resultCount = displayed.length;
   const statusMessage = filterQuery
     ? resultCount === 0
       ? "No libraries match."
-      : `${resultCount} ${resultCount === 1 ? "library" : "libraries"} shown`
+      : `${resultCount} ${
+          resultCount === 1 ? "library" : "libraries"
+        } shown, best matches first`
     : "";
 
   return (
@@ -155,7 +215,7 @@ const MultiLibraryHome: React.FC = () => {
           <p sx={{ pl: 2 }}>No libraries match.</p>
         )}
         <ul id={RESULTS_LIST_ID}>
-          {filteredWithIndices.map(({ lib, displayText, matchIndices }) => (
+          {displayed.map(({ lib, displayText, matchIndices }) => (
             <li key={lib.slug}>
               <LibraryHomeLink slug={lib.slug} title={lib.title}>
                 <HighlightedText
