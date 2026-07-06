@@ -14,16 +14,24 @@ import mockAuthenticated, {
   tokenCreds1
 } from "test-utils/mockAuthState";
 import { generateCredentials } from "utils/auth";
+import { expectAndSuppressConsole } from "test-utils/suppressConsole";
 
 beforeEach(() => {
   jest.useFakeTimers();
   const mockedDate = expirationDate;
   jest.spyOn(Date, "now").mockImplementation(() => mockedDate.getTime());
+  expectAndSuppressConsole(
+    "warn",
+    "Failed to fetch patron profile:",
+    "Server Error: Access token expired:",
+    "The patron authentication access token has expired."
+  );
   fetchMock.resetMocks();
 });
 
 afterEach(() => {
   jest.useRealTimers();
+  jest.restoreAllMocks();
 });
 
 test("displays form", async () => {

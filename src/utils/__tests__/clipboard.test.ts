@@ -1,4 +1,5 @@
 import { copyToClipboard } from "../clipboard";
+import { expectAndSuppressConsole } from "test-utils/suppressConsole";
 
 describe("clipboard utility", () => {
   let originalNavigator: Navigator;
@@ -13,6 +14,15 @@ describe("clipboard utility", () => {
       value: true,
       configurable: true
     });
+
+    expectAndSuppressConsole(
+      "error",
+      "Clipboard API failed:",
+      "Legacy clipboard copy failed:",
+      "Error: Clipboard API failed",
+      "Error: execCommand not supported",
+      "Error: execCommand failed"
+    );
 
     // Clear mocks between tests
     jest.clearAllMocks();
