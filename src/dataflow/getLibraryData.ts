@@ -278,6 +278,7 @@ function parseLinks(links: OPDS1.AuthDocumentLink[] | undefined): LibraryLinks {
       case OPDS1.PasswordResetLinkRel:
         return { ...links, resetPassword: link };
       case "register":
+        return { ...links, registration: link };
       case "logo":
       case "navigation":
         return links;
