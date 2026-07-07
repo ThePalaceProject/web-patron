@@ -188,6 +188,7 @@ export type Book<Status = EmptyObject> = Readonly<
     series?: {
       name: string;
       position?: number;
+      url?: string;
     } | null;
     authors?: string[];
     contributors?: string[];

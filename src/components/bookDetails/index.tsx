@@ -23,6 +23,7 @@ import useBreadcrumbContext from "components/context/BreadcrumbContext";
 import { useAppConfig } from "components/context/AppConfigContext";
 import { getAuthors, getLanguageLabel } from "utils/book";
 import Stack from "components/Stack";
+import Link from "components/Link";
 
 export const BookDetails: React.FC = () => {
   const { companionApp, showMedium } = useAppConfig();
@@ -118,6 +119,19 @@ export const BookDetails: React.FC = () => {
               <DetailField heading="Published" details={book.published} />
               <DetailField heading="Publisher" details={book.publisher} />
               <DetailField heading="Distributor" details={book.providerName} />
+              {book.series?.name && book.series?.url && (
+                <DetailField
+                  heading="Series"
+                  details={
+                    <Link
+                      collectionUrl={book.series.url}
+                      sx={{ textDecoration: "underline" }}
+                    >
+                      {book.series.name}
+                    </Link>
+                  }
+                />
+              )}
             </dl>
             <ReportProblem book={book} />
           </div>
