@@ -252,7 +252,7 @@ function getSeries(entry: OPDSEntry, feedUrl: string): Book["series"] {
     : undefined;
   const positionNum = Number(entry.series?.position ?? positionText);
   const position = Number.isFinite(positionNum) ? positionNum : undefined;
-  console.log(tag);
+
   let url: string | undefined;
   const links = tag?.["link"];
   if (Array.isArray(links)) {
