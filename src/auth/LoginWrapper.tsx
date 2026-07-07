@@ -82,9 +82,7 @@ const LoginWrapper = ({ children }: LoginWrapperProps) => {
           ) : (
             <>
               {children}
-              <div sx={{ textAlign: "center" }}>
-                <SignUpLink />
-              </div>
+              <SignUpLink />
             </>
           )}
         </Stack>

@@ -10,9 +10,11 @@ const SignUpLink: React.FC = () => {
   if (!registration?.href) return null;
 
   return (
-    <ExternalLink href={registration.href}>
-      Sign up for a library card
-    </ExternalLink>
+    <div sx={{ textAlign: "center" }}>
+      <ExternalLink href={registration.href}>
+        Sign up for a library card
+      </ExternalLink>
+    </div>
   );
 };
 
