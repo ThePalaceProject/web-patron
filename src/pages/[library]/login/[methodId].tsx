@@ -1,7 +1,7 @@
 import * as React from "react";
-import { NextPage, GetStaticPaths, GetStaticProps } from "next";
+import { NextPage, GetServerSideProps } from "next";
 import LayoutPage from "components/LayoutPage";
-import withAppProps, { AppProps } from "dataflow/withAppProps";
+import { withAppPropsSSR, AppProps } from "dataflow/withAppProps";
 import LoginWrapper from "auth/LoginWrapper";
 import { useRouter } from "next/router";
 import extractParam from "dataflow/utils";
@@ -46,13 +46,10 @@ const LoginComponent = () => {
   return <AuthenticationHandler method={method} />;
 };
 
-export const getStaticProps: GetStaticProps = withAppProps();
-
-export const getStaticPaths: GetStaticPaths = async () => {
-  return {
-    paths: [],
-    fallback: true
-  };
-};
+/*
+ * The methodId param is unvalidated free-form input, so this page uses
+ * getServerSideProps to avoid persisting a cache entry per unique URL.
+ */
+export const getServerSideProps: GetServerSideProps = withAppPropsSSR();
 
 export default LoginHandlerPage;

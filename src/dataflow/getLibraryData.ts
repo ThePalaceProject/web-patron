@@ -21,10 +21,10 @@ import { AuthDocumentSchema } from "validation/authDocument";
 // ---------------------------------------------------------------------------
 
 /*
- * Caches fetched auth documents by URL. Multiple ISR route rebuilds for the
- * same library (index, loans, book, etc.) all resolve to the same auth document
- * URL; without caching they each issue an independent upstream fetch in quick
- * succession.
+ * Caches fetched auth documents by URL. Page renders for the same library —
+ * ISR route rebuilds (index, loans, etc.) and per-request SSR renders (book,
+ * collection) — all resolve to the same auth document URL; without caching
+ * each render issues an independent upstream fetch.
  *
  * The cache is keyed by URL and stores the last successful fetch time alongside
  * the last attempt time (whether successful or not). refreshMinInterval prevents
