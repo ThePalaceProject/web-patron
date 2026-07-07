@@ -8,6 +8,7 @@ import Head from "next/head";
 import BreadcrumbBar from "components/BreadcrumbBar";
 import useLoginRedirectUrl from "auth/useLoginRedirect";
 import { H1, Text } from "components/Text";
+import SignUpLink from "auth/SignUpLink";
 
 /**
  * Redirects on success
@@ -79,7 +80,10 @@ const LoginWrapper = ({ children }: LoginWrapperProps) => {
               Logging in...
             </Stack>
           ) : (
-            children
+            <>
+              {children}
+              <SignUpLink />
+            </>
           )}
         </Stack>
       </div>

@@ -32,6 +32,36 @@ test("shows children when not loading", () => {
   expect(utils.getByText("child")).toBeInTheDocument();
 });
 
+describe("sign up for a library card link", () => {
+  test("renders when a registration link is configured", () => {
+    const utils = render(<LoginWrapper>child</LoginWrapper>, {
+      library: {
+        libraryLinks: {
+          registration: {
+            rel: "register",
+            href: "https://example.com/register"
+          }
+        }
+      }
+    });
+    const link = utils.getByRole("link", {
+      name: "Sign up for a library card (Opens in a new tab)"
+    });
+    expect(link).toHaveAttribute("href", "https://example.com/register");
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", "noopener noreferrer");
+  });
+
+  test("does not render when no registration link is configured", () => {
+    const utils = render(<LoginWrapper>child</LoginWrapper>);
+    expect(
+      utils.queryByRole("link", {
+        name: "Sign up for a library card (Opens in a new tab)"
+      })
+    ).not.toBeInTheDocument();
+  });
+});
+
 describe("redirects when user becomes authenticated", () => {
   test("uses nextUrl when present", async () => {
     render(<LoginWrapper />, {
