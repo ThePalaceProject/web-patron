@@ -102,7 +102,7 @@ export const getStaticProps: GetStaticProps = withAppProps();
 export const getStaticPaths: GetStaticPaths = async () => {
   return {
     paths: [],
-    fallback: true
+    fallback: "blocking"
   };
 };
 
