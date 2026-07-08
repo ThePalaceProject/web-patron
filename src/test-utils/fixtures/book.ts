@@ -206,6 +206,11 @@ export const audiobook: Book = {
   narrators: ["Simon Brett"],
   audience: "Adult",
   language: "en",
+  series: {
+    name: "A Disorganized Series",
+    position: 2,
+    url: "http://series-url"
+  },
   raw: {
     $: { "schema:additionalType": { value: "http://schema.org/Audiobook" } },
     category: [

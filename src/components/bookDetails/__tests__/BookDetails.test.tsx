@@ -2,13 +2,14 @@ import * as React from "react";
 import { fixtures, render, setup, screen, waitFor } from "test-utils";
 import merge from "deepmerge";
 import { BookDetails } from "../index";
-import { AnyBook } from "interfaces";
+import { AnyBook, Book } from "interfaces";
 import * as complaintActions from "hooks/useComplaints/actions";
 import ReportProblem from "../ReportProblem";
 import { ServerError } from "errors";
 import useSWR from "swr";
 import mockConfig from "test-utils/mockConfig";
 import { BreadcrumbContext } from "components/context/BreadcrumbContext";
+import { mockPush } from "test-utils/mockNextRouter";
 
 jest.mock("swr");
 
@@ -104,6 +105,10 @@ describe("book details page", () => {
     // 9. Distributor
     expect(terms[8]).toHaveTextContent("Distributor:");
     expect(defintions[8]).toHaveTextContent("Palace Marketplace");
+
+    // 10. Series
+    expect(terms[9]).toHaveTextContent("Series:");
+    expect(defintions[9]).toHaveTextContent("A Disorganized Series");
   });
 
   test("shows categories", () => {
@@ -167,6 +172,64 @@ describe("book details page", () => {
     setup(<BookDetails />);
     expect(screen.getByText("Format:")).toBeInTheDocument();
     expect(screen.getByText("ePub")).toBeInTheDocument();
+  });
+
+  test("shows series as a link to the series collection", () => {
+    const bookWithSeries = merge<Book>(fixtures.book, {
+      series: {
+        name: "Kat, Incorrigible",
+        position: 3,
+        url: "http://series-url/Kat%2C%20Incorrigible"
+      }
+    });
+    mockSwr({ data: bookWithSeries });
+    setup(<BookDetails />);
+    expect(screen.getByText("Series:")).toBeInTheDocument();
+    const seriesLink = screen.getByRole("link", { name: "Kat, Incorrigible" });
+    expect(seriesLink).toHaveAttribute(
+      "href",
+      `/testlib/collection/${encodeURIComponent("http://series-url/Kat%2C%20Incorrigible")}`
+    );
+    expect(seriesLink).toHaveTextContent(/^Kat, Incorrigible$/);
+  });
+
+  test("clicking the series link navigates to the series collection page", async () => {
+    const bookWithSeries = merge<Book>(fixtures.book, {
+      series: {
+        name: "Kat, Incorrigible",
+        position: 3,
+        url: "http://series-url/Kat%2C%20Incorrigible"
+      }
+    });
+    mockSwr({ data: bookWithSeries });
+    const { user } = setup(<BookDetails />);
+
+    await user.click(screen.getByRole("link", { name: "Kat, Incorrigible" }));
+
+    expect(mockPush).toHaveBeenCalledTimes(1);
+    expect(mockPush.mock.calls[0][0]).toBe(
+      `/testlib/collection/${encodeURIComponent(
+        "http://series-url/Kat%2C%20Incorrigible"
+      )}`
+    );
+  });
+
+  test("doesn't show series when the book has none", () => {
+    mockSwr({ data: fixtures.book });
+    setup(<BookDetails />);
+    expect(screen.queryByText("Series:")).toBeFalsy();
+  });
+
+  test("doesn't show series when series has no url", () => {
+    const bookWithUrllessSeries = merge<Book>(fixtures.book, {
+      series: {
+        name: "Kat, Incorrigible"
+      }
+    });
+    mockSwr({ data: bookWithUrllessSeries });
+    setup(<BookDetails />);
+    expect(screen.queryByText("Series:")).toBeFalsy();
+    expect(screen.queryByText("Kat, Incorrigible")).toBeFalsy();
   });
 
   test("does not show simplyE callout when NEXT_PUBLIC_COMPANION_APP is 'openebooks'", () => {

@@ -2,7 +2,7 @@ import * as React from "react";
 
 const DetailField: React.FC<{
   heading: string;
-  details?: string;
+  details?: React.ReactNode;
 }> = ({ heading, details }) =>
   details ? (
     <>

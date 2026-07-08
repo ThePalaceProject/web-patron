@@ -113,6 +113,29 @@ test("extracts basic book info", () => {
     },
     language: "en",
     unparsed: {
+      "schema:Series": [
+        {
+          $: {
+            name: {
+              name: "name",
+              value: "Fake Series",
+              local: "name"
+            }
+          },
+          $ns: {
+            uri: "http://schema.org/",
+            local: "Series"
+          },
+          link: [
+            {
+              $: {
+                rel: { value: "series" },
+                href: { value: "/works/series/fake" }
+              }
+            }
+          ]
+        }
+      ],
       "bibframe:distribution": [
         {
           $: {
@@ -220,6 +243,7 @@ test("extracts basic book info", () => {
   expect(book.contributors?.[0]).toBe(entry.contributors[0].name);
   expect(book.series?.name).toBe(entry.series.name);
   expect(book.series?.position).toBe(entry.series.position);
+  expect(book.series?.url).toBe("http://test-url.com/works/series/fake");
   expect(book.subtitle).toBe(entry.subtitle);
   expect(book.summary).toBe(sanitizeHtml(entry.summary.content));
   expect(book.summary).toMatch(
@@ -336,6 +360,224 @@ test("chooses the first supported borrow link", () => {
   expect(bookIsBorrowable(book)).toBeTruthy();
   expect((book as any).borrowUrl).toBe("/borrow-axisnow");
   expect(book.status).toBe("borrowable");
+});
+
+describe("series", () => {
+  function seriesBook(props: {
+    series?: { name: string; position?: number };
+    unparsed?: any;
+  }) {
+    mockConfig();
+    const entry = factory.entry({
+      ...basicInfo,
+      ...props,
+      links: [detailLink]
+    });
+    return entryToBook(entry, "http://test-url.com");
+  }
+
+  test("parses series from lowercase schema:series tag", () => {
+    // the current CM does not use a capitalized tag, so opds-feed-parser
+    // leaves entry.series undefined and everything comes from unparsed
+    const book = seriesBook({
+      unparsed: {
+        "schema:series": [
+          {
+            $: { name: { value: "A Series" } },
+            $ns: { uri: "http://schema.org/", local: "series" },
+            position: [{ _: "6" }],
+            link: [
+              {
+                $: {
+                  rel: { value: "series" },
+                  href: {
+                    value: "https://cm.example.com/works/series/A%20Series"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    });
+    expect(book.series).toEqual({
+      name: "A Series",
+      position: 6,
+      url: "https://cm.example.com/works/series/A%20Series"
+    });
+  });
+
+  test("parses series from capitalized schema:Series tag", () => {
+    const book = seriesBook({
+      series: { name: "Fake Series", position: 2 },
+      unparsed: {
+        "schema:Series": [
+          {
+            $: { name: { value: "Fake Series" } },
+            $ns: { uri: "http://schema.org/", local: "Series" },
+            link: [
+              {
+                $: {
+                  rel: { value: "series" },
+                  href: { value: "https://cm.example.com/series/Fake%20Series" }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    });
+    expect(book.series).toEqual({
+      name: "Fake Series",
+      position: 2,
+      url: "https://cm.example.com/series/Fake%20Series"
+    });
+  });
+
+  test("resolves a relative series href against the feed url", () => {
+    const book = seriesBook({
+      unparsed: {
+        "schema:series": [
+          {
+            $: { name: { value: "Fake Series" } },
+            $ns: { uri: "http://schema.org/", local: "series" },
+            link: [
+              {
+                $: {
+                  rel: { value: "series" },
+                  href: { value: "/works/series/Fake%20Series" }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    });
+    expect(book.series?.url).toBe(
+      "http://test-url.com/works/series/Fake%20Series"
+    );
+  });
+
+  test("uses the first link with rel series and ignores other rels", () => {
+    const book = seriesBook({
+      unparsed: {
+        "schema:series": [
+          {
+            $: { name: { value: "Fake Series" } },
+            $ns: { uri: "http://schema.org/", local: "series" },
+            link: [
+              { $: { rel: { value: "contributor" }, href: { value: "/no" } } },
+              {
+                $: {
+                  rel: { value: "series" },
+                  href: { value: "/Fake%20Series" }
+                }
+              },
+              { $: { rel: { value: "series" }, href: { value: "/second" } } }
+            ]
+          }
+        ]
+      }
+    });
+    expect(book.series?.url).toBe("http://test-url.com/Fake%20Series");
+  });
+
+  test("falls back to the series when unparsed has no tag", () => {
+    const book = seriesBook({
+      series: { name: "Fake Series", position: 2 }
+    });
+    expect(book.series).toEqual({
+      name: "Fake Series",
+      position: 2,
+      url: undefined
+    });
+  });
+
+  test("is undefined when the entry has no series", () => {
+    const book = seriesBook({});
+    expect(book.series).toBeUndefined();
+  });
+
+  test("does not throw on malformed series XML", () => {
+    const ns = { uri: "http://schema.org/", local: "series" };
+
+    // empty tag / no $ns
+    expect(
+      seriesBook({ unparsed: { "schema:series": [{}] } }).series
+    ).toBeUndefined();
+
+    // tag without a name
+    expect(
+      seriesBook({ unparsed: { "schema:series": [{ $ns: ns }] } }).series
+    ).toBeUndefined();
+
+    // tag without links
+    expect(
+      seriesBook({
+        unparsed: {
+          "schema:series": [{ $ns: ns, $: { name: { value: "X" } } }]
+        }
+      }).series
+    ).toEqual({ name: "X", position: undefined, url: undefined });
+
+    // empty link element
+    expect(
+      seriesBook({
+        unparsed: {
+          "schema:series": [
+            { $ns: ns, $: { name: { value: "X" } }, link: [{}] }
+          ]
+        }
+      }).series?.url
+    ).toBeUndefined();
+
+    // link with rel but no href
+    expect(
+      seriesBook({
+        unparsed: {
+          "schema:series": [
+            {
+              $ns: ns,
+              $: { name: { value: "X" } },
+              link: [{ $: { rel: { value: "series" } } }]
+            }
+          ]
+        }
+      }).series?.url
+    ).toBeUndefined();
+
+    // unparsable href
+    expect(
+      seriesBook({
+        unparsed: {
+          "schema:series": [
+            {
+              $ns: ns,
+              $: { name: { value: "X" } },
+              link: [
+                { $: { rel: { value: "series" }, href: { value: "http://" } } }
+              ]
+            }
+          ]
+        }
+      }).series?.url
+    ).toBeUndefined();
+
+    // non-numeric position
+    expect(
+      seriesBook({
+        unparsed: {
+          "schema:series": [
+            {
+              $ns: ns,
+              $: { name: { value: "X" } },
+              position: [{ _: "not-a-number" }]
+            }
+          ]
+        }
+      }).series
+    ).toEqual({ name: "X", position: undefined, url: undefined });
+  });
 });
 
 describe("FulfillableBook", () => {

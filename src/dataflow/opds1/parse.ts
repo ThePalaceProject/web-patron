@@ -213,6 +213,66 @@ function getDuration(entry: OPDSEntry): string | undefined {
 }
 
 /**
+ * Finds the schema.org series tag in the raw entry XML regardless of
+ * namespace prefix and element-name casing.
+ * The current Palace CM emits <schema:series>, older CMs emit <schema:Series>.
+ * opds-feed-parser only matches the capitalized form, so entry.series cannot be relied on.
+ */
+function findSeriesTag(unparsed: any): any {
+  if (!unparsed || typeof unparsed !== "object") return undefined;
+  for (const value of Object.values(unparsed)) {
+    if (Array.isArray(value)) {
+      const tag = value[0];
+      const ns = tag?.["$ns"];
+      if (
+        ns?.uri === "http://schema.org/" &&
+        typeof ns?.local === "string" &&
+        ns.local.toLowerCase() === "series"
+      ) {
+        return tag;
+      }
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Builds the series from entry.unparsed, because opds-feed-parser drops
+ * the nested <link rel="series"> that holds the series feed url.
+ */
+function getSeries(entry: OPDSEntry, feedUrl: string): Book["series"] {
+  const tag = findSeriesTag(entry.unparsed);
+  const name = tag?.["$"]?.["name"]?.value ?? entry.series?.name;
+  if (typeof name !== "string" || name.length === 0) return undefined;
+
+  // Older CMs put the position in a schema:position attribute (which
+  // opds-feed-parser reads); the current CM emits a <position> child.
+  const positionText = Array.isArray(tag?.["position"])
+    ? tag["position"][0]?._
+    : undefined;
+  const positionNum = Number(entry.series?.position ?? positionText);
+  const position = Number.isFinite(positionNum) ? positionNum : undefined;
+
+  let url: string | undefined;
+  const links = tag?.["link"];
+  if (Array.isArray(links)) {
+    const seriesLink = links.find(
+      link => link?.["$"]?.["rel"]?.value === "series"
+    );
+    const href = seriesLink?.["$"]?.["href"]?.value;
+    if (typeof href === "string" && href.length > 0) {
+      try {
+        url = resolve(feedUrl, href);
+      } catch {
+        // ignore a malformed series href
+      }
+    }
+  }
+
+  return { name, position, url };
+}
+
+/**
  * Converters
  */
 
@@ -304,11 +364,11 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
   const bibframeTags = entryToBibframeData(entry);
   const providerName = getProviderName(bibframeTags);
   const duration = getDuration(entry);
+  const series = getSeries(entry, feedUrl);
 
   const book: Book = {
     id: entry.id,
     title: entry.title,
-    series: entry.series,
     authors: authors,
     contributors: contributors,
     subtitle: entry.subtitle,
@@ -335,6 +395,7 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
     trackOpenBookUrl: trackOpenBookLink?.href ?? null,
     previewUrl: previewUrl,
     format: format,
+    series: series,
     raw: entry.unparsed
   };
 
