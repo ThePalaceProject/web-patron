@@ -3,7 +3,6 @@ import {
   OPDSFeed,
   OPDSEntry,
   OPDSArtworkLink,
-  AcquisitionFeed,
   OPDSCollectionLink,
   OPDSFacetLink,
   OPDSLink,
@@ -614,8 +613,22 @@ export function feedToCollection(
   let shelfUrl: string | undefined = undefined;
   let links: OPDSLink[] = [];
 
+  /**
+   * Classify entries individually rather than by feed type: opds-feed-parser
+   * treats a feed as an AcquisitionFeed only when every entry has an
+   * acquisition link, so one entry without would otherwise drop every book
+   * in the feed. An entry with a complete-entry link is a book; entryToBook
+   * requires that link.
+   */
   feed.entries.forEach(entry => {
-    if (feed instanceof AcquisitionFeed) {
+    const isBookEntry = entry.links.some(
+      link => link instanceof CompleteEntryLink
+    );
+    if (isBookEntry) {
+      // Drop entries with no acquisition links at all (e.g. a loan for a
+      // title removed from the collection): they cannot be fulfilled by any
+      // application.
+      if (!entry.links.some(isAcquisitionLink)) return;
       const book = entryToBook(entry, feedUrl);
       const collectionLink = entry.links.find(isCollectionLink);
       if (collectionLink) {

@@ -847,6 +847,46 @@ test("extracts navigation link info", () => {
   expect(link.url).toBe(`http://test-url.com/${navigationLink.href}`);
 });
 
+/**
+ * opds-feed-parser produces a NavigationFeed whenever any entry lacks
+ * acquisition links; books must still be extracted from it, and the
+ * link-less entries dropped.
+ */
+test("extracts books regardless of feed type", () => {
+  mockConfig();
+
+  const fulfillmentLink = factory.acquisitionLink({
+    rel: OPDSAcquisitionLink.GENERIC_REL,
+    type: OPDS1.EpubMediaType,
+    href: "/epub"
+  });
+  const loanEntry = factory.entry({
+    ...basicInfo,
+    id: "loan-entry",
+    links: [fulfillmentLink, detailLink]
+  });
+  const unfulfillableEntry = factory.entry({
+    ...basicInfo,
+    id: "unfulfillable-entry",
+    links: [
+      factory.opdsLink({ rel: OPDS1.RevokeLinkRel, href: "/revoke" }),
+      detailLink
+    ]
+  });
+
+  const navigationFeed = factory.navigationFeed({
+    id: "some id",
+    entries: [loanEntry, unfulfillableEntry],
+    links: []
+  });
+
+  const collection = feedToCollection(navigationFeed, "http://test-url.com");
+
+  expect(collection.books.map(book => book.id)).toEqual(["loan-entry"]);
+  expect(collection.books[0].status).toBe("fulfillable");
+  expect(collection.navigationLinks.length).toBe(0);
+});
+
 test("extracts facet groups", () => {
   const facetLinks = [
     factory.facetLink({
