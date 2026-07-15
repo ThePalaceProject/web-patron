@@ -1,4 +1,5 @@
-import { fetchBearerToken, fetchBook } from "dataflow/opds1/fetch";
+import { fetchBearerToken } from "dataflow/opds1/fetch";
+import { fetchBook } from "dataflow/catalog";
 import ApplicationError from "errors";
 import {
   AnyBook,

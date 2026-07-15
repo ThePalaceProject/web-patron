@@ -547,7 +547,7 @@ function dedupeBooks(books: AnyBook[]): AnyBook[] {
   return Array.from(bookIndex.values());
 }
 
-function formatDate(inputDate: string): string {
+export function formatDate(inputDate: string): string {
   const monthNames = [
     "January",
     "February",

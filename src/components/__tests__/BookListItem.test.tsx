@@ -1,7 +1,7 @@
 import * as React from "react";
 import { screen, setup, fireEvent, fixtures, waitFor } from "test-utils";
 import { BookListItem } from "components/BookList";
-import * as fetch from "dataflow/opds1/fetch";
+import * as fetch from "dataflow/catalog";
 import {
   BorrowableBook,
   FulfillableBook,
@@ -228,7 +228,13 @@ describe("ReservedBook", () => {
       "user-token"
     );
 
-    expect(mockSetBook).toHaveBeenCalledWith(unreservedBook, reservedBook.id);
+    await waitFor(() =>
+      expect(mockSetBook).toHaveBeenCalledWith(unreservedBook, reservedBook.id)
+    );
+
+    expect(
+      await screen.findByRole("button", { name: "Cancel Reservation" })
+    ).toBeInTheDocument();
   });
 
   test("displays number of patrons in queue and your position", () => {

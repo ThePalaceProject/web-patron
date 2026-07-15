@@ -1,7 +1,7 @@
 import * as React from "react";
 import { screen, setup, waitFor } from "test-utils";
 import BorrowOrReserveOrPreview from "components/BorrowOrReserveOrPreview";
-import * as fetch from "dataflow/opds1/fetch";
+import * as fetch from "dataflow/catalog";
 import { ServerError } from "errors";
 import { makeMockTab } from "test-utils/mockTab";
 

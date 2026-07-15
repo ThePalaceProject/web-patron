@@ -3,7 +3,7 @@ import { render, fixtures, waitFor } from "test-utils";
 import { CollectionData } from "interfaces";
 import Recommendations from "../Recommendations";
 import useSWR, { SWRResponse } from "swr";
-import { fetchCollection } from "dataflow/opds1/fetch";
+import { fetchCollection } from "dataflow/catalog";
 
 jest.mock("swr");
 

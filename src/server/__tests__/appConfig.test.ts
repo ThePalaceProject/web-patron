@@ -376,6 +376,46 @@ describe("config parsing", () => {
     });
   });
 
+  // --- enableOpds2 ---
+
+  describe("enableOpds2", () => {
+    it("defaults to false when PALACE_CPW_FEATURE_OPDS2 is not set", async () => {
+      delete process.env.PALACE_CPW_FEATURE_OPDS2;
+      expect((await load(MINIMAL_YAML)).enableOpds2).toBe(false);
+    });
+
+    it("defaults to false when PALACE_CPW_FEATURE_OPDS2 is empty", async () => {
+      process.env.PALACE_CPW_FEATURE_OPDS2 = "";
+      expect((await load(MINIMAL_YAML)).enableOpds2).toBe(false);
+    });
+
+    it.each(["true", "TRUE", "1", "yes", "on", "t", "y"])(
+      "is true when PALACE_CPW_FEATURE_OPDS2 is %s",
+      async value => {
+        process.env.PALACE_CPW_FEATURE_OPDS2 = value;
+        expect((await load(MINIMAL_YAML)).enableOpds2).toBe(true);
+      }
+    );
+
+    it.each(["false", "FALSE", "0", "no", "off", "f", "n"])(
+      "is false when PALACE_CPW_FEATURE_OPDS2 is %s",
+      async value => {
+        process.env.PALACE_CPW_FEATURE_OPDS2 = value;
+        expect((await load(MINIMAL_YAML)).enableOpds2).toBe(false);
+      }
+    );
+
+    it("rejects unrecognized PALACE_CPW_FEATURE_OPDS2 values", async () => {
+      process.env.PALACE_CPW_FEATURE_OPDS2 = "yes please";
+      await expect(load(MINIMAL_YAML)).rejects.toThrow(AppSetupError);
+    });
+
+    it("ignores an enable_opds2 key in the config file", async () => {
+      delete process.env.PALACE_CPW_FEATURE_OPDS2;
+      expect((await load(`enable_opds2: true`)).enableOpds2).toBe(false);
+    });
+  });
+
   // --- openebooks ---
 
   describe("openebooks", () => {

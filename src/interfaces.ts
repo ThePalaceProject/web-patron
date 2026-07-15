@@ -24,6 +24,7 @@ export type AppConfig = {
   authenticationDocuments: AuthDocConfig | null;
   companionApp: "simplye" | "openebooks";
   showMedium: boolean;
+  enableOpds2: boolean;
   bugsnagApiKey: string | null;
   openebooks: OpenEbooksConfig | null;
   /** Reserved item landing path segments. See constants/app.ts. */

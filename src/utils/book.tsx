@@ -153,6 +153,17 @@ export function getMediumName(book: AnyBook): BookMediumName | "" {
 }
 
 export function getMedium(book: AnyBook): BookMedium | "" {
+  // OPDS 2 publications carry the medium as metadata["@type"], with values
+  // that differ from the Atom schema:additionalType ones; translate to the
+  // internal BookMedium values.
+  const opds2Type = book.raw?.metadata?.["@type"];
+  if (opds2Type === "http://schema.org/Audiobook") {
+    return "http://bib.schema.org/Audiobook";
+  }
+  if (opds2Type === "http://schema.org/Book") {
+    return "http://schema.org/EBook";
+  }
+
   if (!book.raw || !book.raw["$"] || !book.raw["$"]["schema:additionalType"]) {
     return "";
   }

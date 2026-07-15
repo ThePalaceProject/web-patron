@@ -9,7 +9,7 @@ import {
 } from "test-utils";
 import BorrowOrReserve from "components/BorrowOrReserve";
 import BorrowOrReserveOrPreview from "components/BorrowOrReserveOrPreview";
-import * as fetch from "dataflow/opds1/fetch";
+import * as fetch from "dataflow/catalog";
 import { mockPush, mockReplace } from "test-utils/mockNextRouter";
 
 test("shows correct button for borrowable book", async () => {

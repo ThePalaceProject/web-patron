@@ -20,6 +20,18 @@ export type {
   RegistryFeed as LibraryRegistryFeed
 } from "validation/registryFeed";
 
+// Schema-derived types for Circulation Manager OPDS 2 catalogs
+// (validation/opds2Catalog.ts). Named Catalog* to avoid colliding with the
+// hand-written structural types below.
+export type {
+  Opds2Feed as CatalogFeed,
+  Opds2Publication as CatalogPublication,
+  Opds2Link as CatalogLink,
+  Opds2LinkProperties as CatalogLinkProperties,
+  Opds2Contributor as CatalogContributor,
+  Opds2Availability as CatalogAvailability
+} from "validation/opds2Catalog";
+
 export interface Collection<M extends AnyObject = AnyObject> {
   metadata: M;
   links: Link[];
@@ -95,6 +107,7 @@ export type AnyLinkRelation =
   | "registry";
 
 export const BaseDocumentMediaType = "application/opds+json";
+export const PublicationMediaType = "application/opds-publication+json";
 export const AuthDocumentMediaType =
   "application/vnd.opds.authentication.v1.0+json";
 

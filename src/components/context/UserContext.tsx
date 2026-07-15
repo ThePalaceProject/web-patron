@@ -1,7 +1,7 @@
 import { fetchAuthToken } from "auth/fetch";
 import useCredentials from "auth/useCredentials";
 import useLibraryContext from "components/context/LibraryContext";
-import { fetchCollection } from "dataflow/opds1/fetch";
+import { fetchCollection } from "dataflow/catalog";
 import { ServerError } from "errors";
 import {
   AppAuthMethod,

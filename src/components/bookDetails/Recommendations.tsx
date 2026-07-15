@@ -3,7 +3,7 @@ import LoadingIndicator from "../LoadingIndicator";
 import { H3, H2 } from "components/Text";
 import Lane from "components/Lane";
 import { AnyBook } from "interfaces";
-import { fetchCollection } from "dataflow/opds1/fetch";
+import { fetchCollection } from "dataflow/catalog";
 import useSWR from "swr";
 import useUser from "components/context/UserContext";
 

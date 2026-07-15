@@ -1,5 +1,5 @@
 import * as React from "react";
-import { fetchBook } from "dataflow/opds1/fetch";
+import { fetchBook } from "dataflow/catalog";
 import useUser from "components/context/UserContext";
 import useLibraryContext from "components/context/LibraryContext";
 import useError from "hooks/useError";

@@ -42,6 +42,7 @@ const VALID_APP_CONFIG: AppConfig = {
   bugsnagApiKey: null,
   companionApp: "simplye",
   showMedium: true,
+  enableOpds2: false,
   openebooks: null,
   mediaSupport: {},
   authenticationDocuments: null,

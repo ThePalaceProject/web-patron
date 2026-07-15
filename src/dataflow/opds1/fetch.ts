@@ -6,6 +6,26 @@ import fetchWithHeaders from "dataflow/fetch";
 import parseSearchData from "dataflow/opds1/parseSearchData";
 
 const parser = new OPDSParser();
+
+/**
+ * Parses OPDS 1.x text into either a Feed or an Entry
+ */
+export async function parseOPDSText(
+  text: string
+): Promise<OPDSEntry | OPDSFeed> {
+  try {
+    return await parser.parse(text);
+  } catch (e) {
+    throw new ApplicationError(
+      {
+        title: "OPDS Error",
+        detail: "Could not parse fetch response into an OPDS Feed or Entry"
+      },
+      e
+    );
+  }
+}
+
 /**
  * Function that will fetch opds and parse it into either
  * a Feed or an Entry
@@ -24,19 +44,7 @@ export async function fetchOPDS(
   }
 
   const text = await response.text();
-
-  try {
-    // parse the text into an opds feed or entry
-    return await parser.parse(text);
-  } catch (e) {
-    throw new ApplicationError(
-      {
-        title: "OPDS Error",
-        detail: "Could not parse fetch response into an OPDS Feed or Entry"
-      },
-      e
-    );
-  }
+  return await parseOPDSText(text);
 }
 
 /**
