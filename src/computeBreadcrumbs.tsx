@@ -14,8 +14,39 @@ const urlComparator = (
   return !!(url1 && url2) && url1 === url2;
 };
 
+/**
+ * A collection is a search results feed when its own url
+ * shares a pathname with its search description url
+ */
+export function isSearchResultsCollection(
+  collection?: CollectionData
+): boolean {
+  if (!collection?.url || !collection.searchDataUrl) return false;
+  // provide dummy base URL in case collection.url
+  // or collection.searchDataUrl are relative links
+  const base = "http://base";
+  try {
+    return (
+      new URL(collection.url, base).pathname ===
+      new URL(collection.searchDataUrl, base).pathname
+    );
+  } catch {
+    return false;
+  }
+}
+
 const computeBreadcrumbs = (collection?: CollectionData): LinkData[] => {
   let links: LinkData[] = [];
+
+  // Currently, search runs across the entire catalog.
+  // So no matter where search originates (home, lane, my books, etc.),
+  // the breadcrumbs should be uniform: Catalog Root / Search
+  if (collection && isSearchResultsCollection(collection)) {
+    return hierarchyComputeBreadcrumbs(
+      { ...collection, parentLink: undefined },
+      urlComparator
+    );
+  }
 
   if (
     collection &&
