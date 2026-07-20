@@ -6,6 +6,7 @@ import {
   BorrowableBook,
   FulfillableBook,
   OnHoldBook,
+  OPDS2,
   ReservableBook,
   ReservedBook,
   UnsupportedBook
@@ -157,10 +158,10 @@ export function getMedium(book: AnyBook): BookMedium | "" {
   // that differ from the Atom schema:additionalType ones; translate to the
   // internal BookMedium values.
   const opds2Type = book.raw?.metadata?.["@type"];
-  if (opds2Type === "http://schema.org/Audiobook") {
+  if (opds2Type === OPDS2.AudiobookMetadataType) {
     return "http://bib.schema.org/Audiobook";
   }
-  if (opds2Type === "http://schema.org/Book") {
+  if (opds2Type === OPDS2.EBookMetadataType) {
     return "http://schema.org/EBook";
   }
 

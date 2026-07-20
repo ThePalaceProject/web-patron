@@ -182,20 +182,38 @@ export type Opds2Feed = typeof Opds2FeedSchema.infer;
 
 // -- Lenient validation ----------------------------------------------------------------
 
-const MAX_REPORTS_PER_SESSION = 50;
+const MAX_REPORTS_PER_WINDOW = 50;
+const REPORT_WINDOW_MS = 60 * 60 * 1000;
 const reportedMismatches = new Set<string>();
+let reportWindowStart = Date.now();
+
+/**
+ * Error report throttling: a single budget shared across every OPDS server
+ * this process talks to, reset on a fixed time window. Prevents the dedupe
+ * cap from silencing reports permanently, but a systemic issue on one server
+ * can still crowd out reports from others within the same window.
+ *
+ * Note: This is a placeholder until we figure out something better.
+ */
+function resetReportWindowIfExpired(): void {
+  if (Date.now() - reportWindowStart >= REPORT_WINDOW_MS) {
+    reportedMismatches.clear();
+    reportWindowStart = Date.now();
+  }
+}
 
 /**
  * Reports an OPDS 2 schema mismatch to Bugsnag at warning severity. Repeat
- * mismatches for the same URL path and leading finding are suppressed, and
- * reporting stops entirely past a session cap, so a systematically drifted
- * server does not flood error tracking.
+ * mismatches for the same URL path and main finding are suppressed, and
+ * reporting stops past a per-window cap, so a broken server does not flood
+ * error tracking.
  */
 export function reportOpds2SchemaMismatch(url: string, summary: string): void {
+  resetReportWindowIfExpired();
   const key = `${url.split("?")[0]}|${summary.split("\n")[0]}`;
   if (
     reportedMismatches.has(key) ||
-    reportedMismatches.size >= MAX_REPORTS_PER_SESSION
+    reportedMismatches.size >= MAX_REPORTS_PER_WINDOW
   ) {
     return;
   }
@@ -217,6 +235,7 @@ export function reportOpds2SchemaMismatch(url: string, summary: string): void {
 /** Clears mismatch dedupe state. Intended for use in tests only. */
 export function resetOpds2MismatchReports(): void {
   reportedMismatches.clear();
+  reportWindowStart = Date.now();
 }
 
 /**

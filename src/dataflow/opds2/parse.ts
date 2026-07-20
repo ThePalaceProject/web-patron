@@ -16,10 +16,12 @@ import {
   BorrowLinkRel,
   EPUB_MEDIA_TYPES,
   HTMLMediaType,
+  OpenAccessLinkRel,
   PdfMediaType,
   PreviewRel,
   RevokeLinkRel,
   ShelfLinkRel,
+  ThumbnailImageRel,
   TrackOpenBookRel
 } from "types/opds1";
 import {
@@ -43,10 +45,6 @@ import DOMPurify from "dompurify";
  * helpers accept unknown-ish data and return undefined rather than throwing
  * when a field has an unexpected shape.
  */
-
-const OpenAccessLinkRel = "http://opds-spec.org/acquisition/open-access";
-const ThumbnailImageRel = "http://opds-spec.org/image/thumbnail";
-const AudiobookType = "http://schema.org/Audiobook";
 
 /**
  * Utils
@@ -344,7 +342,7 @@ export function publicationToBook(
   );
 
   const format =
-    metadata["@type"] === AudiobookType
+    metadata["@type"] === OPDS2.AudiobookMetadataType
       ? "Audiobook"
       : inferEBookFormat(fulfillmentLinks, borrowLink);
 

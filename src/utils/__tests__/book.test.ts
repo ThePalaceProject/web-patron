@@ -1,6 +1,6 @@
 import { describe, expect, test } from "@jest/globals";
 import { AnyBook } from "interfaces";
-import { queueString, bookIsAudiobook } from "utils/book";
+import { queueString, bookIsAudiobook, getMedium } from "utils/book";
 import { makeBorrowableBooks } from "../../test-utils/fixtures/book";
 import { getAuthors } from "../book";
 
@@ -92,5 +92,46 @@ describe("book is audiobook", () => {
     };
 
     expect(bookIsAudiobook(book)).toBe(true);
+  });
+});
+
+describe("getMedium", () => {
+  test("reads OPDS 2 metadata['@type'] for an audiobook", () => {
+    const book: AnyBook = {
+      ...bookFixture,
+      raw: { metadata: { "@type": "http://schema.org/Audiobook" } }
+    };
+
+    expect(getMedium(book)).toBe("http://bib.schema.org/Audiobook");
+  });
+
+  test("reads OPDS 2 metadata['@type'] for an ebook", () => {
+    const book: AnyBook = {
+      ...bookFixture,
+      raw: { metadata: { "@type": "http://schema.org/Book" } }
+    };
+
+    expect(getMedium(book)).toBe("http://schema.org/EBook");
+  });
+
+  test("falls back to the OPDS 1 schema:additionalType attribute", () => {
+    const book: AnyBook = {
+      ...bookFixture,
+      raw: {
+        $: {
+          "schema:additionalType": {
+            value: "http://bib.schema.org/Audiobook"
+          }
+        }
+      }
+    };
+
+    expect(getMedium(book)).toBe("http://bib.schema.org/Audiobook");
+  });
+
+  test("returns an empty string when no medium can be determined", () => {
+    const book: AnyBook = { ...bookFixture, raw: {} };
+
+    expect(getMedium(book)).toBe("");
   });
 });

@@ -362,16 +362,17 @@ describe("book details page", () => {
   });
 });
 
-/**
- * mock fetchComplaintTypes and postComplaint
- */
 const mockBoundFetchComplaintTypes = jest
   .fn()
   .mockResolvedValue(["complaint-type"]);
-const fetchComplaintTypesSpy = jest
-  .spyOn(complaintActions, "fetchComplaintTypes")
-  .mockReturnValue(mockBoundFetchComplaintTypes);
-const postComplaintSpy = jest.spyOn(complaintActions, "postComplaint");
+let fetchComplaintTypesSpy: jest.SpyInstance;
+let postComplaintSpy: jest.SpyInstance;
+
+beforeEach(() => {
+  fetchComplaintTypesSpy = jest
+    .spyOn(complaintActions, "fetchComplaintTypes")
+    .mockReturnValue(mockBoundFetchComplaintTypes);
+});
 
 const bookWithReportUrl = merge<AnyBook>(fixtures.book, {
   raw: {
@@ -391,6 +392,10 @@ const bookWithReportUrl = merge<AnyBook>(fixtures.book, {
 });
 
 describe("report problem", () => {
+  beforeEach(() => {
+    postComplaintSpy = jest.spyOn(complaintActions, "postComplaint");
+  });
+
   test("shows report problem link", () => {
     mockSwr({ data: fixtures.book });
     setup(<BookDetails />);

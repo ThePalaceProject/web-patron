@@ -8,8 +8,9 @@ import { MockNextRouterContextProvider } from "test-utils/mockNextRouter";
 import * as modal from "components/Modal";
 
 // react portals not supported by hooks testing library
-const mockModal = jest.spyOn(modal, "default");
-mockModal.mockReturnValue(<div>modal</div>);
+beforeEach(() => {
+  jest.spyOn(modal, "default").mockReturnValue(<div>modal</div>);
+});
 
 // const TestComponent: React.FC = () => <div>test child</div>;
 

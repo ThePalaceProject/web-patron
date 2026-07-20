@@ -141,7 +141,10 @@ export async function fetchBook(
     if (
       json !== null &&
       typeof json === "object" &&
-      ("publications" in json || "groups" in json || "navigation" in json)
+      ("publications" in json ||
+        "groups" in json ||
+        "navigation" in json ||
+        "facets" in json)
     ) {
       throw new ApplicationError({
         title: "OPDS 2 Error",

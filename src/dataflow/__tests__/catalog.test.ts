@@ -12,6 +12,10 @@ import rawOpdsFeed from "test-utils/fixtures/raw-opds-feed";
 import rawOpdsEntry from "test-utils/fixtures/raw-opds-entry";
 import * as opds2 from "test-utils/fixtures/opds2-catalog";
 
+afterEach(() => {
+  mockConfig();
+});
+
 const OPDS2_FEED_HEADERS = { "content-type": "application/opds+json" };
 const OPDS2_PUBLICATION_HEADERS = {
   "content-type": "application/opds-publication+json"

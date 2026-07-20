@@ -88,4 +88,16 @@ describe("lenientValidate", () => {
     lenientValidate(Opds2FeedSchema, drifted, "https://cm.example.com/a");
     expect(mockTrackError).toHaveBeenCalledTimes(2);
   });
+
+  test("dedupe state clears once the report window elapses", () => {
+    const t0 = Date.now();
+    const dateSpy = jest.spyOn(Date, "now").mockReturnValue(t0);
+
+    lenientValidate(Opds2FeedSchema, drifted, "https://cm.example.com/a");
+    expect(mockTrackError).toHaveBeenCalledTimes(1);
+
+    dateSpy.mockReturnValue(t0 + 61 * 60 * 1000);
+    lenientValidate(Opds2FeedSchema, drifted, "https://cm.example.com/a");
+    expect(mockTrackError).toHaveBeenCalledTimes(2);
+  });
 });

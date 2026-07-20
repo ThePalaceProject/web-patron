@@ -111,6 +111,10 @@ export const PublicationMediaType = "application/opds-publication+json";
 export const AuthDocumentMediaType =
   "application/vnd.opds.authentication.v1.0+json";
 
+// Values of a Circulation Manager publication's metadata["@type"].
+export const AudiobookMetadataType = "http://schema.org/Audiobook";
+export const EBookMetadataType = "http://schema.org/Book";
+
 export type AnyMediaType =
   | typeof BaseDocumentMediaType
   | typeof AuthDocumentMediaType

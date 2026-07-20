@@ -11,18 +11,17 @@ import mockAuthenticated from "test-utils/mockAuthState";
 import * as swr from "swr";
 import { makeSwrResponse } from "test-utils/mockSwr";
 
-const mockSWR = jest.spyOn(swr, "default");
+let mockSWR: jest.SpiedFunction<typeof swr.default>;
+let useRouterSpy: jest.SpiedFunction<typeof router.useRouter>;
 
 const str = JSON.stringify;
 const mockCookie = Cookie as any;
-const useRouterSpy = jest.spyOn(router, "useRouter");
 
 const mutateMock = jest.fn();
 const defaultMock = makeSwrResponse<any>({
   data: fixtures.emptyCollection,
   mutate: mutateMock as any
 });
-mockSWR.mockReturnValue(defaultMock as any);
 
 /**
  * This file tests both UserContext and useCredentials, as
@@ -35,8 +34,9 @@ function renderUserContext() {
 }
 
 beforeEach(() => {
+  mockSWR = jest.spyOn(swr, "default").mockReturnValue(defaultMock as any);
   window.location.hash = "";
-  useRouterSpy.mockReturnValue({
+  useRouterSpy = jest.spyOn(router, "useRouter").mockReturnValue({
     query: {},
     replace: jest.fn()
   } as any);
