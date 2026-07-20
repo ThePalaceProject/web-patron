@@ -105,6 +105,15 @@ describe("with OPDS 2 enabled", () => {
     expect(book.authors).toHaveLength(2);
   });
 
+  test("fetchCollection throws if an OPDS 2 response is a publication", async () => {
+    fetchMock.mockResponseOnce(JSON.stringify(opds2.loanedPublication), {
+      headers: OPDS2_PUBLICATION_HEADERS
+    });
+    await expect(fetchCollection(opds2.CATALOG_URL)).rejects.toThrow(
+      "Could not parse fetch response into an OPDS Feed or Entry"
+    );
+  });
+
   test("fetchBook throws if an OPDS 2 response is a feed", async () => {
     fetchMock.mockResponseOnce(JSON.stringify(opds2.groupedFeed), {
       headers: OPDS2_PUBLICATION_HEADERS

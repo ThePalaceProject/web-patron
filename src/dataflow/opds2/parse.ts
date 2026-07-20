@@ -28,7 +28,7 @@ import {
   Opds2Link,
   Opds2Publication
 } from "validation/opds2Catalog";
-import { fixMimeType, formatDate } from "dataflow/opds1/parse";
+import { dedupeBooks, fixMimeType, formatDate } from "dataflow/opds1/parse";
 import { getAppSupportLevel } from "utils/fulfill";
 import { formatDuration } from "utils/duration";
 import DOMPurify from "dompurify";
@@ -180,7 +180,9 @@ function normalizeAcquisitionType(
  * dataflow/opds1/parse.ts applies to opds:indirectAcquisition elements.
  */
 function parseEntryFormat(entry: AcquisitionObject): ParsedFormat {
-  const childType = asAcquisitionObject(entry.child?.[0])?.type;
+  const childType = normalizeAcquisitionType(
+    asAcquisitionObject(entry.child?.[0])?.type
+  );
   const entryType = normalizeAcquisitionType(entry.type);
   const contentType = (childType ?? entryType) as OPDS1.AnyBookMediaType;
   const indirectionType = childType
@@ -190,7 +192,9 @@ function parseEntryFormat(entry: AcquisitionObject): ParsedFormat {
 }
 
 function parseLinkFormat(link: Opds2Link): ParsedFormat {
-  const indirectType = indirectAcquisitions(link)[0]?.type;
+  const indirectType = normalizeAcquisitionType(
+    indirectAcquisitions(link)[0]?.type
+  );
   const linkType = normalizeAcquisitionType(link.type);
   const contentType = (indirectType ?? linkType) as OPDS1.AnyBookMediaType;
   const indirectionType = indirectType
@@ -321,18 +325,13 @@ export function publicationToBook(
   const holds = borrowLink?.properties?.holds;
   const copies = borrowLink?.properties?.copies;
 
+  // Built the same way as fulfillmentLinks below: an open-access link can
+  // carry its own indirection chain (e.g. a bearer-token-wrapped format for
+  // anonymous direct fulfillment), so contentType, indirectionType, and
+  // supportLevel must all come from the same parsed chain.
   const openAccessLinks: FulfillmentLink[] = acquisitionLinks
     .filter(link => hasRel(link, OpenAccessLinkRel))
-    .map(link => {
-      const url = resolveOptional(feedUrl, link.href);
-      if (!url) return undefined;
-      const { contentType, indirectionType } = parseLinkFormat(link);
-      return {
-        url,
-        contentType: link.type as OPDS1.AnyBookMediaType,
-        supportLevel: getAppSupportLevel(contentType, indirectionType)
-      };
-    })
+    .map(buildFulfillmentLink(feedUrl))
     .filter(isDefined);
 
   const fulfillmentLinks = acquisitionLinks
@@ -525,14 +524,6 @@ function navigationToLinkData(
       };
     })
     .filter((link): link is LinkData => link !== null);
-}
-
-function dedupeBooks(books: AnyBook[]): AnyBook[] {
-  const bookIndex = books.reduce((index, book) => {
-    index.set(book.id, book);
-    return index;
-  }, new Map<string, AnyBook>());
-  return Array.from(bookIndex.values());
 }
 
 /**

@@ -13,6 +13,8 @@ const ADOBE_TYPE = "application/vnd.adobe.adept+xml";
 const EPUB_TYPE = "application/epub+zip";
 const STREAMING_TYPE =
   'text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"';
+const BEARER_TOKEN_TYPE = "application/vnd.librarysimplified.bearer-token+json";
+const PDF_TYPE = "application/pdf";
 
 function makePublication(
   id: number,
@@ -139,6 +141,26 @@ export const openAccessPublication = makePublication(5, "Open Access Book", [
     type: EPUB_TYPE
   }
 ]);
+
+/**
+ * An anonymous direct-fulfillment link: the CM serializes these with the
+ * open-access rel even though the format is wrapped in indirection (here, a
+ * bearer-token exchange), per LibraryAnnotator.acquisition_links.
+ */
+export const openAccessBearerTokenPublication = makePublication(
+  12,
+  "Open Access Bearer Token Book",
+  [
+    {
+      href: "https://cm.example.com/works/12/fulfill",
+      rel: "http://opds-spec.org/acquisition/open-access",
+      type: BEARER_TOKEN_TYPE,
+      properties: {
+        indirectAcquisition: [{ type: PDF_TYPE }]
+      }
+    }
+  ]
+);
 
 /** An active loan: fulfill link with an indirect chain, plus a revoke link. */
 export const loanedPublication = makePublication(6, "Loaned Book", [

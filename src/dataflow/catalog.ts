@@ -43,11 +43,11 @@ export function setOpds2Enabled(enabled: boolean): void {
   _opds2Enabled = enabled;
 }
 
-function isOpds2ContentType(contentType: string): boolean {
-  return (
-    contentType.includes(OPDS2.BaseDocumentMediaType) ||
-    contentType.includes(OPDS2.PublicationMediaType)
-  );
+// Each fetcher matches only the OPDS 2 media types it can handle; anything
+// else falls through to the Atom parser, which fails with a clear error
+// instead of leniently mis-parsing the wrong document kind.
+function isOpds2ContentType(contentType: string, expected: string[]): boolean {
+  return expected.some(type => contentType.includes(type));
 }
 
 function parseOpds2Json(text: string, url: string): unknown {
@@ -99,7 +99,7 @@ export async function fetchCollection(
     Accept: OPDS2_FEED_ACCEPT_HEADER
   });
 
-  if (isOpds2ContentType(contentType)) {
+  if (isOpds2ContentType(contentType, [OPDS2.BaseDocumentMediaType])) {
     const json = parseOpds2Json(text, url);
     const feed = lenientValidate(Opds2FeedSchema, json, url);
     return opds2FeedToCollection(feed, url);
@@ -131,7 +131,12 @@ export async function fetchBook(
     Accept: OPDS2_ENTRY_ACCEPT_HEADER
   });
 
-  if (isOpds2ContentType(contentType)) {
+  if (
+    isOpds2ContentType(contentType, [
+      OPDS2.PublicationMediaType,
+      OPDS2.BaseDocumentMediaType
+    ])
+  ) {
     const json = parseOpds2Json(text, url);
     if (
       json !== null &&

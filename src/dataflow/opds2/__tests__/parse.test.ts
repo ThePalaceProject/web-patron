@@ -46,12 +46,13 @@ describe("publicationToBook", () => {
       asPublication(fixtures.borrowablePublication),
       CATALOG_URL
     );
-    expect(book.status).toBe("borrowable");
-    if (book.status !== "borrowable") throw new Error();
-    expect(book.borrowUrl).toBe("https://cm.example.com/works/1/borrow");
-    expect(book.availability?.status).toBe("available");
-    expect(book.copies).toEqual({ total: 5, available: 3 });
-    expect(book.holds).toEqual({ total: 0, position: undefined });
+    expect(book).toMatchObject({
+      status: "borrowable",
+      borrowUrl: "https://cm.example.com/works/1/borrow",
+      availability: { status: "available" },
+      copies: { total: 5, available: 3 },
+      holds: { total: 0, position: undefined }
+    });
   });
 
   test("parses a reservable book", () => {
@@ -59,10 +60,11 @@ describe("publicationToBook", () => {
       asPublication(fixtures.reservablePublication),
       CATALOG_URL
     );
-    expect(book.status).toBe("reservable");
-    if (book.status !== "reservable") throw new Error();
-    expect(book.reserveUrl).toBe("https://cm.example.com/works/2/borrow");
-    expect(book.copies).toEqual({ total: 2, available: 0 });
+    expect(book).toMatchObject({
+      status: "reservable",
+      reserveUrl: "https://cm.example.com/works/2/borrow",
+      copies: { total: 2, available: 0 }
+    });
   });
 
   test("parses an on-hold (ready) book", () => {
@@ -70,10 +72,11 @@ describe("publicationToBook", () => {
       asPublication(fixtures.onHoldPublication),
       CATALOG_URL
     );
-    expect(book.status).toBe("on-hold");
-    if (book.status !== "on-hold") throw new Error();
-    expect(book.borrowUrl).toBe("https://cm.example.com/works/3/borrow");
-    expect(book.availability?.until).toBe("2026-02-01T00:00:00+00:00");
+    expect(book).toMatchObject({
+      status: "on-hold",
+      borrowUrl: "https://cm.example.com/works/3/borrow",
+      availability: { until: "2026-02-01T00:00:00+00:00" }
+    });
   });
 
   test("parses a reserved book with hold position and revoke url", () => {
@@ -81,10 +84,11 @@ describe("publicationToBook", () => {
       asPublication(fixtures.reservedPublication),
       CATALOG_URL
     );
-    expect(book.status).toBe("reserved");
-    if (book.status !== "reserved") throw new Error();
-    expect(book.revokeUrl).toBe("https://cm.example.com/loans/4/revoke");
-    expect(book.holds).toEqual({ total: 10, position: 3 });
+    expect(book).toMatchObject({
+      status: "reserved",
+      revokeUrl: "https://cm.example.com/loans/4/revoke",
+      holds: { total: 10, position: 3 }
+    });
   });
 
   test("parses an open access book as fulfillable", () => {
@@ -92,16 +96,36 @@ describe("publicationToBook", () => {
       asPublication(fixtures.openAccessPublication),
       CATALOG_URL
     );
-    expect(book.status).toBe("fulfillable");
-    if (book.status !== "fulfillable") throw new Error();
-    expect(book.fulfillmentLinks).toEqual([
-      {
-        url: "https://cm.example.com/works/5/open-access.epub",
-        contentType: "application/epub+zip",
-        supportLevel: "show"
-      }
-    ]);
-    expect(book.revokeUrl).toBeNull();
+    expect(book).toMatchObject({
+      status: "fulfillable",
+      fulfillmentLinks: [
+        {
+          url: "https://cm.example.com/works/5/open-access.epub",
+          contentType: "application/epub+zip",
+          supportLevel: "show"
+        }
+      ],
+      revokeUrl: null
+    });
+  });
+
+  test("parses an open-access link with an indirection chain by its resolved format, not its wrapper type", () => {
+    const book = publicationToBook(
+      asPublication(fixtures.openAccessBearerTokenPublication),
+      CATALOG_URL
+    );
+    expect(book).toMatchObject({
+      status: "fulfillable",
+      fulfillmentLinks: [
+        {
+          url: "https://cm.example.com/works/12/fulfill",
+          contentType: "application/pdf",
+          indirectionType:
+            "application/vnd.librarysimplified.bearer-token+json",
+          supportLevel: "redirect"
+        }
+      ]
+    });
   });
 
   test("parses an active loan as fulfillable with indirection", () => {
@@ -109,17 +133,18 @@ describe("publicationToBook", () => {
       asPublication(fixtures.loanedPublication),
       CATALOG_URL
     );
-    expect(book.status).toBe("fulfillable");
-    if (book.status !== "fulfillable") throw new Error();
-    expect(book.fulfillmentLinks).toEqual([
-      {
-        url: "https://cm.example.com/loans/6/fulfill",
-        contentType: "application/epub+zip",
-        indirectionType: "application/vnd.adobe.adept+xml",
-        supportLevel: "redirect-and-show"
-      }
-    ]);
-    expect(book.revokeUrl).toBe("https://cm.example.com/loans/6/revoke");
+    expect(book).toMatchObject({
+      status: "fulfillable",
+      fulfillmentLinks: [
+        {
+          url: "https://cm.example.com/loans/6/fulfill",
+          contentType: "application/epub+zip",
+          indirectionType: "application/vnd.adobe.adept+xml",
+          supportLevel: "redirect-and-show"
+        }
+      ],
+      revokeUrl: "https://cm.example.com/loans/6/revoke"
+    });
   });
 
   test("parses a streaming loan, normalizing OPDS entry indirection", () => {
@@ -159,16 +184,19 @@ describe("publicationToBook", () => {
       asPublication(fixtures.audiobookPublication),
       CATALOG_URL
     );
-    expect(book.format).toBe("Audiobook");
-    expect(book.duration).toBe("2 hours, 7 minutes");
-    expect(book.narrators).toEqual(["First Narrator", "Second Narrator"]);
-    expect(book.status).toBe("fulfillable");
-    if (book.status !== "fulfillable") throw new Error();
-    expect(book.fulfillmentLinks[0]).toEqual({
-      url: "https://cm.example.com/loans/7/fulfill",
-      contentType: "application/audiobook+json",
-      indirectionType: undefined,
-      supportLevel: "redirect"
+    expect(book).toMatchObject({
+      format: "Audiobook",
+      duration: "2 hours, 7 minutes",
+      narrators: ["First Narrator", "Second Narrator"],
+      status: "fulfillable",
+      fulfillmentLinks: [
+        {
+          url: "https://cm.example.com/loans/7/fulfill",
+          contentType: "application/audiobook+json",
+          indirectionType: undefined,
+          supportLevel: "redirect"
+        }
+      ]
     });
   });
 
