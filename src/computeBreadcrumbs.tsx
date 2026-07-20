@@ -18,18 +18,15 @@ const urlComparator = (
  * A collection is a search results feed when its own url
  * shares a pathname with its search description url
  */
-export function isSearchResultsCollection(
-  collection?: CollectionData
-): boolean {
-  if (!collection?.url || !collection.searchDataUrl) return false;
-  // provide dummy base URL in case collection.url
-  // or collection.searchDataUrl are relative links
-  const base = "http://base";
+function isSearchResultsCollection(collection?: CollectionData): boolean {
+  if (!collection?.url || !collection?.searchDataUrl) return false;
+  // Palace CM currently always provides absolute collection and search URLs
   try {
-    return (
-      new URL(collection.url, base).pathname ===
-      new URL(collection.searchDataUrl, base).pathname
+    const { pathname: collectionPathname } = new URL(collection.url);
+    const { pathname: searchDataUrlPathname } = new URL(
+      collection.searchDataUrl
     );
+    return urlComparator(collectionPathname, searchDataUrlPathname);
   } catch {
     return false;
   }

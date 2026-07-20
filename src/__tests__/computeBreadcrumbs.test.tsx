@@ -1,5 +1,6 @@
 import { describe, expect, test } from "@jest/globals";
 import computeBreadcrumbs from "../computeBreadcrumbs";
+import { CollectionData, LinkData } from "interfaces";
 
 describe("computeBreadcrumbs", () => {
   const collection = {
@@ -74,40 +75,90 @@ describe("computeBreadcrumbs", () => {
       parentLink
     });
 
-    test("drops the lane when the search feed provides simplified:breadcrumbs", () => {
-      const raw = {
-        "simplified:breadcrumbs": [
-          {
-            link: [
-              {
-                $: {
-                  href: { value: catalogRootLink.url },
-                  title: { value: catalogRootLink.text }
-                }
-              },
-              {
-                $: {
-                  href: { value: parentLink.url },
-                  title: { value: parentLink.text }
-                }
-              }
-            ]
-          }
-        ]
-      };
-      const data = Object.assign({}, searchCollection, { raw });
-      expect(computeBreadcrumbs(data)).toEqual([
-        catalogRootLink,
-        { url: searchCollection.url, text: collection.title }
-      ]);
-    });
+    const urlWithTrailingSlash =
+      "http://cm.example/search/1120/?entrypoint=All&q=love";
+    const searchDataUrlWithTrailingSlash =
+      "http://cm.example/search/1120/?entrypoint=All";
 
-    test("drops the lane when the search feed only has hierarchy links", () => {
-      expect(computeBreadcrumbs(searchCollection)).toEqual([
-        catalogRootLink,
-        { url: searchCollection.url, text: collection.title }
-      ]);
-    });
+    const raw = {
+      "simplified:breadcrumbs": [
+        {
+          link: [
+            {
+              $: {
+                href: { value: catalogRootLink.url },
+                title: { value: catalogRootLink.text }
+              }
+            },
+            {
+              $: {
+                href: { value: parentLink.url },
+                title: { value: parentLink.text }
+              }
+            }
+          ]
+        }
+      ]
+    };
+
+    const simplifiedBreadcrumbsCases: Array<
+      [string, CollectionData, Array<LinkData>]
+    > = [
+      [
+        "matching pathnames have no trailing slashes",
+        { ...searchCollection, raw },
+        [catalogRootLink, { url: searchCollection.url, text: collection.title }]
+      ],
+      [
+        "one pathname has a trailing slash",
+        { ...searchCollection, url: urlWithTrailingSlash, raw },
+        [catalogRootLink, { url: urlWithTrailingSlash, text: collection.title }]
+      ],
+      [
+        "both matching pathnames have trailing slashes",
+        {
+          ...searchCollection,
+          url: urlWithTrailingSlash,
+          searchDataUrl: searchDataUrlWithTrailingSlash,
+          raw
+        },
+        [catalogRootLink, { url: urlWithTrailingSlash, text: collection.title }]
+      ]
+    ];
+
+    test.each(simplifiedBreadcrumbsCases)(
+      "drops the lane when the search feed provides simplified:breadcrumbs where %s",
+      (_label, collection, expected) =>
+        expect(computeBreadcrumbs(collection)).toEqual(expected)
+    );
+
+    const hierachyCases: Array<[string, CollectionData, Array<LinkData>]> = [
+      [
+        "with matching pathnames that have no trailing slashes",
+        searchCollection,
+        [catalogRootLink, { url: searchCollection.url, text: collection.title }]
+      ],
+      [
+        "where one pathname has a trailing slash",
+        { ...searchCollection, url: urlWithTrailingSlash },
+        [catalogRootLink, { url: urlWithTrailingSlash, text: collection.title }]
+      ],
+      [
+        "that both have matching pathnames with trailing slashes",
+        {
+          ...searchCollection,
+          url: urlWithTrailingSlash,
+          searchDataUrl: searchDataUrlWithTrailingSlash
+        },
+        [catalogRootLink, { url: urlWithTrailingSlash, text: collection.title }]
+      ]
+    ];
+
+    test.each(hierachyCases)(
+      "drops the lane when the search feed only has hierarchy links %s",
+      (_label, collection, expected) =>
+        expect(computeBreadcrumbs(collection)).toEqual(expected)
+    );
 
     test("keeps the lane on a browse feed", () => {
       const data = Object.assign({}, searchCollection, {
