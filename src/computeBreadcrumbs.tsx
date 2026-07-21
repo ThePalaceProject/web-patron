@@ -14,8 +14,36 @@ const urlComparator = (
   return !!(url1 && url2) && url1 === url2;
 };
 
+/**
+ * A collection is a search results feed when its own url
+ * shares a pathname with its search description url
+ */
+function isSearchResultsCollection(collection?: CollectionData): boolean {
+  if (!collection?.url || !collection?.searchDataUrl) return false;
+  // Palace CM currently always provides absolute collection and search URLs
+  try {
+    const { pathname: collectionPathname } = new URL(collection.url);
+    const { pathname: searchDataUrlPathname } = new URL(
+      collection.searchDataUrl
+    );
+    return urlComparator(collectionPathname, searchDataUrlPathname);
+  } catch {
+    return false;
+  }
+}
+
 const computeBreadcrumbs = (collection?: CollectionData): LinkData[] => {
   let links: LinkData[] = [];
+
+  // Currently, search runs across the entire catalog.
+  // So no matter where search originates (home, lane, my books, etc.),
+  // the breadcrumbs should be uniform: Catalog Root / Search
+  if (collection && isSearchResultsCollection(collection)) {
+    return hierarchyComputeBreadcrumbs(
+      { ...collection, parentLink: undefined },
+      urlComparator
+    );
+  }
 
   if (
     collection &&
