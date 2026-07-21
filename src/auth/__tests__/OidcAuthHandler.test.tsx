@@ -147,7 +147,7 @@ test('clicking "Try Again" after cancel clears flags and redirects', async () =>
   await utils.user.click(utils.getByRole("button", { name: "Try Again" }));
 
   await waitFor(() => {
-    expect(window.location.href).toContain("oidc-auth.com");
+    expect(new URL(window.location.href).host).toBe("oidc-auth.com");
   });
 });
 
@@ -162,7 +162,7 @@ test("proceeds with redirect when navigating back to sign in after cancel", asyn
   });
 
   await waitFor(() => {
-    expect(window.location.href).toContain("oidc-auth.com");
+    expect(new URL(window.location.href).host).toBe("oidc-auth.com");
   });
 });
 
@@ -241,9 +241,10 @@ test('clicking "Use a different account" from error state redirects with prompt=
     utils.getByRole("button", { name: "Use a different account" })
   );
 
-  expect(window.location.href).toContain("prompt=select_account");
-  expect(window.location.href).toContain("oidc-auth.com");
-  expect(sessionStorage.getItem(oidcRedirectKey)).toBeNull();
+  const redirectUrl = new URL(window.location.href);
+  expect(redirectUrl.host).toBe("oidc-auth.com");
+  expect(redirectUrl.searchParams.get("prompt")).toBe("select_account");
+  expect(sessionStorage.getItem(oidcRedirectKey)).toBe("1");
   expect(sessionStorage.getItem(oidcCancelKey)).toBeNull();
 });
 
@@ -262,8 +263,9 @@ test('clicking "Use a different account" from cancel state redirects with prompt
     utils.getByRole("button", { name: "Use a different account" })
   );
 
-  expect(window.location.href).toContain("prompt=select_account");
-  expect(window.location.href).toContain("oidc-auth.com");
-  expect(sessionStorage.getItem(oidcRedirectKey)).toBeNull();
+  const redirectUrl = new URL(window.location.href);
+  expect(redirectUrl.host).toBe("oidc-auth.com");
+  expect(redirectUrl.searchParams.get("prompt")).toBe("select_account");
+  expect(sessionStorage.getItem(oidcRedirectKey)).toBe("1");
   expect(sessionStorage.getItem(oidcCancelKey)).toBeNull();
 });

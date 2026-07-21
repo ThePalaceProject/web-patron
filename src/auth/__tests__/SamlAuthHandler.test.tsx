@@ -30,7 +30,7 @@ test("redirects to proper auth url", async () => {
   });
   await waitFor(() => {
     expect(window.location.href).toBe(
-      "https://saml-auth.com/0&redirect_uri=http%3A%2F%2Ftest-domain.com%2Ftestlib"
+      "https://saml-auth.com/0?redirect_uri=http%3A%2F%2Ftest-domain.com%2Ftestlib"
     );
   });
 });
@@ -145,7 +145,7 @@ test('clicking "Try Again" after cancel clears flags and redirects', async () =>
   await utils.user.click(utils.getByRole("button", { name: "Try Again" }));
 
   await waitFor(() => {
-    expect(window.location.href).toContain("saml-auth.com");
+    expect(new URL(window.location.href).host).toBe("saml-auth.com");
   });
 });
 
@@ -160,7 +160,7 @@ test("proceeds with redirect when navigating back to sign in after cancel", asyn
   });
 
   await waitFor(() => {
-    expect(window.location.href).toContain("saml-auth.com");
+    expect(new URL(window.location.href).host).toBe("saml-auth.com");
   });
 });
 
@@ -202,4 +202,68 @@ test('clicking "Cancel" while redirecting shows cancel UI', async () => {
     expect(utils.getByText("Login was cancelled.")).toBeInTheDocument();
   });
   expect(utils.getByRole("button", { name: "Try Again" })).toBeInTheDocument();
+});
+
+test('shows "Use a different account" button on error state', () => {
+  const utils = render(<SamlAuthHandler method={fixtures.clientSamlMethod} />, {
+    router: { query: { loginError: "Authentication failed" } },
+    user: { token: undefined }
+  });
+  expect(
+    utils.getByRole("button", { name: "Use a different account" })
+  ).toBeInTheDocument();
+});
+
+test('shows "Use a different account" button on cancel state', async () => {
+  sessionStorage.setItem(samlRedirectKey, "1");
+
+  const utils = render(<SamlAuthHandler method={fixtures.clientSamlMethod} />, {
+    user: { token: undefined }
+  });
+
+  await waitFor(() => {
+    expect(utils.getByText("Login was cancelled.")).toBeInTheDocument();
+  });
+  expect(
+    utils.getByRole("button", { name: "Use a different account" })
+  ).toBeInTheDocument();
+});
+
+test('clicking "Use a different account" from error state redirects with force_authn=true', async () => {
+  const utils = setup(<SamlAuthHandler method={fixtures.clientSamlMethod} />, {
+    router: { query: { loginError: "Authentication failed" } },
+    user: { token: undefined }
+  });
+
+  await utils.user.click(
+    utils.getByRole("button", { name: "Use a different account" })
+  );
+
+  const redirectUrl = new URL(window.location.href);
+  expect(redirectUrl.host).toBe("saml-auth.com");
+  expect(redirectUrl.searchParams.get("force_authn")).toBe("true");
+  expect(sessionStorage.getItem(samlRedirectKey)).toBe("1");
+  expect(sessionStorage.getItem(samlCancelKey)).toBeNull();
+});
+
+test('clicking "Use a different account" from cancel state redirects with force_authn=true', async () => {
+  sessionStorage.setItem(samlRedirectKey, "1");
+
+  const utils = setup(<SamlAuthHandler method={fixtures.clientSamlMethod} />, {
+    user: { token: undefined }
+  });
+
+  await waitFor(() => {
+    expect(utils.getByText("Login was cancelled.")).toBeInTheDocument();
+  });
+
+  await utils.user.click(
+    utils.getByRole("button", { name: "Use a different account" })
+  );
+
+  const redirectUrl = new URL(window.location.href);
+  expect(redirectUrl.host).toBe("saml-auth.com");
+  expect(redirectUrl.searchParams.get("force_authn")).toBe("true");
+  expect(sessionStorage.getItem(samlRedirectKey)).toBe("1");
+  expect(sessionStorage.getItem(samlCancelKey)).toBeNull();
 });
