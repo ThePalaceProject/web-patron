@@ -82,11 +82,11 @@ describe("MultiLibraryHome", () => {
     expect(links[3]).toHaveTextContent("100");
   });
 
-  it("returns null when there are no libraries", () => {
+  it("shows a message when there are no libraries", () => {
     mockLibraries([]);
 
-    const { container } = render(<MultiLibraryHome />);
-    expect(container.firstChild).toBeNull();
+    render(<MultiLibraryHome />);
+    expect(screen.getByText("No libraries available.")).toBeInTheDocument();
   });
 
   it("returns null while loading", () => {

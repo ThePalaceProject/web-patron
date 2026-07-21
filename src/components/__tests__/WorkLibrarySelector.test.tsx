@@ -73,6 +73,12 @@ describe("WorkLibrarySelector", () => {
     ).toBeInTheDocument();
   });
 
+  it("shows a message when no libraries are returned", () => {
+    mockLibraries([]);
+    render(<WorkLibrarySelector workId="work-1" />);
+    expect(screen.getByText("No libraries available.")).toBeInTheDocument();
+  });
+
   it("renders a heading and a card for each library", () => {
     mockLibraries([lib("alpha", "Alpha Library"), lib("beta", "Beta Library")]);
     render(<WorkLibrarySelector workId="work-1" />);
