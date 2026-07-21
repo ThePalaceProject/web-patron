@@ -81,6 +81,35 @@ const emptyState: RegistryState = {
 // Helpers
 // ---------------------------------------------------------------------------
 
+/*
+ * Slugs already warned about, so the reserved-slug collision warning is logged
+ * once per process instead of on every request. Per-bundle duplication of this
+ * module-level state is acceptable for a log-only concern.
+ */
+const warnedReservedSlugCollisions = new Set<string>();
+
+/**
+ * Logs a warning when a configured or registry-provided library slug collides
+ * with one of the reserved item landing slugs. The library is intentionally
+ * kept (the service should run, not fail); its routes are shadowed by the
+ * item landing page, and the warning makes the collision findable in the logs.
+ */
+function warnOnReservedSlugCollision(
+  libraries: LibrariesConfig,
+  config: AppConfig
+): void {
+  for (const slug of config.itemLandingSlugs) {
+    if (libraries[slug] && !warnedReservedSlugCollisions.has(slug)) {
+      warnedReservedSlugCollisions.add(slug);
+      console.warn(
+        `Library slug "${slug}" collides with a reserved item landing ` +
+          `slug; the item landing route takes precedence, so this library ` +
+          `will be unreachable at /${slug}.`
+      );
+    }
+  }
+}
+
 /**
  * Extracts the href of the `order=modified` sort facet from the first page
  * of a registry feed. Returns null if the feed does not advertise that facet.
@@ -379,7 +408,10 @@ export async function getLibraries(
 ): Promise<LibrariesConfig> {
   const { registries = [], staticLibraries = {} } = config;
 
-  if (registries.length === 0) return staticLibraries;
+  if (registries.length === 0) {
+    warnOnReservedSlugCollision(staticLibraries, config);
+    return staticLibraries;
+  }
 
   const nowSeconds = Date.now() / 1000;
 
@@ -401,7 +433,9 @@ export async function getLibraries(
     }
   }
 
-  return { ...mergedRegistryLibraries, ...staticLibraries };
+  const merged = { ...mergedRegistryLibraries, ...staticLibraries };
+  warnOnReservedSlugCollision(merged, config);
+  return merged;
 }
 
 /**
@@ -414,4 +448,5 @@ export async function getLibraries(
 export function resetRegistryCaches(): void {
   registryCaches.clear();
   pendingRefreshes.clear();
+  warnedReservedSlugCollisions.clear();
 }

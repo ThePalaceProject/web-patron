@@ -16,6 +16,7 @@ import {
   DEFAULT_REGISTRY_REFRESH_MIN_INTERVAL,
   DEFAULT_REGISTRY_REFRESH_MAX_INTERVAL
 } from "constants/registry";
+import { DEFAULT_ITEM_LANDING_SLUG } from "constants/app";
 import { expectAndSuppressConsole } from "test-utils/suppressConsole";
 
 // ---------------------------------------------------------------------------
@@ -36,6 +37,7 @@ function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     openebooks: null,
     mediaSupport: {},
     authenticationDocuments: null,
+    itemLandingSlugs: [DEFAULT_ITEM_LANDING_SLUG],
     ...overrides
   };
 }
@@ -922,6 +924,114 @@ describe("getLibraries", () => {
 
     await getLibraries(config);
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// reserved item landing slug collision warning
+// ---------------------------------------------------------------------------
+
+describe("reserved item landing slug collision warning", () => {
+  const COLLISION_MESSAGE = "collides with a reserved item landing slug";
+  let warnSpy: jest.SpyInstance;
+
+  beforeEach(() => {
+    resetRegistryCaches();
+    warnSpy = expectAndSuppressConsole(
+      "warn",
+      COLLISION_MESSAGE,
+      "has no order=modified facet"
+    );
+  });
+
+  afterEach(() => warnSpy.mockRestore());
+
+  function collisionWarningCount(): number {
+    return warnSpy.mock.calls.filter(args =>
+      String(args[0]).includes(COLLISION_MESSAGE)
+    ).length;
+  }
+
+  it("warns about a colliding static library but keeps it in the result", async () => {
+    const staticLibraries = {
+      [DEFAULT_ITEM_LANDING_SLUG]: {
+        title: "Colliding Lib",
+        authDocUrl: "https://c.example.com/auth"
+      }
+    };
+
+    const result = await getLibraries(makeConfig({ staticLibraries }));
+
+    expect(result[DEFAULT_ITEM_LANDING_SLUG]).toBeDefined();
+    expect(collisionWarningCount()).toBe(1);
+  });
+
+  it("warns only once across repeated calls", async () => {
+    const staticLibraries = {
+      [DEFAULT_ITEM_LANDING_SLUG]: {
+        title: "Colliding Lib",
+        authDocUrl: "https://c.example.com/auth"
+      }
+    };
+    const config = makeConfig({ staticLibraries });
+
+    await getLibraries(config);
+    await getLibraries(config);
+
+    expect(collisionWarningCount()).toBe(1);
+  });
+
+  it("checks against a configured item_landing_slugs override", async () => {
+    const feed = makePagedFeed([
+      {
+        id: "urn:uuid:reg",
+        title: "Registry Lib",
+        authDocUrl: "https://r.example.com/"
+      }
+    ]);
+    global.fetch = mockFetchSuccess(feed) as unknown as typeof fetch;
+
+    const result = await getLibraries(
+      makeConfig({
+        registries: [makeRegistryConfig()],
+        itemLandingSlugs: ["urn:uuid:reg"]
+      })
+    );
+
+    expect(result["urn:uuid:reg"]).toBeDefined();
+    expect(collisionWarningCount()).toBe(1);
+  });
+
+  it("warns separately for each colliding slug", async () => {
+    const staticLibraries = {
+      [DEFAULT_ITEM_LANDING_SLUG]: {
+        title: "Colliding Lib",
+        authDocUrl: "https://c.example.com/auth"
+      },
+      item: {
+        title: "Also Colliding",
+        authDocUrl: "https://i.example.com/auth"
+      }
+    };
+
+    await getLibraries(
+      makeConfig({
+        staticLibraries,
+        itemLandingSlugs: [DEFAULT_ITEM_LANDING_SLUG, "item"]
+      })
+    );
+
+    expect(collisionWarningCount()).toBe(2);
+  });
+
+  it("does not warn when no library uses the reserved slug", async () => {
+    const staticLibraries = {
+      "my-lib": { title: "My Lib", authDocUrl: "https://my.lib/auth" }
+    };
+
+    await getLibraries(makeConfig({ staticLibraries }));
+
+    expect(collisionWarningCount()).toBe(0);
   });
 });
 

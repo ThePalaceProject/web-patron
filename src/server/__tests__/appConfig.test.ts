@@ -13,6 +13,7 @@ import {
 } from "../appConfig";
 import { AppSetupError } from "errors";
 import { DEFAULT_REGISTRY_FETCH_TIMEOUT } from "constants/registry";
+import { DEFAULT_ITEM_LANDING_SLUG } from "constants/app";
 import { expectAndSuppressConsole } from "test-utils/suppressConsole";
 
 jest.mock("fs", () => ({ readFileSync: jest.fn() }));
@@ -387,6 +388,87 @@ describe("config parsing", () => {
       expect((await load(yaml)).openebooks).toEqual({
         defaultLibrary: "nyc-lib"
       });
+    });
+  });
+
+  // --- itemLandingSlugs ---
+
+  describe("itemLandingSlugs", () => {
+    it("defaults to the reserved item landing slug when absent", async () => {
+      expect((await load(MINIMAL_YAML)).itemLandingSlugs).toEqual([
+        DEFAULT_ITEM_LANDING_SLUG
+      ]);
+    });
+
+    it("wraps a scalar item_landing_slugs value in a one-element list", async () => {
+      expect(
+        (await load(`item_landing_slugs: custom-item`)).itemLandingSlugs
+      ).toEqual(["custom-item"]);
+    });
+
+    it("parses a list of slugs", async () => {
+      const yaml = "item_landing_slugs:\n  - _item_\n  - item";
+      expect((await load(yaml)).itemLandingSlugs).toEqual(["_item_", "item"]);
+    });
+
+    it("accepts an empty list", async () => {
+      expect((await load(`item_landing_slugs: []`)).itemLandingSlugs).toEqual(
+        []
+      );
+    });
+
+    it("throws AppSetupError when an entry contains a slash", async () => {
+      const yaml = 'item_landing_slugs:\n  - _item_\n  - "a/b"';
+      await expect(load(yaml)).rejects.toThrow(AppSetupError);
+    });
+
+    it.each(["", " ", "a?b", "a#b", "a%20b", ".."])(
+      "throws AppSetupError when an entry is not a non-empty single path segment (%j)",
+      async slug => {
+        await expect(load(`item_landing_slugs: "${slug}"`)).rejects.toThrow(
+          AppSetupError
+        );
+      }
+    );
+
+    it.each(["item", "a b", "urn:item", "café"])(
+      "accepts a single-path-segment entry (%j)",
+      async slug => {
+        expect(
+          (await load(`item_landing_slugs: "${slug}"`)).itemLandingSlugs
+        ).toEqual([slug]);
+      }
+    );
+
+    it("collapses duplicate entries", async () => {
+      const yaml = "item_landing_slugs:\n  - _item_\n  - item\n  - _item_";
+      expect((await load(yaml)).itemLandingSlugs).toEqual(["_item_", "item"]);
+    });
+
+    it("disables an entry that collides with a reserved Next.js segment", async () => {
+      const errorSpy = expectAndSuppressConsole(
+        "error",
+        "reserved Next.js path segment"
+      );
+
+      const yaml = "item_landing_slugs:\n  - api\n  - _item_";
+      expect((await load(yaml)).itemLandingSlugs).toEqual(["_item_"]);
+      expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('"api"'));
+
+      errorSpy.mockRestore();
+    });
+
+    it("disables the landing page entirely when every entry is reserved", async () => {
+      const errorSpy = expectAndSuppressConsole(
+        "error",
+        "reserved Next.js path segment"
+      );
+
+      expect(
+        (await load(`item_landing_slugs: _next`)).itemLandingSlugs
+      ).toEqual([]);
+
+      errorSpy.mockRestore();
     });
   });
 

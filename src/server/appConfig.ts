@@ -20,6 +20,7 @@ import type {
 import { AppSetupError } from "errors";
 import { isHttpUrl } from "utils/parse";
 import { DEFAULT_REGISTRY_FETCH_TIMEOUT } from "constants/registry";
+import { DEFAULT_ITEM_LANDING_SLUG, RESERVED_NEXT_SLUGS } from "constants/app";
 
 // ---------------------------------------------------------------------------
 // Schema
@@ -46,7 +47,8 @@ const RawConfigSchema = type({
   "staticLibraries?": "Record<string, unknown>",
   "authenticationDocuments?": AuthDocConfigSchema,
   "mediaSupport?": "Record<string, string | Record<string, string>>",
-  "openebooks?": { defaultLibrary: "string" }
+  "openebooks?": { defaultLibrary: "string" },
+  "itemLandingSlugs?": "string | string[]"
 });
 
 const DEFAULT_MIN_INTERVAL = 60;
@@ -144,6 +146,23 @@ function parseLibrariesConfig(
   );
 }
 
+/**
+ * Whether a value survives being interpolated into a URL path and parsed back
+ * as the same single decoded segment. Delegating to the URL parser avoids
+ * enumerating reserved characters. Anything that terminates the path ("?",
+ * "#"), splits the segment ("/", "\"), collapses during normalization (".",
+ * ".."), or decodes differently ("%xx") fails the round-trip, while values
+ * the parser merely percent-encodes (spaces, non-ASCII) pass.
+ */
+function isSinglePathSegment(value: string): boolean {
+  try {
+    const segments = new URL(`https://host/${value}/x`).pathname.split("/");
+    return segments.length === 3 && decodeURIComponent(segments[1]) === value;
+  } catch {
+    return false;
+  }
+}
+
 function parseYaml(input: Record<string, unknown>): AppConfig {
   const normalized = normalizeConfigKeys(input, [
     "instanceName",
@@ -153,7 +172,8 @@ function parseYaml(input: Record<string, unknown>): AppConfig {
     "gtmId",
     "staticLibraries",
     "authenticationDocuments",
-    "mediaSupport"
+    "mediaSupport",
+    "itemLandingSlugs"
   ]);
 
   if ("bugsnagApiKey" in normalized) {
@@ -215,6 +235,42 @@ function parseYaml(input: Record<string, unknown>): AppConfig {
   const openebooks = result.openebooks
     ? { defaultLibrary: result.openebooks.defaultLibrary }
     : null;
+
+  /*
+   * A scalar is accepted as shorthand for a one-element list. Multiple slugs
+   * all serve the landing page, which allows migrating from one slug to
+   * another with both active; an empty list disables the landing page.
+   * Duplicate entries are collapsed.
+   */
+  const rawItemLandingSlugs =
+    result.itemLandingSlugs ?? DEFAULT_ITEM_LANDING_SLUG;
+  const allItemLandingSlugs = [
+    ...new Set(
+      Array.isArray(rawItemLandingSlugs)
+        ? rawItemLandingSlugs
+        : [rawItemLandingSlugs]
+    )
+  ];
+  for (const slug of allItemLandingSlugs) {
+    if (slug.trim() === "" || !isSinglePathSegment(slug)) {
+      throw new AppSetupError(
+        `CONFIG_FILE: 'item_landing_slugs' entry "${slug}" must be a non-empty single URL path segment.`
+      );
+    }
+  }
+  /*
+   * Next.js consumes reserved segments (API routes, build assets) before page
+   * routing, so a colliding slug could never serve the landing page. Such
+   * entries are disabled with an error instead of being served dead.
+   */
+  const itemLandingSlugs = allItemLandingSlugs.filter(slug => {
+    if (!RESERVED_NEXT_SLUGS.includes(slug)) return true;
+    console.error(
+      `CONFIG_FILE: 'item_landing_slugs' entry "${slug}" collides with the ` +
+        `reserved Next.js path segment "/${slug}" and has been disabled.`
+    );
+    return false;
+  });
 
   const baseRegistries: RegistryConfig[] = (result.registries ?? []).map(r => ({
     url: r.url,
@@ -319,7 +375,8 @@ function parseYaml(input: Record<string, unknown>): AppConfig {
     bugsnagApiKey: process.env.BUGSNAG_API_KEY ?? null,
     companionApp,
     showMedium,
-    openebooks
+    openebooks,
+    itemLandingSlugs
   };
 }
 
