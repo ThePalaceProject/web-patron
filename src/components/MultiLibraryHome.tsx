@@ -19,7 +19,8 @@ const MultiLibraryHome: React.FC = () => {
 
   if (error)
     return <p>Unable to load static libraries from configuration file.</p>;
-  if (!data?.libraries) return null;
+  if (!data) return null;
+  if (!data.libraries?.length) return <p>No libraries available.</p>;
 
   const sorted = [...data.libraries].sort(
     (a: ClientLibrary, b: ClientLibrary) => {
@@ -28,8 +29,6 @@ const MultiLibraryHome: React.FC = () => {
       return titleA.localeCompare(titleB);
     }
   );
-
-  if (sorted.length === 0) return null;
 
   return (
     <ThemeUIProvider theme={theme}>

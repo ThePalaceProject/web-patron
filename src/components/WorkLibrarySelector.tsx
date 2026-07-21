@@ -43,7 +43,8 @@ const WorkLibrarySelector: React.FC<WorkLibrarySelectorProps> = ({
   }
 
   if (error) return <p>Unable to load the library list.</p>;
-  if (!data?.libraries) return null;
+  if (!data) return null;
+  if (!data.libraries?.length) return <p>No libraries available.</p>;
 
   const sorted = [...data.libraries].sort((a, b) => {
     const titleA = a.title || a.slug;
