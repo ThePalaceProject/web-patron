@@ -373,6 +373,36 @@ describe("feedToCollection", () => {
     expect(collection.nextPageUrl).toBe("https://cm.example.com/next-page");
   });
 
+  test("does not throw when publications is not an array", () => {
+    const collection = feedToCollection(
+      {
+        metadata: { title: "Malformed" },
+        links: [],
+        publications: "not-an-array"
+      } as unknown as Opds2Feed,
+      CATALOG_URL
+    );
+    expect(collection.books).toEqual([]);
+  });
+
+  test("does not throw when a group's publications is not an array", () => {
+    const collection = feedToCollection(
+      {
+        metadata: { title: "Malformed Group" },
+        links: [],
+        groups: [
+          {
+            metadata: { title: "Broken Group" },
+            links: [],
+            publications: "not-an-array"
+          }
+        ]
+      } as unknown as Opds2Feed,
+      CATALOG_URL
+    );
+    expect(collection.lanes).toEqual([]);
+  });
+
   test("maps an empty document to an empty collection", () => {
     const collection = feedToCollection({} as Opds2Feed, CATALOG_URL);
     expect(collection).toMatchObject({

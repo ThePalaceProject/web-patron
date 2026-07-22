@@ -540,7 +540,7 @@ function publicationsToBooks(
 }
 
 function groupToLane(group: Opds2Group, feedUrl: string): LaneData | null {
-  const publications = group.publications ?? [];
+  const publications = asArray(group.publications);
   if (publications.length === 0) return null;
   const selfLink = asArray(group.links).find(link => hasRel(link, "self"));
   return {
@@ -561,7 +561,7 @@ export function feedToCollection(
   );
 
   const books = dedupeBooks(
-    publicationsToBooks(feed.publications ?? [], feedUrl)
+    publicationsToBooks(asArray(feed.publications), feedUrl)
   );
 
   const lanes: LaneData[] = [];
