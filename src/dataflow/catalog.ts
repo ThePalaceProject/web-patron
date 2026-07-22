@@ -43,10 +43,17 @@ export function setOpds2Enabled(enabled: boolean): void {
   _opds2Enabled = enabled;
 }
 
+type Opds2CatalogMediaType =
+  | typeof OPDS2.BaseDocumentMediaType
+  | typeof OPDS2.PublicationMediaType;
+
 // Each fetcher matches only the OPDS 2 media types it can handle; anything
 // else falls through to the Atom parser, which fails with a clear error
 // instead of leniently mis-parsing the wrong document kind.
-function isOpds2ContentType(contentType: string, expected: string[]): boolean {
+function isOpds2ContentType(
+  contentType: string,
+  expected: Opds2CatalogMediaType[]
+): boolean {
   return expected.some(type => contentType.includes(type));
 }
 
