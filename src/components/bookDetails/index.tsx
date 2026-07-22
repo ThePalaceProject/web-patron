@@ -17,7 +17,7 @@ import GooglePlayBadge from "components/storeBadges/GooglePlayBadge";
 import { useRouter } from "next/router";
 import extractParam from "dataflow/utils";
 import useSWR from "swr";
-import { fetchBook } from "dataflow/opds1/fetch";
+import { fetchBook } from "dataflow/catalog";
 import useUser from "components/context/UserContext";
 import useBreadcrumbContext from "components/context/BreadcrumbContext";
 import { useAppConfig } from "components/context/AppConfigContext";

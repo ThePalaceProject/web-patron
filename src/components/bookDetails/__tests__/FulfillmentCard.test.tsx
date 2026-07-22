@@ -18,7 +18,7 @@ import {
 } from "interfaces";
 import { ProblemDocument } from "types/opds1";
 import fetchMock from "jest-fetch-mock";
-import * as fetch from "dataflow/opds1/fetch";
+import * as fetch from "dataflow/catalog";
 import { ServerError } from "errors";
 import { MOCK_DATE_STRING } from "test-utils/mockToDateString";
 import { makeMockTab } from "test-utils/mockTab";
@@ -26,7 +26,7 @@ import { makeMockTab } from "test-utils/mockTab";
 jest.mock("downloadjs");
 window.open = jest.fn();
 
-jest.mock("dataflow/opds1/fetch");
+jest.mock("dataflow/catalog");
 
 (fetch as any).fetchBook = jest.fn();
 const mockFetchBook = fetch.fetchBook as jest.MockedFunction<

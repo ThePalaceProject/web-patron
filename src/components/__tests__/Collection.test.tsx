@@ -3,7 +3,7 @@ import { render, fixtures } from "test-utils";
 import { Collection } from "../Collection";
 import { CollectionData, LaneData } from "interfaces";
 import { makeSwrResponse, MockSwr } from "test-utils/mockSwr";
-import { fetchCollection } from "dataflow/opds1/fetch";
+import { fetchCollection } from "dataflow/catalog";
 import useSWR from "swr";
 // import useSWRInfinite from "swr/infinite";
 import "test-utils/mockScrollTo";

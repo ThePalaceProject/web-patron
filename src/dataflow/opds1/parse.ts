@@ -537,7 +537,7 @@ function entryToLink(entry: OPDSEntry, feedUrl: string): LinkData | null {
   return null;
 }
 
-function dedupeBooks(books: AnyBook[]): AnyBook[] {
+export function dedupeBooks(books: AnyBook[]): AnyBook[] {
   // using Map because it preserves key order
   const bookIndex = books.reduce((index, book) => {
     index.set(book.id, book);
@@ -547,7 +547,7 @@ function dedupeBooks(books: AnyBook[]): AnyBook[] {
   return Array.from(bookIndex.values());
 }
 
-function formatDate(inputDate: string): string {
+export function formatDate(inputDate: string): string {
   const monthNames = [
     "January",
     "February",

@@ -34,6 +34,7 @@ function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     bugsnagApiKey: null,
     companionApp: "simplye",
     showMedium: true,
+    enableOpds2: false,
     openebooks: null,
     mediaSupport: {},
     authenticationDocuments: null,

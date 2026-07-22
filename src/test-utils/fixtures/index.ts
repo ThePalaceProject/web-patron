@@ -6,6 +6,7 @@ export * from "./server";
 export * from "./auth-document";
 export * from "./parsed-opds-feed";
 export * as opds2 from "./opds2";
+export * as opds2Catalog from "./opds2-catalog";
 export * from "./collection";
 export * from "./user";
 export * from "./config";

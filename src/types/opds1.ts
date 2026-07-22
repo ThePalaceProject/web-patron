@@ -13,8 +13,10 @@
 export const SelfRel = "self";
 export const AuthDocLinkRelation = "http://opds-spec.org/auth/document";
 export const AcquisitionLinkRel = "http://opds-spec.org/acquisition";
+export const OpenAccessLinkRel = "http://opds-spec.org/acquisition/open-access";
 export const BorrowLinkRel = "http://opds-spec.org/acquisition/borrow";
 export const RevokeLinkRel = "http://librarysimplified.org/terms/rel/revoke";
+export const ThumbnailImageRel = "http://opds-spec.org/image/thumbnail";
 export const TrackOpenBookRel =
   "http://librarysimplified.org/terms/rel/analytics/open-book";
 export const PreviewRel = "preview";

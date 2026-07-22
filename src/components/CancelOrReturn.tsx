@@ -1,7 +1,7 @@
 import * as React from "react";
 import useLibraryContext from "components/context/LibraryContext";
 import useUser from "components/context/UserContext";
-import { fetchBook } from "dataflow/opds1/fetch";
+import { fetchBook } from "dataflow/catalog";
 import Button from "components/Button";
 import useError from "hooks/useError";
 import { useFulfillmentButtonStackError } from "components/layouts/FulfillmentButtonStack";

@@ -4,7 +4,7 @@ import { BookList, InfiniteBookList } from "../BookList";
 import merge from "deepmerge";
 import { BorrowableBook, CollectionData } from "interfaces";
 import useSWRInfinite from "swr/infinite";
-import { fetchCollection } from "dataflow/opds1/fetch";
+import { fetchCollection } from "dataflow/catalog";
 
 const books = fixtures.makeBorrowableBooks(3);
 

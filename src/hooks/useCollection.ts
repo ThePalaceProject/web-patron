@@ -1,6 +1,6 @@
 import useLibraryContext from "components/context/LibraryContext";
 import useUser from "components/context/UserContext";
-import { fetchCollection } from "dataflow/opds1/fetch";
+import { fetchCollection } from "dataflow/catalog";
 import extractParam from "dataflow/utils";
 import ApplicationError from "errors";
 import { CollectionData } from "interfaces";

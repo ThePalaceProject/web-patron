@@ -16,7 +16,7 @@ import BookCover from "./BookCover";
 import BorrowOrReserveOrPreview from "./BorrowOrReserveOrPreview";
 import CancelOrReturnOrPreview from "./CancelOrReturnOrPreview";
 import { AnyBook, CollectionData, LaneData } from "interfaces";
-import { fetchCollection } from "dataflow/opds1/fetch";
+import { fetchCollection } from "dataflow/catalog";
 import useSWRInfinite from "swr/infinite";
 import useUser from "components/context/UserContext";
 import Stack from "components/Stack";

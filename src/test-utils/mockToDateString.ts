@@ -1,10 +1,13 @@
 import { jest } from "@jest/globals";
 /**
- * This file mocks Date.prototype.toDateString so that it just returns a
- * stub string. This makes code using that function testable across timezones
- * since we can't reliably set the timezone of a node process to something specific.
+ * Mocks Date.prototype.toDateString so tests are timezone-independent.
+ * Called in the global beforeEach so it is re-applied after each test's
+ * restoreMocks cleanup.
  */
 export const MOCK_DATE_STRING = "mock-date-string";
-export const toDateStringSpy = jest
-  .spyOn(Date.prototype, "toDateString")
-  .mockImplementation(() => MOCK_DATE_STRING);
+
+export function mockToDateString(): void {
+  jest
+    .spyOn(Date.prototype, "toDateString")
+    .mockImplementation(() => MOCK_DATE_STRING);
+}

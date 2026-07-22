@@ -49,6 +49,11 @@ media_support:
 # default is "simplye"
 companion_app: simplye
 
+# OPDS 2 CATALOGS (experimental): set the PALACE_CPW_FEATURE_OPDS2 environment
+# variable to true to request OPDS 2 (JSON) catalogs from the circulation
+# manager via content negotiation, falling back automatically to OPDS 1 (Atom)
+# when the server does not serve OPDS 2. Default is false.
+
 # BUGSNAG: set the BUGSNAG_API_KEY environment variable to integrate error tracking.
 # (Setting bugsnag_api_key in this file is deprecated and will be ignored.)
 

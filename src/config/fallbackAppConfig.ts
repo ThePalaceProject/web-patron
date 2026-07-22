@@ -6,6 +6,7 @@ const FALLBACK_APP_CONFIG: AppConfig = {
   mediaSupport: {},
   companionApp: "simplye",
   showMedium: true,
+  enableOpds2: false,
   bugsnagApiKey: null,
   openebooks: null,
   authenticationDocuments: null,
