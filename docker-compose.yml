@@ -6,6 +6,7 @@ services:
     environment:
       CONFIG_FILE: /config/config.yml
       NODE_ENV: production
+      PALACE_CPW_FEATURE_OPDS2: ${PALACE_CPW_FEATURE_OPDS2:-false}
     volumes:
       - ./config:/app/config
     ports:

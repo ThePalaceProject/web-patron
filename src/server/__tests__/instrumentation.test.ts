@@ -156,6 +156,36 @@ describe("register", () => {
 });
 
 // ---------------------------------------------------------------------------
+// OPDS 2 startup logging
+// ---------------------------------------------------------------------------
+
+describe("OPDS 2 startup logging", () => {
+  let logSpy: jest.SpyInstance;
+
+  beforeEach(() => {
+    logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+    process.env.NEXT_RUNTIME = "nodejs";
+    mockGetLibraries.mockResolvedValue({});
+  });
+
+  it("logs that OPDS 2 negotiation is enabled when enableOpds2 is true", async () => {
+    mockGetAppConfig.mockResolvedValue({ enableOpds2: true });
+    await register();
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining("OPDS 2 negotiation is enabled")
+    );
+  });
+
+  it("logs that OPDS 2 negotiation is disabled when enableOpds2 is false", async () => {
+    mockGetAppConfig.mockResolvedValue({ enableOpds2: false });
+    await register();
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining("OPDS 2 negotiation is disabled")
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
 // HTTP request logging
 // ---------------------------------------------------------------------------
 
@@ -168,6 +198,9 @@ describe("HTTP request logging", () => {
     mockGetAppConfig.mockResolvedValue({});
     mockGetLibraries.mockResolvedValue({});
     await register();
+    // register() itself logs an OPDS 2 startup message; clear that so tests
+    // only observe logging caused by their own request/response actions.
+    logSpy.mockClear();
   });
 
   afterEach(() => {

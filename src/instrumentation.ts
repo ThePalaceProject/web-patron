@@ -46,6 +46,9 @@ export async function register() {
     const { getLibraries } = await import("server/libraryRegistry");
     try {
       const appConfig = await getAppConfig();
+      console.log(
+        `OPDS 2 negotiation is ${appConfig.enableOpds2 ? "enabled" : "disabled"} (PALACE_CPW_FEATURE_OPDS2).`
+      );
       /*
        * Pre-warm the registry cache before any requests are served.
        * getLibraries() sets pendingRefreshes synchronously before its first
