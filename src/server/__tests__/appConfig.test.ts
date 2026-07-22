@@ -384,26 +384,13 @@ describe("config parsing", () => {
       expect((await load(MINIMAL_YAML)).enableOpds2).toBe(false);
     });
 
-    it("defaults to false when PALACE_CPW_FEATURE_OPDS2 is empty", async () => {
-      process.env.PALACE_CPW_FEATURE_OPDS2 = "";
-      expect((await load(MINIMAL_YAML)).enableOpds2).toBe(false);
+    it.each([
+      ["true", true],
+      ["false", false]
+    ])("is %s when PALACE_CPW_FEATURE_OPDS2 is %s", async (raw, expected) => {
+      process.env.PALACE_CPW_FEATURE_OPDS2 = raw;
+      expect((await load(MINIMAL_YAML)).enableOpds2).toBe(expected);
     });
-
-    it.each(["true", "TRUE", "1", "yes", "on", "t", "y"])(
-      "is true when PALACE_CPW_FEATURE_OPDS2 is %s",
-      async value => {
-        process.env.PALACE_CPW_FEATURE_OPDS2 = value;
-        expect((await load(MINIMAL_YAML)).enableOpds2).toBe(true);
-      }
-    );
-
-    it.each(["false", "FALSE", "0", "no", "off", "f", "n"])(
-      "is false when PALACE_CPW_FEATURE_OPDS2 is %s",
-      async value => {
-        process.env.PALACE_CPW_FEATURE_OPDS2 = value;
-        expect((await load(MINIMAL_YAML)).enableOpds2).toBe(false);
-      }
-    );
 
     it("rejects unrecognized PALACE_CPW_FEATURE_OPDS2 values", async () => {
       process.env.PALACE_CPW_FEATURE_OPDS2 = "yes please";

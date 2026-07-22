@@ -19,6 +19,7 @@ import type {
 } from "interfaces";
 import { AppSetupError } from "errors";
 import { isHttpUrl } from "utils/parse";
+import { parseBoolean } from "utils/envParse";
 import { DEFAULT_REGISTRY_FETCH_TIMEOUT } from "constants/registry";
 import { DEFAULT_ITEM_LANDING_SLUG, RESERVED_NEXT_SLUGS } from "constants/app";
 
@@ -59,23 +60,6 @@ const DEFAULT_MAX_INTERVAL = 300;
  * manager's PALACE_<app>_FEATURE_<flag> convention.
  */
 export const OPDS2_FEATURE_FLAG_ENV = "PALACE_CPW_FEATURE_OPDS2";
-
-// The boolean spellings pydantic accepts, so flags behave the same here as
-// in the circulation manager.
-const TRUE_ENV_VALUES = new Set(["1", "on", "t", "true", "y", "yes"]);
-const FALSE_ENV_VALUES = new Set(["0", "off", "f", "false", "n", "no"]);
-
-function parseBooleanEnv(name: string, defaultValue: boolean): boolean {
-  const raw = process.env[name];
-  if (raw === undefined || raw.trim() === "") return defaultValue;
-  const value = raw.trim().toLowerCase();
-  if (TRUE_ENV_VALUES.has(value)) return true;
-  if (FALSE_ENV_VALUES.has(value)) return false;
-  throw new AppSetupError(
-    `Environment variable ${name} has unrecognized boolean value "${raw}". ` +
-      `Valid values: ${[...TRUE_ENV_VALUES, ...FALSE_ENV_VALUES].join(", ")}.`
-  );
-}
 
 const VALID_MEDIA_SUPPORT_VALUES = new Set<string>([
   "show",
@@ -398,7 +382,7 @@ function parseYaml(input: Record<string, unknown>): AppConfig {
     bugsnagApiKey: process.env.BUGSNAG_API_KEY ?? null,
     companionApp,
     showMedium,
-    enableOpds2: parseBooleanEnv(OPDS2_FEATURE_FLAG_ENV, false),
+    enableOpds2: parseBoolean(OPDS2_FEATURE_FLAG_ENV, false),
     openebooks,
     itemLandingSlugs
   };
