@@ -278,7 +278,12 @@ async function fetchLoans(url: string, token: string) {
   return collection.books;
 }
 
-async function fetchPatronProfile(url: string, token: string) {
+/*
+ * Fetches the patron profile document, which carries the patron's
+ * authorization identifier. Exported so its request and error handling can be
+ * tested directly.
+ */
+export async function fetchPatronProfile(url: string, token: string) {
   const response = await fetch(url, {
     headers: {
       Authorization: token

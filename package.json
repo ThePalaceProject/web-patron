@@ -121,7 +121,6 @@
     "jest-environment-jsdom": "^29.7.0",
     "jest-fetch-mock": "^3.0.3",
     "jest-jasmine2": "^29.7.0",
-    "msw": "^2.6.5",
     "prettier": "^3.6.2",
     "react-is": "^18.2.0",
     "typescript": "^5.9.3"
