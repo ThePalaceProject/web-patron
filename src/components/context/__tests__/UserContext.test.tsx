@@ -38,6 +38,9 @@ function renderUserContext() {
 }
 
 beforeEach(() => {
+  // Jest's clearMocks does not drain queued mockResponseOnce replies, so an
+  // unconsumed one would be served to the next test before its own.
+  fetchMock.resetMocks();
   mockSWR = jest.spyOn(swr, "default").mockReturnValue(defaultMock as any);
   window.location.hash = "";
   useRouterSpy = jest.spyOn(router, "useRouter").mockReturnValue({
@@ -533,11 +536,6 @@ test("patronId is undefined when profile fetch fails", () => {
   jest.useRealTimers();
 });
 
-/**
- * The tests above cover when the patron profile is fetched. These cover the
- * request itself: what is sent to the circulation manager and how its
- * responses are turned into data or errors.
- */
 const PROFILE_URL = "http://test-cm.com/patrons/me/";
 const PATRON_ID = "test-patron-id-12345";
 

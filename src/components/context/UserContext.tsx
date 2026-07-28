@@ -13,7 +13,7 @@ import {
 import * as React from "react";
 import useSWR from "swr";
 import { BasicTokenAuthType } from "types/opds1";
-import { PATRON_PROFILE_FIELDS } from "types/patronProfile";
+import { PATRON_PROFILE_FIELDS, PatronProfile } from "types/patronProfile";
 import { addHours } from "date-fns";
 
 /**
@@ -280,10 +280,12 @@ async function fetchLoans(url: string, token: string) {
 
 /*
  * Fetches the patron profile document, which carries the patron's
- * authorization identifier. Exported so its request and error handling can be
- * tested directly.
+ * authorization identifier.
  */
-export async function fetchPatronProfile(url: string, token: string) {
+export async function fetchPatronProfile(
+  url: string,
+  token: string
+): Promise<PatronProfile> {
   const response = await fetch(url, {
     headers: {
       Authorization: token
