@@ -1,6 +1,6 @@
 {
   "extends": "../tsconfig.json",
-  "include": ["**/*.ts", "**/*.js", "../msw/**/*.ts"],
+  "include": ["**/*.ts", "**/*.js"],
   "exclude": [],
   "compilerOptions": {
     "types": ["cypress", "@testing-library/cypress"]

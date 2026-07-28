@@ -6,10 +6,14 @@ import { OPDS1 } from "interfaces";
 import { act, fixtures, setup } from "test-utils";
 import Cookie from "js-cookie";
 import * as router from "next/router";
-import useUser, { UserProvider } from "components/context/UserContext";
+import useUser, {
+  UserProvider,
+  fetchPatronProfile
+} from "components/context/UserContext";
 import mockAuthenticated from "test-utils/mockAuthState";
 import * as swr from "swr";
 import { makeSwrResponse } from "test-utils/mockSwr";
+import { PATRON_PROFILE_FIELDS } from "types/patronProfile";
 
 let mockSWR: jest.SpiedFunction<typeof swr.default>;
 let useRouterSpy: jest.SpiedFunction<typeof router.useRouter>;
@@ -34,6 +38,9 @@ function renderUserContext() {
 }
 
 beforeEach(() => {
+  // Jest's clearMocks does not drain queued mockResponseOnce replies, so an
+  // unconsumed one would be served to the next test before its own.
+  fetchMock.resetMocks();
   mockSWR = jest.spyOn(swr, "default").mockReturnValue(defaultMock as any);
   window.location.hash = "";
   useRouterSpy = jest.spyOn(router, "useRouter").mockReturnValue({
@@ -527,4 +534,77 @@ test("patronId is undefined when profile fetch fails", () => {
 
   expect(extractedPatronId).toBeUndefined();
   jest.useRealTimers();
+});
+
+const PROFILE_URL = "http://test-cm.com/patrons/me/";
+const PATRON_ID = "test-patron-id-12345";
+
+test("patron profile request sends the token as the Authorization header", async () => {
+  fetchMock.mockResponseOnce(
+    str({ [PATRON_PROFILE_FIELDS.authorizationIdentifier]: PATRON_ID })
+  );
+
+  await fetchPatronProfile(PROFILE_URL, "some-token");
+
+  expect(fetchMock).toHaveBeenCalledTimes(1);
+  const [requestedUrl, init] = fetchMock.mock.calls[0];
+  const url = new URL(String(requestedUrl));
+  expect(url.host).toBe("test-cm.com");
+  expect(url.pathname).toBe("/patrons/me/");
+  expect((init?.headers as Record<string, string>)?.Authorization).toBe(
+    "some-token"
+  );
+});
+
+test("patron profile request returns the patron's authorization identifier", async () => {
+  fetchMock.mockResponseOnce(
+    str({ [PATRON_PROFILE_FIELDS.authorizationIdentifier]: PATRON_ID })
+  );
+
+  const profile = await fetchPatronProfile(PROFILE_URL, "some-token");
+
+  expect(profile[PATRON_PROFILE_FIELDS.authorizationIdentifier]).toBe(
+    PATRON_ID
+  );
+});
+
+test("patron profile request throws a ServerError when the token is rejected", async () => {
+  // A circulation manager answers an unauthorized request with an
+  // authentication document rather than a problem document.
+  fetchMock.mockResponseOnce(
+    str({ id: "http://test-cm.com/authentication_document", title: "Test CM" }),
+    { status: 401 }
+  );
+
+  await expect(
+    fetchPatronProfile(PROFILE_URL, "bad-token")
+  ).rejects.toMatchObject({
+    name: "Server Error",
+    url: PROFILE_URL,
+    info: { title: "Not Authorized", status: 401 },
+    authDocument: { id: "http://test-cm.com/authentication_document" }
+  });
+});
+
+test("patron profile request throws a ServerError carrying the server's problem document", async () => {
+  fetchMock.mockResponseOnce(
+    str({
+      title: "Internal Server Error",
+      detail: "The profile could not be read.",
+      status: 500
+    }),
+    { status: 500 }
+  );
+
+  await expect(
+    fetchPatronProfile(PROFILE_URL, "some-token")
+  ).rejects.toMatchObject({
+    name: "Server Error",
+    url: PROFILE_URL,
+    info: {
+      title: "Internal Server Error",
+      detail: "The profile could not be read.",
+      status: 500
+    }
+  });
 });
