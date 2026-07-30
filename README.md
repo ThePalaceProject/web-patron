@@ -56,6 +56,7 @@ __To have your library added to the demo, register it with NYPL's Library Regist
     - [Running tests](#running-tests)
     - [Example](#example)
   - [Links and Routing](#links-and-routing)
+  - [Translations](#translations)
 - [Deploying](#deploying)
   - [Build a docker container](#build-a-docker-container)
     - [Running the docker container](#running-the-docker-container)
@@ -72,23 +73,23 @@ The app is configured with a YAML file. Point the app at it by setting the `CONF
 
 ### Configuration Options
 
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| `instance_name` | string | `"Patron Web Catalog"` | Name used in error tracking and debug output. Not patron-facing. |
-| `companion_app` | `"simplye"` \| `"openebooks"` | `"simplye"` | Selects which companion mobile app to reference in redirect prompts. |
-| `show_medium` | boolean | `true` | Whether to display the medium (e-book, audiobook, etc.) label on book cards. |
-| `media_support` | mapping | `{}` | Per-MIME-type rendering mode. See [Media Support](#media-support) below. |
-| `static_libraries` | mapping | — | Static library definitions. See [Libraries and Registries Configuration Settings](#libraries-and-registries-configuration-settings). |
-| `registries` | list | `[]` | One or more library registry URLs fetched at runtime. See [Libraries and Registries Configuration Settings](#libraries-and-registries-configuration-settings). |
-| `authentication_documents` | mapping | — | Controls server-side caching of auth documents. See [Authentication Document Caching](#authentication-document-caching). |
+| Key                        | Type                          | Default                | Description                                                                                                                                                    |
+| -------------------------- | ----------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `instance_name`            | string                        | `"Patron Web Catalog"` | Name used in error tracking and debug output. Not patron-facing.                                                                                               |
+| `companion_app`            | `"simplye"` \| `"openebooks"` | `"simplye"`            | Selects which companion mobile app to reference in redirect prompts.                                                                                           |
+| `show_medium`              | boolean                       | `true`                 | Whether to display the medium (e-book, audiobook, etc.) label on book cards.                                                                                   |
+| `media_support`            | mapping                       | `{}`                   | Per-MIME-type rendering mode. See [Media Support](#media-support) below.                                                                                       |
+| `static_libraries`         | mapping                       | —                      | Static library definitions. See [Libraries and Registries Configuration Settings](#libraries-and-registries-configuration-settings).                           |
+| `registries`               | list                          | `[]`                   | One or more library registry URLs fetched at runtime. See [Libraries and Registries Configuration Settings](#libraries-and-registries-configuration-settings). |
+| `authentication_documents` | mapping                       | —                      | Controls server-side caching of auth documents. See [Authentication Document Caching](#authentication-document-caching).                                       |
 
 #### Deprecated Configuration Options
 
-| Key | Description                                                                                                                                                         |
-|-----|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Key               | Description                                                                                                                                                         |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `bugsnag_api_key` | Use the `BUGSNAG_API_KEY` environment variable instead. The value for this key is ignored.                                                                          |
-| `gtm_id` | Use the `GTM_ID` environment variable instead. The value for this key is ignored.                                                                                   |
-| `libraries` | Use `static_libraries` (mapping) or `registries` (string). See [Libraries and Registries Configuration Settings](#libraries-and-registries-configuration-settings). |
+| `gtm_id`          | Use the `GTM_ID` environment variable instead. The value for this key is ignored.                                                                                   |
+| `libraries`       | Use `static_libraries` (mapping) or `registries` (string). See [Libraries and Registries Configuration Settings](#libraries-and-registries-configuration-settings). |
 
 ### Media Support
 
@@ -132,7 +133,6 @@ Any Circulation Manager you'll be using with the app also needs a configuration 
 
 If you are using a Library Registry, this configuration will automatically be created when you register libraries with the Registry, but you need to configure the URL in the Library Registry by running `bin/configuration/configure_site_setting --setting="web_client_url=http://library.org/{uuid}"` (replace the URL with your web client URL). Otherwise, you'll need to create a sitewide setting for it in the Circulation Manager. Finally, make sure that the libraries are registered to the Library Registry you are using.
 
-
 ## Libraries and Registries Configuration Settings
 
 The application supports three different approaches for configuring which libraries are available:
@@ -142,6 +142,7 @@ The application supports three different approaches for configuring which librar
 Define libraries directly in your configuration file as a dictionary mapping library slugs to authentication details. Each library will be accessible at `https://yourdomain.com/{slug}/`.
 
 **Simple Format:**
+
 ```yaml
 static_libraries:
   my-library: https://circulation.example.com/my-library/authentication_document
@@ -167,6 +168,7 @@ Both formats can be mixed in the same configuration file. If no `title` is speci
 #### 2. Library Registries (Dynamic Library Lists)
 
 Instead of hardcoding libraries, you can configure the app to fetch library information from one or more registry URLs. This approach is beneficial when:
+
 - You have a large number of libraries
 - Libraries are frequently added or removed
 - You want to centralize library configuration
@@ -176,8 +178,8 @@ Instead of hardcoding libraries, you can configure the app to fetch library info
 ```yaml
 registries:
   - url: https://registry.thepalaceproject.org/libraries/qa
-    refresh_min_interval: 60    # Seconds between fetch attempts (default: 60)
-    refresh_max_interval: 300   # Seconds before forcing refresh (default: 300)
+    refresh_min_interval: 60 # Seconds between fetch attempts (default: 60)
+    refresh_max_interval: 300 # Seconds before forcing refresh (default: 300)
 ```
 
 **Multiple Registries:**
@@ -210,6 +212,7 @@ In this example, if the registry also contains a library with slug `featured-lib
 **⚠️ The following formats are deprecated, but are temporarily supported for backward compatibility:**
 
 Using an object for `libraries` to define static libraries:
+
 ```yaml
 # DEPRECATED — rename to static_libraries
 libraries:
@@ -217,12 +220,14 @@ libraries:
 ```
 
 Using a string for `libraries` to specify a registry URL:
+
 ```yaml
 # DEPRECATED — use registries array instead
 libraries: https://registry.example.com/libraries
 ```
 
 **Migration from object `libraries`:**
+
 ```yaml
 # OLD (deprecated):
 libraries:
@@ -234,6 +239,7 @@ static_libraries:
 ```
 
 **Migration from string `libraries`:**
+
 ```yaml
 # OLD (deprecated):
 libraries: https://registry.thepalaceproject.org/libraries
@@ -249,16 +255,16 @@ Each library's authentication document is fetched on demand as pages are generat
 
 ```yaml
 authentication_documents:
-  refresh_min_interval: 60    # Minimum seconds between re-fetch attempts (default: 60)
-  refresh_max_interval: 300   # Seconds before a cached auth doc is considered stale (default: 300)
+  refresh_min_interval: 60 # Minimum seconds between re-fetch attempts (default: 60)
+  refresh_max_interval: 300 # Seconds before a cached auth doc is considered stale (default: 300)
 ```
 
 Both keys are optional; omitting the section entirely uses the defaults shown above.
 
-| Key | Default | Description |
-|-----|---------|-------------|
-| `refresh_min_interval` | `60` | Minimum number of seconds that must pass between successive fetch attempts for the same auth document, even if the cached copy is stale. This prevents hammering a slow or unavailable upstream endpoint. |
-| `refresh_max_interval` | `300` | Number of seconds after the last *successful* fetch before the cached auth document is considered stale and a new fetch is attempted. |
+| Key                    | Default | Description                                                                                                                                                                                               |
+| ---------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `refresh_min_interval` | `60`    | Minimum number of seconds that must pass between successive fetch attempts for the same auth document, even if the cached copy is stale. This prevents hammering a slow or unavailable upstream endpoint. |
+| `refresh_max_interval` | `300`   | Number of seconds after the last _successful_ fetch before the cached auth document is considered stale and a new fetch is attempted.                                                                     |
 
 These settings mirror the `refresh_min_interval` / `refresh_max_interval` fields available on each entry in the `registries` list.
 
@@ -272,6 +278,7 @@ The default branch of the repository is `main`. This is where PRs with developme
 
 - An entry in the `CHANGELOG` under `UNRELEASED CHANGES`
 - New/updated tests as appropriate
+
 <!-- - A link to the associated ticket in [NYPL's JIRA](https://nypl.jira.org) when possible -->
 
 ## Installing Dependencies
@@ -385,8 +392,8 @@ This file contains the configuration for the `next-i18next` library, which manag
 
 Key settings:
 
-- **Supported languages**: Finnish (`fi`), Swedish (`sv`) and English (`en`).
-- **Default language**: Finnish (`fi`) is the default and fallback language
+- **Supported languages**: English (`en`), French (`fr`), Italian (`it`), and Spanish (`es`).
+- **Default language**: English (`en`) is the default and fallback language
 - **Namespaces**: The default namespace is set to `translations`, which contains all translation keys
 - **Translation files path**: Translation files are stored in the `public/locales` directory
 
@@ -402,12 +409,12 @@ Key settings:
   - `translations:status` Overview of project translations
   - `translations:lint` List of hardcoded strings needing translation
   - `translations:extract` Extract translation keys and update translation files
-  - `translations:sync` Sync Finnish and Swedish files with the English file
+  - `translations:sync` Sync French, Italian, and Spanish files with the English file
   - `translations:ci` Fail builds when translations are outdated
 
 ### JSON structure for translations files
 
-Translations are stored in flat JSON files named `translations.json`, with one file for each supported language. The JSON files consist of key-value pairs, where the key is a unique identifier for the translation and the value is the actual translated string.  The translation keys within these files can be structured using a dot notation, like `bookDetails.publisher`, but using this structure is optional. Nesting is not used, which makes it easier to retrieve and sort the translations.
+Translations are stored in flat JSON files named `translations.json`, with one file for each supported language. The JSON files consist of key-value pairs, where the key is a unique identifier for the translation and the value is the actual translated string. The translation keys within these files can be structured using a dot notation, like `bookDetails.publisher`, but using this structure is optional. Nesting is not used, which makes it easier to retrieve and sort the translations.
 
 Example content of a `translations.json` file:
 
@@ -440,36 +447,36 @@ To translate strings in components, follow these steps:
 
 3. **Fetch translation strings with `t("translationString")`**
 
-    ```jsx
-      <DetailField heading={t("bookDetails.publisher")} details={book.publisher} />
-    ```
+   ```jsx
+   <DetailField heading={t("bookDetails.publisher")} details={book.publisher} />
+   ```
 
 **Code example:**
 
 This component displays the translation for the key `hello`, showing for example _Hello, translations!_ or _Hei, käännökset!_ or _Hej, översättningar!_ on the page based on the current language in the app.
 
 ```javascript
-  import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next";
 
-  const MyComponent = () => {
-    const { t } = useTranslation();
-    return <h1>{t("hello")}</h1>; 
-  };
+const MyComponent = () => {
+  const { t } = useTranslation();
+  return <h1>{t("hello")}</h1>;
+};
 ```
 
 ### Translation process
 
 To extract translation keys from your component source code and to update the `translations.json` files, follow these steps:
 
-1. **Run the `lint` command (optional)**  
+1. **Run the `lint` command (optional)**
 
-    ```bash
-    npm run translations:lint
-    ```
+   ```bash
+   npm run translations:lint
+   ```
 
-    This command prints a list of hardcoded strings, that are not yet wrapped in the translation function (`t`). These strings probably need to be translated, too.
+   This command prints a list of hardcoded strings, that are not yet wrapped in the translation function (`t`). These strings probably need to be translated, too.
 
-2. **Run the `extract` command**  
+2. **Run the `extract` command**
 
    ```bash
    npm run translations:extract
@@ -477,30 +484,31 @@ To extract translation keys from your component source code and to update the `t
 
    This command will scan the specified directories for translation keys used in your components and update the three `translations.json` files in the `public/locales` directory.
 
-3. **Run the `sync` command (optional)**  
+3. **Run the `sync` command (optional)**
 
    ```bash
    npm run translations:sync
    ```
 
-    This command will compare the Finnish (`fi`) and Swedish (`sv`) translation files against the English (`en`) file. It will add any missing keys from the English file to the Finnish and Swedish files and remove any extra keys that are not present in the English file.
+   This command will compare the French (`fr`), Italian (`it`), and Spanish (`es`) translation files against the English (`en`) file. It will add any missing keys from the English file to the French, Italian, and Spanish files and remove any extra keys that are not present in the English file.
 
 4. **Check the output**  
-  After running the commands, check the `translations.json` files that the new translation keys have been added correctly.
+   After running the commands, check the `translations.json` files that the new translation keys have been added correctly.
 
 5. **Add translations**  
-  Collaborate with the translators and add the translations for the keys in Finnish (`FI`) and Swedish (`SV`) and English (`EN`) to the `translations.json` files.
+   Collaborate with the translators and add the translations for the keys in French (`fr`), Italian (`it`),Spanish (`es`), and English (`en`) to the `translations.json` files.
 
 6. **Save changes**  
-  Verify that the translations are correct and functioning as expected in the application. Then commit the updated translation files.
+   Verify that the translations are correct and functioning as expected in the application. Then commit the updated translation files.
 
 ### Changing the app language
 
-The LanguageSelector component lets users change the language of the E-library application to Finnish, Swedish or English. Note that the language code in the URL is only visible when a language other than Finnish is selected:
+The LanguageSelector component lets users change the language of the E-library application to English, French, Italian, or Spanish. Note that the language code in the URL is only visible when a language other than English is selected:
 
-- **Finnish (default)**: `https://example.com/books` (no language code `fi`)
-- **Swedish**: `https://example.com/sv/books` (language code `sv`)
-- **English**: `https://example.com/en/books` (language code `en`)
+- **English (default)**: `https://example.com/books` (no language code `en`)
+- **French**: `https://example.com/fr/books` (language code `fr`)
+- **Italianh**: `https://example.com/it/books` (language code `it`)
+- **Spanish**: `https://example.com/es/books` (language code `es`)
 
 The component uses Next.js's Router to handle the current language through `router.locale`. When user selects a language, the component updates the locale using `router.push`. This means the URL is updated creating a new entry in the browser's history, so users can always navigate back and see the language switch as a separate step.
 
