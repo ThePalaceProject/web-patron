@@ -15,7 +15,7 @@
 //    => extract translation keys from the code and update the translation files
 //
 // translations:sync
-//    => sync fi and sv files against en file (add missing keys and purge extra ones)
+//    => sync fr, it, and es files against en file (add missing keys and purge extra ones)
 //
 // translations:ci
 //    =>  fails builds when translations are outdated, used for CI purposes
@@ -25,15 +25,15 @@
 import { defineConfig } from "i18next-cli";
 
 // define the supported languages
-// E-kirjasto app has three languages: English, Finnish, Swedish
-const appLocales = ["fi", "sv", "en"];
+// the app has three languages: English, French, Italian, and Spanish
+const appLocales = ["en", "fr", "it", "es"];
 
 // set the primary, "main" language for the application
 // English translations and keys are the "base" for other translations
 const primaryLanguage = "en";
 
-// define secondary languages that will be supported: Finnish and Swedish
-const secondaryLanguages = ["fi", "sv"];
+// define secondary languages that will be supported: French, Italian, and Spanish
+const secondaryLanguages = ["fr", "it", "es"];
 
 // define the functions used for translation in the code
 // t function is used for retrieving translation strings
@@ -48,7 +48,7 @@ const inputFiles = ["src/{components,pages}/**/*.{tsx,jsx}"];
 
 // define the output path to public/locales directory,
 // and organise the translation files by language and namespace,
-// for example public/locales/fi/translations.json
+// for example public/locales/en/translations.json
 const outputPath = "public/locales/{{language}}/{{namespace}}.json";
 
 // define files and directories to ignore during extraction

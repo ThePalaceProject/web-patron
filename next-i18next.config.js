@@ -1,20 +1,14 @@
-// next-i18next.config.js file contains
-// the configuration for the next-i18next library,
-// which manages translations (internationalization)
-// in the E-kirjasto Next.js app
-
-// first import the Node path helper to handle file paths
 const path = require("path");
 
 // define the i18n (internationalization) settings.
 // Supported languages in the application
-// are Finnish, English, and Swedish.
-// The default language for the application is Finnish,
+// are English, French, Italian, and Spanish.
+// The default language for the application is English,
 // which is also used as the fallback language
 // if a translation is missing.
 const i18nConfig = {
-  defaultLocale: "fi",
-  locales: ["fi", "sv", "en"]
+  defaultLocale: "en",
+  locales: ["en", "fr", "it", "es"]
 };
 
 // define the default namespace for translations as "translations"
@@ -28,7 +22,7 @@ const languageFilesPath = path.resolve("./public/locales");
 
 // define the namespaces used for
 // organizing translations in the language files.
-// In E-kirjasto app, the "translations" namespace contains all the
+// Tthe "translations" namespace contains all the
 // translations used throughout the app,
 // and no additional namespaces are currently used.
 const translationNamespaces = ["translations"];
