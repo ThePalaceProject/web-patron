@@ -3,6 +3,7 @@ import { render } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { AppConfig, LibraryData } from "../interfaces";
 import "./mockScrollTo";
+import "./mockCssSupports";
 import * as fixtures from "./fixtures";
 import userEvent from "@testing-library/user-event";
 import serializer from "jest-emotion";

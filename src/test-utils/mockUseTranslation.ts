@@ -1,18 +1,17 @@
 import enTranslations from "../../public/locales/en/translations.json";
-import fiTranslations from "../../public/locales/fi/translations.json";
-import svTranslations from "../../public/locales/sv/translations.json";
+import frTranslations from "../../public/locales/fr/translations.json";
+import itTranslations from "../../public/locales/it/translations.json";
+import esTranslations from "../../public/locales/es/translations.json";
 
 // define translation object
 // with each supported language as property
 const translations: Record<string, Record<string, string>> = {
   en: enTranslations as Record<string, string>,
-  fi: fiTranslations as Record<string, string>,
-  sv: svTranslations as Record<string, string>
+  fr: frTranslations as Record<string, string>,
+  it: itTranslations as Record<string, string>,
+  es: esTranslations as Record<string, string>
 };
 
-// set default language for tests as English
-// (we usually test with source code language)
-// note: actual app default is Finnish
 let currentLanguage = "en";
 
 // helper function that replaces placeholders
