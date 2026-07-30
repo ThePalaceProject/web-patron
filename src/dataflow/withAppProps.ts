@@ -95,7 +95,7 @@ export default function withAppProps(
       // define the current locale.
       // Use the locale from context,
       // or if is missing, use app's default locale
-      const currentLocale = ctx.locale ?? "fi";
+      const currentLocale = ctx.locale ?? "en";
 
       // fetch translations for the current locale from the server,
       // translationNamespaces is used for finding translation keys
@@ -165,11 +165,28 @@ export function withAppPropsSSR(
       }
       const pageProps = await pageResult.props;
 
+      // define the translation file namespaces
+      const translationNamespaces = ["translations"];
+
+      // define the current locale.
+      // Use the locale from context,
+      // or if is missing, use app's default locale
+      const currentLocale = ctx.locale ?? "en";
+
+      // fetch translations for the current locale from the server,
+      // translationNamespaces is used for finding translation keys
+      const translations = await serverSideTranslations(
+        currentLocale,
+        translationNamespaces
+      );
+
       return {
         props: {
           ...pageProps,
           library,
-          appConfig
+          appConfig,
+          _locale: currentLocale,
+          ...translations
         }
       };
     } catch (e) {

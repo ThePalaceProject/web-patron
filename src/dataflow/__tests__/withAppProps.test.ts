@@ -103,11 +103,12 @@ describe("withAppPropsSSR", () => {
     const gssp = withAppPropsSSR(async () => ({ props: { foo: "bar" } }));
     const result = await gssp(ssrCtx({ library: "testlib" }));
 
-    expect(result).toEqual({
+    expect(result).toMatchObject({
       props: {
         foo: "bar",
         appConfig: config,
-        library: expect.objectContaining({ slug: "testlib" })
+        library: expect.objectContaining({ slug: "testlib" }),
+        _locale: "en"
       }
     });
   });
