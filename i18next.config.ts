@@ -28,7 +28,7 @@ import { defineConfig } from "i18next-cli";
 // the app has three languages: English, French, Italian, and Spanish
 const appLocales = ["en", "fr", "it", "es"];
 
-// set the primary, "main" language for the application
+// set the primary language for the application
 // English translations and keys are the "base" for other translations
 const primaryLanguage = "en";
 
