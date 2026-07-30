@@ -11,7 +11,7 @@ jest.mock("next/router", () => ({
 }));
 
 // helper function to mock next/router with specific parameters
-const mockRouter = (locale: string, isReady = true) => {
+const mockRouter = (locale: string) => {
   // define mock implementation of the push function
   const push = jest.fn(() => Promise.resolve());
 
@@ -19,7 +19,6 @@ const mockRouter = (locale: string, isReady = true) => {
   // this allows tests to specify the current locale and readiness state
   (require("next/router").useRouter as jest.Mock).mockReturnValue({
     locale,
-    isReady,
     asPath: "/test",
     push
   });
@@ -29,9 +28,9 @@ const mockRouter = (locale: string, isReady = true) => {
 };
 
 // define helper function to set up the test enviroment
-const setup = (locale: string, isReady = true) => {
+const setup = (locale: string) => {
   // fist mock the router
-  const push = mockRouter(locale, isReady);
+  const push = mockRouter(locale);
 
   // change language using the mock translation function
   mockUseTranslation().i18n.changeLanguage(locale);
@@ -44,6 +43,12 @@ const setup = (locale: string, isReady = true) => {
   return { push };
 };
 
+// helper function that opens the language dropdown
+// so the language options become visible
+const openDropdown = () => {
+  fireEvent.click(screen.getByRole("combobox"));
+};
+
 describe("LanguageSelector", () => {
   beforeEach(() => {
     // use setup with your chosen language
@@ -51,86 +56,107 @@ describe("LanguageSelector", () => {
   });
 
   it.each([
-    [Language.FI, "Valitse sivun kieli"],
-    [Language.SV, "Välj sidspråk"],
-    [Language.EN, "Select page language"]
+    [Language.EN, "Choose language"],
+    [Language.ES, "Seleccionar idioma"],
+    [Language.FR, "Choisir la langue"],
+    [Language.IT, "Scegli la lingua"]
   ])(
     "should show correct aria-label when locale is %s",
     (locale, ariaLabel) => {
       setup(locale);
-      // stack should have correct translated aria-label
-      expect(screen.getByRole("group")).toHaveAttribute(
+      // select should have correct translated aria-label
+      expect(screen.getByRole("combobox")).toHaveAttribute(
         "aria-label",
         ariaLabel
       );
     }
   );
 
-  it("should render language buttons", () => {
-    setup(Language.FI);
-    const buttons = screen.getAllByRole("button");
+  it("should show the current language in the select button", () => {
+    setup(Language.EN);
 
-    // there should be exactly three buttons
-    expect(buttons).toHaveLength(3);
+    // the select button should show the current language name and code
+    expect(screen.getByRole("combobox")).toHaveTextContent("English (en)");
+  });
 
-    // there should be a FI, SV and EN button
-    expect(screen.getByText("FI")).toBeInTheDocument();
-    expect(screen.getByText("SV")).toBeInTheDocument();
-    expect(screen.getByText("EN")).toBeInTheDocument();
+  it("should render language options", () => {
+    setup(Language.EN);
+    openDropdown();
 
-    // the order of buttons should be FI, SV, EN
-    expect(buttons[0]).toHaveTextContent("FI");
-    expect(buttons[1]).toHaveTextContent("SV");
-    expect(buttons[2]).toHaveTextContent("EN");
+    const options = screen.getAllByRole("option");
+
+    // there should be exactly four options
+    expect(options).toHaveLength(4);
+
+    // there should be an EN, FR, IT and ES option,
+    // and the order of options should be EN, FR, IT, ES
+    expect(options[0]).toHaveTextContent("English (en)");
+    expect(options[1]).toHaveTextContent("French (fr)");
+    expect(options[2]).toHaveTextContent("Italian (it)");
+    expect(options[3]).toHaveTextContent("Spanish (es)");
   });
 
   // define test case table
-  // that creates three tests cases for each language
+  // that creates a test case for each language
   it.each`
-    locale         | ariaLabels
-    ${Language.FI} | ${["Suomi", "Ruotsi", "Englanti"]}
-    ${Language.EN} | ${["Finnish", "Swedish", "English"]}
-    ${Language.SV} | ${["Finska", "Svenska", "Engelska"]}
+    locale         | optionNames
+    ${Language.EN} | ${["English (en)", "French (fr)", "Italian (it)", "Spanish (es)"]}
+    ${Language.ES} | ${["Inglés (en)", "Francés (fr)", "Italiano (it)", "Español (es)"]}
+    ${Language.FR} | ${["Anglais (en)", "Français (fr)", "Italien (it)", "Espagnol (es)"]}
+    ${Language.IT} | ${["Inglese (en)", "Francese (fr)", "Italiano (it)", "Spagnolo (es)"]}
   `(
-    "should render correct accessible names for button in $langCode",
-    ({ locale, ariaLabels }) => {
+    "should render correct accessible names for options in $locale",
+    ({ locale, optionNames }) => {
       setup(locale);
+      openDropdown();
 
-      ariaLabels.forEach(ariaLabel =>
-        // each button should have translated aria-labels
+      optionNames.forEach((optionName: string) =>
+        // each option should have a translated accessible name
         expect(
-          screen.getByRole("button", { name: ariaLabel })
+          screen.getByRole("option", { name: optionName })
         ).toBeInTheDocument()
       );
     }
   );
 
   it("should select the current language", () => {
-    setup(Language.SV);
+    setup(Language.FR);
+    openDropdown();
 
-    // SV button should be selected
-    expect(screen.getByText("FI")).not.toHaveAttribute("aria-current");
-    expect(screen.getByText("SV")).toHaveAttribute("aria-current", "true");
-    expect(screen.getByText("EN")).not.toHaveAttribute("aria-current");
+    // only the FR option should be marked as selected
+    expect(
+      screen.getByRole("option", { name: "Anglais (en)" })
+    ).toHaveAttribute("aria-selected", "false");
+    expect(
+      screen.getByRole("option", { name: "Français (fr)" })
+    ).toHaveAttribute("aria-selected", "true");
+    expect(
+      screen.getByRole("option", { name: "Italien (it)" })
+    ).toHaveAttribute("aria-selected", "false");
+    expect(
+      screen.getByRole("option", { name: "Espagnol (es)" })
+    ).toHaveAttribute("aria-selected", "false");
   });
 
   it("should call router.push with correct locale when changing language", () => {
-    const { push } = setup(Language.FI);
+    const { push } = setup(Language.EN);
+    openDropdown();
 
-    fireEvent.click(screen.getByText("SV"));
+    fireEvent.click(screen.getByRole("option", { name: "Spanish (es)" }));
 
-    // should call router.push with Swedish
+    // should call router.push with Spanish
     expect(push).toHaveBeenCalledWith("/test", "/test", {
-      locale: Language.SV
+      locale: Language.ES
     });
   });
 
-  it("should not call router.push when clicking the current language", () => {
-    const { push } = setup(Language.SV);
+  it("should not call router.push when selecting the current language", () => {
+    const { push } = setup(Language.ES);
+    openDropdown();
 
-    fireEvent.click(screen.getByText("SV"));
+    fireEvent.click(screen.getByRole("option", { name: "Español (es)" }));
 
-    // should not call router.push because Swedish is already locale
+    // should not call router.push because Spanish is already locale
     expect(push).not.toHaveBeenCalled();
   });
 
@@ -139,14 +165,6 @@ describe("LanguageSelector", () => {
     setup("de");
 
     // should not find language selector
-    expect(screen.queryByRole("group")).not.toBeInTheDocument();
-  });
-
-  it("should not render selector if router is not ready", () => {
-    // setup using unready router
-    setup(Language.FI, false);
-
-    // should not find language selector
-    expect(screen.queryByRole("group")).not.toBeInTheDocument();
+    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
   });
 });

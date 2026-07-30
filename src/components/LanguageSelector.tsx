@@ -1,56 +1,25 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-
-import { jsx } from "theme-ui";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
-import Button from "components/Button";
 import React from "react";
-import Stack from "components/Stack";
+import {
+  Select,
+  SelectArrow,
+  SelectItem,
+  SelectPopover,
+  useSelectContext,
+  useSelectStore,
+  useStoreState
+} from "@ariakit/react";
+import { styleProps } from "./Button/styles";
+import { lightness } from "@theme-ui/color";
 
 // define enums that match the Next.js i18n locales
 export enum Language {
-  FI = "fi",
-  SV = "sv",
-  EN = "en"
+  EN = "en",
+  FR = "fr",
+  IT = "it",
+  ES = "es"
 }
-
-// define style for the language selector stack
-// (the container for language buttons)
-const stackStyle = {
-  alignItems: "center",
-  backgroundColor: "ui.ekirjastogreen",
-  borderRadius: "30px",
-  fontSize: "12px",
-  height: "32px",
-  justifyContent: "space-around",
-  padding: "5px"
-};
-
-// define base style for a language button
-const buttonBaseStyle = {
-  border: "none",
-  borderRadius: "20px",
-  fontSize: "12px",
-  height: "22px",
-  margin: "0 5px",
-  transition: "background-color 0.3s, color 0.3s, transform 0.3s"
-};
-
-// function that returns the final style for a button
-// based on if it is selected or not
-const getButtonStyle = (isSelected: boolean) => ({
-  ...buttonBaseStyle, // spread base style first
-  backgroundColor: isSelected ? "ui.white" : "ui.ekirjastogreen",
-  color: isSelected ? "ui.black" : "ui.white",
-  fontWeight: isSelected ? "bold" : "normal",
-  "&:focus": {
-    color: isSelected ? "ui.black" : "ui.white",
-    backgroundColor: isSelected ? "ui.white" : "ui.ekirjastogreen",
-    outline: "2px solid #005a5d",
-    outlineOffset: "2px"
-  }
-});
 
 // props interface for LanguageSelector component
 interface LanguageSelectorProps {
@@ -62,18 +31,41 @@ interface LanguageSelectorProps {
 // for example "de" is not a valid language code in our app
 function isLanguage(locale: string | undefined): locale is Language {
   return (
-    locale === Language.FI || locale === Language.SV || locale === Language.EN
+    locale === Language.EN ||
+    locale === Language.FR ||
+    locale === Language.IT ||
+    locale === Language.ES
   );
 }
 
-// main LanguageSelector component
-const LanguageSelector: React.FC<LanguageSelectorProps> = () => {
-  // get translation function t from the useTranslation hook,
-  // used for fetching localized strings for current language
+const LanguageSelectItem: React.FC<{ lang: Language }> = ({ lang }) => {
   const { t } = useTranslation();
+  const store = useSelectContext();
+  const activeId = useStoreState(store, "activeId");
+  const id = `language-option-${lang}`;
+  const isActive = activeId === id;
 
-  // get router instance from Next.js,
-  // used for reading the current locale and changing the language in the URL
+  return (
+    <SelectItem
+      id={id}
+      value={lang}
+      sx={{
+        ...styleProps("ui.black", "md", "ghost"),
+        fontWeight: "normal",
+        width: "100%",
+        justifyContent: "flex-start",
+        ...(isActive && {
+          bg: lightness("ui.black", 0.9)
+        })
+      }}
+    >
+      {t(`languageName.${lang.toUpperCase()}`)} ({lang})
+    </SelectItem>
+  );
+};
+
+const LanguageSelector: React.FC<LanguageSelectorProps> = () => {
+  const { t } = useTranslation();
   const router = useRouter();
 
   // get the current locale from router,
@@ -82,8 +74,8 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = () => {
     ? router.locale
     : undefined;
 
-  // function that handled language change
-  const handleLanguageChange = (language: Language) => {
+  const handleLanguageChange = (value: string) => {
+    const language = value as Language;
     // first check if the selected language is the current locale
     if (currentLocale === language) {
       // nothing to change, languages are the same
@@ -102,50 +94,70 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = () => {
       });
   };
 
-  // function that renders a single language button
-  // we give unique key for each button
-  const renderLanguageButton = (language: Language) => {
-    // first check if this language is currently selected
-    const isSelected = currentLocale === language;
-    const buttonLabel = language.toUpperCase();
+  // create the select store manually (instead of using SelectProvider)
+  // so this component can close the dropdown programmatically
+  const selectStore = useSelectStore({
+    focusLoop: true,
+    value: currentLocale,
+    setValue: handleLanguageChange
+  });
 
-    // create translation keys for aria-label:
-    // - languageName.FI
-    // - languageName.SV
-    // - languageName.EN
-    const ariaLabel = t(`languageName.${language.toUpperCase()}`);
-
-    return (
-      // render one language button
-      <Button
-        key={language}
-        aria-label={ariaLabel}
-        aria-current={isSelected ? "true" : undefined}
-        onClick={() => handleLanguageChange(language)}
-        sx={getButtonStyle(isSelected)}
-      >
-        {buttonLabel}
-      </Button>
-    );
+  /**
+   * Close the dropdown when the Escape key is pressed.
+   * When Firefox is full screen, its default behavior for Escape is to exit full-screen mode.
+   * This conflicts with the expected behavior of keyboard navigation closing modals/dialogs/menus
+   * when pressing the Escape key.
+   * Ariakit skips its own Escape handling once preventDefault has been
+   * called, so the dropdown must also be closed manually.
+   */
+  const handlePopoverKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      selectStore.hide();
+    }
   };
 
-  // checks if the component should be rendered.
-  // Examples when not to render:
-  // - routing might not be complete when navigating to a new page
   // - locale could be invalid, if unsupported language like "de" is used
-  const shouldRenderSelector: boolean = router.isReady && !!currentLocale;
+  if (!currentLocale) {
+    return null;
+  }
 
   return (
-    // render the language selector capsule
-    // containing buttons for FI, SV and EN
     <>
-      {shouldRenderSelector && (
-        <Stack role="group" sx={stackStyle} aria-label={t("languageSelector")}>
-          {renderLanguageButton(Language.FI)}
-          {renderLanguageButton(Language.SV)}
-          {renderLanguageButton(Language.EN)}
-        </Stack>
-      )}
+      <Select
+        store={selectStore}
+        aria-label={t("languageSelector")}
+        sx={{
+          ...styleProps("ui.black", "md", "outlined"),
+          paddingRight: "6px",
+          paddingLeft: "6px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          minWidth: 140
+        }}
+      >
+        {t(`languageName.${currentLocale.toUpperCase()}`)} ({currentLocale})
+        <SelectArrow />
+      </Select>
+      <SelectPopover
+        store={selectStore}
+        gutter={8}
+        sameWidth
+        onKeyDown={handlePopoverKeyDown}
+        sx={{
+          backgroundColor: "white",
+          cursor: "pointer",
+          borderRadius: 2,
+          border: "1px solid",
+          borderColor: "ui.gray.light",
+          padding: "8px"
+        }}
+      >
+        {Object.values(Language).map(lang => (
+          <LanguageSelectItem key={lang} lang={lang} />
+        ))}
+      </SelectPopover>
     </>
   );
 };

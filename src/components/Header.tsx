@@ -10,19 +10,10 @@ import Stack from "./Stack";
 import { AccountMenu } from "./AccountMenu";
 import useUser from "components/context/UserContext";
 import useLogin from "auth/useLogin";
-<<<<<<< HEAD
 import ClientOnly from "./ClientOnly";
-=======
-import { useTranslation } from "next-i18next";
-<<<<<<< HEAD
->>>>>>> b1d9ba13 (EKIRJASTO-771 Add example translation)
-=======
-import LanguageSelector from "components/LanguageSelector";
->>>>>>> 04a64e84 (EKIRJASTO-748 Show button group for language selection in app header)
 
 const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
   const library = useLibraryContext();
-  const { t } = useTranslation();
 
   return (
     <header
@@ -35,8 +26,6 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
       }}
       className={className}
     >
-      {/* Temporary example string to test translations */}
-      <Text>{t("hello")}</Text>
       <Link
         href="/"
         aria-label="Go to catalog home page"
@@ -96,7 +85,6 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
         Catalog
       </NavButton>
 
-      <LanguageSelector />
       {library?.headerLinks?.map(link => (
         <AnchorButton
           variant="ghost"
