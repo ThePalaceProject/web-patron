@@ -1,9 +1,9 @@
-FROM node:20.18.1-alpine AS deps
+FROM node:22.23.2-alpine AS deps
 WORKDIR /app
 COPY package*.json .npmrc ./
-RUN npm ci
+RUN npm i -g npm@11.17.0 && npm ci
 
-FROM node:20.18.1-alpine AS builder
+FROM node:22.23.2-alpine AS builder
 # git is used by read-version.js as a fallback when _version.json is absent
 RUN apk add --no-cache git
 WORKDIR /app
@@ -15,7 +15,7 @@ RUN npm run test:ci && npm run type-check && npm run lint
 ENV NODE_ENV=production
 RUN npm run build
 
-FROM node:20.18.1-alpine AS runner
+FROM node:22.23.2-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production \
     PORT=3000
