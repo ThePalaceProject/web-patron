@@ -114,7 +114,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [20, 24, 26]
+        node-version: [22, 24, 26]
 
     steps:
       - uses: actions/checkout@v4
@@ -145,7 +145,7 @@ jobs:
         run: npm run test:ci -- --coverage
 
       - name: Coveralls Report
-        if: matrix.node-version == 20
+        if: matrix.node-version == 22
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
