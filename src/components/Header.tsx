@@ -10,6 +10,7 @@ import Stack from "./Stack";
 import { AccountMenu } from "./AccountMenu";
 import useUser from "components/context/UserContext";
 import useLogin from "auth/useLogin";
+import ClientOnly from "./ClientOnly";
 
 const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
   const library = useLibraryContext();
@@ -117,15 +118,17 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
         My Books
       </NavButton>
 
-      {isAuthenticated ? (
-        <AccountMenu />
-      ) : isLoading ? (
-        <Button loading />
-      ) : (
-        <NavButton color="ui.black" href={baseLoginUrl}>
-          Sign In
-        </NavButton>
-      )}
+      <ClientOnly>
+        {isAuthenticated ? (
+          <AccountMenu />
+        ) : isLoading ? (
+          <Button loading />
+        ) : (
+          <NavButton color="ui.black" href={baseLoginUrl}>
+            Sign In
+          </NavButton>
+        )}
+      </ClientOnly>
     </div>
   );
 };
