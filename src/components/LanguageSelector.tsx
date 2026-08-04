@@ -21,11 +21,6 @@ export enum Language {
   ES = "es"
 }
 
-// props interface for LanguageSelector component
-interface LanguageSelectorProps {
-  // no properties for this component yet
-}
-
 // helper function (type guard) that checks
 // if a locale is a valid Language
 // for example "de" is not a valid language code in our app
@@ -52,7 +47,6 @@ const LanguageSelectItem: React.FC<{ lang: Language }> = ({ lang }) => {
       sx={{
         ...styleProps("ui.black", "md", "ghost"),
         fontWeight: "normal",
-        width: "100%",
         justifyContent: "flex-start",
         ...(isActive && {
           bg: lightness("ui.black", 0.9)
@@ -64,7 +58,7 @@ const LanguageSelectItem: React.FC<{ lang: Language }> = ({ lang }) => {
   );
 };
 
-const LanguageSelector: React.FC<LanguageSelectorProps> = () => {
+const LanguageSelector: React.FC = () => {
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -130,11 +124,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = () => {
         sx={{
           ...styleProps("ui.black", "md", "outlined"),
           paddingRight: "6px",
-          paddingLeft: "6px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          minWidth: 140
+          paddingLeft: "6px"
         }}
       >
         {t(`languageName.${currentLocale.toUpperCase()}`)} ({currentLocale})
@@ -143,7 +133,6 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = () => {
       <SelectPopover
         store={selectStore}
         gutter={8}
-        sameWidth
         onKeyDown={handlePopoverKeyDown}
         sx={{
           backgroundColor: "white",
@@ -151,7 +140,9 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = () => {
           borderRadius: 2,
           border: "1px solid",
           borderColor: "ui.gray.light",
-          padding: "8px"
+          padding: "8px",
+          display: "flex",
+          flexDirection: "column"
         }}
       >
         {Object.values(Language).map(lang => (

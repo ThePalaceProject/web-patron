@@ -113,7 +113,6 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
         color="ui.black"
         href="/loans"
         iconLeft={BookIcon}
-        sx={{ mr: 1 }}
       >
         My Books
       </NavButton>
