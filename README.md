@@ -372,11 +372,11 @@ When creating links using `<Link>`, you don't need to worry about whether it is 
 
 ## Translations
 
-Overview of the translation setup in the E-kirjasto application
+Overview of the translation setup for the `web-patron` application
 
 ### Packages used for translations
 
-The E-kirjasto application utilizes the following packages for internationalization (i18n):
+The `web-patron` application utilizes the following packages for internationalization (i18n):
 
 - **i18next**: an internationalization framework for JavaScript
 - **next-i18next**: a plugin for Next.js that integrates i18next for server-side translations
@@ -451,19 +451,6 @@ To translate strings in components, follow these steps:
    <DetailField heading={t("bookDetails.publisher")} details={book.publisher} />
    ```
 
-**Code example:**
-
-This component displays the translation for the key `hello`, showing for example _Hello, translations!_ or _Hei, käännökset!_ or _Hej, översättningar!_ on the page based on the current language in the app.
-
-```javascript
-import { useTranslation } from "next-i18next";
-
-const MyComponent = () => {
-  const { t } = useTranslation();
-  return <h1>{t("hello")}</h1>;
-};
-```
-
 ### Translation process
 
 To extract translation keys from your component source code and to update the `translations.json` files, follow these steps:
@@ -503,7 +490,7 @@ To extract translation keys from your component source code and to update the `t
 
 ### Changing the app language
 
-The LanguageSelector component lets users change the language of the E-library application to English, French, Italian, or Spanish. Note that the language code in the URL is only visible when a language other than English is selected:
+The LanguageSelector component lets users change the language of the application to English, French, Italian, or Spanish. Note that the language code in the URL is only visible when a language other than English is selected:
 
 - **English (default)**: `https://example.com/books` (no language code `en`)
 - **French**: `https://example.com/fr/books` (language code `fr`)

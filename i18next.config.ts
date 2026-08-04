@@ -25,7 +25,7 @@
 import { defineConfig } from "i18next-cli";
 
 // define the supported languages
-// the app has three languages: English, French, Italian, and Spanish
+// the app has four languages: English, French, Italian, and Spanish
 const appLocales = ["en", "fr", "it", "es"];
 
 // set the primary language for the application
