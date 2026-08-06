@@ -22,7 +22,7 @@ const languageFilesPath = path.resolve("./public/locales");
 
 // define the namespaces used for
 // organizing translations in the language files.
-// Tthe "translations" namespace contains all the
+// The "translations" namespace contains all the
 // translations used throughout the app,
 // and no additional namespaces are currently used.
 const translationNamespaces = ["translations"];

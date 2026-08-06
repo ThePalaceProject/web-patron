@@ -378,10 +378,10 @@ Overview of the translation setup for the `web-patron` application
 
 The `web-patron` application utilizes the following packages for internationalization (i18n):
 
-- **i18next**: an internationalization framework for JavaScript
 - **next-i18next**: a plugin for Next.js that integrates i18next for server-side translations
-- **react-i18next**: React bindings for i18next (peer dependency required by next-i18next)
 - **i18next-cli** a command-line tool for managing translations (development dependency)
+- **i18next**: an internationalization framework for JavaScript (peer dependency required by `next-i18next`)
+- **react-i18next**: React bindings for i18next (peer dependency required by `next-i18next`)
 - **eslint-plugin-18next** ESLint plugin that warns about hardcoded strings (development dependency)
 
 ### Configuration files
@@ -409,7 +409,7 @@ Key settings:
   - `translations:status` Overview of project translations
   - `translations:lint` List of hardcoded strings needing translation
   - `translations:extract` Extract translation keys and update translation files
-  - `translations:sync` Sync French, Italian, and Spanish files with the English file
+  - `translations:sync` Sync non-English files with the English file
   - `translations:ci` Fail builds when translations are outdated
 
 ### JSON structure for translations files
@@ -436,7 +436,7 @@ To translate strings in components, follow these steps:
 1. **Import the `useTranslation` hook**
 
    ```javascript
-   import { useTranslation } from "next-i18next";
+   import { useTranslation } from "next-i18next/pages";
    ```
 
 2. **Define the `t` translation function**
@@ -469,7 +469,7 @@ To extract translation keys from your component source code and to update the `t
    npm run translations:extract
    ```
 
-   This command will scan the specified directories for translation keys used in your components and update the three `translations.json` files in the `public/locales` directory.
+   This command will scan the specified directories for translation keys used in your components and update the `translations.json` files in the `public/locales` directory.
 
 3. **Run the `sync` command (optional)**
 
@@ -477,25 +477,24 @@ To extract translation keys from your component source code and to update the `t
    npm run translations:sync
    ```
 
-   This command will compare the French (`fr`), Italian (`it`), and Spanish (`es`) translation files against the English (`en`) file. It will add any missing keys from the English file to the French, Italian, and Spanish files and remove any extra keys that are not present in the English file.
+   This command will compare the non-English translation files against the English (`en`) file. It will add any missing keys from the English file to the non-English files and remove any extra keys that are not present in the English file.
 
 4. **Check the output**  
    After running the commands, check the `translations.json` files that the new translation keys have been added correctly.
 
 5. **Add translations**  
-   Collaborate with the translators and add the translations for the keys in French (`fr`), Italian (`it`),Spanish (`es`), and English (`en`) to the `translations.json` files.
+   Collaborate with the translators and add the translations for the keys in the non-English files, and English (`en`) to the `translations.json` files.
 
 6. **Save changes**  
    Verify that the translations are correct and functioning as expected in the application. Then commit the updated translation files.
 
 ### Changing the app language
 
-The LanguageSelector component lets users change the language of the application to English, French, Italian, or Spanish. Note that the language code in the URL is only visible when a language other than English is selected:
+The LanguageSelector component lets users change the language of the application.
+Note that the language code in the URL is only visible when a language other than English is selected:
 
 - **English (default)**: `https://example.com/books` (no language code `en`)
-- **French**: `https://example.com/fr/books` (language code `fr`)
-- **Italianh**: `https://example.com/it/books` (language code `it`)
-- **Spanish**: `https://example.com/es/books` (language code `es`)
+- **non-English language** `https://example.com/{localeCode}/books
 
 The component uses Next.js's Router to handle the current language through `router.locale`. When user selects a language, the component updates the locale using `router.push`. This means the URL is updated creating a new entry in the browser's history, so users can always navigate back and see the language switch as a separate step.
 

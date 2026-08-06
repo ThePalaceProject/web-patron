@@ -47,7 +47,7 @@ const defaultTranslationNamespace = "translations";
 const inputFiles = ["src/{components,pages}/**/*.{tsx,jsx}"];
 
 // define the output path to public/locales directory,
-// and organise the translation files by language and namespace,
+// and organize the translation files by language and namespace,
 // for example public/locales/en/translations.json
 const outputPath = "public/locales/{{language}}/{{namespace}}.json";
 
