@@ -15,7 +15,7 @@ import extractParam from "dataflow/utils";
 import { ParsedUrlQuery } from "querystring";
 import track from "analytics/track";
 import { getAppConfig } from "server/appConfig";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 
 export type AppProps = {
   library?: LibraryData;

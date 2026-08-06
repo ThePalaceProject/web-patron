@@ -13,7 +13,7 @@ import { setMediaSupportConfig } from "utils/fulfill";
 import { setOpds2Enabled } from "dataflow/catalog";
 import type { AppConfig } from "interfaces";
 import FALLBACK_APP_CONFIG from "config/fallbackAppConfig";
-import { appWithTranslation } from "next-i18next";
+import { appWithTranslation } from "next-i18next/pages";
 
 const MyApp = (props: AppProps) => {
   const { Component, pageProps } = props;
