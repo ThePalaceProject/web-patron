@@ -25,10 +25,27 @@ import { getCurrentTestConfig } from "test-utils/mockConfig";
 import { mockUseTranslation } from "test-utils/mockUseTranslation";
 
 // mock next-i18next for all tests
-// so we don't need to repeat this in each test file
-jest.mock("next-i18next", () => ({
+// so we don't need to repeat this in each test file.
+// Note the "/pages" subpath: next-i18next's root export is the App Router
+// build, and this app uses the Pages Router.
+jest.mock("next-i18next/pages", () => ({
   // mock only the useTranslation hook we need
   useTranslation: () => mockUseTranslation()
+}));
+
+// mock serverSideTranslations so page-props tests don't load real locale files.
+// The real implementation awaits i18next's init, which i18next defers with
+// setTimeout. This project enables fake timers globally (see jest.config.js),
+// so that timer never fires and the await would hang forever.
+jest.mock("next-i18next/pages/serverSideTranslations", () => ({
+  serverSideTranslations: async (locale: string, ns: string[]) => ({
+    _nextI18Next: {
+      initialI18nStore: { [locale]: {} },
+      initialLocale: locale,
+      ns,
+      userConfig: null
+    }
+  })
 }));
 
 enableFetchMocks();
