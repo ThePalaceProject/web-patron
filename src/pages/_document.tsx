@@ -7,7 +7,7 @@ class MyDocument extends Document {
     // process.env.GTM_ID is accessible here because _document.tsx is server-only.
     const gtmId = process.env.GTM_ID ?? null;
     return (
-      <Html lang="en">
+      <Html>
         <Head>
           <GTMScript gtmId={gtmId} />
         </Head>
