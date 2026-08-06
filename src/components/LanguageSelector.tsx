@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
 import React from "react";
 import {
   Select,
@@ -12,6 +12,8 @@ import {
 } from "@ariakit/react";
 import { styleProps } from "./Button/styles";
 import { lightness } from "@theme-ui/color";
+import track from "analytics/track";
+import Cookie from "js-cookie";
 
 // define enums that match the Next.js i18n locales
 export enum Language {
@@ -31,6 +33,22 @@ function isLanguage(locale: string | undefined): locale is Language {
     locale === Language.IT ||
     locale === Language.ES
   );
+}
+
+/**
+ * Persist the chosen language so Next.js can restore it on a return visit.
+ * Next reads this cookie during automatic locale detection and prefers it
+ * over the browser's Accept-Language header.
+ * NOTE: Only works when user navigates to root "/" path.
+ */
+function setLocaleCookie(locale: Language) {
+  Cookie.set("NEXT_LOCALE", locale, {
+    expires: 365,
+    path: "/",
+    sameSite: "lax",
+    // only mark Secure over HTTPS; a Secure cookie is dropped on http://localhost
+    secure: window.location.protocol === "https:"
+  });
 }
 
 const LanguageSelectItem: React.FC<{ lang: Language }> = ({ lang }) => {
@@ -58,7 +76,7 @@ const LanguageSelectItem: React.FC<{ lang: Language }> = ({ lang }) => {
   );
 };
 
-const LanguageSelector: React.FC = () => {
+const LanguageSelector: React.FC<{ className?: string }> = ({ className }) => {
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -77,14 +95,24 @@ const LanguageSelector: React.FC = () => {
       return;
     }
 
+    // remember the choice so it survives to future visits
+    setLocaleCookie(language);
+
     // change the language:
     // - update the URL and reload the page with the selected language
     router
       // try to push the same path to the router with a new locale
       .push(router.asPath, router.asPath, { locale: language })
       .catch(error => {
-        // if navigation fails, just console log error
-        console.error("Failed to change language", error);
+        track.error(error, {
+          severity: "error",
+          metadata: {
+            "Router Info": {
+              asPath: router.asPath,
+              locale: language
+            }
+          }
+        });
       });
   };
 
@@ -121,6 +149,7 @@ const LanguageSelector: React.FC = () => {
       <Select
         store={selectStore}
         aria-label={t("languageSelector")}
+        className={className}
         sx={{
           ...styleProps("ui.black", "md", "outlined"),
           paddingRight: "6px",
