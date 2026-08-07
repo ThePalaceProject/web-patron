@@ -220,7 +220,7 @@ describe("book details page", () => {
     expect(screen.queryByText("Series:")).toBeFalsy();
   });
 
-  test("doesn't show series when series has no url", () => {
+  test("show series as text when series has no url", () => {
     const bookWithUrllessSeries = merge<Book>(fixtures.book, {
       series: {
         name: "Kat, Incorrigible"
@@ -228,8 +228,8 @@ describe("book details page", () => {
     });
     mockSwr({ data: bookWithUrllessSeries });
     setup(<BookDetails />);
-    expect(screen.queryByText("Series:")).toBeFalsy();
-    expect(screen.queryByText("Kat, Incorrigible")).toBeFalsy();
+    expect(screen.getByText("Series:")).toBeInTheDocument();
+    expect(screen.getByText("Kat, Incorrigible")).toBeInTheDocument();
   });
 
   test("does not show simplyE callout when NEXT_PUBLIC_COMPANION_APP is 'openebooks'", () => {

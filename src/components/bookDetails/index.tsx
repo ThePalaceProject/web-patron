@@ -119,16 +119,20 @@ export const BookDetails: React.FC = () => {
               <DetailField heading="Published" details={book.published} />
               <DetailField heading="Publisher" details={book.publisher} />
               <DetailField heading="Distributor" details={book.providerName} />
-              {book.series?.name && book.series?.url && (
+              {book.series?.name && (
                 <DetailField
                   heading="Series"
                   details={
-                    <Link
-                      collectionUrl={book.series.url}
-                      sx={{ textDecoration: "underline" }}
-                    >
-                      {book.series.name}
-                    </Link>
+                    book.series?.url ? (
+                      <Link
+                        collectionUrl={book.series.url}
+                        sx={{ textDecoration: "underline" }}
+                      >
+                        {book.series.name}
+                      </Link>
+                    ) : (
+                      book.series.name
+                    )
                   }
                 />
               )}
