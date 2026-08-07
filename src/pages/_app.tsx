@@ -13,6 +13,7 @@ import { setMediaSupportConfig } from "utils/fulfill";
 import { setOpds2Enabled } from "dataflow/catalog";
 import type { AppConfig } from "interfaces";
 import FALLBACK_APP_CONFIG from "config/fallbackAppConfig";
+import { appWithTranslation } from "next-i18next/pages";
 
 const MyApp = (props: AppProps) => {
   const { Component, pageProps } = props;
@@ -56,4 +57,7 @@ export function reportWebVitals(metric: NextWebVitalsMetric) {
   track.webVitals(metric);
 }
 
-export default MyApp;
+// Wrap MyApp component with appWithTranslation to provide i18n context,
+// so we can use translation functions (t) in child components
+// and switch translations based on locales
+export default appWithTranslation(MyApp);

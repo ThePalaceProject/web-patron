@@ -11,6 +11,7 @@ import { AccountMenu } from "./AccountMenu";
 import useUser from "components/context/UserContext";
 import useLogin from "auth/useLogin";
 import ClientOnly from "./ClientOnly";
+import LanguageSelector from "./LanguageSelector";
 
 const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
   const library = useLibraryContext();
@@ -113,7 +114,6 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
         color="ui.black"
         href="/loans"
         iconLeft={BookIcon}
-        sx={{ mr: 1 }}
       >
         My Books
       </NavButton>
@@ -129,6 +129,8 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
           </NavButton>
         )}
       </ClientOnly>
+
+      <LanguageSelector sx={{ ml: 3 }} />
     </div>
   );
 };

@@ -13,7 +13,7 @@
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -39,6 +39,8 @@
     "**/*.tsx",
     "next.config.js",
     "public/sw.js",
-    "src/icons/_template.js"
+    "src/config/fetch-config.js",
+    "src/icons/_template.js",
+    "next-i18next.config.js"
   ]
 }

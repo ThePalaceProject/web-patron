@@ -8,17 +8,20 @@ type StackProps = {
   spacing?: number | string;
   className?: string;
   children?: React.ReactNode;
+  role?: string;
 };
 const Stack: React.FC<StackProps> = ({
   direction = "row",
   spacing = 2,
   children,
   className,
+  role,
   ...rest
 }) => {
   return (
     <div
       className={className}
+      role={role}
       sx={{
         display: "flex",
         flexDirection: direction,

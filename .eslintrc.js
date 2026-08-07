@@ -1,8 +1,12 @@
 module.exports = {
   overrides: [
     {
-      files: ["**/__tests__/**/*.{ts,tsx}", "tests/**/*.{ts,tsx}", "src/test-utils/**/*.{ts,tsx}"],
-      rules: { "react/display-name": "off" }
+      files: [
+        "**/__tests__/**/*.{ts,tsx}",
+        "tests/**/*.{ts,tsx}",
+        "src/test-utils/**/*.{ts,tsx}"
+      ],
+      rules: { "react/display-name": "off", "i18next/no-literal-string": "off" }
     },
     {
       files: ["**/*.js"],
@@ -17,7 +21,10 @@ module.exports = {
         jest: true
       },
       rules: {
-        "no-unused-vars": ["error", { argsIgnorePattern: "^_.*", varsIgnorePattern: "^_.*" }]
+        "no-unused-vars": [
+          "error",
+          { argsIgnorePattern: "^_.*", varsIgnorePattern: "^_.*" }
+        ]
       }
     },
     {
@@ -53,7 +60,8 @@ module.exports = {
     "plugin:jsx-a11y/strict",
     "plugin:@next/next/recommended",
     "plugin:prettier/recommended",
-    "prettier"
+    "prettier",
+    "plugin:i18next/recommended"
   ],
   rules: {
     // this rule was deprecated in favor of another
@@ -114,7 +122,28 @@ module.exports = {
     "no-redeclare": "error",
     "no-var": "error",
     "@next/next/no-img-element": "off",
-    "react/no-unknown-property": ["error", { ignore: ["sx", "jsx", "global"] }]
+    "react/no-unknown-property": ["error", { ignore: ["sx", "jsx", "global"] }],
+    /** TODO: turn on once we begin adding translations */
+    "i18next/no-literal-string": "off"
+    // "i18next/no-literal-string": [
+    //   "warn",
+    //   {
+    //     message: "Use i18n translation instead of hardcoded strings.",
+    //     markupOnly: true,
+    //     ignoredProps: ["data-testid", "href", "htmlFor", "id"],
+    //     "jsx-attributes": {
+    //       include: [
+    //         "alt",
+    //         "aria-label",
+    //         "heading",
+    //         "placeholder",
+    //         "subtitle",
+    //         "title"
+    //       ]
+    //     },
+    //     mode: "jsx-only"
+    //   }
+    // ]
   },
   settings: {
     react: {
