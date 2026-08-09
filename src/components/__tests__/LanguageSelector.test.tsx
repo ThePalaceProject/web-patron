@@ -1,5 +1,5 @@
 import { mockUseTranslation } from "test-utils/mockUseTranslation";
-import { screen, setup as customSetup } from "test-utils";
+import { act, screen, setup as customSetup } from "test-utils";
 import LanguageSelector, { Language } from "components/LanguageSelector";
 import React from "react";
 // resolves to the stateful mock in __mocks__/js-cookie.ts,
@@ -31,7 +31,7 @@ const mockRouter = (locale: string) => {
 };
 
 // define helper function to set up the test environment
-const setup = (locale: string) => {
+const setup = async (locale: string) => {
   // first mock the router
   const push = mockRouter(locale);
 
@@ -40,6 +40,11 @@ const setup = (locale: string) => {
 
   // then render the component
   const { user } = customSetup(<LanguageSelector />);
+
+  // Ariakit registers the select items with its store in a microtask that runs
+  // after render() returns, so the re-render it triggers falls outside the
+  // act() wrapper around render. Flush that microtask here, inside act.
+  await act(async () => {});
 
   // return the mocked push function
   // so we can check it in tests if needed
@@ -59,8 +64,8 @@ describe("LanguageSelector", () => {
     [Language.IT, "Scegli la lingua"]
   ])(
     "should show correct aria-label when locale is %s",
-    (locale, ariaLabel) => {
-      setup(locale);
+    async (locale, ariaLabel) => {
+      await setup(locale);
       // select should have correct translated aria-label
       expect(screen.getByRole("combobox")).toHaveAttribute(
         "aria-label",
@@ -69,15 +74,15 @@ describe("LanguageSelector", () => {
     }
   );
 
-  it("should show the current language in the select button", () => {
-    setup(Language.EN);
+  it("should show the current language in the select button", async () => {
+    await setup(Language.EN);
 
     // the select button should show the current language name and code
     expect(screen.getByRole("combobox")).toHaveTextContent("English (en)");
   });
 
   it("should render language options", async () => {
-    const { user } = setup(Language.EN);
+    const { user } = await setup(Language.EN);
     await user.click(screen.getByRole("combobox"));
 
     const options = screen.getAllByRole("option");
@@ -104,7 +109,7 @@ describe("LanguageSelector", () => {
   `(
     "should render correct accessible names for options in $locale",
     async ({ locale, optionNames }) => {
-      const { user } = setup(locale);
+      const { user } = await setup(locale);
       await user.click(screen.getByRole("combobox"));
 
       optionNames.forEach((optionName: string) =>
@@ -117,7 +122,7 @@ describe("LanguageSelector", () => {
   );
 
   it("should select the current language", async () => {
-    const { user } = setup(Language.FR);
+    const { user } = await setup(Language.FR);
     await user.click(screen.getByRole("combobox"));
 
     // only the FR option should be marked as selected
@@ -136,7 +141,7 @@ describe("LanguageSelector", () => {
   });
 
   it("should call router.push with correct locale when changing language", async () => {
-    const { push, user } = setup(Language.EN);
+    const { push, user } = await setup(Language.EN);
     await user.click(screen.getByRole("combobox"));
 
     await user.click(screen.getByRole("option", { name: "Spanish (es)" }));
@@ -148,7 +153,7 @@ describe("LanguageSelector", () => {
   });
 
   it("should not call router.push when selecting the current language", async () => {
-    const { push, user } = setup(Language.ES);
+    const { push, user } = await setup(Language.ES);
     await user.click(screen.getByRole("combobox"));
 
     await user.click(screen.getByRole("option", { name: "Español (es)" }));
@@ -158,7 +163,7 @@ describe("LanguageSelector", () => {
   });
 
   it("should set the NEXT_LOCALE cookie when changing language", async () => {
-    const { user } = setup(Language.EN);
+    const { user } = await setup(Language.EN);
     await user.click(screen.getByRole("combobox"));
 
     await user.click(screen.getByRole("option", { name: "Spanish (es)" }));
@@ -179,7 +184,7 @@ describe("LanguageSelector", () => {
   });
 
   it("should not set the NEXT_LOCALE cookie when selecting the current language", async () => {
-    const { user } = setup(Language.ES);
+    const { user } = await setup(Language.ES);
     await user.click(screen.getByRole("combobox"));
 
     await user.click(screen.getByRole("option", { name: "Español (es)" }));
@@ -188,9 +193,9 @@ describe("LanguageSelector", () => {
     expect(mockCookie.set).not.toHaveBeenCalled();
   });
 
-  it("should not render selector if locale is invalid", () => {
+  it("should not render selector if locale is invalid", async () => {
     // setup using unsupported language
-    setup("de");
+    await setup("de");
 
     // should not find language selector
     expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
