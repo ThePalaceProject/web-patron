@@ -3,7 +3,7 @@ import LoadingIndicator from "../LoadingIndicator";
 import { H3, H2 } from "components/Text";
 import Lane from "components/Lane";
 import { AnyBook } from "interfaces";
-import { fetchCollection } from "dataflow/catalog";
+import { collectionFetcher } from "dataflow/catalog";
 import useSWR from "swr";
 import useUser from "components/context/UserContext";
 
@@ -13,7 +13,7 @@ const Recommendations: React.FC<{ book: AnyBook }> = ({ book }) => {
 
   const { data: recommendations, isValidating } = useSWR(
     relatedUrl ? [relatedUrl, token] : null,
-    fetchCollection
+    collectionFetcher
   );
 
   const isLoading = !recommendations && isValidating;

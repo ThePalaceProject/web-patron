@@ -88,6 +88,12 @@ async function fetchNegotiated(
 }
 
 /**
+ * SWR fetcher for collections, keyed by [url, token].
+ */
+export const collectionFetcher = ([url, token]: [string, string | undefined]) =>
+  fetchCollection(url, token);
+
+/**
  * Fetches a feed and converts it to a collection
  */
 export async function fetchCollection(

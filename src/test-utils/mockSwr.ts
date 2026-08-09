@@ -11,6 +11,7 @@ export function makeSwrResponse<T>(value?: Partial<SWRResponse<T>>) {
     data: undefined,
     error: undefined,
     isValidating: false,
+    isLoading: false,
     mutate: mockMutate,
     ...value
   };

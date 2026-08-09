@@ -3,7 +3,7 @@ import { render, fixtures } from "test-utils";
 import { Collection } from "../Collection";
 import { CollectionData, LaneData } from "interfaces";
 import { makeSwrResponse, MockSwr } from "test-utils/mockSwr";
-import { fetchCollection } from "dataflow/catalog";
+import { collectionFetcher } from "dataflow/catalog";
 import useSWR from "swr";
 // import useSWRInfinite from "swr/infinite";
 import "test-utils/mockScrollTo";
@@ -41,7 +41,7 @@ test("calls swr to fetch collection", () => {
 
   expect(mockedSWR).toHaveBeenCalledWith(
     ["/collection", "user-token"],
-    fetchCollection
+    collectionFetcher
   );
 });
 

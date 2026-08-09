@@ -64,10 +64,10 @@ const config = {
       config.plugins.push(
         new webpack.IgnorePlugin({ resourceRegExp: /jsdom$/ })
       );
-    // react-axe should only be bundled when REACT_AXE=true
-    !REACT_AXE === "true" &&
+    // @axe-core/react should only be bundled when REACT_AXE=true
+    REACT_AXE !== "true" &&
       config.plugins.push(
-        new webpack.IgnorePlugin({ resourceRegExp: /react-axe$/ })
+        new webpack.IgnorePlugin({ resourceRegExp: /@axe-core\/react$/ })
       );
     // Fixes dependency on "fs" module.
     // We don't (and can't) depend on this in client-side code.

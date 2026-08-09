@@ -3,7 +3,7 @@ import { render, fixtures, waitFor } from "test-utils";
 import { CollectionData } from "interfaces";
 import Recommendations from "../Recommendations";
 import useSWR, { SWRResponse } from "swr";
-import { fetchCollection } from "dataflow/catalog";
+import { collectionFetcher } from "dataflow/catalog";
 
 jest.mock("swr");
 
@@ -15,8 +15,8 @@ function makeSwrResponse(
   return {
     data: undefined,
     error: undefined,
-    // revalidate: jest.fn(),
     isValidating: false,
+    isLoading: false,
     mutate: jest.fn(),
     ...value
   };
@@ -48,7 +48,7 @@ test("fetches the proper url for recommendation collection", () => {
   expect(mockedSWR).toHaveBeenCalledTimes(1);
   expect(mockedSWR).toHaveBeenCalledWith(
     ["http://related-url", "user-token"],
-    fetchCollection
+    collectionFetcher
   );
 });
 

@@ -16,7 +16,7 @@ import BookCover from "./BookCover";
 import BorrowOrReserveOrPreview from "./BorrowOrReserveOrPreview";
 import CancelOrReturnOrPreview from "./CancelOrReturnOrPreview";
 import { AnyBook, CollectionData, LaneData } from "interfaces";
-import { fetchCollection } from "dataflow/catalog";
+import { collectionFetcher } from "dataflow/catalog";
 import useSWRInfinite from "swr/infinite";
 import useUser from "components/context/UserContext";
 import Stack from "components/Stack";
@@ -55,7 +55,7 @@ export const InfiniteBookList: React.FC<{ firstPageUrl: string }> = ({
   };
   const { data, size, error, setSize } = useSWRInfinite(
     getKey,
-    fetchCollection
+    collectionFetcher
   );
 
   const isFetchingInitialData = !data && !error;

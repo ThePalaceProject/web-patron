@@ -1,6 +1,6 @@
 import useLibraryContext from "components/context/LibraryContext";
 import useUser from "components/context/UserContext";
-import { fetchCollection } from "dataflow/catalog";
+import { collectionFetcher } from "dataflow/catalog";
 import extractParam from "dataflow/utils";
 import ApplicationError from "errors";
 import { CollectionData } from "interfaces";
@@ -24,7 +24,7 @@ export default function useCollection() {
     isValidating
   } = useSWR<CollectionData, Error | ApplicationError>(
     collectionUrl ? [collectionUrl, token] : null,
-    fetchCollection
+    collectionFetcher
   );
 
   // make sure unidentified errors are wrapped in an ApplicationError
