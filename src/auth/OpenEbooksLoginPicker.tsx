@@ -10,7 +10,7 @@ import extractParam from "dataflow/utils";
 import { LOGIN_ERROR_QUERY_PARAM } from "utils/constants";
 import { Text } from "../components/Text";
 
-export default function LoginRegion(): JSX.Element {
+export default function LoginRegion(): React.JSX.Element {
   const { authMethods } = useLibraryContext();
   const { query } = useRouter();
 

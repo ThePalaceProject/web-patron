@@ -1,6 +1,7 @@
 import { describe, expect, test } from "@jest/globals";
 import fetchMock from "jest-fetch-mock";
 import {
+  collectionFetcher,
   fetchBook,
   fetchCollection,
   OPDS2_ENTRY_ACCEPT_HEADER,
@@ -33,6 +34,23 @@ describe("with OPDS 2 disabled (default)", () => {
       headers: {
         "X-Requested-With": "XMLHttpRequest",
         "Accept-Language": "*"
+      },
+      method: "GET"
+    });
+  });
+
+  test("collectionFetcher passes the [url, token] SWR key as the url and token arguments", async () => {
+    fetchMock.mockResponseOnce(rawOpdsFeed);
+    const collection = await collectionFetcher([
+      "http://somewhere",
+      "some-token"
+    ]);
+    expect(collection.books).toHaveLength(6);
+    expect(fetchMock).toHaveBeenCalledWith("http://somewhere", {
+      headers: {
+        "X-Requested-With": "XMLHttpRequest",
+        "Accept-Language": "*",
+        Authorization: "some-token"
       },
       method: "GET"
     });

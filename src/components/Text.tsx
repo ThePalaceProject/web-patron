@@ -1,7 +1,9 @@
 import * as React from "react";
 
 type NativeComponent<
-  T extends keyof JSX.IntrinsicElements | React.JSXElementConstructor<any>,
+  T extends
+    | keyof React.JSX.IntrinsicElements
+    | React.JSXElementConstructor<any>,
   P = Record<string, unknown>
 > = React.FC<React.ComponentProps<T> & P>;
 

@@ -19,8 +19,8 @@ function makeSwrResponse(value: Partial<ReturnType<typeof useSWR>>) {
   return {
     data: undefined,
     error: undefined,
-    revalidate: jest.fn(),
     isValidating: false,
+    isLoading: false,
     mutate: jest.fn(),
     ...value
   };

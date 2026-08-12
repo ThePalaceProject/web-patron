@@ -14,7 +14,7 @@ import { Text } from "components/Text";
 import { useInView } from "react-intersection-observer";
 
 type BookRefs = {
-  [id: string]: React.RefObject<HTMLLIElement>;
+  [id: string]: React.RefObject<HTMLLIElement | null>;
 };
 type CurrentBook = {
   index: number;
@@ -36,7 +36,7 @@ const getfilteredBooksAndRefs = (books: AnyBook[], omitIds?: string[]) => {
   });
   /** keep track of a ref for each book */
   const bookRefs: BookRefs = filteredBooks.reduce<{
-    [id: string]: React.RefObject<HTMLLIElement>;
+    [id: string]: React.RefObject<HTMLLIElement | null>;
   }>((acc, value) => {
     const ref = React.createRef<HTMLLIElement>();
     acc[value.id] = ref;

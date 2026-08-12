@@ -4,7 +4,9 @@ const next = require("next");
 const fs = require("fs");
 
 const dev = process.env.NODE_ENV !== "production";
-const app = next({ dev });
+// This project has a custom webpack config, so opt out of Turbopack (the
+// Next.js 16 default bundler), matching the --webpack flag in package.json.
+const app = next({ dev, webpack: true });
 const handle = app.getRequestHandler();
 const port = 3000;
 

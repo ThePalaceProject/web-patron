@@ -58,7 +58,7 @@ module.exports = {
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
     "plugin:jsx-a11y/strict",
-    "plugin:@next/next/recommended",
+    "plugin:@next/next/recommended-legacy",
     "plugin:prettier/recommended",
     "prettier",
     "plugin:i18next/recommended"

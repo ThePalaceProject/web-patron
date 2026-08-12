@@ -92,7 +92,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   const { data, mutate } = useSWR(
     // pass null if there are no credentials or shelfUrl to tell SWR not to fetch at all.
     credentials && shelfUrl ? [shelfUrl, token, credentials?.methodType] : null,
-    fetchLoans,
+    loansFetcher,
     {
       shouldRetryOnError: credentials?.methodType === BasicTokenAuthType,
       revalidateOnFocus: shouldRevalidate(),
@@ -169,8 +169,10 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   }, [credentials, userProfileUrl]);
 
   const { data: profileData } = useSWR(
-    shouldFetchProfile ? [userProfileUrl, token] : null,
-    fetchPatronProfile,
+    shouldFetchProfile && userProfileUrl && token
+      ? [userProfileUrl, token]
+      : null,
+    patronProfileFetcher,
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
@@ -273,10 +275,17 @@ export default function useUser() {
 
 // we only need the books out of a collection for loans,
 // so this is a utility to extract those.
-async function fetchLoans(url: string, token: string) {
+async function fetchLoans(url: string, token?: string) {
   const collection = await fetchCollection(url, token);
   return collection.books;
 }
+
+/**
+ * SWR fetcher for loans, keyed by [url, token, methodType]. The method type
+ * is part of the key only so that switching auth methods refetches.
+ */
+const loansFetcher = ([url, token]: [string, string | undefined, string]) =>
+  fetchLoans(url, token);
 
 /*
  * Fetches the patron profile document, which carries the patron's
@@ -298,6 +307,12 @@ export async function fetchPatronProfile(
 
   return response.json();
 }
+
+/**
+ * SWR fetcher for the patron profile, keyed by [url, token].
+ */
+const patronProfileFetcher = ([url, token]: [string, string]) =>
+  fetchPatronProfile(url, token);
 
 function stringifyToken(
   credentials: AuthCredentials | undefined,
