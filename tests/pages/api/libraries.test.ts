@@ -43,6 +43,7 @@ const VALID_APP_CONFIG: AppConfig = {
   companionApp: "simplye",
   showMedium: true,
   enableOpds2: false,
+  enableLanguageSelector: false,
   openebooks: null,
   mediaSupport: {},
   authenticationDocuments: null,

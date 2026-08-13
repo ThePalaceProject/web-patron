@@ -35,6 +35,7 @@ function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     companionApp: "simplye",
     showMedium: true,
     enableOpds2: false,
+    enableLanguageSelector: false,
     openebooks: null,
     mediaSupport: {},
     authenticationDocuments: null,

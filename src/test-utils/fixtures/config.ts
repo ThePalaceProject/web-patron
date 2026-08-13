@@ -7,6 +7,7 @@ export const config: AppConfig = {
   companionApp: "simplye",
   showMedium: true,
   enableOpds2: false,
+  enableLanguageSelector: false,
   openebooks: null,
   authenticationDocuments: null,
   itemLandingSlugs: [DEFAULT_ITEM_LANDING_SLUG],

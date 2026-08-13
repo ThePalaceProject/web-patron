@@ -124,6 +124,7 @@ The following environment variables can be set to further configure the applicat
 - Set `BUGSNAG_API_KEY` to your Bugsnag project API key to enable error tracking. If unset, Bugsnag is disabled.
 - Set `GTM_ID` to your Google Tag Manager container ID (format: `GTM-XXXXXXXX`) to enable web analytics. If unset, GTM is not loaded.
 - Set `PALACE_CPW_FEATURE_OPDS2=true` to request OPDS 2 (JSON) catalogs from the circulation manager via content negotiation, with automatic fallback to OPDS 1 (Atom) when the server does not serve OPDS 2. This is an experimental feature flag; the default is `false`. Boolean values follow the circulation manager's conventions (`true`/`false`, `1`/`0`, `yes`/`no`, `on`/`off`).
+- Set `PALACE_CPW_FEATURE_LANGUAGE_SELECTOR=true` to enable patron-facing language support: the language selector in the catalog header, automatic locale detection, and locale-prefixed URLs. While the flag is off (the default, while localization work is in progress), the selector is hidden, locale detection is disabled, and locale-prefixed URLs redirect to English. Boolean values follow the circulation manager's conventions (`true`/`false`, `1`/`0`, `yes`/`no`, `on`/`off`).
 - Set `REACT_AXE=true` to run the application with `react-axe` enabled (only works when `NODE_ENV` is "development").
 - Set `ANALYZE=true` to generate bundle analysis files inside `.next/analyze` which will show bundle sizes for server and client, as well as composition.
 

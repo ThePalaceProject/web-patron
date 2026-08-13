@@ -31,7 +31,10 @@ const mockRouter = (locale: string) => {
 };
 
 // define helper function to set up the test environment
-const setup = async (locale: string) => {
+const setup = async (
+  locale: string,
+  { enableLanguageSelector = true } = {}
+) => {
   // first mock the router
   const push = mockRouter(locale);
 
@@ -39,7 +42,11 @@ const setup = async (locale: string) => {
   mockUseTranslation().i18n.changeLanguage(locale);
 
   // then render the component
-  const { user } = customSetup(<LanguageSelector />);
+  // (the selector is behind a feature flag that is off by default,
+  // so tests enable it unless they exercise the disabled state)
+  const { user } = customSetup(<LanguageSelector />, {
+    appConfig: { enableLanguageSelector }
+  });
 
   // Ariakit registers the select items with its store in a microtask that runs
   // after render() returns, so the re-render it triggers falls outside the
@@ -198,6 +205,14 @@ describe("LanguageSelector", () => {
     await setup("de");
 
     // should not find language selector
+    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
+  });
+
+  it("should not render selector when the feature flag is disabled", async () => {
+    await setup(Language.EN, { enableLanguageSelector: false });
+
+    // nothing should be rendered, so the selector is absent from the
+    // accessibility tree, not merely hidden
     expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
   });
 });

@@ -403,6 +403,40 @@ describe("config parsing", () => {
     });
   });
 
+  // --- enableLanguageSelector ---
+
+  describe("enableLanguageSelector", () => {
+    it("defaults to false when PALACE_CPW_FEATURE_LANGUAGE_SELECTOR is not set", async () => {
+      delete process.env.PALACE_CPW_FEATURE_LANGUAGE_SELECTOR;
+      expect((await load(MINIMAL_YAML)).enableLanguageSelector).toBe(false);
+    });
+
+    it.each([
+      ["true", true],
+      ["false", false]
+    ])(
+      "is %s when PALACE_CPW_FEATURE_LANGUAGE_SELECTOR is %s",
+      async (raw, expected) => {
+        process.env.PALACE_CPW_FEATURE_LANGUAGE_SELECTOR = raw;
+        expect((await load(MINIMAL_YAML)).enableLanguageSelector).toBe(
+          expected
+        );
+      }
+    );
+
+    it("rejects unrecognized PALACE_CPW_FEATURE_LANGUAGE_SELECTOR values", async () => {
+      process.env.PALACE_CPW_FEATURE_LANGUAGE_SELECTOR = "yes please";
+      await expect(load(MINIMAL_YAML)).rejects.toThrow(AppSetupError);
+    });
+
+    it("ignores an enable_language_selector key in the config file", async () => {
+      delete process.env.PALACE_CPW_FEATURE_LANGUAGE_SELECTOR;
+      expect(
+        (await load(`enable_language_selector: true`)).enableLanguageSelector
+      ).toBe(false);
+    });
+  });
+
   // --- openebooks ---
 
   describe("openebooks", () => {

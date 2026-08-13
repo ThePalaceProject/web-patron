@@ -25,6 +25,7 @@ export type AppConfig = {
   companionApp: "simplye" | "openebooks";
   showMedium: boolean;
   enableOpds2: boolean;
+  enableLanguageSelector: boolean;
   bugsnagApiKey: string | null;
   openebooks: OpenEbooksConfig | null;
   /** Reserved item landing path segments. See constants/app.ts. */
