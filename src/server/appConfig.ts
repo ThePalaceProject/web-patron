@@ -22,6 +22,10 @@ import { isHttpUrl } from "utils/parse";
 import { parseBoolean } from "utils/envParse";
 import { DEFAULT_REGISTRY_FETCH_TIMEOUT } from "constants/registry";
 import { DEFAULT_ITEM_LANDING_SLUG, RESERVED_NEXT_SLUGS } from "constants/app";
+import {
+  LANGUAGE_SELECTOR_FEATURE_FLAG_ENV,
+  OPDS2_FEATURE_FLAG_ENV
+} from "constants/env";
 
 // ---------------------------------------------------------------------------
 // Schema
@@ -54,12 +58,6 @@ const RawConfigSchema = type({
 
 const DEFAULT_MIN_INTERVAL = 60;
 const DEFAULT_MAX_INTERVAL = 300;
-
-/**
- * Feature flags are environment variables, following the circulation
- * manager's PALACE_<app>_FEATURE_<flag> convention.
- */
-export const OPDS2_FEATURE_FLAG_ENV = "PALACE_CPW_FEATURE_OPDS2";
 
 const VALID_MEDIA_SUPPORT_VALUES = new Set<string>([
   "show",
@@ -383,6 +381,10 @@ function parseYaml(input: Record<string, unknown>): AppConfig {
     companionApp,
     showMedium,
     enableOpds2: parseBoolean(OPDS2_FEATURE_FLAG_ENV, false),
+    enableLanguageSelector: parseBoolean(
+      LANGUAGE_SELECTOR_FEATURE_FLAG_ENV,
+      false
+    ),
     openebooks,
     itemLandingSlugs
   };

@@ -186,6 +186,130 @@ describe("OPDS 2 startup logging", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Language selector startup logging
+// ---------------------------------------------------------------------------
+
+describe("language selector startup logging", () => {
+  let logSpy: jest.SpyInstance;
+
+  beforeEach(() => {
+    logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+    process.env.NEXT_RUNTIME = "nodejs";
+    mockGetLibraries.mockResolvedValue({});
+  });
+
+  it("logs that the language selector is enabled when enableLanguageSelector is true", async () => {
+    mockGetAppConfig.mockResolvedValue({ enableLanguageSelector: true });
+    await register();
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining("The language selector is enabled")
+    );
+  });
+
+  it("logs that the language selector is disabled when enableLanguageSelector is false", async () => {
+    mockGetAppConfig.mockResolvedValue({ enableLanguageSelector: false });
+    await register();
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining("The language selector is disabled")
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Locale detection header stripping
+// ---------------------------------------------------------------------------
+
+describe("locale detection header stripping", () => {
+  beforeEach(() => {
+    jest.spyOn(console, "log").mockImplementation(() => {});
+    process.env.NEXT_RUNTIME = "nodejs";
+    mockGetLibraries.mockResolvedValue({});
+  });
+
+  function emitRequest(
+    headers: Record<string, string>
+  ): Record<string, string> {
+    const patchedEmit = serverProto.emit;
+    const mockReq = { method: "GET", url: "/", headers };
+    const mockRes = new EventEmitter() as any;
+    mockRes.statusCode = 200;
+    patchedEmit.call({}, "request", mockReq, mockRes);
+    return mockReq.headers;
+  }
+
+  describe("when the language selector is disabled", () => {
+    beforeEach(async () => {
+      mockGetAppConfig.mockResolvedValue({ enableLanguageSelector: false });
+      await register();
+    });
+
+    it("removes the accept-language header", () => {
+      const headers = emitRequest({ "accept-language": "es-ES,es;q=0.9" });
+      expect(headers["accept-language"]).toBeUndefined();
+    });
+
+    it("removes the NEXT_LOCALE cookie but keeps other cookies", () => {
+      const headers = emitRequest({
+        cookie: "session=abc; NEXT_LOCALE=es; theme=dark"
+      });
+      expect(headers.cookie).not.toContain("NEXT_LOCALE");
+      expect(headers.cookie).toContain("session=abc");
+      expect(headers.cookie).toContain("theme=dark");
+    });
+
+    it("removes the cookie header entirely when NEXT_LOCALE is the only cookie", () => {
+      const headers = emitRequest({ cookie: "NEXT_LOCALE=es" });
+      expect(headers.cookie).toBeUndefined();
+    });
+
+    it("leaves requests without locale headers unchanged", () => {
+      const headers = emitRequest({ host: "example.com" });
+      expect(headers).toEqual({ host: "example.com" });
+    });
+  });
+
+  it("strips headers for requests that arrive before the config file has loaded", async () => {
+    delete process.env.PALACE_CPW_FEATURE_LANGUAGE_SELECTOR;
+    let resolveConfig: (value: unknown) => void = () => undefined;
+    mockGetAppConfig.mockReturnValue(
+      new Promise(resolve => (resolveConfig = resolve))
+    );
+    const pending = register();
+
+    // let register() progress past its dynamic imports so the emit patch is
+    // installed, while getAppConfig() is still unresolved
+    for (let i = 0; i < 10; i++) await Promise.resolve();
+    expect(serverProto.emit.name).toBe("patchedEmit");
+
+    const headers = emitRequest({
+      "accept-language": "es-ES,es;q=0.9",
+      cookie: "NEXT_LOCALE=es"
+    });
+    expect(headers["accept-language"]).toBeUndefined();
+    expect(headers.cookie).toBeUndefined();
+
+    resolveConfig({ enableLanguageSelector: false });
+    await pending;
+  });
+
+  describe("when the language selector is enabled", () => {
+    beforeEach(async () => {
+      mockGetAppConfig.mockResolvedValue({ enableLanguageSelector: true });
+      await register();
+    });
+
+    it("leaves the accept-language header and NEXT_LOCALE cookie in place", () => {
+      const headers = emitRequest({
+        "accept-language": "es-ES,es;q=0.9",
+        cookie: "NEXT_LOCALE=es; session=abc"
+      });
+      expect(headers["accept-language"]).toBe("es-ES,es;q=0.9");
+      expect(headers.cookie).toBe("NEXT_LOCALE=es; session=abc");
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
 // HTTP request logging
 // ---------------------------------------------------------------------------
 

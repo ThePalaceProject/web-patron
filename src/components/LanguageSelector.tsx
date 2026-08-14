@@ -14,6 +14,7 @@ import { styleProps } from "./Button/styles";
 import { lightness } from "@theme-ui/color";
 import track from "analytics/track";
 import Cookie from "js-cookie";
+import { useAppConfig } from "components/context/AppConfigContext";
 
 // define enums that match the Next.js i18n locales
 export enum Language {
@@ -79,6 +80,7 @@ const LanguageSelectItem: React.FC<{ lang: Language }> = ({ lang }) => {
 const LanguageSelector: React.FC<{ className?: string }> = ({ className }) => {
   const { t } = useTranslation();
   const router = useRouter();
+  const { enableLanguageSelector } = useAppConfig();
 
   // get the current locale from router,
   // and make sure it's a valid language we want to use
@@ -139,8 +141,10 @@ const LanguageSelector: React.FC<{ className?: string }> = ({ className }) => {
     }
   };
 
+  // - the selector is hidden unless the PALACE_CPW_FEATURE_LANGUAGE_SELECTOR
+  //   feature flag is enabled
   // - locale could be invalid, if unsupported language like "de" is used
-  if (!currentLocale) {
+  if (!enableLanguageSelector || !currentLocale) {
     return null;
   }
 
