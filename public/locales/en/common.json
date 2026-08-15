@@ -14,6 +14,7 @@
   "auth.loggingInWithMethod": "Logging in with {{authMethod}}...",
   "auth.login": "Login",
   "auth.loginCancelled": "Login was cancelled.",
+  "auth.mustBeSignedIn": "You must be signed in.",
   "auth.mustBeSignedInToViewPage": "You need to be signed in to view this page.",
   "auth.password.hide": "hide password",
   "auth.password.show": "show password",
