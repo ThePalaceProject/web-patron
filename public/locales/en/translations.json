@@ -113,6 +113,8 @@
   "openEbooksLanding.welcome": "Welcome to Open eBooks",
   "openEbooksLoginPicker.cleverLogo": "Clever Logo",
   "openEbooksLoginPicker.firstBookLogo": "FirstBook Logo",
+  "previewButton.couldNotOpenPreview": "Error: Could not open preview.",
+  "previewButton.preview": "Preview",
   "recommendations.recommendations": "Recommendations",
   "redirectAuthHandler.useDifferentAccount": "Use a different account",
   "reportProblem.chooseType": "Please choose a type",
