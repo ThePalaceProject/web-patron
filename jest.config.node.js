@@ -12,6 +12,10 @@ module.exports = {
   ],
   injectGlobals: true,
   moduleDirectories: ["node_modules", "src"],
+  // Page modules pull in components that import svgs transitively.
+  moduleNameMapper: {
+    "\\.(svg)$": "<rootDir>/__mocks__/fileMock.ts"
+  },
   testEnvironment: "node",
   testMatch: [
     "**/config/**/?(*.)+(spec|test).[tj]s?(x)",
@@ -25,11 +29,23 @@ module.exports = {
   // No setup files for Node.js tests - these are browser-specific
   setupFiles: [],
   setupFilesAfterEnv: [],
+  // Server-side page tests import .tsx page modules, so jsx/tsx must transform
+  // too, with the same theme-ui jsx pragma the browser config uses.
   transform: {
-    "^.+\\.(js|ts)$": [
+    "^.+\\.(js|jsx|ts|tsx)$": [
       "babel-jest",
       {
-        presets: [["next/babel"]]
+        presets: [
+          [
+            "next/babel",
+            {
+              "preset-react": {
+                runtime: "automatic",
+                importSource: "theme-ui"
+              }
+            }
+          ]
+        ]
       }
     ]
   }

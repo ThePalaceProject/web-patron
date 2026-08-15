@@ -15,7 +15,7 @@ import extractParam from "dataflow/utils";
 import { ParsedUrlQuery } from "querystring";
 import track from "analytics/track";
 import { getAppConfig } from "server/appConfig";
-import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
+import { getTranslationProps } from "dataflow/translationProps";
 
 export type AppProps = {
   library?: LibraryData;
@@ -80,6 +80,15 @@ export default function withAppProps(
   defaultLibSlug?: string
 ): GetStaticProps<AppProps> {
   return async (ctx: GetStaticPropsContext<ParsedUrlQuery>) => {
+    /*
+     * Resolved up front, outside the try, so the error branch below still
+     * mounts an i18n provider. Falling back to no translation props keeps a
+     * failure to load locale files from turning a rendered error page into an
+     * unhandled 500.
+     */
+    const translationProps = await getTranslationProps(ctx.locale).catch(
+      () => ({})
+    );
     try {
       const { library, appConfig } = await getLibraryProps(
         ctx.params,
@@ -89,29 +98,13 @@ export default function withAppProps(
       const pageResult = (await pageGetStaticProps?.(ctx)) ?? { props: {} };
       const pageProps = "props" in pageResult ? pageResult.props : {};
 
-      // define the translation file namespaces
-      const translationNamespaces = ["translations"];
-
-      // define the current locale.
-      // Use the locale from context,
-      // or if is missing, use app's default locale
-      const currentLocale = ctx.locale ?? "en";
-
-      // fetch translations for the current locale from the server,
-      // translationNamespaces is used for finding translation keys
-      const translations = await serverSideTranslations(
-        currentLocale,
-        translationNamespaces
-      );
-
       return {
         ...pageResult,
         props: {
           ...pageProps,
           library,
           appConfig,
-          _locale: currentLocale,
-          ...translations
+          ...translationProps
         },
         // revalidate library-wide data once per hour per route
         revalidate: 60 * 60
@@ -129,7 +122,8 @@ export default function withAppProps(
       }
       return {
         props: {
-          error
+          error,
+          ...translationProps
         },
         // library data will be revalidated often for error pages.
         revalidate: 1
@@ -152,6 +146,10 @@ export function withAppPropsSSR(
   defaultLibSlug?: string
 ): GetServerSideProps<AppProps> {
   return async (ctx: GetServerSidePropsContext<ParsedUrlQuery>) => {
+    // see the note in withAppProps above on why this is resolved up front
+    const translationProps = await getTranslationProps(ctx.locale).catch(
+      () => ({})
+    );
     try {
       const { library, appConfig } = await getLibraryProps(
         ctx.params,
@@ -165,28 +163,12 @@ export function withAppPropsSSR(
       }
       const pageProps = await pageResult.props;
 
-      // define the translation file namespaces
-      const translationNamespaces = ["translations"];
-
-      // define the current locale.
-      // Use the locale from context,
-      // or if is missing, use app's default locale
-      const currentLocale = ctx.locale ?? "en";
-
-      // fetch translations for the current locale from the server,
-      // translationNamespaces is used for finding translation keys
-      const translations = await serverSideTranslations(
-        currentLocale,
-        translationNamespaces
-      );
-
       return {
         props: {
           ...pageProps,
           library,
           appConfig,
-          _locale: currentLocale,
-          ...translations
+          ...translationProps
         }
       };
     } catch (e) {
@@ -201,7 +183,8 @@ export function withAppPropsSSR(
       ctx.res.statusCode = error.status ?? 500;
       return {
         props: {
-          error
+          error,
+          ...translationProps
         }
       };
     }

@@ -23,14 +23,15 @@ import { mockToDateString } from "test-utils/mockToDateString";
 import AppConfigContext from "components/context/AppConfigContext";
 import { getCurrentTestConfig } from "test-utils/mockConfig";
 import { mockUseTranslation } from "test-utils/mockUseTranslation";
+import { mockTrans } from "test-utils/mockTrans";
 
 // mock next-i18next for all tests
 // so we don't need to repeat this in each test file.
 // Note the "/pages" subpath: next-i18next's root export is the App Router
 // build, and this app uses the Pages Router.
 jest.mock("next-i18next/pages", () => ({
-  // mock only the useTranslation hook we need
-  useTranslation: () => mockUseTranslation()
+  useTranslation: () => mockUseTranslation(),
+  Trans: (props: Parameters<typeof mockTrans>[0]) => mockTrans(props)
 }));
 
 // mock serverSideTranslations so page-props tests don't load real locale files.

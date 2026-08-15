@@ -1,7 +1,16 @@
 {
+  "404.detail": "",
+  "404.title": "",
   "languageName.EN": "Inglés",
   "languageName.ES": "Español",
   "languageName.FR": "Francés",
   "languageName.IT": "Italiano",
-  "languageSelector": "Seleccionar idioma"
+  "languageSelector": "Seleccionar idioma",
+  "library.home": "",
+  "signedOut.returnToCatalog": "",
+  "signedOut.securityNotice.body1": "",
+  "signedOut.securityNotice.body2": "",
+  "signedOut.securityNotice.body3": "",
+  "signedOut.securityNotice.header": "",
+  "signedOut.signedOut": ""
 }

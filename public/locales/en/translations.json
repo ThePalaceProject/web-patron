@@ -1,7 +1,16 @@
 {
+  "404.detail": "The requested url is not available.",
+  "404.title": "Page Not Found",
   "languageName.EN": "English",
   "languageName.ES": "Spanish",
   "languageName.FR": "French",
   "languageName.IT": "Italian",
-  "languageSelector": "Choose language"
+  "languageSelector": "Choose language",
+  "library.home": "{{catalogName}} Home",
+  "signedOut.returnToCatalog": "Return to Catalog",
+  "signedOut.securityNotice.body1": "You have been signed out of this application, but your session with the authentication provider may still be active.",
+  "signedOut.securityNotice.body2": "This could lead to you (or someone else) being signed back into your account without needing to provided your credentials; or it could prevent you from signing into a different account.",
+  "signedOut.securityNotice.body3": "If you are using a shared or public computer (or need to sign into a different account), please exit / quit your browser completely to ensure that you are fully signed out.",
+  "signedOut.securityNotice.header": "Important Security Notice",
+  "signedOut.signedOut": "Signed Out"
 }

@@ -96,6 +96,17 @@ describe("withAppProps (static)", () => {
     });
     expect(mockTrackError).toHaveBeenCalledTimes(1);
   });
+
+  // the error page renders components that call useTranslation, so it needs an i18next instance
+  test("includes translation props on the error path", async () => {
+    fetchMock.mockReject(new Error("connection refused"));
+    const gsp = withAppProps();
+    const result = await gsp(staticCtx({ library: "testlib" }));
+
+    expect(result).toMatchObject({
+      props: { _locale: "en", _nextI18Next: expect.anything() }
+    });
+  });
 });
 
 describe("withAppPropsSSR", () => {
@@ -164,5 +175,15 @@ describe("withAppPropsSSR", () => {
     expect(result).toMatchObject({ props: { error: { status: 500 } } });
     expect(ctx.res.statusCode).toBe(500);
     expect(mockTrackError).toHaveBeenCalledTimes(1);
+  });
+
+  test("includes translation props on the error path", async () => {
+    fetchMock.mockReject(new Error("connection refused"));
+    const gssp = withAppPropsSSR();
+    const result = await gssp(ssrCtx({ library: "testlib" }));
+
+    expect(result).toMatchObject({
+      props: { _locale: "en", _nextI18Next: expect.anything() }
+    });
   });
 });

@@ -6,7 +6,10 @@ module.exports = {
         "tests/**/*.{ts,tsx}",
         "src/test-utils/**/*.{ts,tsx}"
       ],
-      rules: { "react/display-name": "off", "i18next/no-literal-string": "off" }
+      rules: {
+        "react/display-name": "off",
+        "i18next/no-literal-string": "off"
+      }
     },
     {
       files: ["**/*.js"],
@@ -17,6 +20,9 @@ module.exports = {
         sourceType: "module"
       },
       env: {
+        // ecmaVersion above only enables the syntax; es2020 declares the
+        // built-in globals that come with it, such as Set and Promise
+        es2020: true,
         node: true,
         jest: true
       },
@@ -123,27 +129,30 @@ module.exports = {
     "no-var": "error",
     "@next/next/no-img-element": "off",
     "react/no-unknown-property": ["error", { ignore: ["sx", "jsx", "global"] }],
-    /** TODO: turn on once we begin adding translations */
-    "i18next/no-literal-string": "off"
-    // "i18next/no-literal-string": [
-    //   "warn",
-    //   {
-    //     message: "Use i18n translation instead of hardcoded strings.",
-    //     markupOnly: true,
-    //     ignoredProps: ["data-testid", "href", "htmlFor", "id"],
-    //     "jsx-attributes": {
-    //       include: [
-    //         "alt",
-    //         "aria-label",
-    //         "heading",
-    //         "placeholder",
-    //         "subtitle",
-    //         "title"
-    //       ]
-    //     },
-    //     mode: "jsx-only"
-    //   }
-    // ]
+    "i18next/no-literal-string": [
+      "warn",
+      {
+        message: "Use i18n translation instead of hardcoded strings.",
+        mode: "jsx-only",
+        "should-validate-template": true,
+        "jsx-attributes": {
+          include: [
+            "alt",
+            "aria-label",
+            "currentLocation",
+            "heading",
+            "info",
+            "label",
+            "loadingText",
+            "message",
+            "placeholder",
+            "subtitle",
+            "text",
+            "title"
+          ]
+        }
+      }
+    ]
   },
   settings: {
     react: {
