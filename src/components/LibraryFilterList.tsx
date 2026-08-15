@@ -2,9 +2,9 @@ import * as React from "react";
 import TextInput from "components/TextInput";
 import HighlightedText from "components/HighlightedText";
 import { scoreMatch } from "utils/libraryFilter";
+import { useTranslation } from "next-i18next/pages";
 
 const FILTER_DEBOUNCE_MS = 200;
-const NO_MATCH_MESSAGE = "No libraries match.";
 
 export interface LibraryFilterItem {
   /** Unique identifier, used as the React key for each result. */
@@ -29,6 +29,7 @@ const LibraryFilterList: React.FC<LibraryFilterListProps> = ({
   renderItem,
   resultsListId
 }) => {
+  const { t } = useTranslation();
   const [inputValue, setInputValue] = React.useState("");
   const [filterQuery, setFilterQuery] = React.useState("");
 
@@ -54,13 +55,19 @@ const LibraryFilterList: React.FC<LibraryFilterListProps> = ({
       )
     : filteredWithScores;
 
+  const NO_MATCH_MESSAGE = t(
+    "libraryFilterList.noLibrariesMatch",
+    "No libraries match."
+  );
   const resultCount = displayed.length;
   const statusMessage = filterQuery
     ? resultCount === 0
       ? NO_MATCH_MESSAGE
-      : `${resultCount} ${
-          resultCount === 1 ? "library" : "libraries"
-        } shown, best matches first`
+      : t(
+          "libraryFilterList.librariesMatched",
+          "{{count}} libraries shown, best matches first",
+          { count: resultCount }
+        )
     : "";
 
   return (
@@ -69,9 +76,15 @@ const LibraryFilterList: React.FC<LibraryFilterListProps> = ({
       <div sx={{ display: "inline-block", width: "44ch", mb: 2 }}>
         <TextInput
           type="search"
-          aria-label="Filter libraries"
+          aria-label={t(
+            "libraryFilterList.search.ariaLabel",
+            "Filter libraries"
+          )}
           aria-controls={resultsListId}
-          placeholder="Filter libraries..."
+          placeholder={t(
+            "libraryFilterList.search.placeholder",
+            "Filter libraries..."
+          )}
           value={inputValue}
           onChange={e => setInputValue(e.target.value)}
         />
