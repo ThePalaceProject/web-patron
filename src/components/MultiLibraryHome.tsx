@@ -9,8 +9,10 @@ import LibraryHomeLink from "./LibraryHomeLink";
 import LibraryFilterList from "components/LibraryFilterList";
 import { fetchLibraries } from "dataflow/fetchLibraries";
 import type { ClientLibrary, LibrariesResponse } from "pages/api/libraries";
+import { useTranslation } from "next-i18next/pages";
 
 const MultiLibraryHome: React.FC = () => {
+  const { t } = useTranslation();
   const { instanceName } = useAppConfig();
   const { data, error } = useSWR<LibrariesResponse>(
     "/api/libraries",
@@ -18,9 +20,23 @@ const MultiLibraryHome: React.FC = () => {
   );
 
   if (error)
-    return <p>Unable to load static libraries from configuration file.</p>;
+    return (
+      <p>
+        {t(
+          "multiLibraryHome.unableToLoad",
+          "Unable to load static libraries from configuration file."
+        )}
+      </p>
+    );
   if (!data) return null;
-  if (!data.libraries?.length) return <p>No libraries available.</p>;
+  if (!data.libraries?.length)
+    return (
+      <p>
+        {t("library.noLibrariesAvailable", "No libraries available.", {
+          ns: "common"
+        })}
+      </p>
+    );
 
   const sorted = [...data.libraries].sort(
     (a: ClientLibrary, b: ClientLibrary) => {
@@ -40,9 +56,11 @@ const MultiLibraryHome: React.FC = () => {
           m: 3
         }}
       >
-        <h1>{instanceName} Home</h1>
+        <h1>
+          {instanceName} {t("multiLibraryHome.home", "Home")}
+        </h1>
         <LibraryFilterList
-          heading={<h2>Choose a library:</h2>}
+          heading={<h2>{t("multiLibraryHome.choose", "Choose a library:")}</h2>}
           items={sorted.map(lib => ({
             slug: lib.slug,
             label: lib.title || lib.slug
