@@ -15,26 +15,7 @@ import { lightness } from "@theme-ui/color";
 import track from "analytics/track";
 import Cookie from "js-cookie";
 import { useAppConfig } from "components/context/AppConfigContext";
-
-// define enums that match the Next.js i18n locales
-export enum Language {
-  EN = "en",
-  FR = "fr",
-  IT = "it",
-  ES = "es"
-}
-
-// helper function (type guard) that checks
-// if a locale is a valid Language
-// for example "de" is not a valid language code in our app
-function isLanguage(locale: string | undefined): locale is Language {
-  return (
-    locale === Language.EN ||
-    locale === Language.FR ||
-    locale === Language.IT ||
-    locale === Language.ES
-  );
-}
+import { isLanguage, Language } from "utils/i18n";
 
 /**
  * Persist the chosen language so Next.js can restore it on a return visit.
@@ -72,7 +53,7 @@ const LanguageSelectItem: React.FC<{ lang: Language }> = ({ lang }) => {
         })
       }}
     >
-      {t(`languageName.${lang.toUpperCase()}`)} ({lang})
+      {t(`languageSelector.languageName.${lang.toUpperCase()}`)} ({lang})
     </SelectItem>
   );
 };
@@ -152,7 +133,7 @@ const LanguageSelector: React.FC<{ className?: string }> = ({ className }) => {
     <>
       <Select
         store={selectStore}
-        aria-label={t("languageSelector")}
+        aria-label={t("languageSelector.languageSelector", "Choose language")}
         className={className}
         sx={{
           ...styleProps("ui.black", "md", "outlined"),
@@ -160,7 +141,8 @@ const LanguageSelector: React.FC<{ className?: string }> = ({ className }) => {
           paddingLeft: "6px"
         }}
       >
-        {t(`languageName.${currentLocale.toUpperCase()}`)} ({currentLocale})
+        {t(`languageSelector.languageName.${currentLocale.toUpperCase()}`)} (
+        {currentLocale})
         <SelectArrow />
       </Select>
       <SelectPopover

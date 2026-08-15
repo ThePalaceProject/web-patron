@@ -16,7 +16,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "react-jsx",
+    "jsx": "preserve",
     "jsxImportSource": "theme-ui",
     "strictNullChecks": true,
     "downlevelIteration": true,
