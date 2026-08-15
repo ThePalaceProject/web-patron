@@ -32,7 +32,7 @@ describe("publicationToBook", () => {
     expect(book.authors).toEqual(["Test Author"]);
     expect(book.publisher).toBe("Test Publisher");
     expect(book.language).toBe("en");
-    expect(book.published).toBe("June 15, 2020");
+    expect(book.published).toBe("2020-06-15");
     expect(book.summary).toBe("A <b>very</b> good book.");
     expect(book.audience).toBe("Adult");
     expect(book.categories).toEqual(["Fiction"]);
@@ -186,7 +186,7 @@ describe("publicationToBook", () => {
     );
     expect(book).toMatchObject({
       format: "Audiobook",
-      duration: "2 hours, 7 minutes",
+      duration: 7620,
       narrators: ["First Narrator", "Second Narrator"],
       status: "fulfillable",
       fulfillmentLinks: [

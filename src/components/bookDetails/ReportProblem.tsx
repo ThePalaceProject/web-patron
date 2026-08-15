@@ -11,6 +11,7 @@ import Select, { Label } from "../Select";
 import { H1 } from "components/Text";
 import { getReportUrl } from "utils/libraryLinks";
 import { styleProps } from "../Button/styles";
+import { useTranslation } from "next-i18next/pages";
 
 const getDisplayType = (type: string) =>
   type
@@ -23,6 +24,7 @@ const getDisplayType = (type: string) =>
 type ComplaintFormData = Required<ComplaintData>;
 
 const ReportProblem: React.FC<{ book: AnyBook }> = ({ book }) => {
+  const { t } = useTranslation();
   const { state, dialog, dispatch, postComplaint } = useComplaints(book);
 
   const hasReportUrl = Boolean(getReportUrl(book.raw));
@@ -51,17 +53,20 @@ const ReportProblem: React.FC<{ book: AnyBook }> = ({ book }) => {
     <React.Fragment>
       <Modal
         dialog={dialog}
-        label="Report a problem"
+        label={t("reportProblem.reportProblem", "Report a problem")}
         hide={cancel}
         sx={{ maxWidth: "600px" }}
       >
         {state.success ? (
           <div sx={{ display: "flex", flexDirection: "column" }}>
             <H1 sx={{ fontSize: 3, textAlign: "center" }}>
-              Your problem was reported. Thank you!
+              {t(
+                "reportProblem.problemWasReportedConfirmation",
+                "Your problem was reported. Thank you!"
+              )}
             </H1>
             <Button sx={{ alignSelf: "flex-end" }} onClick={cancel}>
-              Done
+              {t("reportProblem.done", "Done")}
             </Button>
           </div>
         ) : state.isPosting ? (
@@ -82,12 +87,16 @@ const ReportProblem: React.FC<{ book: AnyBook }> = ({ book }) => {
             }}
           >
             <H1 sx={{ alignSelf: "center", fontSize: [3, 4] }}>
-              Report a problem
+              {t("reportProblem.reportProblem", "Report a problem")}
             </H1>
-            <Label htmlFor="complaint-type">Complaint Type</Label>
+            <Label htmlFor="complaint-type">
+              {t("reportProblem.complainType", "Complaint Type")}
+            </Label>
             <Select
               id="complaint-type"
-              {...register("type", { required: "Please choose a type" })}
+              {...register("type", {
+                required: t("reportProblem.chooseType", "Please choose a type")
+              })}
               aria-describedby="complaint-type-error"
             >
               {state.types.map(type => (
@@ -101,14 +110,21 @@ const ReportProblem: React.FC<{ book: AnyBook }> = ({ book }) => {
                 id="complaint-type-error"
                 sx={{ color: "ui.error", fontStyle: "italic" }}
               >
-                Error: {errors.type.message}
+                {t("reportProblem.errorMessage", "Error: {{message}}", {
+                  message: errors.type.message
+                })}
               </span>
             )}
-            <label htmlFor="complaint-body">Details</label>
+            <label htmlFor="complaint-body">
+              {t("reportProblem.details", "Details")}
+            </label>
             <TextArea
               id="complaint-body"
               {...register("detail", {
-                required: "Please enter details about the problem."
+                required: t(
+                  "reportProblem.enterDetails",
+                  "Please enter details about the problem."
+                )
               })}
               sx={{ alignSelf: "stretch", maxWidth: "100%" }}
               aria-describedby="complaint-body-error"
@@ -118,14 +134,18 @@ const ReportProblem: React.FC<{ book: AnyBook }> = ({ book }) => {
                 id="complaint-body-error"
                 sx={{ color: "ui.error", fontStyle: "italic" }}
               >
-                Error: {errors.detail.message}
+                {t("reportProblem.errorMessage", "Error: {{message}}", {
+                  message: errors.detail.message
+                })}
               </span>
             )}
             <div sx={{ mt: 3, "&>button": { ml: 2 }, alignSelf: "flex-end" }}>
               <Button variant="ghost" onClick={cancel}>
-                Cancel
+                {t("actions.cancel", "Cancel", { ns: "common" })}
               </Button>
-              <Button type="submit">Submit</Button>
+              <Button type="submit">
+                {t("reportProblem.submit", "Submit")}
+              </Button>
             </div>
           </form>
         )}
@@ -141,7 +161,7 @@ const ReportProblem: React.FC<{ book: AnyBook }> = ({ book }) => {
           ...styleProps("ui.black", "md", "filled")
         }}
       >
-        Report a problem
+        {t("reportProblem.reportProblem", "Report a problem")}
       </DialogDisclosure>
     </React.Fragment>
   );

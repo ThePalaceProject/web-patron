@@ -256,7 +256,7 @@ test("extracts basic book info", () => {
   expect(book.categories).toContain("label 2");
   expect(book.imageUrl).toBe(thumbImageLink.href);
   expect(book.publisher).toBe("Fake Publisher");
-  expect(book.published).toBe("June 8, 2014");
+  expect(book.published).toBe("2014-06-08");
   expect(book.language).toBe("en");
   expect(book.availability).toEqual(borrowLink.availability);
   expect(book.holds).toBe(borrowLink.holds);
@@ -269,7 +269,7 @@ test("extracts basic book info", () => {
   expect(audiobook.audience).toBe("Adult");
   expect(audiobook.narrators?.length).toBe(1);
   expect(audiobook.narrators?.[0]).toBe("Simon Brett");
-  expect(audiobook.duration).toBe("6 hours, 1 minute");
+  expect(audiobook.duration).toBe(21611);
   // Audience should be removed from categories
   expect(audiobook.categories?.length).toBe(3);
   expect(audiobook.categories).not.toContain("Adult");
@@ -313,6 +313,34 @@ test("doesn't include borrow links without supported formats", () => {
   expect(bookIsBorrowable(book)).toBeFalsy();
   expect((book as any).borrowUrl).toBeUndefined();
   expect(book.status).toBe("unsupported");
+});
+
+describe("dcterms:duration", () => {
+  const durationEntry = (value: string) =>
+    factory.entry({
+      ...basicInfo,
+      links: [detailLink],
+      unparsed: {
+        "dcterms:duration": [
+          {
+            _: value,
+            $ns: { uri: "http://purl.org/dc/terms/", local: "duration" }
+          }
+        ]
+      }
+    });
+
+  test("reads a numeric duration as seconds", () => {
+    const book = entryToBook(durationEntry("21611.0"), "http://test-url.com");
+    expect(book.duration).toBe(21611);
+  });
+
+  test("drops an ISO-8601 duration rather than storing NaN", () => {
+    // dcterms:duration permits ISO-8601, which is not a number of seconds.
+    // This used to coerce to NaN and render as "NaN minutes".
+    const book = entryToBook(durationEntry("PT6H1M"), "http://test-url.com");
+    expect(book.duration).toBeUndefined();
+  });
 });
 
 test("chooses the first supported borrow link", () => {

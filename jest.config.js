@@ -211,8 +211,10 @@ module.exports = {
     ]
   },
 
-  // arktype and its ark*/@ark/* dependencies ship as ESM and must be transformed.
-  transformIgnorePatterns: ["/node_modules/(?!(arktype|arkregex|@ark)/)"],
+  // arktype, its ark*/@ark/* dependencies, and @formatjs/* ship as ESM and must be transformed.
+  transformIgnorePatterns: [
+    "/node_modules/(?!(arktype|arkregex|@ark|@formatjs)/)"
+  ],
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
   // unmockedModulePathPatterns: undefined,

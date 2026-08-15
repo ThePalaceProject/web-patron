@@ -8,6 +8,10 @@ import {
 } from "../fulfill";
 import mockConfig from "test-utils/mockConfig";
 import { fulfillableBook } from "test-utils/fixtures";
+import { mockUseTranslation } from "test-utils/mockUseTranslation";
+import { TFunction } from "next-i18next/pages";
+
+const t = mockUseTranslation().t as unknown as TFunction;
 
 describe("fulfill", () => {
   describe("getFulfillmentFromLink", () => {
@@ -21,9 +25,10 @@ describe("fulfill", () => {
       };
 
       test("should return a fulfillment that gets the download url and token by retrieving a bearer token propagation document", async () => {
-        const fulfillment = getFulfillmentFromLink(fulfillableBook)(
-          link
-        ) as DownloadFulfillment;
+        const fulfillment = getFulfillmentFromLink(
+          fulfillableBook,
+          t
+        )(link) as DownloadFulfillment;
 
         fetchMock.mockResponseOnce(
           /* eslint-disable camelcase */

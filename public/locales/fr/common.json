@@ -1,4 +1,15 @@
 {
+  "actions.cancel": "",
+  "actions.cancelling": "",
+  "actions.cancelReservation": "",
+  "actions.downloadItem": "",
+  "actions.listen": "",
+  "actions.read": "",
+  "actions.return": "",
+  "actions.returning": "",
+  "alt.bookCover": "",
   "error.pageRenderFailed": "",
-  "error.unexpectedError": ""
+  "error.unexpectedError": "",
+  "nav.downloadPalace": "",
+  "status.loading": ""
 }

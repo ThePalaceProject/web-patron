@@ -25,25 +25,31 @@ import { getFulfillmentFromLink } from "utils/fulfill";
 import BookStatus from "components/BookStatus";
 import Link from "./Link";
 import { useAppConfig } from "components/context/AppConfigContext";
+import { useTranslation } from "next-i18next/pages";
+import useLocale from "hooks/useLocale";
 
-const ListLoadingIndicator = () => (
-  <div
-    sx={{
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      fontSize: 2,
-      fontWeight: "heading",
-      p: 3
-    }}
-  >
-    <LoadingIndicator /> Loading ...
-  </div>
-);
+const ListLoadingIndicator = () => {
+  const { t } = useTranslation();
+  return (
+    <div
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        fontSize: 2,
+        fontWeight: "heading",
+        p: 3
+      }}
+    >
+      <LoadingIndicator /> {t("status.loading", "Loading...", { ns: "common" })}
+    </div>
+  );
+};
 
 export const InfiniteBookList: React.FC<{ firstPageUrl: string }> = ({
   firstPageUrl
 }) => {
+  const { t } = useTranslation();
   const { token } = useUser();
   const getKey = (pageIndex: number, previousData: CollectionData | null) => {
     // first page, no previous data
@@ -84,7 +90,7 @@ export const InfiniteBookList: React.FC<{ firstPageUrl: string }> = ({
             onClick={() => setSize(size => size + 1)}
             sx={{ maxWidth: 300 }}
           >
-            View more
+            {t("bookList.viewMore", "View more")}
           </Button>
         </div>
       ) : null}
@@ -107,6 +113,8 @@ export const BookList: React.FC<{
 export const BookListItem: React.FC<{
   book: AnyBook;
 }> = ({ book: collectionBook }) => {
+  const { t } = useTranslation();
+  const locale = useLocale();
   const { showMedium } = useAppConfig();
   const { loans } = useUser();
   // if the book exists in loans, use that version
@@ -114,7 +122,7 @@ export const BookListItem: React.FC<{
   const book = loanedBook ?? collectionBook;
 
   // uses contributors if there are no authors
-  const authors = getAuthorsString(book);
+  const authors = getAuthorsString(book, t, locale);
 
   return (
     <li
@@ -133,7 +141,9 @@ export const BookListItem: React.FC<{
       >
         <Link
           bookUrl={book.url}
-          aria-label={`${book.title} - details page`}
+          aria-label={t("bookList.bookTitle", "{{title}} - details page", {
+            title: book.title
+          })}
           sx={{
             flex: ["0 0 100px", "0 0 100px", "0 0 148px"],
             height: [141, 141, 219]
@@ -154,9 +164,16 @@ export const BookListItem: React.FC<{
               <Link
                 bookUrl={book.url}
                 sx={{ variant: "text.link.bold", color: "brand.primary" }}
-                aria-label={`${book.title} - details page`}
+                aria-label={t(
+                  "bookList.bookTitle",
+                  "{{title}} - details page",
+                  { title: book.title }
+                )}
               >
-                <Metadata display="inline" heading="Title">
+                <Metadata
+                  display="inline"
+                  heading={t("bookList.title", "Title")}
+                >
                   {truncateString(book.title, 50)}
                 </Metadata>
               </Link>
@@ -164,7 +181,9 @@ export const BookListItem: React.FC<{
                 <Text>: {truncateString(book.subtitle, 50)}</Text>
               )}
             </H2>
-            <Metadata heading="Authors">{authors}</Metadata>
+            <Metadata heading={t("bookList.authors", "Authors")}>
+              {authors}
+            </Metadata>
           </div>
 
           <BookStatus book={book} />
@@ -201,9 +220,13 @@ const Description: React.FC<{
   book: AnyBook;
   className?: string;
 }> = ({ book, className }) => {
+  const { t } = useTranslation();
   return (
     <div className={className}>
-      <Metadata heading="Description" variant="text.body.italic">
+      <Metadata
+        heading={t("bookList.description", "Description")}
+        variant="text.body.italic"
+      >
         {truncateString(stripHTML(book.summary ?? ""), 280)}
       </Metadata>
     </div>
@@ -211,6 +234,7 @@ const Description: React.FC<{
 };
 
 const BookListCTA: React.FC<{ book: AnyBook }> = ({ book }) => {
+  const { t } = useTranslation();
   if (bookIsBorrowable(book)) {
     return <BorrowOrReserveOrPreview borrowUrl={book.borrowUrl} isBorrow />;
   }
@@ -230,8 +254,10 @@ const BookListCTA: React.FC<{ book: AnyBook }> = ({ book }) => {
       <CancelOrReturnOrPreview
         revokeUrl={book.revokeUrl}
         id={book.id}
-        text="Cancel Reservation"
-        loadingText="Cancelling..."
+        text={t("actions.cancelReservation", "Cancel Reservation", {
+          ns: "common"
+        })}
+        loadingText={t("actions.cancelling", "Cancelling...", { ns: "common" })}
       />
     );
   }
@@ -245,7 +271,7 @@ const BookListCTA: React.FC<{ book: AnyBook }> = ({ book }) => {
     );
 
     const showableFulfillments = showableLinks.map(
-      getFulfillmentFromLink(book)
+      getFulfillmentFromLink(book, t)
     );
     const singleFulfillment =
       showableFulfillments.length === 1 ? showableFulfillments[0] : undefined;
@@ -261,9 +287,9 @@ const BookListCTA: React.FC<{ book: AnyBook }> = ({ book }) => {
         )}
         <CancelOrReturnOrPreview
           revokeUrl={book.revokeUrl}
-          loadingText="Returning..."
+          loadingText={t("actions.returning", "Returning...", { ns: "common" })}
           id={book.id}
-          text="Return"
+          text={t("actions.return", "Return", { ns: "common" })}
         />
       </Stack>
     );

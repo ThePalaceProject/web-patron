@@ -12,6 +12,7 @@ import {
 import { DownloadMediaType, ReadOnlineMediaType } from "types/opds1";
 import { bookIsAudiobook } from "utils/book";
 import { typeMap } from "utils/file";
+import { TFunction } from "next-i18next/pages";
 
 let _mediaSupport: MediaSupportConfig = {};
 
@@ -73,10 +74,12 @@ export type SupportedFulfillment =
 export type AnyFullfillment = SupportedFulfillment | UnsupportedFulfillment;
 
 export const getFulfillmentFromLink =
-  (book: AnyBook) =>
+  (book: AnyBook, t: TFunction) =>
   (link: FulfillmentLink): AnyFullfillment => {
     const { contentType, indirectionType, supportLevel } = link;
-    const action = bookIsAudiobook(book) ? "Listen" : "Read";
+    const action = bookIsAudiobook(book)
+      ? t("actions.listen", "Listen", { ns: "common" })
+      : t("actions.read", "Read", { ns: "common" });
 
     // don't show fulfillment option if it is unsupported or only allows
     // a redirect to the companion app.
@@ -115,7 +118,10 @@ export const getFulfillmentFromLink =
             link.url
           ),
           type: "download",
-          buttonLabel: `Download ${modifier}${typeName}`,
+          buttonLabel: t("actions.downloadItem", "Download {{item}}", {
+            ns: "common",
+            item: `${modifier}${typeName}`
+          }),
           contentType
         };
 
@@ -152,13 +158,14 @@ export const getFulfillmentFromLink =
   };
 
 export function getFulfillmentsFromBook(
-  book: FulfillableBook
+  book: FulfillableBook,
+  t: TFunction
 ): SupportedFulfillment[] {
   // if (bookIsAudiobook(book)) return [];
   const links = book.fulfillmentLinks;
   const dedupedLinks = dedupeLinks(links);
   const supported = dedupedLinks
-    .map(getFulfillmentFromLink(book))
+    .map(getFulfillmentFromLink(book, t))
     .filter(isSupported);
 
   return supported;

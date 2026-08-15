@@ -6,6 +6,7 @@ import { truncateString } from "../utils/string";
 import { H3, P } from "./Text";
 import { AnyBook } from "interfaces";
 import { useAppConfig } from "components/context/AppConfigContext";
+import { useTranslation } from "next-i18next/pages";
 
 export const BOOK_WIDTH = 187;
 export const BOOK_HEIGHT = 365;
@@ -16,8 +17,9 @@ const BookCard = React.forwardRef<
   HTMLLIElement,
   { book: AnyBook; className?: string }
 >(({ book, className }, ref) => {
+  const { t } = useTranslation();
   const { showMedium } = useAppConfig();
-  const authors = getAuthors(book, 2);
+  const authors = getAuthors(book, t, 2);
 
   // if the book url is undefined, there is no sense displaying it.
   if (!book.url) return null;
@@ -36,9 +38,15 @@ const BookCard = React.forwardRef<
     >
       <Link
         bookUrl={book.url}
-        aria-label={`${book.title} - ${getMediumName(book)}, by ${authors.join(
-          ", "
-        )}`}
+        aria-label={t(
+          "bookCard.ariaLabel",
+          "{{title}} - {{medium}}, by {{authors}}",
+          {
+            title: book.title,
+            medium: getMediumName(book, t),
+            authors: authors.join(", ")
+          }
+        )}
         sx={{ "&:hover": { textDecoration: "none" } }}
       >
         <BookCover book={book} showMedium={showMedium} />

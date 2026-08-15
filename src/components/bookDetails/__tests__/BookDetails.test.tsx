@@ -10,6 +10,7 @@ import useSWR from "swr";
 import mockConfig from "test-utils/mockConfig";
 import { BreadcrumbContext } from "components/context/BreadcrumbContext";
 import { mockPush } from "test-utils/mockNextRouter";
+import { Language } from "utils/i18n";
 
 jest.mock("swr");
 
@@ -110,6 +111,30 @@ describe("book details page", () => {
     expect(terms[9]).toHaveTextContent("Series:");
     expect(defintions[9]).toHaveTextContent("A Disorganized Series");
   });
+
+  test.each([
+    [Language.EN, "April 7, 2026"],
+    [Language.FR, "7 avril 2026"],
+    [Language.IT, "7 aprile 2026"],
+    [Language.ES, "7 de abril de 2026"]
+  ])(
+    "formats the published date in the current locale: %s",
+    (locale, expected) => {
+      /**
+       * The parsers store the raw feed date,
+       * so the locale is applied here at render time.
+       */
+      mockSwr({ data: fixtures.audiobook });
+      setup(<BookDetails />, { router: { locale } });
+
+      const terms = screen.getAllByRole("term");
+      const definitions = screen.getAllByRole("definition");
+      const publishedIndex = terms.findIndex(term =>
+        term.textContent?.includes("Published:")
+      );
+      expect(definitions[publishedIndex]).toHaveTextContent(expected);
+    }
+  );
 
   test("shows categories", () => {
     mockSwr({
@@ -348,9 +373,19 @@ describe("book details page", () => {
 
     it("renders duration", () => {
       setup(<BookDetails />);
-      const duration = fixtures.audiobook.duration as string;
-      expect(screen.getByText(duration)).toBeInTheDocument();
+      // the fixture holds raw seconds (21660); the component formats it
+      expect(screen.getByText("6 hours, 1 minute")).toBeInTheDocument();
       expect(screen.getByText("Duration:")).toBeInTheDocument();
+    });
+
+    test.each([
+      [Language.EN, "6 hours, 1 minute"],
+      [Language.FR, "6 heures et 1 minute"],
+      [Language.IT, "6 ore e 1 minuto"],
+      [Language.ES, "6 horas y 1 minuto"]
+    ])("formats duration in the current locale: %s", (locale, expected) => {
+      setup(<BookDetails />, { router: { locale: locale } });
+      expect(screen.getByText(expected)).toBeInTheDocument();
     });
 
     it("renders narrators", () => {

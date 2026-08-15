@@ -1,4 +1,15 @@
 {
+  "actions.cancel": "Cancel",
+  "actions.cancelling": "Cancelling...",
+  "actions.cancelReservation": "Cancel Reservation",
+  "actions.downloadItem": "Download {{item}}",
+  "actions.listen": "Listen",
+  "actions.read": "Read",
+  "actions.return": "Return",
+  "actions.returning": "Returning...",
+  "alt.bookCover": "Cover for {{title}}",
   "error.pageRenderFailed": "Something went wrong rendering the page.",
-  "error.unexpectedError": "An unexpected error occurred."
+  "error.unexpectedError": "An unexpected error occurred.",
+  "nav.downloadPalace": "Download Palace",
+  "status.loading": "Loading..."
 }
