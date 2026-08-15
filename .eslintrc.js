@@ -108,7 +108,20 @@ module.exports = {
     // if we want this, we should turn disallow any in tsconfig not here
     "@typescript-eslint/no-explicit-any": 0,
     "@typescript-eslint/no-var-requires": 0,
-    camelcase: "error",
+    camelcase: [
+      "error",
+      {
+        // default values for i18next plural forms are identified with an underscore ("_") preceding the plural quantifier
+        allow: [
+          "defaultValue_zero",
+          "defaultValue_one",
+          "defaultValue_two",
+          "defaultValue_few",
+          "defaultValue_many",
+          "defaultValue_other"
+        ]
+      }
+    ],
     "@typescript-eslint/camelcase": 0,
     "@typescript-eslint/prefer-namespace-keyword": "error",
     eqeqeq: ["error", "smart"],
