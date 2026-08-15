@@ -24,5 +24,6 @@
   "error.unexpectedError": "An unexpected error occurred.",
   "error.unknown": "Error: An unknown error occurred.",
   "nav.downloadPalace": "Download Palace",
+  "nav.myBooks": "My Books",
   "status.loading": "Loading..."
 }

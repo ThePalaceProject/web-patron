@@ -8,8 +8,10 @@ import SvgPhone from "icons/Phone";
 import IosBadge from "./storeBadges/IosBadge";
 import GooglePlayBadge from "./storeBadges/GooglePlayBadge";
 import { useAppConfig } from "components/context/AppConfigContext";
+import { useTranslation } from "next-i18next/pages";
 
 const Footer: React.FC<{ className?: string }> = ({ className }) => {
+  const { t } = useTranslation();
   const { companionApp } = useAppConfig();
   const library = useLibraryContext();
   const {
@@ -42,59 +44,61 @@ const Footer: React.FC<{ className?: string }> = ({ className }) => {
           {libraryWebsite && (
             <ListItem>
               <FooterExternalLink href={libraryWebsite.href}>
-                Library Homepage
+                {t("footer.libraryHomepage", "Library Homepage")}
               </FooterExternalLink>
             </ListItem>
           )}
           <ListItem>
             <NavButton variant="link" href="/loans" color="ui.black">
-              My Books
+              {t("nav.myBooks", "My Books", { ns: "common" })}
             </NavButton>
           </ListItem>
           <ListItem>
             {registration && (
               <FooterExternalLink href={registration.href}>
-                Need a library card?
+                {t("footer.needLibraryCardQuestion", "Need a library card?")}
               </FooterExternalLink>
             )}
           </ListItem>
           {privacyPolicy && (
             <ListItem>
               <FooterExternalLink href={privacyPolicy.href}>
-                Privacy
+                {t("footer.privacyPolicy", "Privacy")}
               </FooterExternalLink>
             </ListItem>
           )}
           {tos && (
             <ListItem>
               <FooterExternalLink href={tos.href}>
-                Terms of Use
+                {t("footer.termsOfUse", "Terms of Use")}
               </FooterExternalLink>
             </ListItem>
           )}
           {about && (
             <ListItem>
-              <FooterExternalLink href={about.href}>About</FooterExternalLink>
+              <FooterExternalLink href={about.href}>
+                {t("footer.about", "About")}
+              </FooterExternalLink>
             </ListItem>
           )}
         </FooterList>
       </div>
       <div sx={{ flex: "0 0 auto", mt: 5, mr: [3, 5] }}>
         <H2 variant="text.headers.tertiary" sx={{ mt: 0 }}>
-          Patron Support
+          {t("footer.patronSupport", "Patron Support")}
         </H2>
         <FooterList>
           {helpEmail && (
             <ListItem>
               <FooterExternalLink href={helpEmail.href}>
-                Email Support
+                {t("footer.emailSupport", "Email Support")}
               </FooterExternalLink>
             </ListItem>
           )}
           {helpWebsite && (
             <ListItem>
               <FooterExternalLink href={helpWebsite.href}>
-                Help Website
+                {t("footer.helpWebsite", "Help Website")}
               </FooterExternalLink>
             </ListItem>
           )}
@@ -106,25 +110,30 @@ const Footer: React.FC<{ className?: string }> = ({ className }) => {
   );
 };
 
-const DownloadSimplyECallout = () => (
-  <div sx={{ maxWidth: 300, flex: "0 1 auto", mt: 5 }}>
-    <H2
-      variant="text.headers.tertiary"
-      sx={{ mt: 0, display: "flex", alignItems: "center" }}
-    >
-      <SvgPhone sx={{ mr: 1 }} />
-      Download Palace
-    </H2>
-    <Text>
-      Our mobile app lets you browse, borrow and read from our whole collection
-      of ebooks and audiobooks right on your phone!
-    </Text>
-    <div sx={{ width: "75%", overflow: "hidden", ml: -3 }}>
-      <IosBadge sx={{ p: 3, pb: 0 }} />
-      <GooglePlayBadge />
+const DownloadSimplyECallout = () => {
+  const { t } = useTranslation();
+  return (
+    <div sx={{ maxWidth: 300, flex: "0 1 auto", mt: 5 }}>
+      <H2
+        variant="text.headers.tertiary"
+        sx={{ mt: 0, display: "flex", alignItems: "center" }}
+      >
+        <SvgPhone sx={{ mr: 1 }} />
+        {t("nav.downloadPalace", "Download Palace", { ns: "common" })}
+      </H2>
+      <Text>
+        {t(
+          "footer.mobileAppsCallout",
+          "Our mobile app lets you browse, borrow and read from our whole collection of ebooks and audiobooks right on your phone!"
+        )}
+      </Text>
+      <div sx={{ width: "75%", overflow: "hidden", ml: -3 }}>
+        <IosBadge sx={{ p: 3, pb: 0 }} />
+        <GooglePlayBadge />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const FooterList = (props: React.ComponentProps<typeof List>) => (
   <List
