@@ -1,6 +1,11 @@
 {
   "404.detail": "The requested url is not available.",
   "404.title": "Page Not Found",
+  "accountMenu.account": "Account",
+  "accountMenu.closeMenu": "Close account menu",
+  "accountMenu.copied": "Copied!",
+  "accountMenu.failed": "Failed",
+  "accountMenu.patronId": "Patron ID: {{patronId}}",
   "authButton.loginWithMethod": "Login with {{name}}",
   "authenticationHandler.methodNotSupported": "This authentication method is not supported.",
   "authFeedbackPanel.tryAgain": "Try Again",

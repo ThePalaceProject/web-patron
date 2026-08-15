@@ -1,6 +1,11 @@
 {
   "404.detail": "",
   "404.title": "",
+  "accountMenu.account": "",
+  "accountMenu.closeMenu": "",
+  "accountMenu.copied": "",
+  "accountMenu.failed": "",
+  "accountMenu.patronId": "",
   "authButton.loginWithMethod": "",
   "authenticationHandler.methodNotSupported": "",
   "authFeedbackPanel.tryAgain": "",
