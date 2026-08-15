@@ -1,6 +1,7 @@
 import * as React from "react";
 import { getBugsnagErrorBoundary } from "analytics/bugsnag";
 import ErrorComponent from "components/Error";
+import { useTranslation } from "next-i18next/pages";
 
 export type FallbackProps = {
   error: Error;
@@ -9,12 +10,15 @@ export type FallbackProps = {
 };
 
 export const DefaultFallback: React.FC<FallbackProps> = ({ error }) => {
+  const { t } = useTranslation();
   return (
     <ErrorComponent
       info={{
         title: `${error.name}`,
-        detail:
+        detail: t(
+          "errorBoundary.somethingWentWrong",
           "Something went wrong. Please refresh and try again. If the issue persists, contact your library support staff."
+        )
       }}
     />
   );

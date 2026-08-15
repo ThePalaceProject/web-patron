@@ -18,8 +18,10 @@
   "auth.password.hide": "",
   "auth.password.show": "",
   "auth.signingIn": "",
+  "error.errorWithDescription": "",
   "error.pageRenderFailed": "",
   "error.unexpectedError": "",
+  "error.unknown": "",
   "nav.downloadPalace": "",
   "status.loading": ""
 }
