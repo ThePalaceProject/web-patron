@@ -23,6 +23,7 @@
   "error.pageRenderFailed": "Something went wrong rendering the page.",
   "error.unexpectedError": "An unexpected error occurred.",
   "error.unknown": "Error: An unknown error occurred.",
+  "nav.catalog": "Catalog",
   "nav.downloadPalace": "Download Palace",
   "nav.myBooks": "My Books",
   "status.loading": "Loading..."
