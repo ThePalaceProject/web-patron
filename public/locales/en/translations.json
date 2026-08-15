@@ -138,6 +138,7 @@
   "signOut.confirmationQuestion": "Are you sure you want to sign out?",
   "signOut.signOut": "Sign Out",
   "signUpLink.signUp": "Sign up for a library card",
+  "skipNavigation.skipToContent": "Skip to content",
   "utils.book.availableCopies": "{{availableCopies}} out of {{totalCopies}} copies available.",
   "utils.book.availableCopiesWithQueue": "{{availableCopies}} out of {{totalCopies}} copies available. {{queue}} patrons in the queue.",
   "utils.book.formatAudiobook": "Audiobook",
