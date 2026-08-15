@@ -10,10 +10,12 @@ import useCollection from "hooks/useCollection";
 import ApplicationError from "errors";
 import ErrorComponent from "components/Error";
 import useBreadcrumbContext from "../components/context/BreadcrumbContext";
+import { useTranslation } from "next-i18next/pages";
 
 export const Collection: React.FC<{
   title?: string;
 }> = ({ title }) => {
+  const { t } = useTranslation();
   const { collection, collectionUrl, isValidating, error } = useCollection();
 
   const isLoading = !collection && isValidating;
@@ -71,7 +73,9 @@ export const Collection: React.FC<{
             justifyContent: "center"
           }}
         >
-          <Text variant="text.callouts.italic">This collection is empty.</Text>
+          <Text variant="text.callouts.italic">
+            {t("collection.empty", "This collection is empty.")}
+          </Text>
         </div>
       )}
     </div>

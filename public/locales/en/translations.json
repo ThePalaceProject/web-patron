@@ -35,6 +35,7 @@
   "bookStatus.availability": "Book Availability:",
   "bookStatus.status": "Book Status:",
   "breadcrumbBar.lastItem": "Current location: {{lastItem}}",
+  "collection.empty": "This collection is empty.",
   "error.error": "Error:",
   "error.returnHome": "Return Home",
   "error.somethingWentWrong": "Something went wrong",
