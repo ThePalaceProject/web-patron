@@ -116,6 +116,7 @@
   "openEbooksLoginPicker.firstBookLogo": "FirstBook Logo",
   "previewButton.couldNotOpenPreview": "Error: Could not open preview.",
   "previewButton.preview": "Preview",
+  "readerWrapper.back": "Back",
   "recommendations.recommendations": "Recommendations",
   "redirectAuthHandler.useDifferentAccount": "Use a different account",
   "reportProblem.chooseType": "Please choose a type",
