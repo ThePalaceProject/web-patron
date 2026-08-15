@@ -13,24 +13,43 @@ import GlobalStyles from "components/GlobalStyles";
 import { ErrorBoundary } from "components/ErrorBoundary";
 import OpenEbooksLoginPicker from "auth/OpenEbooksLoginPicker";
 import colors from "theme/colors";
+import { Trans, useTranslation } from "next-i18next/pages";
 
-type PopularBook = { alt: string; imgHref: string };
+type PopularBook = { title: string; imgHref: string };
 
 const popularBooks = {
   EarlyGrades: [
-    { alt: "book cover text 1", imgHref: "/img/earlygrades-1.jpg" },
-    { alt: "book cover text 1", imgHref: "/img/earlygrades-2.jpg" },
-    { alt: "book cover text 1", imgHref: "/img/earlygrades-3.jpg" }
+    {
+      title: "Peep and Egg",
+      imgHref: "/img/earlygrades-1.jpg"
+    },
+    {
+      title: "Bear Says Thanks",
+      imgHref: "/img/earlygrades-2.jpg"
+    },
+    {
+      title: "Brownie and Pearl Take a Dip",
+      imgHref: "/img/earlygrades-3.jpg"
+    }
   ],
   MiddleGrades: [
-    { alt: "book cover text 1", imgHref: "/img/middlegrades-1.jpg" },
-    { alt: "book cover text 1", imgHref: "/img/middlegrades-2.jpg" },
-    { alt: "book cover text 1", imgHref: "/img/middlegrades-3.jpg" }
+    {
+      title: "Dork Diaries - Tales from a Not-So-Fabulous Life",
+      imgHref: "/img/middlegrades-1.jpg"
+    },
+    {
+      title: "President of the Whole Sixth Grade",
+      imgHref: "/img/middlegrades-2.jpg"
+    },
+    {
+      title: "Dork Diaries - The Dork Diaries Set",
+      imgHref: "/img/middlegrades-3.jpg"
+    }
   ],
   HighSchool: [
-    { alt: "book cover text 1", imgHref: "/img/highschool-1.jpg" },
-    { alt: "book cover text 1", imgHref: "/img/highschool-2.jpg" },
-    { alt: "book cover text 1", imgHref: "/img/highschool-3.jpg" }
+    { title: "Among the Hidden", imgHref: "/img/highschool-1.jpg" },
+    { title: "Girl in the Blue Coat", imgHref: "/img/highschool-2.jpg" },
+    { title: "Caraval", imgHref: "/img/highschool-3.jpg" }
   ]
 };
 
@@ -47,6 +66,7 @@ const LandingPage: NextPage<AppProps> = ({ library, error }) => {
 };
 
 export const OpenEbooksLandingComponent = () => {
+  const { t } = useTranslation();
   return (
     <div
       sx={{
@@ -71,11 +91,12 @@ export const OpenEbooksLandingComponent = () => {
             mx: [2, 4]
           }}
         >
-          <H2>Welcome to Open eBooks</H2>
+          <H2>{t("openEbooksLanding.welcome", "Welcome to Open eBooks")}</H2>
           <Text>
-            Unlock access to 1000s of popular and award-winning books for
-            children in K–12th grades of participating schools. Login using your
-            Clever or FirstBook ID below. Now with more books to choose from!
+            {t(
+              "openEbooksLanding.unlockAccess",
+              "Unlock access to 1000s of popular and award-winning books for children in K–12th grades of participating schools. Login using your Clever or FirstBook ID below. Now with more books to choose from!"
+            )}
           </Text>
         </div>
       </div>
@@ -104,7 +125,10 @@ export const OpenEbooksLandingComponent = () => {
           >
             <img
               sx={{ alignItems: "flex-end" }}
-              alt="Mobile Device with Open Ebooks"
+              alt={t(
+                "openEbooksLanding.mobileDevice",
+                "Mobile Device with Open Ebooks"
+              )}
               src={"/img/SimplyEIpad.png"}
             />
           </div>
@@ -124,31 +148,49 @@ export const OpenEbooksLandingComponent = () => {
                 color: "ui.white"
               }}
             >
-              <H2>Download the Mobile App</H2>
-              <Text>Available on iOS and Android devices</Text>
+              <H2>
+                {t("openEbooksLanding.download", "Download the Mobile App")}
+              </H2>
+              <Text>
+                {t(
+                  "openEbooksLanding.availableOnMobile",
+                  "Available on iOS and Android devices"
+                )}
+              </Text>
             </Stack>
           </div>
         </div>
       </div>
       <PopularBookSection books={popularBooks.HighSchool}>
-        <H2>For Teens</H2>
+        <H2>{t("openEbooksLanding.highSchool.header", "For Teens")}</H2>
         <Text>
-          Delve into new worlds, find your favorite stories, or learn about real
-          people and events with our books for Teens and Young Adults.
+          {t(
+            "openEbooksLanding.highSchool.subheader",
+            "Delve into new worlds, find your favorite stories, or learn about real people and events with our books for Teens and Young Adults."
+          )}
         </Text>
       </PopularBookSection>
       <PopularBookSection
         books={popularBooks.MiddleGrades}
         coverLocation="right"
       >
-        <H2>For Middle Schoolers</H2>
-        <Text>Relatable books and stories for middle grade kids.</Text>
+        <H2>
+          {t("openEbooksLanding.middleGrades.header", "For Middle Schoolers")}
+        </H2>
+        <Text>
+          {t(
+            "openEbooksLanding.middleGrades.subheader",
+            "Relatable books and stories for middle grade kids."
+          )}
+        </Text>
       </PopularBookSection>
       <PopularBookSection books={popularBooks.EarlyGrades}>
-        <H2>For Younger Kids</H2>
+        <H2>{t("openEbooksLanding.earlyGrades.header", "For Younger Kids")}</H2>
         <Text>
-          Read along with someone, or start reading on your own: Animals,
-          fairies, mysteries, action and adventure, and even some chapter books.
+          {t(
+            "openEbooksLanding.earlyGrades.subheader",
+            "Read along with someone, or start reading on your own: Animals, fairies, mysteries, action and adventure, and even some chapter books."
+          )}
         </Text>
       </PopularBookSection>
 
@@ -163,15 +205,17 @@ export const OpenEbooksLandingComponent = () => {
           }}
         >
           <Stack sx={{ m: 2 }} direction="column">
-            <H2>FAQ</H2>
+            <H2>{t("openEbooksLanding.faq", "FAQ")}</H2>
             <Text>
-              If you would like to learn more about Open eBooks, as a parent or
-              teacher visit&nbsp;
-              <a href="https://openebooks.net/" sx={{ color: "ui.white" }}>
-                openebooks.net
-              </a>
-              . For help or questions about the app and this website visit our
-              FAQ.
+              <Trans i18nKey="openEbooksLanding.learnMoreLink">
+                If you would like to learn more about Open eBooks, as a parent
+                or teacher visit{" "}
+                <a href="https://openebooks.net/" sx={{ color: "ui.white" }}>
+                  openebooks.net
+                </a>
+                . For help or questions about the app and this website visit our
+                FAQ.
+              </Trans>
             </Text>
 
             <Button
@@ -179,7 +223,9 @@ export const OpenEbooksLandingComponent = () => {
               variant="filled"
               color="ui.white"
             >
-              <span sx={{ color: "ui.black" }}>Learn More</span>
+              <span sx={{ color: "ui.black" }}>
+                {t("openEbooksLanding.learnMore", "Learn More")}
+              </span>
             </Button>
           </Stack>
         </div>
@@ -193,6 +239,7 @@ export const OpenEbooksLandingComponent = () => {
  */
 
 const OpenEbooksHero: React.FC = () => {
+  const { t } = useTranslation();
   const { isAuthenticated } = useUser();
 
   return (
@@ -221,13 +268,15 @@ const OpenEbooksHero: React.FC = () => {
                 href="/"
                 sx={{ mr: 1 }}
               >
-                Catalog
+                {t("nav.catalog", "Catalog", { ns: "common" })}
               </NavButton>
               <SignOut color="ui.white" />
             </>
           ) : (
             <NavButton variant="filled" color="ui.white" href="/login">
-              <span sx={{ color: "ui.black" }}>Log In</span>
+              <span sx={{ color: "ui.black" }}>
+                {t("openEbooksLanding.logIn", "Log In")}
+              </span>
             </NavButton>
           )}
         </div>
@@ -241,7 +290,7 @@ const OpenEbooksHero: React.FC = () => {
             sx={{
               mx: "auto"
             }}
-            alt="Open Ebooks Logo"
+            alt={t("openEbooksLanding.openEbooksLogo", "Open Ebooks Logo")}
             src="/img/OpenEbooksLogo.png"
           />
         </div>
@@ -271,6 +320,7 @@ const PopularBookSection: React.FC<{
   coverLocation?: "left" | "right";
   children?: React.ReactNode;
 }> = ({ children, books, coverLocation }) => {
+  const { t } = useTranslation();
   return (
     <section
       sx={{
@@ -318,7 +368,10 @@ const PopularBookSection: React.FC<{
                 width: "32%",
                 alignSelf: "flex-start"
               }}
-              alt={book.alt}
+              alt={t("alt.bookCover", "Cover for {{title}}", {
+                ns: "common",
+                title: book.title
+              })}
               src={book.imgHref}
             />
           );
