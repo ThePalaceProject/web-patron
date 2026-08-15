@@ -154,5 +154,14 @@
   "utils.book.onLoanUntil": "You have this book on loan until {{availableUntil}}.",
   "utils.book.unknownAuthor": "Unknown Author",
   "utils.book.unknownAuthors": "Authors unknown",
-  "utils.books.positionInQueue": "{{position}} patrons ahead of you in the queue."
+  "utils.books.positionInQueue": "{{position}} patrons ahead of you in the queue.",
+  "workLibrarySelector.back": "Back to search",
+  "workLibrarySelector.choose": "Choose your library to view this item:",
+  "workLibrarySelector.errorMessage.itemUnavailable": "The item with identifier \"{{workId}}\" is not currently available through this library (\"{{label}}\").",
+  "workLibrarySelector.errorMessage.libraryUnavailable": "This library is unavailable.",
+  "workLibrarySelector.errorMessage.unableToOpenItem": "Unable to open this item.",
+  "workLibrarySelector.ok": "OK",
+  "workLibrarySelector.opening": "Opening… (Esc to cancel)",
+  "workLibrarySelector.unableToLoad": "Unable to load the library list.",
+  "workLibrarySelector.unableToReachLibrary": "Unable to reach this library."
 }

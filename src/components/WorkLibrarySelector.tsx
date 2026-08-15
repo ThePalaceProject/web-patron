@@ -6,6 +6,7 @@ import type { CatalogUrlResponse } from "pages/api/catalog-url";
 import LibraryFilterList from "components/LibraryFilterList";
 import { fetchLibraries } from "dataflow/fetchLibraries";
 import { buildWorkUrl } from "utils/workUrl";
+import { useTranslation } from "next-i18next/pages";
 
 /*
  * Bounds a selection resolve (catalog URL lookup plus availability pre-flight)
@@ -21,6 +22,7 @@ interface WorkLibrarySelectorProps {
 const WorkLibrarySelector: React.FC<WorkLibrarySelectorProps> = ({
   workId
 }) => {
+  const { t } = useTranslation();
   const { data, error } = useSWR<LibrariesResponse>(
     "/api/libraries",
     fetchLibraries
@@ -42,9 +44,24 @@ const WorkLibrarySelector: React.FC<WorkLibrarySelectorProps> = ({
     });
   }
 
-  if (error) return <p>Unable to load the library list.</p>;
+  if (error)
+    return (
+      <p>
+        {t(
+          "workLibrarySelector.unableToLoad",
+          "Unable to load the library list."
+        )}
+      </p>
+    );
   if (!data) return null;
-  if (!data.libraries?.length) return <p>No libraries available.</p>;
+  if (!data.libraries?.length)
+    return (
+      <p>
+        {t("library.noLibrariesAvailable", "No libraries available.", {
+          ns: "common"
+        })}
+      </p>
+    );
 
   const sorted = [...data.libraries].sort((a, b) => {
     const titleA = a.title || a.slug;
@@ -56,7 +73,14 @@ const WorkLibrarySelector: React.FC<WorkLibrarySelectorProps> = ({
   return (
     <div ref={searchContainerRef}>
       <LibraryFilterList
-        heading={<h2>Choose your library to view this item:</h2>}
+        heading={
+          <h2>
+            {t(
+              "workLibrarySelector.choose",
+              "Choose your library to view this item:"
+            )}
+          </h2>
+        }
         items={sorted.map(lib => ({
           slug: lib.slug,
           label: lib.title || lib.slug
@@ -104,6 +128,7 @@ const LibrarySelectorCard: React.FC<LibrarySelectorCardProps> = ({
   resolvingSlug,
   onResolvingChange
 }) => {
+  const { t } = useTranslation();
   const router = useRouter();
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const abortRef = React.useRef<AbortController | null>(null);
@@ -150,7 +175,12 @@ const LibrarySelectorCard: React.FC<LibrarySelectorCardProps> = ({
         { signal: controller.signal }
       );
       if (res.status === 404) {
-        setErrorMessage("This library is unavailable.");
+        setErrorMessage(
+          t(
+            "workLibrarySelector.errorMessage.libraryUnavailable",
+            "This library is unavailable."
+          )
+        );
         onResolvingChange(null);
         return;
       }
@@ -171,8 +201,11 @@ const LibrarySelectorCard: React.FC<LibrarySelectorCardProps> = ({
       check.body?.cancel?.();
       if (check.status === 404) {
         setErrorMessage(
-          `The item with identifier “${workId}” is not currently ` +
-            `available through this library (“${label}”).`
+          t(
+            "workLibrarySelector.errorMessage.itemUnavailable",
+            'The item with identifier "{{workId}}" is not currently available through this library ("{{label}}").',
+            { workId, label }
+          )
         );
         onResolvingChange(null);
         return;
@@ -182,7 +215,12 @@ const LibrarySelectorCard: React.FC<LibrarySelectorCardProps> = ({
       destination = `/${library.slug}/book/${encodeURIComponent(bookUrl)}`;
     } catch {
       if (!userCancelledRef.current) {
-        setErrorMessage("Unable to reach this library.");
+        setErrorMessage(
+          t(
+            "workLibrarySelector.unableToReachLibrary",
+            "Unable to reach this library."
+          )
+        );
       }
       onResolvingChange(null);
       return;
@@ -195,7 +233,12 @@ const LibrarySelectorCard: React.FC<LibrarySelectorCardProps> = ({
     try {
       await router.push(destination);
     } catch {
-      setErrorMessage("Unable to open this item.");
+      setErrorMessage(
+        t(
+          "workLibrarySelector.errorMessage.unableToOpenItem",
+          "Unable to open this item."
+        )
+      );
       onResolvingChange(null);
     }
   }
@@ -240,7 +283,7 @@ const LibrarySelectorCard: React.FC<LibrarySelectorCardProps> = ({
         {highlighted}
         {isResolving && (
           <span aria-hidden="true" sx={{ ml: 2, fontSize: 0 }}>
-            Opening… (Esc to cancel)
+            {t("workLibrarySelector.opening", "Opening… (Esc to cancel)")}
           </span>
         )}
       </button>
@@ -267,7 +310,7 @@ const LibrarySelectorCard: React.FC<LibrarySelectorCardProps> = ({
             }}
             sx={{ mr: 2, cursor: "pointer" }}
           >
-            Back to search
+            {t("workLibrarySelector.back", "Back to search")}
           </button>
           <button
             onClick={() => {
@@ -276,7 +319,7 @@ const LibrarySelectorCard: React.FC<LibrarySelectorCardProps> = ({
             }}
             sx={{ cursor: "pointer" }}
           >
-            OK
+            {t("workLibrarySelector.ok", "OK")}
           </button>
         </div>
       )}

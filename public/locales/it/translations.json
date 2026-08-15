@@ -156,5 +156,14 @@
   "utils.book.onLoanUntil": "",
   "utils.book.unknownAuthor": "",
   "utils.book.unknownAuthors": "",
-  "utils.books.positionInQueue": ""
+  "utils.books.positionInQueue": "",
+  "workLibrarySelector.back": "",
+  "workLibrarySelector.choose": "",
+  "workLibrarySelector.errorMessage.itemUnavailable": "",
+  "workLibrarySelector.errorMessage.libraryUnavailable": "",
+  "workLibrarySelector.errorMessage.unableToOpenItem": "",
+  "workLibrarySelector.ok": "",
+  "workLibrarySelector.opening": "",
+  "workLibrarySelector.unableToLoad": "",
+  "workLibrarySelector.unableToReachLibrary": ""
 }
