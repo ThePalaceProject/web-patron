@@ -136,6 +136,8 @@
   "signedOut.securityNotice.body3": "",
   "signedOut.securityNotice.header": "",
   "signedOut.signedOut": "",
+  "signOut.confirmationQuestion": "",
+  "signOut.signOut": "",
   "signUpLink.signUp": "",
   "utils.book.availableCopies": "",
   "utils.book.availableCopiesWithQueue": "",

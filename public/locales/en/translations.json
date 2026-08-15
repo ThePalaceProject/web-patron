@@ -135,6 +135,8 @@
   "signedOut.securityNotice.body3": "If you are using a shared or public computer (or need to sign into a different account), please exit / quit your browser completely to ensure that you are fully signed out.",
   "signedOut.securityNotice.header": "Important Security Notice",
   "signedOut.signedOut": "Signed Out",
+  "signOut.confirmationQuestion": "Are you sure you want to sign out?",
+  "signOut.signOut": "Sign Out",
   "signUpLink.signUp": "Sign up for a library card",
   "utils.book.availableCopies": "{{availableCopies}} out of {{totalCopies}} copies available.",
   "utils.book.availableCopiesWithQueue": "{{availableCopies}} out of {{totalCopies}} copies available. {{queue}} patrons in the queue.",
