@@ -3,6 +3,7 @@ import Link from "./Link";
 import List, { ListItem } from "./List";
 import { LinkData } from "interfaces";
 import useLibraryContext from "components/context/LibraryContext";
+import { useTranslation } from "next-i18next/pages";
 
 const BreadcrumbBar: React.FC<{
   className?: string;
@@ -10,6 +11,7 @@ const BreadcrumbBar: React.FC<{
   breadcrumbs?: Readonly<LinkData[]>;
   children?: React.ReactNode;
 }> = ({ children, className, currentLocation, breadcrumbs: crumbsIn }) => {
+  const { t } = useTranslation();
   // make a local copy, so we can mutate this array without
   // affecting the referenced value
 
@@ -58,7 +60,13 @@ const BreadcrumbBar: React.FC<{
               </ListItem>
             )
         )}
-        <ListItem aria-label={`Current location: ${lastItem}`}>
+        <ListItem
+          aria-label={t(
+            "breadcrumbBar.lastItem",
+            "Current location: {{lastItem}}",
+            { lastItem }
+          )}
+        >
           {lastItem ? lastItem : ""}
         </ListItem>
       </List>

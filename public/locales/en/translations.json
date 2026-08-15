@@ -34,6 +34,7 @@
   "bookList.viewMore": "View more",
   "bookStatus.availability": "Book Availability:",
   "bookStatus.status": "Book Status:",
+  "breadcrumbBar.lastItem": "Current location: {{lastItem}}",
   "error.error": "Error:",
   "error.returnHome": "Return Home",
   "error.somethingWentWrong": "Something went wrong",
