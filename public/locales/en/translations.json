@@ -51,6 +51,7 @@
   "footer.privacyPolicy": "Privacy",
   "footer.termsOfUse": "Terms of Use",
   "forgotPasswordLink.forgotPassword": "Forgot your password?",
+  "formInput.ariaLabel": "{{name}} input",
   "fulfillmentButton.downloading": "Downloading...",
   "fulfillmentButton.opening": "Opening...",
   "fulfillmentButton.read": "Read",
