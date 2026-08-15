@@ -12,6 +12,7 @@ import { AnyBook, LaneData } from "interfaces";
 import Link from "components/Link";
 import { Text } from "components/Text";
 import { useInView } from "react-intersection-observer";
+import { useTranslation } from "next-i18next/pages";
 
 type BookRefs = {
   [id: string]: React.RefObject<HTMLLIElement | null>;
@@ -54,6 +55,7 @@ const Lane: React.FC<{
   omitIds?: string[];
   titleTag?: React.ComponentType;
 }> = ({ omitIds, titleTag: TitleTag = H2, lane: { title, books, url } }) => {
+  const { t } = useTranslation();
   /**
    * We compute these values within a useMemo hook so that they don't change
    * on every render
@@ -173,7 +175,10 @@ const Lane: React.FC<{
         }}
       >
         <TitleTag sx={{ pr: [3, 5], m: 0, mb: 3 }}>
-          {title} <ScreenReaderOnly>collection</ScreenReaderOnly>
+          {title}{" "}
+          <ScreenReaderOnly>
+            {t("lane.collection", "collection")}
+          </ScreenReaderOnly>
         </TitleTag>
         <NavButton
           variant="link"
@@ -182,7 +187,7 @@ const Lane: React.FC<{
           iconRight={ArrowForward}
           sx={{ variant: "text.body.bold", textDecoration: "none" }}
         >
-          See More
+          {t("lane.seeMore", "See More")}
         </NavButton>
       </Stack>
       <div
@@ -223,6 +228,7 @@ const Lane: React.FC<{
 
 const SeeMoreBlock = React.forwardRef<HTMLLIElement, SeeMoreBlockProps>(
   (props, ref) => {
+    const { t } = useTranslation();
     return (
       <li
         sx={{
@@ -269,7 +275,7 @@ const SeeMoreBlock = React.forwardRef<HTMLLIElement, SeeMoreBlockProps>(
               }}
             >
               <Stack direction="column">
-                <Text>See All</Text>
+                <Text>{t("lane.seeAll", "See All")}</Text>
                 <Text variant="text.headers.tertiary">{props.title}</Text>
               </Stack>
             </Card>
@@ -286,6 +292,7 @@ const PrevNextButton: React.FC<{
   isPrev?: boolean;
   disabled: boolean;
 }> = ({ onClick, isPrev = false, disabled }) => {
+  const { t } = useTranslation();
   return (
     <Focusable
       sx={{
@@ -302,7 +309,11 @@ const PrevNextButton: React.FC<{
       }}
       onClick={onClick}
       role="button"
-      aria-label={isPrev ? "scroll left" : "scroll right"}
+      aria-label={
+        isPrev
+          ? t("lane.scrollLeft", "scroll left")
+          : t("lane.scrollRight", "scroll right")
+      }
       disabled={disabled}
     >
       <ArrowForward
@@ -316,6 +327,7 @@ const PrevNextButton: React.FC<{
 };
 
 const LaneErrorFallback: React.FC<FallbackProps> = () => {
+  const { t } = useTranslation();
   return (
     <div
       sx={{
@@ -330,8 +342,10 @@ const LaneErrorFallback: React.FC<FallbackProps> = () => {
         py: 3
       }}
     >
-      There was an error displaying this lane. We&apos;ve reported the error to
-      administrative staff. Please refresh and try again.
+      {t(
+        "lane.errorFallback",
+        "There was an error displaying this lane. We've reported the error to administrative staff. Please refresh and try again."
+      )}
     </div>
   );
 };
