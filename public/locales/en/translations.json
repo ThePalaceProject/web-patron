@@ -68,6 +68,7 @@
   "header.catalogLogo": "{{catalogName}} Logo",
   "header.help": "Help",
   "header.signIn": "Sign In",
+  "itemLandingPage.findLibrary": "Find a Library",
   "languageSelector.languageName.EN": "English",
   "languageSelector.languageName.ES": "Spanish",
   "languageSelector.languageName.FR": "French",
