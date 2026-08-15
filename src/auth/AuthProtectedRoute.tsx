@@ -1,6 +1,7 @@
 import useLogin from "auth/useLogin";
 import useUser from "components/context/UserContext";
 import { PageLoader } from "components/LoadingIndicator";
+import { useTranslation } from "next-i18next/pages";
 import { useRouter } from "next/router";
 import React from "react";
 
@@ -40,6 +41,7 @@ const AuthProtectedRoute = ({ children }: Props) => {
 export default AuthProtectedRoute;
 
 const Unauthorized = () => {
+  const { t } = useTranslation();
   return (
     <div
       sx={{
@@ -50,7 +52,13 @@ const Unauthorized = () => {
         flexDirection: "column"
       }}
     >
-      <h4>You need to be signed in to view this page.</h4>
+      <h4>
+        {t(
+          "auth.mustBeSignedInToViewPage",
+          "You need to be signed in to view this page.",
+          { ns: "common" }
+        )}
+      </h4>
     </div>
   );
 };

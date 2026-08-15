@@ -5,19 +5,21 @@ import { ServerError } from "errors";
 import track from "analytics/track";
 import useLogin from "auth/useLogin";
 import useUser from "components/context/UserContext";
+import { TFunction, useTranslation } from "next-i18next/pages";
 
 interface Props {
   children: React.ReactNode;
 }
 
 const CatchFetchErrors = ({ children }: Props) => {
+  const { t } = useTranslation("common");
   const { initLogin } = useLogin();
   const { isLoading, authFailureContext } = useUser();
 
   function handle401() {
     // Handle redirect-based auth failures generically
     if (authFailureContext) {
-      const serverErrorMessage = formatAuthError(authFailureContext.error);
+      const serverErrorMessage = formatAuthError(authFailureContext.error, t);
 
       initLogin(
         undefined,
@@ -60,12 +62,15 @@ export default CatchFetchErrors;
  * Formats a ServerError into a user-friendly message.
  * Extracts title and detail from the OPDS Problem Document.
  */
-function formatAuthError(error: ServerError): string {
+function formatAuthError(error: ServerError, t: TFunction): string {
   if (error?.info?.title && error?.info?.detail) {
     return `${error.info.title}: ${error.info.detail}`;
   }
 
-  return "Authentication completed successfully, but your account was not recognized. Please contact your library for assistance.";
+  return t(
+    "auth.accountNotRecognized",
+    "Authentication completed successfully, but your account was not recognized. Please contact your library for assistance."
+  );
 }
 
 /**

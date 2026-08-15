@@ -11,6 +11,7 @@ import Button from "components/Button";
 import extractParam from "dataflow/utils";
 import { useRedirectCancelDetection } from "auth/useRedirectCancelDetection";
 import { AuthFeedbackPanel } from "auth/AuthFeedbackPanel";
+import { useTranslation } from "next-i18next/pages";
 
 export const cleverRedirectFlag = (id: string) => `cpw-clever-redirect-${id}`;
 export const cleverCancelFlag = (id: string) => `cpw-clever-cancelled-${id}`;
@@ -18,6 +19,7 @@ export const cleverCancelFlag = (id: string) => `cpw-clever-cancelled-${id}`;
 const CleverAuthHandler: React.FC<{ method: ClientCleverMethod }> = ({
   method
 }) => {
+  const { t } = useTranslation();
   const { token } = useUser();
   const { fullSuccessUrl } = useLoginRedirectUrl();
   const router = useRouter();
@@ -65,7 +67,9 @@ const CleverAuthHandler: React.FC<{ method: ClientCleverMethod }> = ({
   if (cancelDetected) {
     return (
       <AuthFeedbackPanel
-        message="Login was cancelled."
+        message={t("auth.loginCancelled", "Login was cancelled.", {
+          ns: "common"
+        })}
         onTryAgain={handleTryAgain}
       />
     );
@@ -74,9 +78,14 @@ const CleverAuthHandler: React.FC<{ method: ClientCleverMethod }> = ({
     <Stack direction="column" sx={{ alignItems: "center", gap: 3 }}>
       <Stack direction="column" sx={{ alignItems: "center" }}>
         <LoadingIndicator />
-        Logging in with Clever...
+        {t("auth.loggingInWithMethod", "Logging in with {{authMethod}}...", {
+          authMethod: "Clever",
+          ns: "common"
+        })}
       </Stack>
-      <Button onClick={handleCancel}>Cancel</Button>
+      <Button onClick={handleCancel}>
+        {t("actions.cancel", "Cancel", { ns: "common" })}
+      </Button>
     </Stack>
   );
 };

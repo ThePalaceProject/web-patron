@@ -5,6 +5,7 @@ import { Text } from "components/Text";
 import LoadingIndicator from "components/LoadingIndicator";
 import useLogin from "auth/useLogin";
 import { isSupportedAuthType } from "./AuthenticationHandler";
+import { Trans, useTranslation } from "next-i18next/pages";
 
 export default function Login(): React.ReactElement {
   const { initLogin } = useLogin();
@@ -32,27 +33,33 @@ export default function Login(): React.ReactElement {
 }
 
 const NoAuth: React.FC = () => {
+  const { t } = useTranslation();
   const {
     libraryLinks: { helpEmail }
   } = useLibraryContext();
   return (
     <div sx={{ display: "flex", justifyContent: "center", maxWidth: 500 }}>
       <Text>
-        This Library does not have any authentication configured.{" "}
-        {helpEmail && (
-          <Text>
-            If this is an error, please contact your site administrator via
-            email at:{" "}
-            <ExternalLink
-              role="link"
-              href={helpEmail.href}
-              aria-label="Send email to help desk"
-            >
-              {helpEmail.href.replace("mailto:", "")}
-            </ExternalLink>
-            .
-          </Text>
-        )}
+        <Trans i18nKey="login.noAuth">
+          This Library does not have any authentication configured.{" "}
+          {helpEmail && (
+            <Text>
+              If this is an error, please contact your site administrator via
+              email at:{" "}
+              <ExternalLink
+                role="link"
+                href={helpEmail.href}
+                aria-label={t(
+                  "login.helpEmail.ariaLabel",
+                  "Send email to help desk"
+                )}
+              >
+                {helpEmail.href.replace("mailto:", "")}
+              </ExternalLink>
+              .
+            </Text>
+          )}
+        </Trans>
       </Text>
     </div>
   );
