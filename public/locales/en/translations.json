@@ -94,6 +94,7 @@
   "multiLibraryHome.choose": "Choose a library:",
   "multiLibraryHome.home": "Home",
   "multiLibraryHome.unableToLoad": "Unable to load static libraries from configuration file.",
+  "myBooks.empty": "Your books will show up here when you have any loaned or on hold.",
   "openEbooksLoginPicker.cleverLogo": "Clever Logo",
   "openEbooksLoginPicker.firstBookLogo": "FirstBook Logo",
   "recommendations.recommendations": "Recommendations",

@@ -8,6 +8,7 @@ import PageTitle from "./PageTitle";
 import useUser from "components/context/UserContext";
 import { PageLoader } from "components/LoadingIndicator";
 import AuthProtectedRoute from "auth/AuthProtectedRoute";
+import { useTranslation } from "next-i18next/pages";
 
 const availableUntil = (book: AnyBook) =>
   book.availability?.until ? new Date(book.availability.until) : "NaN";
@@ -37,6 +38,7 @@ function compareTitles(a: AnyBook, b: AnyBook): 0 | -1 | 1 {
 }
 
 export const MyBooks: React.FC = () => {
+  const { t } = useTranslation();
   const { loans, isLoading } = useUser();
   const sortedBooks = loans ? sortBooksByLoanExpirationDate(loans) : [];
   const noBooks = sortedBooks.length === 0;
@@ -45,11 +47,13 @@ export const MyBooks: React.FC = () => {
     <AuthProtectedRoute>
       <div sx={{ flex: 1, pb: 4 }}>
         <Head>
-          <title>My Books</title>
+          <title>{t("nav.myBooks", "My Books", { ns: "common" })}</title>
         </Head>
 
-        <BreadcrumbBar currentLocation="My Books" />
-        <PageTitle>My Books</PageTitle>
+        <BreadcrumbBar
+          currentLocation={t("nav.myBooks", "My Books", { ns: "common" })}
+        />
+        <PageTitle>{t("nav.myBooks", "My Books", { ns: "common" })}</PageTitle>
         {noBooks && isLoading ? (
           <PageLoader />
         ) : noBooks ? (
@@ -71,6 +75,7 @@ const LoansContent: React.FC<{ books: AnyBook[] }> = ({ books }) => {
 };
 
 const Empty = () => {
+  const { t } = useTranslation();
   return (
     <>
       <div
@@ -83,7 +88,10 @@ const Empty = () => {
         }}
       >
         <H2 variant="text.headers.tertiary">
-          Your books will show up here when you have any loaned or on hold.
+          {t(
+            "myBooks.empty",
+            "Your books will show up here when you have any loaned or on hold."
+          )}
         </H2>
       </div>
     </>
