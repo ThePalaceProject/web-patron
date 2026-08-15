@@ -85,7 +85,7 @@
   "languageSelector.languageName.IT": "Italian",
   "languageSelector.languageSelector": "Choose language",
   "library.home": "{{catalogName}} Home",
-  "libraryFilterList.librariesMatched_one": "{{count}} libraries shown, best matches first",
+  "libraryFilterList.librariesMatched_one": "{{count}} library shown, best matches first",
   "libraryFilterList.librariesMatched_other": "{{count}} libraries shown, best matches first",
   "libraryFilterList.noLibrariesMatch": "No libraries match.",
   "libraryFilterList.search.ariaLabel": "Filter libraries",

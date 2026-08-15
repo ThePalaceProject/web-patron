@@ -125,9 +125,22 @@ const t = (
   // { count: 2 } reads "x_other". The category comes from Intl.PluralRules,
   // which is what i18next itself uses from v21 onwards, so the suffixes we
   // resolve here are exactly the ones the i18next-cli extractor writes
-  const pluralKey =
+  const pluralCategory =
     typeof options?.count === "number"
-      ? `${key}_${new Intl.PluralRules(currentLanguage).select(options.count)}`
+      ? new Intl.PluralRules(currentLanguage).select(options.count)
+      : undefined;
+  const pluralKey = pluralCategory ? `${key}_${pluralCategory}` : undefined;
+
+  // a caller can also spell the default out per plural category, as
+  // { defaultValue_one: "...", defaultValue_other: "..." }. i18next prefers the
+  // category-specific default over the plain one, so an untranslated plural key
+  // still reads correctly in both forms.
+  const categoryDefaultCandidate = pluralCategory
+    ? options?.[`defaultValue_${pluralCategory}`]
+    : undefined;
+  const categoryDefaultValue =
+    typeof categoryDefaultCandidate === "string"
+      ? categoryDefaultCandidate
       : undefined;
 
   // get the translation for the key from the namespace's file for this
@@ -141,7 +154,8 @@ const t = (
   // configured with returnEmptyString: false, so an empty value falls through
   // to the default value just as it does in the app. If there is no default
   // either, fall back to the key itself.
-  const translationString = translation || defaultValue || key;
+  const translationString =
+    translation || categoryDefaultValue || defaultValue || key;
 
   // fill placeholders like {{bookTitle}} with actual values given as parameter
   const finalTranslation = fillPlaceholders(translationString, options);

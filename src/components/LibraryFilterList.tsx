@@ -66,7 +66,10 @@ const LibraryFilterList: React.FC<LibraryFilterListProps> = ({
       : t(
           "libraryFilterList.librariesMatched",
           "{{count}} libraries shown, best matches first",
-          { count: resultCount }
+          {
+            count: resultCount,
+            defaultValue_one: "{{count}} library shown, best matches first"
+          }
         )
     : "";
 
