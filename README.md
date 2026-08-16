@@ -539,7 +539,7 @@ To extract translation keys from your component source code and to update the `t
    npm run translations:extract
    ```
 
-   This command will scan the specified directories for translation keys used in your components and update the `translations.json` files in the `public/locales` directory.
+   This command will scan the specified directories for translation keys used in your components and update the `translations.json` files in the `public/locales` directory. If passing default values to the `t(...)` function -- either as the 2nd argument or within the options object (e.g. `{ defaultValue: "..."}` or `{ defaultValue_one: "...", defaultValue_two: "..." }`) -- then running the command with the `--sync-primary` flag is useful. It will use the default value as the translation key value in the translation file.
 
 3. **Run the `sync` command (optional)**
 
