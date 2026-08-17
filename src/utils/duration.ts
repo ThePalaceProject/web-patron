@@ -5,8 +5,8 @@ import { Language } from "utils/i18n";
  * Formats a duration given in seconds for display in the given locale.
  *
  * Uses the @formatjs polyfill rather than the native Intl.DurationFormat:
- * the app's pinned Node 22 does not have the global, and TypeScript does not
- * type it. Output is identical to the native implementation.
+ * the app's pinned Node 22 does not have the global, baseline acceptance is March 2025,
+ * and TypeScript does not type it. Output is identical to the native implementation.
  *
  * Sub-minute remainders round up, so a 59-second title reads "1 minute"
  * rather than disappearing.
