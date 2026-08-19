@@ -1,8 +1,9 @@
 import * as React from "react";
 import {
   AnyBook,
+  BookFormat,
   BookMedium,
-  BookMediumName,
+  BookMediumVariant,
   BorrowableBook,
   FulfillableBook,
   OnHoldBook,
@@ -12,8 +13,10 @@ import {
   UnsupportedBook
 } from "interfaces";
 import { Book, Headset } from "../icons";
+import { Language } from "./i18n";
+import { TFunction } from "next-i18next/pages";
 
-export function getAuthors(book: AnyBook, lim?: number): string[] {
+export function getAuthorList(book: AnyBook, lim?: number): string[] | null {
   // select contributors if the authors array is undefined or empty.
   const allAuth =
     typeof book.authors?.length === "number" && book.authors.length > 0
@@ -21,7 +24,9 @@ export function getAuthors(book: AnyBook, lim?: number): string[] {
       : typeof book.contributors?.length === "number" &&
           book.contributors.length > 0
         ? book.contributors
-        : ["Authors unknown"];
+        : null;
+
+  if (!allAuth) return null;
 
   // now limit it to however many
   if (lim) {
@@ -30,19 +35,45 @@ export function getAuthors(book: AnyBook, lim?: number): string[] {
   return allAuth;
 }
 
-export function getAuthorsString(book: AnyBook): string {
-  const { authors } = book;
-  if (!authors) return "Unknown Author";
-  const authorsArray = getAuthors(book, 2);
-
-  if (authors.length > 2) {
-    authorsArray.push(`& ${authors.length - 2} more`);
-  }
-
-  return authorsArray.join(", ");
+/**
+ * Joins author names the way the locale writes a list: "A & B" in English,
+ * "A et B" in French.
+ */
+export function formatAuthorList(authors: string[], locale: Language): string {
+  return new Intl.ListFormat(locale, { style: "short" }).format(authors);
 }
 
-export function availabilityString(book: AnyBook) {
+export function getAuthors(
+  book: AnyBook,
+  t: TFunction,
+  lim?: number
+): string[] {
+  return (
+    getAuthorList(book, lim) ?? [
+      t("utils.book.unknownAuthors", "Authors unknown")
+    ]
+  );
+}
+
+export function getAuthorsString(
+  book: AnyBook,
+  t: TFunction,
+  locale: Language
+): string {
+  const allAuthors = getAuthorList(book);
+  if (!allAuthors) return t("utils.book.unknownAuthor", "Unknown Author");
+
+  const authorsArray = allAuthors.slice(0, 2);
+  if (allAuthors.length > 2) {
+    authorsArray.push(
+      t("utils.book.more", "{{count}} more", { count: allAuthors.length - 2 })
+    );
+  }
+
+  return formatAuthorList(authorsArray, locale);
+}
+
+export function availabilityString(book: AnyBook, t: TFunction) {
   const status = book.status;
 
   switch (status) {
@@ -53,17 +84,36 @@ export function availabilityString(book: AnyBook) {
       const queue =
         typeof book.holds?.total === "number" ? book.holds.total : null;
 
-      return typeof availableCopies === "number" &&
+      if (
+        typeof availableCopies === "number" &&
         typeof totalCopies === "number"
-        ? `${availableCopies} out of ${totalCopies} copies available.${
-            queue ? ` ${queue} patrons in the queue.` : ""
-          }`
-        : null;
+      ) {
+        if (queue) {
+          return t(
+            "utils.book.availableCopiesWithQueue",
+            "{{availableCopies}} out of {{totalCopies}} copies available. {{queue}} patrons in the queue.",
+            { availableCopies, totalCopies, queue }
+          );
+        }
+
+        return t(
+          "utils.book.availableCopies",
+          "{{availableCopies}} out of {{totalCopies}} copies available.",
+          { availableCopies, totalCopies }
+        );
+      }
+
+      return null;
 
     case "reserved":
       const position = book.holds?.position;
       if (!position || isNaN(position)) return null;
-      return `${position} patrons ahead of you in the queue.`;
+
+      return t(
+        "utils.book.positionInQueue",
+        "{{position}} patrons ahead of you in the queue.",
+        { position }
+      );
 
     case "on-hold":
       const until = book.availability?.until
@@ -71,9 +121,14 @@ export function availabilityString(book: AnyBook) {
         : "NaN";
       const untilStr = until === "NaN" ? undefined : until;
 
-      return `You have this book on hold${
-        untilStr ? ` until ${untilStr}` : ""
-      }.`;
+      if (untilStr)
+        return t(
+          "utils.book.onHoldUntil",
+          "You have this book on hold until {{until}}.",
+          { until: untilStr }
+        );
+
+      return t("utils.book.onHold", "You have this book on hold.");
 
     case "fulfillable":
       const availableUntil = book.availability?.until
@@ -81,19 +136,16 @@ export function availabilityString(book: AnyBook) {
         : "NaN";
 
       return availableUntil !== "NaN"
-        ? `You have this book on loan until ${availableUntil}.`
+        ? t(
+            "utils.book.onLoanUntil",
+            "You have this book on loan until {{availableUntil}}.",
+            { availableUntil }
+          )
         : null;
 
     case "unsupported":
       return null;
   }
-}
-
-export function queueString(book: AnyBook) {
-  const holds = book.holds?.total;
-  return typeof holds === "number"
-    ? `There are ${holds} other patrons in the queue.`
-    : "";
 }
 
 export function bookIsFulfillable(book: AnyBook): book is FulfillableBook {
@@ -127,30 +179,61 @@ export function bookIsAudiobook(book: AnyBook): boolean {
   return false;
 }
 
+// `variant` is for presentation (badge colors).
+// The display name is translated separately by `translateMedium` below.
 export const bookMediumMap: {
   [key in BookMedium]: {
-    name: BookMediumName;
+    variant: BookMediumVariant;
     icon: React.ComponentType<{ className?: string }>;
   };
 } = {
   "http://bib.schema.org/Audiobook": {
-    name: "Audiobook",
+    variant: "audiobook",
     icon: Headset
   },
-  "http://schema.org/EBook": { name: "eBook", icon: Book },
-  "http://schema.org/Book": { name: "Book", icon: Book }
+  "http://schema.org/EBook": { variant: "book", icon: Book },
+  "http://schema.org/Book": { variant: "book", icon: Book }
 };
+
+export function translateMedium(medium: BookMedium, t: TFunction): string {
+  switch (medium) {
+    case "http://bib.schema.org/Audiobook":
+      return t("utils.book.mediumAudiobook", "Audiobook");
+    case "http://schema.org/EBook":
+      return t("utils.book.mediumEbook", "eBook");
+    case "http://schema.org/Book":
+      return t("utils.book.mediumBook", "Book");
+  }
+}
+
+// Returns undefined when the book has no format, so that DetailField hides the row.
+// Note that PDF/ePub are format names translators will normally leave as-is.
+export function translateBookFormat(
+  format: BookFormat | undefined,
+  t: TFunction
+): string | undefined {
+  switch (format) {
+    case "Audiobook":
+      return t("utils.book.formatAudiobook", "Audiobook");
+    case "PDF":
+      return t("utils.book.formatPdf", "PDF");
+    case "ePub":
+      return t("utils.book.formatEpub", "ePub");
+    default:
+      return undefined;
+  }
+}
 
 // Return empty string if no medium found
 // currently used for adding format to aria-label; it's okay if no medium is provided
-export function getMediumName(book: AnyBook): BookMediumName | "" {
+export function getMediumName(book: AnyBook, t: TFunction): string {
   const medium = getMedium(book);
 
   if (!(medium in bookMediumMap)) {
     return "";
   }
 
-  return bookMediumMap[medium].name;
+  return translateMedium(medium as BookMedium, t);
 }
 
 export function getMedium(book: AnyBook): BookMedium | "" {
@@ -174,9 +257,12 @@ export function getMedium(book: AnyBook): BookMedium | "" {
     : "";
 }
 
-export function getLanguageLabel(book: AnyBook): string | undefined {
+export function getLanguageLabel(
+  book: AnyBook,
+  locale: Language
+): string | undefined {
   if (book?.language) {
-    const languageNames = new Intl.DisplayNames(["en"], { type: "language" });
+    const languageNames = new Intl.DisplayNames([locale], { type: "language" });
     return languageNames.of(book.language.trim());
   }
   return undefined;

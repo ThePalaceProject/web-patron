@@ -57,6 +57,24 @@ test("truncates authors", () => {
   expect(screen.queryByText("one, two, three")).toBeFalsy();
 });
 
+test("joins authors using the current locale", () => {
+  const twoAuthors = merge<BorrowableBook>(
+    fixtures.book,
+    {
+      status: "borrowable",
+      borrowUrl: "/borrow",
+      authors: ["one", "two"]
+    },
+    {
+      arrayMerge: (a, b) => b
+    }
+  );
+  // Intl.ListFormat joins with "&" in English and "et" in French
+  setup(<BookList books={[twoAuthors]} />, { router: { locale: "fr" } });
+
+  expect(screen.getByText("one et two")).toBeInTheDocument();
+});
+
 test("show return button for fulfillable book", () => {
   setup(<BookList books={[fixtures.fulfillableBook]} />);
   const button = screen.getByRole("button", { name: "Return" });
@@ -130,7 +148,7 @@ describe("infinite loading book list", () => {
     } as any);
     setup(<InfiniteBookList firstPageUrl="/first-page" />);
 
-    expect(screen.getByText("Loading ...")).toBeInTheDocument();
+    expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   test("doesn't show loader when at end of list", () => {

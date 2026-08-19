@@ -3,10 +3,12 @@ import Button from "components/Button";
 import SvgExternalLink from "icons/ExternalOpen";
 import { openPendingTab } from "utils/window";
 import { useFulfillmentButtonStackError } from "components/layouts/FulfillmentButtonStack";
+import { useTranslation } from "next-i18next/pages";
 
 const PreviewButton: React.FC<{ previewUrl?: string | null }> = ({
   previewUrl
 }) => {
+  const { t } = useTranslation();
   const { setError } = useFulfillmentButtonStackError();
 
   function open() {
@@ -16,7 +18,9 @@ const PreviewButton: React.FC<{ previewUrl?: string | null }> = ({
       tab.navigate(previewUrl as string);
     } catch {
       tab.close();
-      setError("Error: Could not open preview.");
+      setError(
+        t("previewButton.couldNotOpenPreview", "Error: Could not open preview.")
+      );
     }
   }
 
@@ -24,7 +28,7 @@ const PreviewButton: React.FC<{ previewUrl?: string | null }> = ({
 
   return (
     <Button variant="outlined" iconLeft={SvgExternalLink} onClick={open}>
-      Preview
+      {t("previewButton.preview", "Preview")}
     </Button>
   );
 };

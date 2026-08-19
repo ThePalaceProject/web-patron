@@ -9,8 +9,10 @@ import { useRouter } from "next/router";
 import extractParam from "dataflow/utils";
 import { LOGIN_ERROR_QUERY_PARAM } from "utils/constants";
 import { Text } from "../components/Text";
+import { useTranslation } from "next-i18next/pages";
 
 export default function LoginRegion(): React.JSX.Element {
+  const { t } = useTranslation();
   const { authMethods } = useLibraryContext();
   const { query } = useRouter();
 
@@ -47,7 +49,10 @@ export default function LoginRegion(): React.JSX.Element {
       >
         <Stack direction="column" sx={column}>
           <div sx={logoHeader}>
-            <img alt="Clever Logo" src={"/img/CleverLogo.png"} />
+            <img
+              alt={t("openEbooksLoginPicker.cleverLogo", "Clever Logo")}
+              src={"/img/CleverLogo.png"}
+            />
           </div>
           <div>
             <AuthButton sx={loginButton} method={cleverMethod} />
@@ -63,7 +68,10 @@ export default function LoginRegion(): React.JSX.Element {
         </Stack>
         <Stack direction="column" sx={column}>
           <div sx={logoHeader}>
-            <img alt="FirstBook Logo" src={"/img/FirstBookLogo.png"} />
+            <img
+              alt={t("openEbooksLoginPicker.firstBookLogo", "FirstBook Logo")}
+              src={"/img/FirstBookLogo.png"}
+            />
           </div>
           <AuthButton sx={loginButton} method={basicMethod} />
         </Stack>

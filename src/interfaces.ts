@@ -177,7 +177,7 @@ export type BookMedium =
   | "http://schema.org/EBook"
   | "http://schema.org/Book";
 
-export type BookMediumName = "Audiobook" | "eBook" | "Book";
+export type BookMediumVariant = "audiobook" | "book";
 
 export type BookAvailability =
   | "available"
@@ -218,7 +218,9 @@ export type Book<Status = EmptyObject> = Readonly<
     categories?: string[];
     language?: string;
     narrators?: string[];
-    duration?: string;
+    // parsers have no locale, so passing raw data through for duration and published
+    // formatting now occurs at render
+    duration?: number;
     published?: string;
     publisher?: string;
     providerName?: string;

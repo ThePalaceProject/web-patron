@@ -10,6 +10,7 @@ import Button from "components/Button";
 import { useRedirectCancelDetection } from "auth/useRedirectCancelDetection";
 import { AuthFeedbackPanel } from "auth/AuthFeedbackPanel";
 import { appendSearchParam } from "utils/url";
+import { useTranslation } from "next-i18next/pages";
 
 /**
  * Shared handler for auth methods (SAML, OIDC) that send the user to an
@@ -23,6 +24,7 @@ export const RedirectAuthHandler: React.FC<{
   cancelFlagKey: string;
   switchAccountParam: { name: string; value: string };
 }> = ({ method, redirectFlagKey, cancelFlagKey, switchAccountParam }) => {
+  const { t } = useTranslation();
   const { token } = useUser();
   const { fullSuccessUrl } = useLoginRedirectUrl();
   const router = useRouter();
@@ -57,8 +59,14 @@ export const RedirectAuthHandler: React.FC<{
   }, [altAuthUrl, redirectFlagKey, cancelFlagKey]);
 
   const switchAccountAction = React.useMemo(
-    () => ({ label: "Use a different account", onClick: handleSwitchAccount }),
-    [handleSwitchAccount]
+    () => ({
+      label: t(
+        "redirectAuthHandler.useDifferentAccount",
+        "Use a different account"
+      ),
+      onClick: handleSwitchAccount
+    }),
+    [handleSwitchAccount, t]
   );
 
   if (loginError) {
@@ -74,7 +82,9 @@ export const RedirectAuthHandler: React.FC<{
   if (cancelDetected) {
     return (
       <AuthFeedbackPanel
-        message="Login was cancelled."
+        message={t("auth.loginCancelled", "Login was cancelled.", {
+          ns: "common"
+        })}
         onTryAgain={handleTryAgain}
         secondaryAction={switchAccountAction}
       />
@@ -84,9 +94,14 @@ export const RedirectAuthHandler: React.FC<{
     <Stack direction="column" sx={{ alignItems: "center", gap: 3 }}>
       <Stack direction="column" sx={{ alignItems: "center" }}>
         <LoadingIndicator />
-        Logging in with {method.description}...
+        {t("auth.loggingInWithMethod", "Logging in with {{authMethod}}...", {
+          authMethod: method.description,
+          ns: "common"
+        })}
       </Stack>
-      <Button onClick={handleCancel}>Cancel</Button>
+      <Button onClick={handleCancel}>
+        {t("actions.cancel", "Cancel", { ns: "common" })}
+      </Button>
     </Stack>
   );
 };

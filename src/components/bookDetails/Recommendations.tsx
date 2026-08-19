@@ -6,8 +6,10 @@ import { AnyBook } from "interfaces";
 import { collectionFetcher } from "dataflow/catalog";
 import useSWR from "swr";
 import useUser from "components/context/UserContext";
+import { useTranslation } from "next-i18next/pages";
 
 const Recommendations: React.FC<{ book: AnyBook }> = ({ book }) => {
+  const { t } = useTranslation();
   const relatedUrl = book.relatedUrl;
   const { token } = useUser();
 
@@ -41,7 +43,7 @@ const Recommendations: React.FC<{ book: AnyBook }> = ({ book }) => {
           color: isLoading ? "ui.gray.dark" : "ui.black"
         }}
       >
-        Recommendations{" "}
+        {t("recommendations.recommendations", "Recommendations")}
         {isLoading && (
           // @ts-expect-error theme-ui Spinner typing expects numeric size
           <LoadingIndicator size="1.75rem" color="ui.gray.dark" />

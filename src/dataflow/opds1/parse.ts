@@ -36,7 +36,6 @@ import { getAppSupportLevel } from "utils/fulfill";
 import { TrackOpenBookRel } from "types/opds1";
 import DOMPurify from "dompurify";
 import { bookIsAudiobook } from "utils/book";
-import { formatDuration } from "utils/duration";
 
 /**
  * Parses OPDS 1.x Feed or Entry into a Collection or Book
@@ -196,7 +195,15 @@ function getNarrators(entry: OPDSEntry): string[] | undefined {
   return undefined;
 }
 
-function getDuration(entry: OPDSEntry): string | undefined {
+/**
+ * Reads dcterms:duration as a number of seconds.
+ *
+ * entry.unparsed is typed `any` and the xml2js text node is a string (eg.
+ * "21611.0"), so the conversion is explicit. dcterms:duration also permits
+ * ISO-8601 (eg. "PT6H1M"), which is not a number of seconds; those convert
+ * to NaN and are dropped rather than stored on the book.
+ */
+function getDuration(entry: OPDSEntry): number | undefined {
   const entryDuration = entry.unparsed?.["dcterms:duration"];
   if (entryDuration && entryDuration.length > 0) {
     const duration = entryDuration.find(
@@ -204,7 +211,8 @@ function getDuration(entry: OPDSEntry): string | undefined {
     )?._;
 
     if (duration) {
-      return formatDuration(duration);
+      const seconds = Number(duration);
+      return Number.isFinite(seconds) && seconds > 0 ? seconds : undefined;
     }
   }
 
@@ -384,7 +392,7 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
     audience: audience,
     duration: duration,
     publisher: entry.publisher,
-    published: entry.issued && formatDate(entry.issued),
+    published: entry.issued,
     categories: categories,
     providerName: providerName,
     language: entry.language,
@@ -545,31 +553,6 @@ export function dedupeBooks(books: AnyBook[]): AnyBook[] {
   }, new Map<any, AnyBook>());
 
   return Array.from(bookIndex.values());
-}
-
-export function formatDate(inputDate: string): string {
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December"
-  ];
-
-  const date = new Date(inputDate);
-  const day = date.getUTCDate();
-  const monthIndex = date.getUTCMonth();
-  const month = monthNames[monthIndex];
-  const year = date.getUTCFullYear();
-
-  return `${month} ${day}, ${year}`;
 }
 
 function OPDSLinkToLinkData(

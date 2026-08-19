@@ -6,11 +6,17 @@ import { useRouter } from "next/router";
 import extractParam from "dataflow/utils";
 import { OPDS1 } from "interfaces";
 import { PageLoader } from "components/LoadingIndicator";
+import { useTranslation } from "next-i18next/pages";
 
 const ErrorComponent: React.FC<{ info?: OPDS1.ProblemDocument }> = ({
   info
 }) => {
-  const { title = "Something went wrong", status, detail } = info ?? {};
+  const { t } = useTranslation();
+  const {
+    title = t("error.somethingWentWrong", "Something went wrong"),
+    status,
+    detail
+  } = info ?? {};
 
   const router = useRouter();
   const library = extractParam(router.query, "library");
@@ -28,12 +34,14 @@ const ErrorComponent: React.FC<{ info?: OPDS1.ProblemDocument }> = ({
           }}
         >
           <H1>
-            {status} Error: {title}
+            {status} {t("error.error", "Error:")} {title}
           </H1>
           <p>
             {detail && `${detail}`} <br />
           </p>
-          <Link href={`/${library}`}>Return Home</Link>
+          <Link href={`/${library}`}>
+            {t("error.returnHome", "Return Home")}
+          </Link>
         </div>
       )}
     </>

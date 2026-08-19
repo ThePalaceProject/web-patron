@@ -34,7 +34,8 @@
     "translations:extract": "npx i18next-cli extract",
     "translations:lint": "npx i18next-cli lint",
     "translations:status": "npx i18next-cli status",
-    "translations:sync": "npx i18next-cli sync"
+    "translations:sync": "npx i18next-cli sync",
+    "translations:unused": "npx i18n-unused display-unused"
   },
   "dependencies": {
     "@ariakit/react": "^0.4.13",
@@ -42,6 +43,7 @@
     "@bugsnag/plugin-react": "^7.19.0",
     "@csstools/normalize.css": "^10.1.0",
     "@emotion/react": "^11.14.0",
+    "@formatjs/intl-durationformat": "^0.10.18",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@fortawesome/free-regular-svg-icons": "^6.7.2",
@@ -121,7 +123,8 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "fetch-mock": "^10.1.1",
-    "i18next-cli": "^1.67.3",
+    "i18n-unused": "^0.20.0",
+    "i18next-cli": "^1.69.2",
     "jest": "^29.7.0",
     "jest-emotion": "^10.0.32",
     "jest-environment-jsdom": "^29.7.0",

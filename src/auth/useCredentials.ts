@@ -7,6 +7,7 @@ import { generateCredentials } from "utils/auth";
 import { REDIRECT_LOGIN_QUERY_PARAM } from "utils/constants";
 import useLogin from "./useLogin";
 import useLibraryContext from "components/context/LibraryContext";
+import { useTranslation } from "next-i18next/pages";
 
 /**
  * This hook:
@@ -19,6 +20,7 @@ import useLibraryContext from "components/context/LibraryContext";
  *    credentials.
  */
 export default function useCredentials(slug: string | null) {
+  const { t } = useTranslation("common");
   const router = useRouter();
   const { initLogin } = useLogin();
   const { authMethods } = useLibraryContext();
@@ -68,7 +70,10 @@ export default function useCredentials(slug: string | null) {
         const errorMessage =
           errorObj?.title && errorObj?.detail
             ? `${errorObj.title}: ${errorObj.detail}`
-            : "Authentication completed successfully, but your account was not recognized. Please contact your library for assistance.";
+            : t(
+                "auth.accountNotRecognized",
+                "Authentication completed successfully, but your account was not recognized. Please contact your library for assistance."
+              );
 
         // Redirect to login page with error message.
         // Don't use current page as redirect since auth just failed.
@@ -76,13 +81,17 @@ export default function useCredentials(slug: string | null) {
         initLogin(undefined, errorMessage, false);
       } catch {
         // If JSON parsing fails, show generic error.
-        initLogin(undefined, "Authentication failed. Please try again.", false);
+        initLogin(
+          undefined,
+          t("auth.authFailed", "Authentication failed. Please try again."),
+          false
+        );
       }
     } else if (!router.query.error) {
       // Clear the ref when there's no error param (e.g., navigated away)
       processedErrorRef.current = null;
     }
-  }, [router.query.error, initLogin]);
+  }, [router.query.error, initLogin, t]);
 
   // use credentials from browser url if they exist
   const { token: urlToken, methodType: urlMethodType } =

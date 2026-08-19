@@ -3,6 +3,7 @@ import { GetServerSideProps, NextPage } from "next";
 import OpenEbooksLandingPage from "components/OpenEbooksLanding";
 import MultiLibraryHome from "components/MultiLibraryHome";
 import { withAppPropsSSR, AppProps } from "dataflow/withAppProps";
+import { getTranslationProps } from "dataflow/translationProps";
 import { getAppConfig } from "server/appConfig";
 import type { AppConfig } from "interfaces";
 
@@ -26,7 +27,11 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async ctx => {
     if ("redirect" in result || "notFound" in result) return result;
     return { props: { ...(await result.props), appConfig } };
   }
-  return { props: { appConfig } };
+  /*
+   * MultiLibraryHome calls useTranslation, so this branch has to supply the
+   * i18n props itself
+   */
+  return { props: { appConfig, ...(await getTranslationProps(ctx.locale)) } };
 };
 
 export default HomePage;

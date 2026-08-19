@@ -24,13 +24,29 @@ import {
   getItemLandingRouteProps,
   ItemLandingProps
 } from "dataflow/itemLanding";
+import { getTranslationProps } from "dataflow/translationProps";
 
 const ItemLandingRoute: NextPage<ItemLandingProps> = ({ workId }) => (
   <ItemLandingPage workId={workId} />
 );
 
+/*
+ * The i18n props are merged here rather than in dataflow/itemLanding.ts so that
+ * module stays locale-agnostic. ItemLandingPage calls useTranslation, so
+ * without them it renders with no i18next instance.
+ */
 export const getServerSideProps: GetServerSideProps<
   ItemLandingProps
-> = async ctx => getItemLandingRouteProps(ctx.params);
+> = async ctx => {
+  const result = await getItemLandingRouteProps(ctx.params);
+  // notFound and redirect results carry no props to merge into
+  if (!("props" in result)) return result;
+  return {
+    props: {
+      ...(await result.props),
+      ...(await getTranslationProps(ctx.locale))
+    }
+  };
+};
 
 export default ItemLandingRoute;

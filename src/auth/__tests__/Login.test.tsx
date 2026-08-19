@@ -49,6 +49,47 @@ test("shows warning if only auth method provided is unsupported", async () => {
   );
 });
 
+test("shows site administrator redirect when a help email is configured for a library", async () => {
+  setup(<Login />, {
+    library: {
+      ...fixtures.libraryData,
+      libraryLinks: {
+        helpEmail: { href: "mailto:help@gmail.com" }
+      },
+      authMethods: []
+    }
+  });
+  expect(
+    screen.getByText(
+      /If this is an error, please contact your site administrator via email at:/
+    )
+  );
+  expect(screen.getByLabelText("Send email to help desk")).toHaveAttribute(
+    "href",
+    "mailto:help@gmail.com"
+  );
+});
+
+test("does not show site administrator redirect when a help email is not configured for a library", async () => {
+  setup(<Login />, {
+    library: {
+      ...fixtures.libraryData,
+      libraryLinks: {
+        helpEmail: undefined
+      },
+      authMethods: []
+    }
+  });
+  expect(
+    screen.queryByText(
+      /If this is an error, please contact your site administrator via email at:/
+    )
+  ).not.toBeInTheDocument();
+  expect(
+    screen.queryByLabelText("Send email to help desk")
+  ).not.toBeInTheDocument();
+});
+
 const oneAuthMethod: AppAuthMethod[] = [fixtures.basicAuthMethod];
 const multipleAuthMethods: AppAuthMethod[] = [
   fixtures.basicTokenAuthMethod,

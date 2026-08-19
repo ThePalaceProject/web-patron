@@ -57,6 +57,14 @@ __To have your library added to the demo, register it with NYPL's Library Regist
     - [Example](#example)
   - [Links and Routing](#links-and-routing)
   - [Translations](#translations)
+    - [Packages used for translations](#packages-used-for-translations)
+    - [Configuration files](#configuration-files)
+    - [JSON structure for translation files](#json-structure-for-translations-files)
+    - [Key naming scheme](#key-naming-scheme)
+    - [Interpolation](#interpolation)
+    - [Linting for hardcoded strings](#linting-for-hardcoded-strings)
+    - [Translation process](#translation-process)
+    - [Changing the app language](#changing-the-app-language)
 - [Deploying](#deploying)
   - [Build a docker container](#build-a-docker-container)
     - [Running the docker container](#running-the-docker-container)
@@ -380,10 +388,11 @@ Overview of the translation setup for the `web-patron` application
 The `web-patron` application utilizes the following packages for internationalization (i18n):
 
 - **next-i18next**: a plugin for Next.js that integrates i18next for server-side translations
-- **i18next-cli** a command-line tool for managing translations (development dependency)
+- **i18next-cli**: a command-line tool for managing translations (development dependency)
+- **i18n-unused**: a command-line tool that flags unused translations (development dependency)
 - **i18next**: an internationalization framework for JavaScript (peer dependency required by `next-i18next`)
 - **react-i18next**: React bindings for i18next (peer dependency required by `next-i18next`)
-- **eslint-plugin-18next** ESLint plugin that warns about hardcoded strings (development dependency)
+- **eslint-plugin-i18next** ESLint plugin that warns about hardcoded strings (development dependency)
 
 ### Configuration files
 
@@ -394,9 +403,9 @@ This file contains the configuration for the `next-i18next` library, which manag
 Key settings:
 
 - **Supported languages**: English (`en`), French (`fr`), Italian (`it`), and Spanish (`es`).
-- **Default language**: English (`en`) is the default and fallback language
-- **Namespaces**: The default namespace is set to `translations`, which contains all translation keys
-- **Translation files path**: Translation files are stored in the `public/locales` directory
+- **Default language**: English (`en`) is the default and fallback language.
+- **Namespaces**: Two namespaces are used. `translations` is the default and holds keys used by a single component; `common` holds strings shared by more than one component. See [Shared strings and the `common` namespace](#shared-strings-and-the-common-namespace)
+- **Translation files path**: Translation files are stored in the `public/locales` directory.
 
 #### `i18next.config.ts`
 
@@ -404,65 +413,148 @@ This file configures the `i18next-cli` for extracting translation keys from the 
 
 Key settings:
 
-- **Input files**: The configuration specifies that `.tsx` and `.jsx` files in the `src/components` and `src/pages` directories should be scanned for translation keys
+- **Input files**: All `.tsx`, `.jsx` and `.ts` files under `src` are scanned for translation keys, excluding `__tests__` directories and `src/test-utils`
 - **Output path**: Extracted translation files are saved in the `public/locales` directory, organized by language and namespace
 - **Commands**: Use the following scripts to manage translations:
   - `translations:status` Overview of project translations
   - `translations:lint` List of hardcoded strings needing translation
   - `translations:extract` Extract translation keys and update translation files
+    - `--sync-primary` Use default value provided in `t(translation_key, default_value)` as translation
+    - `--watch` Update translation file on file save
   - `translations:sync` Sync non-English files with the English file
+    - **Note**: `i18next` generates locale-specific plural forms that might result in more plural keys being generated for other languages than the default language (`en`). For example `en` might only have `key_other` while a different locale could have `key_other` and `key_many`. Running `translations:sync` when locale-specific plural forms exist in translations files other than the default language _and the non-default locales have yet to be translated_ will cause those keys to be removed.
   - `translations:ci` Fail builds when translations are outdated
+
+#### `i18n-unused.config.js`
+
+- **Commands**:
+  - `translations:unused` Lists unused translation keys
+    - `i18next.config.js` sets `removedUnusedKeys: false` so unused keys are not removed upon extraction (`npm run translations:extract`). This command surfaces any unused keys to help with manual removal.
 
 ### JSON structure for translations files
 
-Translations are stored in flat JSON files named `translations.json`, with one file for each supported language. The JSON files consist of key-value pairs, where the key is a unique identifier for the translation and the value is the actual translated string. The translation keys within these files can be structured using a dot notation, like `bookDetails.publisher`, but using this structure is optional. Nesting is not used, which makes it easier to retrieve and sort the translations.
+Translations are stored in flat JSON files, one per language per namespace: `translations.json` and `common.json` under `public/locales/{language}/`. The JSON files consist of key-value pairs, where the key is a unique identifier for the translation and the value is the actual translated string. The translation keys within these files are structured using dot notation, like `bookDetails.publisher`. Nesting is not used, which makes it easier to retrieve and sort the translations.
 
-Example content of a `translations.json` file:
+### Key naming scheme
 
-```json
-{
-  "book": "Book",
-  "bookDetails": "Book details",
-  "bookDetails.publisher": "Publisher",
-  "bookDetails.title": "Title",
-  "bookDetails.author": "Author",
-  "status.availableToBorrow": "This book is available to borrow"
-}
+Every key in the default `translations` namespace should begin with the camelCase name of the file that uses it. A key in `ReportProblem.tsx` starts with `reportProblem.`, a key in `SignOut.tsx` starts with `signOut.`, and so on. Keys in the `common` namespace are the exception — they are shared across files and are grouped by domain.
+
+The prefix is derived from the file path like this:
+
+| File                                     | Prefix        | Rule                                       |
+| ---------------------------------------- | ------------- | ------------------------------------------ |
+| `src/components/SignOut.tsx`             | `signOut`     | PascalCase → camelCase                     |
+| `src/pages/[library]/signed-out.tsx`     | `signedOut`   | kebab-case → camelCase                     |
+| `src/components/bookDetails/index.tsx`   | `bookDetails` | `index` files inherit the parent directory |
+| `src/pages/[library]/book/[bookUrl].tsx` | `bookUrl`     | Next.js dynamic segments are unbracketed   |
+
+Examples:
+
+```tsx
+// src/components/SignOut.tsx
+t("signOut.cancel", "Cancel");
+
+// src/components/bookDetails/index.tsx
+t("bookDetails.publisher", "Publisher");
+
+// src/pages/[library]/signed-out.tsx — keys may have more than two segments
+t("signedOut.securityNotice.body1", "…");
 ```
 
-### Using translations in components
+For an interpolated key, the **full prefix including the dot** must appear in the literal text before the first `${...}`, so that no interpolated value can change which namespace the key lands in:
 
-To translate strings in components, follow these steps:
+```tsx
+// good
+t(`languageSelector.languageName.${code}`);
 
-1. **Import the `useTranslation` hook**
+// bad — different namespace
+t(`languageName.${code}`);
 
-   ```javascript
-   import { useTranslation } from "next-i18next/pages";
-   ```
+// bad — `${suffix}` could produce the key "languageSelectorFoo"
+t(`languageSelector${suffix}`);
+```
 
-2. **Define the `t` translation function**
+#### Shared strings and the `common` namespace
 
-   ```javascript
-   const { t } = useTranslation();
-   ```
+The file-prefix scheme gives each component its own keys, which means a string used by several components would otherwise be duplicated once per component. When that happens, duplicates might drift apart per language over time.
 
-3. **Fetch translation strings with `t("translationString")`**
+**A string rendered by more than one component belongs in `common.json`**, keyed by domain rather than by file. Read it by naming the namespace explicitly:
 
-   ```jsx
-   <DetailField heading={t("bookDetails.publisher")} details={book.publisher} />
-   ```
+```tsx
+// src/components/SignOut.tsx and src/components/bookDetails/ReportProblem.tsx
+// both render the same button label, so it lives in common.json
+t("actions.cancel", "Cancel", { ns: "common" });
+```
+
+The domain prefixes currently in use:
+
+| Prefix     | Holds                                     | Example                        |
+| ---------- | ----------------------------------------- | ------------------------------ |
+| `actions.` | Button labels and their loading states    | `actions.cancelReservation`    |
+| `alt.`     | Alternative text                          | `alt.bookCover`                |
+| `auth.`    | Sign-in copy shared by the auth handlers  | `auth.loggingInWithMethod`     |
+| `error.`   | General error messages                    | `error.unknown`                |
+| `library.` | Copy about the library list               | `library.noLibrariesAvailable` |
+| `nav.`     | Navigation destinations and app-wide CTAs | `nav.myBooks`                  |
+| `status.`  | Loading and status text                   | `status.loading`               |
+
+Two rules keep this working:
+
+1. **The `ns` option is what routes the key.** `i18next-cli` reads it during extraction and writes the key to `common.json` instead of `translations.json`. Forget it and the key silently lands in the default namespace, where the other components cannot share it.
+2. **A new namespace must be registered in three places**: the `ns` array in [next-i18next.config.js](next-i18next.config.js), `translationNamespaces` in [src/dataflow/withAppProps.ts](src/dataflow/withAppProps.ts) (both the static and the server-side variant), and the namespace map in [src/test-utils/mockUseTranslation.ts](src/test-utils/mockUseTranslation.ts). A namespace missing from `withAppProps.ts` is never serialized to the client.
+
+### Interpolation
+
+**Do not overly rely on interpolation**: Opt for interpolation when using user-provided data or strings that won't likely change context when translated. In other cases, it can be difficult to properly translate context when many of the words or phrases within a sentence are translated prior.
+
+E.g. The meaning of the sentence `"Also available to {{action}} in {{app}}"` might change if an action (`read` or `listen to`) is translated outside the context of the sentence. It is better to have separate translations:
+
+```json
+"fulfillmentCard.alsoAvailableToReadIn": "Also available to read in {{app}}",
+"fulfillmentCard.alsoAvailableToListenToIn": "Also available to listen to in {{app}}"
+```
+
+### Linting for hardcoded strings
+
+Two tools flag untranslated strings. They are not redundant — run both.
+
+|                   | `npm run lint` (`i18next/no-literal-string`)         | `npm run translations:lint`                            |
+| ----------------- | ---------------------------------------------------- | ------------------------------------------------------ |
+| Checks            | Hardcoded strings in JSX, **plus** template literals | Hardcoded strings, **plus** `t()` interpolation params |
+| Custom components | Looks inside every component                         | Only inside a fixed allowlist of HTML tag names        |
+| When              | Every lint run, including CI                         | Manually, when adding strings                          |
+
+**ESLint is the stricter of the two on hardcoded strings.** `translations:lint` only inspects elements whose lowercased tag name appears in `i18next-cli`'s built-in HTML allowlist, so hardcoded text inside `<Text>`, `<Link>` and most Theme UI components is invisible to it. `<Button>` and `<H2>` happen to be covered, because they lowercase to `button` and `h2`. The ESLint rule has no tag allowlist, so it catches all of them.
+
+The two also disagree on which JSX attributes are translatable. Both check `alt`, `aria-label`, `label`, `placeholder` and `title`. Past those, the ESLint rule adds project-specific props (`heading`, `info`, `loadingText`, `message`, `subtitle`, `text`, `currentLocation`) configured in [.eslintrc.js](.eslintrc.js), and `i18next-cli` adds others from its own defaults (`caption`, `content`, `description`, `summary`, `aria-description`, …).
+
+**What `translations:lint` adds** is `t()` correctness, which the ESLint rule does not attempt — its default config deliberately excludes `t` as a callee. For a call like:
+
+```tsx
+t("auth.fieldRequired", "Your {{field}} is required.", { field: fieldName });
+```
+
+it checks the `{{placeholders}}` in the string against the keys of the options object in both directions, reporting a placeholder with no matching param (which renders to the patron as the literal text `{{field}}`) and a param with no matching placeholder (which is silently dropped). Rename one side without the other and you get an error. This is the main reason to run it before extracting.
 
 ### Translation process
 
 To extract translation keys from your component source code and to update the `translations.json` files, follow these steps:
 
-1. **Run the `lint` command (optional)**
+0. **Run `npm run lint`**
+
+   ```bash
+   npm run lint
+   ```
+
+   This confirms that any new keys are namespaced correctly for the file they live in. Do this before extracting, so that a mis-prefixed key never reaches the `translations.json` files.
+
+1. **Run the `lint` command**
 
    ```bash
    npm run translations:lint
    ```
 
-   This command prints a list of hardcoded strings, that are not yet wrapped in the translation function (`t`). These strings probably need to be translated, too.
+   This command prints a list of hardcoded strings, that are not yet wrapped in the translation function (`t`). These strings probably need to be translated, too. See [Linting for hardcoded strings](#linting-for-hardcoded-strings) for what this catches that `npm run lint` does not.
 
 2. **Run the `extract` command**
 
@@ -470,7 +562,7 @@ To extract translation keys from your component source code and to update the `t
    npm run translations:extract
    ```
 
-   This command will scan the specified directories for translation keys used in your components and update the `translations.json` files in the `public/locales` directory.
+   This command will scan the specified directories for translation keys used in your components and update the `translations.json` files in the `public/locales` directory. If passing default values to the `t(...)` function -- either as the 2nd argument or within the options object (e.g. `{ defaultValue: "..."}` or `{ defaultValue_one: "...", defaultValue_two: "..." }`) -- then running the command with the `--sync-primary` flag is useful. It will use the default value as the translation key value in the translation file.
 
 3. **Run the `sync` command (optional)**
 
@@ -485,6 +577,7 @@ To extract translation keys from your component source code and to update the `t
 
 5. **Add translations**  
    Collaborate with the translators and add the translations for the keys in the non-English files, and English (`en`) to the `translations.json` files.
+   **Note**: Transifex and `@transifex/cli` will likely be leveraged for automated translation.
 
 6. **Save changes**  
    Verify that the translations are correct and functioning as expected in the application. Then commit the updated translation files.

@@ -386,7 +386,7 @@ describe("WorkLibrarySelector", () => {
 
     const alert = await screen.findByRole("alert");
     expect(alert).toHaveTextContent(
-      "The item with identifier “work-1” is not currently available through this library (“Alpha Library”)."
+      'The item with identifier "work-1" is not currently available through this library ("Alpha Library").'
     );
     expect(mockPush).not.toHaveBeenCalled();
   });

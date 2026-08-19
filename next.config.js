@@ -69,10 +69,18 @@ const config = {
       config.plugins.push(
         new webpack.IgnorePlugin({ resourceRegExp: /@axe-core\/react$/ })
       );
-    // Fixes dependency on "fs" module.
-    // We don't (and can't) depend on this in client-side code.
+    // Stub out Node built-ins that don't exist in the browser. We don't (and
+    // can't) depend on either of these in client-side code.
+    //
+    // fs:     server-only modules that read from disk.
+    //
+    // module: pages/_error.tsx imports dataflow/translationProps, which pulls in
+    //         next-i18next's serverSideTranslations, which calls createRequire
+    //         from "module" to load next-i18next.config.js. Setting module to false
+    //         ensures no build issues for client/browser code.
     if (!isServer) {
       config.resolve.fallback.fs = false;
+      config.resolve.fallback.module = false;
     }
 
     return config;

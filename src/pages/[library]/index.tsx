@@ -3,11 +3,17 @@ import Collection from "components/Collection";
 import { NextPage, GetStaticProps, GetStaticPaths } from "next";
 import LayoutPage from "components/LayoutPage";
 import withAppProps, { AppProps } from "dataflow/withAppProps";
+import { useTranslation } from "next-i18next/pages";
 
 const LibraryHome: NextPage<AppProps> = ({ library, error }) => {
+  const { t } = useTranslation();
   return (
     <LayoutPage library={library} error={error}>
-      <Collection title={`${library?.catalogName} Home`} />
+      <Collection
+        title={t("library.home", "{{catalogName}} Home", {
+          catalogName: library?.catalogName
+        })}
+      />
     </LayoutPage>
   );
 };

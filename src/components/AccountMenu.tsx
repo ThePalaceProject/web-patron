@@ -8,8 +8,10 @@ import useUser from "./context/UserContext";
 import { copyToClipboard } from "../utils/clipboard";
 import Button from "./Button";
 import { styleProps } from "./Button/styles";
+import { useTranslation } from "next-i18next/pages";
 
 export const AccountMenu: React.FC = () => {
+  const { t } = useTranslation();
   const menu = useMenuStore();
   const { patronId } = useUser();
 
@@ -25,7 +27,7 @@ export const AccountMenu: React.FC = () => {
         }}
       >
         <Account sx={{ width: 20, height: 20 }} />
-        Account
+        {t("accountMenu.account", "Account")}
       </MenuButton>
 
       <Menu
@@ -61,7 +63,7 @@ export const AccountMenu: React.FC = () => {
               minWidth: "auto",
               p: 1
             }}
-            aria-label="Close account menu"
+            aria-label={t("accountMenu.closeMenu", "Close account menu")}
           >
             <Icon
               decorative={false}
@@ -86,6 +88,7 @@ interface PatronIdMenuItemProps {
 }
 
 const PatronIdMenuItem: React.FC<PatronIdMenuItemProps> = ({ patronId }) => {
+  const { t } = useTranslation();
   const [copyStatus, setCopyStatus] = React.useState<
     "idle" | "copied" | "error"
   >("idle");
@@ -128,7 +131,7 @@ const PatronIdMenuItem: React.FC<PatronIdMenuItemProps> = ({ patronId }) => {
         }}
       >
         <span sx={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis" }}>
-          Patron&nbsp;ID:&nbsp;{patronId}
+          {t("accountMenu.patronId", "Patron ID: {{patronId}}", { patronId })}
         </span>
         <div
           sx={{ display: "flex", alignItems: "center", gap: 1, flexShrink: 0 }}
@@ -140,7 +143,7 @@ const PatronIdMenuItem: React.FC<PatronIdMenuItemProps> = ({ patronId }) => {
               aria-live="polite"
               aria-atomic="true"
             >
-              Copied!
+              {t("accountMenu.copied", "Copied!")}
             </span>
           )}
           {copyStatus === "error" && (
@@ -150,7 +153,7 @@ const PatronIdMenuItem: React.FC<PatronIdMenuItemProps> = ({ patronId }) => {
               aria-live="polite"
               aria-atomic="true"
             >
-              Failed
+              {t("accountMenu.failed", "Failed")}
             </span>
           )}
           <Copy sx={{ width: 16, height: 16 }} />

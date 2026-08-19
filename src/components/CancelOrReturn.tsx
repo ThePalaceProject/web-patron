@@ -5,6 +5,7 @@ import { fetchBook } from "dataflow/catalog";
 import Button from "components/Button";
 import useError from "hooks/useError";
 import { useFulfillmentButtonStackError } from "components/layouts/FulfillmentButtonStack";
+import { useTranslation } from "next-i18next/pages";
 
 const CancelOrReturn: React.FC<{
   text: string;
@@ -12,6 +13,7 @@ const CancelOrReturn: React.FC<{
   revokeUrl: string | null;
   id: string;
 }> = ({ text, loadingText, revokeUrl, id }) => {
+  const { t } = useTranslation("common");
   const { token, setBook } = useUser();
   const { catalogUrl } = useLibraryContext();
   const [loading, setLoading] = React.useState(false);
@@ -25,7 +27,7 @@ const CancelOrReturn: React.FC<{
   async function cancelReservation(revokeUrl: string) {
     clearError();
     if (!token) {
-      setErrorString("You must be signed in.");
+      setErrorString(t("auth.mustBeSignedIn", "You must be signed in."));
       return;
     }
     setLoading(true);

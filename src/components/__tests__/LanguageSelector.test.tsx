@@ -1,10 +1,11 @@
 import { mockUseTranslation } from "test-utils/mockUseTranslation";
 import { act, screen, setup as customSetup } from "test-utils";
-import LanguageSelector, { Language } from "components/LanguageSelector";
+import LanguageSelector from "components/LanguageSelector";
 import React from "react";
 // resolves to the stateful mock in __mocks__/js-cookie.ts,
 // which test-utils resets before each test
 import mockCookie from "js-cookie";
+import { Language } from "utils/i18n";
 
 // mock the next/router first
 // to prevent tests using the actual router

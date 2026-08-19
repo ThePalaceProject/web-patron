@@ -5,6 +5,7 @@ import Button from "components/Button";
 import LoadingIndicator from "components/LoadingIndicator";
 import { Container } from "theme-ui";
 import ChevronLeft from "icons/ChevronLeft";
+import { useTranslation } from "next-i18next/pages";
 
 interface ReaderWrapperProps {
   children: (args: {
@@ -14,6 +15,7 @@ interface ReaderWrapperProps {
 }
 
 const ReaderWrapper = ({ children }: ReaderWrapperProps) => {
+  const { t } = useTranslation();
   const { back } = useRouter();
   const close = () => back();
 
@@ -42,7 +44,7 @@ const ReaderWrapper = ({ children }: ReaderWrapperProps) => {
             iconLeft={ChevronLeft}
             sx={{ alignSelf: "flex-start", margin: 10 }}
           >
-            Back
+            {t("readerWrapper.back", "Back")}
           </Button>
         }
       />

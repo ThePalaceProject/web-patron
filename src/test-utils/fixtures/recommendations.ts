@@ -39,7 +39,7 @@ export const recommendations: CollectionData = {
           holds: null,
           copies: null,
           publisher: "Standard Ebooks",
-          published: "January 29, 1813",
+          published: "1813-01-29",
           categories: [
             "Adult",
             "Fiction",
@@ -1050,7 +1050,7 @@ export const recommendations: CollectionData = {
           holds: null,
           copies: null,
           publisher: "Standard Ebooks",
-          published: "December 24, 1815",
+          published: "1815-12-24",
           categories: [
             "Adult",
             "Fiction",

@@ -30,9 +30,8 @@ import {
   Opds2Link,
   Opds2Publication
 } from "validation/opds2Catalog";
-import { dedupeBooks, fixMimeType, formatDate } from "dataflow/opds1/parse";
+import { dedupeBooks, fixMimeType } from "dataflow/opds1/parse";
 import { getAppSupportLevel } from "utils/fulfill";
-import { formatDuration } from "utils/duration";
 import DOMPurify from "dompurify";
 
 /**
@@ -415,14 +414,10 @@ export function publicationToBook(
     categories,
     publisher: contributorNames(metadata.publisher)[0],
     published:
-      typeof metadata.published === "string"
-        ? formatDate(metadata.published)
-        : undefined,
+      typeof metadata.published === "string" ? metadata.published : undefined,
     language,
     duration:
-      typeof metadata.duration === "number"
-        ? formatDuration(metadata.duration)
-        : undefined,
+      typeof metadata.duration === "number" ? metadata.duration : undefined,
     format,
     series,
     url: detailUrl,

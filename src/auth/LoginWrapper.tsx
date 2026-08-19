@@ -9,6 +9,7 @@ import BreadcrumbBar from "components/BreadcrumbBar";
 import useLoginRedirectUrl from "auth/useLoginRedirect";
 import { H1, Text } from "components/Text";
 import SignUpLink from "auth/SignUpLink";
+import { useTranslation } from "next-i18next/pages";
 
 /**
  * Redirects on success
@@ -20,6 +21,7 @@ interface LoginWrapperProps {
 }
 
 const LoginWrapper = ({ children }: LoginWrapperProps) => {
+  const { t } = useTranslation();
   const { isAuthenticated, isLoading } = useUser();
   const { catalogName } = useLibraryContext();
   const { push } = useRouter();
@@ -42,9 +44,13 @@ const LoginWrapper = ({ children }: LoginWrapperProps) => {
       }}
     >
       <Head>
-        <title>Login - {catalogName}</title>
+        <title>
+          {t("loginWrapper.title", "Login - {{catalogName}}", { catalogName })}
+        </title>
       </Head>
-      <BreadcrumbBar currentLocation="Login" />
+      <BreadcrumbBar
+        currentLocation={t("auth.login", "Login", { ns: "common" })}
+      />
       <div
         sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
       >
@@ -54,7 +60,11 @@ const LoginWrapper = ({ children }: LoginWrapperProps) => {
         >
           <div sx={{ textAlign: "center", p: 0 }}>
             <H1
-              aria-label={`Log in to ${catalogName}`}
+              aria-label={t(
+                "loginWrapper.logInTo",
+                "Log in to {{catalogName}}",
+                { catalogName }
+              )}
               variant="text.headers.secondary"
             >
               {catalogName}
@@ -66,7 +76,7 @@ const LoginWrapper = ({ children }: LoginWrapperProps) => {
                   mt: 15
                 }}
               >
-                Login
+                {t("auth.login", "Login", { ns: "common" })}
               </Text>
             </H1>
           </div>
@@ -77,7 +87,7 @@ const LoginWrapper = ({ children }: LoginWrapperProps) => {
           {isLoading || isAuthenticated ? (
             <Stack direction="column" sx={{ alignItems: "center" }}>
               <LoadingIndicator />
-              Logging in...
+              {t("loginWrapper.loggingIn", "Logging in...")}
             </Stack>
           ) : (
             <>

@@ -15,7 +15,9 @@
 //    => extract translation keys from the code and update the translation files
 //
 // translations:sync
-//    => sync fr, it, and es files against en file (add missing keys and purge extra ones)
+//    => sync non-English files against en file (add missing keys and purge extra ones)
+//    => caveat: translations:sync will strip empty locale-specific plural forms (e.g. `_many`)
+//    => when such forms are missing from en (due to locale-specific differences in pluralization)
 //
 // translations:ci
 //    =>  fails builds when translations are outdated, used for CI purposes
@@ -43,8 +45,10 @@ const translationFunctions = ["t"];
 const defaultTranslationNamespace = "translations";
 
 // define the input file patterns to search for translation keys
-// We include all .tsx and .jsx files in the components and pages directories
-const inputFiles = ["src/{components,pages}/**/*.{tsx,jsx}"];
+// We include all files anywhere in src, rather than naming individual directories,
+// so a directory that gains translated components cannot silently fall out of extraction
+// We also include .ts files as some utilities and hooks pass strings to components
+const inputFiles = ["src/**/*.{tsx,jsx,ts}"];
 
 // define the output path to public/locales directory,
 // and organize the translation files by language and namespace,
@@ -52,8 +56,13 @@ const inputFiles = ["src/{components,pages}/**/*.{tsx,jsx}"];
 const outputPath = "public/locales/{{language}}/{{namespace}}.json";
 
 // define files and directories to ignore during extraction
-// For example test files are skipped
-const ignoredFiles = ["**/__tests__/**"];
+// Test files are skipped, as are the shared test helpers in src/test-utils,
+// which reference the translation API but hold no keys of their own
+const ignoredFiles = [
+  "**/__tests__/**",
+  "src/test-utils/**",
+  "**/*.stories.tsx"
+];
 
 // define list of HTML attributes to ignore during extraction,
 // these attributes do not need to be translated

@@ -12,8 +12,10 @@ import useUser from "components/context/UserContext";
 import useLogin from "auth/useLogin";
 import ClientOnly from "./ClientOnly";
 import LanguageSelector from "./LanguageSelector";
+import { useTranslation } from "next-i18next/pages";
 
 const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
+  const { t } = useTranslation();
   const library = useLibraryContext();
 
   return (
@@ -29,7 +31,10 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
     >
       <Link
         href="/"
-        aria-label="Go to catalog home page"
+        aria-label={t(
+          "header.catalogLink.ariaLabel",
+          "Go to catalog home page"
+        )}
         sx={{
           display: "flex",
           flexDirection: "column",
@@ -41,7 +46,12 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
         }}
       >
         {library.logoUrl ? (
-          <img src={library.logoUrl} alt={`${library.catalogName} Logo`} />
+          <img
+            src={library.logoUrl}
+            alt={t("header.catalogLogo", "{{catalogName}} Logo", {
+              catalogName: library.catalogName
+            })}
+          />
         ) : (
           <Text variant="text.headers.primary">{library.catalogName}</Text>
         )}
@@ -50,10 +60,7 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
         direction="column"
         spacing={4}
         sx={{
-          // flexDirection: "column",
-          // flexWrap: "wrap",
           alignItems: ["stretch", "flex-end"],
-          // justifyContent: "space-between",
           flex: 1
         }}
       >
@@ -65,6 +72,7 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
 };
 
 const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
+  const { t } = useTranslation();
   const { helpWebsite } = library.libraryLinks;
   const { isAuthenticated, isLoading } = useUser();
   const { baseLoginUrl } = useLogin();
@@ -83,7 +91,7 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
         href="/"
         sx={{ whiteSpace: "initial" }}
       >
-        Catalog
+        {t("nav.catalog", "Catalog", { ns: "common" })}
       </NavButton>
 
       {library?.headerLinks?.map(link => (
@@ -103,9 +111,9 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
           variant="ghost"
           color="ui.black"
           href={helpWebsite.href}
-          title="help"
+          title={t("header.help", "Help")}
         >
-          Help
+          {t("header.help", "Help")}
         </AnchorButton>
       )}
 
@@ -115,7 +123,7 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
         href="/loans"
         iconLeft={BookIcon}
       >
-        My Books
+        {t("nav.myBooks", "My Books", { ns: "common" })}
       </NavButton>
 
       <ClientOnly>
@@ -125,7 +133,7 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
           <Button loading />
         ) : (
           <NavButton color="ui.black" href={baseLoginUrl}>
-            Sign In
+            {t("header.signIn", "Sign In")}
           </NavButton>
         )}
       </ClientOnly>

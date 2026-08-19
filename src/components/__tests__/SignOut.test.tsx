@@ -58,7 +58,7 @@ test("signs out on click signout", async () => {
 
   await user.click(signOut);
   const signOutForReal = await screen.findByRole("button", {
-    name: "Confirm Sign Out"
+    name: "Sign Out"
   });
 
   expect(fixtures.mockSignOut).toHaveBeenCalledTimes(0);
@@ -132,7 +132,7 @@ describe("OIDC logout with logout endpoint", () => {
     await user.click(signOutBtn);
 
     const signOutForReal = await screen.findByRole("button", {
-      name: "Confirm Sign Out"
+      name: "Sign Out"
     });
     await user.click(signOutForReal);
 
@@ -151,7 +151,7 @@ describe("OIDC logout with logout endpoint", () => {
     await user.click(signOutBtn);
 
     const signOutForReal = await screen.findByRole("button", {
-      name: "Confirm Sign Out"
+      name: "Sign Out"
     });
     await user.click(signOutForReal);
 
@@ -206,7 +206,7 @@ describe("OIDC logout with logout endpoint", () => {
     const signOutBtn = await screen.findByRole("button", { name: "Sign Out" });
     await user.click(signOutBtn);
     const signOutForReal = await screen.findByRole("button", {
-      name: "Confirm Sign Out"
+      name: "Sign Out"
     });
     await user.click(signOutForReal);
 
@@ -225,7 +225,7 @@ describe("OIDC logout with logout endpoint", () => {
     await user.click(signOutBtn);
 
     const signOutForReal = await screen.findByRole("button", {
-      name: "Confirm Sign Out"
+      name: "Sign Out"
     });
     await user.click(signOutForReal);
 
@@ -249,7 +249,7 @@ describe("OIDC logout with logout endpoint", () => {
     await user.click(signOutBtn);
 
     const signOutForReal = await screen.findByRole("button", {
-      name: "Confirm Sign Out"
+      name: "Sign Out"
     });
     await user.click(signOutForReal);
 
@@ -315,7 +315,7 @@ describe("SAML logout with logout endpoint", () => {
     await user.click(signOutBtn);
 
     const signOutForReal = await screen.findByRole("button", {
-      name: "Confirm Sign Out"
+      name: "Sign Out"
     });
     await user.click(signOutForReal);
 
@@ -333,7 +333,7 @@ describe("SAML logout with logout endpoint", () => {
     await user.click(signOutBtn);
 
     const signOutForReal = await screen.findByRole("button", {
-      name: "Confirm Sign Out"
+      name: "Sign Out"
     });
     await user.click(signOutForReal);
 
@@ -358,7 +358,7 @@ describe("SAML logout with logout endpoint", () => {
     await user.click(signOutBtn);
 
     const signOutForReal = await screen.findByRole("button", {
-      name: "Confirm Sign Out"
+      name: "Sign Out"
     });
     await user.click(signOutForReal);
 
@@ -378,7 +378,7 @@ describe("SAML logout with logout endpoint", () => {
     await user.click(signOutBtn);
 
     const signOutForReal = await screen.findByRole("button", {
-      name: "Confirm Sign Out"
+      name: "Sign Out"
     });
     await user.click(signOutForReal);
 
@@ -415,7 +415,7 @@ test("falls back to local signout for OIDC without logout link", async () => {
   await user.click(signOut);
 
   const signOutForReal = await screen.findByRole("button", {
-    name: "Confirm Sign Out"
+    name: "Sign Out"
   });
   await user.click(signOutForReal);
 
@@ -452,7 +452,7 @@ test("falls back to redirect-based signout for SAML without logout link", async 
   await user.click(signOut);
 
   const signOutForReal = await screen.findByRole("button", {
-    name: "Confirm Sign Out"
+    name: "Sign Out"
   });
   await user.click(signOutForReal);
 

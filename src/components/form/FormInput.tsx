@@ -1,6 +1,7 @@
 import * as React from "react";
 import FormLabel from "./FormLabel";
 import TextInput from "../TextInput";
+import { useTranslation } from "next-i18next/pages";
 
 type FormInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   name: string;
@@ -17,6 +18,7 @@ const END_ICON_WIDTH = 40;
  */
 const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
   ({ type = "text", label, name, error, required, endIcon, ...props }, ref) => {
+    const { t } = useTranslation();
     const describedById = `${name}-errors`;
     return (
       <div role="group" sx={{ mb: 2 }}>
@@ -28,7 +30,7 @@ const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
           <TextInput
             id={name}
             name={name}
-            aria-label={`${name} input`}
+            aria-label={t("formInput.ariaLabel", "{{name}} input", { name })}
             aria-describedby={describedById}
             ref={ref}
             type={type}

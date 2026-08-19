@@ -21,11 +21,22 @@ import { fetchBook } from "dataflow/catalog";
 import useUser from "components/context/UserContext";
 import useBreadcrumbContext from "components/context/BreadcrumbContext";
 import { useAppConfig } from "components/context/AppConfigContext";
-import { getAuthors, getLanguageLabel } from "utils/book";
+import {
+  formatAuthorList,
+  getAuthorList,
+  getLanguageLabel,
+  translateBookFormat
+} from "utils/book";
 import Stack from "components/Stack";
 import Link from "components/Link";
+import { useTranslation } from "next-i18next/pages";
+import useLocale from "hooks/useLocale";
+import { formatDate } from "utils/date";
+import { formatDuration } from "utils/duration";
 
 export const BookDetails: React.FC = () => {
+  const { t } = useTranslation();
+  const currentLocale = useLocale();
   const { companionApp, showMedium } = useAppConfig();
   const { query } = useRouter();
   const bookUrl = extractParam(query, "bookUrl");
@@ -42,8 +53,11 @@ export const BookDetails: React.FC = () => {
 
   if (!book) return <PageLoader />;
 
+  // uses contributors if there are no authors, and is null if the feed has neither
+  const authors = getAuthorList(book);
+
   return (
-    <section aria-label="Book details">
+    <section aria-label={t("bookDetails.bookDetails", "Book details")}>
       <Head>
         <title>{book.title}</title>
       </Head>
@@ -76,14 +90,19 @@ export const BookDetails: React.FC = () => {
           >
             <Stack direction="column">
               <H1 sx={{ m: 0 }}>
-                <ScreenReaderOnly>Book title: </ScreenReaderOnly>
+                <ScreenReaderOnly>
+                  {t("bookDetails.bookTitle", "Book title:")}{" "}
+                </ScreenReaderOnly>
                 {book.title}
                 {book.subtitle && `: ${book.subtitle}`}
               </H1>
 
               <Text variant="text.callouts.regular">
-                by&nbsp;
-                {getAuthors(book)?.join(", ") ?? "Unknown"}
+                {authors
+                  ? t("bookDetails.byAuthors", "by {{authors}}", {
+                      authors: formatAuthorList(authors, currentLocale)
+                    })
+                  : t("bookDetails.authorsUnknown", "Author unknown")}
               </Text>
               {showMedium && (
                 <div sx={{ my: 2 }}>
@@ -101,27 +120,49 @@ export const BookDetails: React.FC = () => {
                 mt: 2
               }}
             >
-              <DetailField heading="Format" details={book.format} />
-              <DetailField heading="Audience" details={book.audience} />
               <DetailField
-                heading="Categories"
+                heading={t("bookDetails.format", "Format")}
+                details={translateBookFormat(book.format, t)}
+              />
+              <DetailField
+                heading={t("bookDetails.audience", "Audience")}
+                details={book.audience}
+              />
+              <DetailField
+                heading={t("bookDetails.categories", "Categories")}
                 details={book.categories?.join(", ")}
               />
               <DetailField
-                heading="Language"
-                details={getLanguageLabel(book)}
+                heading={t("bookDetails.language", "Language")}
+                details={getLanguageLabel(book, currentLocale)}
               />
               <DetailField
-                heading="Narrators"
+                heading={t("bookDetails.narrators", "Narrators")}
                 details={book.narrators?.join(", ")}
               />
-              <DetailField heading="Duration" details={book.duration} />
-              <DetailField heading="Published" details={book.published} />
-              <DetailField heading="Publisher" details={book.publisher} />
-              <DetailField heading="Distributor" details={book.providerName} />
+              <DetailField
+                heading={t("bookDetails.duration", "Duration")}
+                details={
+                  book.duration && formatDuration(book.duration, currentLocale)
+                }
+              />
+              <DetailField
+                heading={t("bookDetails.published", "Published")}
+                details={
+                  book.published && formatDate(book.published, currentLocale)
+                }
+              />
+              <DetailField
+                heading={t("bookDetails.publisher", "Publisher")}
+                details={book.publisher}
+              />
+              <DetailField
+                heading={t("bookDetails.distributor", "Distributor")}
+                details={book.providerName}
+              />
               {book.series?.name && book.series?.url && (
                 <DetailField
-                  heading="Series"
+                  heading={t("bookDetails.series", "Series")}
                   details={
                     <Link
                       collectionUrl={book.series.url}
@@ -145,18 +186,30 @@ export const BookDetails: React.FC = () => {
 const Summary: React.FC<{ book: AnyBook; className?: string }> = ({
   book,
   className
-}) => (
-  <div sx={{ my: 2 }} className={className}>
-    <H2 sx={{ mb: 2, variant: "text.headers.tertiary" }}>Summary</H2>
-    <div
-      dangerouslySetInnerHTML={{
-        __html: book.summary ?? "Summary not provided."
-      }}
-    />
-  </div>
-);
+}) => {
+  const { t } = useTranslation();
+  return (
+    <div sx={{ my: 2 }} className={className}>
+      <H2 sx={{ mb: 2, variant: "text.headers.tertiary" }}>
+        {t("bookDetails.summary", "Summary")}
+      </H2>
+      {book.summary ? (
+        <div
+          dangerouslySetInnerHTML={{
+            __html: book.summary
+          }}
+        />
+      ) : (
+        <Text>
+          {t("bookDetails.summaryNotProvided", "Summary not provided.")}
+        </Text>
+      )}
+    </div>
+  );
+};
 
 const SimplyECallout: React.FC<{ className?: string }> = ({ className }) => {
+  const { t } = useTranslation();
   return (
     <section
       sx={{
@@ -170,10 +223,14 @@ const SimplyECallout: React.FC<{ className?: string }> = ({ className }) => {
       className={className}
     >
       <PalaceLogo sx={{ mt: 3, height: "120px" }} />
-      <H3 sx={{ mt: 0 }}>Download Palace</H3>
+      <H3 sx={{ mt: 0 }}>
+        {t("nav.downloadPalace", "Download Palace", { ns: "common" })}
+      </H3>
       <Text>
-        Browse and read our collection of ebooks and audiobooks right from your
-        phone.
+        {t(
+          "bookDetails.browseBooks",
+          "Browse and read our collection of ebooks and audiobooks right from your phone."
+        )}
       </Text>
       <div sx={{ maxWidth: 140, mx: "auto", mt: 3 }}>
         <IosBadge sx={{ m: "6%" }} />

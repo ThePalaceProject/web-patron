@@ -8,6 +8,7 @@ import withAppProps, { AppProps } from "dataflow/withAppProps";
 import useUser from "components/context/UserContext";
 import { useRouter } from "next/router";
 import useLinkUtils from "hooks/useLinkUtils";
+import { useTranslation } from "next-i18next/pages";
 
 /**
  * This page is shown after SAML/Clever sign-out to warn users about
@@ -17,6 +18,7 @@ import useLinkUtils from "hooks/useLinkUtils";
  * to avoid showing the "Sign In" button.
  */
 export const SignedOutContent: React.FC = () => {
+  const { t } = useTranslation();
   const { isAuthenticated } = useUser();
   const router = useRouter();
   const { buildMultiLibraryLink } = useLinkUtils();
@@ -42,7 +44,7 @@ export const SignedOutContent: React.FC = () => {
       }}
     >
       <Head>
-        <title>Signed Out</title>
+        <title>{t("signedOut.signedOut", "Signed Out")}</title>
       </Head>
 
       <div
@@ -52,7 +54,9 @@ export const SignedOutContent: React.FC = () => {
           textAlign: "center"
         }}
       >
-        <h1 sx={{ mb: 4, fontSize: [4, 5] }}>Signed Out</h1>
+        <h1 sx={{ mb: 4, fontSize: [4, 5] }}>
+          {t("signedOut.signedOut", "Signed Out")}
+        </h1>
 
         <div
           sx={{
@@ -64,25 +68,35 @@ export const SignedOutContent: React.FC = () => {
             mb: 4
           }}
         >
-          <h2 sx={{ mt: 0, color: "ui.error" }}>Important Security Notice</h2>
+          <h2 sx={{ mt: 0, color: "ui.error" }}>
+            {t("signedOut.securityNotice.header", "Important Security Notice")}
+          </h2>
           <p sx={{ fontSize: 3, textAlign: "left" }}>
-            You have been signed out of this application, but your session with
-            the authentication provider may still be active.
+            {t(
+              "signedOut.securityNotice.body1",
+              "You have been signed out of this application, but your session with the authentication provider may still be active."
+            )}
           </p>
           <p sx={{ fontSize: 3, textAlign: "left" }}>
-            This could lead to you (or someone else) being signed back into your
-            account without needing to provided your credentials; or it could
-            prevent you from signing into a different account.
+            {t(
+              "signedOut.securityNotice.body2",
+              "This could lead to you (or someone else) being signed back into your account without needing to provide your credentials; or it could prevent you from signing into a different account."
+            )}
           </p>
           <p sx={{ fontSize: 3, fontWeight: "bold", textAlign: "left", mb: 0 }}>
-            If you are using a shared or public computer (or need to sign into a
-            different account), please exit / quit your browser completely to
-            ensure that you are fully signed out.
+            {t(
+              "signedOut.securityNotice.body3",
+              "If you are using a shared or public computer (or need to sign into a different account), please exit / quit your browser completely to ensure that you are fully signed out."
+            )}
           </p>
         </div>
 
         <Link href="/">
-          <Button aria-label="Return to Catalog">Return to Catalog</Button>
+          <Button
+            aria-label={t("signedOut.returnToCatalog", "Return to Catalog")}
+          >
+            {t("signedOut.returnToCatalog", "Return to Catalog")}
+          </Button>
         </Link>
       </div>
     </div>

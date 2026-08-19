@@ -19,6 +19,7 @@ import useError from "hooks/useError";
 import useLinkUtils from "hooks/useLinkUtils";
 import { openPendingTab } from "utils/window";
 import Stack from "./Stack";
+import { useTranslation } from "next-i18next/pages";
 
 const FulfillmentButton: React.FC<{
   details: AnyFullfillment;
@@ -74,6 +75,7 @@ const ReadOnlineExternal: React.FC<{
   isPrimaryAction: boolean;
   trackOpenBookUrl: string | null;
 }> = ({ details, isPrimaryAction, trackOpenBookUrl }) => {
+  const { t } = useTranslation();
   const { catalogUrl } = useLibraryContext();
   const { token } = useUser();
   const [loading, setLoading] = React.useState(false);
@@ -105,9 +107,9 @@ const ReadOnlineExternal: React.FC<{
         iconLeft={SvgExternalLink}
         onClick={open}
         loading={loading}
-        loadingText="Opening..."
+        loadingText={t("fulfillmentButton.opening", "Opening...")}
       >
-        {details?.buttonLabel ?? "Read"}
+        {details?.buttonLabel ?? t("fulfillmentButton.read", "Read")}
       </Button>
       {error && <Text sx={{ color: "ui.error" }}>{error}</Text>}
     </Stack>
@@ -119,6 +121,7 @@ const ReadOnlineInternal: React.FC<{
   trackOpenBookUrl: string | null;
   isPrimaryAction: boolean;
 }> = ({ details, isPrimaryAction, trackOpenBookUrl }) => {
+  const { t } = useTranslation();
   const router = useRouter();
   const { buildReaderLink } = useLinkUtils();
 
@@ -129,7 +132,7 @@ const ReadOnlineInternal: React.FC<{
   }
   return (
     <Button {...getButtonStyles(isPrimaryAction)} onClick={open}>
-      {details?.buttonLabel ?? "Read"}
+      {details?.buttonLabel ?? t("fulfillmentButton.read", "Read")}
     </Button>
   );
 };
@@ -139,6 +142,7 @@ const DownloadButton: React.FC<{
   title: string;
   isPrimaryAction: boolean;
 }> = ({ details, title, isPrimaryAction }) => {
+  const { t } = useTranslation();
   const { buttonLabel } = details;
   const [loading, setLoading] = React.useState(false);
   const { error, handleError, clearError } = useError();
@@ -172,7 +176,7 @@ const DownloadButton: React.FC<{
         {...getButtonStyles(isPrimaryAction)}
         iconLeft={SvgDownload}
         loading={loading}
-        loadingText="Downloading..."
+        loadingText={t("fulfillmentButton.downloading", "Downloading...")}
       >
         {buttonLabel}
       </Button>

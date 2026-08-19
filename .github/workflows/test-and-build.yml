@@ -73,6 +73,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Check for Outdated Translations
+        run: npm run translations:ci
+
   typecheck:
     name: Typecheck
     needs: node_setup

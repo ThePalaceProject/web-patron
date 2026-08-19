@@ -1,13 +1,15 @@
 import * as React from "react";
 import { Text } from "./Text";
-import { bookMediumMap, getMedium } from "utils/book";
-import { AnyBook, BookMediumName } from "interfaces";
+import { bookMediumMap, getMedium, translateMedium } from "utils/book";
+import { AnyBook, BookMediumVariant } from "interfaces";
 import { Badge } from "theme-ui";
+import { useTranslation } from "next-i18next/pages";
 
 const MediumIndicator: React.FC<{ book: AnyBook; className?: string }> = ({
   book,
   className
 }) => {
+  const { t } = useTranslation();
   const medium = getMedium(book);
 
   if (Object.keys(bookMediumMap).indexOf(medium) === -1) return null;
@@ -15,10 +17,10 @@ const MediumIndicator: React.FC<{ book: AnyBook; className?: string }> = ({
   const mediumInfo = bookMediumMap[medium];
   return (
     <Text sx={{ display: "flex", alignItems: "center" }} className={className}>
-      <Badge sx={badgeStyleProps(mediumInfo.name)} mr={2}>
+      <Badge sx={badgeStyleProps(mediumInfo.variant)} mr={2}>
         <MediumIcon book={book} />
       </Badge>
-      {mediumInfo.name}
+      {translateMedium(medium, t)}
     </Text>
   );
 };
@@ -41,17 +43,16 @@ export const MediumIcon: React.FC<{ book: AnyBook; className?: string }> = ({
   ) : null;
 };
 
-const badgeStyleProps = (mediumName: BookMediumName) => {
-  switch (mediumName) {
-    case "Audiobook": {
+const badgeStyleProps = (variant: BookMediumVariant) => {
+  switch (variant) {
+    case "audiobook": {
       return {
         background: "ui.blue.light",
         color: "ui.white"
       };
     }
 
-    case "Book":
-    case "eBook": {
+    case "book": {
       return {
         background: "ui.green.success",
         color: "ui.white"
@@ -59,6 +60,6 @@ const badgeStyleProps = (mediumName: BookMediumName) => {
     }
 
     default:
-      throw new Error(`You chose an unimplemented Medium Icon: ${mediumName}`);
+      throw new Error(`You chose an unimplemented Medium Icon: ${variant}`);
   }
 };

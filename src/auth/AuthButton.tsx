@@ -2,6 +2,7 @@ import React from "react";
 import { NavButton } from "components/Button";
 import { AppAuthMethod } from "interfaces";
 import useLogin from "auth/useLogin";
+import { useTranslation } from "next-i18next/pages";
 
 export const authButtonstyles = {
   display: "flex",
@@ -19,15 +20,20 @@ const AuthButton: React.FC<{
   method: AppAuthMethod;
   className?: string;
 }> = ({ method, className }) => {
+  const { t } = useTranslation();
   const { description, links } = method;
   const imageUrl = links?.find(link => link.rel === "logo")?.href;
   const name = description ?? "Basic Auth";
   const { getLoginUrl } = useLogin();
   const loginUrl = getLoginUrl(method.id);
 
+  const label = t("authButton.loginWithMethod", "Login with {{name}}", {
+    name
+  });
+
   return (
     <NavButton
-      aria-label={`Login with ${name}`}
+      aria-label={label}
       type="submit"
       className={className}
       sx={{
@@ -36,7 +42,7 @@ const AuthButton: React.FC<{
       }}
       href={loginUrl}
     >
-      {imageUrl ? "" : `Login with ${name}`}
+      {imageUrl ? "" : label}
     </NavButton>
   );
 };

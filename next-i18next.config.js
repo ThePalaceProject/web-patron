@@ -22,10 +22,15 @@ const languageFilesPath = path.resolve("./public/locales");
 
 // define the namespaces used for
 // organizing translations in the language files.
-// The "translations" namespace contains all the
-// translations used throughout the app,
-// and no additional namespaces are currently used.
-const translationNamespaces = ["translations"];
+// - "translations" is the default namespace. It holds keys used by a single
+//   component, each prefixed with that component's file name.
+// - "common" holds strings shared by more than one component, grouped under a
+//   domain prefix (actions, auth, library, nav, status). Read them by passing
+//   the namespace explicitly, for example:
+//     t("actions.cancel", "Cancel", { ns: "common" })
+// Every namespace listed here must also be listed in TRANSLATION_NAMESPACES in
+// src/dataflow/translationProps.ts, or its keys never reach the client.
+const translationNamespaces = ["translations", "common"];
 
 // create the configuration object for next-i18next.
 // keySeparator:
@@ -40,7 +45,8 @@ const nextI18NextConfig = {
   keySeparator: false,
   localePath: languageFilesPath,
   ns: translationNamespaces,
-  reloadOnPrerender: process.env.NODE_ENV === "development"
+  reloadOnPrerender: process.env.NODE_ENV === "development",
+  returnEmptyString: false // uses the default value from translation function (second argument) if key in translation is an empty string ("")
 };
 
 // export the configuration

@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Spinner } from "theme-ui";
 import { H2 } from "./Text";
+import { useTranslation } from "next-i18next/pages";
 
 const LoadingIndicator: React.FC<React.ComponentProps<typeof Spinner>> = ({
   color = "ui.black",
@@ -10,6 +11,7 @@ const LoadingIndicator: React.FC<React.ComponentProps<typeof Spinner>> = ({
 };
 
 export const PageLoader = () => {
+  const { t } = useTranslation();
   return (
     <div
       sx={{
@@ -21,7 +23,9 @@ export const PageLoader = () => {
       }}
     >
       <LoadingIndicator />
-      <H2 sx={{ fontSize: 2 }}>Loading...</H2>
+      <H2 sx={{ fontSize: 2 }}>
+        {t("status.loading", "Loading...", { ns: "common" })}
+      </H2>
     </div>
   );
 };

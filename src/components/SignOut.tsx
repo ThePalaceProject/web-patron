@@ -10,6 +10,7 @@ import { normalizeLink, UriTemplateTerms, TemplatedLink } from "utils/opds";
 import { useRouter } from "next/router";
 import useLinkUtils from "hooks/useLinkUtils";
 import useLibraryContext from "./context/LibraryContext";
+import { useTranslation } from "next-i18next/pages";
 
 interface SignOutProps {
   color?: string;
@@ -57,6 +58,7 @@ async function performLogoutRequest(
 export const SignOut: React.FC<SignOutProps> = ({
   color = "ui.black"
 }: SignOutProps) => {
+  const { t } = useTranslation();
   const dialog = useDialogStore();
   const { signOut, credentials, token } = useUser();
   const router = useRouter();
@@ -127,22 +129,27 @@ export const SignOut: React.FC<SignOutProps> = ({
   return (
     <>
       <DialogDisclosure store={dialog} sx={styleProps(color, "md", "ghost")}>
-        Sign Out
+        {t("signOut.signOut", "Sign Out")}
       </DialogDisclosure>
       <Modal
         hideOnClickOutside
         dialog={dialog}
         role="alertdialog"
-        label="Sign Out"
+        label={t("signOut.signOut", "Sign Out")}
         showClose={false}
       >
-        <p>Are you sure you want to sign out?</p>
+        <p>
+          {t(
+            "signOut.confirmationQuestion",
+            "Are you sure you want to sign out?"
+          )}
+        </p>
         <Stack sx={{ justifyContent: "center" }}>
           <Button variant="ghost" color="ui.gray.dark" onClick={dialog.hide}>
-            Cancel
+            {t("actions.cancel", "Cancel", { ns: "common" })}
           </Button>
           <Button color="ui.error" onClick={signOutAndClose}>
-            Confirm Sign Out
+            {t("signOut.signOut", "Sign Out")}
           </Button>
         </Stack>
       </Modal>

@@ -6,7 +6,10 @@ module.exports = {
         "tests/**/*.{ts,tsx}",
         "src/test-utils/**/*.{ts,tsx}"
       ],
-      rules: { "react/display-name": "off", "i18next/no-literal-string": "off" }
+      rules: {
+        "react/display-name": "off",
+        "i18next/no-literal-string": "off"
+      }
     },
     {
       files: ["**/*.js"],
@@ -17,6 +20,9 @@ module.exports = {
         sourceType: "module"
       },
       env: {
+        // ecmaVersion above only enables the syntax; es2020 declares the
+        // built-in globals that come with it, such as Set and Promise
+        es2020: true,
         node: true,
         jest: true
       },
@@ -102,7 +108,20 @@ module.exports = {
     // if we want this, we should turn disallow any in tsconfig not here
     "@typescript-eslint/no-explicit-any": 0,
     "@typescript-eslint/no-var-requires": 0,
-    camelcase: "error",
+    camelcase: [
+      "error",
+      {
+        // default values for i18next plural forms are identified with an underscore ("_") preceding the plural quantifier
+        allow: [
+          "defaultValue_zero",
+          "defaultValue_one",
+          "defaultValue_two",
+          "defaultValue_few",
+          "defaultValue_many",
+          "defaultValue_other"
+        ]
+      }
+    ],
     "@typescript-eslint/camelcase": 0,
     "@typescript-eslint/prefer-namespace-keyword": "error",
     eqeqeq: ["error", "smart"],
@@ -123,27 +142,30 @@ module.exports = {
     "no-var": "error",
     "@next/next/no-img-element": "off",
     "react/no-unknown-property": ["error", { ignore: ["sx", "jsx", "global"] }],
-    /** TODO: turn on once we begin adding translations */
-    "i18next/no-literal-string": "off"
-    // "i18next/no-literal-string": [
-    //   "warn",
-    //   {
-    //     message: "Use i18n translation instead of hardcoded strings.",
-    //     markupOnly: true,
-    //     ignoredProps: ["data-testid", "href", "htmlFor", "id"],
-    //     "jsx-attributes": {
-    //       include: [
-    //         "alt",
-    //         "aria-label",
-    //         "heading",
-    //         "placeholder",
-    //         "subtitle",
-    //         "title"
-    //       ]
-    //     },
-    //     mode: "jsx-only"
-    //   }
-    // ]
+    "i18next/no-literal-string": [
+      "warn",
+      {
+        message: "Use i18n translation instead of hardcoded strings.",
+        mode: "jsx-only",
+        "should-validate-template": true,
+        "jsx-attributes": {
+          include: [
+            "alt",
+            "aria-label",
+            "currentLocation",
+            "heading",
+            "info",
+            "label",
+            "loadingText",
+            "message",
+            "placeholder",
+            "subtitle",
+            "text",
+            "title"
+          ]
+        }
+      }
+    ]
   },
   settings: {
     react: {

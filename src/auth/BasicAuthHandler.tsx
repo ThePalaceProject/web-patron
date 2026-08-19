@@ -12,6 +12,7 @@ import { ServerError } from "errors";
 import { Keyboard } from "types/opds1";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "next-i18next/pages";
 
 type FormData = {
   [key: string]: string;
@@ -23,6 +24,7 @@ type FormData = {
 const BasicAuthHandler: React.FC<{
   method: ClientBasicMethod;
 }> = ({ method }) => {
+  const { t } = useTranslation();
   const { signIn, error, isLoading } = useUser();
   const {
     register,
@@ -71,7 +73,11 @@ const BasicAuthHandler: React.FC<{
           maxLength: 25
         })}
         error={
-          errors[usernameInputName] && `Your ${usernameInputName} is required.`
+          errors[usernameInputName] &&
+          t("auth.fieldRequired", "Your {{field}} is required.", {
+            field: usernameInputName,
+            ns: "common"
+          })
         }
       />
       {hasPasswordInput && (
@@ -85,11 +91,18 @@ const BasicAuthHandler: React.FC<{
           placeholder={passwordInputName}
           error={
             errors[passwordInputName] &&
-            `Your ${passwordInputName} is required.`
+            t("auth.fieldRequired", "Your {{field}} is required.", {
+              field: passwordInputName,
+              ns: "common"
+            })
           }
           endIcon={
             <InputIconButton
-              aria-label={`${showPassword ? "hide" : "show"} password`}
+              aria-label={
+                showPassword
+                  ? t("auth.password.hide", "hide password", { ns: "common" })
+                  : t("auth.password.show", "show password", { ns: "common" })
+              }
               onClick={togglePasswordVisibility}
             >
               <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
@@ -104,9 +117,9 @@ const BasicAuthHandler: React.FC<{
           ...modalButtonStyles
         }}
         loading={isLoading}
-        loadingText="Signing in..."
+        loadingText={t("auth.signingIn", "Signing in...", { ns: "common" })}
       >
-        Login
+        {t("auth.login", "Login", { ns: "common" })}
       </Button>
 
       <ForgotPasswordLink />

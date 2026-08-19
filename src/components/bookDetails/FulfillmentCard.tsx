@@ -20,6 +20,7 @@ import {
 import BookStatus from "components/BookStatus";
 import { AnyBook, FulfillableBook, FulfillmentLink } from "interfaces";
 import { useAppConfig } from "components/context/AppConfigContext";
+import { useTranslation } from "next-i18next/pages";
 
 const FulfillmentCard: React.FC<{ book: AnyBook }> = ({ book }) => {
   return (
@@ -42,6 +43,7 @@ const FulfillmentCard: React.FC<{ book: AnyBook }> = ({ book }) => {
 const FulfillmentContent: React.FC<{
   book: AnyBook;
 }> = ({ book }) => {
+  const { t } = useTranslation();
   if (bookIsBorrowable(book)) {
     return (
       <BorrowOrReserveOrPreview
@@ -65,8 +67,10 @@ const FulfillmentContent: React.FC<{
       <CancelOrReturnOrPreview
         revokeUrl={book.revokeUrl}
         previewUrl={book.previewUrl}
-        text="Cancel Reservation"
-        loadingText="Cancelling..."
+        text={t("actions.cancelReservation", "Cancel Reservation", {
+          ns: "common"
+        })}
+        loadingText={t("actions.cancelling", "Cancelling...", { ns: "common" })}
         id={book.id}
       />
     );
@@ -85,7 +89,10 @@ const FulfillmentContent: React.FC<{
   }
   return (
     <Text>
-      This title is not supported in this application, please try another.
+      {t(
+        "fulfillmentCard.titleNotSupported",
+        "This title is not supported in this application, please try another."
+      )}
     </Text>
   );
 };
@@ -98,8 +105,9 @@ const AccessCard: React.FC<{
   book: FulfillableBook;
   links: readonly FulfillmentLink[];
 }> = ({ book, links }) => {
+  const { t } = useTranslation();
   const { companionApp } = useAppConfig();
-  const fulfillments = getFulfillmentsFromBook(book);
+  const fulfillments = getFulfillmentsFromBook(book, t);
 
   // visually prioritize internal and external readers (mirrors apps)
   const [webCatalogFulfillments, otherFulfillments] = _.partition(
@@ -112,11 +120,40 @@ const AccessCard: React.FC<{
   const hasOtherFulfillments = otherFulfillments.length > 0;
 
   const redirectUser = shouldRedirectToCompanionApp(links);
-  const action = book.format === "Audiobook" ? "listen to" : "read";
-  const companionAppName =
-    companionApp === "openebooks" ? "Open eBooks" : "the Palace App";
+  const isAudiobook = book.format === "Audiobook";
 
-  const bookStatus = `${isFulfillableInWebCatalog && redirectUser ? "Also available" : "Available"} to ${action}${redirectUser ? ` in ${companionAppName}` : ""}.`;
+  const app =
+    companionApp === "openebooks"
+      ? t("fulfillmentCard.companionAppOpenEbooks", "Open eBooks")
+      : t("fulfillmentCard.companionAppPalace", "the Palace App");
+
+  const bookStatus = !redirectUser
+    ? isAudiobook
+      ? t("fulfillmentCard.availableToListenTo", "Available to listen to.")
+      : t("fulfillmentCard.availableToRead", "Available to read.")
+    : isFulfillableInWebCatalog
+      ? isAudiobook
+        ? t(
+            "fulfillmentCard.alsoAvailableToListenToInApp",
+            "Also available to listen to in {{app}}.",
+            { app }
+          )
+        : t(
+            "fulfillmentCard.alsoAvailableToReadInApp",
+            "Also available to read in {{app}}.",
+            { app }
+          )
+      : isAudiobook
+        ? t(
+            "fulfillmentCard.availableToListenToInApp",
+            "Available to listen to in {{app}}.",
+            { app }
+          )
+        : t(
+            "fulfillmentCard.availableToReadInApp",
+            "Available to read in {{app}}.",
+            { app }
+          );
 
   return (
     <>
@@ -132,17 +169,19 @@ const AccessCard: React.FC<{
           ))}
           <CancelOrReturnOrPreview
             revokeUrl={book.revokeUrl}
-            loadingText="Returning..."
+            loadingText={t("actions.returning", "Returning...", {
+              ns: "common"
+            })}
             id={book.id}
-            text="Return"
+            text={t("actions.return", "Return", { ns: "common" })}
           />
         </Stack>
       ) : (
         <CancelOrReturnOrPreview
           revokeUrl={book.revokeUrl}
-          loadingText="Returning..."
+          loadingText={t("actions.returning", "Returning...", { ns: "common" })}
           id={book.id}
-          text="Return"
+          text={t("actions.return", "Return", { ns: "common" })}
         />
       )}
 
@@ -150,7 +189,10 @@ const AccessCard: React.FC<{
 
       {hasOtherFulfillments && redirectUser && (
         <Text variant="text.body.italic">
-          If you would rather read on your computer, you can:
+          {t(
+            "fulfillmentCard.redirectUser",
+            "If you would rather read on your computer, you can:"
+          )}
         </Text>
       )}
       {hasOtherFulfillments && (

@@ -20,6 +20,7 @@ import {
 } from "../types/opds1";
 import track from "../analytics/track";
 import ApplicationError from "../errors";
+import { useTranslation } from "next-i18next/pages";
 
 type SupportedAuthTypes =
   | typeof BasicAuthType
@@ -84,6 +85,7 @@ const getSupportedAuthMethod = (method: any) => {
 const AuthenticationHandler: React.ComponentType<AuthHandlerWrapperProps> = ({
   method
 }) => {
+  const { t } = useTranslation();
   const _AuthHandler = authHandlers[method.type];
   const supportedMethod = getSupportedAuthMethod(method);
 
@@ -99,6 +101,13 @@ const AuthenticationHandler: React.ComponentType<AuthHandlerWrapperProps> = ({
       detail: `Failed to render what should be a supported authentication method. Is the Login method filtering correctly configured? Method ID: ${method.id}`
     })
   );
-  return <p>This authentication method is not supported.</p>;
+  return (
+    <p>
+      {t(
+        "authenticationHandler.methodNotSupported",
+        "This authentication method is not supported."
+      )}
+    </p>
+  );
 };
 export default AuthenticationHandler;
