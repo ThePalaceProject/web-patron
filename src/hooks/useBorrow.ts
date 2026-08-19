@@ -20,7 +20,9 @@ export default function useBorrow(isBorrow: boolean) {
   const loadingText = isBorrow
     ? t("actions.borrowing", "Borrowing...")
     : t("actions.reserving", "Reserving...");
-  const buttonLabel = isBorrow ? "Borrow" : "Reserve";
+  const buttonLabel = isBorrow
+    ? t("actions.borrow", "Borrow")
+    : t("actions.reserve", "Reserve");
 
   const borrowOrReserve = async (url: string) => {
     clearError();

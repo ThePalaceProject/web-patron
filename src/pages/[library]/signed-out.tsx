@@ -80,7 +80,7 @@ export const SignedOutContent: React.FC = () => {
           <p sx={{ fontSize: 3, textAlign: "left" }}>
             {t(
               "signedOut.securityNotice.body2",
-              "This could lead to you (or someone else) being signed back into your account without needing to provided your credentials; or it could prevent you from signing into a different account."
+              "This could lead to you (or someone else) being signed back into your account without needing to provide your credentials; or it could prevent you from signing into a different account."
             )}
           </p>
           <p sx={{ fontSize: 3, fontWeight: "bold", textAlign: "left", mb: 0 }}>

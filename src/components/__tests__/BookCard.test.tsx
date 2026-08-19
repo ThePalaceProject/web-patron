@@ -18,7 +18,7 @@ test("render accessible label for link within book card", () => {
 
   expect(
     utils.getByRole("link", {
-      name: "The Mayan Secrets - eBook, by Clive Cussler, Thomas Perry"
+      name: "The Mayan Secrets - eBook, by Clive Cussler & Thomas Perry"
     })
   );
 });

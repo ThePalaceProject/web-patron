@@ -16,11 +16,7 @@ import { Book, Headset } from "../icons";
 import { Language } from "./i18n";
 import { TFunction } from "next-i18next/pages";
 
-export function getAuthors(
-  book: AnyBook,
-  t: TFunction,
-  lim?: number
-): string[] {
+export function getAuthorList(book: AnyBook, lim?: number): string[] | null {
   // select contributors if the authors array is undefined or empty.
   const allAuth =
     typeof book.authors?.length === "number" && book.authors.length > 0
@@ -28,7 +24,9 @@ export function getAuthors(
       : typeof book.contributors?.length === "number" &&
           book.contributors.length > 0
         ? book.contributors
-        : [t("utils.book.unknownAuthors", "Authors unknown")];
+        : null;
+
+  if (!allAuth) return null;
 
   // now limit it to however many
   if (lim) {
@@ -37,25 +35,42 @@ export function getAuthors(
   return allAuth;
 }
 
+/**
+ * Joins author names the way the locale writes a list: "A & B" in English,
+ * "A et B" in French.
+ */
+export function formatAuthorList(authors: string[], locale: Language): string {
+  return new Intl.ListFormat(locale, { style: "short" }).format(authors);
+}
+
+export function getAuthors(
+  book: AnyBook,
+  t: TFunction,
+  lim?: number
+): string[] {
+  return (
+    getAuthorList(book, lim) ?? [
+      t("utils.book.unknownAuthors", "Authors unknown")
+    ]
+  );
+}
+
 export function getAuthorsString(
   book: AnyBook,
   t: TFunction,
   locale: Language
 ): string {
-  const { authors } = book;
-  if (!authors) return t("utils.book.unknownAuthor", "Unknown Author");
-  const authorsArray = getAuthors(book, t, 2);
+  const allAuthors = getAuthorList(book);
+  if (!allAuthors) return t("utils.book.unknownAuthor", "Unknown Author");
 
-  const listFormatter = new Intl.ListFormat(locale, {
-    style: "short"
-  });
-  if (authors.length > 2) {
+  const authorsArray = allAuthors.slice(0, 2);
+  if (allAuthors.length > 2) {
     authorsArray.push(
-      t("utils.book.more", "{{count}} more", { count: authors.length - 2 })
+      t("utils.book.more", "{{count}} more", { count: allAuthors.length - 2 })
     );
   }
 
-  return listFormatter.format(authorsArray);
+  return formatAuthorList(authorsArray, locale);
 }
 
 export function availabilityString(book: AnyBook, t: TFunction) {
@@ -95,7 +110,7 @@ export function availabilityString(book: AnyBook, t: TFunction) {
       if (!position || isNaN(position)) return null;
 
       return t(
-        "utils.books.positionInQueue",
+        "utils.book.positionInQueue",
         "{{position}} patrons ahead of you in the queue.",
         { position }
       );

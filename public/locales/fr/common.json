@@ -1,4 +1,5 @@
 {
+  "actions.borrow": "",
   "actions.borrowing": "",
   "actions.cancel": "",
   "actions.cancelling": "",
@@ -6,6 +7,7 @@
   "actions.downloadItem": "",
   "actions.listen": "",
   "actions.read": "",
+  "actions.reserve": "",
   "actions.reserving": "",
   "actions.return": "",
   "actions.returning": "",

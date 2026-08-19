@@ -21,7 +21,12 @@ import { fetchBook } from "dataflow/catalog";
 import useUser from "components/context/UserContext";
 import useBreadcrumbContext from "components/context/BreadcrumbContext";
 import { useAppConfig } from "components/context/AppConfigContext";
-import { getAuthors, getLanguageLabel, translateBookFormat } from "utils/book";
+import {
+  formatAuthorList,
+  getAuthorList,
+  getLanguageLabel,
+  translateBookFormat
+} from "utils/book";
 import Stack from "components/Stack";
 import Link from "components/Link";
 import { useTranslation } from "next-i18next/pages";
@@ -47,6 +52,9 @@ export const BookDetails: React.FC = () => {
   }
 
   if (!book) return <PageLoader />;
+
+  // uses contributors if there are no authors, and is null if the feed has neither
+  const authors = getAuthorList(book);
 
   return (
     <section aria-label={t("bookDetails.bookDetails", "Book details")}>
@@ -90,9 +98,11 @@ export const BookDetails: React.FC = () => {
               </H1>
 
               <Text variant="text.callouts.regular">
-                {t("bookDetails.by", "by")}&nbsp;
-                {getAuthors(book, t)?.join(", ") ??
-                  t("bookDetails.unknown", "Unknown")}
+                {authors
+                  ? t("bookDetails.byAuthors", "by {{authors}}", {
+                      authors: formatAuthorList(authors, currentLocale)
+                    })
+                  : t("bookDetails.authorsUnknown", "Author unknown")}
               </Text>
               {showMedium && (
                 <div sx={{ my: 2 }}>
@@ -183,13 +193,17 @@ const Summary: React.FC<{ book: AnyBook; className?: string }> = ({
       <H2 sx={{ mb: 2, variant: "text.headers.tertiary" }}>
         {t("bookDetails.summary", "Summary")}
       </H2>
-      <div
-        dangerouslySetInnerHTML={{
-          __html:
-            book.summary ??
-            t("bookDetails.summaryNotProvided", "Summary not provided.")
-        }}
-      />
+      {book.summary ? (
+        <div
+          dangerouslySetInnerHTML={{
+            __html: book.summary
+          }}
+        />
+      ) : (
+        <Text>
+          {t("bookDetails.summaryNotProvided", "Summary not provided.")}
+        </Text>
+      )}
     </div>
   );
 };

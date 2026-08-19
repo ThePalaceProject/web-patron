@@ -10,7 +10,8 @@ import {
 } from "utils/book";
 import { mockUseTranslation } from "test-utils/mockUseTranslation";
 import { makeBorrowableBooks } from "../../test-utils/fixtures/book";
-import { getAuthors } from "../book";
+import { formatAuthorList, getAuthorList, getAuthors } from "../book";
+import { Language } from "utils/i18n";
 
 const bookFixture = makeBorrowableBooks(1)[0];
 
@@ -66,6 +67,50 @@ describe("get authors", () => {
       contributors: []
     };
     expect(getAuthors(book, t)).toStrictEqual(["Authors unknown"]);
+  });
+});
+
+describe("get author list", () => {
+  const someAuthors = ["Peter sieger", "Jeff", "Alan turing", "Boris Johnson"];
+
+  test("returns null when there are neither authors nor contributors", () => {
+    const book = {
+      ...bookFixture,
+      authors: [],
+      contributors: []
+    };
+    expect(getAuthorList(book)).toBeNull();
+  });
+
+  test("returns contributors when authors is undefined", () => {
+    const book = {
+      ...bookFixture,
+      authors: undefined,
+      contributors: someAuthors
+    };
+    expect(getAuthorList(book)).toStrictEqual(someAuthors);
+  });
+
+  test("returns limited number of authors when requested", () => {
+    const book = {
+      ...bookFixture,
+      authors: someAuthors
+    };
+    expect(getAuthorList(book, 2)).toStrictEqual(["Peter sieger", "Jeff"]);
+  });
+});
+
+describe("format author list", () => {
+  test("joins with the separator the locale uses", () => {
+    expect(formatAuthorList(["one", "two"], Language.EN)).toBe("one & two");
+    expect(formatAuthorList(["one", "two"], Language.FR)).toBe("one et two");
+    expect(formatAuthorList(["one", "two", "three"], Language.EN)).toBe(
+      "one, two, & three"
+    );
+  });
+
+  test("returns a lone author unchanged", () => {
+    expect(formatAuthorList(["one"], Language.EN)).toBe("one");
   });
 });
 

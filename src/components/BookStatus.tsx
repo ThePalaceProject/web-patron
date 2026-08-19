@@ -11,14 +11,14 @@ const BookStatus: React.FC<{ book: AnyBook }> = ({ book }) => {
 
   const unfillableReason =
     status === "borrowable"
-      ? "Available to borrow"
+      ? t("bookStatus.availableToBorrow", "Available to borrow")
       : status === "reservable"
-        ? "Unavailable"
+        ? t("bookStatus.unavailable", "Unavailable")
         : status === "reserved"
-          ? "Reserved"
+          ? t("bookStatus.reserved", "Reserved")
           : status === "on-hold"
-            ? "Ready to Borrow"
-            : "Unsupported";
+            ? t("bookStatus.readyToBorrow", "Ready to Borrow")
+            : t("bookStatus.unsupported", "Unsupported");
 
   return (
     <div>

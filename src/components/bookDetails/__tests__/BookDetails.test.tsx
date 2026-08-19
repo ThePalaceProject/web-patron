@@ -199,6 +199,51 @@ describe("book details page", () => {
     expect(screen.getByText("ePub")).toBeInTheDocument();
   });
 
+  test("shows the byline as a single translated phrase", () => {
+    mockSwr({ data: fixtures.book });
+    setup(<BookDetails />);
+    expect(
+      screen.getByText("by Clive Cussler & Thomas Perry")
+    ).toBeInTheDocument();
+  });
+
+  test("falls back to contributors when the book has no authors", () => {
+    const bookWithoutAuthors = merge<Book>(
+      fixtures.book,
+      { authors: [] },
+      { arrayMerge: (a, b) => b }
+    );
+    mockSwr({ data: bookWithoutAuthors });
+    setup(<BookDetails />);
+    expect(screen.getByText("by contributor 1")).toBeInTheDocument();
+  });
+
+  test("shows a standalone phrase when there are neither authors nor contributors", () => {
+    const bookWithoutAnyone = merge<Book>(
+      fixtures.book,
+      { authors: [], contributors: [] },
+      { arrayMerge: (a, b) => b }
+    );
+    mockSwr({ data: bookWithoutAnyone });
+    setup(<BookDetails />);
+    expect(screen.getByText("Author unknown")).toBeInTheDocument();
+    expect(screen.queryByText(/^by /)).toBeFalsy();
+  });
+
+  test("joins the byline authors using the current locale", () => {
+    /**
+     * Intl.ListFormat joins with "&" in English and "et" in French. The French
+     * value of bookDetails.byAuthors is still empty on this branch, so the
+     * phrase itself falls back to the English default while the list separator
+     * already follows the locale.
+     */
+    mockSwr({ data: fixtures.book });
+    setup(<BookDetails />, { router: { locale: Language.FR } });
+    expect(
+      screen.getByText("by Clive Cussler et Thomas Perry")
+    ).toBeInTheDocument();
+  });
+
   test("shows series as a link to the series collection", () => {
     const bookWithSeries = merge<Book>(fixtures.book, {
       series: {
