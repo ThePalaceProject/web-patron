@@ -62,6 +62,7 @@ __To have your library added to the demo, register it with NYPL's Library Regist
     - [JSON structure for translation files](#json-structure-for-translations-files)
     - [Key naming scheme](#key-naming-scheme)
     - [Interpolation](#interpolation)
+    - [Linting for hardcoded strings](#linting-for-hardcoded-strings)
     - [Translation process](#translation-process)
     - [Changing the app language](#changing-the-app-language)
 - [Deploying](#deploying)
@@ -391,7 +392,7 @@ The `web-patron` application utilizes the following packages for internationaliz
 - **i18n-unused**: a command-line tool that flags unused translations (development dependency)
 - **i18next**: an internationalization framework for JavaScript (peer dependency required by `next-i18next`)
 - **react-i18next**: React bindings for i18next (peer dependency required by `next-i18next`)
-- **eslint-plugin-18next** ESLint plugin that warns about hardcoded strings (development dependency)
+- **eslint-plugin-i18next** ESLint plugin that warns about hardcoded strings (development dependency)
 
 ### Configuration files
 
@@ -412,7 +413,7 @@ This file configures the `i18next-cli` for extracting translation keys from the 
 
 Key settings:
 
-- **Input files**: The configuration specifies that `.tsx` and `.jsx` files in the `src/components` and `src/pages` directories should be scanned for translation keys
+- **Input files**: All `.tsx`, `.jsx` and `.ts` files under `src` are scanned for translation keys, excluding `__tests__` directories and `src/test-utils`
 - **Output path**: Extracted translation files are saved in the `public/locales` directory, organized by language and namespace
 - **Commands**: Use the following scripts to manage translations:
   - `translations:status` Overview of project translations
@@ -513,6 +514,28 @@ E.g. The meaning of the sentence `"Also available to {{action}} in {{app}}"` mig
 "fulfillmentCard.alsoAvailableToListenToIn": "Also available to listen to in {{app}}"
 ```
 
+### Linting for hardcoded strings
+
+Two tools flag untranslated strings. They are not redundant — run both.
+
+|                   | `npm run lint` (`i18next/no-literal-string`)         | `npm run translations:lint`                            |
+| ----------------- | ---------------------------------------------------- | ------------------------------------------------------ |
+| Checks            | Hardcoded strings in JSX, **plus** template literals | Hardcoded strings, **plus** `t()` interpolation params |
+| Custom components | Looks inside every component                         | Only inside a fixed allowlist of HTML tag names        |
+| When              | Every lint run, including CI                         | Manually, when adding strings                          |
+
+**ESLint is the stricter of the two on hardcoded strings.** `translations:lint` only inspects elements whose lowercased tag name appears in `i18next-cli`'s built-in HTML allowlist, so hardcoded text inside `<Text>`, `<Link>` and most Theme UI components is invisible to it. `<Button>` and `<H2>` happen to be covered, because they lowercase to `button` and `h2`. The ESLint rule has no tag allowlist, so it catches all of them.
+
+The two also disagree on which JSX attributes are translatable. Both check `alt`, `aria-label`, `label`, `placeholder` and `title`. Past those, the ESLint rule adds project-specific props (`heading`, `info`, `loadingText`, `message`, `subtitle`, `text`, `currentLocation`) configured in [.eslintrc.js](.eslintrc.js), and `i18next-cli` adds others from its own defaults (`caption`, `content`, `description`, `summary`, `aria-description`, …).
+
+**What `translations:lint` adds** is `t()` correctness, which the ESLint rule does not attempt — its default config deliberately excludes `t` as a callee. For a call like:
+
+```tsx
+t("auth.fieldRequired", "Your {{field}} is required.", { field: fieldName });
+```
+
+it checks the `{{placeholders}}` in the string against the keys of the options object in both directions, reporting a placeholder with no matching param (which renders to the patron as the literal text `{{field}}`) and a param with no matching placeholder (which is silently dropped). Rename one side without the other and you get an error. This is the main reason to run it before extracting.
+
 ### Translation process
 
 To extract translation keys from your component source code and to update the `translations.json` files, follow these steps:
@@ -525,13 +548,13 @@ To extract translation keys from your component source code and to update the `t
 
    This confirms that any new keys are namespaced correctly for the file they live in. Do this before extracting, so that a mis-prefixed key never reaches the `translations.json` files.
 
-1. **Run the `lint` command (optional)**
+1. **Run the `lint` command**
 
    ```bash
    npm run translations:lint
    ```
 
-   This command prints a list of hardcoded strings, that are not yet wrapped in the translation function (`t`). These strings probably need to be translated, too.
+   This command prints a list of hardcoded strings, that are not yet wrapped in the translation function (`t`). These strings probably need to be translated, too. See [Linting for hardcoded strings](#linting-for-hardcoded-strings) for what this catches that `npm run lint` does not.
 
 2. **Run the `extract` command**
 

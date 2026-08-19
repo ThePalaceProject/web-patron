@@ -58,7 +58,11 @@ const outputPath = "public/locales/{{language}}/{{namespace}}.json";
 // define files and directories to ignore during extraction
 // Test files are skipped, as are the shared test helpers in src/test-utils,
 // which reference the translation API but hold no keys of their own
-const ignoredFiles = ["**/__tests__/**", "src/test-utils/**"];
+const ignoredFiles = [
+  "**/__tests__/**",
+  "src/test-utils/**",
+  "**/*.stories.tsx"
+];
 
 // define list of HTML attributes to ignore during extraction,
 // these attributes do not need to be translated
