@@ -76,12 +76,8 @@ const config = {
     //
     // module: pages/_error.tsx imports dataflow/translationProps, which pulls in
     //         next-i18next's serverSideTranslations, which calls createRequire
-    //         from "module" to load next-i18next.config.js. _error may only use
-    //         getInitialProps, and Next does not strip that from the client
-    //         bundle the way it strips getStaticProps, so even though the IS_SERVER
-    //         guard in _error.getInitialProps means it never runs there.
-    //         Next polyfills "path" itself but has no fallback for these two,
-    //         so without this the client build fails with "Can't resolve 'module'".
+    //         from "module" to load next-i18next.config.js. Setting module to false
+    //         ensures no build issues for client/browser code.
     if (!isServer) {
       config.resolve.fallback.fs = false;
       config.resolve.fallback.module = false;
