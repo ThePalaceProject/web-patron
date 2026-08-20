@@ -927,6 +927,87 @@ describe("getLibraries", () => {
     await getLibraries(config);
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
+
+  it("returns the same merged object across calls while the cache is unchanged", async () => {
+    const feed = makePagedFeed([
+      { id: "urn:uuid:a", title: "A", authDocUrl: "https://a.example.com/" }
+    ]);
+    global.fetch = mockFetchSuccess(feed) as unknown as typeof fetch;
+
+    const config = makeConfig({
+      registries: [
+        makeRegistryConfig({ refreshMinInterval: 60, refreshMaxInterval: 300 })
+      ]
+    });
+
+    const first = await getLibraries(config);
+    const second = await getLibraries(config);
+    expect(second).toBe(first);
+  });
+
+  it("recomputes the merge after a refresh updates the cache", async () => {
+    const NOW = 1_000_000;
+    const nowSpy = jest.spyOn(Date, "now").mockReturnValue(NOW * 1000);
+
+    const feedA = makePagedFeed([
+      { id: "urn:uuid:a", title: "A", authDocUrl: "https://a.example.com/" }
+    ]);
+    const feedB = makePagedFeed([
+      { id: "urn:uuid:a", title: "A", authDocUrl: "https://a.example.com/" },
+      { id: "urn:uuid:b", title: "B", authDocUrl: "https://b.example.com/" }
+    ]);
+    global.fetch = jest
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        statusText: "OK",
+        json: async () => feedA
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        statusText: "OK",
+        json: async () => feedB
+      }) as unknown as typeof fetch;
+
+    const config = makeConfig({
+      registries: [
+        makeRegistryConfig({ refreshMinInterval: 1, refreshMaxInterval: 10 })
+      ]
+    });
+
+    const first = await getLibraries(config);
+    expect(first["urn:uuid:b"]).toBeUndefined();
+
+    nowSpy.mockReturnValue((NOW + 11) * 1000);
+    const second = await getLibraries(config);
+    expect(second).not.toBe(first);
+    expect(second["urn:uuid:b"]).toBeDefined();
+  });
+
+  it("does not reuse a memoized result for a different config object", async () => {
+    const feed = makePagedFeed([
+      { id: "urn:uuid:a", title: "A", authDocUrl: "https://a.example.com/" }
+    ]);
+    global.fetch = mockFetchSuccess(feed) as unknown as typeof fetch;
+
+    const registries = [
+      makeRegistryConfig({ refreshMinInterval: 60, refreshMaxInterval: 300 })
+    ];
+    const staticLibraries = {
+      "my-lib": { title: "My Lib", authDocUrl: "https://my.lib/auth" }
+    };
+
+    const first = await getLibraries(makeConfig({ registries }));
+    expect(first["my-lib"]).toBeUndefined();
+
+    const second = await getLibraries(
+      makeConfig({ registries, staticLibraries })
+    );
+    expect(second["my-lib"]).toBeDefined();
+    expect(second["urn:uuid:a"]).toBeDefined();
+  });
 });
 
 // ---------------------------------------------------------------------------

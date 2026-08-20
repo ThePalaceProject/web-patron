@@ -54,6 +54,13 @@ interface CrawlResult {
 interface RegistryModuleState {
   registryCaches: Map<string, RegistryState>;
   pendingRefreshes: Map<string, Promise<void>>;
+  /*
+   * Incremented on every registryCaches write. getLibraries compares it to
+   * decide whether its memoized merge is still valid. Lives on the shared
+   * state so a write from one bundle context invalidates the memos held by
+   * all the others.
+   */
+  cacheVersion: number;
 }
 
 declare const global: typeof globalThis & {
@@ -63,11 +70,30 @@ declare const global: typeof globalThis & {
 if (!global.__cpwRegistryState) {
   global.__cpwRegistryState = {
     registryCaches: new Map<string, RegistryState>(),
-    pendingRefreshes: new Map<string, Promise<void>>()
+    pendingRefreshes: new Map<string, Promise<void>>(),
+    cacheVersion: 0
   };
 }
 
-const { registryCaches, pendingRefreshes } = global.__cpwRegistryState;
+const moduleState = global.__cpwRegistryState;
+/*
+ * `global` survives dev-server hot reloads, so the state object found above
+ * may have been created by an earlier build of this module in which
+ * cacheVersion did not yet exist. In that case, backfill the field so that
+ * the version checks below can always compare numbers.
+ */
+moduleState.cacheVersion ??= 0;
+
+const { registryCaches, pendingRefreshes } = moduleState;
+
+/*
+ * Records a registry cache entry and invalidates the memoized merge in
+ * getLibraries. All registryCaches writes must go through this helper.
+ */
+function setRegistryCache(url: string, state: RegistryState): void {
+  registryCaches.set(url, state);
+  moduleState.cacheVersion++;
+}
 
 const emptyState: RegistryState = {
   libraries: {},
@@ -334,7 +360,7 @@ async function refreshRegistry(
     (registryConfig.timeout ?? DEFAULT_REGISTRY_FETCH_TIMEOUT) * 1000;
   const attemptTime = nowSeconds;
 
-  registryCaches.set(registryConfig.url, {
+  setRegistryCache(registryConfig.url, {
     ...existing,
     lastAttemptedFetch: attemptTime
   });
@@ -367,7 +393,7 @@ async function refreshRegistry(
         ? result.libraries
         : { ...existing.libraries, ...result.libraries };
 
-      registryCaches.set(registryConfig.url, {
+      setRegistryCache(registryConfig.url, {
         libraries: mergedLibraries,
         lastSuccessfulFetch: attemptTime,
         lastAttemptedFetch: attemptTime,
@@ -391,12 +417,27 @@ async function refreshRegistry(
   }
 }
 
+/*
+ * Most recent getLibraries merge, valid while cacheVersion and the config
+ * reference are both unchanged. Per-bundle: each bundle context recomputes at
+ * most once per cache write, since the shared cacheVersion invalidates every
+ * bundle's copy.
+ */
+let memoizedMerge: {
+  cacheVersion: number;
+  config: AppConfig;
+  libraries: LibrariesConfig;
+} | null = null;
+
 /**
  * Returns the current merged library list, refreshing all configured registries
  * in parallel if their data is stale. Incremental refreshes (stopping at entries
  * older than lastSuccessfulFetch) are used when the feed advertises an
  * order=modified facet. Full crawls replace the cache; partial crawls merge
  * new entries into it. On failure, the existing cached state is retained.
+ *
+ * The merged result is memoized between registry cache writes, so repeated
+ * calls with the same config return a shared object that must not be mutated.
  *
  * Merge precedence (highest to lowest):
  *   1. Static libraries from config
@@ -421,6 +462,23 @@ export async function getLibraries(
     )
   );
 
+  /*
+   * The merge below allocates a fresh object spanning every library, so the
+   * result is memoized. Until a registry cache entry is written, calls passing
+   * the same config object get the previous result back. The comparison is
+   * per-process. getAppConfig caches one AppConfig object for the life of its
+   * process, so requests served by the same instance pass the same reference
+   * (but each instance behind a load balancer keeps its own config, cache, and
+   * memo). Callers share the returned object and must not mutate it.
+   */
+  if (
+    memoizedMerge !== null &&
+    memoizedMerge.cacheVersion === moduleState.cacheVersion &&
+    memoizedMerge.config === config
+  ) {
+    return memoizedMerge.libraries;
+  }
+
   // Merge: earlier registries override later ones; static libraries override all.
   let mergedRegistryLibraries: LibrariesConfig = {};
   for (let i = registries.length - 1; i >= 0; i--) {
@@ -434,6 +492,11 @@ export async function getLibraries(
   }
 
   const merged = { ...mergedRegistryLibraries, ...staticLibraries };
+  memoizedMerge = {
+    cacheVersion: moduleState.cacheVersion,
+    config,
+    libraries: merged
+  };
   warnOnReservedSlugCollision(merged, config);
   return merged;
 }
@@ -449,4 +512,6 @@ export function resetRegistryCaches(): void {
   registryCaches.clear();
   pendingRefreshes.clear();
   warnedReservedSlugCollisions.clear();
+  memoizedMerge = null;
+  moduleState.cacheVersion++;
 }
