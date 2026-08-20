@@ -28,5 +28,8 @@ ENV NODE_ENV=production \
 COPY --from=builder /app/_next/standalone ./
 COPY --from=builder /app/_next/static ./_next/static
 COPY --from=builder /app/public ./public
+# next-i18next resolves ./next-i18next.config.js against the working directory
+# when a call site does not pass the config explicitly.
+COPY --from=builder /app/next-i18next.config.js ./
 EXPOSE 3000
 CMD ["node", "server.js"]
