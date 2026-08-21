@@ -76,6 +76,16 @@ jobs:
       - name: Check for Outdated Translations
         run: npm run translations:ci
 
+      # translations:ci only catches keys missing from the files; status also
+      # fails when a key is present in a secondary locale but left untranslated.
+      # Locale-specific optional plural forms (fr/it/es `_many`) are excluded
+      # from its totals, so a missing one never fails this gate.
+      - name: Check Translation Status
+        run: npm run translations:status
+
+      - name: Check for Unused Translation Keys
+        run: npm run translations:unused
+
   typecheck:
     name: Typecheck
     needs: node_setup

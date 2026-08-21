@@ -7,7 +7,7 @@ const DetailField: React.FC<{
   details ? (
     <>
       <dt>
-        <b>{heading}: </b>
+        <b>{heading} </b>
       </dt>
       <dd style={{ marginLeft: 10 }}>{details}</dd>
     </>

@@ -5,7 +5,7 @@ import Head from "next/head";
 import PageTitle from "./PageTitle";
 import { Text } from "./Text";
 import BreadcrumbBar from "./BreadcrumbBar";
-import computeBreadcrumbs from "computeBreadcrumbs";
+import computeBreadcrumbs, { collectionTitleText } from "computeBreadcrumbs";
 import useCollection from "hooks/useCollection";
 import ApplicationError from "errors";
 import ErrorComponent from "components/Error";
@@ -22,13 +22,16 @@ export const Collection: React.FC<{
 
   const hasLanes = collection?.lanes && collection.lanes.length > 0;
   const hasBooks = collection?.books && collection.books.length > 0;
+  const collectionTitle = collection
+    ? collectionTitleText(collection, t)
+    : undefined;
   const pageTitle = isLoading
     ? ""
-    : (title ?? collection?.title ?? "Collection");
+    : (title ?? collectionTitle ?? t("collection.fallbackTitle", "Collection"));
 
   const collectionBreadcrumbs = React.useMemo(
-    () => computeBreadcrumbs(collection),
-    [collection]
+    () => computeBreadcrumbs(collection, t),
+    [collection, t]
   );
 
   const { storedBreadcrumbs, setStoredBreadcrumbs } = useBreadcrumbContext();

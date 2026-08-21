@@ -11,3 +11,11 @@ export function appendSearchParam(
   url.searchParams.set(name, value);
   return url.toString();
 }
+
+export function searchParams(href: string): URLSearchParams | null {
+  try {
+    return new URL(href).searchParams;
+  } catch {
+    return null;
+  }
+}

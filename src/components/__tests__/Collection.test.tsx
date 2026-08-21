@@ -158,6 +158,56 @@ test("renders empty state if no lanes or books", () => {
   expect(utils.getByText("This collection is empty.")).toBeInTheDocument();
 });
 
+describe("page title", () => {
+  // The CM titles every search results feed "Search", and marks it as one by
+  // giving it the same pathname as its search description url.
+  const searchCollection = {
+    id: "id",
+    url: "http://cm.example/search/1120?entrypoint=All&q=love",
+    searchDataUrl: "http://cm.example/search/1120?entrypoint=All",
+    title: "Search",
+    navigationLinks: [],
+    books: [],
+    lanes: [],
+    catalogRootLink: { url: "http://cm.example/groups/", text: "All Books" }
+  };
+
+  test("uses the collection's own title", () => {
+    mockSwr({
+      isValidating: false,
+      data: { ...searchCollection, title: "Adventure", searchDataUrl: null }
+    });
+    const utils = render(<Collection />, {
+      router: { query: { collectionUrl: "/collection" } }
+    });
+    expect(
+      utils.getByRole("heading", { level: 1, name: "Adventure" })
+    ).toBeInTheDocument();
+  });
+
+  test("translates the title of a search results feed", () => {
+    mockSwr({ isValidating: false, data: searchCollection });
+    const utils = render(<Collection />, {
+      router: { query: { collectionUrl: "/collection" } }
+    });
+    // English resolves back to "Search", and the crumb agrees with the heading.
+    expect(
+      utils.getByRole("heading", { level: 1, name: "Search" })
+    ).toBeInTheDocument();
+    expect(utils.getByRole("link", { name: "All Books" })).toBeInTheDocument();
+  });
+
+  test("the title prop still wins over the collection title", () => {
+    mockSwr({ isValidating: false, data: searchCollection });
+    const utils = render(<Collection title="My Library Home" />, {
+      router: { query: { collectionUrl: "/collection" } }
+    });
+    expect(
+      utils.getByRole("heading", { level: 1, name: "My Library Home" })
+    ).toBeInTheDocument();
+  });
+});
+
 describe("breadcrumbs", () => {
   const laneData: LaneData = {
     title: "my lane",

@@ -67,9 +67,10 @@ describe("LanguageSelector", () => {
 
   it.each([
     [Language.EN, "Choose language"],
-    [Language.ES, "Seleccionar idioma"],
     [Language.FR, "Choisir la langue"],
-    [Language.IT, "Scegli la lingua"]
+    [Language.IT, "Scegli la lingua"],
+    [Language.DE, "Sprache auswählen"],
+    [Language.ES, "Seleccionar idioma"]
   ])(
     "should show correct aria-label when locale is %s",
     async (locale, ariaLabel) => {
@@ -95,25 +96,27 @@ describe("LanguageSelector", () => {
 
     const options = screen.getAllByRole("option");
 
-    // there should be exactly four options
-    expect(options).toHaveLength(4);
+    // there should be exactly five options
+    expect(options).toHaveLength(5);
 
-    // there should be an EN, FR, IT and ES option,
-    // and the order of options should be EN, FR, IT, ES
+    // options are in EFIGS order — English, French, Italian, German, Spanish —
+    // which comes from the declaration order of the Language enum
     expect(options[0]).toHaveTextContent("English (en)");
     expect(options[1]).toHaveTextContent("French (fr)");
     expect(options[2]).toHaveTextContent("Italian (it)");
-    expect(options[3]).toHaveTextContent("Spanish (es)");
+    expect(options[3]).toHaveTextContent("German (de)");
+    expect(options[4]).toHaveTextContent("Spanish (es)");
   });
 
   // define test case table
   // that creates a test case for each language
   it.each`
     locale         | optionNames
-    ${Language.EN} | ${["English (en)", "French (fr)", "Italian (it)", "Spanish (es)"]}
-    ${Language.ES} | ${["Inglés (en)", "Francés (fr)", "Italiano (it)", "Español (es)"]}
-    ${Language.FR} | ${["Anglais (en)", "Français (fr)", "Italien (it)", "Espagnol (es)"]}
-    ${Language.IT} | ${["Inglese (en)", "Francese (fr)", "Italiano (it)", "Spagnolo (es)"]}
+    ${Language.EN} | ${["English (en)", "French (fr)", "Italian (it)", "German (de)", "Spanish (es)"]}
+    ${Language.FR} | ${["Anglais (en)", "Français (fr)", "Italien (it)", "Allemand (de)", "Espagnol (es)"]}
+    ${Language.IT} | ${["Inglese (en)", "Francese (fr)", "Italiano (it)", "Tedesco (de)", "Spagnolo (es)"]}
+    ${Language.DE} | ${["Englisch (en)", "Französisch (fr)", "Italienisch (it)", "Deutsch (de)", "Spanisch (es)"]}
+    ${Language.ES} | ${["Inglés (en)", "Francés (fr)", "Italiano (it)", "Alemán (de)", "Español (es)"]}
   `(
     "should render correct accessible names for options in $locale",
     async ({ locale, optionNames }) => {
@@ -142,6 +145,9 @@ describe("LanguageSelector", () => {
     ).toHaveAttribute("aria-selected", "true");
     expect(
       screen.getByRole("option", { name: "Italien (it)" })
+    ).toHaveAttribute("aria-selected", "false");
+    expect(
+      screen.getByRole("option", { name: "Allemand (de)" })
     ).toHaveAttribute("aria-selected", "false");
     expect(
       screen.getByRole("option", { name: "Espagnol (es)" })
@@ -203,7 +209,8 @@ describe("LanguageSelector", () => {
 
   it("should not render selector if locale is invalid", async () => {
     // setup using unsupported language
-    await setup("de");
+    // ("pt" — "de" became a supported locale and can no longer stand in here)
+    await setup("pt");
 
     // should not find language selector
     expect(screen.queryByRole("combobox")).not.toBeInTheDocument();

@@ -35,6 +35,8 @@ describe("formatDuration", () => {
     // space (U+00A0), so this is not the plain space it looks like
     expect(formatDuration(21660, Language.FR)).toBe("6 heures et 1 minute");
     expect(formatDuration(21660, Language.IT)).toBe("6 ore e 1 minuto");
+    // German uses a comma rather than a conjunction to join the units
+    expect(formatDuration(21660, Language.DE)).toBe("6 Stunden, 1 Minute");
     expect(formatDuration(21660, Language.ES)).toBe("6 horas y 1 minuto");
   });
 

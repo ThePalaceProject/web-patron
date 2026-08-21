@@ -394,6 +394,8 @@ The `web-patron` application utilizes the following packages for internationaliz
 - **react-i18next**: React bindings for i18next (peer dependency required by `next-i18next`)
 - **eslint-plugin-i18next** ESLint plugin that warns about hardcoded strings (development dependency)
 
+There is also a Claude skill at `.claude/skills/translate/` that writes the non-English copy. It reads `translations:status` to find keys that are present but untranslated, fills them in, and carries the termbase and register rules in `references/glossary.md`. It does not add `t(...)` calls or run extraction — those stay with the developer.
+
 ### Configuration files
 
 #### `next-i18next.config.js`
@@ -402,7 +404,7 @@ This file contains the configuration for the `next-i18next` library, which manag
 
 Key settings:
 
-- **Supported languages**: English (`en`), French (`fr`), Italian (`it`), and Spanish (`es`).
+- **Supported languages**: English (`en`), French (`fr`), Italian (`it`), German (`de`), and Spanish (`es`) — EFIGS order, which is also the order they appear in the language selector.
 - **Default language**: English (`en`) is the default and fallback language.
 - **Namespaces**: Two namespaces are used. `translations` is the default and holds keys used by a single component; `common` holds strings shared by more than one component. See [Shared strings and the `common` namespace](#shared-strings-and-the-common-namespace)
 - **Translation files path**: Translation files are stored in the `public/locales` directory.
@@ -413,10 +415,11 @@ This file configures the `i18next-cli` for extracting translation keys from the 
 
 Key settings:
 
-- **Input files**: All `.tsx`, `.jsx` and `.ts` files under `src` are scanned for translation keys, excluding `__tests__` directories and `src/test-utils`
+- **Input files**: The configuration scans `src/**/*.{tsx,jsx,ts}` — everything under `src`, rather than named directories, so a directory that gains translated components cannot silently fall out of extraction. `.ts` files are included because some utilities and hooks pass strings to components.
+- **Limits of extraction**: keys are found when they can be resolved statically. `<Trans i18nKey="...">` is extracted, with the English default built from the JSX children (including numbered element placeholders such as `<1>a link</1>`), and template literals are extracted when the interpolated value is traceable. A value the extractor would have to execute is not resolved — ``t(`languageSelector.languageName.${lang.toUpperCase()}`)`` in [LanguageSelector.tsx](src/components/LanguageSelector.tsx) produces no keys, so the `languageSelector.languageName.*` matrix is maintained by hand.
 - **Output path**: Extracted translation files are saved in the `public/locales` directory, organized by language and namespace
 - **Commands**: Use the following scripts to manage translations:
-  - `translations:status` Overview of project translations
+  - `translations:status` Overview of project translations. Pass a locale for a key-by-key view (`npm run translations:status -- de`), and add `--hide-translated` to see only outstanding work. **This is a CI gate**: it exits non-zero when any non-English locale has a key that is present but untranslated, which `translations:ci` cannot detect because `returnEmptyString: false` makes an empty value fall through to the English default. Locale-specific optional plural forms (`fr`/`it`/`es` `_many`) are excluded from its totals and never fail the gate.
   - `translations:lint` List of hardcoded strings needing translation
   - `translations:extract` Extract translation keys and update translation files
     - `--sync-primary` Use default value provided in `t(translation_key, default_value)` as translation
@@ -429,7 +432,8 @@ Key settings:
 
 - **Commands**:
   - `translations:unused` Lists unused translation keys
-    - `i18next.config.js` sets `removedUnusedKeys: false` so unused keys are not removed upon extraction (`npm run translations:extract`). This command surfaces any unused keys to help with manual removal.
+
+`i18next.config.ts` sets `removeUnusedKeys: false` so unused keys are not removed upon extraction (`npm run translations:extract`). This command surfaces any unused keys to help with manual removal.
 
 ### JSON structure for translations files
 
@@ -501,7 +505,7 @@ The domain prefixes currently in use:
 Two rules keep this working:
 
 1. **The `ns` option is what routes the key.** `i18next-cli` reads it during extraction and writes the key to `common.json` instead of `translations.json`. Forget it and the key silently lands in the default namespace, where the other components cannot share it.
-2. **A new namespace must be registered in three places**: the `ns` array in [next-i18next.config.js](next-i18next.config.js), `translationNamespaces` in [src/dataflow/withAppProps.ts](src/dataflow/withAppProps.ts) (both the static and the server-side variant), and the namespace map in [src/test-utils/mockUseTranslation.ts](src/test-utils/mockUseTranslation.ts). A namespace missing from `withAppProps.ts` is never serialized to the client.
+2. **A new namespace must be registered in three places**: the `ns` array in [next-i18next.config.js](next-i18next.config.js), `TRANSLATION_NAMESPACES` in [src/dataflow/translationProps.ts](src/dataflow/translationProps.ts), and the namespace map in [src/test-utils/mockUseTranslation.ts](src/test-utils/mockUseTranslation.ts). A namespace missing from `TRANSLATION_NAMESPACES` is never serialized to the client.
 
 ### Interpolation
 
@@ -510,9 +514,27 @@ Two rules keep this working:
 E.g. The meaning of the sentence `"Also available to {{action}} in {{app}}"` might change if an action (`read` or `listen to`) is translated outside the context of the sentence. It is better to have separate translations:
 
 ```json
-"fulfillmentCard.alsoAvailableToReadIn": "Also available to read in {{app}}",
-"fulfillmentCard.alsoAvailableToListenToIn": "Also available to listen to in {{app}}"
+"fulfillmentCard.alsoAvailableToReadInApp": "Also available to read in {{app}}.",
+"fulfillmentCard.alsoAvailableToListenToInApp": "Also available to listen to in {{app}}."
 ```
+
+### Punctuation and locale-sensitive spacing
+
+**Punctuation that a locale might space differently belongs inside the `t()` value, never appended in JSX.** The colon is the one that bites: French requires a non-breaking space before `:` (`Éditeur : Penguin`), while German, Spanish and Italian close it up. A label rendered as `{t("bookDetails.publisher", "Publisher")}: ` reaches the translator bare, so no locale file can ever supply that space — the page ships `Éditeur: ` and there is nothing a translator can do about it.
+
+Keep the whole user-visible string in one translatable unit instead:
+
+```tsx
+// no — the colon is unreachable from public/locales
+<b>{t("bookDetails.publisher", "Publisher")}: </b>
+
+// yes — French can write "Éditeur :"
+<b>{t("bookDetails.publisher", "Publisher:")} </b>
+```
+
+The same applies to `?`, `!` and `;`, which French also spaces. When punctuation genuinely separates two runs of markup rather than terminating a label — a book title and its subtitle, rendered as separate elements — give the separator its own key with the value interpolated, as [BookList.tsx](src/components/BookList.tsx) and [bookDetails/index.tsx](src/components/bookDetails/index.tsx) do with `book.subtitleSeparator` (`": {{subtitle}}"`).
+
+Neither linter catches a stranded colon, so this is a code review concern. The termbase in [.claude/skills/translate/references/glossary.md](.claude/skills/translate/references/glossary.md) carries the matching rule for translators.
 
 ### Linting for hardcoded strings
 
@@ -576,7 +598,7 @@ To extract translation keys from your component source code and to update the `t
    After running the commands, check the `translations.json` files that the new translation keys have been added correctly.
 
 5. **Add translations**  
-   Collaborate with the translators and add the translations for the keys in the non-English files, and English (`en`) to the `translations.json` files.
+   Fill in the values for the keys in the non-English files. The `/translate` Claude skill at `.claude/skills/translate/` does this: run it bare to fill every locale, with a locale to narrow it (`/translate de`), or with a file or directory to re-check just the keys that file uses (`/translate src/components/BookStatus.tsx`). It works from `translations:status` and follows the project termbase in `references/glossary.md`.
    **Note**: Transifex and `@transifex/cli` will likely be leveraged for automated translation.
 
 6. **Save changes**  

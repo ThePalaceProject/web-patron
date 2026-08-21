@@ -24,6 +24,7 @@
   "auth.password.hide": "hide password",
   "auth.password.show": "show password",
   "auth.signingIn": "Signing in...",
+  "book.subtitleSeparator": ": {{subtitle}}",
   "error.errorWithDescription": "Error: {{description}}",
   "error.pageRenderFailed": "Something went wrong rendering the page.",
   "error.unexpectedError": "An unexpected error occurred.",
