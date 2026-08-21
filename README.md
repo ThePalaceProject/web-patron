@@ -599,7 +599,6 @@ To extract translation keys from your component source code and to update the `t
 
 5. **Add translations**  
    Fill in the values for the keys in the non-English files. The `/translate` Claude skill at `.claude/skills/translate/` does this: run it bare to fill every locale, with a locale to narrow it (`/translate de`), or with a file or directory to re-check just the keys that file uses (`/translate src/components/BookStatus.tsx`). It works from `translations:status` and follows the project termbase in `references/glossary.md`.
-   **Note**: Transifex and `@transifex/cli` will likely be leveraged for automated translation.
 
 6. **Save changes**  
    Verify that the translations are correct and functioning as expected in the application. Then commit the updated translation files.
