@@ -6,7 +6,8 @@ import { mockUseTranslation } from "test-utils/mockUseTranslation";
 
 const t = mockUseTranslation().t as unknown as TFunction;
 
-// Gives us the key back instead of the English default
+// Gives us the key back instead of English default,
+// so we can test that the key was correctly passed through
 const keyEcho = ((key: string) => key) as unknown as TFunction;
 
 const feed = (params: string) => `http://cm.test/feed?${params}`;

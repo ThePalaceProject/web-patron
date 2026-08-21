@@ -3,8 +3,8 @@ import computeBreadcrumbs from "../computeBreadcrumbs";
 import { CollectionData, LinkData } from "interfaces";
 import { TFunction } from "next-i18next/pages";
 
-// Echoes the key back, so these cases assert which key was chosen rather than
-// the English default it happens to fall back to.
+// Gives us the key back instead of English default,
+// so we can test that the key was correctly passed through
 const keyEcho = ((key: string) => key) as unknown as TFunction;
 
 describe("computeBreadcrumbs", () => {
