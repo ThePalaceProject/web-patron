@@ -802,18 +802,19 @@ describe("crawlRegistryFeed (incremental behaviour via getLibraries)", () => {
 // ---------------------------------------------------------------------------
 
 describe("getLibraries", () => {
-  let warnSpy: jest.SpyInstance;
-
   beforeEach(() => {
     resetRegistryCaches();
-    warnSpy = expectAndSuppressConsole(
+    expectAndSuppressConsole(
       "warn",
       "has no order=modified facet; incremental fetching is not supported. " +
         "Full crawls will run every refresh."
     );
   });
 
-  afterEach(() => warnSpy.mockRestore());
+  // restoreAllMocks (not just warnSpy) so the Date.now spies used in this
+  // describe cannot leak into later tests; jest.config.node.js does not set
+  // restoreMocks.
+  afterEach(() => jest.restoreAllMocks());
 
   it("returns static libraries when no registries are configured", async () => {
     const staticLibraries = {

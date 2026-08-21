@@ -80,7 +80,11 @@ const moduleState = global.__cpwRegistryState;
  * `global` survives dev-server hot reloads, so the state object found above
  * may have been created by an earlier build of this module in which
  * cacheVersion did not yet exist. In that case, backfill the field so that
- * the version checks below can always compare numbers.
+ * the version checks below can always compare numbers. The converse is not
+ * guarded: a bundle still running an earlier build writes to the cache
+ * without bumping the version, so a reloaded bundle can serve a stale memo
+ * until the next write from current code. That window is dev-only and closes
+ * on the next refresh.
  */
 moduleState.cacheVersion ??= 0;
 
@@ -88,7 +92,8 @@ const { registryCaches, pendingRefreshes } = moduleState;
 
 /*
  * Records a registry cache entry and invalidates the memoized merge in
- * getLibraries. All registryCaches writes must go through this helper.
+ * getLibraries. All registryCaches.set calls go through this helper;
+ * resetRegistryCaches clears the map directly and bumps the version itself.
  */
 function setRegistryCache(url: string, state: RegistryState): void {
   registryCaches.set(url, state);
@@ -446,7 +451,7 @@ let memoizedMerge: {
  */
 export async function getLibraries(
   config: AppConfig
-): Promise<LibrariesConfig> {
+): Promise<Readonly<LibrariesConfig>> {
   const { registries = [], staticLibraries = {} } = config;
 
   if (registries.length === 0) {
@@ -466,10 +471,11 @@ export async function getLibraries(
    * The merge below allocates a fresh object spanning every library, so the
    * result is memoized. Until a registry cache entry is written, calls passing
    * the same config object get the previous result back. The comparison is
-   * per-process. getAppConfig caches one AppConfig object for the life of its
-   * process, so requests served by the same instance pass the same reference
-   * (but each instance behind a load balancer keeps its own config, cache, and
-   * memo). Callers share the returned object and must not mutate it.
+   * local. getAppConfig caches one AppConfig object per bundle context, so
+   * repeated calls within a bundle pass the same reference and pair with this
+   * bundle's memo (and each server instance behind a load balancer keeps its
+   * own config, cache, and memo). Callers share the returned object and must
+   * not mutate it.
    */
   if (
     memoizedMerge !== null &&
