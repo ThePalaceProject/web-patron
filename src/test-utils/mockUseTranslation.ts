@@ -2,10 +2,12 @@ import enTranslations from "../../public/locales/en/translations.json";
 import frTranslations from "../../public/locales/fr/translations.json";
 import itTranslations from "../../public/locales/it/translations.json";
 import esTranslations from "../../public/locales/es/translations.json";
+import deTranslations from "../../public/locales/de/translations.json";
 import enCommon from "../../public/locales/en/common.json";
 import frCommon from "../../public/locales/fr/common.json";
 import itCommon from "../../public/locales/it/common.json";
 import esCommon from "../../public/locales/es/common.json";
+import deCommon from "../../public/locales/de/common.json";
 
 // define translation object keyed first by namespace and then by language,
 // mirroring the public/locales/{language}/{namespace}.json layout on disk.
@@ -16,13 +18,15 @@ const translations: Record<string, Record<string, Record<string, string>>> = {
     en: enTranslations as Record<string, string>,
     fr: frTranslations as Record<string, string>,
     it: itTranslations as Record<string, string>,
-    es: esTranslations as Record<string, string>
+    es: esTranslations as Record<string, string>,
+    de: deTranslations as Record<string, string>
   },
   common: {
     en: enCommon as Record<string, string>,
     fr: frCommon as Record<string, string>,
     it: itCommon as Record<string, string>,
-    es: esCommon as Record<string, string>
+    es: esCommon as Record<string, string>,
+    de: deCommon as Record<string, string>
   }
 };
 

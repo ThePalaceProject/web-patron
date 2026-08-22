@@ -2,13 +2,14 @@ const path = require("path");
 
 // define the i18n (internationalization) settings.
 // Supported languages in the application
-// are English, French, Italian, and Spanish.
+// are English, French, Italian, German, and Spanish (EFIGS order,
+// which is also the order they appear in the language selector).
 // The default language for the application is English,
 // which is also used as the fallback language
 // if a translation is missing.
 const i18nConfig = {
   defaultLocale: "en",
-  locales: ["en", "fr", "it", "es"]
+  locales: ["en", "fr", "it", "de", "es"]
 };
 
 // define the default namespace for translations as "translations"

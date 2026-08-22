@@ -94,7 +94,11 @@ export const BookDetails: React.FC = () => {
                   {t("bookDetails.bookTitle", "Book title:")}{" "}
                 </ScreenReaderOnly>
                 {book.title}
-                {book.subtitle && `: ${book.subtitle}`}
+                {book.subtitle &&
+                  t("book.subtitleSeparator", ": {{subtitle}}", {
+                    subtitle: book.subtitle,
+                    ns: "common"
+                  })}
               </H1>
 
               <Text variant="text.callouts.regular">
@@ -121,48 +125,48 @@ export const BookDetails: React.FC = () => {
               }}
             >
               <DetailField
-                heading={t("bookDetails.format", "Format")}
+                heading={t("bookDetails.format", "Format:")}
                 details={translateBookFormat(book.format, t)}
               />
               <DetailField
-                heading={t("bookDetails.audience", "Audience")}
+                heading={t("bookDetails.audience", "Audience:")}
                 details={book.audience}
               />
               <DetailField
-                heading={t("bookDetails.categories", "Categories")}
+                heading={t("bookDetails.categories", "Categories:")}
                 details={book.categories?.join(", ")}
               />
               <DetailField
-                heading={t("bookDetails.language", "Language")}
+                heading={t("bookDetails.language", "Language:")}
                 details={getLanguageLabel(book, currentLocale)}
               />
               <DetailField
-                heading={t("bookDetails.narrators", "Narrators")}
+                heading={t("bookDetails.narrators", "Narrators:")}
                 details={book.narrators?.join(", ")}
               />
               <DetailField
-                heading={t("bookDetails.duration", "Duration")}
+                heading={t("bookDetails.duration", "Duration:")}
                 details={
                   book.duration && formatDuration(book.duration, currentLocale)
                 }
               />
               <DetailField
-                heading={t("bookDetails.published", "Published")}
+                heading={t("bookDetails.published", "Published:")}
                 details={
                   book.published && formatDate(book.published, currentLocale)
                 }
               />
               <DetailField
-                heading={t("bookDetails.publisher", "Publisher")}
+                heading={t("bookDetails.publisher", "Publisher:")}
                 details={book.publisher}
               />
               <DetailField
-                heading={t("bookDetails.distributor", "Distributor")}
+                heading={t("bookDetails.distributor", "Distributor:")}
                 details={book.providerName}
               />
               {book.series?.name && book.series?.url && (
                 <DetailField
-                  heading={t("bookDetails.series", "Series")}
+                  heading={t("bookDetails.series", "Series:")}
                   details={
                     <Link
                       collectionUrl={book.series.url}

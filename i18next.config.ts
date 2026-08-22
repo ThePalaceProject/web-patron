@@ -27,15 +27,16 @@
 import { defineConfig } from "i18next-cli";
 
 // define the supported languages
-// the app has four languages: English, French, Italian, and Spanish
-const appLocales = ["en", "fr", "it", "es"];
+// the app has five languages in EFIGS order:
+// English, French, Italian, German, and Spanish
+const appLocales = ["en", "fr", "it", "de", "es"];
 
 // set the primary language for the application
 // English translations and keys are the "base" for other translations
 const primaryLanguage = "en";
 
-// define secondary languages that will be supported: French, Italian, and Spanish
-const secondaryLanguages = ["fr", "it", "es"];
+// define secondary languages that will be supported: French, Italian, German, and Spanish
+const secondaryLanguages = ["fr", "it", "de", "es"];
 
 // define the functions used for translation in the code
 // t function is used for retrieving translation strings

@@ -73,8 +73,17 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      # Catches keys missing from files
       - name: Check for Outdated Translations
         run: npm run translations:ci
+
+      # Fails when a key is present in secondary locale but left untranslated
+      - name: Check Translation Status
+        run: npm run translations:status
+
+      # Locates translations keys in translation files that are unused  
+      - name: Check for Unused Translation Keys
+        run: npm run translations:unused
 
   typecheck:
     name: Typecheck

@@ -10,7 +10,7 @@ import { NextRequest } from "next/server";
 import { proxy } from "../../proxy";
 
 const I18N = {
-  locales: ["en", "fr", "it", "es"],
+  locales: ["en", "fr", "it", "de", "es"],
   defaultLocale: "en"
 };
 
@@ -50,7 +50,7 @@ describe("proxy", () => {
       expect(location.pathname).toBe("/library/books");
     });
 
-    it.each(["fr", "it", "es"])("redirects the /%s root to /", locale => {
+    it.each(["fr", "it", "de", "es"])("redirects the /%s root to /", locale => {
       const response = proxy(makeRequest(`/${locale}`));
       expect(redirectLocation(response).pathname).toBe("/");
     });

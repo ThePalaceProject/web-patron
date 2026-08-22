@@ -1,6 +1,11 @@
 import { describe, expect, test } from "@jest/globals";
 import computeBreadcrumbs from "../computeBreadcrumbs";
 import { CollectionData, LinkData } from "interfaces";
+import { TFunction } from "next-i18next/pages";
+
+// Gives us the key back instead of English default,
+// so we can test that the key was correctly passed through
+const keyEcho = ((key: string) => key) as unknown as TFunction;
 
 describe("computeBreadcrumbs", () => {
   const collection = {
@@ -179,5 +184,33 @@ describe("computeBreadcrumbs", () => {
         { url: searchCollection.url, text: collection.title }
       ]);
     });
+
+    test("translates the search crumb when given a translation function", () => {
+      expect(computeBreadcrumbs(searchCollection, keyEcho)).toEqual([
+        catalogRootLink,
+        { url: searchCollection.url, text: "collection.searchResults" }
+      ]);
+    });
+
+    test("leaves a browse feed's own title untranslated", () => {
+      const data = Object.assign({}, searchCollection, {
+        url: "http://cm.example/feed/1120?entrypoint=All"
+      });
+      expect(computeBreadcrumbs(data, keyEcho)).toEqual([
+        catalogRootLink,
+        parentLink,
+        { url: data.url, text: collection.title }
+      ]);
+    });
+  });
+
+  test("translates the catalog root fallback when the link has no text", () => {
+    const data = Object.assign({}, collection, {
+      catalogRootLink: { url: "different url", text: "" }
+    });
+    expect(computeBreadcrumbs(data, keyEcho)).toEqual([
+      { url: "different url", text: "computeBreadcrumbs.catalog" },
+      { url: collection.url, text: collection.title }
+    ]);
   });
 });

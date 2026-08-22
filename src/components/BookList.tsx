@@ -172,16 +172,21 @@ export const BookListItem: React.FC<{
               >
                 <Metadata
                   display="inline"
-                  heading={t("bookList.title", "Title")}
+                  heading={t("bookList.title", "Title:")}
                 >
                   {truncateString(book.title, 50)}
                 </Metadata>
               </Link>
               {book.subtitle && (
-                <Text>: {truncateString(book.subtitle, 50)}</Text>
+                <Text>
+                  {t("book.subtitleSeparator", ": {{subtitle}}", {
+                    subtitle: truncateString(book.subtitle, 50),
+                    ns: "common"
+                  })}
+                </Text>
               )}
             </H2>
-            <Metadata heading={t("bookList.authors", "Authors")}>
+            <Metadata heading={t("bookList.authors", "Authors:")}>
               {authors}
             </Metadata>
           </div>
@@ -210,7 +215,7 @@ const Metadata: React.FC<{
 }> = ({ heading, variant, children, display = "block" }) => {
   return (
     <P sx={{ margin: 0, variant, display }}>
-      <ScreenReaderOnly>{heading}: </ScreenReaderOnly>
+      <ScreenReaderOnly>{heading} </ScreenReaderOnly>
       {children}
     </P>
   );
@@ -224,7 +229,7 @@ const Description: React.FC<{
   return (
     <div className={className}>
       <Metadata
-        heading={t("bookList.description", "Description")}
+        heading={t("bookList.description", "Description:")}
         variant="text.body.italic"
       >
         {truncateString(stripHTML(book.summary ?? ""), 280)}

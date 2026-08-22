@@ -1,4 +1,5 @@
 import { CollectionData, LinkData } from "interfaces";
+import { TFunction } from "next-i18next/pages";
 
 // Custom URL comparator to ignore trailing slashes.
 const urlComparator = (
@@ -18,7 +19,9 @@ const urlComparator = (
  * A collection is a search results feed when its own url
  * shares a pathname with its search description url
  */
-function isSearchResultsCollection(collection?: CollectionData): boolean {
+export function isSearchResultsCollection(
+  collection?: CollectionData
+): boolean {
   if (!collection?.url || !collection?.searchDataUrl) return false;
   // Palace CM currently always provides absolute collection and search URLs
   try {
@@ -32,7 +35,23 @@ function isSearchResultsCollection(collection?: CollectionData): boolean {
   }
 }
 
-const computeBreadcrumbs = (collection?: CollectionData): LinkData[] => {
+/**
+ * The CM titles every search results feed "Search" (OpenSearchDocument.search_info).
+ * Every other collection title is library data and is shown as-is.
+ * Without a `t` we fall back to the CM's English.
+ */
+export function collectionTitleText(
+  collection: CollectionData,
+  t?: TFunction
+): string {
+  if (!t || !isSearchResultsCollection(collection)) return collection.title;
+  return t("collection.searchResults", "Search");
+}
+
+const computeBreadcrumbs = (
+  collection?: CollectionData,
+  t?: TFunction
+): LinkData[] => {
   let links: LinkData[] = [];
 
   // Currently, search runs across the entire catalog.
@@ -41,7 +60,8 @@ const computeBreadcrumbs = (collection?: CollectionData): LinkData[] => {
   if (collection && isSearchResultsCollection(collection)) {
     return hierarchyComputeBreadcrumbs(
       { ...collection, parentLink: undefined },
-      urlComparator
+      urlComparator,
+      t
     );
   }
 
@@ -61,10 +81,10 @@ const computeBreadcrumbs = (collection?: CollectionData): LinkData[] => {
     });
     links.push({
       url: collection.url,
-      text: collection.title
+      text: collectionTitleText(collection, t)
     });
   } else {
-    links = hierarchyComputeBreadcrumbs(collection, urlComparator);
+    links = hierarchyComputeBreadcrumbs(collection, urlComparator, t);
   }
 
   return links;
@@ -80,7 +100,8 @@ export default computeBreadcrumbs;
  * */
 export function hierarchyComputeBreadcrumbs(
   collection?: CollectionData,
-  comparator?: (url1: string, url2: string) => boolean
+  comparator?: (url1: string, url2: string) => boolean,
+  t?: TFunction
 ): LinkData[] {
   const links: LinkData[] = [];
 
@@ -96,7 +117,9 @@ export function hierarchyComputeBreadcrumbs(
 
   if (catalogRootLink && !comparator(catalogRootLink.url, collection.url)) {
     links.push({
-      text: catalogRootLink.text || "Catalog",
+      text:
+        catalogRootLink.text ||
+        (t ? t("computeBreadcrumbs.catalog", "Catalog") : "Catalog"),
       url: catalogRootLink.url
     });
   }
@@ -116,7 +139,7 @@ export function hierarchyComputeBreadcrumbs(
 
   links.push({
     url: collection.url,
-    text: collection.title
+    text: collectionTitleText(collection, t)
   });
 
   return links;

@@ -6,6 +6,7 @@ describe("formatDate", () => {
     expect(formatDate("2014-06-08", Language.EN)).toBe("June 8, 2014");
     expect(formatDate("2014-06-08", Language.FR)).toBe("8 juin 2014");
     expect(formatDate("2014-06-08", Language.IT)).toBe("8 giugno 2014");
+    expect(formatDate("2014-06-08", Language.DE)).toBe("8. Juni 2014");
     expect(formatDate("2014-06-08", Language.ES)).toBe("8 de junio de 2014");
   });
 
