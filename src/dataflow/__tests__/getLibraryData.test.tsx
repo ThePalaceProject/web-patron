@@ -4,6 +4,7 @@ import {
   fetchAuthDocument,
   buildLibraryData,
   getAuthDocUrl,
+  getLibraryEntry,
   resetAuthDocCache
 } from "../getLibraryData";
 import fetchMock from "jest-fetch-mock";
@@ -97,6 +98,40 @@ describe("getAuthDocUrl", () => {
     });
     const url = await getAuthDocUrl("uuid-abc");
     expect(url).toBe("https://reg.example.com/auth");
+  });
+});
+
+describe("getLibraryEntry", () => {
+  test("throws PageNotFoundError if library is not found", async () => {
+    mockGetLibraries.mockResolvedValueOnce({});
+    const promise = getLibraryEntry("not there slug");
+    await expect(promise).rejects.toThrow(PageNotFoundError);
+  });
+
+  test("returns the registry id for a registry-sourced library", async () => {
+    mockGetLibraries.mockResolvedValueOnce({
+      "uuid-abc": {
+        id: "urn:uuid:abc",
+        title: "Registry Lib",
+        authDocUrl: "https://reg.example.com/auth"
+      }
+    });
+    await expect(getLibraryEntry("uuid-abc")).resolves.toEqual({
+      id: "urn:uuid:abc",
+      title: "Registry Lib",
+      authDocUrl: "https://reg.example.com/auth"
+    });
+  });
+
+  test("falls back to the slug as id for a static library", async () => {
+    mockGetLibraries.mockResolvedValueOnce({
+      hello: { title: "Hello Library", authDocUrl: "http://library.com" }
+    });
+    await expect(getLibraryEntry("hello")).resolves.toEqual({
+      id: "hello",
+      title: "Hello Library",
+      authDocUrl: "http://library.com"
+    });
   });
 });
 
@@ -259,6 +294,7 @@ describe("buildLibraryData", () => {
   test("returns correct response", () => {
     const library = buildLibraryData(fixtures.authDoc, "librarySlug");
     expect(library).toEqual({
+      id: "librarySlug",
       slug: "librarySlug",
       catalogUrl: "/catalog-root",
       catalogName: "auth doc title",
@@ -269,6 +305,18 @@ describe("buildLibraryData", () => {
       userProfileUrl: "http://test-cm.com/patrons/me/",
       authMethods: [],
       libraryLinks: {}
+    });
+  });
+
+  test("uses the provided library id", () => {
+    const library = buildLibraryData(
+      fixtures.authDoc,
+      "librarySlug",
+      "urn:uuid:abc"
+    );
+    expect(library).toMatchObject({
+      id: "urn:uuid:abc",
+      slug: "librarySlug"
     });
   });
 

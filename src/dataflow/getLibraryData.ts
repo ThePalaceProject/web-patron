@@ -92,29 +92,46 @@ function shouldRefreshAuthDoc(
   return nowSeconds - entry.lastSuccessfulFetch >= maxInterval;
 }
 
+/** A library resolved by slug from the merged library list. */
+export interface LibraryEntry {
+  id: string;
+  title: string;
+  authDocUrl: string;
+}
+
 /**
- * Interprets the app config to return the auth document url.
- * Uses getLibraries so registry-sourced libraries (not present in the static
- * build-time config) are included in the lookup.
+ * Looks up a library by slug in the merged static and registry library list.
+ * The returned id defaults to the slug when the entry has none (static
+ * libraries).
  *
  * Accepts an already-fetched AppConfig to avoid a redundant getAppConfig()
- * call when the caller has already loaded it.
+ * call.
  */
-export async function getAuthDocUrl(
+export async function getLibraryEntry(
   librarySlug: string,
   appConfig?: AppConfig
-): Promise<string> {
+): Promise<LibraryEntry> {
   const config = appConfig ?? (await getAppConfig());
   const libraries = await getLibraries(config);
 
-  const authDocUrl =
-    librarySlug in libraries ? libraries[librarySlug]?.authDocUrl : undefined;
-  if (typeof authDocUrl !== "string") {
+  const entry = librarySlug in libraries ? libraries[librarySlug] : undefined;
+  if (typeof entry?.authDocUrl !== "string") {
     throw new PageNotFoundError(
       `No authentication document url is configured for the library: ${librarySlug}.`
     );
   }
-  return authDocUrl;
+  return {
+    id: entry.id ?? librarySlug,
+    title: entry.title,
+    authDocUrl: entry.authDocUrl
+  };
+}
+
+export async function getAuthDocUrl(
+  librarySlug: string,
+  appConfig?: AppConfig
+): Promise<string> {
+  return (await getLibraryEntry(librarySlug, appConfig)).authDocUrl;
 }
 
 /**
@@ -221,12 +238,13 @@ function getCatalogUrl(authDoc: OPDS1.AuthDocument): string {
   return url;
 }
 /**
- * Constructs the internal LibraryData state from an auth document,
- * catalog url, and library slug.
+ * Constructs the internal LibraryData state from an auth document, library
+ * slug, and stable library id (defaults to the slug).
  */
 export function buildLibraryData(
   authDoc: OPDS1.AuthDocument,
-  librarySlug: string
+  librarySlug: string,
+  libraryId: string = librarySlug
 ): LibraryData {
   const logoUrl = authDoc.links?.find(link => link.rel === "logo")?.href;
   const headerLinks =
@@ -237,6 +255,7 @@ export function buildLibraryData(
   const userProfileUrl = getUserProfileUrl(authDoc);
   const catalogUrl = getCatalogUrl(authDoc);
   return {
+    id: libraryId,
     slug: librarySlug,
     catalogUrl,
     shelfUrl: shelfUrl ?? null,

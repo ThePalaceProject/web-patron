@@ -143,7 +143,25 @@ export interface AuthCredentials {
   authenticationUrl?: string;
 }
 
+/**
+ * A library the user pinned to their personal list, persisted in
+ * localStorage. Contains no credentials.
+ */
+export interface PinnedLibrary {
+  id: string;
+  slug: string;
+  title: string;
+  logoUrl?: string;
+  /** Unix milliseconds. */
+  pinnedAt: number;
+}
+
 export interface LibraryData {
+  /**
+   * Stable identifier: the catalog `metadata.id` for registry libraries,
+   * the config key (equal to the slug) for static libraries.
+   */
+  id: string;
   slug: string;
   catalogUrl: string;
   catalogName: string;

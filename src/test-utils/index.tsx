@@ -12,6 +12,7 @@ import { NextRouter } from "next/router";
 import { enableFetchMocks } from "jest-fetch-mock";
 import { LibraryProvider } from "components/context/LibraryContext";
 import { BreadcrumbProvider } from "components/context/BreadcrumbContext";
+import { PinnedLibrariesProvider } from "components/context/PinnedLibrariesContext";
 import { UserContext, UserState } from "components/context/UserContext";
 import { ThemeUIProvider } from "theme-ui";
 import makeTheme from "theme";
@@ -112,7 +113,9 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
           <ThemeUIProvider theme={theme}>
             <LibraryProvider library={library}>
               <UserContext.Provider value={user}>
-                <BreadcrumbProvider>{children}</BreadcrumbProvider>
+                <PinnedLibrariesProvider>
+                  <BreadcrumbProvider>{children}</BreadcrumbProvider>
+                </PinnedLibrariesProvider>
               </UserContext.Provider>
             </LibraryProvider>
           </ThemeUIProvider>

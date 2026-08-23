@@ -15,6 +15,7 @@ beforeEach(() => {
 // const TestComponent: React.FC = () => <div>test child</div>;
 
 const testLibrary: LibraryData = {
+  id: "TEST",
   slug: "TEST",
   catalogUrl: "http://example.com/home",
   catalogName: "Example",

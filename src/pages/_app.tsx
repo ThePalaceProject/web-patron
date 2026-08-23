@@ -7,6 +7,7 @@ import "@nypl/design-system-react-components/dist/styles.css";
 import "css-overrides.css";
 import track from "analytics/track";
 import { BreadcrumbProvider } from "components/context/BreadcrumbContext";
+import { PinnedLibrariesProvider } from "components/context/PinnedLibrariesContext";
 import AppConfigContext from "components/context/AppConfigContext";
 import { initBugsnag } from "analytics/bugsnag";
 import { setMediaSupportConfig } from "utils/fulfill";
@@ -41,9 +42,11 @@ const MyApp = (props: AppProps) => {
   return (
     <AppConfigContext.Provider value={appConfig}>
       <ErrorBoundary>
-        <BreadcrumbProvider>
-          <Component {...pageProps} />
-        </BreadcrumbProvider>
+        <PinnedLibrariesProvider>
+          <BreadcrumbProvider>
+            <Component {...pageProps} />
+          </BreadcrumbProvider>
+        </PinnedLibrariesProvider>
       </ErrorBoundary>
     </AppConfigContext.Provider>
   );

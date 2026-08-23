@@ -62,7 +62,7 @@ describe("withAppProps (static)", () => {
       props: {
         foo: "bar",
         appConfig: config,
-        library: { slug: "testlib", catalogName: authDoc.title }
+        library: { id: "testlib", slug: "testlib", catalogName: authDoc.title }
       }
     });
   });
