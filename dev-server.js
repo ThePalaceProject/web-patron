@@ -19,7 +19,7 @@ const httpsOptions = {
  * To determine the user's IP address, we query the node.js networkInterfaces object and
  * ignore any non-IPv4 and internal (e.g. 127.0.0.1) addresses
  */
-var ipAddr = Object.values(require("os").networkInterfaces()).reduce(
+const ipAddr = Object.values(require("os").networkInterfaces()).reduce(
   (r, list) =>
     r.concat(
       list.reduce(

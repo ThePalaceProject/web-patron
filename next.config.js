@@ -11,7 +11,9 @@ const log = (...message) =>
 let _version = {};
 try {
   _version = require("./src/_version.json");
-} catch {}
+} catch {
+  /* Not generated: readVersionInfo falls back to git below. */
+}
 
 const { APP_VERSION, GIT_COMMIT_SHA, GIT_BRANCH } = readVersionInfo(_version);
 
@@ -50,8 +52,7 @@ const config = {
     return [{ source: "/version.json", destination: "/api/version.json" }];
   },
   productionBrowserSourceMaps: true,
-  generateBuildId: async () => BUILD_ID,
-  webpack: (config, { dev, isServer, _defaultLoaders, webpack }) => {
+  webpack: (config, { isServer, _defaultLoaders, webpack }) => {
     console.log(
       chalk.cyan("info  -"),
       `Building ${isServer ? "server" : "client"} files using Webpack version ${
