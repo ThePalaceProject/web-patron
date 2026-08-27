@@ -63,6 +63,13 @@ interface PinnedLibraryListProps {
    * unpinned library's other pin button sits. Should be focusable.
    */
   emptyFocusRef?: React.RefObject<HTMLElement | null>;
+  /**
+   * Extra section-level controls for the header row, shown beside the
+   * Reorder button and hidden while reordering.
+   */
+  actions?: React.ReactNode;
+  /** Receives the "My Libraries" heading, which is focusable. */
+  headingRef?: React.RefObject<HTMLHeadingElement | null>;
 }
 
 /**
@@ -108,7 +115,9 @@ const PinnedLibraryList: React.FC<PinnedLibraryListProps> = ({
   renderItem,
   reordering = false,
   onReorderingChange,
-  emptyFocusRef
+  emptyFocusRef,
+  actions,
+  headingRef: headingRefProp
 }) => {
   const { t } = useTranslation();
   const {
@@ -126,7 +135,8 @@ const PinnedLibraryList: React.FC<PinnedLibraryListProps> = ({
     syncWithAvailable(libraries);
   }, [libraries, pinnedLibraries, syncWithAvailable]);
 
-  const headingRef = React.useRef<HTMLHeadingElement>(null);
+  const ownHeadingRef = React.useRef<HTMLHeadingElement>(null);
+  const headingRef = headingRefProp ?? ownHeadingRef;
   const sectionRef = React.useRef<HTMLElement>(null);
   const warningHidden = usePublicWarningHidden();
 
@@ -177,7 +187,7 @@ const PinnedLibraryList: React.FC<PinnedLibraryListProps> = ({
       return;
     }
     replacementFor(origin.getAttribute("data-pin-library"))?.focus();
-  }, [pinnedIdsKey, emptyFocusRef, takeFocusOrigin]);
+  }, [pinnedIdsKey, emptyFocusRef, headingRef, takeFocusOrigin]);
 
   const canReorder = onReorderingChange !== undefined && shownCount > 1;
   const isReordering = canReorder && reordering;
@@ -273,25 +283,28 @@ const PinnedLibraryList: React.FC<PinnedLibraryListProps> = ({
         <h2 ref={headingRef} tabIndex={-1}>
           {t("library.myLibraries", "My Libraries", { ns: "common" })}
         </h2>
-        {canReorder && (
-          <Button
-            variant="ghost"
-            color="ui.black"
-            onClick={() => onReorderingChange?.(!isReordering)}
-            aria-label={
-              isReordering
-                ? t(
-                    "pinnedLibraryList.doneLabel",
-                    "Done reordering My Libraries"
-                  )
-                : t("pinnedLibraryList.reorderLabel", "Reorder My Libraries")
-            }
-          >
-            {isReordering
-              ? t("pinnedLibraryList.done", "Done")
-              : t("pinnedLibraryList.reorder", "Reorder")}
-          </Button>
-        )}
+        <div sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          {!isReordering && actions}
+          {canReorder && (
+            <Button
+              variant="ghost"
+              color="ui.black"
+              onClick={() => onReorderingChange?.(!isReordering)}
+              aria-label={
+                isReordering
+                  ? t(
+                      "pinnedLibraryList.doneLabel",
+                      "Done reordering My Libraries"
+                    )
+                  : t("pinnedLibraryList.reorderLabel", "Reorder My Libraries")
+              }
+            >
+              {isReordering
+                ? t("pinnedLibraryList.done", "Done")
+                : t("pinnedLibraryList.reorder", "Reorder")}
+            </Button>
+          )}
+        </div>
       </div>
       {warningHidden && (
         <Button

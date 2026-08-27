@@ -20,12 +20,20 @@ import {
 } from "utils/pinnedLibraries";
 import { hasStoredCredentials } from "auth/useCredentials";
 import { HIDE_PUBLIC_WARNING_KEY } from "utils/publicWarning";
+import { copyToClipboard } from "utils/clipboard";
 import MultiLibraryHome from "../MultiLibraryHome";
 import useSWR from "swr";
 import { makeSwrResponse } from "test-utils/mockSwr";
 import type { ClientLibrary, LibrariesResponse } from "pages/api/libraries";
 
 jest.mock("swr");
+jest.mock("utils/clipboard", () => ({
+  copyToClipboard: jest.fn().mockResolvedValue(true)
+}));
+
+const mockedCopy = copyToClipboard as jest.MockedFunction<
+  typeof copyToClipboard
+>;
 
 const mockedSWR = useSWR as jest.MockedFunction<typeof useSWR>;
 
@@ -578,6 +586,288 @@ describe("MultiLibraryHome", () => {
         expect(pinnedOrder()).toEqual(["alpha", "beta"]);
       }
     );
+  });
+
+  describe("pins link", () => {
+    it("adds pins from a ?pins link after confirmation", async () => {
+      mockLibraries([
+        {
+          ...lib("alpha", "Alpha Library"),
+          logoUrl: "https://s3.example.com/alpha.png"
+        },
+        lib("beta", "Beta Library")
+      ]);
+      const replace = jest.fn();
+
+      render(<MultiLibraryHome />, {
+        router: { query: { pins: "beta,alpha" }, replace }
+      });
+
+      const dialog = await screen.findByRole("alertdialog", {
+        name: "Add to My Libraries"
+      });
+      expect(within(dialog).getByText("Beta Library")).toBeInTheDocument();
+      expect(within(dialog).getByText("Alpha Library")).toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole("button", { name: "Add libraries" }));
+
+      // Pins stored in link order, carrying the server logo.
+      const stored = readPinnedLibraries();
+      expect(stored.map(entry => entry.id)).toEqual(["urn:beta", "urn:alpha"]);
+      expect(stored[1].logoUrl).toBe("https://s3.example.com/alpha.png");
+
+      // The parameter is stripped from the URL.
+      expect(replace).toHaveBeenCalled();
+      expect(replace.mock.calls[0][0].query.pins).toBeUndefined();
+
+      await waitFor(() =>
+        expect(
+          screen.queryByRole("alertdialog", { name: "Add to My Libraries" })
+        ).toBeNull()
+      );
+    });
+
+    it("focuses My Libraries and announces the count after adding", async () => {
+      mockLibraries([
+        lib("alpha", "Alpha Library"),
+        lib("beta", "Beta Library")
+      ]);
+
+      render(<MultiLibraryHome />, {
+        router: { query: { pins: "alpha,beta" }, replace: jest.fn() }
+      });
+
+      await screen.findByRole("alertdialog", {
+        name: "Add to My Libraries"
+      });
+      fireEvent.click(screen.getByRole("button", { name: "Add libraries" }));
+
+      await waitFor(() =>
+        expect(
+          screen.getByRole("heading", { name: "My Libraries" })
+        ).toHaveFocus()
+      );
+      expectAnnouncement("2 libraries added to My Libraries.");
+    });
+
+    it("ignores a ?pins link when pinning is disabled", () => {
+      mockLibraries([lib("alpha", "Alpha Library")]);
+      const replace = jest.fn();
+
+      render(<MultiLibraryHome />, {
+        appConfig: { enablePinning: false },
+        router: { query: { pins: "alpha" }, replace }
+      });
+
+      expect(
+        screen.queryByRole("alertdialog", { name: "Add to My Libraries" })
+      ).toBeNull();
+      expect(replace).not.toHaveBeenCalled();
+      expect(readPinnedLibraries()).toEqual([]);
+    });
+
+    it("stores nothing when the link dialog is canceled", async () => {
+      mockLibraries([lib("alpha", "Alpha Library")]);
+      const replace = jest.fn();
+
+      render(<MultiLibraryHome />, {
+        router: { query: { pins: "alpha" }, replace }
+      });
+
+      await screen.findByRole("alertdialog", { name: "Add to My Libraries" });
+      fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+      expect(readPinnedLibraries()).toEqual([]);
+      expect(replace).toHaveBeenCalled();
+      await waitFor(() =>
+        expect(
+          screen.queryByRole("alertdialog", { name: "Add to My Libraries" })
+        ).toBeNull()
+      );
+    });
+
+    it("strips the param without a dialog when there is nothing new to add", () => {
+      pinLibraries(lib("alpha", "Alpha Library"));
+      mockLibraries([lib("alpha", "Alpha Library")]);
+      const replace = jest.fn();
+
+      render(<MultiLibraryHome />, {
+        router: { query: { pins: "alpha,ghost" }, replace }
+      });
+
+      expect(
+        screen.queryByRole("alertdialog", { name: "Add to My Libraries" })
+      ).toBeNull();
+      expect(replace).toHaveBeenCalled();
+    });
+
+    it("adds pins named by id, preferring an id match over a slug match", async () => {
+      // "clash" is one library's id and another library's slug.
+      const byId = { id: "clash", slug: "first", title: "First Library" };
+      const bySlug = {
+        id: "urn:second",
+        slug: "clash",
+        title: "Second Library"
+      };
+      mockLibraries([
+        { ...byId, authDocUrl: "https://example.com/first/auth" },
+        { ...bySlug, authDocUrl: "https://example.com/second/auth" }
+      ]);
+      const replace = jest.fn();
+
+      render(<MultiLibraryHome />, {
+        // "clash" resolves by id. "first" names the same library by slug,
+        // so it resolves once. "urn:second" resolves by id.
+        router: { query: { pins: "clash,first,urn:second" }, replace }
+      });
+
+      const dialog = await screen.findByRole("alertdialog", {
+        name: "Add to My Libraries"
+      });
+      expect(within(dialog).getByText("First Library")).toBeInTheDocument();
+      expect(within(dialog).getByText("Second Library")).toBeInTheDocument();
+      expect(within(dialog).getAllByRole("listitem")).toHaveLength(2);
+
+      fireEvent.click(screen.getByRole("button", { name: "Add libraries" }));
+      expect(readPinnedLibraries().map(entry => entry.id)).toEqual([
+        "clash",
+        "urn:second"
+      ]);
+    });
+
+    it("appends missing libraries after existing pins without touching them", async () => {
+      pinLibraries(lib("alpha", "Alpha Library"));
+      mockLibraries([
+        lib("alpha", "Alpha Library"),
+        lib("beta", "Beta Library"),
+        lib("gamma", "Gamma Library")
+      ]);
+      const replace = jest.fn();
+
+      render(<MultiLibraryHome />, {
+        // Alpha is already pinned; the link lists it anyway.
+        router: { query: { pins: "urn:gamma,alpha,urn:beta" }, replace }
+      });
+
+      const dialog = await screen.findByRole("alertdialog", {
+        name: "Add to My Libraries"
+      });
+      // Only the missing libraries are offered.
+      expect(within(dialog).queryByText("Alpha Library")).toBeNull();
+
+      fireEvent.click(screen.getByRole("button", { name: "Add libraries" }));
+
+      // Existing pins stay first and untouched; the rest append in link order.
+      expect(readPinnedLibraries().map(entry => entry.id)).toEqual([
+        "urn:alpha",
+        "urn:gamma",
+        "urn:beta"
+      ]);
+    });
+
+    it("clears the param when the dialog is dismissed with Escape", async () => {
+      mockLibraries([lib("alpha", "Alpha Library")]);
+      const replace = jest.fn();
+
+      render(<MultiLibraryHome />, {
+        router: { query: { pins: "alpha" }, replace }
+      });
+
+      await screen.findByRole("alertdialog", { name: "Add to My Libraries" });
+      fireEvent.keyDown(document.activeElement ?? document.body, {
+        key: "Escape"
+      });
+
+      await waitFor(() =>
+        expect(
+          screen.queryByRole("alertdialog", { name: "Add to My Libraries" })
+        ).toBeNull()
+      );
+      expect(readPinnedLibraries()).toEqual([]);
+      expect(replace).toHaveBeenCalled();
+      expect(replace.mock.calls[0][0].query.pins).toBeUndefined();
+    });
+
+    it("hides the copy action while reordering", () => {
+      pinLibraries(lib("alpha", "Alpha Library"), lib("beta", "Beta Library"));
+      mockLibraries([
+        lib("alpha", "Alpha Library"),
+        lib("beta", "Beta Library")
+      ]);
+      render(<MultiLibraryHome />);
+
+      expect(
+        screen.getByRole("button", { name: "Copy link with pinned libraries" })
+      ).toBeInTheDocument();
+
+      fireEvent.click(
+        screen.getByRole("button", { name: "Reorder My Libraries" })
+      );
+
+      expect(
+        screen.queryByRole("button", {
+          name: "Copy link with pinned libraries"
+        })
+      ).toBeNull();
+    });
+
+    it("copies a link carrying the pinned entries in order", async () => {
+      pinLibraries(lib("beta", "Beta Library"), lib("alpha", "Alpha Library"));
+      mockLibraries([
+        lib("alpha", "Alpha Library"),
+        lib("beta", "Beta Library")
+      ]);
+
+      render(<MultiLibraryHome />);
+      fireEvent.click(
+        screen.getByRole("button", { name: "Copy link with pinned libraries" })
+      );
+
+      await waitFor(() => expect(mockedCopy).toHaveBeenCalled());
+      const url = new URL(mockedCopy.mock.calls[0][0]);
+      expect(url.pathname).toBe("/");
+      expect(url.searchParams.get("pins")).toBe("urn:beta,urn:alpha");
+
+      expect(await screen.findByText("Copied!")).toBeInTheDocument();
+      expectAnnouncement("Link copied.");
+    });
+
+    it("copies only the pinned libraries shown on the page", async () => {
+      // "ghost" stays pinned in storage, but the server list no longer has
+      // it under that id, so the page does not show it.
+      pinLibraries(
+        lib("alpha", "Alpha Library"),
+        lib("ghost", "Ghost Library"),
+        lib("beta", "Beta Library")
+      );
+      mockLibraries([
+        lib("alpha", "Alpha Library"),
+        lib("beta", "Beta Library")
+      ]);
+
+      render(<MultiLibraryHome />);
+      fireEvent.click(
+        screen.getByRole("button", { name: "Copy link with pinned libraries" })
+      );
+
+      await waitFor(() => expect(mockedCopy).toHaveBeenCalled());
+      const url = new URL(mockedCopy.mock.calls[0][0]);
+      expect(url.searchParams.get("pins")).toBe("urn:alpha,urn:beta");
+    });
+
+    it("shows and announces a failed copy", async () => {
+      mockedCopy.mockResolvedValueOnce(false);
+      pinLibraries(lib("alpha", "Alpha Library"));
+      mockLibraries([lib("alpha", "Alpha Library")]);
+
+      render(<MultiLibraryHome />);
+      fireEvent.click(
+        screen.getByRole("button", { name: "Copy link with pinned libraries" })
+      );
+
+      expect(await screen.findByText("Failed")).toBeInTheDocument();
+      expectAnnouncement("The link could not be copied.");
+    });
   });
 
   describe("library filter input", () => {
