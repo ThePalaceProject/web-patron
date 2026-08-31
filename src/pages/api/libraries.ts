@@ -18,6 +18,8 @@ export interface ClientLibrary {
   slug: string;
   title: string;
   authDocUrl: string;
+  logoUrl?: string;
+  description?: string;
 }
 
 export interface LibrariesResponse {
@@ -45,7 +47,9 @@ export default async function handler(
         id: lib.id ?? slug,
         slug,
         title: lib.title,
-        authDocUrl: lib.authDocUrl
+        authDocUrl: lib.authDocUrl,
+        ...(lib.logoUrl && { logoUrl: lib.logoUrl }),
+        ...(lib.description && { description: lib.description })
       }));
 
     res.status(200).json({ libraries: clientLibraries });

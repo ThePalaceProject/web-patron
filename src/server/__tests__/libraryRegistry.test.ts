@@ -57,6 +57,9 @@ function makePagedFeed(
     title: string;
     authDocUrl?: string;
     updated?: string;
+    description?: string;
+    logoUrl?: string;
+    images?: Array<{ href: string; rel?: string; type?: string }>;
   }>,
   options: {
     nextHref?: string;
@@ -98,23 +101,36 @@ function makePagedFeed(
     },
     links,
     facets,
-    catalogs: catalogs.map(({ id, title, authDocUrl, updated }) => ({
-      metadata: {
-        id,
-        title,
-        updated: updated ?? "",
-        modified: updated ?? "",
-        description: ""
-      },
-      links: authDocUrl
-        ? [
-            {
-              type: "application/vnd.opds.authentication.v1.0+json",
-              href: authDocUrl
-            }
-          ]
-        : []
-    }))
+    catalogs: catalogs.map(
+      ({ id, title, authDocUrl, updated, description, logoUrl, images }) => ({
+        metadata: {
+          id,
+          title,
+          updated: updated ?? "",
+          modified: updated ?? "",
+          description: description ?? ""
+        },
+        links: authDocUrl
+          ? [
+              {
+                type: "application/vnd.opds.authentication.v1.0+json",
+                href: authDocUrl
+              }
+            ]
+          : [],
+        ...(images
+          ? { images }
+          : logoUrl && {
+              images: [
+                {
+                  rel: "http://opds-spec.org/image/thumbnail",
+                  href: logoUrl,
+                  type: "image/png"
+                }
+              ]
+            })
+      })
+    )
   };
 }
 
@@ -295,6 +311,93 @@ describe("fetchRegistryLibraries", () => {
         title: "Library B",
         authDocUrl: "https://b.example.com/"
       }
+    });
+  });
+
+  it("falls back to the first image when no thumbnail relation is present", async () => {
+    const feed = makePagedFeed([
+      {
+        id: "urn:uuid:abc",
+        title: "Library A",
+        authDocUrl: "https://a.example.com/",
+        images: [
+          {
+            rel: "http://opds-spec.org/image",
+            href: "https://s3.example.com/full.png",
+            type: "image/png"
+          }
+        ]
+      }
+    ]);
+    global.fetch = mockFetchSuccess(feed) as unknown as typeof fetch;
+
+    const result = await fetchRegistryLibraries(REGISTRY_URL);
+
+    expect(result["urn:uuid:abc"]?.logoUrl).toBe(
+      "https://s3.example.com/full.png"
+    );
+  });
+
+  it("prefers the thumbnail relation over earlier images and trims it", async () => {
+    const feed = makePagedFeed([
+      {
+        id: "urn:uuid:abc",
+        title: "Library A",
+        authDocUrl: "https://a.example.com/",
+        images: [
+          {
+            rel: "http://opds-spec.org/image",
+            href: "https://s3.example.com/full.png",
+            type: "image/png"
+          },
+          {
+            rel: "http://opds-spec.org/image/thumbnail",
+            href: "  https://s3.example.com/thumb.png  ",
+            type: "image/png"
+          }
+        ]
+      }
+    ]);
+    global.fetch = mockFetchSuccess(feed) as unknown as typeof fetch;
+
+    const result = await fetchRegistryLibraries(REGISTRY_URL);
+
+    expect(result["urn:uuid:abc"]?.logoUrl).toBe(
+      "https://s3.example.com/thumb.png"
+    );
+  });
+
+  it("captures the thumbnail logo and description when present", async () => {
+    const feed = makePagedFeed([
+      {
+        id: "urn:uuid:abc",
+        title: "Library A",
+        authDocUrl: "https://a.example.com/",
+        description: "Serving Anytown.",
+        logoUrl: "https://s3.example.com/logo.png"
+      },
+      {
+        id: "urn:uuid:def",
+        title: "Library B",
+        authDocUrl: "https://b.example.com/"
+      }
+    ]);
+    global.fetch = mockFetchSuccess(feed) as unknown as typeof fetch;
+
+    const result = await fetchRegistryLibraries(REGISTRY_URL);
+
+    expect(result["urn:uuid:abc"]).toEqual({
+      id: "urn:uuid:abc",
+      title: "Library A",
+      authDocUrl: "https://a.example.com/",
+      logoUrl: "https://s3.example.com/logo.png",
+      description: "Serving Anytown."
+    });
+    // Absent fields stay absent rather than becoming empty strings.
+    expect(result["urn:uuid:def"]).toEqual({
+      id: "urn:uuid:def",
+      title: "Library B",
+      authDocUrl: "https://b.example.com/"
     });
   });
 

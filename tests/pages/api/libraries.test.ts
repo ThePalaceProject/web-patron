@@ -149,6 +149,44 @@ describe("GET /api/libraries", () => {
     });
   });
 
+  it("passes the logo and description through when present", async () => {
+    mockGetLibraries.mockResolvedValue({
+      "uuid-full": {
+        id: "urn:uuid:full",
+        title: "Full",
+        authDocUrl: "https://f.example.com/auth",
+        logoUrl: "https://s3.example.com/logo.png",
+        description: "Serving Anytown."
+      },
+      "uuid-bare": {
+        id: "urn:uuid:bare",
+        title: "Bare",
+        authDocUrl: "https://b.example.com/auth"
+      }
+    });
+
+    const { res, json } = makeRes();
+    await handler({} as NextApiRequest, res);
+
+    const { libraries } = json.mock.calls[0][0] as LibrariesResponse;
+    expect(libraries).toEqual([
+      {
+        id: "urn:uuid:full",
+        slug: "uuid-full",
+        title: "Full",
+        authDocUrl: "https://f.example.com/auth",
+        logoUrl: "https://s3.example.com/logo.png",
+        description: "Serving Anytown."
+      },
+      {
+        id: "urn:uuid:bare",
+        slug: "uuid-bare",
+        title: "Bare",
+        authDocUrl: "https://b.example.com/auth"
+      }
+    ]);
+  });
+
   it("filters out undefined library entries", async () => {
     mockGetLibraries.mockResolvedValue({
       "uuid-valid": {
