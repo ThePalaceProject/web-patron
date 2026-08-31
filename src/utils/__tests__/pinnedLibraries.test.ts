@@ -101,6 +101,40 @@ describe("syncPinned", () => {
     expect(result).toBe(pinned);
   });
 
+  test("backfills a missing logo from the available list", () => {
+    const result = syncPinned(
+      [pinnedLib],
+      [
+        {
+          id: pinnedLib.id,
+          slug: pinnedLib.slug,
+          title: pinnedLib.title,
+          authDocUrl: "https://example.com/abclib/auth",
+          logoUrl: "https://s3.example.com/logo.png"
+        }
+      ]
+    );
+    expect(result).toEqual([
+      { ...pinnedLib, logoUrl: "https://s3.example.com/logo.png" }
+    ]);
+  });
+
+  test("keeps a stored logo over the available list's logo", () => {
+    const pinned = [
+      { ...pinnedLib, logoUrl: "https://example.com/stored-logo.png" }
+    ];
+    const result = syncPinned(pinned, [
+      {
+        id: pinnedLib.id,
+        slug: pinnedLib.slug,
+        title: pinnedLib.title,
+        authDocUrl: "https://example.com/abclib/auth",
+        logoUrl: "https://s3.example.com/other-logo.png"
+      }
+    ]);
+    expect(result).toBe(pinned);
+  });
+
   test("returns the original array when nothing changed", () => {
     const pinned = [pinnedLib];
     const result = syncPinned(pinned, [

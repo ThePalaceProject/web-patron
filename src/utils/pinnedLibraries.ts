@@ -70,8 +70,9 @@ export function withoutPinned(
 
 /**
  * Returns `pinned` with slug and title refreshed from `available`, matched
- * by id. Entries absent from `available` are kept unchanged. Returns the
- * original array when nothing changed.
+ * by id, and a missing logo backfilled when the server list carries one (a
+ * stored logo is kept as is). Entries absent from `available` are kept
+ * unchanged. Returns the original array when nothing changed.
  */
 export function syncPinned(
   pinned: PinnedLibrary[],
@@ -81,14 +82,22 @@ export function syncPinned(
   let changed = false;
   const next = pinned.map(entry => {
     const current = byId.get(entry.id);
+    if (!current) return entry;
+    const logoUrl = entry.logoUrl ?? current.logoUrl;
     if (
-      !current ||
-      (current.slug === entry.slug && current.title === entry.title)
+      current.slug === entry.slug &&
+      current.title === entry.title &&
+      logoUrl === entry.logoUrl
     ) {
       return entry;
     }
     changed = true;
-    return { ...entry, slug: current.slug, title: current.title };
+    return {
+      ...entry,
+      slug: current.slug,
+      title: current.title,
+      ...(logoUrl && { logoUrl })
+    };
   });
   return changed ? next : pinned;
 }
