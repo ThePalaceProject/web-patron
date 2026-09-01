@@ -6,7 +6,7 @@ import {
   GetStaticPropsContext
 } from "next";
 import {
-  getAuthDocUrl,
+  getLibraryEntry,
   fetchAuthDocument,
   buildLibraryData
 } from "dataflow/getLibraryData";
@@ -43,12 +43,12 @@ async function getLibraryProps(
     );
 
   const appConfig = await getAppConfig();
-  const authDocUrl = await getAuthDocUrl(librarySlug, appConfig);
+  const libraryEntry = await getLibraryEntry(librarySlug, appConfig);
   const authDocument = await fetchAuthDocument(
-    authDocUrl,
+    libraryEntry.authDocUrl,
     appConfig.authenticationDocuments ?? undefined
   );
-  const library = buildLibraryData(authDocument, librarySlug);
+  const library = buildLibraryData(authDocument, librarySlug, libraryEntry.id);
   return { library, appConfig };
 }
 
