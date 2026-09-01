@@ -156,11 +156,33 @@ jobs:
       - name: Test
         run: npm run test:ci -- --coverage
 
-      - name: Coveralls Report
+      # The jsdom and node Jest suites write separate coverage reports
+      # (coverage/ and coverage-node/). Upload both as one parallel build so
+      # Coveralls merges them and we avoid confusing coverage reporting.
+      - name: Coveralls Report (jsdom suite)
         if: matrix.node-version == 22
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          file: coverage/lcov.info
+          flag-name: jsdom
+          parallel: true
+
+      - name: Coveralls Report (node suite)
+        if: matrix.node-version == 22
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          file: coverage-node/lcov.info
+          flag-name: node
+          parallel: true
+
+      - name: Coveralls Finished
+        if: matrix.node-version == 22
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          parallel-finished: true
 
   publish:
     name: Publish image to Docker registry

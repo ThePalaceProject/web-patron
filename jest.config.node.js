@@ -4,7 +4,7 @@
 module.exports = {
   clearMocks: true,
   collectCoverage: true,
-  coverageDirectory: "coverage",
+  coverageDirectory: "coverage-node",
   coveragePathIgnorePatterns: [
     "/node_modules/",
     "/src/test-utils/",
