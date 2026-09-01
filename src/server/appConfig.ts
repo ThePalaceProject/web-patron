@@ -99,7 +99,12 @@ function parseLibraryEntry(
   field: string,
   slug: string,
   value: unknown
-): { title: string; authDocUrl: string } {
+): {
+  title: string;
+  authDocUrl: string;
+  logoUrl?: string;
+  description?: string;
+} {
   const path = `CONFIG_FILE.${field}['${slug}']`;
   if (value == null) {
     throw new AppSetupError(`${path} cannot be null or undefined`);
@@ -112,7 +117,8 @@ function parseLibraryEntry(
   }
   if (typeof value === "object" && !Array.isArray(value)) {
     const entry = normalizeConfigKeys(value as Record<string, unknown>, [
-      "authDocUrl"
+      "authDocUrl",
+      "logoUrl"
     ]);
     if (!("authDocUrl" in entry) || typeof entry.authDocUrl !== "string") {
       throw new AppSetupError(
@@ -132,7 +138,22 @@ function parseLibraryEntry(
       }
       title = entry.title;
     }
-    return { title, authDocUrl: entry.authDocUrl };
+    const optionalString = (key: "logoUrl" | "description") => {
+      if (!(key in entry)) return undefined;
+      if (typeof entry[key] !== "string") {
+        throw new AppSetupError(`${path}.${key} must be a string`);
+      }
+      const trimmed = (entry[key] as string).trim();
+      return trimmed === "" ? undefined : trimmed;
+    };
+    const logoUrl = optionalString("logoUrl");
+    const description = optionalString("description");
+    return {
+      title,
+      authDocUrl: entry.authDocUrl,
+      ...(logoUrl && { logoUrl }),
+      ...(description && { description })
+    };
   }
   throw new AppSetupError(
     `${path} must be either a string (auth doc URL) or an object with 'authDocUrl' property`

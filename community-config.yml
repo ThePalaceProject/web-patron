@@ -75,6 +75,15 @@ companion_app: simplye
 static_libraries:
   main-street-city: https://demo.thepalaceproject.org/GA0000/authentication_document
 #
+# Entries can also be objects with optional display metadata:
+#
+# static_libraries:
+#   my-library:
+#     auth_doc_url: https://example.com/my-library/authentication_document
+#     title: "My Public Library"
+#     logo_url: https://example.com/my-library/logo.png
+#     description: "Serving My Town."
+#
 # 2. RUNTIME LIBRARY REGISTRIES (recommended for dynamic library lists):
 #    Define one or more library registry URLs that will be fetched at runtime.
 #    This allows libraries to be added/removed without rebuilding the application.

@@ -795,6 +795,36 @@ describe("config parsing", () => {
       });
     });
 
+    it("passes optional logoUrl and description through on object entries", async () => {
+      const yaml = [
+        "staticLibraries:",
+        "  my-lib:",
+        "    authDocUrl: https://example.com/auth",
+        "    logoUrl: https://example.com/logo.png",
+        "    description: A fine library."
+      ].join("\n");
+      expect((await load(yaml)).staticLibraries).toEqual({
+        "my-lib": {
+          title: "my-lib",
+          authDocUrl: "https://example.com/auth",
+          logoUrl: "https://example.com/logo.png",
+          description: "A fine library."
+        }
+      });
+    });
+
+    it("rejects a non-string logoUrl on an object entry", async () => {
+      const yaml = [
+        "staticLibraries:",
+        "  my-lib:",
+        "    authDocUrl: https://example.com/auth",
+        "    logoUrl: 42"
+      ].join("\n");
+      await expect(load(yaml)).rejects.toThrow(
+        "CONFIG_FILE.static_libraries['my-lib'].logoUrl must be a string"
+      );
+    });
+
     it("uses slug as title when title is absent from object-format entry", async () => {
       const yaml =
         "libraries:\n  my-lib:\n    authDocUrl: https://example.com/auth";

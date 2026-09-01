@@ -10,6 +10,9 @@ import {
 import { computeSlug, validateSlug } from "utils/librarySlug";
 import { RegistryFeedSchema } from "validation/registryFeed";
 
+/** The registry marks each library's logo with this image relation. */
+const THUMBNAIL_RELATION = "http://opds-spec.org/image/thumbnail";
+
 // ---------------------------------------------------------------------------
 // Internal state types
 // ---------------------------------------------------------------------------
@@ -268,10 +271,17 @@ async function crawlRegistryFeed(
         continue;
       }
 
+      const thumbnailUrl = catalog.images
+        ?.find(image => image.rel === THUMBNAIL_RELATION)
+        ?.href.trim();
+      const logoUrl = thumbnailUrl || catalog.images?.[0]?.href.trim();
+      const description = catalog.metadata.description?.trim();
       accumulated[slug] = {
         id: catalog.metadata.id,
         title: catalog.metadata.title,
-        authDocUrl: authDocLink.href
+        authDocUrl: authDocLink.href,
+        ...(logoUrl && { logoUrl }),
+        ...(description && { description })
       };
     }
   }

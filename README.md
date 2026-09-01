@@ -167,12 +167,14 @@ static_libraries:
   my-library:
     auth_doc_url: https://circulation.example.com/my-library/authentication_document
     title: "My Public Library"
+    logo_url: https://example.com/my-library/logo.png
+    description: "Serving My Town and the surrounding communities."
   another-lib:
     auth_doc_url: https://circulation.example.com/another-lib/authentication_document
     title: "Community Reading Center"
 ```
 
-Both formats can be mixed in the same configuration file. If no `title` is specified, the slug will be used as the display name.
+Both formats can be mixed in the same configuration file. If no `title` is specified, the slug will be used as the display name. The optional `logo_url` and `description` values are exposed to the client for display alongside the library.
 
 #### 2. Library Registries (Dynamic Library Lists)
 
