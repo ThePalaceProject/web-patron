@@ -7,6 +7,7 @@ import { modalButtonStyles } from "components/Modal";
 import { ClientBasicTokenMethod } from "interfaces";
 import { generateToken } from "auth/useCredentials";
 import ForgotPasswordLink from "auth/ForgotPasswordLink";
+import { authFormStyles } from "auth/styles";
 import useUser from "components/context/UserContext";
 import ApplicationError, { ServerError } from "errors";
 import { Keyboard } from "types/opds1";
@@ -98,14 +99,7 @@ const BasicTokenAuthHandler: React.FC<{
   };
 
   return (
-    <form
-      onSubmit={onSubmit}
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        maxWidth: 400
-      }}
-    >
+    <form onSubmit={onSubmit} sx={authFormStyles}>
       <Text sx={{ color: "ui.error", alignItems: "center", display: "flex" }}>
         {serverError && `${serverError.info.title}: ${serverError.info.detail}`}
       </Text>
