@@ -24,6 +24,7 @@ const sizes = {
 const zIndices = {
   hide: -1,
   base: 0,
+  headerMenu: 1000,
   modal: 1000,
   skipNavigation: 2000
 };
