@@ -42,7 +42,7 @@ export const AccountMenu: React.FC = () => {
           borderColor: "ui.gray.light",
           py: 0,
           minWidth: "420px",
-          zIndex: 1000,
+          zIndex: "headerMenu",
           display: "flex",
           flexDirection: "column"
         }}
