@@ -42,7 +42,7 @@ const Search: React.FC<SearchProps> = ({ className, ...props }) => {
   // show no searchbar if we cannot perform a search or there was an error
   if (!searchData || error) return null;
 
-  const title = searchData?.shortName ?? "Search";
+  const title = searchData.shortName ?? "Search";
 
   // handle the search
   const onSearch = (e: React.FormEvent<HTMLFormElement>) => {
