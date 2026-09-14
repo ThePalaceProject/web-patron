@@ -5,6 +5,7 @@ import { mockPush } from "test-utils/mockNextRouter";
 import useSWR from "swr";
 import { makeSwrResponse, MockSwr } from "test-utils/mockSwr";
 import { SearchData } from "interfaces";
+import { mockUseTranslation } from "test-utils/mockUseTranslation";
 
 const fixtureData = {
   template: "/search/{searchTerms}",
@@ -12,6 +13,11 @@ const fixtureData = {
   shortName: "search shortname",
   url: "http://search-url.com/"
 };
+
+const withLocale = (locale: string) =>
+  mockUseTranslation().i18n.changeLanguage(locale);
+
+afterEach(() => withLocale("en"));
 
 jest.mock("swr");
 
@@ -72,3 +78,26 @@ test("searching calls history.push with url", async () => {
     { shallow: true }
   );
 });
+
+test.each([
+  ["search", "en", "Search"],
+  ["search", "es", "Buscar"],
+  ["search shortname", "es", "search shortname"],
+  // i18next uses colons to identify the appropriate namespace.
+  // We'll check to ensure any short names with colons are passed
+  // through as the default value.
+  ["search: shortname", "es", "search: shortname"],
+  ["search:shortname", "es", "search:shortname"],
+  ["common:search", "es", "common:search"]
+])(
+  "Search title attribute should resolve %s for locale %s to %s",
+  (shortName, locale, expected) => {
+    withLocale(locale);
+    mockSwr({ data: { ...fixtureData, shortName } });
+    setup(<Search />, {
+      router: { locale, query: { collectionUrl: "/collection" } }
+    });
+
+    expect(screen.getByRole("searchbox")).toHaveAttribute("title", expected);
+  }
+);

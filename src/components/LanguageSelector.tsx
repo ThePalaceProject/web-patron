@@ -157,7 +157,8 @@ const LanguageSelector: React.FC<{ className?: string }> = ({ className }) => {
           borderColor: "ui.gray.light",
           padding: "8px",
           display: "flex",
-          flexDirection: "column"
+          flexDirection: "column",
+          zIndex: "headerMenu"
         }}
       >
         {Object.values(Language).map(lang => (
