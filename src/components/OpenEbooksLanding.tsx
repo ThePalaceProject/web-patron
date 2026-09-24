@@ -14,6 +14,7 @@ import { ErrorBoundary } from "components/ErrorBoundary";
 import OpenEbooksLoginPicker from "auth/OpenEbooksLoginPicker";
 import colors from "theme/colors";
 import { Trans, useTranslation } from "next-i18next/pages";
+import LanguageSelector from "./LanguageSelector";
 
 type PopularBook = { title: string; imgHref: string };
 
@@ -279,6 +280,7 @@ const OpenEbooksHero: React.FC = () => {
               </span>
             </NavButton>
           )}
+          <LanguageSelector sx={{ ml: 3 }} />
         </div>
         <div
           sx={{

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { render, screen, fireEvent, act } from "test-utils";
+import { render, screen, fireEvent, act, waitFor } from "test-utils";
 import MultiLibraryHome from "../MultiLibraryHome";
 import useSWR from "swr";
 import { makeSwrResponse } from "test-utils/mockSwr";
@@ -438,6 +438,36 @@ describe("MultiLibraryHome", () => {
           .map(m => m.textContent)
           .join("")
       ).toBe("Ill");
+    });
+  });
+
+  describe("LanguageSelector", () => {
+    beforeEach(() => {
+      mockLibraries([lib("alpha")]);
+    });
+
+    it("displays when enabled in appConfig", () => {
+      render(<MultiLibraryHome />, {
+        appConfig: { enableLanguageSelector: true }
+      });
+
+      waitFor(() => {
+        expect(
+          screen.getByRole("combobox", { name: "Choose language" })
+        ).toBeInTheDocument();
+      });
+    });
+
+    it("does not display when disabled in appConfig", () => {
+      render(<MultiLibraryHome />, {
+        appConfig: { enableLanguageSelector: false }
+      });
+
+      waitFor(() => {
+        expect(
+          screen.queryByRole("combobox", { name: "Choose language" })
+        ).not.toBeInTheDocument();
+      });
     });
   });
 });
