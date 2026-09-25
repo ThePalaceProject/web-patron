@@ -446,24 +446,24 @@ describe("MultiLibraryHome", () => {
       mockLibraries([lib("alpha")]);
     });
 
-    it("displays when enabled in appConfig", () => {
+    it("displays when enabled in appConfig", async () => {
       render(<MultiLibraryHome />, {
         appConfig: { enableLanguageSelector: true }
       });
 
-      waitFor(() => {
+      await waitFor(() => {
         expect(
           screen.getByRole("combobox", { name: "Choose language" })
         ).toBeInTheDocument();
       });
     });
 
-    it("does not display when disabled in appConfig", () => {
+    it("does not display when disabled in appConfig", async () => {
       render(<MultiLibraryHome />, {
         appConfig: { enableLanguageSelector: false }
       });
 
-      waitFor(() => {
+      await waitFor(() => {
         expect(
           screen.queryByRole("combobox", { name: "Choose language" })
         ).not.toBeInTheDocument();
