@@ -9,6 +9,7 @@ import useUser from "components/context/UserContext";
 import { useRouter } from "next/router";
 import useLinkUtils from "hooks/useLinkUtils";
 import { useTranslation } from "next-i18next/pages";
+import LanguageSelector from "components/LanguageSelector";
 
 /**
  * This page is shown after SAML/Clever sign-out to warn users about
@@ -46,7 +47,7 @@ export const SignedOutContent: React.FC = () => {
       <Head>
         <title>{t("signedOut.signedOut", "Signed Out")}</title>
       </Head>
-
+      <LanguageSelector sx={{ alignSelf: "end" }} />
       <div
         sx={{
           maxWidth: 600,

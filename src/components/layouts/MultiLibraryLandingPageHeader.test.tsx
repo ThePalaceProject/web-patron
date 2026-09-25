@@ -1,19 +1,10 @@
-import * as React from "react";
-import { render, screen, waitFor } from "../../test-utils";
-import { OpenEbooksLandingComponent } from "components/OpenEbooksLanding";
-
-test("renders", () => {
-  render(<OpenEbooksLandingComponent />);
-  expect(
-    screen.getByRole("heading", {
-      name: "Welcome to Open eBooks"
-    })
-  ).toBeInTheDocument();
-});
+/* eslint-disable i18next/no-literal-string */
+import { render, screen, waitFor } from "test-utils";
+import MultiLibraryLandingPageHeader from "./MultiLibraryLandingPageHeader";
 
 describe("LanguageSelector", () => {
   it("displays when enabled in appConfig", async () => {
-    render(<OpenEbooksLandingComponent />, {
+    render(<MultiLibraryLandingPageHeader heading="My Library" />, {
       appConfig: { enableLanguageSelector: true }
     });
 
@@ -25,7 +16,7 @@ describe("LanguageSelector", () => {
   });
 
   it("does not display when disabled in appConfig", async () => {
-    render(<OpenEbooksLandingComponent />, {
+    render(<MultiLibraryLandingPageHeader heading="My Library" />, {
       appConfig: { enableLanguageSelector: false }
     });
 

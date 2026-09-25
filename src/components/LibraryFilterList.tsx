@@ -76,7 +76,7 @@ const LibraryFilterList: React.FC<LibraryFilterListProps> = ({
   return (
     <>
       {heading}
-      <div sx={{ display: "inline-block", width: "44ch", mb: 2 }}>
+      <div sx={{ width: ["auto", "44ch"], mb: 2 }}>
         <TextInput
           type="search"
           aria-label={t(

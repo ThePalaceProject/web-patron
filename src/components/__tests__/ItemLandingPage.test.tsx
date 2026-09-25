@@ -8,28 +8,31 @@ jest.mock("swr");
 
 const mockedSWR = useSWR as jest.MockedFunction<typeof useSWR>;
 
-test("renders a heading and passes workId down to the library selector", () => {
-  mockedSWR.mockReturnValue(
-    makeSwrResponse<any>({
-      data: {
-        libraries: [
-          {
-            id: "urn:testlib",
-            slug: "testlib",
-            title: "Test Library",
-            authDocUrl: "https://example.com/testlib/auth"
-          }
-        ]
-      }
-    })
-  );
+describe("ItemLandingPage", () => {
+  beforeEach(() => {
+    mockedSWR.mockReturnValue(
+      makeSwrResponse<any>({
+        data: {
+          libraries: [
+            {
+              id: "urn:testlib",
+              slug: "testlib",
+              title: "Test Library",
+              authDocUrl: "https://example.com/testlib/auth"
+            }
+          ]
+        }
+      })
+    );
+  });
+  test("renders a heading and passes workId down to the library selector", () => {
+    render(<ItemLandingPage workId="work-1" />);
 
-  render(<ItemLandingPage workId="work-1" />);
-
-  expect(
-    screen.getByRole("heading", { level: 1, name: "Find a Library" })
-  ).toBeInTheDocument();
-  expect(
-    screen.getByRole("button", { name: "Test Library" })
-  ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Find a Library" })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Test Library" })
+    ).toBeInTheDocument();
+  });
 });

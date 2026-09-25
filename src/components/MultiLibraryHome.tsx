@@ -10,6 +10,7 @@ import LibraryFilterList from "components/LibraryFilterList";
 import { fetchLibraries } from "dataflow/fetchLibraries";
 import type { ClientLibrary, LibrariesResponse } from "pages/api/libraries";
 import { useTranslation } from "next-i18next/pages";
+import MultiLibraryLandingPageHeader from "./layouts/MultiLibraryLandingPageHeader";
 
 const MultiLibraryHome: React.FC = () => {
   const { t } = useTranslation();
@@ -56,9 +57,9 @@ const MultiLibraryHome: React.FC = () => {
           m: 3
         }}
       >
-        <h1>
-          {instanceName} {t("multiLibraryHome.home", "Home")}
-        </h1>
+        <MultiLibraryLandingPageHeader
+          heading={`${instanceName} ${t("multiLibraryHome.home", "Home")}`}
+        />
         <LibraryFilterList
           heading={<h2>{t("multiLibraryHome.choose", "Choose a library:")}</h2>}
           items={sorted.map(lib => ({
