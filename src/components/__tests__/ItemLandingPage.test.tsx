@@ -1,5 +1,5 @@
 import * as React from "react";
-import { render, screen, waitFor } from "test-utils";
+import { render, screen } from "test-utils";
 import useSWR from "swr";
 import ItemLandingPage from "../ItemLandingPage";
 import { makeSwrResponse } from "test-utils/mockSwr";
@@ -34,31 +34,5 @@ describe("ItemLandingPage", () => {
     expect(
       screen.getByRole("button", { name: "Test Library" })
     ).toBeInTheDocument();
-  });
-
-  describe("LanguageSelector", () => {
-    it("displays when enabled in appConfig", async () => {
-      render(<ItemLandingPage workId="work-1" />, {
-        appConfig: { enableLanguageSelector: true }
-      });
-
-      await waitFor(() => {
-        expect(
-          screen.getByRole("combobox", { name: "Choose language" })
-        ).toBeInTheDocument();
-      });
-    });
-
-    it("does not display when disabled in appConfig", async () => {
-      render(<ItemLandingPage workId="work-1" />, {
-        appConfig: { enableLanguageSelector: false }
-      });
-
-      await waitFor(() => {
-        expect(
-          screen.queryByRole("combobox", { name: "Choose language" })
-        ).not.toBeInTheDocument();
-      });
-    });
   });
 });

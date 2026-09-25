@@ -4,7 +4,7 @@ import { Themed } from "@theme-ui/mdx";
 import WorkLibrarySelector from "components/WorkLibrarySelector";
 import theme from "theme/theme";
 import { useTranslation } from "next-i18next/pages";
-import LanguageSelector from "./LanguageSelector";
+import MultiLibraryLandingPageHeader from "./layouts/MultiLibraryLandingPageHeader";
 
 interface ItemLandingPageProps {
   workId: string;
@@ -22,24 +22,9 @@ const ItemLandingPage: React.FC<ItemLandingPageProps> = ({ workId }) => {
           m: 3
         }}
       >
-        <div
-          sx={{
-            display: "flex",
-            flexDirection: ["column", "row"],
-            justifyContent: "space-between"
-          }}
-        >
-          <h1 sx={{ order: [2, 1] }}>
-            {t("itemLandingPage.findLibrary", "Find a Library")}
-          </h1>
-          <LanguageSelector
-            sx={{
-              order: [1, 2],
-              width: "fit-content",
-              alignSelf: ["end", "unset"]
-            }}
-          />
-        </div>
+        <MultiLibraryLandingPageHeader
+          heading={t("itemLandingPage.findLibrary", "Find a Library")}
+        />
         <WorkLibrarySelector workId={workId} />
       </Themed.root>
     </ThemeUIProvider>
