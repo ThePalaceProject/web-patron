@@ -29,6 +29,8 @@
   "error.pageRenderFailed": "Beim Anzeigen der Seite ist ein Fehler aufgetreten.",
   "error.unexpectedError": "Es ist ein unerwarteter Fehler aufgetreten.",
   "error.unknown": "Fehler: Es ist ein unbekannter Fehler aufgetreten.",
+  "library.findAnother": "Finden Sie eine andere Bibliothek:",
+  "library.myLibraries": "Meine Bibliotheken",
   "library.noLibrariesAvailable": "Keine Bibliotheken verfügbar.",
   "nav.catalog": "Katalog",
   "nav.downloadPalace": "Palace laden",

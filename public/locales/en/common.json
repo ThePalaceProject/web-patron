@@ -29,6 +29,8 @@
   "error.pageRenderFailed": "Something went wrong rendering the page.",
   "error.unexpectedError": "An unexpected error occurred.",
   "error.unknown": "Error: An unknown error occurred.",
+  "library.findAnother": "Find another library:",
+  "library.myLibraries": "My Libraries",
   "library.noLibrariesAvailable": "No libraries available.",
   "nav.catalog": "Catalog",
   "nav.downloadPalace": "Download Palace",

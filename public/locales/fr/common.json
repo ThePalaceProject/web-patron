@@ -29,6 +29,8 @@
   "error.pageRenderFailed": "Une erreur s'est produite lors de l'affichage de la page.",
   "error.unexpectedError": "Une erreur inattendue s'est produite.",
   "error.unknown": "Erreur : une erreur inconnue s'est produite.",
+  "library.findAnother": "Trouvez une autre bibliothèque :",
+  "library.myLibraries": "Mes bibliothèques",
   "library.noLibrariesAvailable": "Aucune bibliothèque disponible.",
   "nav.catalog": "Catalogue",
   "nav.downloadPalace": "Obtenir Palace",
