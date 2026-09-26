@@ -44,6 +44,7 @@ const VALID_APP_CONFIG: AppConfig = {
   showMedium: true,
   enableOpds2: false,
   enableLanguageSelector: false,
+  enablePinning: false,
   openebooks: null,
   mediaSupport: {},
   authenticationDocuments: null,

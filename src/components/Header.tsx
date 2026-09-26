@@ -10,8 +10,10 @@ import Stack from "./Stack";
 import { AccountMenu } from "./AccountMenu";
 import useUser from "components/context/UserContext";
 import useLogin from "auth/useLogin";
+import useSignOutFlow from "hooks/useSignOutFlow";
 import ClientOnly from "./ClientOnly";
 import LanguageSelector from "./LanguageSelector";
+import PinButton from "./PinButton";
 import { useTranslation } from "next-i18next/pages";
 
 const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
@@ -75,6 +77,7 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
   const { t } = useTranslation();
   const { helpWebsite } = library.libraryLinks;
   const { isAuthenticated, isLoading } = useUser();
+  const signOutFlow = useSignOutFlow();
   const { baseLoginUrl } = useLogin();
 
   return (
@@ -136,6 +139,19 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
             {t("header.signIn", "Sign In")}
           </NavButton>
         )}
+      </ClientOnly>
+
+      <ClientOnly>
+        <PinButton
+          library={{
+            id: library.id,
+            slug: library.slug,
+            title: library.catalogName,
+            logoUrl: library.logoUrl ?? undefined
+          }}
+          signOut={signOutFlow}
+          sx={{ ml: 3 }}
+        />
       </ClientOnly>
 
       <LanguageSelector sx={{ ml: 3 }} />

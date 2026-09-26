@@ -1,4 +1,4 @@
-import { describe, expect, test } from "@jest/globals";
+import { describe, expect, jest, test } from "@jest/globals";
 import * as React from "react";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import fetchMock from "jest-fetch-mock";
@@ -11,9 +11,19 @@ import {
   readPinnedLibraries
 } from "utils/pinnedLibraries";
 import { PinnedLibrary } from "interfaces";
+import AppConfigContext from "components/context/AppConfigContext";
+import { config } from "test-utils/fixtures/config";
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
-  <PinnedLibrariesProvider>{children}</PinnedLibrariesProvider>
+  <AppConfigContext.Provider value={config}>
+    <PinnedLibrariesProvider>{children}</PinnedLibrariesProvider>
+  </AppConfigContext.Provider>
+);
+
+const disabledWrapper = ({ children }: { children: React.ReactNode }) => (
+  <AppConfigContext.Provider value={{ ...config, enablePinning: false }}>
+    <PinnedLibrariesProvider>{children}</PinnedLibrariesProvider>
+  </AppConfigContext.Provider>
 );
 
 const library = {
@@ -65,6 +75,25 @@ describe("usePinnedLibraries", () => {
     expect(result.current.pinnedLibraries).toEqual([]);
     expect(result.current.isPinned(library.id)).toBe(false);
     expect(readPinnedLibraries()).toEqual([]);
+  });
+
+  test("ignores stored entries and refuses writes when pinning is disabled", () => {
+    localStorage.setItem(
+      PINNED_LIBRARIES_KEY,
+      JSON.stringify([{ ...library, pinnedAt: 1000 }])
+    );
+    const { result } = renderHook(() => usePinnedLibraries(), {
+      wrapper: disabledWrapper
+    });
+
+    expect(result.current.pinnedLibraries).toEqual([]);
+    expect(result.current.isPinned(library.id)).toBe(false);
+
+    act(() => result.current.pinLibrary({ ...library, id: "urn:uuid:other" }));
+
+    expect(result.current.pinnedLibraries).toEqual([]);
+    // The stored value is untouched, not cleared.
+    expect(readPinnedLibraries()).toHaveLength(1);
   });
 
   test("reads the logo from the auth document when pinning without one", async () => {
@@ -312,5 +341,27 @@ describe("cross-tab storage events", () => {
     dispatchStorage("SOME_OTHER_KEY");
 
     expect(result.current.pinnedLibraries).toBe(before);
+  });
+});
+
+describe("focus origin", () => {
+  test("is returned once, then cleared", () => {
+    const { result } = renderHook(() => usePinnedLibraries(), { wrapper });
+    const button = document.createElement("button");
+
+    result.current.markFocusOrigin(button);
+
+    expect(result.current.takeFocusOrigin()).toBe(button);
+    expect(result.current.takeFocusOrigin()).toBeNull();
+  });
+
+  test("expires when not taken within a second", () => {
+    const now = jest.spyOn(performance, "now").mockReturnValue(1000);
+    const { result } = renderHook(() => usePinnedLibraries(), { wrapper });
+
+    result.current.markFocusOrigin(document.createElement("button"));
+    now.mockReturnValue(2001);
+
+    expect(result.current.takeFocusOrigin()).toBeNull();
   });
 });

@@ -1,5 +1,14 @@
 import * as React from "react";
-import { act, render, screen, fireEvent, setup, waitFor } from "test-utils";
+import {
+  act,
+  render,
+  screen,
+  fireEvent,
+  setup,
+  waitFor,
+  within
+} from "test-utils";
+import { pinLibraries } from "test-utils/pinning";
 import useSWR from "swr";
 import fetchMock from "jest-fetch-mock";
 import WorkLibrarySelector, {
@@ -410,27 +419,36 @@ describe("WorkLibrarySelector", () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it("dismisses the unavailable panel and refocuses search on 'Back to search'", async () => {
-    mockLibraries([lib("alpha", "Alpha Library")]);
-    fetchMock.mockResponses(
-      [
-        JSON.stringify({ catalogUrl: "https://alpha.example.com/catalog" }),
-        { status: 200 }
-      ],
-      ["", { status: 404 }]
-    );
-    const { user } = setup(<WorkLibrarySelector workId="work-1" />);
+  it.each([
+    ["a search result", "Back to search", false],
+    ["a pinned library", "Find another library", true]
+  ])(
+    "for %s, dismisses the unavailable panel and refocuses search on %p",
+    async (_, buttonName, pinned) => {
+      if (pinned) {
+        pinLibraries(lib("alpha", "Alpha Library"));
+      }
+      mockLibraries([lib("alpha", "Alpha Library")]);
+      fetchMock.mockResponses(
+        [
+          JSON.stringify({ catalogUrl: "https://alpha.example.com/catalog" }),
+          { status: 200 }
+        ],
+        ["", { status: 404 }]
+      );
+      const { user } = setup(<WorkLibrarySelector workId="work-1" />);
 
-    await user.click(screen.getByRole("button", { name: "Alpha Library" }));
-    await screen.findByRole("alert");
+      await user.click(screen.getByRole("button", { name: "Alpha Library" }));
+      await screen.findByRole("alert");
 
-    await user.click(screen.getByRole("button", { name: "Back to search" }));
+      await user.click(screen.getByRole("button", { name: buttonName }));
 
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
-    expect(
-      screen.getByRole("searchbox", { name: /filter libraries/i })
-    ).toHaveFocus();
-  });
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("searchbox", { name: /filter libraries/i })
+      ).toHaveFocus();
+    }
+  );
 
   it("dismisses the unavailable panel and refocuses the card on 'OK'", async () => {
     mockLibraries([lib("alpha", "Alpha Library")]);
@@ -454,5 +472,48 @@ describe("WorkLibrarySelector", () => {
         screen.getByRole("button", { name: "Alpha Library" })
       ).toHaveFocus()
     );
+  });
+
+  describe("My Libraries", () => {
+    it("shows pinned libraries above the list, without pin controls", () => {
+      pinLibraries(lib("beta", "Beta Library"));
+      mockLibraries([
+        lib("alpha", "Alpha Library"),
+        lib("beta", "Beta Library")
+      ]);
+      render(<WorkLibrarySelector workId="work-1" />);
+
+      const section = screen.getByRole("region", { name: "My Libraries" });
+      expect(
+        within(section).getByRole("button", { name: "Beta Library" })
+      ).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: /My Libraries/ })).toBeNull();
+      expect(
+        screen.getByRole("heading", { name: "Find another library:" })
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "Alpha Library" })
+      ).toBeNull();
+    });
+
+    it("with a pin, typing a filter shows the library list", () => {
+      pinLibraries(lib("beta", "Beta Library"));
+      mockLibraries([
+        lib("alpha", "Alpha Library"),
+        lib("beta", "Beta Library")
+      ]);
+      render(<WorkLibrarySelector workId="work-1" />);
+
+      fireEvent.change(
+        screen.getByRole("searchbox", { name: /filter libraries/i }),
+        { target: { value: "alp" } }
+      );
+      act(() => {
+        jest.advanceTimersByTime(200);
+      });
+      expect(
+        screen.getAllByRole("button").map(button => button.textContent)
+      ).toContain("Alpha Library");
+    });
   });
 });

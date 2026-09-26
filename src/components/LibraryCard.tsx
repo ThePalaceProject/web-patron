@@ -30,6 +30,13 @@ interface LibraryCardProps {
    */
   children: (actionProps: LibraryCardActionProps) => React.ReactNode;
   /**
+   * Rendered at the end of the card's main row, stacked over the stretched
+   * click target so it stays clickable. Normally a pin toggle.
+   */
+  trailing?: React.ReactNode;
+  /** Turns off the hover effect while the card's action is unavailable. */
+  disabled?: boolean;
+  /**
    * Rendered below the card's main row and stacked over the stretched click
    * target, so its controls stay clickable.
    */
@@ -70,6 +77,8 @@ const LibraryCard: React.FC<LibraryCardProps> = ({
   logoUrl,
   description,
   children,
+  trailing,
+  disabled = false,
   footer
 }) => {
   const descriptionId = React.useId();
@@ -90,16 +99,9 @@ const LibraryCard: React.FC<LibraryCardProps> = ({
         py: 2,
         transition: "box-shadow 150ms ease, border-color 150ms ease",
         "@media (prefers-reduced-motion: reduce)": { transition: "none" },
-        "&:hover": {
-          boxShadow: "cardHover",
-          borderColor: "ui.gray.dark"
-        },
-        // A separate rule so browsers without :has() still get the hover
-        // above.
-        "&:hover:has([aria-disabled='true'])": {
-          boxShadow: "card",
-          borderColor: "ui.gray.medium"
-        },
+        "&:hover": disabled
+          ? {}
+          : { boxShadow: "cardHover", borderColor: "ui.gray.dark" },
         [action]: {
           color: "ui.link.primary",
           fontWeight: "medium",
@@ -182,6 +184,11 @@ const LibraryCard: React.FC<LibraryCardProps> = ({
             </div>
           )}
         </div>
+        {trailing && (
+          <div sx={{ position: "relative", zIndex: 1, flexShrink: 0 }}>
+            {trailing}
+          </div>
+        )}
       </div>
       {footer && <div sx={{ position: "relative", zIndex: 1 }}>{footer}</div>}
     </div>

@@ -8,6 +8,7 @@ const FALLBACK_APP_CONFIG: AppConfig = {
   showMedium: true,
   enableOpds2: false,
   enableLanguageSelector: false,
+  enablePinning: false,
   bugsnagApiKey: null,
   openebooks: null,
   authenticationDocuments: null,

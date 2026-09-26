@@ -52,6 +52,14 @@ test("adds no description reference when there is no description", () => {
   );
 });
 
+test("renders trailing content outside the action", () => {
+  renderCard({ trailing: <button>Pin</button> });
+  expect(screen.getByRole("button", { name: "Pin" })).not.toHaveAttribute(
+    "data-library-card-action"
+  );
+  expect(screen.getByRole("link", { name: "ABC Library" })).toBeInTheDocument();
+});
+
 test("renders the footer", () => {
   renderCard({ footer: <button>OK</button> });
   expect(screen.getByRole("button", { name: "OK" })).toBeInTheDocument();

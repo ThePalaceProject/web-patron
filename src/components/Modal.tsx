@@ -22,8 +22,14 @@ type ModalProps = {
   dialog: any;
   hide?: () => void;
   label?: string;
+  /** Id of the element that names the dialog, in place of `label`. */
+  labelledBy?: string;
+  /** Id of the element that holds the dialog's message. */
+  describedBy?: string;
   className?: string;
   hideOnClickOutside?: boolean;
+  /** Remove the dialog from the DOM while hidden. */
+  unmountOnHide?: boolean;
   role?: string;
   showClose?: boolean;
   children?: React.ReactNode;
@@ -34,8 +40,11 @@ const Modal: React.FC<ModalProps> = ({
   hide,
   children,
   label,
+  labelledBy,
+  describedBy,
   className,
   hideOnClickOutside,
+  unmountOnHide,
   role,
   showClose = true
 }) => {
@@ -45,6 +54,7 @@ const Modal: React.FC<ModalProps> = ({
       role={role}
       className={className}
       hideOnInteractOutside={hideOnClickOutside}
+      unmountOnHide={unmountOnHide}
       backdrop={
         <div
           sx={{
@@ -68,6 +78,8 @@ const Modal: React.FC<ModalProps> = ({
         margin: "auto"
       }}
       aria-label={label}
+      aria-labelledby={labelledBy}
+      aria-describedby={describedBy}
     >
       {showClose && (
         <Button

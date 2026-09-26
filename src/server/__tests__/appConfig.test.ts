@@ -437,6 +437,33 @@ describe("config parsing", () => {
     });
   });
 
+  // --- enablePinning ---
+
+  describe("enablePinning", () => {
+    it("defaults to false when PALACE_CPW_FEATURE_PINNING is not set", async () => {
+      delete process.env.PALACE_CPW_FEATURE_PINNING;
+      expect((await load(MINIMAL_YAML)).enablePinning).toBe(false);
+    });
+
+    it.each([
+      ["true", true],
+      ["false", false]
+    ])("is %s when PALACE_CPW_FEATURE_PINNING is %s", async (raw, expected) => {
+      process.env.PALACE_CPW_FEATURE_PINNING = raw;
+      expect((await load(MINIMAL_YAML)).enablePinning).toBe(expected);
+    });
+
+    it("rejects unrecognized PALACE_CPW_FEATURE_PINNING values", async () => {
+      process.env.PALACE_CPW_FEATURE_PINNING = "yes please";
+      await expect(load(MINIMAL_YAML)).rejects.toThrow(AppSetupError);
+    });
+
+    it("ignores an enable_pinning key in the config file", async () => {
+      delete process.env.PALACE_CPW_FEATURE_PINNING;
+      expect((await load(`enable_pinning: true`)).enablePinning).toBe(false);
+    });
+  });
+
   // --- openebooks ---
 
   describe("openebooks", () => {
