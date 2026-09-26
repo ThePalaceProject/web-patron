@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import type { ClientLibrary, LibrariesResponse } from "pages/api/libraries";
 import type { CatalogUrlResponse } from "pages/api/catalog-url";
 import LibraryFilterList from "components/LibraryFilterList";
+import LibraryCard from "components/LibraryCard";
 import { fetchLibraries } from "dataflow/fetchLibraries";
 import { buildWorkUrl } from "utils/workUrl";
 import { useTranslation } from "next-i18next/pages";
@@ -243,86 +244,92 @@ const LibrarySelectorCard: React.FC<LibrarySelectorCardProps> = ({
     }
   }
 
-  return (
-    <div sx={{ mb: 1 }}>
-      {/*
-       * A <button> rather than <a> is correct here: the destination URL is not
-       * known until the async /api/catalog-url call resolves, so there is no
-       * href to give a link. aria-busy signals the loading state to screen
-       * readers; the visual "Opening…" span (which also advertises the Escape
-       * cancel) is aria-hidden to avoid duplication.
-       * aria-disabled is used instead of disabled while a resolve is in
-       * flight so keyboard focus stays on the button (disabled would drop
-       * focus to the body); handleSelect ignores activations made during the
-       * resolve. Every card is marked disabled during a resolve because
-       * selection is blocked everywhere, not just on the resolving card.
-       * role="alert" on errors makes them announced without requiring focus;
-       * it wraps only the message text so the buttons in the error panel are
-       * not announced as live-region content.
-       */}
-      <button
-        ref={buttonRef}
-        onClick={handleSelect}
-        aria-disabled={anyResolving}
-        aria-busy={isResolving}
-        sx={{
-          background: "none",
-          border: "none",
-          p: 0,
-          cursor: isResolving
-            ? "wait"
-            : anyResolving
-              ? "not-allowed"
-              : "pointer",
-          color: "inherit",
-          font: "inherit",
-          textAlign: "left",
-          textDecoration: "underline"
-        }}
+  /*
+   * role="alert" makes errors announced without requiring focus. It wraps
+   * only the message text so the buttons in the error panel are not
+   * announced as live-region content.
+   */
+  const errorPanel = errorMessage && (
+    <div
+      sx={{
+        mt: 2,
+        p: 2,
+        border: "1px solid",
+        borderColor: "ui.error",
+        borderRadius: 2
+      }}
+    >
+      <span
+        role="alert"
+        sx={{ display: "block", color: "ui.error", fontSize: 1, mb: 1 }}
       >
-        {highlighted}
-        {isResolving && (
-          <span aria-hidden="true" sx={{ ml: 2, fontSize: 0 }}>
-            {t("workLibrarySelector.opening", "Opening… (Esc to cancel)")}
-          </span>
-        )}
+        {errorMessage}
+      </span>
+      <button
+        onClick={() => {
+          setErrorMessage(null);
+          onBackToSearch();
+        }}
+        sx={{ mr: 2, cursor: "pointer" }}
+      >
+        {t("workLibrarySelector.back", "Back to search")}
       </button>
-      {errorMessage && (
-        <div
+      <button
+        onClick={() => {
+          setErrorMessage(null);
+          requestAnimationFrame(() => buttonRef.current?.focus());
+        }}
+        sx={{ cursor: "pointer" }}
+      >
+        {t("workLibrarySelector.ok", "OK")}
+      </button>
+    </div>
+  );
+
+  // A <button> rather than <a> is correct here: the destination URL is not
+  // known until the async /api/catalog-url call resolves, so there is no href
+  // to give a link. aria-busy signals the loading state to screen readers;
+  // the visual "Opening…" span (which also advertises the Escape cancel) is
+  // aria-hidden to avoid duplication.
+  // aria-disabled is used instead of disabled while a resolve is in flight so
+  // keyboard focus stays on the button (disabled would drop focus to the
+  // body); handleSelect ignores activations made during the resolve. Every
+  // card is marked disabled during a resolve because selection is blocked
+  // everywhere, not just on the resolving card.
+  return (
+    <LibraryCard
+      logoUrl={library.logoUrl}
+      description={library.description}
+      footer={errorPanel}
+    >
+      {actionProps => (
+        <button
+          {...actionProps}
+          ref={buttonRef}
+          onClick={handleSelect}
+          aria-disabled={anyResolving}
+          aria-busy={isResolving}
           sx={{
-            mt: 1,
-            p: 2,
-            border: "1px solid",
-            borderColor: "ui.error",
-            borderRadius: 2
+            background: "none",
+            border: "none",
+            p: 0,
+            cursor: isResolving
+              ? "wait"
+              : anyResolving
+                ? "not-allowed"
+                : "pointer",
+            font: "inherit",
+            textAlign: "left"
           }}
         >
-          <span
-            role="alert"
-            sx={{ display: "block", color: "ui.error", fontSize: 1, mb: 1 }}
-          >
-            {errorMessage}
-          </span>
-          <button
-            onClick={() => {
-              setErrorMessage(null);
-              onBackToSearch();
-            }}
-            sx={{ mr: 2, cursor: "pointer" }}
-          >
-            {t("workLibrarySelector.back", "Back to search")}
-          </button>
-          <button
-            onClick={() => {
-              setErrorMessage(null);
-              requestAnimationFrame(() => buttonRef.current?.focus());
-            }}
-            sx={{ cursor: "pointer" }}
-          >
-            {t("workLibrarySelector.ok", "OK")}
-          </button>
-        </div>
+          {highlighted}
+          {isResolving && (
+            <span aria-hidden="true" sx={{ ml: 2, fontSize: 0 }}>
+              {t("workLibrarySelector.opening", "Opening… (Esc to cancel)")}
+            </span>
+          )}
+        </button>
       )}
-    </div>
+    </LibraryCard>
   );
 };

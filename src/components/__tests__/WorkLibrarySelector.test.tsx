@@ -96,6 +96,25 @@ describe("WorkLibrarySelector", () => {
     ).toBeInTheDocument();
   });
 
+  it("passes each library's logo and description to its card", () => {
+    mockLibraries([
+      {
+        ...lib("alpha", "Alpha Library"),
+        logoUrl: "https://example.com/alpha/logo.png",
+        description: "Serving Alphaville."
+      }
+    ]);
+    render(<WorkLibrarySelector workId="work-1" />);
+
+    expect(screen.getByRole("presentation")).toHaveAttribute(
+      "src",
+      "https://example.com/alpha/logo.png"
+    );
+    expect(
+      screen.getByRole("button", { name: "Alpha Library" })
+    ).toHaveAccessibleDescription("Serving Alphaville.");
+  });
+
   it("sorts libraries by title", () => {
     mockLibraries([
       lib("zebra", "Zebra Library"),

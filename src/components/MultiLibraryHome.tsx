@@ -7,6 +7,7 @@ import { useAppConfig } from "components/context/AppConfigContext";
 import theme from "theme/theme";
 import LibraryHomeLink from "./LibraryHomeLink";
 import LibraryFilterList from "components/LibraryFilterList";
+import LibraryCard from "components/LibraryCard";
 import { fetchLibraries } from "dataflow/fetchLibraries";
 import type { ClientLibrary, LibrariesResponse } from "pages/api/libraries";
 import { useTranslation } from "next-i18next/pages";
@@ -46,6 +47,7 @@ const MultiLibraryHome: React.FC = () => {
       return titleA.localeCompare(titleB);
     }
   );
+  const librariesBySlug = new Map(sorted.map(lib => [lib.slug, lib]));
 
   return (
     <ThemeUIProvider theme={theme}>
@@ -67,9 +69,21 @@ const MultiLibraryHome: React.FC = () => {
             label: lib.title || lib.slug
           }))}
           resultsListId="library-filter-results"
-          renderItem={({ slug, highlighted }) => (
-            <LibraryHomeLink slug={slug}>{highlighted}</LibraryHomeLink>
-          )}
+          renderItem={({ slug, highlighted }) => {
+            const library = librariesBySlug.get(slug);
+            return (
+              <LibraryCard
+                logoUrl={library?.logoUrl}
+                description={library?.description}
+              >
+                {actionProps => (
+                  <LibraryHomeLink slug={slug} {...actionProps}>
+                    {highlighted}
+                  </LibraryHomeLink>
+                )}
+              </LibraryCard>
+            );
+          }}
         />
       </Themed.root>
     </ThemeUIProvider>
