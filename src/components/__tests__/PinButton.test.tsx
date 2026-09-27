@@ -1,6 +1,7 @@
 import * as React from "react";
-import { screen, setup, waitFor } from "test-utils";
+import { act, screen, setup, waitFor } from "test-utils";
 import PinButton from "components/PinButton";
+import { ANNOUNCE_DELAY_MS } from "components/context/PinnedLibrariesContext";
 import { readPinnedLibraries } from "utils/pinnedLibraries";
 import {
   HIDE_PUBLIC_WARNING_KEY,
@@ -232,17 +233,58 @@ describe("onToggle", () => {
 });
 
 describe("announcements", () => {
-  test.each([
-    ["pinning", false, "ABC Library pinned to My Libraries."],
-    ["unpinning", true, "ABC Library unpinned from My Libraries."]
-  ])("announces %s", async (_, startPinned, message) => {
+  const PINNED = "ABC Library pinned to My Libraries.";
+  const UNPINNED = "ABC Library unpinned from My Libraries.";
+
+  /** Waits out the announcement delay. */
+  function flushAnnouncement() {
+    act(() => {
+      jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
+    });
+  }
+
+  test("announces a direct pin", async () => {
     localStorage.setItem(HIDE_PUBLIC_WARNING_KEY, "true");
-    if (startPinned) pinLibraries(library);
     const { user } = setup(<PinButton library={library} />);
 
-    await user.click(startPinned ? unpinButton() : pinButton());
+    await user.click(pinButton());
+    flushAnnouncement();
 
-    expect(screen.getByRole("status")).toHaveTextContent(message);
+    expect(screen.getByRole("status")).toHaveTextContent(PINNED);
+  });
+
+  test("announces a pin confirmed in the warning dialog", async () => {
+    const { user } = setup(<PinButton library={library} />);
+
+    await user.click(pinButton());
+    await user.click(screen.getByRole("button", { name: "Pin Library" }));
+    flushAnnouncement();
+
+    expect(screen.getByRole("status")).toHaveTextContent(PINNED);
+  });
+
+  test("announces a direct unpin", async () => {
+    pinLibraries(library);
+    const { user } = setup(<PinButton library={library} />);
+
+    await user.click(unpinButton());
+    flushAnnouncement();
+
+    expect(screen.getByRole("status")).toHaveTextContent(UNPINNED);
+  });
+
+  test("announces an unpin confirmed in the sign-out dialog", async () => {
+    pinLibraries(library);
+    seedCredentials(library.slug);
+    const { user } = setup(<PinButton library={library} />);
+
+    await user.click(unpinButton());
+    await user.click(
+      screen.getByRole("button", { name: "Unpin and Sign Out" })
+    );
+    flushAnnouncement();
+
+    expect(screen.getByRole("status")).toHaveTextContent(UNPINNED);
   });
 
   test("has no announcement region when pinning is disabled", () => {

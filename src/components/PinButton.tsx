@@ -123,6 +123,8 @@ const PinButton: React.FC<PinButtonProps> = ({
     <>
       <Button
         ref={buttonRef}
+        // Lets a pinned library list find this library's button.
+        data-pin-library={library.id}
         variant="ghost"
         color={pinned ? "ui.black" : "ui.gray.dark"}
         className={className}

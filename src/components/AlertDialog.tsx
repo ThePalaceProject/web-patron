@@ -16,8 +16,9 @@ interface AlertDialogProps {
 
 /**
  * A confirmation dialog named by its visible title and described by its
- * message, so screen readers read both when it opens. It closes only
- * through its own controls or Escape, not on an outside click.
+ * message, so screen readers read both when it opens. Focus starts on its
+ * first control. It closes only through its own controls or Escape, not on
+ * an outside click.
  */
 const AlertDialog: React.FC<AlertDialogProps> = ({
   dialog,

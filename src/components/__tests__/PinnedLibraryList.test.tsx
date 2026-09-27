@@ -42,10 +42,15 @@ const Section: React.FC<
 const renderTitle = (library: ClientLibrary) => <span>{library.title}</span>;
 
 /** A card whose button unpins its library, for the focus tests. */
-const UnpinItem: React.FC<{ library: ClientLibrary }> = ({ library }) => {
+const UnpinItem: React.FC<{
+  library: ClientLibrary;
+  /** Marks the button with its library, as PinButton does. */
+  tagged?: boolean;
+}> = ({ library, tagged = false }) => {
   const { unpinLibrary, markFocusOrigin } = usePinnedLibraries();
   return (
     <button
+      data-pin-library={tagged ? library.id : undefined}
       onClick={event => {
         markFocusOrigin(event.currentTarget);
         unpinLibrary(library.id);
@@ -119,7 +124,7 @@ test("refreshes stored entries from the server list", () => {
 });
 
 describe("focus after unpinning a focused card", () => {
-  test("moves to the section heading when other pins remain", async () => {
+  test("moves to the section heading when the control names no library", async () => {
     pin("alpha", "beta");
     const { user } = setup(
       <Section
@@ -135,33 +140,38 @@ describe("focus after unpinning a focused card", () => {
     expect(screen.getByRole("heading", { name: "My Libraries" })).toHaveFocus();
   });
 
-  test("moves to emptyFocusRef when the last pin is removed", async () => {
-    pin("alpha");
-    const Page = () => {
-      const fallbackRef = React.useRef<HTMLHeadingElement>(null);
-      return (
-        <>
-          <Section
-            libraries={[lib("alpha")]}
-            renderItem={library => <UnpinItem library={library} />}
-            emptyFocusRef={fallbackRef}
-          />
-          <h2 ref={fallbackRef} tabIndex={-1}>
-            Choose a library:
-          </h2>
-        </>
+  test.each([true, false])(
+    "moves to emptyFocusRef after the last unpin when no other pin button exists (tagged: %p)",
+    async tagged => {
+      pin("alpha");
+      const Page = () => {
+        const fallbackRef = React.useRef<HTMLHeadingElement>(null);
+        return (
+          <>
+            <Section
+              libraries={[lib("alpha")]}
+              renderItem={library => (
+                <UnpinItem library={library} tagged={tagged} />
+              )}
+              emptyFocusRef={fallbackRef}
+            />
+            <h2 ref={fallbackRef} tabIndex={-1}>
+              Choose a library:
+            </h2>
+          </>
+        );
+      };
+      const { user } = setup(<Page />);
+
+      await user.click(
+        screen.getByRole("button", { name: "Unpin alpha Library" })
       );
-    };
-    const { user } = setup(<Page />);
 
-    await user.click(
-      screen.getByRole("button", { name: "Unpin alpha Library" })
-    );
-
-    expect(
-      screen.getByRole("heading", { name: "Choose a library:" })
-    ).toHaveFocus();
-  });
+      expect(
+        screen.getByRole("heading", { name: "Choose a library:" })
+      ).toHaveFocus();
+    }
+  );
 
   test("returns to a surviving control that lost focus", async () => {
     pin("alpha");

@@ -8,7 +8,11 @@ import {
   waitFor,
   within
 } from "test-utils";
-import { pinLibraries, seedCredentials } from "test-utils/pinning";
+import {
+  myLibrariesSection,
+  pinLibraries,
+  seedCredentials
+} from "test-utils/pinning";
 import { PINNED_LIBRARIES_KEY } from "utils/pinnedLibraries";
 import { hasStoredCredentials } from "auth/useCredentials";
 import { HIDE_PUBLIC_WARNING_KEY } from "utils/publicWarning";
@@ -37,7 +41,7 @@ function lib(slug: string, title?: string) {
 /** Types into the library filter and waits out its debounce. */
 function typeFilter(value: string) {
   fireEvent.change(
-    screen.getByRole("searchbox", { name: "Filter libraries" }),
+    screen.getByRole("searchbox", { name: /Filter libraries/ }),
     { target: { value } }
   );
   act(() => {
@@ -193,8 +197,7 @@ describe("MultiLibraryHome", () => {
         screen.getByRole("button", { name: "Pin Beta Library to My Libraries" })
       );
 
-      const heading = screen.getByRole("heading", { name: "My Libraries" });
-      const section = screen.getByRole("region", { name: "My Libraries" });
+      const section = myLibrariesSection();
       expect(
         within(section).getByRole("link", { name: "Beta Library" })
       ).toBeInTheDocument();
@@ -203,11 +206,16 @@ describe("MultiLibraryHome", () => {
           name: "Unpin Beta Library from My Libraries"
         })
       ).toBeInTheDocument();
-      // The pressed button was in the list that is now hidden.
-      expect(heading).toHaveFocus();
+      // The pressed button was in the list that is now hidden, so focus
+      // moves to the library's new button in My Libraries.
+      expect(
+        within(section).getByRole("button", {
+          name: "Unpin Beta Library from My Libraries"
+        })
+      ).toHaveFocus();
     });
 
-    it("pinning through the warning dialog moves focus to My Libraries", async () => {
+    it("pinning through the warning dialog moves focus to the pinned library", async () => {
       localStorage.removeItem(HIDE_PUBLIC_WARNING_KEY);
       const { user } = setup(<MultiLibraryHome />);
 
@@ -223,12 +231,14 @@ describe("MultiLibraryHome", () => {
 
       await waitFor(() =>
         expect(
-          screen.getByRole("heading", { name: "My Libraries" })
+          within(myLibrariesSection()).getByRole("button", {
+            name: "Unpin Beta Library from My Libraries"
+          })
         ).toHaveFocus()
       );
     });
 
-    it("signed-in unpin through its dialog moves focus to My Libraries", async () => {
+    it("signed-in unpin through its dialog moves focus to the next pinned library", async () => {
       pinLibraries(alpha, beta);
       seedCredentials("alpha");
       const { user } = setup(<MultiLibraryHome />);
@@ -247,11 +257,10 @@ describe("MultiLibraryHome", () => {
       );
       await user.keyboard("{Enter}");
 
-      await waitFor(() =>
-        expect(
-          screen.getByRole("heading", { name: "My Libraries" })
-        ).toHaveFocus()
-      );
+      const unpinBeta = within(myLibrariesSection()).getByRole("button", {
+        name: "Unpin Beta Library from My Libraries"
+      });
+      await waitFor(() => expect(unpinBeta).toHaveFocus());
       expect(hasStoredCredentials("alpha")).toBe(false);
     });
 
@@ -266,13 +275,15 @@ describe("MultiLibraryHome", () => {
       );
 
       expect(
-        screen.getByRole("searchbox", { name: "Filter libraries" })
+        screen.getByRole("searchbox", { name: /Filter libraries/ })
       ).toHaveValue("");
       expect(
         screen.getAllByRole("link").map(link => link.getAttribute("href"))
       ).toEqual(["/beta", "/alpha"]);
       expect(
-        screen.getByRole("heading", { name: "My Libraries" })
+        within(myLibrariesSection()).getByRole("button", {
+          name: "Unpin Alpha Library from My Libraries"
+        })
       ).toHaveFocus();
     });
 
@@ -280,7 +291,7 @@ describe("MultiLibraryHome", () => {
       pinLibraries(beta);
       render(<MultiLibraryHome />);
       const searchbox = screen.getByRole("searchbox", {
-        name: "Filter libraries"
+        name: /Filter libraries/
       });
       act(() => searchbox.focus());
       typeFilter("alp");
@@ -292,9 +303,7 @@ describe("MultiLibraryHome", () => {
         );
       });
 
-      expect(
-        screen.getByRole("region", { name: "My Libraries" })
-      ).toHaveTextContent("Alpha Library");
+      expect(myLibrariesSection()).toHaveTextContent("Alpha Library");
       expect(searchbox).toHaveValue("alp");
       expect(searchbox).toHaveFocus();
     });
@@ -305,17 +314,19 @@ describe("MultiLibraryHome", () => {
       typeFilter("alp");
 
       await user.click(
-        within(screen.getByRole("region", { name: "My Libraries" })).getByRole(
-          "button",
-          { name: "Unpin Beta Library from My Libraries" }
-        )
+        within(myLibrariesSection()).getByRole("button", {
+          name: "Unpin Beta Library from My Libraries"
+        })
       );
 
       expect(
-        screen.getByRole("searchbox", { name: "Filter libraries" })
+        screen.getByRole("searchbox", { name: /Filter libraries/ })
       ).toHaveValue("");
+      // Beta was last in the list, so focus moves to the previous library.
       expect(
-        screen.getByRole("heading", { name: "My Libraries" })
+        within(myLibrariesSection()).getByRole("button", {
+          name: "Unpin Alpha Library from My Libraries"
+        })
       ).toHaveFocus();
     });
 
@@ -329,6 +340,15 @@ describe("MultiLibraryHome", () => {
       expect(screen.getAllByRole("link")).toHaveLength(1);
     });
 
+    it.each([
+      [false, "Choose a library: Filter libraries"],
+      [true, "Find another library: Filter libraries"]
+    ])("names the search box from its heading (pinned: %p)", (pinned, name) => {
+      if (pinned) pinLibraries(beta);
+      render(<MultiLibraryHome />);
+      expect(screen.getByRole("searchbox", { name })).toBeInTheDocument();
+    });
+
     it("with a pin, hides the library list until a filter is typed", () => {
       pinLibraries(beta);
       render(<MultiLibraryHome />);
@@ -339,7 +359,7 @@ describe("MultiLibraryHome", () => {
       expect(screen.queryByRole("link", { name: "Alpha Library" })).toBeNull();
 
       const searchbox = screen.getByRole("searchbox", {
-        name: "Filter libraries"
+        name: /Filter libraries/
       });
       expect(searchbox).not.toHaveAttribute("aria-controls");
       expect(searchbox).toHaveAccessibleDescription(
@@ -355,12 +375,12 @@ describe("MultiLibraryHome", () => {
       );
     });
 
-    it("unpinning the last library moves focus to the library list heading", async () => {
+    it("unpinning the last library moves focus to its pin button in the full list", async () => {
       pinLibraries(alpha);
       mockLibraries([alpha]);
       const { user } = setup(<MultiLibraryHome />);
 
-      const section = screen.getByRole("region", { name: "My Libraries" });
+      const section = myLibrariesSection();
       await user.click(
         within(section).getByRole("button", {
           name: "Unpin Alpha Library from My Libraries"
@@ -370,9 +390,11 @@ describe("MultiLibraryHome", () => {
       expect(
         screen.queryByRole("heading", { name: "My Libraries" })
       ).toBeNull();
-      expect(
-        screen.getByRole("heading", { name: "Choose a library:" })
-      ).toHaveFocus();
+      // The full list is back, so focus moves to that library's pin button.
+      const pinAlpha = screen.getByRole("button", {
+        name: "Pin Alpha Library to My Libraries"
+      });
+      expect(pinAlpha).toHaveFocus();
     });
 
     it("shows no pin controls when pinning is disabled", () => {

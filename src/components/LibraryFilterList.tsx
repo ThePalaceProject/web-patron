@@ -37,6 +37,8 @@ const LibraryFilterList: React.FC<LibraryFilterListProps> = ({
   const [inputValue, setInputValue] = React.useState("");
   const [filterQuery, setFilterQuery] = React.useState("");
   const hintId = React.useId();
+  const headingId = React.useId();
+  const labelId = React.useId();
 
   React.useEffect(() => {
     const timer = setTimeout(
@@ -81,14 +83,16 @@ const LibraryFilterList: React.FC<LibraryFilterListProps> = ({
 
   return (
     <>
-      {heading}
+      <div id={headingId}>{heading}</div>
       <div sx={{ width: ["auto", "44ch"], mb: 2 }}>
+        <span id={labelId} sx={{ variant: "accessibility.visuallyHidden" }}>
+          {t("libraryFilterList.search.ariaLabel", "Filter libraries")}
+        </span>
         <TextInput
           type="search"
-          aria-label={t(
-            "libraryFilterList.search.ariaLabel",
-            "Filter libraries"
-          )}
+          // Named by the heading and its own label, e.g. "Find another
+          // library: Filter libraries", so it makes sense on its own.
+          aria-labelledby={`${headingId} ${labelId}`}
           aria-controls={showResults ? resultsListId : undefined}
           aria-describedby={hideUntilFiltered ? hintId : undefined}
           placeholder={t(

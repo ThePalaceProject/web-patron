@@ -58,6 +58,7 @@ const Modal: React.FC<ModalProps> = ({
       backdrop={
         <div
           sx={{
+            zIndex: "modal",
             backgroundColor: "rgb(0 0 0 / 0.1)",
             "-webkit-backdrop-filter": "blur(4px)",
             backdropFilter: "blur(4px)"
@@ -72,6 +73,7 @@ const Modal: React.FC<ModalProps> = ({
         py: 3,
         m: 2,
         position: "fixed",
+        zIndex: "modal",
         height: "fit-content",
         maxWidth: "400px",
         inset: "0.75rem",

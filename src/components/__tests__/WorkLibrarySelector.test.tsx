@@ -8,7 +8,7 @@ import {
   waitFor,
   within
 } from "test-utils";
-import { pinLibraries } from "test-utils/pinning";
+import { myLibrariesSection, pinLibraries } from "test-utils/pinning";
 import useSWR from "swr";
 import fetchMock from "jest-fetch-mock";
 import WorkLibrarySelector, {
@@ -483,7 +483,7 @@ describe("WorkLibrarySelector", () => {
       ]);
       render(<WorkLibrarySelector workId="work-1" />);
 
-      const section = screen.getByRole("region", { name: "My Libraries" });
+      const section = myLibrariesSection();
       expect(
         within(section).getByRole("button", { name: "Beta Library" })
       ).toBeInTheDocument();

@@ -18,9 +18,9 @@ interface PinnedLibraryListProps {
   /** Renders the card for one pinned library. */
   renderItem: (library: ClientLibrary) => React.ReactNode;
   /**
-   * Receives focus when unpinning the last library removes the focused
-   * card along with the section. Should be focusable, e.g. a heading with
-   * tabIndex={-1}.
+   * Receives focus after the last unpin when the unpinned library has no
+   * pin button elsewhere on the page. Should be focusable, e.g. a heading
+   * with tabIndex={-1}.
    */
   emptyFocusRef?: React.RefObject<HTMLElement | null>;
 }
@@ -51,8 +51,11 @@ export function useShownPinnedLibraries(
  * public computer warning is turned off, offers to turn it back on.
  *
  * When a pin or unpin made in this page leaves focus nowhere, focus returns
- * to the control that made it or, if that control is gone, moves to the
- * section heading (or to `emptyFocusRef` when the section is gone).
+ * to the control that made it. If that control is gone, focus moves to the
+ * library's pin button in this list after a pin, or to a neighboring
+ * library's pin button after an unpin, or to the section heading when no
+ * such button exists. After the last unpin, it moves to that library's pin
+ * button elsewhere on the page, or to `emptyFocusRef`.
  */
 const PinnedLibraryList: React.FC<PinnedLibraryListProps> = ({
   libraries,
@@ -72,7 +75,7 @@ const PinnedLibraryList: React.FC<PinnedLibraryListProps> = ({
   }, [libraries, pinnedLibraries, syncWithAvailable]);
 
   const headingRef = React.useRef<HTMLHeadingElement>(null);
-  const headingId = React.useId();
+  const sectionRef = React.useRef<HTMLElement>(null);
   const warningHidden = usePublicWarningHidden();
 
   const restoreWarning = () => {
@@ -81,23 +84,54 @@ const PinnedLibraryList: React.FC<PinnedLibraryListProps> = ({
     headingRef.current?.focus();
   };
   const shownCount = pinned.length;
-  const previousCount = React.useRef(shownCount);
+
+  // A string, so the effect below runs only when the shown ids change.
+  const pinnedIdsKey = JSON.stringify(pinned.map(library => library.id));
+  const previousIds = React.useRef<string[]>(JSON.parse(pinnedIdsKey));
   React.useEffect(() => {
-    if (shownCount === previousCount.current) return;
-    previousCount.current = shownCount;
+    const pinnedIds: string[] = JSON.parse(pinnedIdsKey);
+    const removedFrom = previousIds.current;
+    previousIds.current = pinnedIds;
     const origin = takeFocusOrigin();
+    if (!origin || pinnedIds.length === removedFrom.length) return;
+
+    const pinButtonIn = (
+      root: ParentNode | null | undefined,
+      libraryId: string | undefined
+    ) =>
+      Array.from(
+        root?.querySelectorAll<HTMLElement>("[data-pin-library]") ?? []
+      ).find(button => libraryId && button.dataset.pinLibrary === libraryId);
+    const pinButtonFor = (libraryId: string | undefined) =>
+      pinButtonIn(sectionRef.current, libraryId);
+
+    // Picks the replacement described in the component comment.
+    const replacementFor = (libraryId: string | null) => {
+      if (!libraryId) return headingRef.current ?? emptyFocusRef?.current;
+      const pinnedButton = pinButtonFor(libraryId);
+      if (pinnedButton) return pinnedButton;
+      if (pinnedIds.length === 0) {
+        return pinButtonIn(document, libraryId) ?? emptyFocusRef?.current;
+      }
+      const removedAt = removedFrom.indexOf(libraryId);
+      const neighbor = pinnedIds[Math.min(removedAt, pinnedIds.length - 1)];
+      return pinButtonFor(neighbor) ?? headingRef.current;
+    };
+
     const active = document.activeElement;
-    if (!origin || (active && active !== document.body)) return;
-    if (origin.isConnected) origin.focus();
-    else
-      (shownCount > 0 ? headingRef.current : emptyFocusRef?.current)?.focus();
-  }, [shownCount, emptyFocusRef, takeFocusOrigin]);
+    if (active && active !== document.body) return;
+    if (origin.isConnected) {
+      origin.focus();
+      return;
+    }
+    replacementFor(origin.getAttribute("data-pin-library"))?.focus();
+  }, [pinnedIdsKey, emptyFocusRef, takeFocusOrigin]);
 
   if (shownCount === 0) return null;
 
   return (
-    <section aria-labelledby={headingId}>
-      <h2 id={headingId} ref={headingRef} tabIndex={-1}>
+    <section ref={sectionRef}>
+      <h2 ref={headingRef} tabIndex={-1}>
         {t("library.myLibraries", "My Libraries", { ns: "common" })}
       </h2>
       {warningHidden && (
