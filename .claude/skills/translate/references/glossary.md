@@ -297,14 +297,17 @@ lane header.
 A patron pins libraries to a personal list on this device. The list's name is a proper noun in
 the UI and keeps each locale's established form when it appears inside a sentence.
 
-| English      | German             | French            | Spanish         | Italian            |
-| ------------ | ------------------ | ----------------- | --------------- | ------------------ |
-| My Libraries | Meine Bibliotheken | Mes bibliothèques | Mis bibliotecas | Le mie biblioteche |
-| pin          | anheften           | épingler          | anclar          | fissare            |
-| unpin        | lösen              | désépingler       | desanclar       | rimuovere          |
+| English      | German                 | French            | Spanish         | Italian            |
+| ------------ | ---------------------- | ----------------- | --------------- | ------------------ |
+| My Libraries | Meine Bibliotheken     | Mes bibliothèques | Mis bibliotecas | Le mie biblioteche |
+| pin          | anheften               | épingler          | anclar          | fissare            |
+| unpin        | lösen                  | désépingler       | desanclar       | rimuovere          |
+| reorder      | neu anordnen           | réorganiser       | reordenar       | riordinare         |
+| move up      | nach oben verschieben  | monter            | subir           | spostare in alto   |
+| move down    | nach unten verschieben | descendre         | bajar           | spostare in basso  |
 
 `pin` and `unpin` are the verbs for My Libraries. They are unrelated to the `PIN` credential
-field, which stays `PIN`.
+field, which stays `PIN`. `reorder` changes the order of My Libraries.
 
 - **In running text** German declines the list name (`von Meinen Bibliotheken`), and Italian
   merges the article into the preposition (`nelle mie biblioteche`, `dalle mie biblioteche`).
