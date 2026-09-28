@@ -496,6 +496,17 @@ describe("WorkLibrarySelector", () => {
       ).toBeNull();
     });
 
+    it("offers no reordering", () => {
+      pinLibraries(lib("alpha", "Alpha Library"), lib("beta", "Beta Library"));
+      mockLibraries([
+        lib("alpha", "Alpha Library"),
+        lib("beta", "Beta Library")
+      ]);
+      render(<WorkLibrarySelector workId="work-1" />);
+
+      expect(screen.queryByRole("button", { name: /Reorder/ })).toBeNull();
+    });
+
     it("with a pin, typing a filter shows the library list", () => {
       pinLibraries(lib("beta", "Beta Library"));
       mockLibraries([

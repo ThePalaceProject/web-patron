@@ -8,3 +8,6 @@ import variants from "theme/variants";
  */
 export const VISUALLY_HIDDEN_STYLE = variants.accessibility
   .visuallyHidden as React.CSSProperties;
+
+/** Minimum comfortable touch target size, in pixels. */
+export const MIN_TOUCH_TARGET_PX = 44;

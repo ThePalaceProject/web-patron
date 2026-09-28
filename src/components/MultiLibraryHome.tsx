@@ -57,31 +57,46 @@ const MultiLibraryHome: React.FC = () => {
   );
   const librariesBySlug = new Map(sorted.map(lib => [lib.slug, lib]));
 
-  // `title` replaces the name as the link content, e.g. to mark search matches.
-  const renderCard = (library: ClientLibrary, title?: React.ReactNode) => {
+  // `title` replaces the name as the link content, e.g. to mark search
+  // matches. `reorderControls` replace the pin button and the link, so the
+  // card cannot be opened while it is being reordered.
+  const renderCard = (
+    library: ClientLibrary,
+    {
+      title,
+      reorderControls
+    }: { title?: React.ReactNode; reorderControls?: React.ReactNode } = {}
+  ) => {
     const name = library.title || library.slug;
     return (
       <LibraryCard
         logoUrl={library.logoUrl}
         description={library.description}
+        disabled={reorderControls !== undefined}
         trailing={
-          <PinButton
-            library={{
-              id: library.id,
-              slug: library.slug,
-              title: name,
-              logoUrl: library.logoUrl,
-              authDocUrl: library.authDocUrl
-            }}
-            onToggle={resetSearch}
-          />
+          reorderControls ?? (
+            <PinButton
+              library={{
+                id: library.id,
+                slug: library.slug,
+                title: name,
+                logoUrl: library.logoUrl,
+                authDocUrl: library.authDocUrl
+              }}
+              onToggle={resetSearch}
+            />
+          )
         }
       >
-        {actionProps => (
-          <LibraryHomeLink slug={library.slug} {...actionProps}>
-            {title ?? name}
-          </LibraryHomeLink>
-        )}
+        {actionProps =>
+          reorderControls === undefined ? (
+            <LibraryHomeLink slug={library.slug} {...actionProps}>
+              {title ?? name}
+            </LibraryHomeLink>
+          ) : (
+            <span>{name}</span>
+          )
+        }
       </LibraryCard>
     );
   };
@@ -102,7 +117,10 @@ const MultiLibraryHome: React.FC = () => {
         <PinnedLibraryList
           libraries={data.libraries}
           pinned={shownPinned}
-          renderItem={library => renderCard(library)}
+          renderItem={(library, reorderControls) =>
+            renderCard(library, { reorderControls })
+          }
+          reorderable
           emptyFocusRef={searchInputRef}
         />
         <LibraryFilterList
@@ -127,7 +145,7 @@ const MultiLibraryHome: React.FC = () => {
           resultsListId="library-filter-results"
           renderItem={({ slug, highlighted }) => {
             const library = librariesBySlug.get(slug);
-            return library ? renderCard(library, highlighted) : null;
+            return library ? renderCard(library, { title: highlighted }) : null;
           }}
         />
       </Themed.root>

@@ -9,6 +9,7 @@ import {
   PINNED_LIBRARIES_KEY,
   readPinnedLibraries,
   writePinnedLibraries,
+  withMovedTo,
   withPinned,
   withoutPinned,
   syncPinned
@@ -26,6 +27,11 @@ export type PinnedLibrariesState = {
   pinnedLibraries: PinnedLibrary[];
   pinLibrary: (library: PinnableLibrary) => void;
   unpinLibrary: (id: string) => void;
+  /**
+   * Moves a pinned library to the stored position of the library whose id
+   * is `targetId`. Unknown ids are no-ops.
+   */
+  movePinnedLibrary: (id: string, targetId: string) => void;
   isPinned: (id: string) => boolean;
   /**
    * Refreshes pinned entries from the current server library list, matched
@@ -167,6 +173,12 @@ export const PinnedLibrariesProvider: React.FC<{
     [update]
   );
 
+  const movePinnedLibrary = React.useCallback(
+    (id: string, targetId: string) =>
+      update(prev => withMovedTo(prev, id, targetId)),
+    [update]
+  );
+
   const syncWithAvailable = React.useCallback(
     (available: ClientLibrary[]) => update(prev => syncPinned(prev, available)),
     [update]
@@ -230,6 +242,7 @@ export const PinnedLibrariesProvider: React.FC<{
       pinnedLibraries,
       pinLibrary,
       unpinLibrary,
+      movePinnedLibrary,
       isPinned,
       syncWithAvailable,
       markFocusOrigin,
@@ -240,6 +253,7 @@ export const PinnedLibrariesProvider: React.FC<{
       pinnedLibraries,
       pinLibrary,
       unpinLibrary,
+      movePinnedLibrary,
       isPinned,
       syncWithAvailable,
       markFocusOrigin,

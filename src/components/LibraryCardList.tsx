@@ -1,5 +1,8 @@
 import * as React from "react";
 
+/** The widest a list of library cards gets. */
+export const LIBRARY_CARD_LIST_MAX_WIDTH = "40rem";
+
 type LibraryCardListProps = React.HTMLAttributes<HTMLUListElement>;
 
 /** A vertical list of library cards. Each child should be an <li>. */
@@ -16,7 +19,7 @@ const LibraryCardList: React.FC<LibraryCardListProps> = ({
     sx={{
       listStyle: "none",
       pl: 0,
-      maxWidth: "40rem",
+      maxWidth: LIBRARY_CARD_LIST_MAX_WIDTH,
       display: "flex",
       flexDirection: "column",
       gap: 2

@@ -4,6 +4,7 @@ import {
   PINNED_LIBRARIES_KEY,
   readPinnedLibraries,
   writePinnedLibraries,
+  withMovedTo,
   withPinned,
   withoutPinned,
   syncPinned
@@ -74,6 +75,47 @@ describe("withoutPinned", () => {
   test("returns the original array when the id is not pinned", () => {
     const libraries = [pinnedLib];
     expect(withoutPinned(libraries, "unknown")).toBe(libraries);
+  });
+});
+
+describe("withMovedTo", () => {
+  const entry = (id: string): PinnedLibrary => ({
+    id,
+    slug: id,
+    title: id.toUpperCase(),
+    pinnedAt: 1000
+  });
+  const abc = [entry("a"), entry("b"), entry("c")];
+  const ids = (libraries: PinnedLibrary[]) => libraries.map(lib => lib.id);
+
+  test.each([
+    ["a", "c", ["b", "c", "a"]],
+    ["c", "a", ["c", "a", "b"]],
+    ["a", "b", ["b", "a", "c"]],
+    ["c", "b", ["a", "c", "b"]]
+  ])("moves %p to the position of %p", (id, targetId, expected) => {
+    expect(ids(withMovedTo(abc, id, targetId))).toEqual(expected);
+  });
+
+  test("moves across entries missing from the shown list", () => {
+    const withHidden = [entry("a"), entry("hidden"), entry("b")];
+    expect(ids(withMovedTo(withHidden, "a", "b"))).toEqual([
+      "hidden",
+      "b",
+      "a"
+    ]);
+  });
+
+  test("returns the original array for unknown ids or a move onto itself", () => {
+    expect(withMovedTo(abc, "unknown", "a")).toBe(abc);
+    expect(withMovedTo(abc, "a", "unknown")).toBe(abc);
+    expect(withMovedTo(abc, "b", "b")).toBe(abc);
+  });
+
+  test("does not mutate the input array", () => {
+    const input = [entry("a"), entry("b")];
+    withMovedTo(input, "a", "b");
+    expect(ids(input)).toEqual(["a", "b"]);
   });
 });
 

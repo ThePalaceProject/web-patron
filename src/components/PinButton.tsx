@@ -16,6 +16,7 @@ import {
   clearStoredCredentials
 } from "auth/useCredentials";
 import { useTranslation } from "next-i18next/pages";
+import { MIN_TOUCH_TARGET_PX } from "constants/a11y";
 
 export type { PinnableLibrary };
 
@@ -144,7 +145,7 @@ const PinButton: React.FC<PinButtonProps> = ({
         onClick={handleClick}
         aria-label={label}
         title={label}
-        sx={{ minWidth: 44, minHeight: 44 }}
+        sx={{ minWidth: MIN_TOUCH_TARGET_PX, minHeight: MIN_TOUCH_TARGET_PX }}
       >
         <FontAwesomeIcon
           icon={faThumbtack}

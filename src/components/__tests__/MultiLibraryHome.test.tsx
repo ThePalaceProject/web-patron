@@ -13,13 +13,17 @@ import {
   pinLibraries,
   seedCredentials
 } from "test-utils/pinning";
-import { PINNED_LIBRARIES_KEY } from "utils/pinnedLibraries";
+import {
+  PINNED_LIBRARIES_KEY,
+  readPinnedLibraries
+} from "utils/pinnedLibraries";
 import { hasStoredCredentials } from "auth/useCredentials";
+import { ANNOUNCE_DELAY_MS } from "components/context/PinnedLibrariesContext";
 import { HIDE_PUBLIC_WARNING_KEY } from "utils/publicWarning";
 import MultiLibraryHome from "../MultiLibraryHome";
 import useSWR from "swr";
 import { makeSwrResponse } from "test-utils/mockSwr";
-import type { LibrariesResponse } from "pages/api/libraries";
+import type { ClientLibrary, LibrariesResponse } from "pages/api/libraries";
 
 jest.mock("swr");
 
@@ -403,6 +407,149 @@ describe("MultiLibraryHome", () => {
     it("shows no pin controls when pinning is disabled", () => {
       render(<MultiLibraryHome />, { appConfig: { enablePinning: false } });
       expect(screen.queryByRole("button", { name: /My Libraries/ })).toBeNull();
+    });
+  });
+
+  describe("reordering My Libraries", () => {
+    const alpha = lib("alpha", "Alpha Library");
+    const beta = lib("beta", "Beta Library");
+
+    beforeEach(() => {
+      mockLibraries([alpha, beta]);
+    });
+
+    const pinnedOrder = () => readPinnedLibraries().map(entry => entry.slug);
+
+    const startReordering = async (...pins: ClientLibrary[]) => {
+      pinLibraries(...pins);
+      const utils = setup(<MultiLibraryHome />);
+      await utils.user.click(
+        screen.getByRole("button", { name: "Reorder My Libraries" })
+      );
+      return utils;
+    };
+
+    const expectAnnouncement = (text: string) => {
+      act(() => {
+        jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
+      });
+      expect(
+        document.querySelector("body > [role='status']")
+      ).toHaveTextContent(text);
+    };
+
+    it("offers Reorder only when two or more pinned libraries are shown", () => {
+      pinLibraries(alpha);
+      render(<MultiLibraryHome />);
+      expect(
+        screen.queryByRole("button", { name: "Reorder My Libraries" })
+      ).toBeNull();
+    });
+
+    it("shows move buttons in place of pin buttons and links while reordering", async () => {
+      const { user } = await startReordering(alpha, beta);
+
+      const section = myLibrariesSection();
+      expect(
+        within(section).getByRole("button", { name: "Move Alpha Library up" })
+      ).toHaveAttribute("aria-disabled", "true");
+      expect(
+        within(section).queryByRole("button", { name: /from My Libraries/ })
+      ).toBeNull();
+      // The cards cannot be opened while reordering.
+      expect(within(section).queryByRole("link")).toBeNull();
+      expect(within(section).getByText("Alpha Library")).toBeInTheDocument();
+
+      await user.click(
+        screen.getByRole("button", { name: "Done reordering My Libraries" })
+      );
+      expect(
+        within(section).queryByRole("button", { name: /^Move / })
+      ).toBeNull();
+      expect(
+        within(section).getByRole("button", {
+          name: "Unpin Alpha Library from My Libraries"
+        })
+      ).toBeInTheDocument();
+      expect(
+        within(section).getByRole("link", { name: "Alpha Library" })
+      ).toBeInTheDocument();
+    });
+
+    it("moves a library, keeps focus on the button, and announces the new position", async () => {
+      const { user } = await startReordering(alpha, beta);
+
+      await user.click(
+        screen.getByRole("button", { name: "Move Alpha Library down" })
+      );
+
+      expect(pinnedOrder()).toEqual(["beta", "alpha"]);
+      const moveDown = screen.getByRole("button", {
+        name: "Move Alpha Library down"
+      });
+      expect(moveDown).toHaveFocus();
+      expect(moveDown).toHaveAttribute("aria-disabled", "true");
+      expectAnnouncement("Alpha Library moved to position 2 of 2.");
+    });
+
+    it("moves a library up", async () => {
+      const { user } = await startReordering(alpha, beta);
+
+      await user.click(
+        screen.getByRole("button", { name: "Move Beta Library up" })
+      );
+
+      expect(pinnedOrder()).toEqual(["beta", "alpha"]);
+      expect(
+        screen.getByRole("button", { name: "Move Beta Library up" })
+      ).toHaveFocus();
+    });
+
+    it("moves past a pinned library that the server list no longer has", async () => {
+      const { user } = await startReordering(
+        alpha,
+        lib("gone", "Gone Library"),
+        beta
+      );
+
+      await user.click(
+        screen.getByRole("button", { name: "Move Alpha Library down" })
+      );
+
+      expect(pinnedOrder()).toEqual(["gone", "beta", "alpha"]);
+      expectAnnouncement("Alpha Library moved to position 2 of 2.");
+    });
+
+    it("leaves reorder mode when fewer than two libraries are shown", async () => {
+      const { user } = await startReordering(alpha, beta);
+
+      typeFilter("alp");
+      // While reordering, only the search results show pin buttons.
+      await user.click(
+        screen.getByRole("button", {
+          name: "Unpin Alpha Library from My Libraries"
+        })
+      );
+      pinLibraries(alpha, beta);
+      act(() => {
+        window.dispatchEvent(
+          new StorageEvent("storage", { key: PINNED_LIBRARIES_KEY })
+        );
+      });
+
+      expect(
+        screen.getByRole("button", { name: "Reorder My Libraries" })
+      ).toBeInTheDocument();
+    });
+
+    it("ignores a move past the end of the list", async () => {
+      const { user } = await startReordering(alpha, beta);
+
+      await user.click(
+        screen.getByRole("button", { name: "Move Alpha Library up" })
+      );
+
+      expect(pinnedOrder()).toEqual(["alpha", "beta"]);
     });
   });
 
