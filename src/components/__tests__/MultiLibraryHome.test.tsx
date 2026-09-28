@@ -42,6 +42,25 @@ describe("MultiLibraryHome", () => {
     expect(links[2]).toHaveTextContent("Zebra Library");
   });
 
+  it("passes each library's logo and description to its card", () => {
+    mockLibraries([
+      {
+        ...lib("alpha", "Alpha Library"),
+        logoUrl: "https://example.com/alpha/logo.png",
+        description: "Serving Alphaville."
+      }
+    ]);
+    render(<MultiLibraryHome />);
+
+    expect(screen.getByRole("presentation")).toHaveAttribute(
+      "src",
+      "https://example.com/alpha/logo.png"
+    );
+    expect(
+      screen.getByRole("link", { name: "Alpha Library" })
+    ).toHaveAccessibleDescription("Serving Alphaville.");
+  });
+
   it("displays libraries sorted by slug when no title is provided", () => {
     mockLibraries([lib("zebra"), lib("alpha"), lib("middle")]);
 

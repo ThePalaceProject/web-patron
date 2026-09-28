@@ -9,7 +9,10 @@ import { useRouter } from "next/router";
  */
 export const FOCUS_PREFETCH_DEBOUNCE_MS = 300;
 
-export interface LibraryHomeLinkProps {
+export interface LibraryHomeLinkProps extends Omit<
+  React.AnchorHTMLAttributes<HTMLAnchorElement>,
+  "href" | "title" | "onFocus" | "onBlur"
+> {
   slug: string;
   title?: string;
 }
@@ -33,7 +36,7 @@ export interface LibraryHomeLinkProps {
  */
 const LibraryHomeLink: React.FC<
   React.PropsWithChildren<LibraryHomeLinkProps>
-> = ({ slug, title, children }) => {
+> = ({ slug, title, children, ...rest }) => {
   const router = useRouter();
   const href = `/${slug}`;
   const timer = React.useRef<ReturnType<typeof setTimeout> | undefined>(
@@ -54,6 +57,7 @@ const LibraryHomeLink: React.FC<
 
   return (
     <Link
+      {...rest}
       href={href}
       prefetch={false}
       onFocus={prefetchOnFocus}
