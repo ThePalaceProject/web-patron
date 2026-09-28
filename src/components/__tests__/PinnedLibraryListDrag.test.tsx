@@ -4,8 +4,7 @@ import type { DragEndEvent } from "@dnd-kit/core";
 import PinnedLibraryList, {
   useShownPinnedLibraries
 } from "components/PinnedLibraryList";
-import { ANNOUNCE_DELAY_MS } from "components/context/PinnedLibrariesContext";
-import { pinLibraries } from "test-utils/pinning";
+import { expectAnnouncement, pinLibraries } from "test-utils/pinning";
 import { readPinnedLibraries } from "utils/pinnedLibraries";
 import type { ClientLibrary } from "pages/api/libraries";
 
@@ -39,6 +38,7 @@ const libraries = [lib("alpha"), lib("beta"), lib("gamma")];
 
 const Section: React.FC = () => {
   const pinned = useShownPinnedLibraries(libraries);
+  const [reordering, setReordering] = React.useState(false);
   return (
     <PinnedLibraryList
       libraries={libraries}
@@ -49,7 +49,8 @@ const Section: React.FC = () => {
           {reorderControls}
         </span>
       )}
-      reorderable
+      reordering={reordering}
+      onReorderingChange={setReordering}
     />
   );
 };
@@ -79,14 +80,9 @@ test("dropping a library onto another moves it there and announces it", async ()
   await startReordering();
 
   drop("urn:alpha", "urn:gamma");
-  act(() => {
-    jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
-  });
 
   expect(pinnedOrder()).toEqual(["beta", "gamma", "alpha"]);
-  expect(document.querySelector("body > [role='status']")).toHaveTextContent(
-    "alpha Library moved to position 3 of 3."
-  );
+  expectAnnouncement("alpha Library moved to position 3 of 3.");
 });
 
 test.each([

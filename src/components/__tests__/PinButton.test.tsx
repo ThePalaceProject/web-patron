@@ -1,13 +1,16 @@
 import * as React from "react";
-import { act, screen, setup, waitFor } from "test-utils";
+import { screen, setup, waitFor } from "test-utils";
 import PinButton from "components/PinButton";
-import { ANNOUNCE_DELAY_MS } from "components/context/PinnedLibrariesContext";
 import { readPinnedLibraries } from "utils/pinnedLibraries";
 import {
   HIDE_PUBLIC_WARNING_KEY,
   isPublicWarningHidden
 } from "utils/publicWarning";
-import { pinLibraries, seedCredentials } from "test-utils/pinning";
+import {
+  expectAnnouncement,
+  pinLibraries,
+  seedCredentials
+} from "test-utils/pinning";
 import { hasStoredCredentials } from "auth/useCredentials";
 
 const library = {
@@ -236,21 +239,12 @@ describe("announcements", () => {
   const PINNED = "ABC Library pinned to My Libraries.";
   const UNPINNED = "ABC Library unpinned from My Libraries.";
 
-  /** Waits out the announcement delay. */
-  function flushAnnouncement() {
-    act(() => {
-      jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
-    });
-  }
-
   test("announces a direct pin", async () => {
     localStorage.setItem(HIDE_PUBLIC_WARNING_KEY, "true");
     const { user } = setup(<PinButton library={library} />);
 
     await user.click(pinButton());
-    flushAnnouncement();
-
-    expect(screen.getByRole("status")).toHaveTextContent(PINNED);
+    expectAnnouncement(PINNED);
   });
 
   test("announces a pin confirmed in the warning dialog", async () => {
@@ -258,9 +252,7 @@ describe("announcements", () => {
 
     await user.click(pinButton());
     await user.click(screen.getByRole("button", { name: "Pin Library" }));
-    flushAnnouncement();
-
-    expect(screen.getByRole("status")).toHaveTextContent(PINNED);
+    expectAnnouncement(PINNED);
   });
 
   test("announces a direct unpin, with the empty-list note on the last one", async () => {
@@ -268,11 +260,7 @@ describe("announcements", () => {
     const { user } = setup(<PinButton library={library} />);
 
     await user.click(unpinButton());
-    flushAnnouncement();
-
-    expect(screen.getByRole("status")).toHaveTextContent(
-      `${UNPINNED} No libraries are pinned.`
-    );
+    expectAnnouncement(`${UNPINNED} No libraries are pinned.`);
   });
 
   test("does not announce the empty-list note while other pins remain", async () => {
@@ -284,9 +272,7 @@ describe("announcements", () => {
     const { user } = setup(<PinButton library={library} />);
 
     await user.click(unpinButton());
-    flushAnnouncement();
-
-    expect(screen.getByRole("status")).toHaveTextContent(UNPINNED);
+    expectAnnouncement(UNPINNED);
     expect(screen.getByRole("status")).not.toHaveTextContent(
       "No libraries are pinned."
     );
@@ -301,9 +287,7 @@ describe("announcements", () => {
     await user.click(
       screen.getByRole("button", { name: "Unpin and Sign Out" })
     );
-    flushAnnouncement();
-
-    expect(screen.getByRole("status")).toHaveTextContent(UNPINNED);
+    expectAnnouncement(UNPINNED);
   });
 
   test("has no announcement region when pinning is disabled", () => {

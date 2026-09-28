@@ -28,6 +28,11 @@ const MultiLibraryHome: React.FC = () => {
   );
   const shownPinned = useShownPinnedLibraries(data?.libraries ?? []);
   const hasPinned = shownPinned.length > 0;
+  const [reordering, setReordering] = React.useState(false);
+  // Leaves reorder mode once fewer than two libraries are shown. Otherwise
+  // the search would stay hidden with no Done button, and My Libraries would
+  // come back already in that mode.
+  if (reordering && shownPinned.length < 2) setReordering(false);
 
   if (error)
     return (
@@ -58,8 +63,8 @@ const MultiLibraryHome: React.FC = () => {
   const librariesBySlug = new Map(sorted.map(lib => [lib.slug, lib]));
 
   // `title` replaces the name as the link content, e.g. to mark search
-  // matches. `reorderControls` replace the pin button and the link, so the
-  // card cannot be opened while it is being reordered.
+  // matches. `reorderControls` replace the pin button, and the link becomes
+  // plain text, so the card cannot be opened while it is being reordered.
   const renderCard = (
     library: ClientLibrary,
     {
@@ -94,7 +99,8 @@ const MultiLibraryHome: React.FC = () => {
               {title ?? name}
             </LibraryHomeLink>
           ) : (
-            <span>{name}</span>
+            // Keeps the title's weight, but not its link color.
+            <span sx={{ fontWeight: "medium" }}>{name}</span>
           )
         }
       </LibraryCard>
@@ -120,34 +126,40 @@ const MultiLibraryHome: React.FC = () => {
           renderItem={(library, reorderControls) =>
             renderCard(library, { reorderControls })
           }
-          reorderable
+          reordering={reordering}
+          onReorderingChange={setReordering}
           emptyFocusRef={searchInputRef}
         />
-        <LibraryFilterList
-          // A pin or unpin made here starts a fresh search: the box empties
-          // and, with pins shown, the list hides.
-          key={searchKey}
-          inputRef={searchInputRef}
-          heading={
-            <h2>
-              {hasPinned
-                ? t("library.findAnother", "Find another library:", {
-                    ns: "common"
-                  })
-                : t("multiLibraryHome.choose", "Choose a library:")}
-            </h2>
-          }
-          hideUntilFiltered={hasPinned}
-          items={sorted.map(lib => ({
-            slug: lib.slug,
-            label: lib.title || lib.slug
-          }))}
-          resultsListId="library-filter-results"
-          renderItem={({ slug, highlighted }) => {
-            const library = librariesBySlug.get(slug);
-            return library ? renderCard(library, { title: highlighted }) : null;
-          }}
-        />
+        {/* Hidden while reordering, so the page shows only My Libraries. */}
+        {!reordering && (
+          <LibraryFilterList
+            // A pin or unpin made here starts a fresh search: the box empties
+            // and, with pins shown, the list hides.
+            key={searchKey}
+            inputRef={searchInputRef}
+            heading={
+              <h2>
+                {hasPinned
+                  ? t("library.findAnother", "Find another library:", {
+                      ns: "common"
+                    })
+                  : t("multiLibraryHome.choose", "Choose a library:")}
+              </h2>
+            }
+            hideUntilFiltered={hasPinned}
+            items={sorted.map(lib => ({
+              slug: lib.slug,
+              label: lib.title || lib.slug
+            }))}
+            resultsListId="library-filter-results"
+            renderItem={({ slug, highlighted }) => {
+              const library = librariesBySlug.get(slug);
+              return library
+                ? renderCard(library, { title: highlighted })
+                : null;
+            }}
+          />
+        )}
       </Themed.root>
     </ThemeUIProvider>
   );

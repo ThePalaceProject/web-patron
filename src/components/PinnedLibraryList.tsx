@@ -46,10 +46,16 @@ interface PinnedLibraryListProps {
     reorderControls?: React.ReactNode
   ) => React.ReactNode;
   /**
-   * Offers a reorder mode, with Move up and Move down buttons and pointer
-   * dragging, when two or more pinned libraries are shown.
+   * Whether the list is in reorder mode, with Move up and Move down buttons
+   * and pointer dragging. Takes effect only with `onReorderingChange` and
+   * two or more shown libraries.
    */
-  reorderable?: boolean;
+  reordering?: boolean;
+  /**
+   * Called by the Reorder and Done button, which the list shows when this
+   * is given and two or more pinned libraries are shown.
+   */
+  onReorderingChange?: (reordering: boolean) => void;
   /**
    * Receives focus after the last unpin, so the user lands somewhere
    * predictable (e.g. the library search input) instead of wherever the
@@ -78,11 +84,15 @@ export function useShownPinnedLibraries(
   });
 }
 
+const displayName = (library: ClientLibrary) => library.title || library.slug;
+
 /**
  * The "My Libraries" section. Renders nothing when `pinned` is empty. Also
  * refreshes the stored pinned entries from the server list. While the
- * public computer warning is turned off, offers to turn it back on. See
- * `reorderable` for reordering.
+ * public computer warning is turned off, offers to turn it back on. With
+ * `onReorderingChange` and two or more shown libraries, a Reorder and Done
+ * button toggles `reordering`, which shows move controls and allows pointer
+ * dragging.
  *
  * When a pin or unpin made in this page leaves focus nowhere, focus returns
  * to the control that made it. If that control is gone, focus moves to the
@@ -91,13 +101,12 @@ export function useShownPinnedLibraries(
  * such button exists. After the last unpin, it moves to `emptyFocusRef`,
  * or to that library's pin button elsewhere on the page.
  */
-const displayName = (library: ClientLibrary) => library.title || library.slug;
-
 const PinnedLibraryList: React.FC<PinnedLibraryListProps> = ({
   libraries,
   pinned,
   renderItem,
-  reorderable = false,
+  reordering = false,
+  onReorderingChange,
   emptyFocusRef
 }) => {
   const { t } = useTranslation();
@@ -169,11 +178,7 @@ const PinnedLibraryList: React.FC<PinnedLibraryListProps> = ({
     replacementFor(origin.getAttribute("data-pin-library"))?.focus();
   }, [pinnedIdsKey, emptyFocusRef, takeFocusOrigin]);
 
-  const [reordering, setReordering] = React.useState(false);
-  const canReorder = reorderable && shownCount > 1;
-  // Leaves reorder mode once fewer than two libraries are shown, so the
-  // section does not come back already in that mode.
-  if (reordering && !canReorder) setReordering(false);
+  const canReorder = onReorderingChange !== undefined && shownCount > 1;
   const isReordering = canReorder && reordering;
 
   // A move reorders the list items, which can drop focus from the pressed
@@ -271,7 +276,7 @@ const PinnedLibraryList: React.FC<PinnedLibraryListProps> = ({
           <Button
             variant="ghost"
             color="ui.link.primary"
-            onClick={() => setReordering(current => !current)}
+            onClick={() => onReorderingChange?.(!isReordering)}
             aria-label={
               isReordering
                 ? t(

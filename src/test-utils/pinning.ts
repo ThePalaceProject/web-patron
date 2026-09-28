@@ -1,7 +1,8 @@
-import { screen } from "@testing-library/react";
+import { act, screen } from "@testing-library/react";
 import { OPDS1, PinnedLibrary } from "interfaces";
 import { storeCredentials } from "auth/useCredentials";
 import { writePinnedLibraries } from "utils/pinnedLibraries";
+import { ANNOUNCE_DELAY_MS } from "components/context/PinnedLibrariesContext";
 
 /** Stores the given libraries as pinned, in order. */
 export function pinLibraries(
@@ -29,4 +30,19 @@ export function myLibrariesSection(): HTMLElement {
     .closest("section");
   if (!section) throw new Error("My Libraries heading is not in a section");
   return section;
+}
+
+/**
+ * Waits out the announcement delay and checks the text of the pinning
+ * announcement region.
+ */
+export function expectAnnouncement(text: string): void {
+  act(() => {
+    jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
+  });
+  // The drag library adds its own assertive status region to the body while
+  // reordering, so this selects the polite one.
+  expect(
+    document.querySelector("body > [role='status'][aria-live='polite']")
+  ).toHaveTextContent(text);
 }
