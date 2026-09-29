@@ -128,6 +128,7 @@
   "openEbooksLanding.welcome": "Bienvenue sur Open eBooks",
   "openEbooksLoginPicker.cleverLogo": "Logo de Clever",
   "openEbooksLoginPicker.firstBookLogo": "Logo de FirstBook",
+  "pinButton.nonePinned": "Aucune bibliothèque épinglée.",
   "pinButton.pin.ariaLabel": "Épingler {{title}} dans Mes bibliothèques",
   "pinButton.pinned": "Bibliothèque épinglée dans Mes bibliothèques : {{title}}.",
   "pinButton.unpin.ariaLabel": "Désépingler {{title}} de Mes bibliothèques",

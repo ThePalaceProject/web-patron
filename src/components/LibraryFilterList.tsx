@@ -24,6 +24,8 @@ interface LibraryFilterListProps {
   resultsListId: string;
   /** Show results only while the search box holds a filter. */
   hideUntilFiltered?: boolean;
+  /** Reaches the search input, e.g. as a focus target after an unpin. */
+  inputRef?: React.Ref<HTMLInputElement>;
 }
 
 const LibraryFilterList: React.FC<LibraryFilterListProps> = ({
@@ -31,7 +33,8 @@ const LibraryFilterList: React.FC<LibraryFilterListProps> = ({
   items,
   renderItem,
   resultsListId,
-  hideUntilFiltered = false
+  hideUntilFiltered = false,
+  inputRef
 }) => {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = React.useState("");
@@ -89,6 +92,7 @@ const LibraryFilterList: React.FC<LibraryFilterListProps> = ({
           {t("libraryFilterList.search.ariaLabel", "Filter libraries")}
         </span>
         <TextInput
+          ref={inputRef}
           type="search"
           // Named by the heading and its own label, e.g. "Find another
           // library: Filter libraries", so it makes sense on its own.

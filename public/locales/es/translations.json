@@ -128,6 +128,7 @@
   "openEbooksLanding.welcome": "Le damos la bienvenida a Open eBooks",
   "openEbooksLoginPicker.cleverLogo": "Logotipo de Clever",
   "openEbooksLoginPicker.firstBookLogo": "Logotipo de FirstBook",
+  "pinButton.nonePinned": "No hay bibliotecas ancladas.",
   "pinButton.pin.ariaLabel": "Anclar {{title}} a Mis bibliotecas",
   "pinButton.pinned": "Biblioteca anclada a Mis bibliotecas: {{title}}.",
   "pinButton.unpin.ariaLabel": "Desanclar {{title}} de Mis bibliotecas",

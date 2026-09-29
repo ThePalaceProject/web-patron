@@ -47,8 +47,14 @@ const PinButton: React.FC<PinButtonProps> = ({
 }) => {
   const { t } = useTranslation();
   const pinningEnabled = usePinningEnabled();
-  const { isPinned, pinLibrary, unpinLibrary, markFocusOrigin, announce } =
-    usePinnedLibraries();
+  const {
+    isPinned,
+    pinnedLibraries,
+    pinLibrary,
+    unpinLibrary,
+    markFocusOrigin,
+    announce
+  } = usePinnedLibraries();
   const warningDialog = useDialogStore();
   const unpinDialog = useDialogStore();
   const buttonRef = React.useRef<HTMLButtonElement>(null);
@@ -66,12 +72,19 @@ const PinButton: React.FC<PinButtonProps> = ({
   };
 
   const unpin = () => {
+    const wasLast = pinnedLibraries.length === 1;
     markFocusOrigin(buttonRef.current);
     unpinLibrary(library.id);
+    const unpinned = t(
+      "pinButton.unpinned",
+      "{{title}} unpinned from My Libraries.",
+      { title: library.title }
+    );
+    // One announce call, because a second call would replace the first.
     announce(
-      t("pinButton.unpinned", "{{title}} unpinned from My Libraries.", {
-        title: library.title
-      })
+      wasLast
+        ? `${unpinned} ${t("pinButton.nonePinned", "No libraries are pinned.")}`
+        : unpinned
     );
     onToggle?.();
   };

@@ -18,9 +18,9 @@ interface PinnedLibraryListProps {
   /** Renders the card for one pinned library. */
   renderItem: (library: ClientLibrary) => React.ReactNode;
   /**
-   * Receives focus after the last unpin when the unpinned library has no
-   * pin button elsewhere on the page. Should be focusable, e.g. a heading
-   * with tabIndex={-1}.
+   * Receives focus after the last unpin, so the user lands somewhere
+   * predictable (e.g. the library search input) instead of wherever the
+   * unpinned library's other pin button sits. Should be focusable.
    */
   emptyFocusRef?: React.RefObject<HTMLElement | null>;
 }
@@ -54,8 +54,8 @@ export function useShownPinnedLibraries(
  * to the control that made it. If that control is gone, focus moves to the
  * library's pin button in this list after a pin, or to a neighboring
  * library's pin button after an unpin, or to the section heading when no
- * such button exists. After the last unpin, it moves to that library's pin
- * button elsewhere on the page, or to `emptyFocusRef`.
+ * such button exists. After the last unpin, it moves to `emptyFocusRef`,
+ * or to that library's pin button elsewhere on the page.
  */
 const PinnedLibraryList: React.FC<PinnedLibraryListProps> = ({
   libraries,
@@ -111,7 +111,7 @@ const PinnedLibraryList: React.FC<PinnedLibraryListProps> = ({
       const pinnedButton = pinButtonFor(libraryId);
       if (pinnedButton) return pinnedButton;
       if (pinnedIds.length === 0) {
-        return pinButtonIn(document, libraryId) ?? emptyFocusRef?.current;
+        return emptyFocusRef?.current ?? pinButtonIn(document, libraryId);
       }
       const removedAt = removedFrom.indexOf(libraryId);
       const neighbor = pinnedIds[Math.min(removedAt, pinnedIds.length - 1)];

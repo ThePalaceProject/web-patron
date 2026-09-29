@@ -20,7 +20,7 @@ import MultiLibraryLandingPageHeader from "./layouts/MultiLibraryLandingPageHead
 const MultiLibraryHome: React.FC = () => {
   const { t } = useTranslation();
   const { instanceName } = useAppConfig();
-  const chooseHeadingRef = React.useRef<HTMLHeadingElement>(null);
+  const searchInputRef = React.useRef<HTMLInputElement>(null);
   const [searchKey, resetSearch] = React.useReducer((n: number) => n + 1, 0);
   const { data, error } = useSWR<LibrariesResponse>(
     "/api/libraries",
@@ -103,14 +103,15 @@ const MultiLibraryHome: React.FC = () => {
           libraries={data.libraries}
           pinned={shownPinned}
           renderItem={library => renderCard(library)}
-          emptyFocusRef={chooseHeadingRef}
+          emptyFocusRef={searchInputRef}
         />
         <LibraryFilterList
           // A pin or unpin made here starts a fresh search: the box empties
           // and, with pins shown, the list hides.
           key={searchKey}
+          inputRef={searchInputRef}
           heading={
-            <h2 ref={chooseHeadingRef} tabIndex={-1}>
+            <h2>
               {hasPinned
                 ? t("library.findAnother", "Find another library:", {
                     ns: "common"

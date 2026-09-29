@@ -263,14 +263,33 @@ describe("announcements", () => {
     expect(screen.getByRole("status")).toHaveTextContent(PINNED);
   });
 
-  test("announces a direct unpin", async () => {
+  test("announces a direct unpin, with the empty-list note on the last one", async () => {
     pinLibraries(library);
     const { user } = setup(<PinButton library={library} />);
 
     await user.click(unpinButton());
     flushAnnouncement();
 
+    expect(screen.getByRole("status")).toHaveTextContent(
+      `${UNPINNED} No libraries are pinned.`
+    );
+  });
+
+  test("does not announce the empty-list note while other pins remain", async () => {
+    pinLibraries(library, {
+      id: "urn:uuid:other",
+      slug: "otherlib",
+      title: "Other Library"
+    });
+    const { user } = setup(<PinButton library={library} />);
+
+    await user.click(unpinButton());
+    flushAnnouncement();
+
     expect(screen.getByRole("status")).toHaveTextContent(UNPINNED);
+    expect(screen.getByRole("status")).not.toHaveTextContent(
+      "No libraries are pinned."
+    );
   });
 
   test("announces an unpin confirmed in the sign-out dialog", async () => {

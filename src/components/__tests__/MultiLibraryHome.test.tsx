@@ -375,7 +375,7 @@ describe("MultiLibraryHome", () => {
       );
     });
 
-    it("unpinning the last library moves focus to its pin button in the full list", async () => {
+    it("unpinning the last library moves focus to the search input and announces it", async () => {
       pinLibraries(alpha);
       mockLibraries([alpha]);
       const { user } = setup(<MultiLibraryHome />);
@@ -390,11 +390,14 @@ describe("MultiLibraryHome", () => {
       expect(
         screen.queryByRole("heading", { name: "My Libraries" })
       ).toBeNull();
-      // The full list is back, so focus moves to that library's pin button.
-      const pinAlpha = screen.getByRole("button", {
-        name: "Pin Alpha Library to My Libraries"
-      });
-      expect(pinAlpha).toHaveFocus();
+      // Landing mid-list on the library's other pin button is disorienting,
+      // so the search input is the predictable target.
+      expect(
+        screen.getByRole("searchbox", { name: /Filter libraries/ })
+      ).toHaveFocus();
+      await screen.findByText(
+        "Alpha Library unpinned from My Libraries. No libraries are pinned."
+      );
     });
 
     it("shows no pin controls when pinning is disabled", () => {
