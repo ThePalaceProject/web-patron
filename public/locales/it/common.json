@@ -29,6 +29,8 @@
   "error.pageRenderFailed": "Si è verificato un errore durante la visualizzazione della pagina.",
   "error.unexpectedError": "Si è verificato un errore imprevisto.",
   "error.unknown": "Errore: si è verificato un errore sconosciuto.",
+  "library.findAnother": "Trovi un'altra biblioteca:",
+  "library.myLibraries": "Le mie biblioteche",
   "library.noLibrariesAvailable": "Nessuna biblioteca disponibile.",
   "nav.catalog": "Catalogo",
   "nav.downloadPalace": "Scarica Palace",

@@ -97,6 +97,9 @@ export async function register() {
       console.log(
         `The language selector is ${appConfig.enableLanguageSelector ? "enabled" : "disabled"} (PALACE_CPW_FEATURE_LANGUAGE_SELECTOR).`
       );
+      console.log(
+        `Library pinning is ${appConfig.enablePinning ? "enabled" : "disabled"} (PALACE_CPW_FEATURE_PINNING).`
+      );
       stripLocaleDetectionHeaders = !appConfig.enableLanguageSelector;
       /*
        * Pre-warm the registry cache before any requests are served.

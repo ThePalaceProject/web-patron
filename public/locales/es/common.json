@@ -29,6 +29,8 @@
   "error.pageRenderFailed": "Se ha producido un error al mostrar la página.",
   "error.unexpectedError": "Se ha producido un error inesperado.",
   "error.unknown": "Error: se ha producido un error desconocido.",
+  "library.findAnother": "Busque otra biblioteca:",
+  "library.myLibraries": "Mis bibliotecas",
   "library.noLibrariesAvailable": "No hay bibliotecas disponibles.",
   "nav.catalog": "Catálogo",
   "nav.downloadPalace": "Descargar Palace",

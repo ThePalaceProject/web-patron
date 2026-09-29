@@ -292,6 +292,29 @@ lane header.
 | Recommendations   | Empfehlungen       | Recommandations     | Recomendaciones    | Consigli          |
 | Return to Catalog | Zurück zum Katalog | Retour au catalogue | Volver al catálogo | Torna al catalogo |
 
+## Library pinning
+
+A patron pins libraries to a personal list on this device. The list's name is a proper noun in
+the UI and keeps each locale's established form when it appears inside a sentence.
+
+| English      | German             | French            | Spanish         | Italian            |
+| ------------ | ------------------ | ----------------- | --------------- | ------------------ |
+| My Libraries | Meine Bibliotheken | Mes bibliothèques | Mis bibliotecas | Le mie biblioteche |
+| pin          | anheften           | épingler          | anclar          | fissare            |
+| unpin        | lösen              | désépingler       | desanclar       | rimuovere          |
+
+`pin` and `unpin` are the verbs for My Libraries. They are unrelated to the `PIN` credential
+field, which stays `PIN`.
+
+- **In running text** German declines the list name (`von Meinen Bibliotheken`), and Italian
+  merges the article into the preposition (`nelle mie biblioteche`, `dalle mie biblioteche`).
+  French and Spanish keep it as is (`dans Mes bibliothèques`, `a Mis bibliotecas`).
+- **A library's `{{title}}` has unknown gender.** Status messages name "the library" instead of
+  agreeing with the title, and put the title last:
+  `Bibliothèque épinglée dans Mes bibliothèques : {{title}}.`
+  German needs no recast: `{{title}} wurde an Meine Bibliotheken angeheftet.`
+  See Gender agreement, rule 1.
+
 ## Error, empty, and loading states
 
 Keep these impersonal. They are the strings most likely to force a participle agreeing with the
@@ -352,7 +375,9 @@ Order of preference:
    of the reader. `Vous avez été déconnecté` → `Votre session a été fermée`. A participial heading
    like `Déconnecté` becomes the event noun: `Déconnexion`. Spanish shows the pattern most
    cleanly: `Sesión cerrada` / `Ha cerrado la sesión`, with no participle agreeing with the
-   reader.
+   reader. The same applies to a `{{title}}` of unknown gender:
+   `Biblioteca anclada a Mis bibliotecas: {{title}}.`
+   agrees with "biblioteca", not with the title.
 2. **Use the bare institutional form** for role labels that name a function rather than a person —
    `Autor`, `auteur`, `editorial`. Grammatical gender on a field label asserts nothing about the
    individual named beside it.

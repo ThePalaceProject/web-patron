@@ -24,7 +24,8 @@ import { DEFAULT_REGISTRY_FETCH_TIMEOUT } from "constants/registry";
 import { DEFAULT_ITEM_LANDING_SLUG, RESERVED_NEXT_SLUGS } from "constants/app";
 import {
   LANGUAGE_SELECTOR_FEATURE_FLAG_ENV,
-  OPDS2_FEATURE_FLAG_ENV
+  OPDS2_FEATURE_FLAG_ENV,
+  PINNING_FEATURE_FLAG_ENV
 } from "constants/env";
 
 // ---------------------------------------------------------------------------
@@ -406,6 +407,7 @@ function parseYaml(input: Record<string, unknown>): AppConfig {
       LANGUAGE_SELECTOR_FEATURE_FLAG_ENV,
       false
     ),
+    enablePinning: parseBoolean(PINNING_FEATURE_FLAG_ENV, false),
     openebooks,
     itemLandingSlugs
   };

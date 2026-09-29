@@ -8,6 +8,7 @@ export const config: AppConfig = {
   showMedium: true,
   enableOpds2: false,
   enableLanguageSelector: false,
+  enablePinning: true,
   openebooks: null,
   authenticationDocuments: null,
   itemLandingSlugs: [DEFAULT_ITEM_LANDING_SLUG],

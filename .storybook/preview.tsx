@@ -2,6 +2,9 @@ import * as React from "react";
 import { ThemeUIProvider } from "theme-ui";
 // import { Provider as ReakitProvider } from "@ariakit/react";
 import { LibraryProvider } from "../src/components/context/LibraryContext";
+import { PinnedLibrariesProvider } from "../src/components/context/PinnedLibrariesContext";
+import AppConfigContext from "../src/components/context/AppConfigContext";
+import FALLBACK_APP_CONFIG from "../src/config/fallbackAppConfig";
 import { UserContext, UserState } from "../src/components/context/UserContext";
 import makeTheme from "../src/theme";
 import { libraryData } from "../src/test-utils/fixtures/library"
@@ -66,15 +69,21 @@ export const decorators = [
     const theme = makeTheme(libraryData.colors);
     const library = libraryData;
     return (
-      <ThemeUIProvider theme={theme}>
-        {/* <ReakitProvider> */}
+      <AppConfigContext.Provider
+        value={{ ...FALLBACK_APP_CONFIG, enablePinning: true }}
+      >
+        <ThemeUIProvider theme={theme}>
+          {/* <ReakitProvider> */}
           <LibraryProvider library={library}>
             <UserContext.Provider value={user}>
+              <PinnedLibrariesProvider>
                 <Story />
+              </PinnedLibrariesProvider>
             </UserContext.Provider>
           </LibraryProvider>
-        {/* </ReakitProvider> */}
-      </ThemeUIProvider>
+          {/* </ReakitProvider> */}
+        </ThemeUIProvider>
+      </AppConfigContext.Provider>
     )
   },
 ];

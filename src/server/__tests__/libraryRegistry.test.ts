@@ -36,6 +36,7 @@ function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     showMedium: true,
     enableOpds2: false,
     enableLanguageSelector: false,
+    enablePinning: false,
     openebooks: null,
     mediaSupport: {},
     authenticationDocuments: null,

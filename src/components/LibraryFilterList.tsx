@@ -1,6 +1,7 @@
 import * as React from "react";
 import TextInput from "components/TextInput";
 import HighlightedText from "components/HighlightedText";
+import LibraryCardList from "components/LibraryCardList";
 import { scoreMatch } from "utils/libraryFilter";
 import { useTranslation } from "next-i18next/pages";
 
@@ -21,17 +22,26 @@ interface LibraryFilterListProps {
     item: LibraryFilterItem & { highlighted: React.ReactNode }
   ) => React.ReactNode;
   resultsListId: string;
+  /** Show results only while the search box holds a filter. */
+  hideUntilFiltered?: boolean;
+  /** Reaches the search input, e.g. as a focus target after an unpin. */
+  inputRef?: React.Ref<HTMLInputElement>;
 }
 
 const LibraryFilterList: React.FC<LibraryFilterListProps> = ({
   heading,
   items,
   renderItem,
-  resultsListId
+  resultsListId,
+  hideUntilFiltered = false,
+  inputRef
 }) => {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = React.useState("");
   const [filterQuery, setFilterQuery] = React.useState("");
+  const hintId = React.useId();
+  const headingId = React.useId();
+  const labelId = React.useId();
 
   React.useEffect(() => {
     const timer = setTimeout(
@@ -60,6 +70,7 @@ const LibraryFilterList: React.FC<LibraryFilterListProps> = ({
     "No libraries match."
   );
   const resultCount = displayed.length;
+  const showResults = !hideUntilFiltered || filterQuery !== "";
   const statusMessage = filterQuery
     ? resultCount === 0
       ? NO_MATCH_MESSAGE
@@ -75,15 +86,19 @@ const LibraryFilterList: React.FC<LibraryFilterListProps> = ({
 
   return (
     <>
-      {heading}
+      <div id={headingId}>{heading}</div>
       <div sx={{ width: ["auto", "44ch"], mb: 2 }}>
+        <span id={labelId} sx={{ variant: "accessibility.visuallyHidden" }}>
+          {t("libraryFilterList.search.ariaLabel", "Filter libraries")}
+        </span>
         <TextInput
+          ref={inputRef}
           type="search"
-          aria-label={t(
-            "libraryFilterList.search.ariaLabel",
-            "Filter libraries"
-          )}
-          aria-controls={resultsListId}
+          // Named by the heading and its own label, e.g. "Find another
+          // library: Filter libraries", so it makes sense on its own.
+          aria-labelledby={`${headingId} ${labelId}`}
+          aria-controls={showResults ? resultsListId : undefined}
+          aria-describedby={hideUntilFiltered ? hintId : undefined}
           placeholder={t(
             "libraryFilterList.search.placeholder",
             "Filter libraries..."
@@ -91,6 +106,14 @@ const LibraryFilterList: React.FC<LibraryFilterListProps> = ({
           value={inputValue}
           onChange={e => setInputValue(e.target.value)}
         />
+        {hideUntilFiltered && (
+          <span id={hintId} sx={{ variant: "accessibility.visuallyHidden" }}>
+            {t(
+              "libraryFilterList.hiddenResultsHint",
+              "Matching libraries appear as you type."
+            )}
+          </span>
+        )}
       </div>
       {/* Always in the DOM so screen readers register the live region before content changes. */}
       <div
@@ -104,35 +127,23 @@ const LibraryFilterList: React.FC<LibraryFilterListProps> = ({
       {filterQuery && resultCount === 0 && (
         <p sx={{ pl: 2 }}>{NO_MATCH_MESSAGE}</p>
       )}
-      {/* eslint-disable-next-line jsx-a11y/no-redundant-roles */}
-      <ul
-        id={resultsListId}
-        // Keeps list semantics in Safari, which drops them from lists
-        // styled with listStyle: none.
-        role="list"
-        sx={{
-          listStyle: "none",
-          pl: 0,
-          maxWidth: "40rem",
-          display: "flex",
-          flexDirection: "column",
-          gap: 2
-        }}
-      >
-        {displayed.map(({ item, matchIndices }) => (
-          <li key={item.slug}>
-            {renderItem({
-              ...item,
-              highlighted: (
-                <HighlightedText
-                  text={item.label}
-                  matchIndices={matchIndices}
-                />
-              )
-            })}
-          </li>
-        ))}
-      </ul>
+      {showResults && (
+        <LibraryCardList id={resultsListId}>
+          {displayed.map(({ item, matchIndices }) => (
+            <li key={item.slug}>
+              {renderItem({
+                ...item,
+                highlighted: (
+                  <HighlightedText
+                    text={item.label}
+                    matchIndices={matchIndices}
+                  />
+                )
+              })}
+            </li>
+          ))}
+        </LibraryCardList>
+      )}
     </>
   );
 };

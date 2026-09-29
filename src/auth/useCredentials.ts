@@ -169,6 +169,31 @@ function clearCredentialStorage(librarySlug: string | null) {
   Cookie.remove(storageKey(librarySlug));
 }
 
+/** Returns true when stored credentials exist for the library slug. */
+export function hasStoredCredentials(librarySlug: string | null): boolean {
+  return getCredentialStorage(librarySlug) !== undefined;
+}
+
+/**
+ * Stores credentials for the library slug. Unlike the hook's setCredentials,
+ * this does not update any mounted React state.
+ */
+export function storeCredentials(
+  librarySlug: string | null,
+  credentials: AuthCredentials
+): void {
+  setCredentialStorage(librarySlug, credentials);
+}
+
+/**
+ * Clears stored credentials for the library slug. Unlike the hook's
+ * clearCredentials, this does not update any mounted React state; callers
+ * inside the library's UserContext should use that instead.
+ */
+export function clearStoredCredentials(librarySlug: string | null): void {
+  clearCredentialStorage(librarySlug);
+}
+
 export function generateToken(username: string, password?: string) {
   return generateCredentials(username, password);
 }

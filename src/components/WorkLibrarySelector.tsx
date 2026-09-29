@@ -5,6 +5,9 @@ import type { ClientLibrary, LibrariesResponse } from "pages/api/libraries";
 import type { CatalogUrlResponse } from "pages/api/catalog-url";
 import LibraryFilterList from "components/LibraryFilterList";
 import LibraryCard from "components/LibraryCard";
+import PinnedLibraryList, {
+  useShownPinnedLibraries
+} from "components/PinnedLibraryList";
 import { fetchLibraries } from "dataflow/fetchLibraries";
 import { buildWorkUrl } from "utils/workUrl";
 import { useTranslation } from "next-i18next/pages";
@@ -28,6 +31,8 @@ const WorkLibrarySelector: React.FC<WorkLibrarySelectorProps> = ({
     "/api/libraries",
     fetchLibraries
   );
+  const shownPinned = useShownPinnedLibraries(data?.libraries ?? []);
+  const hasPinned = shownPinned.length > 0;
   const searchContainerRef = React.useRef<HTMLDivElement>(null);
   /*
    * Slug of the card currently resolving a selection, or null. Held here
@@ -73,15 +78,39 @@ const WorkLibrarySelector: React.FC<WorkLibrarySelectorProps> = ({
 
   return (
     <div ref={searchContainerRef}>
+      <PinnedLibraryList
+        libraries={data.libraries}
+        pinned={shownPinned}
+        renderItem={library => {
+          const name = library.title || library.slug;
+          return (
+            <LibrarySelectorCard
+              library={library}
+              workId={workId}
+              label={name}
+              highlighted={name}
+              onBackToSearch={focusSearch}
+              fromPinned
+              resolvingSlug={resolvingSlug}
+              onResolvingChange={setResolvingSlug}
+            />
+          );
+        }}
+      />
       <LibraryFilterList
         heading={
           <h2>
-            {t(
-              "workLibrarySelector.choose",
-              "Choose your library to view this item:"
-            )}
+            {hasPinned
+              ? t("library.findAnother", "Find another library:", {
+                  ns: "common"
+                })
+              : t(
+                  "workLibrarySelector.choose",
+                  "Choose your library to view this item:"
+                )}
           </h2>
         }
+        hideUntilFiltered={hasPinned}
         items={sorted.map(lib => ({
           slug: lib.slug,
           label: lib.title || lib.slug
@@ -115,6 +144,8 @@ interface LibrarySelectorCardProps {
   label: string;
   highlighted: React.ReactNode;
   onBackToSearch: () => void;
+  /** The card is in the My Libraries section rather than the search results. */
+  fromPinned?: boolean;
   /** Slug of the card currently resolving a selection, or null. */
   resolvingSlug: string | null;
   onResolvingChange: (slug: string | null) => void;
@@ -126,6 +157,7 @@ const LibrarySelectorCard: React.FC<LibrarySelectorCardProps> = ({
   label,
   highlighted,
   onBackToSearch,
+  fromPinned = false,
   resolvingSlug,
   onResolvingChange
 }) => {
@@ -272,7 +304,9 @@ const LibrarySelectorCard: React.FC<LibrarySelectorCardProps> = ({
         }}
         sx={{ mr: 2, cursor: "pointer" }}
       >
-        {t("workLibrarySelector.back", "Back to search")}
+        {fromPinned
+          ? t("workLibrarySelector.findAnother", "Find another library")
+          : t("workLibrarySelector.back", "Back to search")}
       </button>
       <button
         onClick={() => {
@@ -301,6 +335,7 @@ const LibrarySelectorCard: React.FC<LibrarySelectorCardProps> = ({
       logoUrl={library.logoUrl}
       description={library.description}
       footer={errorPanel}
+      disabled={anyResolving}
     >
       {actionProps => (
         <button
