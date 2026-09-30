@@ -19,6 +19,7 @@ import {
   useSensors,
   type DragEndEvent
 } from "@dnd-kit/core";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {
   SortableContext,
   verticalListSortingStrategy
@@ -275,7 +276,7 @@ const PinnedLibraryList: React.FC<PinnedLibraryListProps> = ({
         {canReorder && (
           <Button
             variant="ghost"
-            color="ui.link.primary"
+            color="ui.black"
             onClick={() => onReorderingChange?.(!isReordering)}
             aria-label={
               isReordering
@@ -308,6 +309,7 @@ const PinnedLibraryList: React.FC<PinnedLibraryListProps> = ({
       {isReordering ? (
         <DndContext
           sensors={dragSensors}
+          modifiers={[restrictToVerticalAxis]}
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
           accessibility={{
