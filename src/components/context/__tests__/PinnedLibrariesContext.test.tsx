@@ -10,7 +10,8 @@ import {
 } from "../PinnedLibrariesContext";
 import {
   PINNED_LIBRARIES_KEY,
-  readPinnedLibraries
+  readPinnedLibraries,
+  writePinnedLibraries
 } from "utils/pinnedLibraries";
 import { PinnedLibrary } from "interfaces";
 import AppConfigContext from "components/context/AppConfigContext";
@@ -343,6 +344,23 @@ describe("cross-tab storage events", () => {
     dispatchStorage("SOME_OTHER_KEY");
 
     expect(result.current.pinnedLibraries).toBe(before);
+  });
+});
+
+describe("movePinnedLibrary", () => {
+  test("moves an entry and persists the new order", () => {
+    writePinnedLibraries([
+      { ...library, pinnedAt: 1000 },
+      { ...library, id: "urn:uuid:other", slug: "other", pinnedAt: 2000 }
+    ]);
+    const { result } = renderHook(() => usePinnedLibraries(), { wrapper });
+
+    act(() => result.current.movePinnedLibrary(library.id, "urn:uuid:other"));
+
+    expect(readPinnedLibraries().map(entry => entry.slug)).toEqual([
+      "other",
+      library.slug
+    ]);
   });
 });
 

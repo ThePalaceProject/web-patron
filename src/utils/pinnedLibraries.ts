@@ -69,6 +69,25 @@ export function withoutPinned(
 }
 
 /**
+ * Returns `libraries` with the entry whose id is `id` moved to the position
+ * of the entry whose id is `targetId`, shifting the entries in between.
+ * Returns the original array when either id is not pinned or they match.
+ */
+export function withMovedTo(
+  libraries: PinnedLibrary[],
+  id: string,
+  targetId: string
+): PinnedLibrary[] {
+  const from = libraries.findIndex(lib => lib.id === id);
+  const to = libraries.findIndex(lib => lib.id === targetId);
+  if (from === -1 || to === -1 || from === to) return libraries;
+  const next = [...libraries];
+  const [entry] = next.splice(from, 1);
+  next.splice(to, 0, entry);
+  return next;
+}
+
+/**
  * Returns `pinned` with slug and title refreshed from `available`, matched
  * by id, and a missing logo backfilled when the server list carries one (a
  * stored logo is kept as is). Entries absent from `available` are kept

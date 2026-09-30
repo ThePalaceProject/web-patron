@@ -9,17 +9,21 @@ import {
   within
 } from "test-utils";
 import {
+  expectAnnouncement,
   myLibrariesSection,
   pinLibraries,
   seedCredentials
 } from "test-utils/pinning";
-import { PINNED_LIBRARIES_KEY } from "utils/pinnedLibraries";
+import {
+  PINNED_LIBRARIES_KEY,
+  readPinnedLibraries
+} from "utils/pinnedLibraries";
 import { hasStoredCredentials } from "auth/useCredentials";
 import { HIDE_PUBLIC_WARNING_KEY } from "utils/publicWarning";
 import MultiLibraryHome from "../MultiLibraryHome";
 import useSWR from "swr";
 import { makeSwrResponse } from "test-utils/mockSwr";
-import type { LibrariesResponse } from "pages/api/libraries";
+import type { ClientLibrary, LibrariesResponse } from "pages/api/libraries";
 
 jest.mock("swr");
 
@@ -404,6 +408,176 @@ describe("MultiLibraryHome", () => {
       render(<MultiLibraryHome />, { appConfig: { enablePinning: false } });
       expect(screen.queryByRole("button", { name: /My Libraries/ })).toBeNull();
     });
+  });
+
+  describe("reordering My Libraries", () => {
+    const alpha = lib("alpha", "Alpha Library");
+    const beta = lib("beta", "Beta Library");
+
+    beforeEach(() => {
+      mockLibraries([alpha, beta]);
+    });
+
+    const pinnedOrder = () => readPinnedLibraries().map(entry => entry.slug);
+
+    const startReordering = async (...pins: ClientLibrary[]) => {
+      pinLibraries(...pins);
+      const utils = setup(<MultiLibraryHome />);
+      await utils.user.click(
+        screen.getByRole("button", { name: "Reorder My Libraries" })
+      );
+      return utils;
+    };
+
+    it("offers Reorder only when two or more pinned libraries are shown", () => {
+      pinLibraries(alpha);
+      render(<MultiLibraryHome />);
+      expect(
+        screen.queryByRole("button", { name: "Reorder My Libraries" })
+      ).toBeNull();
+    });
+
+    it("shows move buttons in place of pin buttons and links while reordering", async () => {
+      const { user } = await startReordering(alpha, beta);
+
+      const section = myLibrariesSection();
+      expect(
+        within(section).getByRole("button", { name: "Move Alpha Library up" })
+      ).toHaveAttribute("aria-disabled", "true");
+      expect(
+        within(section).queryByRole("button", { name: /from My Libraries/ })
+      ).toBeNull();
+      // The cards cannot be opened while reordering.
+      expect(within(section).queryByRole("link")).toBeNull();
+      expect(within(section).getByText("Alpha Library")).toBeInTheDocument();
+      // The drag handle is not a tab stop.
+      await user.tab();
+      expect(
+        within(section).getByRole("button", { name: "Move Alpha Library up" })
+      ).toHaveFocus();
+
+      await user.click(
+        screen.getByRole("button", { name: "Done reordering My Libraries" })
+      );
+      expect(
+        within(section).queryByRole("button", { name: /^Move / })
+      ).toBeNull();
+      expect(
+        within(section).getByRole("button", {
+          name: "Unpin Alpha Library from My Libraries"
+        })
+      ).toBeInTheDocument();
+      expect(
+        within(section).getByRole("link", { name: "Alpha Library" })
+      ).toBeInTheDocument();
+    });
+
+    it.each([
+      ["Move Alpha Library down", "Alpha Library moved to position 2 of 2."],
+      ["Move Beta Library up", "Beta Library moved to position 1 of 2."]
+    ])(
+      "%s moves it, keeps focus on the button, and announces it",
+      async (buttonName, announcement) => {
+        const { user } = await startReordering(alpha, beta);
+
+        await user.click(screen.getByRole("button", { name: buttonName }));
+
+        expect(pinnedOrder()).toEqual(["beta", "alpha"]);
+        const button = screen.getByRole("button", { name: buttonName });
+        expect(button).toHaveFocus();
+        // The library is now at the end the button points to.
+        expect(button).toHaveAttribute("aria-disabled", "true");
+        expectAnnouncement(announcement);
+      }
+    );
+
+    it("focuses the Move button after the move renders", async () => {
+      await startReordering(alpha, beta);
+      // A plain click event does not move focus, so only the list's refocus
+      // after the move can put focus on the button. Real browsers can drop
+      // focus from a moved list item.
+      fireEvent.click(
+        screen.getByRole("button", { name: "Move Alpha Library down" })
+      );
+
+      expect(pinnedOrder()).toEqual(["beta", "alpha"]);
+      expect(
+        screen.getByRole("button", { name: "Move Alpha Library down" })
+      ).toHaveFocus();
+    });
+
+    it("moves past a pinned library that the server list no longer has", async () => {
+      const { user } = await startReordering(
+        alpha,
+        lib("gone", "Gone Library"),
+        beta
+      );
+
+      await user.click(
+        screen.getByRole("button", { name: "Move Alpha Library down" })
+      );
+
+      expect(pinnedOrder()).toEqual(["gone", "beta", "alpha"]);
+      expectAnnouncement("Alpha Library moved to position 2 of 2.");
+    });
+
+    it("leaves reorder mode when fewer than two libraries are shown", async () => {
+      await startReordering(alpha, beta);
+
+      // Another tab unpins one library, then pins it again.
+      const syncFromStorage = () =>
+        act(() => {
+          window.dispatchEvent(
+            new StorageEvent("storage", { key: PINNED_LIBRARIES_KEY })
+          );
+        });
+      pinLibraries(alpha);
+      syncFromStorage();
+      expect(
+        screen.getByRole("searchbox", { name: /Filter libraries/ })
+      ).toBeInTheDocument();
+      pinLibraries(alpha, beta);
+      syncFromStorage();
+
+      expect(
+        screen.getByRole("button", { name: "Reorder My Libraries" })
+      ).toBeInTheDocument();
+      expect(
+        within(myLibrariesSection()).getByRole("link", {
+          name: "Alpha Library"
+        })
+      ).toBeInTheDocument();
+    });
+
+    it("hides Find another library while reordering", async () => {
+      const { user } = await startReordering(alpha, beta);
+
+      expect(
+        screen.queryByRole("heading", { name: "Find another library:" })
+      ).toBeNull();
+      expect(screen.queryByRole("searchbox")).toBeNull();
+
+      await user.click(
+        screen.getByRole("button", { name: "Done reordering My Libraries" })
+      );
+      expect(
+        screen.getByRole("heading", { name: "Find another library:" })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("searchbox", { name: /Filter libraries/ })
+      ).toBeInTheDocument();
+    });
+
+    it.each(["Move Alpha Library up", "Move Beta Library down"])(
+      "ignores %s at the edge of the list",
+      async buttonName => {
+        const { user } = await startReordering(alpha, beta);
+
+        await user.click(screen.getByRole("button", { name: buttonName }));
+
+        expect(pinnedOrder()).toEqual(["alpha", "beta"]);
+      }
+    );
   });
 
   describe("library filter input", () => {

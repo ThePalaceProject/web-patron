@@ -283,3 +283,22 @@ describe("shared computer warning reset", () => {
     expect(screen.getByRole("heading", { name: "My Libraries" })).toHaveFocus();
   });
 });
+
+test("ignores reordering when the page does not handle it", () => {
+  pin("alpha", "beta");
+  render(
+    <Section
+      libraries={[lib("alpha"), lib("beta")]}
+      renderItem={(library, reorderControls) => (
+        <span>
+          {library.title}
+          {reorderControls}
+        </span>
+      )}
+      reordering
+    />
+  );
+
+  expect(screen.queryByRole("button", { name: /Reorder/ })).toBeNull();
+  expect(screen.queryByRole("button", { name: /^Move / })).toBeNull();
+});

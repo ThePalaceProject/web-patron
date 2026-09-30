@@ -1,7 +1,29 @@
 import * as React from "react";
 import type { ClientLibrary } from "pages/api/libraries";
 import Button from "components/Button";
-import LibraryCardList from "components/LibraryCardList";
+import LibraryCardList, {
+  LIBRARY_CARD_LIST_MAX_WIDTH
+} from "components/LibraryCardList";
+import {
+  MOVE_ATTRIBUTE,
+  type MoveDirection,
+  ReorderControls,
+  SortablePinnedItem,
+  moveButtonKey
+} from "components/PinnedLibraryReorder";
+import {
+  DndContext,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent
+} from "@dnd-kit/core";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import {
+  SortableContext,
+  verticalListSortingStrategy
+} from "@dnd-kit/sortable";
 import usePublicWarningHidden from "hooks/usePublicWarningHidden";
 import { showPublicWarning } from "utils/publicWarning";
 import {
@@ -15,8 +37,26 @@ interface PinnedLibraryListProps {
   libraries: ClientLibrary[];
   /** The pinned libraries to show, from `useShownPinnedLibraries`. */
   pinned: ClientLibrary[];
-  /** Renders the card for one pinned library. */
-  renderItem: (library: ClientLibrary) => React.ReactNode;
+  /**
+   * Renders the card for one pinned library. In reorder mode it receives the
+   * reorder controls, to show in place of the card's usual trailing
+   * content.
+   */
+  renderItem: (
+    library: ClientLibrary,
+    reorderControls?: React.ReactNode
+  ) => React.ReactNode;
+  /**
+   * Whether the list is in reorder mode, with Move up and Move down buttons
+   * and pointer dragging. Takes effect only with `onReorderingChange` and
+   * two or more shown libraries.
+   */
+  reordering?: boolean;
+  /**
+   * Called by the Reorder and Done button, which the list shows when this
+   * is given and two or more pinned libraries are shown.
+   */
+  onReorderingChange?: (reordering: boolean) => void;
   /**
    * Receives focus after the last unpin, so the user lands somewhere
    * predictable (e.g. the library search input) instead of wherever the
@@ -45,10 +85,15 @@ export function useShownPinnedLibraries(
   });
 }
 
+const displayName = (library: ClientLibrary) => library.title || library.slug;
+
 /**
  * The "My Libraries" section. Renders nothing when `pinned` is empty. Also
  * refreshes the stored pinned entries from the server list. While the
- * public computer warning is turned off, offers to turn it back on.
+ * public computer warning is turned off, offers to turn it back on. With
+ * `onReorderingChange` and two or more shown libraries, a Reorder and Done
+ * button toggles `reordering`, which shows move controls and allows pointer
+ * dragging.
  *
  * When a pin or unpin made in this page leaves focus nowhere, focus returns
  * to the control that made it. If that control is gone, focus moves to the
@@ -61,11 +106,18 @@ const PinnedLibraryList: React.FC<PinnedLibraryListProps> = ({
   libraries,
   pinned,
   renderItem,
+  reordering = false,
+  onReorderingChange,
   emptyFocusRef
 }) => {
   const { t } = useTranslation();
-  const { pinnedLibraries, syncWithAvailable, takeFocusOrigin } =
-    usePinnedLibraries();
+  const {
+    pinnedLibraries,
+    syncWithAvailable,
+    takeFocusOrigin,
+    movePinnedLibrary,
+    announce
+  } = usePinnedLibraries();
 
   // Also reruns when the pinned list changes, so entries read from storage
   // after this list mounted get refreshed too. A sync with nothing to change
@@ -127,13 +179,120 @@ const PinnedLibraryList: React.FC<PinnedLibraryListProps> = ({
     replacementFor(origin.getAttribute("data-pin-library"))?.focus();
   }, [pinnedIdsKey, emptyFocusRef, takeFocusOrigin]);
 
+  const canReorder = onReorderingChange !== undefined && shownCount > 1;
+  const isReordering = canReorder && reordering;
+
+  // A move reorders the list items, which can drop focus from the pressed
+  // Move button, so the button is focused again after the move renders.
+  const refocusKey = React.useRef<string>(undefined);
+  React.useLayoutEffect(() => {
+    const key = refocusKey.current;
+    if (!key) return;
+    refocusKey.current = undefined;
+    const button = Array.from(
+      sectionRef.current?.querySelectorAll<HTMLElement>(
+        `[${MOVE_ATTRIBUTE}]`
+      ) ?? []
+    ).find(element => element.getAttribute(MOVE_ATTRIBUTE) === key);
+    if (button && document.activeElement !== button) button.focus();
+  });
+
+  // Moves `library` to the shown position of the library with `targetId`.
+  const move = (library: ClientLibrary, targetId: string) => {
+    const position = pinned.findIndex(entry => entry.id === targetId);
+    if (position === -1 || targetId === library.id) return;
+    movePinnedLibrary(library.id, targetId);
+    announce(
+      t(
+        "pinnedLibraryList.moved",
+        "{{title}} moved to position {{position}} of {{total}}.",
+        {
+          title: displayName(library),
+          position: position + 1,
+          total: shownCount
+        }
+      )
+    );
+  };
+
+  const moveByButton = (
+    library: ClientLibrary,
+    index: number,
+    direction: MoveDirection
+  ) => {
+    const target = pinned[direction === "up" ? index - 1 : index + 1];
+    if (!target) return;
+    refocusKey.current = moveButtonKey(direction, library.id);
+    move(library, target.id);
+  };
+
+  // Dragging starts only after the pointer moves a few pixels, so a click
+  // on the drag handle does nothing.
+  const dragSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+  );
+  const handleDragEnd = ({ active, over }: DragEndEvent) => {
+    const library = pinned.find(entry => entry.id === active.id);
+    if (over && library) move(library, String(over.id));
+  };
+
   if (shownCount === 0) return null;
+
+  const items = pinned.map((library, index) =>
+    isReordering ? (
+      <SortablePinnedItem key={library.id} id={library.id}>
+        {dragHandleProps =>
+          renderItem(
+            library,
+            <ReorderControls
+              libraryId={library.id}
+              title={displayName(library)}
+              atTop={index === 0}
+              atBottom={index === shownCount - 1}
+              onMove={direction => moveByButton(library, index, direction)}
+              dragHandleProps={dragHandleProps}
+            />
+          )
+        }
+      </SortablePinnedItem>
+    ) : (
+      <li key={library.id}>{renderItem(library)}</li>
+    )
+  );
 
   return (
     <section ref={sectionRef}>
-      <h2 ref={headingRef} tabIndex={-1}>
-        {t("library.myLibraries", "My Libraries", { ns: "common" })}
-      </h2>
+      <div
+        sx={{
+          display: "flex",
+          alignItems: "baseline",
+          justifyContent: "space-between",
+          maxWidth: LIBRARY_CARD_LIST_MAX_WIDTH
+        }}
+      >
+        <h2 ref={headingRef} tabIndex={-1}>
+          {t("library.myLibraries", "My Libraries", { ns: "common" })}
+        </h2>
+        {canReorder && (
+          <Button
+            variant="ghost"
+            color="ui.black"
+            onClick={() => onReorderingChange?.(!isReordering)}
+            aria-label={
+              isReordering
+                ? t(
+                    "pinnedLibraryList.doneLabel",
+                    "Done reordering My Libraries"
+                  )
+                : t("pinnedLibraryList.reorderLabel", "Reorder My Libraries")
+            }
+          >
+            {isReordering
+              ? t("pinnedLibraryList.done", "Done")
+              : t("pinnedLibraryList.reorder", "Reorder")}
+          </Button>
+        )}
+      </div>
       {warningHidden && (
         <Button
           variant="link"
@@ -147,11 +306,35 @@ const PinnedLibraryList: React.FC<PinnedLibraryListProps> = ({
           )}
         </Button>
       )}
-      <LibraryCardList>
-        {pinned.map(library => (
-          <li key={library.id}>{renderItem(library)}</li>
-        ))}
-      </LibraryCardList>
+      {isReordering ? (
+        <DndContext
+          sensors={dragSensors}
+          modifiers={[restrictToVerticalAxis]}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+          accessibility={{
+            // Dragging is pointer-only and the handle is hidden from
+            // assistive technology, so dnd-kit's own English announcements
+            // are silenced in favor of the localized move announcement.
+            announcements: {
+              onDragStart: () => undefined,
+              onDragOver: () => undefined,
+              onDragEnd: () => undefined,
+              onDragCancel: () => undefined
+            },
+            screenReaderInstructions: { draggable: "" }
+          }}
+        >
+          <SortableContext
+            items={pinned.map(library => library.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <LibraryCardList>{items}</LibraryCardList>
+          </SortableContext>
+        </DndContext>
+      ) : (
+        <LibraryCardList>{items}</LibraryCardList>
+      )}
     </section>
   );
 };
