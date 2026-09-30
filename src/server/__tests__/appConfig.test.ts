@@ -15,6 +15,7 @@ import { AppSetupError } from "errors";
 import { DEFAULT_REGISTRY_FETCH_TIMEOUT } from "constants/registry";
 import { DEFAULT_ITEM_LANDING_SLUG } from "constants/app";
 import { expectAndSuppressConsole } from "test-utils/suppressConsole";
+import { firebaseConfig } from "test-utils/fixtures/config";
 
 jest.mock("fs", () => ({ readFileSync: jest.fn() }));
 
@@ -461,6 +462,81 @@ describe("config parsing", () => {
     it("ignores an enable_pinning key in the config file", async () => {
       delete process.env.PALACE_CPW_FEATURE_PINNING;
       expect((await load(`enable_pinning: true`)).enablePinning).toBe(false);
+    });
+  });
+
+  // --- firebaseAnalytics ---
+
+  describe("firebaseAnalytics", () => {
+    function enable(firebase?: unknown) {
+      process.env.PALACE_CPW_FEATURE_FIREBASE_ANALYTICS = "true";
+      if (firebase !== undefined) {
+        process.env.PALACE_CPW_FIREBASE_CONFIG =
+          typeof firebase === "string" ? firebase : JSON.stringify(firebase);
+      } else {
+        delete process.env.PALACE_CPW_FIREBASE_CONFIG;
+      }
+    }
+
+    it("is disabled when PALACE_CPW_FEATURE_FIREBASE_ANALYTICS is not set", async () => {
+      delete process.env.PALACE_CPW_FEATURE_FIREBASE_ANALYTICS;
+      expect((await load(MINIMAL_YAML)).firebaseAnalytics.enable).toBe(false);
+    });
+
+    it("rejects unrecognized PALACE_CPW_FEATURE_FIREBASE_ANALYTICS values", async () => {
+      process.env.PALACE_CPW_FEATURE_FIREBASE_ANALYTICS = "yes please";
+      await expect(load(MINIMAL_YAML)).rejects.toThrow(AppSetupError);
+    });
+
+    it("ignores an enable_analytics key in the config file", async () => {
+      delete process.env.PALACE_CPW_FEATURE_FIREBASE_ANALYTICS;
+      expect(
+        (await load(`enable_analytics: true`)).firebaseAnalytics.enable
+      ).toBe(false);
+    });
+
+    it("carries no credentials when analytics is disabled, even if they are present", async () => {
+      delete process.env.PALACE_CPW_FEATURE_FIREBASE_ANALYTICS;
+      process.env.PALACE_CPW_FIREBASE_CONFIG = JSON.stringify(firebaseConfig);
+      expect((await load(MINIMAL_YAML)).firebaseAnalytics).toEqual({
+        enable: false,
+        config: null
+      });
+    });
+
+    it("parses the JSON credentials when analytics is enabled", async () => {
+      enable(firebaseConfig);
+      expect((await load(MINIMAL_YAML)).firebaseAnalytics).toEqual({
+        enable: true,
+        config: firebaseConfig
+      });
+    });
+
+    it.each([
+      [
+        "analytics is enabled but credentials are missing",
+        undefined,
+        AppSetupError
+      ],
+      ["analytics is enabled but credentials are blank", "    ", AppSetupError],
+      [
+        "the credentials are not valid JSON",
+        "{apiKey: nope}",
+        /not valid JSON/
+      ],
+      [
+        "a required fields are missing",
+        { measurementId: "just-me" },
+        AppSetupError
+      ],
+      [
+        "a required field is empty",
+        { ...firebaseConfig, measurementId: "" },
+        AppSetupError
+      ]
+    ])("throws when %s", async (_condition, config, expected) => {
+      enable(config);
+      await expect(load(MINIMAL_YAML)).rejects.toThrow(expected);
     });
   });
 

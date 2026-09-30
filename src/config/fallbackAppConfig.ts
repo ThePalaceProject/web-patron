@@ -9,6 +9,7 @@ const FALLBACK_APP_CONFIG: AppConfig = {
   enableOpds2: false,
   enableLanguageSelector: false,
   enablePinning: false,
+  firebaseAnalytics: { enable: false, config: null },
   bugsnagApiKey: null,
   openebooks: null,
   authenticationDocuments: null,

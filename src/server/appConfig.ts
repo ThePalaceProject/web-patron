@@ -13,6 +13,7 @@ import YAML from "yaml";
 import { type } from "arktype";
 import type {
   AppConfig,
+  FirebaseAnalyticsConfig,
   LibrariesConfig,
   MediaSupportConfig,
   RegistryConfig
@@ -23,6 +24,7 @@ import { parseBoolean } from "utils/envParse";
 import { DEFAULT_REGISTRY_FETCH_TIMEOUT } from "constants/registry";
 import { DEFAULT_ITEM_LANDING_SLUG, RESERVED_NEXT_SLUGS } from "constants/app";
 import {
+  FIREBASE_ANALYTICS_FEATURE_FLAG_ENV,
   LANGUAGE_SELECTOR_FEATURE_FLAG_ENV,
   OPDS2_FEATURE_FLAG_ENV,
   PINNING_FEATURE_FLAG_ENV
@@ -55,6 +57,19 @@ const RawConfigSchema = type({
   "mediaSupport?": "Record<string, string | Record<string, string>>",
   "openebooks?": { defaultLibrary: "string" },
   "itemLandingSlugs?": "string | string[]"
+});
+
+/**
+ * Every field the Firebase console provides is required
+ */
+const FirebaseConfigSchema = type({
+  apiKey: "string > 0",
+  authDomain: "string > 0",
+  projectId: "string > 0",
+  storageBucket: "string > 0",
+  messagingSenderId: "string > 0",
+  appId: "string > 0",
+  measurementId: "string > 0"
 });
 
 const DEFAULT_MIN_INTERVAL = 60;
@@ -188,6 +203,41 @@ function isSinglePathSegment(value: string): boolean {
   } catch {
     return false;
   }
+}
+
+/**
+ * Reads the Firebase Analytics feature flag and Firebase config credentials from the
+ * environment.
+ */
+function parseFirebaseAnalytics(): FirebaseAnalyticsConfig {
+  const enabled = parseBoolean(FIREBASE_ANALYTICS_FEATURE_FLAG_ENV, false);
+  const raw = process.env.FIREBASE_CONFIG;
+  const isSet = raw !== undefined && raw.trim() !== "";
+
+  if (!enabled) return { enable: false, config: null };
+  if (!isSet) {
+    throw new AppSetupError(
+      `${FIREBASE_ANALYTICS_FEATURE_FLAG_ENV} is enabled but FIREBASE_CONFIG is not set. ` +
+        `Set it to the JSON firebaseConfig object from the Firebase console, or disable analytics.`
+    );
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    throw new AppSetupError(
+      "Environment variable FIREBASE_CONFIG is not valid JSON."
+    );
+  }
+
+  const result = FirebaseConfigSchema(parsed);
+  if (result instanceof type.errors) {
+    throw new AppSetupError(
+      `Environment variable FIREBASE_CONFIG is invalid:\n${result.summary}`
+    );
+  }
+  return { enable: true, config: result };
 }
 
 function parseYaml(input: Record<string, unknown>): AppConfig {
@@ -408,6 +458,7 @@ function parseYaml(input: Record<string, unknown>): AppConfig {
       false
     ),
     enablePinning: parseBoolean(PINNING_FEATURE_FLAG_ENV, false),
+    firebaseAnalytics: parseFirebaseAnalytics(),
     openebooks,
     itemLandingSlugs
   };

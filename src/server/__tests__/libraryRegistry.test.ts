@@ -37,6 +37,7 @@ function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     enableOpds2: false,
     enableLanguageSelector: false,
     enablePinning: false,
+    firebaseAnalytics: { enable: false, config: null },
     openebooks: null,
     mediaSupport: {},
     authenticationDocuments: null,

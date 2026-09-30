@@ -19,12 +19,19 @@ import { EventEmitter } from "node:events";
 import { register } from "../../instrumentation";
 import { getAppConfig } from "server/appConfig";
 import { getLibraries } from "server/libraryRegistry";
+import FALLBACK_APP_CONFIG from "config/fallbackAppConfig";
+import { firebaseConfig } from "test-utils/fixtures/config";
+import type { AppConfig } from "interfaces";
 
 type EmitFn = (event: string | symbol, ...args: unknown[]) => boolean;
 const serverProto = http.Server.prototype as unknown as { emit: EmitFn };
 
 const mockGetAppConfig = getAppConfig as jest.Mock;
 const mockGetLibraries = getLibraries as jest.Mock;
+
+function appConfig(overrides: Partial<AppConfig> = {}): AppConfig {
+  return { ...FALLBACK_APP_CONFIG, ...overrides };
+}
 
 const originalEnv = process.env;
 let savedFetch: typeof globalThis.fetch;
@@ -64,7 +71,7 @@ describe("register", () => {
 
   it("calls getAppConfig when NEXT_RUNTIME is 'nodejs'", async () => {
     process.env.NEXT_RUNTIME = "nodejs";
-    mockGetAppConfig.mockResolvedValue({});
+    mockGetAppConfig.mockResolvedValue(appConfig());
     mockGetLibraries.mockResolvedValue({});
     await register();
     expect(mockGetAppConfig).toHaveBeenCalledTimes(1);
@@ -72,14 +79,14 @@ describe("register", () => {
 
   it("resolves without error when getAppConfig succeeds", async () => {
     process.env.NEXT_RUNTIME = "nodejs";
-    mockGetAppConfig.mockResolvedValue({});
+    mockGetAppConfig.mockResolvedValue(appConfig());
     mockGetLibraries.mockResolvedValue({});
     await expect(register()).resolves.toBeUndefined();
   });
 
   it("calls getLibraries with the appConfig returned by getAppConfig", async () => {
     process.env.NEXT_RUNTIME = "nodejs";
-    const fakeConfig = { registries: [], staticLibraries: {} };
+    const fakeConfig = appConfig({ registries: [], staticLibraries: {} });
     mockGetAppConfig.mockResolvedValue(fakeConfig);
     mockGetLibraries.mockResolvedValue({});
     await register();
@@ -169,7 +176,7 @@ describe("OPDS 2 startup logging", () => {
   });
 
   it("logs that OPDS 2 negotiation is enabled when enableOpds2 is true", async () => {
-    mockGetAppConfig.mockResolvedValue({ enableOpds2: true });
+    mockGetAppConfig.mockResolvedValue(appConfig({ enableOpds2: true }));
     await register();
     expect(logSpy).toHaveBeenCalledWith(
       expect.stringContaining("OPDS 2 negotiation is enabled")
@@ -177,7 +184,7 @@ describe("OPDS 2 startup logging", () => {
   });
 
   it("logs that OPDS 2 negotiation is disabled when enableOpds2 is false", async () => {
-    mockGetAppConfig.mockResolvedValue({ enableOpds2: false });
+    mockGetAppConfig.mockResolvedValue(appConfig({ enableOpds2: false }));
     await register();
     expect(logSpy).toHaveBeenCalledWith(
       expect.stringContaining("OPDS 2 negotiation is disabled")
@@ -199,7 +206,9 @@ describe("language selector startup logging", () => {
   });
 
   it("logs that the language selector is enabled when enableLanguageSelector is true", async () => {
-    mockGetAppConfig.mockResolvedValue({ enableLanguageSelector: true });
+    mockGetAppConfig.mockResolvedValue(
+      appConfig({ enableLanguageSelector: true })
+    );
     await register();
     expect(logSpy).toHaveBeenCalledWith(
       expect.stringContaining("The language selector is enabled")
@@ -207,10 +216,46 @@ describe("language selector startup logging", () => {
   });
 
   it("logs that the language selector is disabled when enableLanguageSelector is false", async () => {
-    mockGetAppConfig.mockResolvedValue({ enableLanguageSelector: false });
+    mockGetAppConfig.mockResolvedValue(
+      appConfig({ enableLanguageSelector: false })
+    );
     await register();
     expect(logSpy).toHaveBeenCalledWith(
       expect.stringContaining("The language selector is disabled")
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Firebase Analytics startup logging
+// ---------------------------------------------------------------------------
+
+describe("Firebase Analytics startup logging", () => {
+  let logSpy: jest.SpyInstance;
+
+  beforeEach(() => {
+    logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+    process.env.NEXT_RUNTIME = "nodejs";
+    mockGetLibraries.mockResolvedValue({});
+  });
+
+  it("logs that analytics is enabled when firebaseAnalytics.enable is true", async () => {
+    mockGetAppConfig.mockResolvedValue(
+      appConfig({ firebaseAnalytics: { enable: true, config: firebaseConfig } })
+    );
+    await register();
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining("Analytics is enabled")
+    );
+  });
+
+  it("logs that analytics is disabled when firebaseAnalytics.enable is false", async () => {
+    mockGetAppConfig.mockResolvedValue(
+      appConfig({ firebaseAnalytics: { enable: false, config: null } })
+    );
+    await register();
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining("Analytics is disabled")
     );
   });
 });
@@ -239,7 +284,9 @@ describe("locale detection header stripping", () => {
 
   describe("when the language selector is disabled", () => {
     beforeEach(async () => {
-      mockGetAppConfig.mockResolvedValue({ enableLanguageSelector: false });
+      mockGetAppConfig.mockResolvedValue(
+        appConfig({ enableLanguageSelector: false })
+      );
       await register();
     });
 
@@ -288,13 +335,15 @@ describe("locale detection header stripping", () => {
     expect(headers["accept-language"]).toBeUndefined();
     expect(headers.cookie).toBeUndefined();
 
-    resolveConfig({ enableLanguageSelector: false });
+    resolveConfig(appConfig({ enableLanguageSelector: false }));
     await pending;
   });
 
   describe("when the language selector is enabled", () => {
     beforeEach(async () => {
-      mockGetAppConfig.mockResolvedValue({ enableLanguageSelector: true });
+      mockGetAppConfig.mockResolvedValue(
+        appConfig({ enableLanguageSelector: true })
+      );
       await register();
     });
 
@@ -319,7 +368,7 @@ describe("HTTP request logging", () => {
   beforeEach(async () => {
     logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
     process.env.NEXT_RUNTIME = "nodejs";
-    mockGetAppConfig.mockResolvedValue({});
+    mockGetAppConfig.mockResolvedValue(appConfig());
     mockGetLibraries.mockResolvedValue({});
     await register();
     // register() itself logs an OPDS 2 startup message; clear that so tests
@@ -399,7 +448,7 @@ describe("outbound fetch logging", () => {
     globalThis.fetch = mockFetch as unknown as typeof fetch;
     logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
     process.env.NEXT_RUNTIME = "nodejs";
-    mockGetAppConfig.mockResolvedValue({});
+    mockGetAppConfig.mockResolvedValue(appConfig());
     mockGetLibraries.mockResolvedValue({});
     await register();
   });
