@@ -471,10 +471,10 @@ describe("config parsing", () => {
     function enable(firebase?: unknown) {
       process.env.PALACE_CPW_FEATURE_FIREBASE_ANALYTICS = "true";
       if (firebase !== undefined) {
-        process.env.PALACE_CPW_FIREBASE_CONFIG =
+        process.env.FIREBASE_CONFIG =
           typeof firebase === "string" ? firebase : JSON.stringify(firebase);
       } else {
-        delete process.env.PALACE_CPW_FIREBASE_CONFIG;
+        delete process.env.FIREBASE_CONFIG;
       }
     }
 
