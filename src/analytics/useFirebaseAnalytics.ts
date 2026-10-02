@@ -31,7 +31,7 @@ export default function useFirebaseAnalytics(
     firebase.logEvent("page_view", {
       page_location,
       page_title: document.title,
-      locale: locale
+      locale
     });
-  }, [asPath, locale, isFallback, library?.id]);
+  }, [asPath, locale, isFallback]);
 }

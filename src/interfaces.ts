@@ -54,7 +54,7 @@ export type FirebaseConfig = {
 
 /**
  * Whether Firebase Analytics is switched on, and with which credentials.
- * Credentials are present only analytics are enabled
+ * Credentials are present only if analytics are enabled
  */
 export type FirebaseAnalyticsConfig =
   | { enable: true; config: FirebaseConfig }

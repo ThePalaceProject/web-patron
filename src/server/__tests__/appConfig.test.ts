@@ -471,10 +471,10 @@ describe("config parsing", () => {
     function enable(firebase?: unknown) {
       process.env.PALACE_CPW_FEATURE_FIREBASE_ANALYTICS = "true";
       if (firebase !== undefined) {
-        process.env.FIREBASE_CONFIG =
+        process.env.PALACE_CPW_FIREBASE_CONFIG =
           typeof firebase === "string" ? firebase : JSON.stringify(firebase);
       } else {
-        delete process.env.FIREBASE_CONFIG;
+        delete process.env.PALACE_CPW_FIREBASE_CONFIG;
       }
     }
 
@@ -525,7 +525,7 @@ describe("config parsing", () => {
         /not valid JSON/
       ],
       [
-        "a required fields are missing",
+        "required fields are missing",
         { measurementId: "just-me" },
         AppSetupError
       ],

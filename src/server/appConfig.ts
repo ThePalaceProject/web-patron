@@ -211,13 +211,13 @@ function isSinglePathSegment(value: string): boolean {
  */
 function parseFirebaseAnalytics(): FirebaseAnalyticsConfig {
   const enabled = parseBoolean(FIREBASE_ANALYTICS_FEATURE_FLAG_ENV, false);
-  const raw = process.env.FIREBASE_CONFIG;
-  const isSet = raw !== undefined && raw.trim() !== "";
-
   if (!enabled) return { enable: false, config: null };
+
+  const raw = process.env.PALACE_CPW_FIREBASE_CONFIG;
+  const isSet = raw !== undefined && raw.trim() !== "";
   if (!isSet) {
     throw new AppSetupError(
-      `${FIREBASE_ANALYTICS_FEATURE_FLAG_ENV} is enabled but FIREBASE_CONFIG is not set. ` +
+      `${FIREBASE_ANALYTICS_FEATURE_FLAG_ENV} is enabled but PALACE_CPW_FIREBASE_CONFIG is not set. ` +
         `Set it to the JSON firebaseConfig object from the Firebase console, or disable analytics.`
     );
   }
@@ -227,14 +227,14 @@ function parseFirebaseAnalytics(): FirebaseAnalyticsConfig {
     parsed = JSON.parse(raw);
   } catch {
     throw new AppSetupError(
-      "Environment variable FIREBASE_CONFIG is not valid JSON."
+      "Environment variable PALACE_CPW_FIREBASE_CONFIG is not valid JSON."
     );
   }
 
   const result = FirebaseConfigSchema(parsed);
   if (result instanceof type.errors) {
     throw new AppSetupError(
-      `Environment variable FIREBASE_CONFIG is invalid:\n${result.summary}`
+      `Environment variable PALACE_CPW_FIREBASE_CONFIG is invalid:\n${result.summary}`
     );
   }
   return { enable: true, config: result };

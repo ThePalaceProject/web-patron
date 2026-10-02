@@ -186,7 +186,7 @@ describe("initialization", () => {
     analytics.init(ENABLED, LIBRARY);
     await flushPromises();
 
-    // Loading never started, so Firebase SDK didn't asked if it can run
+    // Loading never started, so Firebase SDK didn't ask if it can run
     expect(mockIsSupported).not.toHaveBeenCalled();
     expect(mockInitializeAnalytics).not.toHaveBeenCalled();
 
@@ -463,8 +463,8 @@ describe("logEvent", () => {
 
   it("queues an event before loading finishes", async () => {
     analytics.init(ENABLED, LIBRARY);
-    // `firebaseAnalytics` is still pending, which is the
-    // logEvent awaits the same promise rather than dropping the event.
+    // `firebaseAnalytics` is still pending.
+    // logEvent awaits `firebaseAnalytics` rather than dropping the event.
     const sent = analytics.logEvent("page_view");
     await flushPromises();
     await sent;
