@@ -1,4 +1,4 @@
-import { AppConfig } from "interfaces";
+import { AppConfig, FirebaseConfig } from "interfaces";
 import { DEFAULT_ITEM_LANDING_SLUG } from "constants/app";
 
 export const config: AppConfig = {
@@ -9,6 +9,7 @@ export const config: AppConfig = {
   enableOpds2: false,
   enableLanguageSelector: false,
   enablePinning: true,
+  firebaseAnalytics: { enable: false, config: null },
   openebooks: null,
   authenticationDocuments: null,
   itemLandingSlugs: [DEFAULT_ITEM_LANDING_SLUG],
@@ -43,4 +44,14 @@ export const config: AppConfig = {
       "application/pdf": "redirect"
     }
   }
+};
+
+export const firebaseConfig: FirebaseConfig = {
+  apiKey: "test-api-key",
+  authDomain: "test.firebaseapp.com",
+  projectId: "test-project",
+  storageBucket: "test.firebasestorage.app",
+  messagingSenderId: "000000000000",
+  appId: "1:000000000000:web:abcdef",
+  measurementId: "G-TESTID"
 };

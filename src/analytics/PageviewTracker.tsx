@@ -16,6 +16,7 @@ const PageviewTracker = ({ children }: Props) => {
 
   /**
    * We update the dataLayer whenever we change pages.
+   * For use with Google Analytics, not Firebase Analytics
    */
   React.useEffect(() => {
     track.pageview({

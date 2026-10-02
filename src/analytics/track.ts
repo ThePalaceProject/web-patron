@@ -12,6 +12,7 @@ type PageData = {
   bookUrl?: string;
 };
 // doesn't track an event, just updates the data layer for the page
+// For use with Google Analytics, not Firebase Analytics
 function pageview(page: PageData) {
   window?.dataLayer?.push({
     event: "pageview",

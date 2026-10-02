@@ -10,6 +10,7 @@ import { BreadcrumbProvider } from "components/context/BreadcrumbContext";
 import { PinnedLibrariesProvider } from "components/context/PinnedLibrariesContext";
 import AppConfigContext from "components/context/AppConfigContext";
 import { initBugsnag } from "analytics/bugsnag";
+import useFirebaseAnalytics from "analytics/useFirebaseAnalytics";
 import { setMediaSupportConfig } from "utils/fulfill";
 import { setOpds2Enabled } from "dataflow/catalog";
 import type { AppConfig } from "interfaces";
@@ -38,6 +39,8 @@ const MyApp = (props: AppProps) => {
   initBugsnag(appConfig);
   setMediaSupportConfig(appConfig.mediaSupport);
   setOpds2Enabled(appConfig.enableOpds2);
+
+  useFirebaseAnalytics(appConfig, pageProps.library ?? null);
 
   return (
     <AppConfigContext.Provider value={appConfig}>

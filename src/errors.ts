@@ -74,6 +74,22 @@ export class FetchError extends ApplicationError {
   }
 }
 
+/**
+ * For when an analytics SDK fails after the app has started.
+ */
+export class AnalyticsError extends ApplicationError {
+  constructor(m: string, baseError?: Error) {
+    const info = {
+      title: "Analytics Error",
+      detail: m
+    };
+    super(info, baseError);
+    Object.setPrototypeOf(this, AnalyticsError.prototype);
+    this.name = "Analytics Error";
+    this.cause = baseError;
+  }
+}
+
 function isProblemDocument(
   details: OPDS1.ProblemDocument | OPDS1.AuthDocument
 ): details is OPDS1.ProblemDocument {

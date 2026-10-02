@@ -69,6 +69,7 @@
     "deepmerge": "^4.2.2",
     "dompurify": "^3.4.13",
     "downloadjs": "^1.4.7",
+    "firebase": "^12.19.0",
     "history": "^4.10.1",
     "js-cookie": "^3.0.7",
     "jsdom": "^16.2.2",

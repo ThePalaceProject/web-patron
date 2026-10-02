@@ -100,6 +100,9 @@ export async function register() {
       console.log(
         `Library pinning is ${appConfig.enablePinning ? "enabled" : "disabled"} (PALACE_CPW_FEATURE_PINNING).`
       );
+      console.log(
+        `Firebase Analytics is ${appConfig.firebaseAnalytics.enable ? "enabled" : "disabled"} (PALACE_CPW_FEATURE_FIREBASE_ANALYTICS).`
+      );
       stripLocaleDetectionHeaders = !appConfig.enableLanguageSelector;
       /*
        * Pre-warm the registry cache before any requests are served.

@@ -27,6 +27,7 @@ export type AppConfig = {
   enableOpds2: boolean;
   enableLanguageSelector: boolean;
   enablePinning: boolean;
+  firebaseAnalytics: FirebaseAnalyticsConfig;
   bugsnagApiKey: string | null;
   openebooks: OpenEbooksConfig | null;
   /** Reserved item landing path segments. See constants/app.ts. */
@@ -36,6 +37,28 @@ export type AppConfig = {
 export type OpenEbooksConfig = {
   defaultLibrary: string;
 };
+
+/**
+ * The Firebase web app credentials,
+ * mirroring the `firebaseConfig` object the Firebase console generates.
+ */
+export type FirebaseConfig = {
+  apiKey: string;
+  authDomain: string;
+  projectId: string;
+  storageBucket: string;
+  messagingSenderId: string;
+  appId: string;
+  measurementId: string;
+};
+
+/**
+ * Whether Firebase Analytics is switched on, and with which credentials.
+ * Credentials are present only if analytics are enabled
+ */
+export type FirebaseAnalyticsConfig =
+  | { enable: true; config: FirebaseConfig }
+  | { enable: false; config: null };
 
 export type MediaSupportConfig = Partial<DefaultMediaSupport> &
   DirectMediaSupport &
