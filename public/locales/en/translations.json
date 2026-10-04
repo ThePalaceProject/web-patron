@@ -112,6 +112,7 @@
   "multiLibraryHome.addFromLink.title": "Add to My Libraries",
   "multiLibraryHome.choose": "Choose a library:",
   "multiLibraryHome.home": "Home",
+  "multiLibraryHome.promotedHeading": "Promoted libraries",
   "multiLibraryHome.share.ariaLabel": "Share My Libraries",
   "multiLibraryHome.share.copied": "Link copied.",
   "multiLibraryHome.share.failed": "Could not copy link.",

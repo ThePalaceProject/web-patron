@@ -3,7 +3,6 @@ import { PinnedLibrary } from "interfaces";
 import {
   PINNED_LIBRARIES_KEY,
   buildPinsPath,
-  parsePinsParam,
   readPinnedLibraries,
   writePinnedLibraries,
   withMovedTo,
@@ -11,6 +10,7 @@ import {
   withoutPinned,
   syncPinned
 } from "utils/pinnedLibraries";
+import { parseLibraryListParam } from "utils/libraryListParam";
 
 const pinnedLib: PinnedLibrary = {
   id: "urn:uuid:abc",
@@ -193,29 +193,6 @@ describe("syncPinned", () => {
   });
 });
 
-describe("parsePinsParam", () => {
-  test("splits, trims, and preserves order", () => {
-    expect(parsePinsParam("beta, alpha ,gamma")).toEqual([
-      "beta",
-      "alpha",
-      "gamma"
-    ]);
-  });
-
-  test("drops empties and duplicates", () => {
-    expect(parsePinsParam(",alpha,,alpha,")).toEqual(["alpha"]);
-  });
-
-  test("handles a repeated query parameter and undefined", () => {
-    expect(parsePinsParam(["alpha,beta", "gamma"])).toEqual([
-      "alpha",
-      "beta",
-      "gamma"
-    ]);
-    expect(parsePinsParam(undefined)).toEqual([]);
-  });
-});
-
 describe("buildPinsPath", () => {
   test("builds the home path with ids in pin order", () => {
     const path = buildPinsPath([{ id: "urn:b" }, { id: "urn:a" }]);
@@ -224,10 +201,10 @@ describe("buildPinsPath", () => {
     expect(url.searchParams.get("pins")).toBe("urn:b,urn:a");
   });
 
-  test("round-trips ids through parsePinsParam", () => {
+  test("round-trips ids through the list parser", () => {
     const path = buildPinsPath([{ id: "urn:uuid:a b&c" }]);
     const url = new URL(path, "http://test.example.com");
-    expect(parsePinsParam(url.searchParams.get("pins") ?? "")).toEqual([
+    expect(parseLibraryListParam(url.searchParams.get("pins") ?? "")).toEqual([
       "urn:uuid:a b&c"
     ]);
   });

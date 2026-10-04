@@ -41,6 +41,7 @@ export const MockNextRouterContextProvider: React.FC<{
     asPath = `/${libraryData.slug}`,
     // default to the app's default locale, matching next-i18next.config.js
     locale = "en",
+    defaultLocale = "en",
     push = mockPush,
     replace = mockReplace,
     reload = jest.fn().mockImplementation(() => null),
@@ -64,6 +65,7 @@ export const MockNextRouterContextProvider: React.FC<{
     query,
     asPath,
     locale,
+    defaultLocale,
     push,
     replace,
     reload,
