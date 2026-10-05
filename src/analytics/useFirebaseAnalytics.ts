@@ -2,14 +2,13 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 import firebase from "analytics/firebase";
-import { stripCredentials } from "utils/url";
 import type { AppConfig, LibraryData } from "interfaces";
 
 export default function useFirebaseAnalytics(
   appConfig: AppConfig,
   library: Pick<LibraryData, "id" | "slug"> | null
 ): void {
-  const { asPath, locale, isFallback } = useRouter();
+  const { asPath, pathname, locale, isFallback } = useRouter();
   const lastLogged = React.useRef<string | null>(null);
 
   React.useEffect(() => {
@@ -20,18 +19,14 @@ export default function useFirebaseAnalytics(
   React.useEffect(() => {
     if (isFallback) return;
 
-    // Read from the window rather than from `asPath`,
-    // because `asPath` omits the locale prefix that the address bar keeps.
-    const page_location = stripCredentials(window.location.href);
-
     // guard against re-renders
-    if (lastLogged.current === page_location) return;
-    lastLogged.current = page_location;
+    if (lastLogged.current === window.location.href) return;
+    lastLogged.current = window.location.href;
 
     firebase.logEvent("page_view", {
-      page_location,
-      page_title: document.title,
+      page_location: pathname,
       locale
     });
-  }, [asPath, locale, isFallback]);
+    // include `asPath` to check for page navigation
+  }, [asPath, pathname, locale, isFallback]);
 }

@@ -161,22 +161,28 @@ describe("initialization", () => {
     });
   });
 
+  it("overrides the automatic page_title and page_referrer parameters", async () => {
+    analytics.init(ENABLED, LIBRARY);
+    await flushPromises();
+
+    expect(mockInitializeAnalytics).toHaveBeenCalledWith(FIREBASE_APP, {
+      config: expect.objectContaining({ page_title: "", page_referrer: "" })
+    });
+  });
+
   it("sends the instance name and build details with the library", async () => {
     analytics.init(ENABLED, LIBRARY);
     await flushPromises();
 
     expect(mockInitializeAnalytics).toHaveBeenCalledWith(FIREBASE_APP, {
-      config: {
-        ...LIBRARY_PARAMS,
-        user_properties: LIBRARY_PARAMS,
-        send_page_view: false,
+      config: expect.objectContaining({
         instance_name: "Test Instance",
         app_version: mockBuild.APP_VERSION,
         build_id: mockBuild.BUILD_ID,
         release_stage: mockBuild.RELEASE_STAGE,
         git_branch: mockBuild.GIT_BRANCH,
         git_commit_sha: mockBuild.GIT_COMMIT_SHA
-      }
+      })
     });
   });
 
@@ -302,6 +308,8 @@ describe("library parameters", () => {
         ...NO_LIBRARY_PARAMS,
         user_properties: NO_LIBRARY_PARAMS,
         send_page_view: false,
+        page_title: "",
+        page_referrer: "",
         instance_name: "Test Instance",
         app_version: mockBuild.APP_VERSION,
         build_id: mockBuild.BUILD_ID,

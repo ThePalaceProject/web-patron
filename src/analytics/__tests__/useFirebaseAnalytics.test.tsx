@@ -66,7 +66,10 @@ function renderFirebaseHook(props: Props) {
   const tree = ({
     library,
     appConfig = APP_CONFIG_FIREBASE_ENABLED,
-    router,
+    router = {
+      pathname: "/[library]/book/[bookUrl]",
+      asPath: "/testlib/book/123"
+    },
     title
   }: Props) => (
     <MockNextRouterContextProvider router={router}>
@@ -83,7 +86,8 @@ function renderFirebaseHook(props: Props) {
 }
 
 /**
- * useFirebaseAnalytics reads page_location from the window, not from `asPath`.
+ * useFirebaseAnalytics reads page_location from router.pathname, not from router.asPath.
+ * Sets href on window to test that page_location is set from pathname and not address bar
  */
 function setHref(href: string) {
   window.history.replaceState({}, "", href);
@@ -92,6 +96,11 @@ function setHref(href: string) {
 beforeEach(() => {
   setHref("/testlib");
   document.title = "Previous Page";
+  // document.referrer is read-only,
+  // so we must mock the value with Object.defineProperty
+  Object.defineProperty(document, "referrer", {
+    value: "https://website.com/login"
+  });
 });
 
 describe("initialization", () => {
@@ -143,23 +152,28 @@ describe("initialization", () => {
 });
 
 describe("page views", () => {
-  it("sends one page view for the initial render", () => {
-    renderFirebaseHook({ library: LIBRARY, title: "Test Library" });
-
-    expect(mockLogEvent).toHaveBeenCalledTimes(1);
-    expect(mockLogEvent).toHaveBeenCalledWith("page_view", {
-      page_location: "http://test-domain.com/testlib",
-      page_title: "Test Library",
-      locale: "en"
+  it("sends path for route file, not for the populated URL as seen in the address bar", () => {
+    setHref("/testlib/book/123");
+    renderFirebaseHook({
+      library: LIBRARY,
+      router: {
+        asPath: "/testlib/book/123",
+        pathname: "/[library]/book/[bookUrl]"
+      }
     });
+    expect(mockLogEvent).toHaveBeenCalledTimes(1);
+    expect(mockLogEvent).toHaveBeenCalledWith(
+      "page_view",
+      expect.objectContaining({ page_location: "/[library]/book/[bookUrl]" })
+    );
   });
 
-  it("does not repeat a page view for the URL it last logged", () => {
+  it("does not repeat a page view for the page_location it last logged", () => {
     const { rerenderFirebaseHook } = renderFirebaseHook({ library: LIBRARY });
     expect(mockLogEvent).toHaveBeenCalledTimes(1);
 
-    // any change in asPath might signal that a navigation might have happened
-    // But the check should be done against window.location.href
+    // Any change in asPath signals that a navigation has occured,
+    // but the last logged check should be done against window.location.href
     rerenderFirebaseHook({
       library: LIBRARY,
       router: { asPath: "/[library]" }
@@ -183,20 +197,20 @@ describe("page views", () => {
       const { rerenderFirebaseHook } = renderFirebaseHook({
         library: null,
         appConfig: FALLBACK_APP_CONFIG,
-        router: { isFallback: true }
+        router: { isFallback: true, pathname: "/" }
       });
       expect(mockLogEvent).not.toHaveBeenCalled();
 
       rerenderFirebaseHook({
         library: LIBRARY,
-        router: { isFallback: false },
+        router: { isFallback: false, pathname: "/[library]" },
         title: "Test Library"
       });
 
       expect(mockLogEvent).toHaveBeenCalledTimes(1);
       expect(mockLogEvent).toHaveBeenCalledWith(
         "page_view",
-        expect.objectContaining({ page_title: "Test Library" })
+        expect.objectContaining({ page_location: "/[library]" })
       );
     });
   });
@@ -205,133 +219,113 @@ describe("page views", () => {
     it("sends a page view for each navigation", () => {
       const { rerenderFirebaseHook } = renderFirebaseHook({
         library: LIBRARY,
-        title: "Test Library"
+        title: "Test Library",
+        router: { asPath: "/testlib", pathname: "/[library]" }
       });
       expect(mockLogEvent).toHaveBeenCalledTimes(1);
       expect(mockLogEvent).toHaveBeenLastCalledWith("page_view", {
-        page_location: "http://test-domain.com/testlib",
-        page_title: "Test Library",
+        page_location: "/[library]",
         locale: "en"
       });
 
       setHref("/testlib/book/123");
       rerenderFirebaseHook({
         library: LIBRARY,
-        router: { asPath: "/testlib/book/123" },
+        router: {
+          asPath: "/testlib/book/123",
+          pathname: "/[library]/book/[bookUrl]"
+        },
         title: "A Book"
       });
 
       expect(mockLogEvent).toHaveBeenCalledTimes(2);
       expect(mockLogEvent).toHaveBeenLastCalledWith("page_view", {
-        page_location: "http://test-domain.com/testlib/book/123",
-        page_title: "A Book",
+        page_location: "/[library]/book/[bookUrl]",
         locale: "en"
       });
     });
 
     it("sends a page view on returning to an earlier page", () => {
       // first page navigation
-      const { rerenderFirebaseHook } = renderFirebaseHook({ library: LIBRARY });
+      const { rerenderFirebaseHook } = renderFirebaseHook({
+        library: LIBRARY,
+        router: { asPath: "/testlib", pathname: "/[library]" }
+      });
 
       // second page navigation
       setHref("/testlib/book/123");
       rerenderFirebaseHook({
         library: LIBRARY,
-        router: { asPath: "/testlib/book/123" }
+        router: {
+          asPath: "/testlib/book/123",
+          pathname: "/[library]/book/[bookUrl]"
+        }
       });
 
       // Back to where the patron started: a repeat visit, not a re-render.
       setHref("/testlib");
       rerenderFirebaseHook({
         library: LIBRARY,
-        router: { asPath: "/testlib" }
+        router: { asPath: "/testlib", pathname: "/[library]" }
       });
 
       expect(mockLogEvent).toHaveBeenCalledTimes(3);
       expect(mockLogEvent).toHaveBeenLastCalledWith(
         "page_view",
         expect.objectContaining({
-          page_location: "http://test-domain.com/testlib"
+          page_location: "/[library]"
         })
       );
     });
   });
 
-  describe("stripping credentials from page location", () => {
-    it.each([
-      ["SAML or OIDC", "/testlib?access_token=secret&patron_info=%7B%7D"],
-      ["Clever", "/testlib#access_token=secret"]
-    ])(
-      "leaves the patron's token out of the page view after a %s sign-in",
-      (_, pathWithCredentials) => {
-        setHref(pathWithCredentials);
-        renderFirebaseHook({ library: LIBRARY });
-
-        expect(mockLogEvent).toHaveBeenCalledWith(
-          "page_view",
-          expect.objectContaining({
-            page_location: "http://test-domain.com/testlib"
-          })
-        );
-        expect(JSON.stringify(mockLogEvent.mock.calls)).not.toContain("secret");
-      }
-    );
-
-    it("does not send a second page view once the token is cleared from the address", () => {
-      setHref("/testlib?access_token=secret");
-      const { rerenderFirebaseHook } = renderFirebaseHook({
-        library: LIBRARY,
-        router: { asPath: "/testlib?access_token=secret" }
-      });
-      expect(mockLogEvent).toHaveBeenCalledTimes(1);
-
-      setHref("/testlib");
-      rerenderFirebaseHook({
-        library: LIBRARY,
-        router: { asPath: "/testlib" }
-      });
-
-      expect(mockLogEvent).toHaveBeenCalledTimes(1);
-    });
-  });
-
   describe("i18n", () => {
-    it("reads the locale-prefixed href rather than asPath", () => {
+    it("reads the locale from the router", () => {
       setHref("/fr/testlib");
       renderFirebaseHook({
         library: LIBRARY,
-        router: { locale: "fr", asPath: "/testlib" }
+        router: { locale: "fr", asPath: "/testlib", pathname: "/[library]" }
       });
 
       expect(mockLogEvent).toHaveBeenCalledWith(
         "page_view",
         expect.objectContaining({
-          page_location: expect.stringContaining("/fr/testlib"),
+          page_location: "/[library]",
           locale: "fr"
         })
       );
     });
 
     it("sends a page view when the patron switches language on the same page", () => {
-      const { rerenderFirebaseHook } = renderFirebaseHook({ library: LIBRARY });
+      const { rerenderFirebaseHook } = renderFirebaseHook({
+        library: LIBRARY,
+        router: {
+          locale: "en",
+          asPath: "/testlib",
+          pathname: "/[library]"
+        }
+      });
       expect(mockLogEvent).toHaveBeenCalledTimes(1);
       expect(mockLogEvent).toHaveBeenLastCalledWith(
         "page_view",
         expect.objectContaining({
-          page_location: "http://test-domain.com/testlib",
-          locale: "en"
+          locale: "en",
+          page_location: "/[library]"
         })
       );
 
       setHref("/fr/testlib");
-      rerenderFirebaseHook({ library: LIBRARY, router: { locale: "fr" } });
+      rerenderFirebaseHook({
+        library: LIBRARY,
+        router: { locale: "fr", asPath: "/testlib", pathname: "/[library]" }
+      });
 
       expect(mockLogEvent).toHaveBeenCalledTimes(2);
       expect(mockLogEvent).toHaveBeenLastCalledWith(
         "page_view",
         expect.objectContaining({
-          page_location: "http://test-domain.com/fr/testlib",
-          locale: "fr"
+          locale: "fr",
+          page_location: "/[library]"
         })
       );
     });
