@@ -96,11 +96,6 @@ function setHref(href: string) {
 beforeEach(() => {
   setHref("/testlib");
   document.title = "Previous Page";
-  // document.referrer is read-only,
-  // so we must mock the value with Object.defineProperty
-  Object.defineProperty(document, "referrer", {
-    value: "https://website.com/login"
-  });
 });
 
 describe("initialization", () => {
@@ -164,19 +159,24 @@ describe("page views", () => {
     expect(mockLogEvent).toHaveBeenCalledTimes(1);
     expect(mockLogEvent).toHaveBeenCalledWith(
       "page_view",
-      expect.objectContaining({ page_location: "/[library]/book/[bookUrl]" })
+      expect.objectContaining({
+        page_location: "http://test-domain.com/[library]/book/[bookUrl]"
+      })
     );
   });
 
   it("does not repeat a page view for the page_location it last logged", () => {
-    const { rerenderFirebaseHook } = renderFirebaseHook({ library: LIBRARY });
+    const { rerenderFirebaseHook } = renderFirebaseHook({
+      library: LIBRARY,
+      router: { asPath: "/[library]", pathname: "/testlib" }
+    });
     expect(mockLogEvent).toHaveBeenCalledTimes(1);
 
     // Any change in asPath signals that a navigation has occured,
     // but the last logged check should be done against window.location.href
     rerenderFirebaseHook({
       library: LIBRARY,
-      router: { asPath: "/[library]" }
+      router: { asPath: "/[library]", pathname: "/testlib" }
     });
 
     expect(mockLogEvent).toHaveBeenCalledTimes(1);
@@ -210,7 +210,9 @@ describe("page views", () => {
       expect(mockLogEvent).toHaveBeenCalledTimes(1);
       expect(mockLogEvent).toHaveBeenCalledWith(
         "page_view",
-        expect.objectContaining({ page_location: "/[library]" })
+        expect.objectContaining({
+          page_location: "http://test-domain.com/[library]"
+        })
       );
     });
   });
@@ -224,7 +226,7 @@ describe("page views", () => {
       });
       expect(mockLogEvent).toHaveBeenCalledTimes(1);
       expect(mockLogEvent).toHaveBeenLastCalledWith("page_view", {
-        page_location: "/[library]",
+        page_location: "http://test-domain.com/[library]",
         locale: "en"
       });
 
@@ -240,7 +242,7 @@ describe("page views", () => {
 
       expect(mockLogEvent).toHaveBeenCalledTimes(2);
       expect(mockLogEvent).toHaveBeenLastCalledWith("page_view", {
-        page_location: "/[library]/book/[bookUrl]",
+        page_location: "http://test-domain.com/[library]/book/[bookUrl]",
         locale: "en"
       });
     });
@@ -273,9 +275,90 @@ describe("page views", () => {
       expect(mockLogEvent).toHaveBeenLastCalledWith(
         "page_view",
         expect.objectContaining({
-          page_location: "/[library]"
+          page_location: "http://test-domain.com/[library]"
         })
       );
+    });
+
+    describe("query params and hashes", () => {
+      it.each([
+        ["query params", "/testlib?query=param1", "/testlib?query=param2"],
+        ["hashes", "/testlib#hash1", "/testlib#hash2"]
+      ])("sends a page view when only %s change", (_, path1, path2) => {
+        setHref(path1);
+        renderFirebaseHook({
+          library: LIBRARY,
+          router: { asPath: path1, pathname: "/[library]" }
+        });
+
+        expect(mockLogEvent).toHaveBeenCalledTimes(1);
+        expect(mockLogEvent).toHaveBeenCalledWith(
+          "page_view",
+          expect.objectContaining({
+            page_location: "http://test-domain.com/[library]"
+          })
+        );
+
+        setHref(path2);
+        renderFirebaseHook({
+          library: LIBRARY,
+          router: { asPath: path2, pathname: "/[library]" }
+        });
+
+        expect(mockLogEvent).toHaveBeenCalledTimes(2);
+        expect(mockLogEvent).toHaveBeenCalledWith(
+          "page_view",
+          expect.objectContaining({
+            page_location: "http://test-domain.com/[library]"
+          })
+        );
+      });
+
+      describe("stripping credentials from page location", () => {
+        it.each([
+          ["SAML or OIDC", "/testlib?access_token=secret&patron_info=%7B%7D"],
+          ["Clever", "/testlib#access_token=secret"]
+        ])(
+          "leaves the patron's token out of the page view after a %s sign-in",
+          (_, pathWithCredentials) => {
+            setHref(pathWithCredentials);
+            renderFirebaseHook({
+              library: LIBRARY,
+              router: { asPath: pathWithCredentials, pathname: "/[library]" }
+            });
+
+            expect(mockLogEvent).toHaveBeenCalledWith(
+              "page_view",
+              expect.objectContaining({
+                page_location: "http://test-domain.com/[library]"
+              })
+            );
+            expect(JSON.stringify(mockLogEvent.mock.calls)).not.toContain(
+              "secret"
+            );
+          }
+        );
+
+        it("does not send a second page view once the token is cleared from the address", () => {
+          setHref("/testlib?access_token=secret");
+          const { rerenderFirebaseHook } = renderFirebaseHook({
+            library: LIBRARY,
+            router: {
+              asPath: "/testlib?access_token=secret",
+              pathname: "/[library]"
+            }
+          });
+          expect(mockLogEvent).toHaveBeenCalledTimes(1);
+
+          setHref("/testlib");
+          rerenderFirebaseHook({
+            library: LIBRARY,
+            router: { asPath: "/testlib", pathname: "/[library]" }
+          });
+
+          expect(mockLogEvent).toHaveBeenCalledTimes(1);
+        });
+      });
     });
   });
 
@@ -290,7 +373,7 @@ describe("page views", () => {
       expect(mockLogEvent).toHaveBeenCalledWith(
         "page_view",
         expect.objectContaining({
-          page_location: "/[library]",
+          page_location: "http://test-domain.com/[library]",
           locale: "fr"
         })
       );
@@ -310,7 +393,7 @@ describe("page views", () => {
         "page_view",
         expect.objectContaining({
           locale: "en",
-          page_location: "/[library]"
+          page_location: "http://test-domain.com/[library]"
         })
       );
 
@@ -325,7 +408,7 @@ describe("page views", () => {
         "page_view",
         expect.objectContaining({
           locale: "fr",
-          page_location: "/[library]"
+          page_location: "http://test-domain.com/[library]"
         })
       );
     });
