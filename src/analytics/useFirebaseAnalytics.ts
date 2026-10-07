@@ -2,14 +2,14 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 import firebase from "analytics/firebase";
-import { stripCredentials } from "utils/url";
 import type { AppConfig, LibraryData } from "interfaces";
+import { stripCredentials } from "utils/url";
 
 export default function useFirebaseAnalytics(
   appConfig: AppConfig,
   library: Pick<LibraryData, "id" | "slug"> | null
 ): void {
-  const { asPath, locale, isFallback } = useRouter();
+  const { asPath, pathname, locale, isFallback } = useRouter();
   const lastLogged = React.useRef<string | null>(null);
 
   React.useEffect(() => {
@@ -20,18 +20,18 @@ export default function useFirebaseAnalytics(
   React.useEffect(() => {
     if (isFallback) return;
 
-    // Read from the window rather than from `asPath`,
-    // because `asPath` omits the locale prefix that the address bar keeps.
-    const page_location = stripCredentials(window.location.href);
+    // Comparing URLs without query params or hashes guards specifically against
+    // auth redirects (e.g. SAML, OIDC) where patron credentials are included.
+    const location = stripCredentials(window.location.href);
 
     // guard against re-renders
-    if (lastLogged.current === page_location) return;
-    lastLogged.current = page_location;
+    if (lastLogged.current === location) return;
+    lastLogged.current = location;
 
     firebase.logEvent("page_view", {
-      page_location,
-      page_title: document.title,
+      page_location: `${window.location.origin}${pathname}`,
       locale
     });
-  }, [asPath, locale, isFallback]);
+    // include `asPath` to check for page navigation
+  }, [asPath, pathname, locale, isFallback]);
 }

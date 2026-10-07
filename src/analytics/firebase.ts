@@ -74,6 +74,10 @@ async function load(
         // Adding the library to user_properties, so certain user-scoped events will carry it too
         user_properties: libraryParams,
         send_page_view: false, // false allows us to customize custom parameters sent on page_view events
+        // Even with send_page_view: false, Firebase Analytics SDK still automatically sends page_title and page_referrer.
+        // Setting them as empty strings overrides both
+        page_title: "",
+        page_referrer: "",
         instance_name: instanceName,
         app_version: APP_VERSION,
         build_id: BUILD_ID,
