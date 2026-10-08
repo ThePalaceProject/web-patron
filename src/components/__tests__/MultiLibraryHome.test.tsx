@@ -21,6 +21,7 @@ import {
 import { hasStoredCredentials } from "auth/useCredentials";
 import { HIDE_PUBLIC_WARNING_KEY } from "utils/publicWarning";
 import { copyToClipboard } from "utils/clipboard";
+import { parsePromoteLabel } from "utils/libraryListParam";
 import MultiLibraryHome from "../MultiLibraryHome";
 import useSWR from "swr";
 import { makeSwrResponse } from "test-utils/mockSwr";
@@ -30,9 +31,17 @@ jest.mock("swr");
 jest.mock("utils/clipboard", () => ({
   copyToClipboard: jest.fn().mockResolvedValue(true)
 }));
+jest.mock("utils/libraryListParam", () => ({
+  ...jest.requireActual("utils/libraryListParam"),
+  parsePromoteLabel: jest.fn()
+}));
 
 const mockedCopy = copyToClipboard as jest.MockedFunction<
   typeof copyToClipboard
+>;
+
+const mockedParsePromoteLabel = parsePromoteLabel as jest.MockedFunction<
+  typeof parsePromoteLabel
 >;
 
 const mockedSWR = useSWR as jest.MockedFunction<typeof useSWR>;
@@ -893,6 +902,7 @@ describe("MultiLibraryHome", () => {
   describe("promoted libraries", () => {
     beforeEach(() => {
       localStorage.setItem(HIDE_PUBLIC_WARNING_KEY, "true");
+      mockedParsePromoteLabel.mockReset();
     });
 
     it("shows the named libraries in order under the default heading", () => {
@@ -1003,22 +1013,35 @@ describe("MultiLibraryHome", () => {
       ).toBeInTheDocument();
     });
 
-    it("uses a provided promoteLabel as the heading, as plain text", () => {
+    it("shows the parsed promoteLabel as the heading, as plain text", () => {
+      mockedParsePromoteLabel.mockReturnValue("Consortium <b>picks</b>");
       mockLibraries([lib("alpha", "Alpha Library")]);
 
       render(<MultiLibraryHome />, {
-        router: {
-          query: { promote: "alpha", promoteLabel: "Consortium <b>picks</b>" }
-        }
+        router: { query: { promote: "alpha", promoteLabel: "raw label" } }
       });
 
-      const heading = screen.getByRole("heading", {
-        name: "Consortium <b>picks</b>"
-      });
-      expect(heading).toBeInTheDocument();
+      expect(mockedParsePromoteLabel).toHaveBeenCalledWith("raw label");
+      expect(
+        screen.getByRole("heading", { name: "Consortium <b>picks</b>" })
+      ).toBeInTheDocument();
       expect(
         screen.queryByRole("heading", { name: "Promoted libraries" })
       ).toBeNull();
+    });
+
+    it("shows the default heading when the promoteLabel parses to nothing", () => {
+      mockedParsePromoteLabel.mockReturnValue(undefined);
+      mockLibraries([lib("alpha", "Alpha Library")]);
+
+      render(<MultiLibraryHome />, {
+        router: { query: { promote: "alpha", promoteLabel: "raw label" } }
+      });
+
+      expect(mockedParsePromoteLabel).toHaveBeenCalledWith("raw label");
+      expect(
+        screen.getByRole("heading", { name: "Promoted libraries" })
+      ).toBeInTheDocument();
     });
 
     it("sorts the group by library name when promoteOrder is name", () => {
@@ -1057,18 +1080,6 @@ describe("MultiLibraryHome", () => {
       expect(links[1]).toHaveTextContent("Apple Library");
     });
 
-    it("falls back to the default heading for a blank promoteLabel", () => {
-      mockLibraries([lib("alpha", "Alpha Library")]);
-
-      render(<MultiLibraryHome />, {
-        router: { query: { promote: "alpha", promoteLabel: "   " } }
-      });
-
-      expect(
-        screen.getByRole("heading", { name: "Promoted libraries" })
-      ).toBeInTheDocument();
-    });
-
     it.each([
       ["absent", {}],
       ["empty", { promote: "" }],
@@ -1077,6 +1088,7 @@ describe("MultiLibraryHome", () => {
     ])(
       "ignores promoteLabel and promoteOrder when promote is %s",
       (_, promoteQuery) => {
+        mockedParsePromoteLabel.mockReturnValue("Consortium picks");
         mockLibraries([lib("alpha", "Alpha Library")]);
 
         render(<MultiLibraryHome />, {

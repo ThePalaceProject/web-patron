@@ -32,6 +32,7 @@ import {
 import { copyToClipboard } from "utils/clipboard";
 import {
   firstParamValue,
+  parsePromoteLabel,
   parseLibraryListParam,
   resolveLibraryList,
   PROMOTE_QUERY_PARAM,
@@ -222,9 +223,11 @@ const MultiLibraryHome: React.FC = () => {
    * is display-only: nothing is stored, so the parameter stays in the URL
    * and the page works as a shareable curated view. Libraries already shown
    * in My Libraries are left out, and the group hides entirely once nothing
-   * remains. `?promoteLabel=` overrides the group's localized heading and
-   * is rendered as plain text. Both companion parameters are ignored when
-   * `?promote=` names no library the group would show.
+   * remains. `?promoteLabel=` overrides the group's localized heading, is
+   * cut to `PROMOTE_LABEL_MAX_LENGTH` characters, and is rendered as plain
+   * text. A label holding a URL, email address, or phone number is
+   * ignored. Both companion parameters are ignored when `?promote=` names
+   * no library the group would show.
    */
   const shownPinnedIds = new Set(shownPinned.map(lib => lib.id));
   const promoted = resolveLibraryList(
@@ -235,7 +238,7 @@ const MultiLibraryHome: React.FC = () => {
     promoted.sort(byName);
   }
   const promotedLabel =
-    firstParamValue(router.query[PROMOTE_LABEL_QUERY_PARAM])?.trim() ||
+    parsePromoteLabel(router.query[PROMOTE_LABEL_QUERY_PARAM]) ??
     t("multiLibraryHome.promotedHeading", "Promoted libraries");
 
   // `title` replaces the name as the link content, e.g. to mark search
@@ -340,7 +343,8 @@ const MultiLibraryHome: React.FC = () => {
         />
         {promoted.length > 0 && !reordering && (
           <section>
-            <h2>{promotedLabel}</h2>
+            {/* A long label from the URL wraps, even without spaces. */}
+            <h2 sx={{ overflowWrap: "anywhere" }}>{promotedLabel}</h2>
             <LibraryCardList>
               {promoted.map(library => (
                 <li key={library.id}>

@@ -7,6 +7,8 @@ import type { ClientLibrary } from "pages/api/libraries";
 export const PROMOTE_QUERY_PARAM = "promote";
 /** The promoted group's heading. Without it the localized default is used. */
 export const PROMOTE_LABEL_QUERY_PARAM = "promoteLabel";
+/** The most characters of a `?promoteLabel=` heading that are shown. */
+export const PROMOTE_LABEL_MAX_LENGTH = 100;
 /** "name" sorts the promoted group by library name; any other value keeps link order. */
 export const PROMOTE_ORDER_QUERY_PARAM = "promoteOrder";
 
@@ -15,6 +17,60 @@ export function firstParamValue(
   value: string | string[] | undefined
 ): string | undefined {
   return Array.isArray(value) ? value[0] : value;
+}
+
+/**
+ * Contact details a link could plant in a page heading: a URL (with a
+ * scheme, starting with "www.", a bare domain in any script, an IPv4
+ * address, a bracketed IPv6 address, or "localhost" anywhere), an email
+ * address with a dotted domain, or a phone number (ten or more digits, or a
+ * local "555-1234" form). Short numbers such as "District 186" or
+ * "2024-2025" do not match.
+ */
+const CONTACT_INFO_PATTERNS = [
+  /[a-z][a-z\d+.-]*:\/\//i,
+  /\bwww\./i,
+  new RegExp(
+    String.raw`(?:^|[^\p{L}\p{N}-])[\p{L}\p{N}-]+\.(?:[\p{L}\p{N}-]+\.)*\p{L}{2,}(?![\p{L}\p{N}])`,
+    "u"
+  ),
+  /\b\d{1,3}(?:\.\d{1,3}){3}\b/,
+  /\[[\da-f]*:[\da-f]*:[\da-f:.]*\]/i,
+  /localhost/i,
+  /[^\s@]+@[^\s@]+\.[^\s@]+/,
+  /\d(?:[\s().-]*\d){9,}/,
+  /\b\d{3}[\s.-]\d{4}\b/
+];
+
+/**
+ * Whether the text holds a URL, email address, or phone number. The text is
+ * NFKC-normalized first, so full-width forms such as "\uFF20" match too, and
+ * the ideographic full stop "\u3002" counts as a dot, as it does in domain
+ * names.
+ */
+function hasContactInfo(text: string): boolean {
+  const normalized = text.normalize("NFKC").replace(/\u3002/g, ".");
+  return CONTACT_INFO_PATTERNS.some(pattern => pattern.test(normalized));
+}
+
+/**
+ * The promoted group's heading from a `?promoteLabel=` value: trimmed, and
+ * cut to `PROMOTE_LABEL_MAX_LENGTH` characters ending in an ellipsis when
+ * longer. Undefined when blank or when it holds a URL, email address, or
+ * phone number.
+ */
+export function parsePromoteLabel(
+  value: string | string[] | undefined
+): string | undefined {
+  const label = firstParamValue(value)?.trim() ?? "";
+  if (hasContactInfo(label)) return undefined;
+  const chars = Array.from(label);
+  if (chars.length === 0) return undefined;
+  if (chars.length <= PROMOTE_LABEL_MAX_LENGTH) return chars.join("");
+  return `${chars
+    .slice(0, PROMOTE_LABEL_MAX_LENGTH - 1)
+    .join("")
+    .trimEnd()}\u2026`;
 }
 
 /**
