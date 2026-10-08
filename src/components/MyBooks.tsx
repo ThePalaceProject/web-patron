@@ -37,8 +37,8 @@ function compareTitles(a: AnyBook, b: AnyBook): 0 | -1 | 1 {
   return -1;
 }
 
-// A shelf book has these statuses only as the optimistic result of a return
-// or a cancelled reservation, until the shelf is fetched again.
+// A returned loan or canceled hold keeps its new borrowable or reservable
+// status until the shelf is fetched again.
 const isOnShelf = (book: AnyBook) =>
   book.status !== "borrowable" && book.status !== "reservable";
 
