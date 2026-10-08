@@ -6,6 +6,7 @@ import { ErrorBoundary } from "components/ErrorBoundary";
 import "@nypl/design-system-react-components/dist/styles.css";
 import "css-overrides.css";
 import track from "analytics/track";
+import { AnnouncerProvider } from "components/context/AnnouncerContext";
 import { BreadcrumbProvider } from "components/context/BreadcrumbContext";
 import { PinnedLibrariesProvider } from "components/context/PinnedLibrariesContext";
 import AppConfigContext from "components/context/AppConfigContext";
@@ -45,11 +46,13 @@ const MyApp = (props: AppProps) => {
   return (
     <AppConfigContext.Provider value={appConfig}>
       <ErrorBoundary>
-        <PinnedLibrariesProvider>
-          <BreadcrumbProvider>
-            <Component {...pageProps} />
-          </BreadcrumbProvider>
-        </PinnedLibrariesProvider>
+        <AnnouncerProvider>
+          <PinnedLibrariesProvider>
+            <BreadcrumbProvider>
+              <Component {...pageProps} />
+            </BreadcrumbProvider>
+          </PinnedLibrariesProvider>
+        </AnnouncerProvider>
       </ErrorBoundary>
     </AppConfigContext.Provider>
   );

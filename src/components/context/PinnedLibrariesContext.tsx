@@ -1,7 +1,6 @@
 import * as React from "react";
-import { createPortal } from "react-dom";
 import AppConfigContext from "components/context/AppConfigContext";
-import { VISUALLY_HIDDEN_STYLE } from "constants/a11y";
+import { Announce, useAnnounce } from "components/context/AnnouncerContext";
 import { fetchLibraryLogo } from "dataflow/fetchLibraries";
 import { PinnedLibrary } from "interfaces";
 import type { ClientLibrary } from "pages/api/libraries";
@@ -49,24 +48,11 @@ export type PinnedLibrariesState = {
    * storage loading do not move focus.
    */
   takeFocusOrigin: () => HTMLElement | null;
-  /**
-   * Has screen readers read `message` politely, e.g. after a pin. The text
-   * is written after ANNOUNCE_DELAY_MS and cleared after ANNOUNCEMENT_TTL_MS.
-   */
-  announce: (message: string) => void;
+  announce: Announce;
 };
 
 /** How long a recorded focus origin stays valid, in milliseconds. */
 const FOCUS_ORIGIN_TTL_MS = 1000;
-
-/**
- * Delay before an announcement is written, in milliseconds, so a closing
- * modal dialog has released the region and a focus move has settled.
- */
-export const ANNOUNCE_DELAY_MS = 150;
-
-/** How long an announcement stays in the region, in milliseconds. */
-export const ANNOUNCEMENT_TTL_MS = 5000;
 
 const PinnedLibrariesContext = React.createContext<
   PinnedLibrariesState | undefined
@@ -203,34 +189,7 @@ export const PinnedLibrariesProvider: React.FC<{
     return origin.element;
   }, []);
 
-  // The id gives each message a fresh node, so a repeated message is read
-  // again.
-  const [announcement, setAnnouncement] = React.useState({ id: 0, text: "" });
-  // The announcement region is portaled to the body, which exists only in
-  // the browser.
-  const [mounted, setMounted] = React.useState(false);
-  React.useEffect(() => setMounted(true), []);
-  const announceTimer = React.useRef<ReturnType<typeof setTimeout>>(undefined);
-  const clearTimer = React.useRef<ReturnType<typeof setTimeout>>(undefined);
-  React.useEffect(
-    () => () => {
-      clearTimeout(announceTimer.current);
-      clearTimeout(clearTimer.current);
-    },
-    []
-  );
-  const announce = React.useCallback((text: string) => {
-    clearTimeout(announceTimer.current);
-    clearTimeout(clearTimer.current);
-    announceTimer.current = setTimeout(() => {
-      setAnnouncement(prev => ({ id: prev.id + 1, text }));
-      // Clearing keeps a stale message out of the page for browse mode.
-      clearTimer.current = setTimeout(
-        () => setAnnouncement(prev => ({ ...prev, text: "" })),
-        ANNOUNCEMENT_TTL_MS
-      );
-    }, ANNOUNCE_DELAY_MS);
-  }, []);
+  const announce = useAnnounce();
 
   const isPinned = React.useCallback(
     (id: string) => pinnedLibraries.some(lib => lib.id === id),
@@ -265,14 +224,6 @@ export const PinnedLibrariesProvider: React.FC<{
   return (
     <PinnedLibrariesContext.Provider value={value}>
       {children}
-      {enabled &&
-        mounted &&
-        createPortal(
-          <div role="status" aria-live="polite" style={VISUALLY_HIDDEN_STYLE}>
-            <span key={announcement.id}>{announcement.text}</span>
-          </div>,
-          document.body
-        )}
     </PinnedLibrariesContext.Provider>
   );
 };

@@ -2,9 +2,8 @@ import { describe, expect, jest, test } from "@jest/globals";
 import * as React from "react";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import fetchMock from "jest-fetch-mock";
+import { ANNOUNCE_DELAY_MS, AnnouncerProvider } from "../AnnouncerContext";
 import {
-  ANNOUNCE_DELAY_MS,
-  ANNOUNCEMENT_TTL_MS,
   PinnedLibrariesProvider,
   usePinnedLibraries
 } from "../PinnedLibrariesContext";
@@ -19,13 +18,17 @@ import { config } from "test-utils/fixtures/config";
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <AppConfigContext.Provider value={config}>
-    <PinnedLibrariesProvider>{children}</PinnedLibrariesProvider>
+    <AnnouncerProvider>
+      <PinnedLibrariesProvider>{children}</PinnedLibrariesProvider>
+    </AnnouncerProvider>
   </AppConfigContext.Provider>
 );
 
 const disabledWrapper = ({ children }: { children: React.ReactNode }) => (
   <AppConfigContext.Provider value={{ ...config, enablePinning: false }}>
-    <PinnedLibrariesProvider>{children}</PinnedLibrariesProvider>
+    <AnnouncerProvider>
+      <PinnedLibrariesProvider>{children}</PinnedLibrariesProvider>
+    </AnnouncerProvider>
   </AppConfigContext.Provider>
 );
 
@@ -387,67 +390,16 @@ describe("focus origin", () => {
 });
 
 describe("announce", () => {
-  const status = () => document.querySelector("[role='status']")!;
-
-  test("writes the message after a delay and clears it later", () => {
-    const { result } = renderHook(() => usePinnedLibraries(), { wrapper });
-
-    act(() => result.current.announce("Pinned."));
-    expect(status().textContent).toBe("");
-
-    act(() => {
-      jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
-    });
-    expect(status().textContent).toBe("Pinned.");
-
-    act(() => {
-      jest.advanceTimersByTime(ANNOUNCEMENT_TTL_MS);
-    });
-    expect(status().textContent).toBe("");
-  });
-
-  test("puts a repeated message in a new node, so it is read again", () => {
+  test("writes to the app's announcement region", () => {
     const { result } = renderHook(() => usePinnedLibraries(), { wrapper });
 
     act(() => result.current.announce("Pinned."));
     act(() => {
       jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
     });
-    const first = status().firstElementChild;
 
-    act(() => result.current.announce("Pinned."));
-    act(() => {
-      jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
-    });
-
-    expect(status().firstElementChild).not.toBe(first);
-    expect(status().textContent).toBe("Pinned.");
-  });
-
-  test("a new message cancels the pending clear", () => {
-    const { result } = renderHook(() => usePinnedLibraries(), { wrapper });
-
-    act(() => result.current.announce("Pinned."));
-    act(() => {
-      jest.advanceTimersByTime(ANNOUNCE_DELAY_MS + 1000);
-    });
-    act(() => result.current.announce("Unpinned."));
-    act(() => {
-      jest.advanceTimersByTime(ANNOUNCEMENT_TTL_MS - 1000);
-    });
-
-    expect(status().textContent).toBe("Unpinned.");
-  });
-
-  test("a rapid second message replaces the pending one", () => {
-    const { result } = renderHook(() => usePinnedLibraries(), { wrapper });
-
-    act(() => result.current.announce("Pinned."));
-    act(() => result.current.announce("Unpinned."));
-    act(() => {
-      jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
-    });
-
-    expect(status().textContent).toBe("Unpinned.");
+    expect(document.querySelector("[role='status']")?.textContent).toBe(
+      "Pinned."
+    );
   });
 });

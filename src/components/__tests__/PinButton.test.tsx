@@ -289,11 +289,4 @@ describe("announcements", () => {
     );
     expectAnnouncement(UNPINNED);
   });
-
-  test("has no announcement region when pinning is disabled", () => {
-    setup(<PinButton library={library} />, {
-      appConfig: { enablePinning: false }
-    });
-    expect(screen.queryByRole("status")).toBeNull();
-  });
 });

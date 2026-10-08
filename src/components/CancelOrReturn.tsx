@@ -1,6 +1,7 @@
 import * as React from "react";
 import useLibraryContext from "components/context/LibraryContext";
 import useUser from "components/context/UserContext";
+import { useAnnounce } from "components/context/AnnouncerContext";
 import { fetchBook } from "dataflow/catalog";
 import Button from "components/Button";
 import useError from "hooks/useError";
@@ -10,12 +11,14 @@ import { useTranslation } from "next-i18next/pages";
 const CancelOrReturn: React.FC<{
   text: string;
   loadingText: string;
+  successMessage: string;
   revokeUrl: string | null;
   id: string;
-}> = ({ text, loadingText, revokeUrl, id }) => {
+}> = ({ text, loadingText, successMessage, revokeUrl, id }) => {
   const { t } = useTranslation("common");
   const { token, setBook } = useUser();
   const { catalogUrl } = useLibraryContext();
+  const announce = useAnnounce();
   const [loading, setLoading] = React.useState(false);
   const { error, handleError, setErrorString, clearError } = useError();
   const { setError } = useFulfillmentButtonStackError();
@@ -34,6 +37,7 @@ const CancelOrReturn: React.FC<{
     try {
       const newBook = await fetchBook(revokeUrl, catalogUrl, token);
       setBook(newBook, id);
+      announce(successMessage);
     } catch (e) {
       handleError(e);
     }

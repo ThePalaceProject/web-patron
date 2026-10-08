@@ -2,7 +2,7 @@ import { act, screen } from "@testing-library/react";
 import { OPDS1, PinnedLibrary } from "interfaces";
 import { storeCredentials } from "auth/useCredentials";
 import { writePinnedLibraries } from "utils/pinnedLibraries";
-import { ANNOUNCE_DELAY_MS } from "components/context/PinnedLibrariesContext";
+import { ANNOUNCE_DELAY_MS } from "components/context/AnnouncerContext";
 
 /** Stores the given libraries as pinned, in order. */
 export function pinLibraries(

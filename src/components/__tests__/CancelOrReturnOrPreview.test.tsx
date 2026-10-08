@@ -1,9 +1,10 @@
 import * as React from "react";
-import { screen, setup, waitFor } from "test-utils";
+import { act, fixtures, screen, setup, waitFor } from "test-utils";
 import CancelOrReturnOrPreview from "components/CancelOrReturnOrPreview";
 import * as fetch from "dataflow/catalog";
 import { ServerError } from "errors";
 import { makeMockTab } from "test-utils/mockTab";
+import { ANNOUNCE_DELAY_MS } from "components/context/AnnouncerContext";
 
 (fetch as any).fetchBook = jest.fn();
 const mockedFetchBook = fetch.fetchBook as jest.MockedFunction<
@@ -21,6 +22,7 @@ test("renders cancel button and preview button when both urls provided", () => {
     <CancelOrReturnOrPreview
       text="Cancel Reservation"
       loadingText="Cancelling..."
+      successMessage="Reservation cancelled."
       revokeUrl="/revoke"
       id="book-id"
       previewUrl="https://example.com/preview"
@@ -37,6 +39,7 @@ test("renders only preview button when cancel url is null", () => {
     <CancelOrReturnOrPreview
       text="Cancel Reservation"
       loadingText="Cancelling..."
+      successMessage="Reservation cancelled."
       revokeUrl={null}
       id="book-id"
       previewUrl="https://example.com/preview"
@@ -53,6 +56,7 @@ test("renders only cancel button when preview url is excluded", () => {
     <CancelOrReturnOrPreview
       text="Cancel Reservation"
       loadingText="Cancelling..."
+      successMessage="Reservation cancelled."
       revokeUrl="/revokeUrl"
       id="book-id"
     />
@@ -70,6 +74,7 @@ test("renders only cancel button when preview url is null", () => {
     <CancelOrReturnOrPreview
       text="Cancel Reservation"
       loadingText="Cancelling..."
+      successMessage="Reservation cancelled."
       revokeUrl="/revokeUrl"
       previewUrl={null}
       id="book-id"
@@ -88,6 +93,7 @@ test("shows error from CancelOrReturn when user is not authenticated", async () 
     <CancelOrReturnOrPreview
       text="Cancel Reservation"
       loadingText="Cancelling..."
+      successMessage="Reservation cancelled."
       revokeUrl="/revoke"
       id="book-id"
     />,
@@ -104,6 +110,7 @@ test("shows server errors from CancelOrReturn", async () => {
     <CancelOrReturnOrPreview
       text="Cancel Reservation"
       loadingText="Cancelling..."
+      successMessage="Reservation cancelled."
       revokeUrl="/revoke"
       id="book-id"
     />
@@ -124,6 +131,38 @@ test("shows server errors from CancelOrReturn", async () => {
       screen.getByText("Error: Something happened on the server")
     ).toBeInTheDocument();
   });
+  act(() => {
+    jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
+  });
+  expect(screen.getByRole("status")).toHaveTextContent("");
+});
+
+test("announces the success message once the book is updated", async () => {
+  mockedFetchBook.mockResolvedValueOnce(fixtures.borrowableBook);
+  const { user } = setup(
+    <CancelOrReturnOrPreview
+      text="Cancel Reservation"
+      loadingText="Cancelling..."
+      successMessage="Reservation cancelled."
+      revokeUrl="/revoke"
+      id="book-id"
+    />
+  );
+
+  await user.click(screen.getByRole("button", { name: "Cancel Reservation" }));
+  await waitFor(() =>
+    expect(fixtures.mockSetBook).toHaveBeenCalledWith(
+      fixtures.borrowableBook,
+      "book-id"
+    )
+  );
+  act(() => {
+    jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
+  });
+
+  expect(screen.getByRole("status")).toHaveTextContent(
+    "Reservation cancelled."
+  );
 });
 
 test("shows error from PreviewButton when preview URL is non-https", async () => {
@@ -133,6 +172,7 @@ test("shows error from PreviewButton when preview URL is non-https", async () =>
     <CancelOrReturnOrPreview
       text="Cancel Reservation"
       loadingText="Cancelling..."
+      successMessage="Reservation cancelled."
       revokeUrl="/revoke"
       id="book-id"
       previewUrl="http://example.com/preview"
