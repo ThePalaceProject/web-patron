@@ -13,3 +13,4 @@ export { default as List } from "./List";
 export { default as Phone } from "./Phone";
 export { default as Search } from "./Search";
 export { default as Settings } from "./Settings";
+export { default as Share } from "./Share";

@@ -88,6 +88,42 @@ export function withMovedTo(
 }
 
 /**
+ * Query parameter naming pinned libraries on the home page, by stable id
+ * or by slug, so a bookmarked or shared link can populate My Libraries on
+ * another device or in a private window (which cannot see this browser's
+ * stored pins).
+ */
+export const PINS_QUERY_PARAM = "pins";
+
+/**
+ * Library identifiers from a `?pins=` query value: comma-separated,
+ * trimmed, empties and duplicates dropped, order preserved. A repeated
+ * parameter contributes all of its values.
+ */
+export function parsePinsParam(value: string | string[] | undefined): string[] {
+  const raw = Array.isArray(value) ? value.join(",") : (value ?? "");
+  const seen = new Set<string>();
+  return raw
+    .split(",")
+    .map(token => token.trim())
+    .filter(token => {
+      if (!token || seen.has(token)) return false;
+      seen.add(token);
+      return true;
+    });
+}
+
+/**
+ * The home page path with a `?pins=` value naming `libraries` by their
+ * stable ids, which survive slug changes, in the given order. Entries are
+ * comma delimited, so an id containing a comma cannot round-trip.
+ */
+export function buildPinsPath(libraries: Pick<PinnedLibrary, "id">[]): string {
+  const ids = libraries.map(lib => encodeURIComponent(lib.id));
+  return `/?${PINS_QUERY_PARAM}=${ids.join(",")}`;
+}
+
+/**
  * Returns `pinned` with slug and title refreshed from `available`, matched
  * by id, and a missing logo backfilled when the server list carries one (a
  * stored logo is kept as is). Entries absent from `available` are kept
