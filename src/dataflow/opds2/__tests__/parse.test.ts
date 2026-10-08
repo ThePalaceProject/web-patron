@@ -147,6 +147,47 @@ describe("publicationToBook", () => {
     });
   });
 
+  test("reads an active loan's dates from its fulfillment link", () => {
+    const book = publicationToBook(
+      asPublication(fixtures.loanedPublication),
+      CATALOG_URL
+    );
+    expect(book.availability).toEqual({
+      since: "2026-01-01T00:00:00+00:00",
+      until: "2026-01-22T00:00:00+00:00",
+      status: "ready"
+    });
+  });
+
+  test("reads an active loan's copies and holds from its fulfillment link", () => {
+    const loan = JSON.parse(JSON.stringify(fixtures.loanedPublication));
+    const fulfillLink = loan.links.find(
+      (link: { rel?: string }) =>
+        link.rel === "http://opds-spec.org/acquisition"
+    );
+    fulfillLink.properties.copies = { total: 5, available: 2 };
+    fulfillLink.properties.holds = { total: 3 };
+
+    const book = publicationToBook(asPublication(loan), CATALOG_URL);
+
+    expect(book.status).toBe("fulfillable");
+    expect(book.availability?.status).toBe("ready");
+    expect(book.copies).toEqual({ total: 5, available: 2 });
+    expect(book.holds).toEqual({ total: 3, position: undefined });
+  });
+
+  test("has no loan end date when an active loan's fulfillment link has no until", () => {
+    const book = publicationToBook(
+      asPublication(fixtures.loanedPublicationPerpetual),
+      CATALOG_URL
+    );
+    expect(book.availability).toEqual({
+      since: "2026-01-01T00:00:00+00:00",
+      until: undefined,
+      status: "ready"
+    });
+  });
+
   test("parses a streaming loan, normalizing OPDS entry indirection", () => {
     const book = publicationToBook(
       asPublication(fixtures.streamingLoanedPublication),

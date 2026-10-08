@@ -33,7 +33,7 @@ const FulfillmentCard: React.FC<{ book: AnyBook }> = ({ book }) => {
       }}
     >
       <Stack direction="column" sx={{ my: 3, alignItems: "flex-start" }}>
-        <BookStatus book={book} />
+        <BookStatus book={book} placement="details" />
         <FulfillmentContent book={book} />
       </Stack>
     </div>

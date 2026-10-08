@@ -330,7 +330,16 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
 
   const borrowLink = getBorrowLink(acquisitionLinks);
 
-  const { availability, holds, copies } = borrowLink ?? {};
+  // The CM sends either borrow links or generic acquisition links with
+  // availability data. An active loan should only have generic links,
+  // which carry availability status, copies and holds.
+  const availabilityLink =
+    borrowLink ??
+    acquisitionLinks.find(
+      link => link.rel === OPDSAcquisitionLink.GENERIC_REL && link.availability
+    );
+
+  const { availability, holds, copies } = availabilityLink ?? {};
 
   const openAccessLinks: FulfillmentLink[] = acquisitionLinks
     .filter(link => {
