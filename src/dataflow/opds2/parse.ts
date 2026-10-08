@@ -312,15 +312,25 @@ export function publicationToBook(
   const acquisitionLinks = links.filter(isAcquisitionLink);
   const borrowLink = getBorrowLink(acquisitionLinks);
 
-  const availability = borrowLink?.properties?.availability;
-  // The OPDS 2 availability state defaults to "available" when omitted, so a
-  // borrow link without explicit availability is treated as available.
-  const borrowState: BookAvailability | undefined = borrowLink
-    ? (availability?.state ?? "available")
-    : undefined;
+  // The CM sends either borrow links or generic acquisition links with
+  // availability data. An active loan should only have generic links,
+  // which carry availability status, copies and holds.
+  const availabilityLink =
+    borrowLink ??
+    acquisitionLinks.find(
+      link => hasRel(link, AcquisitionLinkRel) && link.properties?.availability
+    );
 
-  const holds = borrowLink?.properties?.holds;
-  const copies = borrowLink?.properties?.copies;
+  const availability = availabilityLink?.properties?.availability;
+  const holds = availabilityLink?.properties?.holds;
+  const copies = availabilityLink?.properties?.copies;
+
+  // The OPDS 2 availability state defaults to "available" when omitted, so a
+  // borrow link without explicit availability is treated as available. An active
+  // loan's state comes from its generic link, where the CM sends "ready".
+  const availabilityState: BookAvailability | undefined = borrowLink
+    ? (availability?.state ?? "available")
+    : availability?.state;
 
   // Built the same way as fulfillmentLinks below: an open-access link can
   // carry its own indirection chain (e.g. a bearer-token-wrapped format for
@@ -396,9 +406,8 @@ export function publicationToBook(
     availability: {
       since: availability?.since,
       until: availability?.until,
-      // borrowState is undefined when there is no borrow link, matching the
-      // OPDS 1 parser; our internal type is stricter, hence the cast.
-      status: borrowState as BookAvailability
+      // our internal type is stricter, hence the cast.
+      status: availabilityState as BookAvailability
     },
     holds:
       holds && typeof holds.total === "number"
@@ -444,7 +453,7 @@ export function publicationToBook(
   }
 
   // it's a reserved book
-  if (borrowState === "reserved") {
+  if (availabilityState === "reserved") {
     return {
       ...book,
       status: "reserved",
@@ -455,7 +464,7 @@ export function publicationToBook(
   const borrowUrl = borrowLink ? linkHref(borrowLink) : undefined;
 
   // it's a reservable book
-  if (borrowUrl && borrowState === "unavailable") {
+  if (borrowUrl && availabilityState === "unavailable") {
     return {
       ...book,
       status: "reservable",
@@ -464,7 +473,7 @@ export function publicationToBook(
   }
 
   // it is on hold and ready to borrow
-  if (borrowUrl && borrowState === "ready") {
+  if (borrowUrl && availabilityState === "ready") {
     return {
       ...book,
       status: "on-hold",
@@ -473,7 +482,7 @@ export function publicationToBook(
   }
 
   // it's a borrowable book
-  if (borrowUrl && borrowState === "available") {
+  if (borrowUrl && availabilityState === "available") {
     return {
       ...book,
       status: "borrowable",

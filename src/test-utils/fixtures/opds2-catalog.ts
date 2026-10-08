@@ -183,6 +183,29 @@ export const loanedPublication = makePublication(6, "Loaned Book", [
   }
 ]);
 
+export const loanedPublicationPerpetual = makePublication(
+  13,
+  "Perpetually Loaned Book",
+  [
+    {
+      href: "https://cm.example.com/loans/6/fulfill",
+      rel: "http://opds-spec.org/acquisition",
+      type: ADOBE_TYPE,
+      properties: {
+        availability: {
+          state: "ready",
+          since: "2026-01-01T00:00:00+00:00"
+        },
+        indirectAcquisition: [{ type: EPUB_TYPE }]
+      }
+    },
+    {
+      href: "https://cm.example.com/loans/6/revoke",
+      rel: "http://librarysimplified.org/terms/rel/revoke"
+    }
+  ]
+);
+
 /**
  * An active "Read Online" loan: a streaming link behind OPDS entry
  * indirection, which the CM types as the OPDS 2 publication media type.

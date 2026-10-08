@@ -21,7 +21,6 @@ import { ProblemDocument } from "types/opds1";
 import fetchMock from "jest-fetch-mock";
 import * as fetch from "dataflow/catalog";
 import { ServerError } from "errors";
-import { MOCK_DATE_STRING } from "test-utils/mockToDateString";
 import { makeMockTab } from "test-utils/mockTab";
 import { ANNOUNCE_DELAY_MS } from "components/context/AnnouncerContext";
 
@@ -89,16 +88,14 @@ describe("OnHoldBook", () => {
     borrowUrl: "/borrow",
     availability: {
       status: "ready",
-      until: "2020-06-16"
+      until: "2020-06-16T12:00:00Z"
     }
   });
 
   test("correct title and subtitle", () => {
     setup(<FulfillmentCard book={onHoldBook} />);
     expect(screen.getByText("Ready to Borrow")).toBeInTheDocument();
-    expect(
-      screen.getByText(`You have this book on hold until ${MOCK_DATE_STRING}.`)
-    );
+    expect(screen.getByText("You have this book on hold until June 16, 2020."));
   });
 
   test("borrow button fetches url and shows error", async () => {
@@ -364,7 +361,7 @@ describe("FulfillableBook", () => {
     ],
     availability: {
       status: "available",
-      until: "2020-06-18"
+      until: "2020-06-18T12:00:00Z"
     }
   });
 
@@ -579,7 +576,7 @@ describe("FulfillableBook", () => {
   test("correct title and subtitle without redirect", () => {
     setup(<FulfillmentCard book={downloadableBook} />);
     expect(
-      screen.getByText(`You have this book on loan until ${MOCK_DATE_STRING}.`)
+      screen.getByText("Borrowed until June 18, 2020")
     ).toBeInTheDocument();
     expect(
       screen.queryByText("Also available to read in the Palace App.")

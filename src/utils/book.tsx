@@ -14,6 +14,7 @@ import {
 } from "interfaces";
 import { Book, Headset } from "../icons";
 import { Language } from "./i18n";
+import { formatDate, timeUntil } from "./date";
 import { TFunction } from "next-i18next/pages";
 
 export function getAuthorList(book: AnyBook, lim?: number): string[] | null {
@@ -73,7 +74,15 @@ export function getAuthorsString(
   return formatAuthorList(authorsArray, locale);
 }
 
-export function availabilityString(book: AnyBook, t: TFunction) {
+// Where an availability string is shown, which decides its wording.
+export type AvailabilityPlacement = "list" | "details";
+
+export function availabilityString(
+  book: AnyBook,
+  t: TFunction,
+  locale: Language,
+  placement: AvailabilityPlacement
+) {
   const status = book.status;
 
   switch (status) {
@@ -117,34 +126,108 @@ export function availabilityString(book: AnyBook, t: TFunction) {
 
     case "on-hold":
       const until = book.availability?.until
-        ? new Date(book.availability.until).toDateString()
-        : "NaN";
-      const untilStr = until === "NaN" ? undefined : until;
+        ? formatDate(book.availability.until, locale, { utc: false })
+        : undefined;
 
-      if (untilStr)
+      if (until)
         return t(
           "utils.book.onHoldUntil",
           "You have this book on hold until {{until}}.",
-          { until: untilStr }
+          { until }
         );
 
       return t("utils.book.onHold", "You have this book on hold.");
 
     case "fulfillable":
-      const availableUntil = book.availability?.until
-        ? new Date(book.availability.until).toDateString()
-        : "NaN";
-
-      return availableUntil !== "NaN"
-        ? t(
-            "utils.book.onLoanUntil",
-            "You have this book on loan until {{availableUntil}}.",
-            { availableUntil }
-          )
-        : null;
+      return loanEndString(book.availability?.until, t, locale, placement);
 
     case "unsupported":
       return null;
+  }
+}
+
+// The end of a loan reads "Due…" in book lists and
+// "Borrowed until…" on the book details page.
+function loanEndString(
+  until: string | undefined,
+  t: TFunction,
+  locale: Language,
+  placement: AvailabilityPlacement
+) {
+  if (!until) return null;
+  const availableUntil = formatDate(until, locale, { utc: false });
+  if (!availableUntil) return null;
+
+  const timeLeft = timeUntil(until);
+  if (placement === "details") {
+    switch (timeLeft?.unit) {
+      case "days":
+        return t(
+          "utils.book.borrowedUntilDaysLeft",
+          "Borrowed until {{availableUntil}} ({{count}} days left)",
+          {
+            availableUntil,
+            count: timeLeft.count,
+            defaultValue_one:
+              "Borrowed until {{availableUntil}} ({{count}} day left)"
+          }
+        );
+      case "hours":
+        return t(
+          "utils.book.borrowedUntilHoursLeft",
+          "Borrowed until {{availableUntil}} ({{count}} hours left)",
+          {
+            availableUntil,
+            count: timeLeft.count,
+            defaultValue_one:
+              "Borrowed until {{availableUntil}} ({{count}} hour left)"
+          }
+        );
+      case "lessThanHour":
+        return t(
+          "utils.book.borrowedUntilLessThanHourLeft",
+          "Borrowed until {{availableUntil}} (less than an hour left)",
+          { availableUntil }
+        );
+      default:
+        return t(
+          "utils.book.borrowedUntil",
+          "Borrowed until {{availableUntil}}",
+          { availableUntil }
+        );
+    }
+  }
+  switch (timeLeft?.unit) {
+    case "days":
+      return t(
+        "utils.book.dueDaysLeft",
+        "Due {{availableUntil}} ({{count}} days left)",
+        {
+          availableUntil,
+          count: timeLeft.count,
+          defaultValue_one: "Due {{availableUntil}} ({{count}} day left)"
+        }
+      );
+    case "hours":
+      return t(
+        "utils.book.dueHoursLeft",
+        "Due {{availableUntil}} ({{count}} hours left)",
+        {
+          availableUntil,
+          count: timeLeft.count,
+          defaultValue_one: "Due {{availableUntil}} ({{count}} hour left)"
+        }
+      );
+    case "lessThanHour":
+      return t(
+        "utils.book.dueLessThanHourLeft",
+        "Due {{availableUntil}} (less than an hour left)",
+        { availableUntil }
+      );
+    default:
+      return t("utils.book.due", "Due {{availableUntil}}", {
+        availableUntil
+      });
   }
 }
 

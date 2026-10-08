@@ -191,7 +191,7 @@ export const BookListItem: React.FC<{
             </Metadata>
           </div>
 
-          <BookStatus book={book} />
+          <BookStatus book={book} placement="list" />
           <BookListCTA book={book} />
           <Description
             book={book}

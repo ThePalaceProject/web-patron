@@ -187,3 +187,6 @@ export const mockUseTranslation = () => ({
   t,
   i18n
 });
+
+export const withLocale = (locale: string) =>
+  mockUseTranslation().i18n.changeLanguage(locale);

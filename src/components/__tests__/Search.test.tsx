@@ -5,7 +5,8 @@ import { mockPush } from "test-utils/mockNextRouter";
 import useSWR from "swr";
 import { makeSwrResponse, MockSwr } from "test-utils/mockSwr";
 import { SearchData } from "interfaces";
-import { mockUseTranslation } from "test-utils/mockUseTranslation";
+import { withLocale } from "test-utils/mockUseTranslation";
+import { Language } from "utils/i18n";
 
 const fixtureData = {
   template: "/search/{searchTerms}",
@@ -14,10 +15,7 @@ const fixtureData = {
   url: "http://search-url.com/"
 };
 
-const withLocale = (locale: string) =>
-  mockUseTranslation().i18n.changeLanguage(locale);
-
-afterEach(() => withLocale("en"));
+afterEach(() => withLocale(Language.EN));
 
 jest.mock("swr");
 
