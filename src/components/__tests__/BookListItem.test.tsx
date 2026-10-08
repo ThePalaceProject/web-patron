@@ -1,5 +1,5 @@
 import * as React from "react";
-import { screen, setup, fireEvent, fixtures, waitFor } from "test-utils";
+import { act, screen, setup, fireEvent, fixtures, waitFor } from "test-utils";
 import { BookListItem } from "components/BookList";
 import * as fetch from "dataflow/catalog";
 import {
@@ -11,6 +11,7 @@ import {
 } from "interfaces";
 import { mergeBook, mockSetBook } from "test-utils/fixtures";
 import { MOCK_DATE_STRING } from "test-utils/mockToDateString";
+import { ANNOUNCE_DELAY_MS } from "components/context/AnnouncerContext";
 
 /**
  * Borrowable
@@ -237,6 +238,27 @@ describe("ReservedBook", () => {
     ).toBeInTheDocument();
   });
 
+  test("announces the cancelled reservation", async () => {
+    const unreservedBook = mergeBook<BorrowableBook>({
+      status: "borrowable",
+      borrowUrl: "/borrow"
+    });
+    mockFetchBook.mockResolvedValue(unreservedBook);
+    setup(<BookListItem book={reservedBook} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Cancel Reservation" }));
+    await waitFor(() =>
+      expect(mockSetBook).toHaveBeenCalledWith(unreservedBook, reservedBook.id)
+    );
+    act(() => {
+      jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
+    });
+
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Reservation for The Mayan Secrets cancelled."
+    );
+  });
+
   test("displays number of patrons in queue and your position", () => {
     const reservedBookWithQueue = fixtures.mergeBook<ReservedBook>({
       status: "reserved",
@@ -319,6 +341,50 @@ describe("FulfillableBook", () => {
     expect(
       screen.getByText(`You have this book on loan until ${MOCK_DATE_STRING}.`)
     ).toBeInTheDocument();
+  });
+
+  test("announces the return", async () => {
+    const unborrowed = mergeBook<BorrowableBook>({
+      status: "borrowable",
+      borrowUrl: "/borrow"
+    });
+    mockFetchBook.mockResolvedValue(unborrowed);
+    setup(<BookListItem book={downloadableBook} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Return" }));
+    await waitFor(() =>
+      expect(mockSetBook).toHaveBeenCalledWith(unborrowed, downloadableBook.id)
+    );
+    act(() => {
+      jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
+    });
+
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "The Mayan Secrets returned."
+    );
+  });
+
+  test("announces the title of the loaned version of the book", async () => {
+    const loanedBook = fixtures.mergeBook<FulfillableBook>({
+      ...downloadableBook,
+      title: "Loaned Title"
+    });
+    mockFetchBook.mockResolvedValue(
+      mergeBook<BorrowableBook>({ status: "borrowable", borrowUrl: "/borrow" })
+    );
+    setup(<BookListItem book={downloadableBook} />, {
+      user: { loans: [loanedBook] }
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Return" }));
+    await waitFor(() => expect(mockSetBook).toHaveBeenCalled());
+    act(() => {
+      jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
+    });
+
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Loaned Title returned."
+    );
   });
 
   test("handles lack of availability info", () => {

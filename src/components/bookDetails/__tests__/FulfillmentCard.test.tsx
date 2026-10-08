@@ -1,5 +1,6 @@
 import * as React from "react";
 import {
+  act,
   setup,
   screen,
   waitFor,
@@ -22,6 +23,7 @@ import * as fetch from "dataflow/catalog";
 import { ServerError } from "errors";
 import { MOCK_DATE_STRING } from "test-utils/mockToDateString";
 import { makeMockTab } from "test-utils/mockTab";
+import { ANNOUNCE_DELAY_MS } from "components/context/AnnouncerContext";
 
 jest.mock("downloadjs");
 window.open = jest.fn();
@@ -256,6 +258,27 @@ describe("reserved", () => {
     expect(mockSetBook).toHaveBeenCalledWith(unreservedBook, reservedBook.id);
   });
 
+  test("announces the cancelled reservation with the book title", async () => {
+    const unreservedBook = mergeBook<BorrowableBook>({
+      status: "borrowable",
+      borrowUrl: "/borrow"
+    });
+    mockFetchBook.mockResolvedValue(unreservedBook);
+    setup(<FulfillmentCard book={reservedBook} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Cancel Reservation" }));
+    await waitFor(() =>
+      expect(mockSetBook).toHaveBeenCalledWith(unreservedBook, reservedBook.id)
+    );
+    act(() => {
+      jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
+    });
+
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Reservation for The Mayan Secrets cancelled."
+    );
+  });
+
   test("handles cancel reservation errors", async () => {
     const problem: ProblemDocument = {
       detail: "Can't do that",
@@ -370,6 +393,72 @@ describe("FulfillableBook", () => {
     );
 
     expect(mockSetBook).toHaveBeenCalledWith(unborrowed, downloadableBook.id);
+  });
+
+  test("announces the return for a downloadable book", async () => {
+    const unborrowed = mergeBook<BorrowableBook>({
+      status: "borrowable",
+      borrowUrl: "/borrow"
+    });
+    mockFetchBook.mockResolvedValue(unborrowed);
+    setup(<FulfillmentCard book={downloadableBook} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Return" }));
+    await waitFor(() =>
+      expect(mockSetBook).toHaveBeenCalledWith(unborrowed, downloadableBook.id)
+    );
+    act(() => {
+      jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
+    });
+
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "The Mayan Secrets returned."
+    );
+  });
+
+  test("announces the return for a web-readable book", async () => {
+    const unborrowed = mergeBook<BorrowableBook>({
+      status: "borrowable",
+      borrowUrl: "/borrow"
+    });
+    mockFetchBook.mockResolvedValue(unborrowed);
+    setup(<FulfillmentCard book={externalReadOnlineBook} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Return" }));
+    await waitFor(() =>
+      expect(mockSetBook).toHaveBeenCalledWith(
+        unborrowed,
+        externalReadOnlineBook.id
+      )
+    );
+    act(() => {
+      jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
+    });
+
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "The Mayan Secrets returned."
+    );
+  });
+
+  test("announces the return using the book's own title", async () => {
+    const titledBook = mergeBook<FulfillableBook>({
+      ...downloadableBook,
+      title: "Another Title"
+    });
+    mockFetchBook.mockResolvedValue(
+      mergeBook<BorrowableBook>({ status: "borrowable", borrowUrl: "/borrow" })
+    );
+    setup(<FulfillmentCard book={titledBook} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Return" }));
+    await waitFor(() => expect(mockSetBook).toHaveBeenCalled());
+    act(() => {
+      jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
+    });
+
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Another Title returned."
+    );
   });
 
   test("shows read button for external web reader links", async () => {

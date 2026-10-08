@@ -71,6 +71,11 @@ const FulfillmentContent: React.FC<{
           ns: "common"
         })}
         loadingText={t("actions.cancelling", "Cancelling...", { ns: "common" })}
+        successMessage={t(
+          "actions.reservationCancelled",
+          "Reservation for {{title}} cancelled.",
+          { title: book.title, ns: "common" }
+        )}
         id={book.id}
       />
     );
@@ -121,6 +126,10 @@ const AccessCard: React.FC<{
 
   const redirectUser = shouldRedirectToCompanionApp(links);
   const isAudiobook = book.format === "Audiobook";
+  const returnedMessage = t("actions.returned", "{{title}} returned.", {
+    title: book.title,
+    ns: "common"
+  });
 
   const app =
     companionApp === "openebooks"
@@ -172,6 +181,7 @@ const AccessCard: React.FC<{
             loadingText={t("actions.returning", "Returning...", {
               ns: "common"
             })}
+            successMessage={returnedMessage}
             id={book.id}
             text={t("actions.return", "Return", { ns: "common" })}
           />
@@ -180,6 +190,7 @@ const AccessCard: React.FC<{
         <CancelOrReturnOrPreview
           revokeUrl={book.revokeUrl}
           loadingText={t("actions.returning", "Returning...", { ns: "common" })}
+          successMessage={returnedMessage}
           id={book.id}
           text={t("actions.return", "Return", { ns: "common" })}
         />

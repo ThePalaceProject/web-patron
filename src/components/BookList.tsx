@@ -263,6 +263,11 @@ const BookListCTA: React.FC<{ book: AnyBook }> = ({ book }) => {
           ns: "common"
         })}
         loadingText={t("actions.cancelling", "Cancelling...", { ns: "common" })}
+        successMessage={t(
+          "actions.reservationCancelled",
+          "Reservation for {{title}} cancelled.",
+          { title: book.title, ns: "common" }
+        )}
       />
     );
   }
@@ -293,6 +298,10 @@ const BookListCTA: React.FC<{ book: AnyBook }> = ({ book }) => {
         <CancelOrReturnOrPreview
           revokeUrl={book.revokeUrl}
           loadingText={t("actions.returning", "Returning...", { ns: "common" })}
+          successMessage={t("actions.returned", "{{title}} returned.", {
+            title: book.title,
+            ns: "common"
+          })}
           id={book.id}
           text={t("actions.return", "Return", { ns: "common" })}
         />

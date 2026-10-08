@@ -1,7 +1,33 @@
 import * as React from "react";
-import { render, fixtures } from "test-utils";
+import { act, render, fixtures, screen, setup, waitFor } from "test-utils";
 import { MyBooks } from "../MyBooks";
-import { FulfillableBook } from "interfaces";
+import {
+  AnyBook,
+  BorrowableBook,
+  FulfillableBook,
+  ReservableBook
+} from "interfaces";
+import { UserState } from "components/context/UserContext";
+import { ANNOUNCE_DELAY_MS } from "components/context/AnnouncerContext";
+import * as fetch from "dataflow/catalog";
+
+(fetch as any).fetchBook = jest.fn();
+const mockedFetchBook = fetch.fetchBook as jest.MockedFunction<
+  typeof fetch.fetchBook
+>;
+
+const signedIn = (loans: AnyBook[]): Partial<UserState> => ({
+  isAuthenticated: true,
+  status: "authenticated",
+  isLoading: false,
+  loans
+});
+
+const returned = (book: FulfillableBook): BorrowableBook => ({
+  ...book,
+  status: "borrowable",
+  borrowUrl: "/borrow"
+});
 
 test("shows message and button when not authenticated", () => {
   const utils = render(<MyBooks />);
@@ -106,4 +132,45 @@ test("sorts books", () => {
   expect(bookNames[2]).toHaveTextContent("Book Title 10");
   expect(bookNames[3]).toHaveTextContent("Book Title 0");
   expect(bookNames[4]).toHaveTextContent("Book Title 1");
+});
+
+test("hides books returned or cancelled before the shelf is fetched again", () => {
+  const [onLoan] = fixtures.makeFulfillableBooks(1);
+  render(<MyBooks />, {
+    user: signedIn([
+      onLoan,
+      fixtures.mergeBook<BorrowableBook>({
+        id: "returned",
+        title: "Returned Title",
+        status: "borrowable",
+        borrowUrl: "/borrow"
+      }),
+      fixtures.mergeBook<ReservableBook>({
+        id: "cancelled",
+        title: "Cancelled Title",
+        status: "reservable",
+        reserveUrl: "/reserve"
+      })
+    ])
+  });
+
+  expect(screen.getByText("Book Title 0")).toBeInTheDocument();
+  expect(screen.queryByText("Returned Title")).not.toBeInTheDocument();
+  expect(screen.queryByText("Cancelled Title")).not.toBeInTheDocument();
+});
+
+test("announces a returned book", async () => {
+  const [onLoan] = fixtures.makeFulfillableBooks(1);
+  mockedFetchBook.mockResolvedValueOnce(returned(onLoan));
+  const { user } = setup(<MyBooks />, { user: signedIn([onLoan]) });
+
+  await user.click(screen.getByRole("button", { name: "Return" }));
+  await waitFor(() => expect(fixtures.mockSetBook).toHaveBeenCalled());
+  act(() => {
+    jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
+  });
+
+  expect(screen.getByRole("status")).toHaveTextContent(
+    "Book Title 0 returned."
+  );
 });

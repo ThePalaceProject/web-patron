@@ -37,10 +37,17 @@ function compareTitles(a: AnyBook, b: AnyBook): 0 | -1 | 1 {
   return -1;
 }
 
+// A returned loan or canceled hold keeps its new borrowable or reservable
+// status until the shelf is fetched again.
+const isOnShelf = (book: AnyBook) =>
+  book.status !== "borrowable" && book.status !== "reservable";
+
 export const MyBooks: React.FC = () => {
   const { t } = useTranslation();
   const { loans, isLoading } = useUser();
-  const sortedBooks = loans ? sortBooksByLoanExpirationDate(loans) : [];
+  const sortedBooks = loans
+    ? sortBooksByLoanExpirationDate(loans.filter(isOnShelf))
+    : [];
   const noBooks = sortedBooks.length === 0;
 
   return (
