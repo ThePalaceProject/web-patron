@@ -126,7 +126,6 @@ export const BookListItem: React.FC<{
 
   return (
     <li
-      data-book-id={book.id}
       sx={{
         listStyle: "none",
         borderBottom: "1px solid",
