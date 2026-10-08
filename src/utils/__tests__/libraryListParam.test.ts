@@ -81,7 +81,13 @@ describe("parsePromoteLabel", () => {
     ["a dotted phone number", "Call 555.123.4567"],
     ["a local phone number", "Call 555-1234"],
     ["full-width characters", "Write to help\uFF20example\uFF0Eorg"],
-    ["contact details past the length limit", `${"a ".repeat(60)}example.com`]
+    ["contact details past the length limit", `${"a ".repeat(60)}example.com`],
+    [
+      // The trailing digits keep the full label from matching; the cut at
+      // the length limit lands right after the domain and exposes it.
+      "a domain exposed by the length cut",
+      `${"a".repeat(PROMOTE_LABEL_MAX_LENGTH - 12)}example.com99`
+    ]
   ])("rejects a label with %s", (_, value) => {
     expect(parsePromoteLabel(value)).toBeUndefined();
   });

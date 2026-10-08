@@ -56,8 +56,10 @@ function hasContactInfo(text: string): boolean {
 /**
  * The promoted group's heading from a `?promoteLabel=` value: trimmed, and
  * cut to `PROMOTE_LABEL_MAX_LENGTH` characters ending in an ellipsis when
- * longer. Undefined when blank or when it holds a URL, email address, or
- * phone number.
+ * longer. Undefined when blank or when the label, or its cut form, holds a
+ * URL, email address, or phone number. The cut form is checked separately
+ * because the cut can expose contact details the full label hid, such as a
+ * domain whose trailing characters made it not match.
  */
 export function parsePromoteLabel(
   value: string | string[] | undefined
@@ -67,10 +69,11 @@ export function parsePromoteLabel(
   const chars = Array.from(label);
   if (chars.length === 0) return undefined;
   if (chars.length <= PROMOTE_LABEL_MAX_LENGTH) return chars.join("");
-  return `${chars
+  const cut = `${chars
     .slice(0, PROMOTE_LABEL_MAX_LENGTH - 1)
     .join("")
     .trimEnd()}\u2026`;
+  return hasContactInfo(cut) ? undefined : cut;
 }
 
 /**
