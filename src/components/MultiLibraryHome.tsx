@@ -8,7 +8,7 @@ import { useDialogStore } from "@ariakit/react/dialog";
 import { useAppConfig } from "components/context/AppConfigContext";
 import theme from "theme/theme";
 import Button from "components/Button";
-import Copy from "icons/Copy";
+import Share from "icons/Share";
 import LibraryHomeLink from "./LibraryHomeLink";
 import LibraryFilterList from "components/LibraryFilterList";
 import LibraryCard from "components/LibraryCard";
@@ -171,20 +171,19 @@ const MultiLibraryHome: React.FC = () => {
 
   const cancelAdd = () => addDialog.hide();
 
+  const copiedMessage = t("multiLibraryHome.share.copied", "Link copied.");
+  const failedMessage = t(
+    "multiLibraryHome.share.failed",
+    "Could not copy link."
+  );
+
   // The link names only the pinned libraries shown on the page, so it
   // matches what the user sees.
   const handleCopyLink = async () => {
     const url = `${window.location.origin}${buildPinsPath(shownPinned)}`;
     const success = await copyToClipboard(url);
     setCopyStatus(success ? "copied" : "error");
-    announce(
-      success
-        ? t("multiLibraryHome.copyLink.copiedAnnouncement", "Link copied.")
-        : t(
-            "multiLibraryHome.copyLink.failedAnnouncement",
-            "The link could not be copied."
-          )
-    );
+    announce(success ? copiedMessage : failedMessage);
     setTimeout(() => setCopyStatus("idle"), 2000);
   };
 
@@ -288,26 +287,24 @@ const MultiLibraryHome: React.FC = () => {
             <>
               {/* Screen readers hear the result through `announce`. */}
               {copyStatus === "copied" && (
-                <span sx={{ fontSize: 0 }}>
-                  {t("multiLibraryHome.copyLink.copied", "Copied!")}
-                </span>
+                <span sx={{ fontSize: 0 }}>{copiedMessage}</span>
               )}
               {copyStatus === "error" && (
                 <span sx={{ fontSize: 0, color: "ui.error" }}>
-                  {t("multiLibraryHome.copyLink.failed", "Failed")}
+                  {failedMessage}
                 </span>
               )}
               <Button
                 variant="ghost"
                 color="ui.black"
                 onClick={handleCopyLink}
-                iconLeft={Copy}
+                iconLeft={Share}
                 aria-label={t(
-                  "multiLibraryHome.copyLink.ariaLabel",
-                  "Copy link with pinned libraries"
+                  "multiLibraryHome.share.ariaLabel",
+                  "Share My Libraries"
                 )}
               >
-                {t("multiLibraryHome.copyLink.label", "Copy link")}
+                {t("multiLibraryHome.share.label", "Share")}
               </Button>
             </>
           }
@@ -350,7 +347,8 @@ const MultiLibraryHome: React.FC = () => {
             "This link adds these libraries to My Libraries in this browser."
           )}
         >
-          <ul sx={{ pl: 4, mb: 3 }}>
+          {/* Scrolls a long list, so the buttons below stay on screen. */}
+          <ul sx={{ pl: 4, mb: 3, maxHeight: "40vh", overflowY: "auto" }}>
             {librariesToAdd?.map(lib => (
               <li key={lib.id}>{lib.title || lib.slug}</li>
             ))}

@@ -788,7 +788,7 @@ describe("MultiLibraryHome", () => {
       expect(replace.mock.calls[0][0].query.pins).toBeUndefined();
     });
 
-    it("hides the copy action while reordering", () => {
+    it("hides the Share button while reordering", () => {
       pinLibraries(lib("alpha", "Alpha Library"), lib("beta", "Beta Library"));
       mockLibraries([
         lib("alpha", "Alpha Library"),
@@ -797,7 +797,7 @@ describe("MultiLibraryHome", () => {
       render(<MultiLibraryHome />);
 
       expect(
-        screen.getByRole("button", { name: "Copy link with pinned libraries" })
+        screen.getByRole("button", { name: "Share My Libraries" })
       ).toBeInTheDocument();
 
       fireEvent.click(
@@ -806,7 +806,7 @@ describe("MultiLibraryHome", () => {
 
       expect(
         screen.queryByRole("button", {
-          name: "Copy link with pinned libraries"
+          name: "Share My Libraries"
         })
       ).toBeNull();
     });
@@ -820,7 +820,7 @@ describe("MultiLibraryHome", () => {
 
       render(<MultiLibraryHome />);
       fireEvent.click(
-        screen.getByRole("button", { name: "Copy link with pinned libraries" })
+        screen.getByRole("button", { name: "Share My Libraries" })
       );
 
       await waitFor(() => expect(mockedCopy).toHaveBeenCalled());
@@ -828,7 +828,7 @@ describe("MultiLibraryHome", () => {
       expect(url.pathname).toBe("/");
       expect(url.searchParams.get("pins")).toBe("urn:beta,urn:alpha");
 
-      expect(await screen.findByText("Copied!")).toBeInTheDocument();
+      expect(await screen.findByText("Link copied.")).toBeInTheDocument();
       expectAnnouncement("Link copied.");
     });
 
@@ -847,7 +847,7 @@ describe("MultiLibraryHome", () => {
 
       render(<MultiLibraryHome />);
       fireEvent.click(
-        screen.getByRole("button", { name: "Copy link with pinned libraries" })
+        screen.getByRole("button", { name: "Share My Libraries" })
       );
 
       await waitFor(() => expect(mockedCopy).toHaveBeenCalled());
@@ -862,11 +862,13 @@ describe("MultiLibraryHome", () => {
 
       render(<MultiLibraryHome />);
       fireEvent.click(
-        screen.getByRole("button", { name: "Copy link with pinned libraries" })
+        screen.getByRole("button", { name: "Share My Libraries" })
       );
 
-      expect(await screen.findByText("Failed")).toBeInTheDocument();
-      expectAnnouncement("The link could not be copied.");
+      expect(
+        await screen.findByText("Could not copy link.")
+      ).toBeInTheDocument();
+      expectAnnouncement("Could not copy link.");
     });
   });
 
