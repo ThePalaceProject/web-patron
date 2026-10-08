@@ -2,10 +2,10 @@ import type { ClientLibrary } from "pages/api/libraries";
 
 /**
  * Query parameter naming libraries to show as a promoted group on the home
- * page, by stable id or by slug, and the parameter carrying that group's
- * heading. Without a heading the localized default is used.
+ * page, by stable id or by slug.
  */
 export const PROMOTE_QUERY_PARAM = "promote";
+/** The promoted group's heading. Without it the localized default is used. */
 export const PROMOTE_LABEL_QUERY_PARAM = "promoteLabel";
 /** "name" sorts the promoted group by library name; any other value keeps link order. */
 export const PROMOTE_ORDER_QUERY_PARAM = "promoteOrder";

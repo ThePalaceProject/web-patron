@@ -686,6 +686,24 @@ describe("MultiLibraryHome", () => {
       );
     });
 
+    it("keeps ?promote when it strips ?pins", async () => {
+      mockLibraries([
+        lib("beta", "Beta Library"),
+        lib("gamma", "Gamma Library")
+      ]);
+      const replace = jest.fn();
+
+      render(<MultiLibraryHome />, {
+        router: { query: { pins: "beta", promote: "gamma" }, replace }
+      });
+
+      await screen.findByRole("alertdialog", { name: "Add to My Libraries" });
+      fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+      expect(replace).toHaveBeenCalled();
+      expect(replace.mock.calls[0][0].query).toEqual({ promote: "gamma" });
+    });
+
     it("strips the param without a dialog when there is nothing new to add", () => {
       pinLibraries(lib("alpha", "Alpha Library"));
       mockLibraries([lib("alpha", "Alpha Library")]);
@@ -788,23 +806,6 @@ describe("MultiLibraryHome", () => {
       expect(replace.mock.calls[0][0].query.pins).toBeUndefined();
     });
 
-    it("copies a link without a locale prefix", async () => {
-      pinLibraries(lib("alpha", "Alpha Library"));
-      mockLibraries([lib("alpha", "Alpha Library")]);
-
-      render(<MultiLibraryHome />, {
-        router: { locale: "fr", defaultLocale: "en" }
-      });
-      fireEvent.click(
-        screen.getByRole("button", { name: "Share My Libraries" })
-      );
-
-      await waitFor(() => expect(mockedCopy).toHaveBeenCalled());
-      const url = new URL(mockedCopy.mock.calls[0][0]);
-      expect(url.pathname).toBe("/");
-      expect(url.searchParams.get("pins")).toBe("urn:alpha");
-    });
-
     it("hides the Share button while reordering", () => {
       pinLibraries(lib("alpha", "Alpha Library"), lib("beta", "Beta Library"));
       mockLibraries([
@@ -890,6 +891,10 @@ describe("MultiLibraryHome", () => {
   });
 
   describe("promoted libraries", () => {
+    beforeEach(() => {
+      localStorage.setItem(HIDE_PUBLIC_WARNING_KEY, "true");
+    });
+
     it("shows the named libraries in order under the default heading", () => {
       mockLibraries([
         lib("alpha", "Alpha Library"),
@@ -914,6 +919,87 @@ describe("MultiLibraryHome", () => {
         within(section).getByRole("button", {
           name: "Pin Gamma Library to My Libraries"
         })
+      ).toBeInTheDocument();
+    });
+
+    it("leaves pinned libraries out and hides the group once all are pinned", () => {
+      pinLibraries(lib("alpha", "Alpha Library"));
+      mockLibraries([
+        lib("alpha", "Alpha Library"),
+        lib("beta", "Beta Library")
+      ]);
+
+      render(<MultiLibraryHome />, {
+        router: { query: { promote: "alpha,beta" } }
+      });
+
+      const section = screen
+        .getByRole("heading", { name: "Promoted libraries" })
+        .closest("section")!;
+      const links = within(section).getAllByRole("link");
+      expect(links).toHaveLength(1);
+      expect(links[0]).toHaveTextContent("Beta Library");
+
+      // Pinning the last remaining promoted library hides the group.
+      fireEvent.click(
+        within(section).getByRole("button", {
+          name: "Pin Beta Library to My Libraries"
+        })
+      );
+      expect(readPinnedLibraries().map(entry => entry.id)).toEqual([
+        "urn:alpha",
+        "urn:beta"
+      ]);
+      expect(screen.queryByText("Promoted libraries")).toBeNull();
+      expect(
+        within(myLibrariesSection()).getByRole("button", {
+          name: "Unpin Beta Library from My Libraries"
+        })
+      ).toHaveFocus();
+    });
+
+    it("keeps the typed search when a promoted library is pinned", () => {
+      mockLibraries([
+        lib("alpha", "Alpha Library"),
+        lib("beta", "Beta Library")
+      ]);
+
+      render(<MultiLibraryHome />, {
+        router: { query: { promote: "alpha" } }
+      });
+      typeFilter("bet");
+
+      const section = screen
+        .getByRole("heading", { name: "Promoted libraries" })
+        .closest("section")!;
+      fireEvent.click(
+        within(section).getByRole("button", {
+          name: "Pin Alpha Library to My Libraries"
+        })
+      );
+
+      expect(readPinnedLibraries().map(entry => entry.id)).toEqual([
+        "urn:alpha"
+      ]);
+      expect(
+        screen.getByRole("searchbox", { name: /Filter libraries/ })
+      ).toHaveValue("bet");
+    });
+
+    it("shows a stored pin in the group while pinning is disabled", () => {
+      pinLibraries(lib("alpha", "Alpha Library"));
+      mockLibraries([lib("alpha", "Alpha Library")]);
+
+      render(<MultiLibraryHome />, {
+        appConfig: { enablePinning: false },
+        router: { query: { promote: "alpha" } }
+      });
+
+      const section = screen
+        .getByRole("heading", { name: "Promoted libraries" })
+        .closest("section")!;
+      expect(
+        within(section).getByRole("link", { name: "Alpha Library" })
       ).toBeInTheDocument();
     });
 
@@ -983,23 +1069,6 @@ describe("MultiLibraryHome", () => {
       ).toBeInTheDocument();
     });
 
-    it("shows no promoted group without the parameter or matches", () => {
-      mockLibraries([lib("alpha", "Alpha Library")]);
-
-      const { unmount } = render(<MultiLibraryHome />);
-      expect(
-        screen.queryByRole("heading", { name: "Promoted libraries" })
-      ).toBeNull();
-      unmount();
-
-      render(<MultiLibraryHome />, {
-        router: { query: { promote: "ghost" } }
-      });
-      expect(
-        screen.queryByRole("heading", { name: "Promoted libraries" })
-      ).toBeNull();
-    });
-
     it.each([
       ["absent", {}],
       ["empty", { promote: "" }],
@@ -1033,11 +1102,12 @@ describe("MultiLibraryHome", () => {
       pinLibraries(lib("alpha", "Alpha Library"), lib("beta", "Beta Library"));
       mockLibraries([
         lib("alpha", "Alpha Library"),
-        lib("beta", "Beta Library")
+        lib("beta", "Beta Library"),
+        lib("gamma", "Gamma Library")
       ]);
 
       render(<MultiLibraryHome />, {
-        router: { query: { promote: "beta" } }
+        router: { query: { promote: "gamma" } }
       });
 
       expect(

@@ -220,15 +220,17 @@ const MultiLibraryHome: React.FC = () => {
    * A `?promote=` query shows the named libraries as their own group, in
    * link order, or by library name when `?promoteOrder=name`. The group
    * is display-only: nothing is stored, so the parameter stays in the URL
-   * and the page works as a shareable curated view. `?promoteLabel=`
-   * overrides the group's localized heading and is rendered as plain text.
-   * Both companion parameters are ignored when `?promote=` names no
-   * available library.
+   * and the page works as a shareable curated view. Libraries already shown
+   * in My Libraries are left out, and the group hides entirely once nothing
+   * remains. `?promoteLabel=` overrides the group's localized heading and
+   * is rendered as plain text. Both companion parameters are ignored when
+   * `?promote=` names no library the group would show.
    */
+  const shownPinnedIds = new Set(shownPinned.map(lib => lib.id));
   const promoted = resolveLibraryList(
     parseLibraryListParam(router.query[PROMOTE_QUERY_PARAM]),
     data.libraries
-  );
+  ).filter(lib => !shownPinnedIds.has(lib.id));
   if (firstParamValue(router.query[PROMOTE_ORDER_QUERY_PARAM]) === "name") {
     promoted.sort(byName);
   }
@@ -239,12 +241,18 @@ const MultiLibraryHome: React.FC = () => {
   // `title` replaces the name as the link content, e.g. to mark search
   // matches. `reorderControls` replace the pin button, and the link becomes
   // plain text, so the card cannot be opened while it is being reordered.
+  // A pin or unpin clears the search unless `keepSearch` is set.
   const renderCard = (
     library: ClientLibrary,
     {
       title,
-      reorderControls
-    }: { title?: React.ReactNode; reorderControls?: React.ReactNode } = {}
+      reorderControls,
+      keepSearch = false
+    }: {
+      title?: React.ReactNode;
+      reorderControls?: React.ReactNode;
+      keepSearch?: boolean;
+    } = {}
   ) => {
     const name = library.title || library.slug;
     return (
@@ -262,7 +270,7 @@ const MultiLibraryHome: React.FC = () => {
                 logoUrl: library.logoUrl,
                 authDocUrl: library.authDocUrl
               }}
-              onToggle={resetSearch}
+              onToggle={keepSearch ? undefined : resetSearch}
             />
           )
         }
@@ -335,7 +343,9 @@ const MultiLibraryHome: React.FC = () => {
             <h2>{promotedLabel}</h2>
             <LibraryCardList>
               {promoted.map(library => (
-                <li key={library.id}>{renderCard(library)}</li>
+                <li key={library.id}>
+                  {renderCard(library, { keepSearch: true })}
+                </li>
               ))}
             </LibraryCardList>
           </section>
