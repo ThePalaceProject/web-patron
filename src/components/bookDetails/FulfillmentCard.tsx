@@ -47,6 +47,7 @@ const FulfillmentContent: React.FC<{
   if (bookIsBorrowable(book)) {
     return (
       <BorrowOrReserveOrPreview
+        placement="details"
         isBorrow
         borrowUrl={book.borrowUrl}
         previewUrl={book.previewUrl}
@@ -56,6 +57,7 @@ const FulfillmentContent: React.FC<{
   if (bookIsReservable(book)) {
     return (
       <BorrowOrReserveOrPreview
+        placement="details"
         isBorrow={false}
         borrowUrl={book.reserveUrl}
         previewUrl={book.previewUrl}
@@ -83,6 +85,7 @@ const FulfillmentContent: React.FC<{
   if (bookIsOnHold(book)) {
     return (
       <BorrowOrReserveOrPreview
+        placement="details"
         borrowUrl={book.borrowUrl}
         previewUrl={book.previewUrl}
         isBorrow

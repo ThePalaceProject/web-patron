@@ -151,7 +151,7 @@ export function availabilityString(
 }
 
 // The end of a loan reads "Due…" in book lists and
-// "Borrowed until…" on the book details page.
+// "Borrowed until…" on book details pages.
 function loanEndString(
   until: string | undefined,
   t: TFunction,

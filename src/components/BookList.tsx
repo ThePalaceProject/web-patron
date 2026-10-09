@@ -241,17 +241,33 @@ const Description: React.FC<{
 const BookListCTA: React.FC<{ book: AnyBook }> = ({ book }) => {
   const { t } = useTranslation();
   if (bookIsBorrowable(book)) {
-    return <BorrowOrReserveOrPreview borrowUrl={book.borrowUrl} isBorrow />;
+    return (
+      <BorrowOrReserveOrPreview
+        placement="list"
+        borrowUrl={book.borrowUrl}
+        isBorrow
+      />
+    );
   }
 
   if (bookIsReservable(book)) {
     return (
-      <BorrowOrReserveOrPreview borrowUrl={book.reserveUrl} isBorrow={false} />
+      <BorrowOrReserveOrPreview
+        placement="list"
+        borrowUrl={book.reserveUrl}
+        isBorrow={false}
+      />
     );
   }
 
   if (bookIsOnHold(book)) {
-    return <BorrowOrReserveOrPreview borrowUrl={book.borrowUrl} isBorrow />;
+    return (
+      <BorrowOrReserveOrPreview
+        placement="list"
+        borrowUrl={book.borrowUrl}
+        isBorrow
+      />
+    );
   }
 
   if (bookIsReserved(book)) {

@@ -74,6 +74,28 @@ describe("BorrowableBook", () => {
       expect(mockSetBook).toHaveBeenCalledWith(borrowableBook)
     );
   });
+
+  test("announces the loan end date after borrowing", async () => {
+    mockFetchBook.mockResolvedValue(
+      fixtures.mergeBook<FulfillableBook>({
+        status: "fulfillable",
+        revokeUrl: "/revoke",
+        fulfillmentLinks: [],
+        availability: { status: "available", until: "2020-06-18T12:00:00Z" }
+      })
+    );
+    setup(<BookListItem book={borrowableBook} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Borrow" }));
+    await waitFor(() => expect(mockSetBook).toHaveBeenCalled());
+    act(() => {
+      jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
+    });
+
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Book Availability: Due June 18, 2020"
+    );
+  });
 });
 
 describe("OnHoldBook", () => {
@@ -183,6 +205,41 @@ describe("ReservableBook", () => {
     // we revalidate the loans
     await waitFor(() =>
       expect(mockSetBook).toHaveBeenCalledWith(reservableBook)
+    );
+  });
+
+  test("announces patron place in hold queue after reserving", async () => {
+    const mockSetBook = jest.fn();
+
+    const reservedBook = fixtures.mergeBook<ReservedBook>({
+      status: "reserved",
+      revokeUrl: "/revoke",
+      availability: { status: "reserved" },
+      copies: { total: 13, available: 0 },
+      holds: { total: 2, position: 1 }
+    });
+
+    mockFetchBook.mockResolvedValue(reservedBook);
+
+    setup(<BookListItem book={reservableBook} />, {
+      user: {
+        setBook: mockSetBook,
+        isAuthenticated: true,
+        loans: fixtures.loans.books
+      }
+    });
+
+    // click reserve
+    fireEvent.click(screen.getByText("Reserve"));
+
+    await waitFor(() => expect(mockSetBook).toHaveBeenCalledWith(reservedBook));
+    act(() => {
+      jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
+    });
+
+    // TODO: Incorrect pluralization (1 patrons) flagged for separate PR
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Book Availability: 1 patrons ahead of you in the queue"
     );
   });
 });
@@ -435,5 +492,29 @@ describe("FulfillableBook", () => {
     });
     setup(<BookListItem book={withoutAvailability} />);
     expect(screen.queryByText("Book Availability:")).not.toBeInTheDocument();
+  });
+
+  test("announces only the return when the returned book re-renders", async () => {
+    const returnedBook = mergeBook<BorrowableBook>({
+      status: "borrowable",
+      borrowUrl: "/borrow",
+      copies: { total: 3, available: 3 }
+    });
+    mockFetchBook.mockResolvedValue(returnedBook);
+    const { rerender } = setup(<BookListItem book={downloadableBook} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Return" }));
+    await waitFor(() => expect(mockSetBook).toHaveBeenCalled());
+    rerender(<BookListItem book={returnedBook} />);
+    act(() => {
+      jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
+    });
+
+    expect(
+      screen.getByText("3 out of 3 copies available.")
+    ).toBeInTheDocument();
+    const statuses = screen.getAllByRole("status");
+    expect(statuses).toHaveLength(1);
+    expect(statuses[0]).toHaveTextContent("The Mayan Secrets returned.");
   });
 });
