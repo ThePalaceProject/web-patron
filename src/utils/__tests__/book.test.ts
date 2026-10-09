@@ -1,15 +1,23 @@
-import { describe, expect, test } from "@jest/globals";
-import { AnyBook, BookFormat, BookMedium } from "interfaces";
+import { afterEach, describe, expect, jest, test } from "@jest/globals";
+import {
+  AnyBook,
+  BookAvailability,
+  BookFormat,
+  BookMedium,
+  FulfillableBook,
+  OnHoldBook
+} from "interfaces";
 import { TFunction } from "next-i18next/pages";
 import {
+  availabilityString,
   bookIsAudiobook,
   getMedium,
   getMediumName,
   translateBookFormat,
   translateMedium
 } from "utils/book";
-import { mockUseTranslation } from "test-utils/mockUseTranslation";
-import { makeBorrowableBooks } from "../../test-utils/fixtures/book";
+import { mockUseTranslation, withLocale } from "test-utils/mockUseTranslation";
+import { makeBorrowableBooks, mergeBook } from "../../test-utils/fixtures/book";
 import { formatAuthorList, getAuthorList, getAuthors } from "../book";
 import { Language } from "utils/i18n";
 
@@ -196,6 +204,148 @@ describe("getMediumName", () => {
     const book: AnyBook = { ...bookFixture, raw: {} };
 
     expect(getMediumName(book, t)).toBe("");
+  });
+});
+
+describe("availabilityString", () => {
+  const until = "2026-10-19T12:00:00Z";
+  const MINUTE = 60 * 1000;
+  const HOUR = 60 * MINUTE;
+  const DAY = 24 * HOUR;
+  const withTimeLeft = (ms: number) =>
+    jest.spyOn(Date, "now").mockReturnValue(Date.parse(until) - ms);
+
+  afterEach(() => withLocale(Language.EN));
+
+  const onLoan = (
+    availability: { status: BookAvailability; until?: string } = {
+      status: "available",
+      until: until
+    }
+  ) =>
+    mergeBook<FulfillableBook>({
+      status: "fulfillable",
+      revokeUrl: "/revoke",
+      fulfillmentLinks: [],
+      availability
+    });
+
+  const onHold = (
+    availability: { status: BookAvailability; until?: string } = {
+      status: "ready",
+      until: until
+    }
+  ) =>
+    mergeBook<OnHoldBook>({
+      status: "on-hold",
+      borrowUrl: "/borrow",
+      availability
+    });
+
+  describe("fulfillable loans", () => {
+    describe.each([
+      {
+        placement: "list",
+        loanEnd: "Due October 19, 2026",
+        loanEndDe: "Fällig am 19. Oktober 2026"
+      },
+      {
+        placement: "details",
+        loanEnd: "Borrowed until October 19, 2026",
+        loanEndDe: "Ausgeliehen bis 19. Oktober 2026"
+      }
+    ] as const)("$placement placement", ({ placement, loanEnd, loanEndDe }) => {
+      const availability = (loan = onLoan(), language = Language.EN) =>
+        availabilityString(loan, t, language, placement);
+
+      test.each([
+        {
+          remaining: "13 days and 23 hours",
+          ms: 13 * DAY + 23 * HOUR,
+          suffix: "(13 days left)"
+        },
+        {
+          remaining: "1 day",
+          ms: DAY,
+          suffix: "(1 day left)"
+        },
+        {
+          remaining: "23 hours and 59 minutes",
+          ms: 23 * HOUR + 59 * MINUTE,
+          suffix: "(23 hours left)"
+        },
+        {
+          remaining: "1 hour",
+          ms: HOUR,
+          suffix: "(1 hour left)"
+        },
+        {
+          remaining: "30 minutes",
+          ms: 30 * MINUTE,
+          suffix: "(less than an hour left)"
+        }
+      ])(
+        "with $remaining remaining, shows the loan's end date and '$suffix'",
+        ({ ms, suffix }) => {
+          withTimeLeft(ms);
+          expect(availability()).toBe(`${loanEnd} ${suffix}`);
+        }
+      );
+
+      test("shows only the end date once the loan has passed", () => {
+        withTimeLeft(-DAY);
+        expect(availability()).toBe(loanEnd);
+      });
+
+      test.each([
+        {
+          reason: "has no end date",
+          bookAvailability: { status: "available" }
+        },
+        {
+          reason: "has an invalid end date",
+          bookAvailability: { status: "available", until: "not-a-date" }
+        }
+      ] as const)(
+        "shows nothing when a loan $reason",
+        ({ bookAvailability }) => {
+          expect(availability(onLoan(bookAvailability))).toBeNull();
+        }
+      );
+
+      test("shows the formatted wording and date based on locale", () => {
+        withLocale(Language.DE);
+        withTimeLeft(-DAY);
+        expect(availabilityString(onLoan(), t, Language.DE, placement)).toBe(
+          loanEndDe
+        );
+      });
+    });
+  });
+
+  describe("loans on hold", () => {
+    test("shows a ready hold's end date", () => {
+      expect(availabilityString(onHold(), t, Language.EN, "list")).toBe(
+        "You have this book on hold until October 19, 2026."
+      );
+    });
+
+    test("shows a ready hold without an end date", () => {
+      expect(
+        availabilityString(onHold({ status: "ready" }), t, Language.EN, "list")
+      ).toBe("You have this book on hold.");
+    });
+
+    test("shows a ready hold without a valid end date", () => {
+      expect(
+        availabilityString(
+          onHold({ status: "ready", until: "not-a-date" }),
+          t,
+          Language.EN,
+          "list"
+        )
+      ).toBe("You have this book on hold.");
+    });
   });
 });
 

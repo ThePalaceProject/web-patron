@@ -33,7 +33,7 @@ const FulfillmentCard: React.FC<{ book: AnyBook }> = ({ book }) => {
       }}
     >
       <Stack direction="column" sx={{ my: 3, alignItems: "flex-start" }}>
-        <BookStatus book={book} />
+        <BookStatus book={book} placement="details" />
         <FulfillmentContent book={book} />
       </Stack>
     </div>
@@ -47,6 +47,7 @@ const FulfillmentContent: React.FC<{
   if (bookIsBorrowable(book)) {
     return (
       <BorrowOrReserveOrPreview
+        placement="details"
         isBorrow
         borrowUrl={book.borrowUrl}
         previewUrl={book.previewUrl}
@@ -56,6 +57,7 @@ const FulfillmentContent: React.FC<{
   if (bookIsReservable(book)) {
     return (
       <BorrowOrReserveOrPreview
+        placement="details"
         isBorrow={false}
         borrowUrl={book.reserveUrl}
         previewUrl={book.previewUrl}
@@ -83,6 +85,7 @@ const FulfillmentContent: React.FC<{
   if (bookIsOnHold(book)) {
     return (
       <BorrowOrReserveOrPreview
+        placement="details"
         borrowUrl={book.borrowUrl}
         previewUrl={book.previewUrl}
         isBorrow

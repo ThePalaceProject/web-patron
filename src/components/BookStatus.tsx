@@ -1,11 +1,16 @@
 import * as React from "react";
 import { MediumIcon } from "components/MediumIndicator";
 import { AnyBook } from "interfaces";
-import { availabilityString } from "utils/book";
+import { AvailabilityPlacement, availabilityString } from "utils/book";
 import { ScreenReaderOnly, Text } from "components/Text";
-import { useTranslation } from "next-i18next/pages";
+import { TFunction, useTranslation } from "next-i18next/pages";
+import { Language } from "utils/i18n";
+import useLocale from "hooks/useLocale";
 
-const BookStatus: React.FC<{ book: AnyBook }> = ({ book }) => {
+const BookStatus: React.FC<{
+  book: AnyBook;
+  placement: AvailabilityPlacement;
+}> = ({ book, placement }) => {
   const { t } = useTranslation();
   const { status } = book;
 
@@ -33,14 +38,18 @@ const BookStatus: React.FC<{ book: AnyBook }> = ({ book }) => {
           </Text>
         </div>
       )}
-      <AvailabilityString book={book} />
+      <AvailabilityString book={book} placement={placement} />
     </div>
   );
 };
 
-const AvailabilityString: React.FC<{ book: AnyBook }> = ({ book }) => {
+const AvailabilityString: React.FC<{
+  book: AnyBook;
+  placement: AvailabilityPlacement;
+}> = ({ book, placement }) => {
   const { t } = useTranslation();
-  const str = availabilityString(book, t);
+  const locale = useLocale();
+  const str = availabilityString(book, t, locale, placement);
   if (!str) return null;
   return (
     <Text
@@ -54,5 +63,20 @@ const AvailabilityString: React.FC<{ book: AnyBook }> = ({ book }) => {
     </Text>
   );
 };
+
+/**
+ * What a screen reader announces for a book's availability,
+ * e.g. the loan end date announced after a borrow.
+ */
+export function availabilityAnnouncement(
+  book: AnyBook,
+  t: TFunction,
+  locale: Language,
+  placement: AvailabilityPlacement
+): string | null {
+  const str = availabilityString(book, t, locale, placement);
+  if (!str) return null;
+  return `${t("bookStatus.availability", "Book Availability:")} ${str}`;
+}
 
 export default BookStatus;

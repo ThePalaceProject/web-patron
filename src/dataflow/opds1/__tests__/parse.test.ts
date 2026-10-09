@@ -626,6 +626,84 @@ describe("FulfillableBook", () => {
     expect(book.status).toBe("fulfillable");
   });
 
+  test("reads an active loan's dates from its fulfillment link", () => {
+    mockConfig();
+    const fulfillmentLink = factory.acquisitionLink({
+      rel: OPDSAcquisitionLink.GENERIC_REL,
+      type: OPDS1.EpubMediaType,
+      href: "/epub",
+      availability: {
+        status: "available",
+        since: "2026-10-05T18:30:00+00:00",
+        until: "2026-10-26T18:30:00+00:00"
+      },
+      copies: { total: 5, available: 2 },
+      holds: { total: 3 }
+    });
+    const entry = factory.entry({
+      ...basicInfo,
+      links: [fulfillmentLink, detailLink]
+    });
+
+    const book = entryToBook(entry, "http://test-url.com");
+
+    expect(book.status).toBe("fulfillable");
+    // with no borrow link, the status comes from the fulfillment link
+    expect(book.availability).toEqual({
+      since: "2026-10-05T18:30:00+00:00",
+      until: "2026-10-26T18:30:00+00:00",
+      status: "available"
+    });
+  });
+
+  test("reads an active loan's copies and holds from its fulfillment link", () => {
+    mockConfig();
+    const fulfillmentLink = factory.acquisitionLink({
+      rel: OPDSAcquisitionLink.GENERIC_REL,
+      type: OPDS1.EpubMediaType,
+      href: "/epub",
+      availability: {
+        status: "available",
+        since: "2026-10-05T18:30:00+00:00",
+        until: "2026-10-26T18:30:00+00:00"
+      },
+      copies: { total: 5, available: 2 },
+      holds: { total: 3 }
+    });
+    const entry = factory.entry({
+      ...basicInfo,
+      links: [fulfillmentLink, detailLink]
+    });
+
+    const book = entryToBook(entry, "http://test-url.com");
+
+    expect(book.status).toBe("fulfillable");
+    expect(book.copies).toEqual({ total: 5, available: 2 });
+    expect(book.holds).toEqual({ total: 3 });
+  });
+
+  test("has no loan end date when an active loan's fulfillment link has no until", () => {
+    mockConfig();
+    const fulfillmentLink = factory.acquisitionLink({
+      rel: OPDSAcquisitionLink.GENERIC_REL,
+      type: OPDS1.EpubMediaType,
+      href: "/epub",
+      availability: {
+        status: "available",
+        since: "2026-10-05T18:30:00+00:00"
+      }
+    });
+    const entry = factory.entry({
+      ...basicInfo,
+      links: [fulfillmentLink, detailLink]
+    });
+
+    const book = entryToBook(entry, "http://test-url.com");
+
+    expect(book.status).toBe("fulfillable");
+    expect(book.availability?.until).toBeUndefined();
+  });
+
   const revokeLink = factory.opdsLink({
     rel: OPDS1.RevokeLinkRel,
     href: "/revoke"
