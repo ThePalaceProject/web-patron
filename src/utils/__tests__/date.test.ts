@@ -17,15 +17,18 @@ describe("formatDate", () => {
     );
   });
 
-  test("formats a full timestamp in the local timezone when utc is false", () => {
-    // Pin the local timezone to UTC+14, so date rolls over to the next calendar day.
+  test("formats a full timestamp in the local time zone when utc is false", () => {
+    // Pin the host environment's time zone to UTC+14, so date rolls over to the next calendar day.
     // spy inspired by https://sheetsj.com/2021/05/mock-intl-and-date-globals-in-jest.
     const OriginalDateTimeFormat = Intl.DateTimeFormat;
     const spy = jest.spyOn(Intl, "DateTimeFormat").mockImplementation(
       (locale?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions) =>
         new OriginalDateTimeFormat(locale, {
           ...options,
-          timeZone: "Pacific/Kiritimati"
+          timeZone:
+            options?.timeZone === undefined
+              ? "Pacific/Kiritimati"
+              : options.timeZone
         })
     );
     try {
