@@ -13,13 +13,15 @@ import * as fetch from "dataflow/catalog";
 import { mockPush, mockReplace } from "test-utils/mockNextRouter";
 
 test("shows correct button for borrowable book", async () => {
-  setup(<BorrowOrReserve isBorrow borrowUrl="/url" />);
+  setup(<BorrowOrReserve placement="details" isBorrow borrowUrl="/url" />);
   await screen.findByRole("button", { name: "Borrow" });
   expect(screen.getByRole("button", { name: "Borrow" })).toBeInTheDocument();
 });
 
 test("shows reserve button for reservable book", () => {
-  setup(<BorrowOrReserve isBorrow={false} borrowUrl="/url" />);
+  setup(
+    <BorrowOrReserve placement="details" isBorrow={false} borrowUrl="/url" />
+  );
   expect(screen.getByRole("button", { name: "Reserve" })).toBeInTheDocument();
 });
 
@@ -34,7 +36,7 @@ const mockedFetchBook = fetch.fetchBook as jest.MockedFunction<
 
 test("borrowing calls correct url with token", async () => {
   mockedFetchBook.mockResolvedValueOnce(fixtures.fulfillableBook);
-  setup(<BorrowOrReserve isBorrow borrowUrl="/url" />);
+  setup(<BorrowOrReserve placement="details" isBorrow borrowUrl="/url" />);
 
   const button = await screen.findByRole("button", {
     name: "Borrow"
@@ -58,9 +60,12 @@ test("borrowing calls correct url with token", async () => {
 });
 
 test("redirects to login when not signed in", async () => {
-  const { user } = setup(<BorrowOrReserve isBorrow borrowUrl="/url" />, {
-    user: { isAuthenticated: false, token: undefined }
-  });
+  const { user } = setup(
+    <BorrowOrReserve placement="details" isBorrow borrowUrl="/url" />,
+    {
+      user: { isAuthenticated: false, token: undefined }
+    }
+  );
 
   const button = await screen.findByRole("button", {
     name: "Borrow"
@@ -94,7 +99,9 @@ test("redirects to login when not signed in", async () => {
 });
 
 test("calls set book after borrowing", async () => {
-  const { user } = setup(<BorrowOrReserve isBorrow borrowUrl="/url" />);
+  const { user } = setup(
+    <BorrowOrReserve placement="details" isBorrow borrowUrl="/url" />
+  );
   const button = await screen.findByRole("button", {
     name: "Borrow"
   });
@@ -111,6 +118,7 @@ describe("Preview button (via BorrowOrReserveOrPreview)", () => {
   test("renders Preview button when previewUrl is provided", () => {
     setup(
       <BorrowOrReserveOrPreview
+        placement="details"
         isBorrow
         borrowUrl="/borrow"
         previewUrl="/preview"
@@ -121,7 +129,13 @@ describe("Preview button (via BorrowOrReserveOrPreview)", () => {
   });
 
   test("does not render Preview button when previewUrl is omitted", () => {
-    setup(<BorrowOrReserveOrPreview isBorrow borrowUrl="/borrow" />);
+    setup(
+      <BorrowOrReserveOrPreview
+        placement="details"
+        isBorrow
+        borrowUrl="/borrow"
+      />
+    );
     expect(
       screen.queryByRole("button", { name: "Preview" })
     ).not.toBeInTheDocument();
@@ -130,6 +144,7 @@ describe("Preview button (via BorrowOrReserveOrPreview)", () => {
   test("does not render Preview button when previewUrl is null", () => {
     setup(
       <BorrowOrReserveOrPreview
+        placement="details"
         isBorrow
         borrowUrl="/borrow"
         previewUrl={null}
@@ -143,6 +158,7 @@ describe("Preview button (via BorrowOrReserveOrPreview)", () => {
   test("renders Preview button for reserve variant when previewUrl is provided", () => {
     setup(
       <BorrowOrReserveOrPreview
+        placement="details"
         isBorrow={false}
         borrowUrl="/reserve"
         previewUrl="/preview"

@@ -118,6 +118,7 @@ export function availabilityString(
       const position = book.holds?.position;
       if (!position || isNaN(position)) return null;
 
+      // TODO: Incorrect pluralization (1 patrons) flagged for separate PR
       return t(
         "utils.book.positionInQueue",
         "{{position}} patrons ahead of you in the queue.",
@@ -147,7 +148,7 @@ export function availabilityString(
 }
 
 // The end of a loan reads "Due…" in book lists and
-// "Borrowed until…" on the book details page.
+// "Borrowed until…" on book details pages.
 function loanEndString(
   until: string | undefined,
   t: TFunction,

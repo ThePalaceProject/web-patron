@@ -80,6 +80,30 @@ describe("BorrowableBook", () => {
     await waitForElementToBeRemoved(() => screen.queryByText("Borrowing..."));
     expect(screen.getByText("Error: Can't do that"));
   });
+
+  test("announces the loan end date after borrowing", async () => {
+    mockFetchBook.mockResolvedValue(
+      mergeBook<FulfillableBook>({
+        status: "fulfillable",
+        revokeUrl: "/revoke",
+        fulfillmentLinks: [],
+        availability: { status: "available", until: "2020-06-18T12:00:00Z" }
+      })
+    );
+    setup(<FulfillmentCard book={borrowableBook} />, {
+      user: { isAuthenticated: true }
+    });
+
+    fireEvent.click(await screen.findByRole("button", { name: "Borrow" }));
+    await waitFor(() => expect(mockSetBook).toHaveBeenCalled());
+    act(() => {
+      jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
+    });
+
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Book Availability: Borrowed until June 18, 2020"
+    );
+  });
 });
 
 describe("OnHoldBook", () => {

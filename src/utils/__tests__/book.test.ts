@@ -257,26 +257,35 @@ describe("availabilityString", () => {
     ] as const)("$placement placement", ({ placement, loanEnd, loanEndDe }) => {
       const availability = (loan = onLoan(), language = Language.EN) =>
         availabilityString(loan, t, language, placement);
+
       test.each([
         {
           remaining: "13 days and 23 hours",
           ms: 13 * DAY + 23 * HOUR,
           suffix: "(13 days left)"
         },
-        { remaining: "1 day", ms: DAY, suffix: "(1 day left)" },
+        {
+          remaining: "1 day",
+          ms: DAY,
+          suffix: "(1 day left)"
+        },
         {
           remaining: "23 hours and 59 minutes",
           ms: 23 * HOUR + 59 * MINUTE,
           suffix: "(23 hours left)"
         },
-        { remaining: "1 hour", ms: HOUR, suffix: "(1 hour left)" },
+        {
+          remaining: "1 hour",
+          ms: HOUR,
+          suffix: "(1 hour left)"
+        },
         {
           remaining: "30 minutes",
           ms: 30 * MINUTE,
           suffix: "(less than an hour left)"
         }
       ])(
-        "with $remaining remaining, shows the loan's end date and $suffix",
+        "with $remaining remaining, shows the loan's end date and '$suffix'",
         ({ ms, suffix }) => {
           withTimeLeft(ms);
           expect(availability()).toBe(`${loanEnd} ${suffix}`);

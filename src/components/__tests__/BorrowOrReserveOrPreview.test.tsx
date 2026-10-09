@@ -19,6 +19,7 @@ beforeEach(() => {
 test("renders borrow button and preview button when both urls provided", () => {
   setup(
     <BorrowOrReserveOrPreview
+      placement="details"
       isBorrow
       borrowUrl="/borrow"
       previewUrl="https://example.com/preview"
@@ -29,7 +30,13 @@ test("renders borrow button and preview button when both urls provided", () => {
 });
 
 test("preview button does not render when preview url is excluded", () => {
-  setup(<BorrowOrReserveOrPreview isBorrow borrowUrl="/borrow" />);
+  setup(
+    <BorrowOrReserveOrPreview
+      placement="details"
+      isBorrow
+      borrowUrl="/borrow"
+    />
+  );
   expect(screen.queryByRole("button", { name: "Borrow" })).toBeInTheDocument();
   expect(
     screen.queryByRole("button", { name: "Preview" })
@@ -38,7 +45,12 @@ test("preview button does not render when preview url is excluded", () => {
 
 test("preview button does not render when preview url is null", () => {
   setup(
-    <BorrowOrReserveOrPreview isBorrow borrowUrl="/borrow" previewUrl={null} />
+    <BorrowOrReserveOrPreview
+      placement="details"
+      isBorrow
+      borrowUrl="/borrow"
+      previewUrl={null}
+    />
   );
   expect(screen.queryByRole("button", { name: "Borrow" })).toBeInTheDocument();
   expect(
@@ -49,7 +61,11 @@ test("preview button does not render when preview url is null", () => {
 describe("BorrowOrReserve error handling", () => {
   test("shows error from BorrowOrReserve when user is not authenticated", async () => {
     const { user } = setup(
-      <BorrowOrReserveOrPreview isBorrow borrowUrl="/url" />,
+      <BorrowOrReserveOrPreview
+        placement="details"
+        isBorrow
+        borrowUrl="/url"
+      />,
       { user: { isAuthenticated: false, token: undefined } }
     );
 
@@ -65,7 +81,7 @@ describe("BorrowOrReserve error handling", () => {
 
   test("shows server errors from BorrowOrReserve", async () => {
     const { user } = setup(
-      <BorrowOrReserveOrPreview isBorrow borrowUrl="/url" />
+      <BorrowOrReserveOrPreview placement="details" isBorrow borrowUrl="/url" />
     );
     const button = await screen.findByRole("button", {
       name: "Borrow"
@@ -90,7 +106,7 @@ describe("BorrowOrReserve error handling", () => {
 
   test("shows unrecognized fetch errors from BorrowOrReserve", async () => {
     const { user } = setup(
-      <BorrowOrReserveOrPreview isBorrow borrowUrl="/url" />
+      <BorrowOrReserveOrPreview placement="details" isBorrow borrowUrl="/url" />
     );
     const button = await screen.findByRole("button", {
       name: "Borrow"
@@ -114,6 +130,7 @@ describe("PreviewButton error handling", () => {
 
     const { user } = setup(
       <BorrowOrReserveOrPreview
+        placement="details"
         isBorrow
         borrowUrl="/url"
         previewUrl="http://example.com/preview"
