@@ -67,7 +67,7 @@
     "chalk": "^4.1.0",
     "date-fns": "^4.1.0",
     "deepmerge": "^4.2.2",
-    "dompurify": "^3.4.13",
+    "dompurify": "^3.4.16",
     "downloadjs": "^1.4.7",
     "firebase": "^12.19.0",
     "history": "^4.10.1",
