@@ -109,14 +109,28 @@ type TranslationOptions = Record<string, string | number | undefined> & {
 };
 
 // define mock function t to return the translation for the current language.
-// The signature mirrors the i18next overload the app uses,
-// t(key, defaultValue, options), and supports simple placeholder replacement,
-// for example: t("addedToFavorites", "Add {{bookTitle}}", { bookTitle: "Moomin" })
+// The signature mirrors the two i18next overloads the app uses,
+// t(key, defaultValue, options) and t(key, options), and supports simple
+// placeholder replacement, for example:
+// - t("addedToFavorites", "Add {{bookTitle}}", { bookTitle: "Moomin" })
+// - t("x", { count: 2, defaultValue_one: "...", defaultValue_other: "..." })
 const t = (
   key: string,
-  defaultValue?: string,
-  options?: TranslationOptions
+  defaultValueOrOptions?: string | TranslationOptions,
+  maybeOptions?: TranslationOptions
 ): string => {
+  // in the t(key, options) form the default value, if any, lives on options
+  const options =
+    typeof defaultValueOrOptions === "object"
+      ? defaultValueOrOptions
+      : maybeOptions;
+  const defaultValue =
+    typeof defaultValueOrOptions === "object"
+      ? typeof defaultValueOrOptions.defaultValue === "string"
+        ? defaultValueOrOptions.defaultValue
+        : undefined
+      : defaultValueOrOptions;
+
   // pick the namespace the caller asked for, defaulting to "translations"
   const namespace = translations[options?.ns ?? defaultNamespace] ?? {};
 

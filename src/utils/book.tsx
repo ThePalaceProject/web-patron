@@ -89,11 +89,15 @@ export function availabilityString(book: AnyBook, t: TFunction) {
         typeof totalCopies === "number"
       ) {
         if (queue) {
-          return t(
-            "utils.book.availableCopiesWithQueue",
-            "{{availableCopies}} out of {{totalCopies}} copies available. {{queue}} patrons in the queue.",
-            { availableCopies, totalCopies, queue }
-          );
+          return t("utils.book.availableCopiesWithQueue", {
+            availableCopies,
+            count: queue,
+            totalCopies,
+            defaultValue_one:
+              "{{availableCopies}} out of {{totalCopies}} copies available. {{count}} patron in the queue.",
+            defaultValue_other:
+              "{{availableCopies}} out of {{totalCopies}} copies available. {{count}} patrons in the queue."
+          });
         }
 
         return t(
@@ -109,11 +113,11 @@ export function availabilityString(book: AnyBook, t: TFunction) {
       const position = book.holds?.position;
       if (!position || isNaN(position)) return null;
 
-      return t(
-        "utils.book.positionInQueue",
-        "{{position}} patrons ahead of you in the queue.",
-        { position }
-      );
+      return t("utils.book.positionInQueue", {
+        count: position,
+        defaultValue_one: "{{count}} patron ahead of you in the queue.",
+        defaultValue_other: "{{count}} patrons ahead of you in the queue."
+      });
 
     case "on-hold":
       const until = book.availability?.until

@@ -161,18 +161,27 @@ describe("ReservableBook", () => {
     expect(reserveButton).toBeInTheDocument();
   });
 
-  test("shows number of patrons in queue when holds info present", () => {
-    const bookWithQueue = mergeBook({
-      ...reservableBook,
-      holds: {
-        total: 4
-      }
-    });
-    setup(<FulfillmentCard book={bookWithQueue} />);
-    expect(
-      screen.getByText("0 out of 13 copies available. 4 patrons in the queue.")
-    );
-  });
+  test.each([
+    [1, "1 patron"],
+    [4, "4 patrons"],
+    [42, "42 patrons"]
+  ])(
+    "shows correctly formatted number of patrons in queue when holds info present and queue size is %i",
+    (total, expected) => {
+      const bookWithQueue = mergeBook({
+        ...reservableBook,
+        holds: {
+          total
+        }
+      });
+      setup(<FulfillmentCard book={bookWithQueue} />);
+      expect(
+        screen.getByText(
+          `0 out of 13 copies available. ${expected} in the queue.`
+        )
+      );
+    }
+  );
 
   test("doesn't show patrons in queue when holds info no present", () => {
     setup(<FulfillmentCard book={reservableBook} />);
@@ -214,7 +223,7 @@ describe("ReservableBook", () => {
   });
 });
 
-describe("reserved", () => {
+describe("ReservedBook", () => {
   const reservedBook = mergeBook<ReservedBook>({
     status: "reserved",
     revokeUrl: "/revoke",
@@ -310,26 +319,33 @@ describe("reserved", () => {
     ).toBeInTheDocument();
   });
 
-  test("displays number of patrons in queue and your position", () => {
-    const reservedBookWithQueue = mergeBook<ReservedBook>({
-      status: "reserved",
-      revokeUrl: "/revoke",
-      availability: {
-        status: "reserved"
-      },
-      copies: {
-        total: 13,
-        available: 0
-      },
-      holds: {
-        total: 23,
-        position: 5
-      }
-    });
-    setup(<FulfillmentCard book={reservedBookWithQueue} />);
-    expect(screen.getByText("5 patrons ahead of you in the queue."))
-      .toBeInTheDocument;
-  });
+  test.each([
+    [1, "1 patron"],
+    [5, "5 patrons"],
+    [42, "42 patrons"]
+  ])(
+    "shows correctly formatted number of patrons in queue and your position when queue size is %i",
+    (position, expected) => {
+      const reservedBookWithQueue = mergeBook<ReservedBook>({
+        status: "reserved",
+        revokeUrl: "/revoke",
+        availability: {
+          status: "reserved"
+        },
+        copies: {
+          total: 13,
+          available: 0
+        },
+        holds: {
+          total: 23,
+          position
+        }
+      });
+      setup(<FulfillmentCard book={reservedBookWithQueue} />);
+      expect(screen.getByText(`${expected} ahead of you in the queue.`))
+        .toBeInTheDocument;
+    }
+  );
 });
 
 describe("FulfillableBook", () => {
