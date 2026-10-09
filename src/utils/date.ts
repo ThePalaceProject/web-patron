@@ -6,9 +6,11 @@ const HOUR_MS = 60 * 60 * 1000;
  * Formats a date string for display in the given locale.
  *
  * By default timeZone is set to UTC so a publication date does not shift
- * by a day depending on the patron's timezone.
- * Pass `utc: false` for a timezone-aware timestamp, which can be used to provide
- * an active loan's end date relevant to a patron's timezone.
+ * by a day depending on the patron's time zone.
+ * Pass `utc: false` for a time zone aware timestamp, which can be used to provide
+ * an active loan's end date relative to a patron's time zone. When timeZone is undefined,
+ * Intl.DateTimeFormat relies on the host environment's time zone as defined in the ECMAScript
+ * Internationalization specs: https://tc39.es/ecma402/#sec-intl.datetimeformat.prototype.resolvedoptions
  *
  * Returns undefined for an unparseable date. Intl.DateTimeFormat.format
  * throws a RangeError on an Invalid Date, and a malformed date on one feed
