@@ -96,24 +96,6 @@ export function withMovedTo(
 export const PINS_QUERY_PARAM = "pins";
 
 /**
- * Library identifiers from a `?pins=` query value: comma-separated,
- * trimmed, empties and duplicates dropped, order preserved. A repeated
- * parameter contributes all of its values.
- */
-export function parsePinsParam(value: string | string[] | undefined): string[] {
-  const raw = Array.isArray(value) ? value.join(",") : (value ?? "");
-  const seen = new Set<string>();
-  return raw
-    .split(",")
-    .map(token => token.trim())
-    .filter(token => {
-      if (!token || seen.has(token)) return false;
-      seen.add(token);
-      return true;
-    });
-}
-
-/**
  * The home page path with a `?pins=` value naming `libraries` by their
  * stable ids, which survive slug changes, in the given order. Entries are
  * comma delimited, so an id containing a comma cannot round-trip.

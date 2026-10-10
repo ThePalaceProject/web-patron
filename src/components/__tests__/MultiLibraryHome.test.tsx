@@ -21,6 +21,7 @@ import {
 import { hasStoredCredentials } from "auth/useCredentials";
 import { HIDE_PUBLIC_WARNING_KEY } from "utils/publicWarning";
 import { copyToClipboard } from "utils/clipboard";
+import { parsePromoteLabel } from "utils/libraryListParam";
 import MultiLibraryHome from "../MultiLibraryHome";
 import useSWR from "swr";
 import { makeSwrResponse } from "test-utils/mockSwr";
@@ -30,9 +31,17 @@ jest.mock("swr");
 jest.mock("utils/clipboard", () => ({
   copyToClipboard: jest.fn().mockResolvedValue(true)
 }));
+jest.mock("utils/libraryListParam", () => ({
+  ...jest.requireActual("utils/libraryListParam"),
+  parsePromoteLabel: jest.fn()
+}));
 
 const mockedCopy = copyToClipboard as jest.MockedFunction<
   typeof copyToClipboard
+>;
+
+const mockedParsePromoteLabel = parsePromoteLabel as jest.MockedFunction<
+  typeof parsePromoteLabel
 >;
 
 const mockedSWR = useSWR as jest.MockedFunction<typeof useSWR>;
@@ -686,6 +695,24 @@ describe("MultiLibraryHome", () => {
       );
     });
 
+    it("keeps ?promote when it strips ?pins", async () => {
+      mockLibraries([
+        lib("beta", "Beta Library"),
+        lib("gamma", "Gamma Library")
+      ]);
+      const replace = jest.fn();
+
+      render(<MultiLibraryHome />, {
+        router: { query: { pins: "beta", promote: "gamma" }, replace }
+      });
+
+      await screen.findByRole("alertdialog", { name: "Add to My Libraries" });
+      fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+      expect(replace).toHaveBeenCalled();
+      expect(replace.mock.calls[0][0].query).toEqual({ promote: "gamma" });
+    });
+
     it("strips the param without a dialog when there is nothing new to add", () => {
       pinLibraries(lib("alpha", "Alpha Library"));
       mockLibraries([lib("alpha", "Alpha Library")]);
@@ -869,6 +896,243 @@ describe("MultiLibraryHome", () => {
         await screen.findByText("Could not copy link.")
       ).toBeInTheDocument();
       expectAnnouncement("Could not copy link.");
+    });
+  });
+
+  describe("promoted libraries", () => {
+    beforeEach(() => {
+      localStorage.setItem(HIDE_PUBLIC_WARNING_KEY, "true");
+      mockedParsePromoteLabel.mockReset();
+    });
+
+    it("shows the named libraries in order under the default heading", () => {
+      mockLibraries([
+        lib("alpha", "Alpha Library"),
+        lib("beta", "Beta Library"),
+        lib("gamma", "Gamma Library")
+      ]);
+
+      render(<MultiLibraryHome />, {
+        router: { query: { promote: "urn:gamma,beta,ghost" } }
+      });
+
+      const heading = screen.getByRole("heading", {
+        name: "Promoted libraries"
+      });
+      const section = heading.closest("section")!;
+      const links = within(section).getAllByRole("link");
+      expect(links[0]).toHaveTextContent("Gamma Library");
+      expect(links[1]).toHaveTextContent("Beta Library");
+      expect(links).toHaveLength(2);
+      // Promoted cards keep their pin controls.
+      expect(
+        within(section).getByRole("button", {
+          name: "Pin Gamma Library to My Libraries"
+        })
+      ).toBeInTheDocument();
+    });
+
+    it("leaves pinned libraries out and hides the group once all are pinned", () => {
+      pinLibraries(lib("alpha", "Alpha Library"));
+      mockLibraries([
+        lib("alpha", "Alpha Library"),
+        lib("beta", "Beta Library")
+      ]);
+
+      render(<MultiLibraryHome />, {
+        router: { query: { promote: "alpha,beta" } }
+      });
+
+      const section = screen
+        .getByRole("heading", { name: "Promoted libraries" })
+        .closest("section")!;
+      const links = within(section).getAllByRole("link");
+      expect(links).toHaveLength(1);
+      expect(links[0]).toHaveTextContent("Beta Library");
+
+      // Pinning the last remaining promoted library hides the group.
+      fireEvent.click(
+        within(section).getByRole("button", {
+          name: "Pin Beta Library to My Libraries"
+        })
+      );
+      expect(readPinnedLibraries().map(entry => entry.id)).toEqual([
+        "urn:alpha",
+        "urn:beta"
+      ]);
+      expect(screen.queryByText("Promoted libraries")).toBeNull();
+      expect(
+        within(myLibrariesSection()).getByRole("button", {
+          name: "Unpin Beta Library from My Libraries"
+        })
+      ).toHaveFocus();
+    });
+
+    it("keeps the typed search when a promoted library is pinned", () => {
+      mockLibraries([
+        lib("alpha", "Alpha Library"),
+        lib("beta", "Beta Library")
+      ]);
+
+      render(<MultiLibraryHome />, {
+        router: { query: { promote: "alpha" } }
+      });
+      typeFilter("bet");
+
+      const section = screen
+        .getByRole("heading", { name: "Promoted libraries" })
+        .closest("section")!;
+      fireEvent.click(
+        within(section).getByRole("button", {
+          name: "Pin Alpha Library to My Libraries"
+        })
+      );
+
+      expect(readPinnedLibraries().map(entry => entry.id)).toEqual([
+        "urn:alpha"
+      ]);
+      expect(
+        screen.getByRole("searchbox", { name: /Filter libraries/ })
+      ).toHaveValue("bet");
+    });
+
+    it("shows a stored pin in the group while pinning is disabled", () => {
+      pinLibraries(lib("alpha", "Alpha Library"));
+      mockLibraries([lib("alpha", "Alpha Library")]);
+
+      render(<MultiLibraryHome />, {
+        appConfig: { enablePinning: false },
+        router: { query: { promote: "alpha" } }
+      });
+
+      const section = screen
+        .getByRole("heading", { name: "Promoted libraries" })
+        .closest("section")!;
+      expect(
+        within(section).getByRole("link", { name: "Alpha Library" })
+      ).toBeInTheDocument();
+    });
+
+    it("shows the parsed promoteLabel as the heading, as plain text", () => {
+      mockedParsePromoteLabel.mockReturnValue("Consortium <b>picks</b>");
+      mockLibraries([lib("alpha", "Alpha Library")]);
+
+      render(<MultiLibraryHome />, {
+        router: { query: { promote: "alpha", promoteLabel: "raw label" } }
+      });
+
+      expect(mockedParsePromoteLabel).toHaveBeenCalledWith("raw label");
+      expect(
+        screen.getByRole("heading", { name: "Consortium <b>picks</b>" })
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole("heading", { name: "Promoted libraries" })
+      ).toBeNull();
+    });
+
+    it("shows the default heading when the promoteLabel parses to nothing", () => {
+      mockedParsePromoteLabel.mockReturnValue(undefined);
+      mockLibraries([lib("alpha", "Alpha Library")]);
+
+      render(<MultiLibraryHome />, {
+        router: { query: { promote: "alpha", promoteLabel: "raw label" } }
+      });
+
+      expect(mockedParsePromoteLabel).toHaveBeenCalledWith("raw label");
+      expect(
+        screen.getByRole("heading", { name: "Promoted libraries" })
+      ).toBeInTheDocument();
+    });
+
+    it("sorts the group by library name when promoteOrder is name", () => {
+      mockLibraries([
+        lib("alpha", "Zebra Library"),
+        lib("beta", "Apple Library")
+      ]);
+
+      render(<MultiLibraryHome />, {
+        router: { query: { promote: "alpha,beta", promoteOrder: "name" } }
+      });
+
+      const section = screen
+        .getByRole("heading", { name: "Promoted libraries" })
+        .closest("section")!;
+      const links = within(section).getAllByRole("link");
+      expect(links[0]).toHaveTextContent("Apple Library");
+      expect(links[1]).toHaveTextContent("Zebra Library");
+    });
+
+    it("keeps link order for any other promoteOrder value", () => {
+      mockLibraries([
+        lib("alpha", "Zebra Library"),
+        lib("beta", "Apple Library")
+      ]);
+
+      render(<MultiLibraryHome />, {
+        router: { query: { promote: "alpha,beta", promoteOrder: "banana" } }
+      });
+
+      const section = screen
+        .getByRole("heading", { name: "Promoted libraries" })
+        .closest("section")!;
+      const links = within(section).getAllByRole("link");
+      expect(links[0]).toHaveTextContent("Zebra Library");
+      expect(links[1]).toHaveTextContent("Apple Library");
+    });
+
+    it.each([
+      ["absent", {}],
+      ["empty", { promote: "" }],
+      ["whitespace-only", { promote: " , " }],
+      ["unmatched", { promote: "ghost" }]
+    ])(
+      "ignores promoteLabel and promoteOrder when promote is %s",
+      (_, promoteQuery) => {
+        mockedParsePromoteLabel.mockReturnValue("Consortium picks");
+        mockLibraries([lib("alpha", "Alpha Library")]);
+
+        render(<MultiLibraryHome />, {
+          router: {
+            query: {
+              ...promoteQuery,
+              promoteLabel: "Consortium picks",
+              promoteOrder: "name"
+            }
+          }
+        });
+
+        expect(
+          screen.queryByRole("heading", { name: "Consortium picks" })
+        ).toBeNull();
+        expect(
+          screen.queryByRole("heading", { name: "Promoted libraries" })
+        ).toBeNull();
+      }
+    );
+
+    it("hides the promoted group while reordering", () => {
+      pinLibraries(lib("alpha", "Alpha Library"), lib("beta", "Beta Library"));
+      mockLibraries([
+        lib("alpha", "Alpha Library"),
+        lib("beta", "Beta Library"),
+        lib("gamma", "Gamma Library")
+      ]);
+
+      render(<MultiLibraryHome />, {
+        router: { query: { promote: "gamma" } }
+      });
+
+      expect(
+        screen.getByRole("heading", { name: "Promoted libraries" })
+      ).toBeInTheDocument();
+
+      fireEvent.click(
+        screen.getByRole("button", { name: "Reorder My Libraries" })
+      );
+
+      expect(
+        screen.queryByRole("heading", { name: "Promoted libraries" })
+      ).toBeNull();
     });
   });
 

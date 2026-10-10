@@ -12,6 +12,7 @@ import Share from "icons/Share";
 import LibraryHomeLink from "./LibraryHomeLink";
 import LibraryFilterList from "components/LibraryFilterList";
 import LibraryCard from "components/LibraryCard";
+import LibraryCardList from "components/LibraryCardList";
 import AlertDialog, { AlertDialogActions } from "components/AlertDialog";
 import PinButton from "components/PinButton";
 import PinnedLibraryList, {
@@ -25,11 +26,19 @@ import { fetchLibraries } from "dataflow/fetchLibraries";
 import type { ClientLibrary, LibrariesResponse } from "pages/api/libraries";
 import {
   buildPinsPath,
-  parsePinsParam,
   readPinnedLibraries,
   PINS_QUERY_PARAM
 } from "utils/pinnedLibraries";
 import { copyToClipboard } from "utils/clipboard";
+import {
+  firstParamValue,
+  parsePromoteLabel,
+  parseLibraryListParam,
+  resolveLibraryList,
+  PROMOTE_QUERY_PARAM,
+  PROMOTE_LABEL_QUERY_PARAM,
+  PROMOTE_ORDER_QUERY_PARAM
+} from "utils/libraryListParam";
 import { useTranslation } from "next-i18next/pages";
 import MultiLibraryLandingPageHeader from "./layouts/MultiLibraryLandingPageHeader";
 
@@ -75,6 +84,8 @@ const MultiLibraryHome: React.FC = () => {
   const [copyStatus, setCopyStatus] = React.useState<
     "idle" | "copied" | "error"
   >("idle");
+  const copyResetTimer = React.useRef<ReturnType<typeof setTimeout>>(undefined);
+  React.useEffect(() => () => clearTimeout(copyResetTimer.current), []);
   /*
    * Ids of the libraries the dialog last offered to add. The effect below
    * can re-run while the same `pins` value is still in the query, for
@@ -92,37 +103,31 @@ const MultiLibraryHome: React.FC = () => {
       shallow: true
     });
   }, [router]);
-  clearPinsParamRef.current = clearPinsParam;
+  React.useEffect(() => {
+    clearPinsParamRef.current = clearPinsParam;
+  });
 
   /*
    * A `?pins=` link populates My Libraries after confirmation. The link's
    * not-yet-pinned libraries are appended in link order. Existing pins are
    * never removed, moved, or duplicated. Unknown entries are ignored, and
    * a link with nothing to add is stripped from the URL without a dialog.
+   * With pinning disabled the parameter is ignored and left in place.
    * The pinned check reads storage directly because the provider loads
    * storage into context in an effect that runs after this one.
    */
   const libraries = data?.libraries;
   React.useEffect(() => {
     if (!pinningEnabled || !libraries?.length) return;
-    const tokens = parsePinsParam(pinsValue);
+    const tokens = parseLibraryListParam(pinsValue);
     if (tokens.length === 0) {
       lastOfferRef.current = "";
       return;
     }
     const storedIds = new Set(readPinnedLibraries().map(lib => lib.id));
-    // Each entry names a library by stable id or by slug; an id match wins
-    // when one value is some library's id and another library's slug.
-    const availableById = new Map(libraries.map(lib => [lib.id, lib]));
-    const availableBySlug = new Map(libraries.map(lib => [lib.slug, lib]));
-    const resolved = new Set<string>();
-    const toAdd = tokens
-      .map(token => availableById.get(token) ?? availableBySlug.get(token))
-      .filter((lib): lib is ClientLibrary => {
-        if (!lib || storedIds.has(lib.id) || resolved.has(lib.id)) return false;
-        resolved.add(lib.id);
-        return true;
-      });
+    const toAdd = resolveLibraryList(tokens, libraries).filter(
+      lib => !storedIds.has(lib.id)
+    );
     if (toAdd.length === 0) {
       lastOfferRef.current = "";
       setLibrariesToAdd(null);
@@ -184,7 +189,8 @@ const MultiLibraryHome: React.FC = () => {
     const success = await copyToClipboard(url);
     setCopyStatus(success ? "copied" : "error");
     announce(success ? copiedMessage : failedMessage);
-    setTimeout(() => setCopyStatus("idle"), 2000);
+    clearTimeout(copyResetTimer.current);
+    copyResetTimer.current = setTimeout(() => setCopyStatus("idle"), 2000);
   };
 
   if (error)
@@ -206,24 +212,50 @@ const MultiLibraryHome: React.FC = () => {
       </p>
     );
 
-  const sorted = [...data.libraries].sort(
-    (a: ClientLibrary, b: ClientLibrary) => {
-      const titleA = a.title || a.slug;
-      const titleB = b.title || b.slug;
-      return titleA.localeCompare(titleB);
-    }
-  );
+  const byName = (a: ClientLibrary, b: ClientLibrary) =>
+    (a.title || a.slug).localeCompare(b.title || b.slug);
+  const sorted = [...data.libraries].sort(byName);
   const librariesBySlug = new Map(sorted.map(lib => [lib.slug, lib]));
+
+  /*
+   * A `?promote=` query shows the named libraries as their own group, in
+   * link order, or by library name when `?promoteOrder=name`. The group
+   * is display-only: nothing is stored, so the parameter stays in the URL
+   * and the page works as a shareable curated view. Libraries already shown
+   * in My Libraries are left out, and the group hides entirely once nothing
+   * remains. `?promoteLabel=` overrides the group's localized heading, is
+   * cut to `PROMOTE_LABEL_MAX_LENGTH` characters, and is rendered as plain
+   * text. A label holding a URL, email address, or phone number is
+   * ignored. Both companion parameters are ignored when `?promote=` names
+   * no library the group would show.
+   */
+  const shownPinnedIds = new Set(shownPinned.map(lib => lib.id));
+  const promoted = resolveLibraryList(
+    parseLibraryListParam(router.query[PROMOTE_QUERY_PARAM]),
+    data.libraries
+  ).filter(lib => !shownPinnedIds.has(lib.id));
+  if (firstParamValue(router.query[PROMOTE_ORDER_QUERY_PARAM]) === "name") {
+    promoted.sort(byName);
+  }
+  const promotedLabel =
+    parsePromoteLabel(router.query[PROMOTE_LABEL_QUERY_PARAM]) ??
+    t("multiLibraryHome.promotedHeading", "Promoted libraries");
 
   // `title` replaces the name as the link content, e.g. to mark search
   // matches. `reorderControls` replace the pin button, and the link becomes
   // plain text, so the card cannot be opened while it is being reordered.
+  // A pin or unpin clears the search unless `keepSearch` is set.
   const renderCard = (
     library: ClientLibrary,
     {
       title,
-      reorderControls
-    }: { title?: React.ReactNode; reorderControls?: React.ReactNode } = {}
+      reorderControls,
+      keepSearch = false
+    }: {
+      title?: React.ReactNode;
+      reorderControls?: React.ReactNode;
+      keepSearch?: boolean;
+    } = {}
   ) => {
     const name = library.title || library.slug;
     return (
@@ -241,7 +273,7 @@ const MultiLibraryHome: React.FC = () => {
                 logoUrl: library.logoUrl,
                 authDocUrl: library.authDocUrl
               }}
-              onToggle={resetSearch}
+              onToggle={keepSearch ? undefined : resetSearch}
             />
           )
         }
@@ -309,6 +341,19 @@ const MultiLibraryHome: React.FC = () => {
             </>
           }
         />
+        {promoted.length > 0 && !reordering && (
+          <section>
+            {/* A long label from the URL wraps, even without spaces. */}
+            <h2 sx={{ overflowWrap: "anywhere" }}>{promotedLabel}</h2>
+            <LibraryCardList>
+              {promoted.map(library => (
+                <li key={library.id}>
+                  {renderCard(library, { keepSearch: true })}
+                </li>
+              ))}
+            </LibraryCardList>
+          </section>
+        )}
         {/* Hidden while reordering, so the page shows only My Libraries. */}
         {!reordering && (
           <LibraryFilterList

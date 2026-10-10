@@ -114,6 +114,7 @@
   "multiLibraryHome.addFromLink.title": "Añadir a Mis bibliotecas",
   "multiLibraryHome.choose": "Elija una biblioteca:",
   "multiLibraryHome.home": "Inicio",
+  "multiLibraryHome.promotedHeading": "Bibliotecas destacadas",
   "multiLibraryHome.share.ariaLabel": "Compartir Mis bibliotecas",
   "multiLibraryHome.share.copied": "Enlace copiado.",
   "multiLibraryHome.share.failed": "No se ha podido copiar el enlace.",
