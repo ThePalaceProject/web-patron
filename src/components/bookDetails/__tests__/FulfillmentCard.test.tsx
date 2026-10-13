@@ -324,7 +324,7 @@ describe("ReservedBook", () => {
     [5, "5 patrons"],
     [42, "42 patrons"]
   ])(
-    "shows correctly formatted number of patrons in queue and your position when queue size is %i",
+    "shows correctly formatted number of patrons in queue and your position when position in queue is %i",
     (position, expected) => {
       const reservedBookWithQueue = mergeBook<ReservedBook>({
         status: "reserved",
@@ -342,8 +342,9 @@ describe("ReservedBook", () => {
         }
       });
       setup(<FulfillmentCard book={reservedBookWithQueue} />);
-      expect(screen.getByText(`${expected} ahead of you in the queue.`))
-        .toBeInTheDocument;
+      expect(
+        screen.getByText(`${expected} ahead of you in the queue.`)
+      ).toBeInTheDocument();
     }
   );
 });
