@@ -237,9 +237,8 @@ describe("ReservableBook", () => {
       jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
     });
 
-    // TODO: Incorrect pluralization (1 patrons) flagged for separate PR
     expect(screen.getByRole("status")).toHaveTextContent(
-      "Book Availability: 1 patrons ahead of you in the queue"
+      "Book Availability: 1 patron ahead of you in the queue"
     );
   });
 });
