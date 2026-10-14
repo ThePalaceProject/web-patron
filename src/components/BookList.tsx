@@ -191,7 +191,7 @@ export const BookListItem: React.FC<{
             </Metadata>
           </div>
 
-          <BookStatus book={book} />
+          <BookStatus book={book} placement="list" />
           <BookListCTA book={book} />
           <Description
             book={book}
@@ -241,17 +241,33 @@ const Description: React.FC<{
 const BookListCTA: React.FC<{ book: AnyBook }> = ({ book }) => {
   const { t } = useTranslation();
   if (bookIsBorrowable(book)) {
-    return <BorrowOrReserveOrPreview borrowUrl={book.borrowUrl} isBorrow />;
+    return (
+      <BorrowOrReserveOrPreview
+        placement="list"
+        borrowUrl={book.borrowUrl}
+        isBorrow
+      />
+    );
   }
 
   if (bookIsReservable(book)) {
     return (
-      <BorrowOrReserveOrPreview borrowUrl={book.reserveUrl} isBorrow={false} />
+      <BorrowOrReserveOrPreview
+        placement="list"
+        borrowUrl={book.reserveUrl}
+        isBorrow={false}
+      />
     );
   }
 
   if (bookIsOnHold(book)) {
-    return <BorrowOrReserveOrPreview borrowUrl={book.borrowUrl} isBorrow />;
+    return (
+      <BorrowOrReserveOrPreview
+        placement="list"
+        borrowUrl={book.borrowUrl}
+        isBorrow
+      />
+    );
   }
 
   if (bookIsReserved(book)) {

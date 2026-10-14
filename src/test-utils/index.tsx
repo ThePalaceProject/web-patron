@@ -21,7 +21,6 @@ import mockConfig from "test-utils/mockConfig";
 import mockCookie from "../../__mocks__/js-cookie";
 import track from "analytics/track";
 import "react-intersection-observer/test-utils";
-import { mockToDateString } from "test-utils/mockToDateString";
 import AppConfigContext from "components/context/AppConfigContext";
 import { getCurrentTestConfig } from "test-utils/mockConfig";
 import { mockUseTranslation } from "test-utils/mockUseTranslation";
@@ -57,7 +56,6 @@ expect.addSnapshotSerializer(serializer);
 // standard config mock
 beforeEach(() => {
   mockConfig();
-  mockToDateString();
   localStorage.clear();
   mockCookie.reset();
 });

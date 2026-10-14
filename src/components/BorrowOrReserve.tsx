@@ -2,13 +2,15 @@ import * as React from "react";
 import useBorrow from "hooks/useBorrow";
 import Button from "./Button";
 import { useFulfillmentButtonStackError } from "components/layouts/FulfillmentButtonStack";
+import { AvailabilityPlacement } from "utils/book";
 
 const BorrowOrReserve: React.FC<{
   isBorrow: boolean;
   borrowUrl: string;
-}> = ({ isBorrow, borrowUrl }) => {
+  placement: AvailabilityPlacement;
+}> = ({ isBorrow, borrowUrl, placement }) => {
   const { isLoading, loadingText, buttonLabel, borrowOrReserve, error } =
-    useBorrow(isBorrow);
+    useBorrow(isBorrow, placement);
   const { setError } = useFulfillmentButtonStackError();
 
   React.useEffect(() => {
