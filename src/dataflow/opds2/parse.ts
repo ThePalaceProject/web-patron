@@ -406,7 +406,9 @@ export function publicationToBook(
     availability: {
       since: availability?.since,
       until: availability?.until,
-      // our internal type is stricter, hence the cast.
+      // the opds1 parser casts the type status because
+      // our internal types are stricter than those in the
+      // OPDSFeedParser. We cast here as well for compatibility.
       status: availabilityState as BookAvailability
     },
     holds:

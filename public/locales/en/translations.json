@@ -209,7 +209,6 @@
   "utils.book.more_other": "{{count}} more",
   "utils.book.onHold": "You have this book on hold.",
   "utils.book.onHoldUntil": "You have this book on hold until {{until}}.",
-  "utils.book.onLoanUntil": "You have this book on loan until {{availableUntil}}.",
   "utils.book.positionInQueue_one": "{{count}} patron ahead of you in the queue.",
   "utils.book.positionInQueue_other": "{{count}} patrons ahead of you in the queue.",
   "utils.book.unknownAuthor": "Unknown Author",

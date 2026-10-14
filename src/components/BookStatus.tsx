@@ -3,8 +3,7 @@ import { MediumIcon } from "components/MediumIndicator";
 import { AnyBook } from "interfaces";
 import { AvailabilityPlacement, availabilityString } from "utils/book";
 import { ScreenReaderOnly, Text } from "components/Text";
-import { TFunction, useTranslation } from "next-i18next/pages";
-import { Language } from "utils/i18n";
+import { useTranslation } from "next-i18next/pages";
 import useLocale from "hooks/useLocale";
 
 const BookStatus: React.FC<{
@@ -63,20 +62,5 @@ const AvailabilityString: React.FC<{
     </Text>
   );
 };
-
-/**
- * What a screen reader announces for a book's availability,
- * e.g. the loan end date announced after a borrow.
- */
-export function availabilityAnnouncement(
-  book: AnyBook,
-  t: TFunction,
-  locale: Language,
-  placement: AvailabilityPlacement
-): string | null {
-  const str = availabilityString(book, t, locale, placement);
-  if (!str) return null;
-  return `${t("bookStatus.availability", "Book Availability:")} ${str}`;
-}
 
 export default BookStatus;

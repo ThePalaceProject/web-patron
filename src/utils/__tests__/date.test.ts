@@ -21,7 +21,7 @@ describe("formatDate", () => {
     // Pin the host environment's time zone to UTC+14, so date rolls over to the next calendar day.
     // spy inspired by https://sheetsj.com/2021/05/mock-intl-and-date-globals-in-jest.
     const OriginalDateTimeFormat = Intl.DateTimeFormat;
-    const spy = jest.spyOn(Intl, "DateTimeFormat").mockImplementation(
+    jest.spyOn(Intl, "DateTimeFormat").mockImplementation(
       (locale?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions) =>
         new OriginalDateTimeFormat(locale, {
           ...options,
@@ -31,13 +31,9 @@ describe("formatDate", () => {
               : options.timeZone
         })
     );
-    try {
-      expect(
-        formatDate("2026-10-19T12:00:00Z", Language.EN, { utc: false })
-      ).toBe("October 20, 2026");
-    } finally {
-      spy.mockRestore();
-    }
+    expect(
+      formatDate("2026-10-19T12:00:00Z", Language.EN, { utc: false })
+    ).toBe("October 20, 2026");
   });
 
   test("returns undefined for an unparseable date", () => {

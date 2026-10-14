@@ -7,9 +7,8 @@ import useLogin from "auth/useLogin";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next/pages";
 import { useAnnounce } from "components/context/AnnouncerContext";
-import { availabilityAnnouncement } from "components/BookStatus";
 import useLocale from "hooks/useLocale";
-import { AvailabilityPlacement } from "utils/book";
+import { availabilityAnnouncement, AvailabilityPlacement } from "utils/book";
 
 export default function useBorrow(
   isBorrow: boolean,

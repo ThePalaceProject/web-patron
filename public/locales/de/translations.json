@@ -209,7 +209,6 @@
   "utils.book.more_other": "{{count}} weitere",
   "utils.book.onHold": "Sie haben dieses Buch vorgemerkt.",
   "utils.book.onHoldUntil": "Sie haben dieses Buch bis zum {{until}} vorgemerkt.",
-  "utils.book.onLoanUntil": "Sie haben dieses Buch bis zum {{availableUntil}} ausgeliehen.",
   "utils.book.positionInQueue_one": "{{count}} Vormerkung vor Ihnen in der Warteliste.",
   "utils.book.positionInQueue_other": "{{count}} Vormerkungen vor Ihnen in der Warteliste.",
   "utils.book.unknownAuthor": "Autor unbekannt",

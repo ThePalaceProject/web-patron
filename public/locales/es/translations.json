@@ -217,7 +217,6 @@
   "utils.book.more_other": "{{count}} más",
   "utils.book.onHold": "Tiene este libro reservado.",
   "utils.book.onHoldUntil": "Tiene este libro reservado hasta el {{until}}.",
-  "utils.book.onLoanUntil": "Tiene este libro en préstamo hasta el {{availableUntil}}.",
   "utils.book.positionInQueue_one": "{{count}} reserva por delante de la suya en la lista de espera.",
   "utils.book.positionInQueue_many": "{{count}} reservas por delante de la suya en la lista de espera.",
   "utils.book.positionInQueue_other": "{{count}} reservas por delante de la suya en la lista de espera.",

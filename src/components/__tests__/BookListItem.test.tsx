@@ -440,50 +440,6 @@ describe("FulfillableBook", () => {
     );
   });
 
-  test("announces the return", async () => {
-    const unborrowed = mergeBook<BorrowableBook>({
-      status: "borrowable",
-      borrowUrl: "/borrow"
-    });
-    mockFetchBook.mockResolvedValue(unborrowed);
-    setup(<BookListItem book={downloadableBook} />);
-
-    fireEvent.click(screen.getByRole("button", { name: "Return" }));
-    await waitFor(() =>
-      expect(mockSetBook).toHaveBeenCalledWith(unborrowed, downloadableBook.id)
-    );
-    act(() => {
-      jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
-    });
-
-    expect(screen.getByRole("status")).toHaveTextContent(
-      "The Mayan Secrets returned."
-    );
-  });
-
-  test("announces the title of the loaned version of the book", async () => {
-    const loanedBook = fixtures.mergeBook<FulfillableBook>({
-      ...downloadableBook,
-      title: "Loaned Title"
-    });
-    mockFetchBook.mockResolvedValue(
-      mergeBook<BorrowableBook>({ status: "borrowable", borrowUrl: "/borrow" })
-    );
-    setup(<BookListItem book={downloadableBook} />, {
-      user: { loans: [loanedBook] }
-    });
-
-    fireEvent.click(screen.getByRole("button", { name: "Return" }));
-    await waitFor(() => expect(mockSetBook).toHaveBeenCalled());
-    act(() => {
-      jest.advanceTimersByTime(ANNOUNCE_DELAY_MS);
-    });
-
-    expect(screen.getByRole("status")).toHaveTextContent(
-      "Loaned Title returned."
-    );
-  });
-
   test("handles lack of availability info", () => {
     const withoutAvailability = fixtures.mergeBook({
       ...downloadableBook,

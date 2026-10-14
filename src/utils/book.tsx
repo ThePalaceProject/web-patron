@@ -235,6 +235,21 @@ function loanEndString(
   }
 }
 
+/**
+ * What a screen reader announces for a book's availability,
+ * e.g. the loan end date announced after a borrow.
+ */
+export function availabilityAnnouncement(
+  book: AnyBook,
+  t: TFunction,
+  locale: Language,
+  placement: AvailabilityPlacement
+): string | null {
+  const str = availabilityString(book, t, locale, placement);
+  if (!str) return null;
+  return `${t("bookStatus.availability", "Book Availability:")} ${str}`;
+}
+
 export function bookIsFulfillable(book: AnyBook): book is FulfillableBook {
   return book.status === "fulfillable";
 }
