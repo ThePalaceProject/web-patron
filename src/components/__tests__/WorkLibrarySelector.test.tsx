@@ -82,6 +82,20 @@ describe("WorkLibrarySelector", () => {
     ).toBeInTheDocument();
   });
 
+  it("keeps showing loaded libraries when a refresh fails", () => {
+    mockedSWR.mockReturnValue(
+      makeSwrResponse<any>({
+        data: { libraries: [lib("alpha", "Alpha Library")] },
+        error: new Error("fetch failed")
+      })
+    );
+    render(<WorkLibrarySelector workId="work-1" />);
+    expect(screen.getByText("Alpha Library")).toBeInTheDocument();
+    expect(
+      screen.queryByText("Unable to load the library list.")
+    ).not.toBeInTheDocument();
+  });
+
   it("shows a message when no libraries are returned", () => {
     mockLibraries([]);
     render(<WorkLibrarySelector workId="work-1" />);

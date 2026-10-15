@@ -173,10 +173,23 @@ describe("MultiLibraryHome", () => {
 
     render(<MultiLibraryHome />);
     expect(
-      screen.getByText(
-        "Unable to load static libraries from configuration file."
-      )
+      screen.getByText("Unable to load the library list.")
     ).toBeInTheDocument();
+  });
+
+  it("keeps showing loaded libraries when a refresh fails", () => {
+    mockedSWR.mockReturnValue(
+      makeSwrResponse<any>({
+        data: { libraries: [lib("test", "Test Library")] },
+        error: new Error("fetch failed")
+      })
+    );
+
+    render(<MultiLibraryHome />);
+    expect(screen.getByText("Test Library")).toBeInTheDocument();
+    expect(
+      screen.queryByText("Unable to load the library list.")
+    ).not.toBeInTheDocument();
   });
 
   it("displays instance name in heading", () => {
