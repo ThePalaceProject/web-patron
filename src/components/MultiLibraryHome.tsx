@@ -193,13 +193,11 @@ const MultiLibraryHome: React.FC = () => {
     copyResetTimer.current = setTimeout(() => setCopyStatus("idle"), 2000);
   };
 
-  if (error)
+  // A failed refresh keeps the loaded list on screen.
+  if (error && !data)
     return (
       <p>
-        {t(
-          "multiLibraryHome.unableToLoad",
-          "Unable to load static libraries from configuration file."
-        )}
+        {t("multiLibraryHome.unableToLoad", "Unable to load the library list.")}
       </p>
     );
   if (!data) return null;

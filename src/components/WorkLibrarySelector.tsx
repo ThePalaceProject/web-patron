@@ -50,7 +50,8 @@ const WorkLibrarySelector: React.FC<WorkLibrarySelectorProps> = ({
     });
   }
 
-  if (error)
+  // A failed refresh keeps the loaded list on screen.
+  if (error && !data)
     return (
       <p>
         {t(

@@ -117,7 +117,7 @@
   "multiLibraryHome.share.copied": "Link copied.",
   "multiLibraryHome.share.failed": "Could not copy link.",
   "multiLibraryHome.share.label": "Share",
-  "multiLibraryHome.unableToLoad": "Unable to load static libraries from configuration file.",
+  "multiLibraryHome.unableToLoad": "Unable to load the library list.",
   "myBooks.empty": "Your books will show up here when you have any loaned or on hold.",
   "openEbooksLanding.availableOnMobile": "Available on iOS and Android devices",
   "openEbooksLanding.download": "Download the Mobile App",

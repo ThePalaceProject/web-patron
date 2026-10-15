@@ -117,7 +117,7 @@
   "multiLibraryHome.share.copied": "Link kopiert.",
   "multiLibraryHome.share.failed": "Link konnte nicht kopiert werden.",
   "multiLibraryHome.share.label": "Teilen",
-  "multiLibraryHome.unableToLoad": "Die statischen Bibliotheken konnten nicht aus der Konfigurationsdatei geladen werden.",
+  "multiLibraryHome.unableToLoad": "Die Bibliotheksliste konnte nicht geladen werden.",
   "myBooks.empty": "Ihre Bücher erscheinen hier, sobald Sie etwas ausgeliehen oder vorgemerkt haben.",
   "openEbooksLanding.availableOnMobile": "Verfügbar für iOS- und Android-Geräte",
   "openEbooksLanding.download": "Mobile App laden",

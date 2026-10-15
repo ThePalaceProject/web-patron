@@ -119,7 +119,7 @@
   "multiLibraryHome.share.copied": "Link copiato.",
   "multiLibraryHome.share.failed": "Impossibile copiare il link.",
   "multiLibraryHome.share.label": "Condividi",
-  "multiLibraryHome.unableToLoad": "Impossibile caricare le biblioteche statiche dal file di configurazione.",
+  "multiLibraryHome.unableToLoad": "Impossibile caricare l'elenco delle biblioteche.",
   "myBooks.empty": "I suoi libri compariranno qui quando avrà un prestito o una prenotazione.",
   "openEbooksLanding.availableOnMobile": "Disponibile su dispositivi iOS e Android",
   "openEbooksLanding.download": "Scarica l'app per dispositivi mobili",
