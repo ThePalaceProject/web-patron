@@ -25,6 +25,7 @@ describe("ItemLandingPage", () => {
       })
     );
   });
+
   test("renders a heading and passes workId down to the library selector", () => {
     render(<ItemLandingPage workId="work-1" />);
 
@@ -34,5 +35,11 @@ describe("ItemLandingPage", () => {
     expect(
       screen.getByRole("button", { name: "Test Library" })
     ).toBeInTheDocument();
+  });
+
+  test("displays Palace Web Catalog logo", () => {
+    render(<ItemLandingPage workId="work-1" />);
+    const logo = screen.getByRole("img", { name: "Palace Web Catalog" });
+    expect(logo).toBeInTheDocument();
   });
 });

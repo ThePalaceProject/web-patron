@@ -28,3 +28,17 @@ test("renders page loader when error code is 401", () => {
   const headingEl = document.querySelector("h2");
   expect(headingEl).toHaveTextContent("Loading...");
 });
+
+test("displays Palace Web Catalog logo", () => {
+  const utils = render(
+    <Error
+      info={{
+        status: 404,
+        title: "Page Not Found",
+        detail: "The requested url is not available"
+      }}
+    />
+  );
+  const logo = utils.getByRole("img", { name: "Palace Web Catalog" });
+  expect(logo).toBeInTheDocument();
+});

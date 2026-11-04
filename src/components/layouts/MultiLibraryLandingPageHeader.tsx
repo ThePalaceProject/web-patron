@@ -1,8 +1,10 @@
 import LanguageSelector from "components/LanguageSelector";
+import PalaceWebCatalogLogo from "components/PalaceWebCatalogLogo";
+import Stack from "components/Stack";
 import * as React from "react";
 
 interface MultiLibraryLandingPageHeaderProps {
-  heading: string;
+  heading?: string;
 }
 
 const MultiLibraryLandingPageHeader: React.FC<
@@ -12,18 +14,29 @@ const MultiLibraryLandingPageHeader: React.FC<
     <div
       sx={{
         display: "flex",
-        flexDirection: ["column", "row"],
+        flexDirection: "row",
         justifyContent: "space-between"
       }}
     >
-      <h1 sx={{ order: [2, 1] }}>{heading}</h1>
-      <LanguageSelector
-        sx={{
-          order: [1, 2],
-          width: "fit-content",
-          alignSelf: ["end", "unset"]
-        }}
-      />
+      <Stack direction="column" sx={{ mb: 3 }}>
+        {heading ? (
+          <>
+            <div sx={{ flex: 1, minWidth: 0 }}>
+              <PalaceWebCatalogLogo />
+            </div>
+            <h1 sx={{ mt: 3 }}>{heading}</h1>
+          </>
+        ) : (
+          <div sx={{ flex: 1, minWidth: 0 }}>
+            <h1>
+              <PalaceWebCatalogLogo />
+            </h1>
+          </div>
+        )}
+      </Stack>
+      <div>
+        <LanguageSelector />
+      </div>
     </div>
   );
 };

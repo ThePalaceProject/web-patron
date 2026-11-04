@@ -5,7 +5,6 @@ import * as React from "react";
 import useSWR from "swr";
 import { useRouter } from "next/router";
 import { useDialogStore } from "@ariakit/react/dialog";
-import { useAppConfig } from "components/context/AppConfigContext";
 import theme from "theme/theme";
 import Button from "components/Button";
 import Share from "icons/Share";
@@ -44,7 +43,6 @@ import MultiLibraryLandingPageHeader from "./layouts/MultiLibraryLandingPageHead
 
 const MultiLibraryHome: React.FC = () => {
   const { t } = useTranslation();
-  const { instanceName } = useAppConfig();
   const searchInputRef = React.useRef<HTMLInputElement>(null);
   const [searchKey, resetSearch] = React.useReducer((n: number) => n + 1, 0);
   const { data, error } = useSWR<LibrariesResponse>(
@@ -300,9 +298,7 @@ const MultiLibraryHome: React.FC = () => {
           m: 3
         }}
       >
-        <MultiLibraryLandingPageHeader
-          heading={`${instanceName} ${t("multiLibraryHome.home", "Home")}`}
-        />
+        <MultiLibraryLandingPageHeader />
         <PinnedLibraryList
           libraries={data.libraries}
           pinned={shownPinned}

@@ -27,3 +27,9 @@ describe("LanguageSelector", () => {
     });
   });
 });
+
+it("displays Palace Web Catalog logo", () => {
+  render(<MultiLibraryLandingPageHeader heading="My Library" />);
+  const logo = screen.getByRole("img", { name: "Palace Web Catalog" });
+  expect(logo).toBeInTheDocument();
+});

@@ -192,16 +192,16 @@ describe("MultiLibraryHome", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("displays instance name in heading", () => {
-    mockLibraries([lib("test", "Test Library")]);
-
-    render(<MultiLibraryHome />, {
-      appConfig: { instanceName: "My Custom Instance" }
+  it("displays Palace Web Catalog logo as the page heading", () => {
+    mockLibraries([lib("alpha", "Alpha Library")]);
+    render(<MultiLibraryHome />);
+    const heading = screen.getByRole("heading", {
+      level: 1,
+      name: "Palace Web Catalog"
     });
-
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "My Custom Instance Home"
-    );
+    expect(
+      within(heading).getByRole("img", { name: "Palace Web Catalog" })
+    ).toBeInTheDocument();
   });
 
   it("uses h2 for the sub-heading to maintain heading hierarchy", () => {

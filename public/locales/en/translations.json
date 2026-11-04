@@ -111,7 +111,6 @@
   "multiLibraryHome.addFromLink.message": "This link adds these libraries to My Libraries in this browser.",
   "multiLibraryHome.addFromLink.title": "Add to My Libraries",
   "multiLibraryHome.choose": "Choose a library:",
-  "multiLibraryHome.home": "Home",
   "multiLibraryHome.promotedHeading": "Promoted libraries",
   "multiLibraryHome.share.ariaLabel": "Share My Libraries",
   "multiLibraryHome.share.copied": "Link copied.",
