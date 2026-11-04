@@ -1,7 +1,9 @@
 import * as React from "react";
 import TextInput from "components/TextInput";
 import HighlightedText from "components/HighlightedText";
-import LibraryCardList from "components/LibraryCardList";
+import LibraryCardList, {
+  LIBRARY_CARD_LIST_MAX_WIDTH
+} from "components/LibraryCardList";
 import { scoreMatch } from "utils/libraryFilter";
 import { useTranslation } from "next-i18next/pages";
 
@@ -26,6 +28,14 @@ interface LibraryFilterListProps {
   hideUntilFiltered?: boolean;
   /** Reaches the search input, e.g. as a focus target after an unpin. */
   inputRef?: React.Ref<HTMLInputElement>;
+  /**
+   * Controls shown beside the search box, e.g. a button that closes it.
+   * They sit at the right edge of the library cards, and the search box
+   * grows to fill the space before them.
+   */
+  searchActions?: React.ReactNode;
+  /** Stretches the search box to the width of the library cards. */
+  fullWidthSearch?: boolean;
 }
 
 const LibraryFilterList: React.FC<LibraryFilterListProps> = ({
@@ -34,7 +44,9 @@ const LibraryFilterList: React.FC<LibraryFilterListProps> = ({
   renderItem,
   resultsListId,
   hideUntilFiltered = false,
-  inputRef
+  inputRef,
+  searchActions,
+  fullWidthSearch = false
 }) => {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = React.useState("");
@@ -87,33 +99,52 @@ const LibraryFilterList: React.FC<LibraryFilterListProps> = ({
   return (
     <>
       <div id={headingId}>{heading}</div>
-      <div sx={{ width: ["auto", "44ch"], mb: 2 }}>
-        <span id={labelId} sx={{ variant: "accessibility.visuallyHidden" }}>
-          {t("libraryFilterList.search.ariaLabel", "Filter libraries")}
-        </span>
-        <TextInput
-          ref={inputRef}
-          type="search"
-          // Named by the heading and its own label, e.g. "Find another
-          // library: Filter libraries", so it makes sense on its own.
-          aria-labelledby={`${headingId} ${labelId}`}
-          aria-controls={showResults ? resultsListId : undefined}
-          aria-describedby={hideUntilFiltered ? hintId : undefined}
-          placeholder={t(
-            "libraryFilterList.search.placeholder",
-            "Filter libraries..."
-          )}
-          value={inputValue}
-          onChange={e => setInputValue(e.target.value)}
-        />
-        {hideUntilFiltered && (
-          <span id={hintId} sx={{ variant: "accessibility.visuallyHidden" }}>
-            {t(
-              "libraryFilterList.hiddenResultsHint",
-              "Matching libraries appear as you type."
-            )}
+      <div
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 2,
+          mb: 2,
+          maxWidth: LIBRARY_CARD_LIST_MAX_WIDTH
+        }}
+      >
+        <div
+          sx={{
+            flex:
+              fullWidthSearch || searchActions
+                ? "1 1 auto"
+                : ["1 1 auto", "0 1 44ch"],
+            minWidth: 0
+          }}
+        >
+          <span id={labelId} sx={{ variant: "accessibility.visuallyHidden" }}>
+            {t("libraryFilterList.search.ariaLabel", "Filter libraries")}
           </span>
-        )}
+          <TextInput
+            ref={inputRef}
+            type="search"
+            // Named by the heading and its own label, e.g. "Find another
+            // library: Filter libraries", so it makes sense on its own.
+            aria-labelledby={`${headingId} ${labelId}`}
+            aria-controls={showResults ? resultsListId : undefined}
+            aria-describedby={hideUntilFiltered ? hintId : undefined}
+            placeholder={t(
+              "libraryFilterList.search.placeholder",
+              "Filter libraries..."
+            )}
+            value={inputValue}
+            onChange={e => setInputValue(e.target.value)}
+          />
+          {hideUntilFiltered && (
+            <span id={hintId} sx={{ variant: "accessibility.visuallyHidden" }}>
+              {t(
+                "libraryFilterList.hiddenResultsHint",
+                "Matching libraries appear as you type."
+              )}
+            </span>
+          )}
+        </div>
+        {searchActions}
       </div>
       {/* Always in the DOM so screen readers register the live region before content changes. */}
       <div

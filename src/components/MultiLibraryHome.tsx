@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { useDialogStore } from "@ariakit/react/dialog";
 import theme from "theme/theme";
 import Button from "components/Button";
+import Add from "icons/Add";
 import Share from "icons/Share";
 import LibraryHomeLink from "./LibraryHomeLink";
 import LibraryFilterList from "components/LibraryFilterList";
@@ -44,18 +45,84 @@ import MultiLibraryLandingPageHeader from "./layouts/MultiLibraryLandingPageHead
 const MultiLibraryHome: React.FC = () => {
   const { t } = useTranslation();
   const searchInputRef = React.useRef<HTMLInputElement>(null);
-  const [searchKey, resetSearch] = React.useReducer((n: number) => n + 1, 0);
   const { data, error } = useSWR<LibrariesResponse>(
     "/api/libraries",
     fetchLibraries
   );
   const shownPinned = useShownPinnedLibraries(data?.libraries ?? []);
+  /*
+   * The element that the effect below focuses once it shows. `unpin` names
+   * the library whose Unpin button in My Libraries gets focus. The
+   * `IfLost` values focus their element only when focus was lost, that is,
+   * when the element that last had focus left the page.
+   */
+  const [pendingFocus, setPendingFocus] = React.useState<
+    | "myLibraries"
+    | "myLibrariesIfLost"
+    | "search"
+    | "searchIfLost"
+    | "addLibrary"
+    | { unpin: string }
+    | null
+  >(null);
+  const lastFocusedRef = React.useRef<Element | null>(null);
+  React.useEffect(() => {
+    const handleFocusIn = (event: FocusEvent) => {
+      lastFocusedRef.current = event.target as Element;
+    };
+    const handleFocusOut = (event: FocusEvent) => {
+      // Focus that moves to another element is recorded on focusin.
+      if (event.relatedTarget instanceof Element) return;
+      const target = event.target;
+      // Waits until a removal that caused the blur is done. A target that
+      // is still on the page, with focus on the page body, was left by a
+      // click on plain text, so focus was not lost.
+      queueMicrotask(() => {
+        const active = document.activeElement;
+        if (
+          lastFocusedRef.current === target &&
+          (target as Element).isConnected &&
+          (!active || active === document.body)
+        ) {
+          lastFocusedRef.current = null;
+        }
+      });
+    };
+    document.addEventListener("focusin", handleFocusIn);
+    document.addEventListener("focusout", handleFocusOut);
+    return () => {
+      document.removeEventListener("focusin", handleFocusIn);
+      document.removeEventListener("focusout", handleFocusOut);
+    };
+  }, []);
   const hasPinned = shownPinned.length > 0;
   const [reordering, setReordering] = React.useState(false);
   // Leaves reorder mode once fewer than two libraries are shown. Otherwise
-  // the search would stay hidden with no Done button, and My Libraries would
-  // come back already in that mode.
+  // the promoted group would stay hidden with no Done button, and My
+  // Libraries would come back already in that mode.
   if (reordering && shownPinned.length < 2) setReordering(false);
+  /*
+   * Add mode hides My Libraries and shows the full library list, so the
+   * user can pin a library. A pin made from that list, a confirmed `?pins=`
+   * link, the Done button, or Escape ends it. With no pins left, the page
+   * shows that list anyway, so add mode ends.
+   */
+  const [adding, setAdding] = React.useState(false);
+  const [hadPinned, setHadPinned] = React.useState(hasPinned);
+  if (hadPinned !== hasPinned) {
+    setHadPinned(hasPinned);
+    if (hasPinned) {
+      // The search leaves with the first pin, so focus on it would be lost.
+      setPendingFocus(prev => prev ?? "myLibrariesIfLost");
+    } else {
+      setAdding(false);
+      // The My Libraries header and the Done button leave with the last
+      // pin, so focus on them would be lost.
+      setPendingFocus(prev => prev ?? "searchIfLost");
+    }
+  }
+  const addLibraryButtonRef = React.useRef<HTMLButtonElement>(null);
+  const filterAreaRef = React.useRef<HTMLDivElement>(null);
 
   const pinningEnabled = usePinningEnabled();
   const { pinLibrary, announce } = usePinnedLibraries();
@@ -76,9 +143,6 @@ const MultiLibraryHome: React.FC = () => {
   const [librariesToAdd, setLibrariesToAdd] = React.useState<
     ClientLibrary[] | null
   >(null);
-  // Set by a confirmed add, so the effect below moves focus to the My
-  // Libraries heading once it shows.
-  const [focusMyLibraries, setFocusMyLibraries] = React.useState(false);
   const [copyStatus, setCopyStatus] = React.useState<
     "idle" | "copied" | "error"
   >("idle");
@@ -142,10 +206,75 @@ const MultiLibraryHome: React.FC = () => {
   }, [pinningEnabled, libraries, pinsValue, addDialog, clearPinsParam]);
 
   React.useEffect(() => {
-    if (!focusMyLibraries || !hasPinned) return;
-    setFocusMyLibraries(false);
-    myLibrariesHeadingRef.current?.focus();
-  }, [focusMyLibraries, hasPinned]);
+    if (!pendingFocus) return;
+    if (
+      pendingFocus === "searchIfLost" ||
+      pendingFocus === "myLibrariesIfLost"
+    ) {
+      setPendingFocus(null);
+      const active = document.activeElement;
+      const last = lastFocusedRef.current;
+      const lost =
+        (!active || active === document.body) &&
+        last !== null &&
+        !last.isConnected;
+      const fallback =
+        pendingFocus === "searchIfLost"
+          ? searchInputRef
+          : myLibrariesHeadingRef;
+      if (lost) fallback.current?.focus();
+      return;
+    }
+    const unpinButtonFor = (libraryId: string) =>
+      Array.from(
+        myLibrariesHeadingRef.current
+          ?.closest("section")
+          ?.querySelectorAll<HTMLElement>("[data-pin-library]") ?? []
+      ).find(button => button.dataset.pinLibrary === libraryId) ??
+      myLibrariesHeadingRef.current;
+    const target =
+      typeof pendingFocus === "object"
+        ? unpinButtonFor(pendingFocus.unpin)
+        : {
+            myLibraries: myLibrariesHeadingRef,
+            search: searchInputRef,
+            addLibrary: addLibraryButtonRef
+          }[pendingFocus].current;
+    if (!target) return;
+    setPendingFocus(null);
+    target.focus();
+  }, [pendingFocus, hasPinned, adding]);
+
+  const startAdding = () => {
+    setAdding(true);
+    setPendingFocus("search");
+  };
+  const finishAdding = React.useCallback(() => {
+    setAdding(false);
+    setPendingFocus("addLibrary");
+  }, []);
+  const finishAddingWithPin = (libraryId: string) => {
+    setAdding(false);
+    setPendingFocus({ unpin: libraryId });
+  };
+
+  /*
+   * In add mode, Escape acts as the Done button while focus is in the
+   * search area. The listener is on the DOM element, so Escape in a dialog,
+   * which renders in a portal outside it, only closes the dialog.
+   */
+  React.useEffect(() => {
+    const area = filterAreaRef.current;
+    if (!adding || !area) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || event.isComposing || event.defaultPrevented)
+        return;
+      event.preventDefault();
+      finishAdding();
+    };
+    area.addEventListener("keydown", handleKeyDown);
+    return () => area.removeEventListener("keydown", handleKeyDown);
+  }, [adding, finishAdding]);
 
   const confirmAdd = () => {
     const added = librariesToAdd ?? [];
@@ -168,7 +297,8 @@ const MultiLibraryHome: React.FC = () => {
         }
       )
     );
-    setFocusMyLibraries(true);
+    setAdding(false);
+    setPendingFocus("myLibraries");
     addDialog.hide();
   };
 
@@ -240,17 +370,17 @@ const MultiLibraryHome: React.FC = () => {
   // `title` replaces the name as the link content, e.g. to mark search
   // matches. `reorderControls` replace the pin button, and the link becomes
   // plain text, so the card cannot be opened while it is being reordered.
-  // A pin or unpin clears the search unless `keepSearch` is set.
+  // `onPin` runs after the card's pin button pins the library.
   const renderCard = (
     library: ClientLibrary,
     {
       title,
       reorderControls,
-      keepSearch = false
+      onPin
     }: {
       title?: React.ReactNode;
       reorderControls?: React.ReactNode;
-      keepSearch?: boolean;
+      onPin?: () => void;
     } = {}
   ) => {
     const name = library.title || library.slug;
@@ -269,7 +399,7 @@ const MultiLibraryHome: React.FC = () => {
                 logoUrl: library.logoUrl,
                 authDocUrl: library.authDocUrl
               }}
-              onToggle={keepSearch ? undefined : resetSearch}
+              onPin={onPin}
             />
           )
         }
@@ -299,84 +429,143 @@ const MultiLibraryHome: React.FC = () => {
         }}
       >
         <MultiLibraryLandingPageHeader />
-        <PinnedLibraryList
-          libraries={data.libraries}
-          pinned={shownPinned}
-          renderItem={(library, reorderControls) =>
-            renderCard(library, { reorderControls })
-          }
-          reordering={reordering}
-          onReorderingChange={setReordering}
-          emptyFocusRef={searchInputRef}
-          headingRef={myLibrariesHeadingRef}
-          actions={
-            <>
-              {/* Screen readers hear the result through `announce`. */}
-              {copyStatus === "copied" && (
-                <span sx={{ fontSize: 0 }}>{copiedMessage}</span>
-              )}
-              {copyStatus === "error" && (
-                <span sx={{ fontSize: 0, color: "ui.error" }}>
-                  {failedMessage}
-                </span>
-              )}
+        {/* Hidden in add mode, so the page shows only the library list. */}
+        {!adding && (
+          <PinnedLibraryList
+            libraries={data.libraries}
+            pinned={shownPinned}
+            renderItem={(library, reorderControls) =>
+              renderCard(library, { reorderControls })
+            }
+            reordering={reordering}
+            onReorderingChange={setReordering}
+            emptyFocusRef={searchInputRef}
+            headingRef={myLibrariesHeadingRef}
+            uppercaseHeader
+            actions={
+              <span sx={{ position: "relative", display: "inline-flex" }}>
+                <Button
+                  variant="ghost"
+                  color="ui.black"
+                  onClick={handleCopyLink}
+                  iconLeft={Share}
+                  aria-label={t(
+                    "multiLibraryHome.share.ariaLabel",
+                    "Share My Libraries"
+                  )}
+                >
+                  {t("multiLibraryHome.share.label", "Share")}
+                </Button>
+                {/*
+                 * Floats below the button, so showing it moves nothing in
+                 * the row. It starts at the button's left edge, so it stays
+                 * on screen when the button is at the left of the page.
+                 * Clicks pass through it to the content below. Screen
+                 * readers hear the result through `announce`.
+                 */}
+                {copyStatus !== "idle" && (
+                  <span
+                    sx={{
+                      position: "absolute",
+                      top: "100%",
+                      left: 0,
+                      pointerEvents: "none",
+                      zIndex: 1,
+                      mt: 1,
+                      px: 2,
+                      py: 1,
+                      whiteSpace: "nowrap",
+                      fontSize: 0,
+                      color: copyStatus === "error" ? "ui.error" : "ui.black",
+                      bg: "ui.white",
+                      border: "1px solid",
+                      borderColor: "ui.gray.light",
+                      borderRadius: "button"
+                    }}
+                  >
+                    {copyStatus === "error" ? failedMessage : copiedMessage}
+                  </span>
+                )}
+              </span>
+            }
+            trailingActions={
               <Button
+                ref={addLibraryButtonRef}
                 variant="ghost"
                 color="ui.black"
-                onClick={handleCopyLink}
-                iconLeft={Share}
+                onClick={startAdding}
+                iconLeft={Add}
                 aria-label={t(
-                  "multiLibraryHome.share.ariaLabel",
-                  "Share My Libraries"
+                  "multiLibraryHome.addLibrary.ariaLabel",
+                  "Add library to My Libraries"
                 )}
               >
-                {t("multiLibraryHome.share.label", "Share")}
+                {t("multiLibraryHome.addLibrary.label", "Add library")}
               </Button>
-            </>
-          }
-        />
-        {promoted.length > 0 && !reordering && (
+            }
+          />
+        )}
+        {promoted.length > 0 && !reordering && !adding && (
           <section>
             {/* A long label from the URL wraps, even without spaces. */}
             <h2 sx={{ overflowWrap: "anywhere" }}>{promotedLabel}</h2>
             <LibraryCardList>
               {promoted.map(library => (
-                <li key={library.id}>
-                  {renderCard(library, { keepSearch: true })}
-                </li>
+                <li key={library.id}>{renderCard(library)}</li>
               ))}
             </LibraryCardList>
           </section>
         )}
-        {/* Hidden while reordering, so the page shows only My Libraries. */}
-        {!reordering && (
-          <LibraryFilterList
-            // A pin or unpin made here starts a fresh search: the box empties
-            // and, with pins shown, the list hides.
-            key={searchKey}
-            inputRef={searchInputRef}
-            heading={
-              <h2>
-                {hasPinned
-                  ? t("library.findAnother", "Find another library:", {
-                      ns: "common"
+        {/* With pins shown, the list appears only in add mode. */}
+        {(!hasPinned || adding) && (
+          <div ref={filterAreaRef}>
+            <LibraryFilterList
+              inputRef={searchInputRef}
+              heading={
+                <h2>
+                  {adding
+                    ? t("library.findAnother", "Find another library:", {
+                        ns: "common"
+                      })
+                    : t("multiLibraryHome.choose", "Choose a library:")}
+                </h2>
+              }
+              items={sorted.map(lib => ({
+                slug: lib.slug,
+                label: lib.title || lib.slug
+              }))}
+              resultsListId="library-filter-results"
+              fullWidthSearch
+              renderItem={({ slug, highlighted }) => {
+                const library = librariesBySlug.get(slug);
+                return library
+                  ? renderCard(library, {
+                      title: highlighted,
+                      onPin: adding
+                        ? () => finishAddingWithPin(library.id)
+                        : undefined
                     })
-                  : t("multiLibraryHome.choose", "Choose a library:")}
-              </h2>
-            }
-            hideUntilFiltered={hasPinned}
-            items={sorted.map(lib => ({
-              slug: lib.slug,
-              label: lib.title || lib.slug
-            }))}
-            resultsListId="library-filter-results"
-            renderItem={({ slug, highlighted }) => {
-              const library = librariesBySlug.get(slug);
-              return library
-                ? renderCard(library, { title: highlighted })
-                : null;
-            }}
-          />
+                  : null;
+              }}
+              searchActions={
+                adding && (
+                  <Button
+                    variant="ghost"
+                    color="ui.black"
+                    onClick={finishAdding}
+                    aria-label={t(
+                      "multiLibraryHome.addLibrary.doneAriaLabel",
+                      "Done, back to My Libraries"
+                    )}
+                    aria-keyshortcuts="Escape"
+                    sx={{ textTransform: "uppercase" }}
+                  >
+                    {t("multiLibraryHome.addLibrary.done", "Done")}
+                  </Button>
+                )
+              }
+            />
+          </div>
         )}
         <AlertDialog
           dialog={addDialog}
