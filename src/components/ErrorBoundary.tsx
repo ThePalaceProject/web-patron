@@ -9,10 +9,14 @@ export type FallbackProps = {
   clearError: () => void;
 };
 
-export const DefaultFallback: React.FC<FallbackProps> = ({ error }) => {
+const Fallback: React.FC<FallbackProps & { showLogo: boolean }> = ({
+  error,
+  showLogo
+}) => {
   const { t } = useTranslation();
   return (
     <ErrorComponent
+      showLogo={showLogo}
       info={{
         title: `${error.name}`,
         detail: t(
@@ -23,6 +27,15 @@ export const DefaultFallback: React.FC<FallbackProps> = ({ error }) => {
     />
   );
 };
+
+export const DefaultFallback: React.FC<FallbackProps> = props => (
+  <Fallback {...props} showLogo />
+);
+
+// Inside the site layout, where the Footer already shows the logo
+export const InlineFallback: React.FC<FallbackProps> = props => (
+  <Fallback {...props} showLogo={false} />
+);
 
 type ErrorState = { error?: Error; info?: React.ErrorInfo };
 const initialState: ErrorState = { error: undefined, info: undefined };

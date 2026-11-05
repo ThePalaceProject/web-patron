@@ -14,6 +14,7 @@
   "actions.returned": "Prestito restituito: {{title}}.",
   "actions.returning": "Restituzione...",
   "alt.bookCover": "Copertina di {{title}}",
+  "alt.palaceWebCatalog": "Palace Web Catalog",
   "auth.accountNotRecognized": "L'autenticazione è riuscita, ma il suo account non è stato riconosciuto. Contatti la sua biblioteca per assistenza.",
   "auth.authFailed": "Autenticazione non riuscita. Riprovi.",
   "auth.fieldRequired": "Il campo {{field}} è obbligatorio.",

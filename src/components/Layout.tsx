@@ -4,7 +4,7 @@ import GlobalStyles from "./GlobalStyles";
 import Header from "./Header";
 import Footer from "./Footer";
 import SkipNavigation from "./SkipNavigation";
-import { ErrorBoundary } from "components/ErrorBoundary";
+import { ErrorBoundary, InlineFallback } from "components/ErrorBoundary";
 
 export const CONTENT_ID = "cpw-content";
 
@@ -29,7 +29,7 @@ const Layout = ({ children }: Props) => {
           flexDirection: "column"
         }}
       >
-        <ErrorBoundary>{children}</ErrorBoundary>
+        <ErrorBoundary fallback={InlineFallback}>{children}</ErrorBoundary>
       </main>
       <Footer sx={{ width: "100%" }} />
     </Themed.root>

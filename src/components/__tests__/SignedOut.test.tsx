@@ -12,6 +12,12 @@ test("renders signed out page", () => {
   ).toBeInTheDocument();
 });
 
+it("displays Palace Web Catalog logo", () => {
+  setup(<SignedOutContent />);
+  const logo = screen.getByRole("img", { name: "Palace Web Catalog" });
+  expect(logo).toBeInTheDocument();
+});
+
 describe("LanguageSelector", () => {
   it("displays when enabled in appConfig", async () => {
     render(<SignedOutContent />, {

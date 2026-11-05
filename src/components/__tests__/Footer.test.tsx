@@ -122,3 +122,9 @@ describe("toggling SimplyE Branding", () => {
     expect(myBooks).toHaveAttribute("href", "/testlib/loans");
   });
 });
+
+test("displays Palace Web Catalog logo", () => {
+  const utils = render(<Footer />);
+  const logo = utils.getByRole("img", { name: "Palace Web Catalog" });
+  expect(logo).toBeInTheDocument();
+});

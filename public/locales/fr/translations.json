@@ -113,7 +113,6 @@
   "multiLibraryHome.addFromLink.message": "Ce lien ajoute les bibliothèques suivantes à Mes bibliothèques dans ce navigateur.",
   "multiLibraryHome.addFromLink.title": "Ajouter à Mes bibliothèques",
   "multiLibraryHome.choose": "Choisissez une bibliothèque :",
-  "multiLibraryHome.home": "Accueil",
   "multiLibraryHome.promotedHeading": "Bibliothèques mises en avant",
   "multiLibraryHome.share.ariaLabel": "Partager Mes bibliothèques",
   "multiLibraryHome.share.copied": "Lien copié.",

@@ -17,6 +17,7 @@ const Error: NextPage<ErrorPageProps> = ({ errorInfo, statusCode }) => {
   const { t } = useTranslation();
   return (
     <ErrorComponent
+      showLogo
       info={
         errorInfo ?? {
           status: statusCode,

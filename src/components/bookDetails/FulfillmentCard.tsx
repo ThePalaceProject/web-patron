@@ -7,7 +7,7 @@ import {
   bookIsOnHold,
   bookIsFulfillable
 } from "utils/book";
-import withErrorBoundary from "../ErrorBoundary";
+import withErrorBoundary, { InlineFallback } from "../ErrorBoundary";
 import Stack from "components/Stack";
 import { Text } from "components/Text";
 import BorrowOrReserveOrPreview from "components/BorrowOrReserveOrPreview";
@@ -225,4 +225,4 @@ const AccessCard: React.FC<{
   );
 };
 
-export default withErrorBoundary(FulfillmentCard);
+export default withErrorBoundary(FulfillmentCard, InlineFallback);

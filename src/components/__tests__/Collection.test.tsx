@@ -58,6 +58,23 @@ test("displays loader", () => {
   ).toBeInTheDocument();
 });
 
+test("displays error without the Palace Web Catalog logo", () => {
+  mockSwr({
+    isValidating: false,
+    data: undefined,
+    error: new Error("Server Error")
+  });
+  const utils = render(<Collection />, {
+    router: { query: { collectionUrl: "/collection" } }
+  });
+  expect(
+    utils.getByRole("heading", { name: /Fetch Collection Error/ })
+  ).toBeInTheDocument();
+  expect(
+    utils.queryByRole("img", { name: "Palace Web Catalog" })
+  ).not.toBeInTheDocument();
+});
+
 test("displays lanes when present", () => {
   const laneData: LaneData = {
     title: "my lane",

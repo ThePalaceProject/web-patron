@@ -9,6 +9,7 @@ import IosBadge from "./storeBadges/IosBadge";
 import GooglePlayBadge from "./storeBadges/GooglePlayBadge";
 import { useAppConfig } from "components/context/AppConfigContext";
 import { useTranslation } from "next-i18next/pages";
+import PalaceWebCatalogLogo from "./PalaceWebCatalogLogo";
 
 const Footer: React.FC<{ className?: string }> = ({ className }) => {
   const { t } = useTranslation();
@@ -36,6 +37,17 @@ const Footer: React.FC<{ className?: string }> = ({ className }) => {
       }}
       className={className}
     >
+      <div
+        sx={{
+          flex: "0 0 auto",
+          width: ["100%", "100%", "100%", "auto"],
+          mt: 5,
+          mr: 5
+        }}
+      >
+        <PalaceWebCatalogLogo />
+      </div>
+
       <div sx={{ flex: "0 0 auto", mt: 5, mr: 5 }}>
         <H2 variant="text.headers.tertiary" sx={{ mt: 0, maxWidth: "100%" }}>
           {title}

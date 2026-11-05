@@ -14,6 +14,7 @@
   "actions.returned": "{{title}} returned.",
   "actions.returning": "Returning...",
   "alt.bookCover": "Cover for {{title}}",
+  "alt.palaceWebCatalog": "Palace Web Catalog",
   "auth.accountNotRecognized": "Authentication completed successfully, but your account was not recognized. Please contact your library for assistance.",
   "auth.authFailed": "Authentication failed. Please try again.",
   "auth.fieldRequired": "Your {{field}} is required.",

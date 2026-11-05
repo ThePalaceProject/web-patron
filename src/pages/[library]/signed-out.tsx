@@ -10,6 +10,7 @@ import { useRouter } from "next/router";
 import useLinkUtils from "hooks/useLinkUtils";
 import { useTranslation } from "next-i18next/pages";
 import LanguageSelector from "components/LanguageSelector";
+import PalaceWebCatalogLogo from "components/PalaceWebCatalogLogo";
 
 /**
  * This page is shown after SAML/Clever sign-out to warn users about
@@ -47,7 +48,21 @@ export const SignedOutContent: React.FC = () => {
       <Head>
         <title>{t("signedOut.signedOut", "Signed Out")}</title>
       </Head>
-      <LanguageSelector sx={{ alignSelf: "end" }} />
+      <div
+        sx={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2
+        }}
+      >
+        <div sx={{ flex: 1, minWidth: 0 }}>
+          <PalaceWebCatalogLogo />
+        </div>
+        <LanguageSelector sx={{ alignSelf: ["center", "start"] }} />
+      </div>
       <div
         sx={{
           maxWidth: 600,
