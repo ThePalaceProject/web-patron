@@ -35,7 +35,7 @@ const Page = (props: AppPropsWithChildren) => {
    */
 
   if (props.error || !props.library) {
-    return <Error info={props.error} />;
+    return <Error info={props.error} showLogo />;
   }
 
   const { library, children } = props;

@@ -14,7 +14,7 @@
   "actions.returned": "Préstamo devuelto: {{title}}.",
   "actions.returning": "Devolviendo...",
   "alt.bookCover": "Portada de {{title}}",
-  "alt.palaceWebCatalog": "Catálogo web Palace",
+  "alt.palaceWebCatalog": "Palace Web Catalog",
   "auth.accountNotRecognized": "La autenticación se ha completado correctamente, pero no se ha reconocido su cuenta. Póngase en contacto con su biblioteca.",
   "auth.authFailed": "La autenticación ha fallado. Inténtelo de nuevo.",
   "auth.fieldRequired": "El campo {{field}} es obligatorio.",

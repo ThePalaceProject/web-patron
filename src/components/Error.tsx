@@ -9,9 +9,10 @@ import { PageLoader } from "components/LoadingIndicator";
 import { useTranslation } from "next-i18next/pages";
 import PalaceWebCatalogLogo from "./PalaceWebCatalogLogo";
 
-const ErrorComponent: React.FC<{ info?: OPDS1.ProblemDocument }> = ({
-  info
-}) => {
+const ErrorComponent: React.FC<{
+  info?: OPDS1.ProblemDocument;
+  showLogo?: boolean;
+}> = ({ info, showLogo = false }) => {
   const { t } = useTranslation();
   const {
     title = t("error.somethingWentWrong", "Something went wrong"),
@@ -34,7 +35,7 @@ const ErrorComponent: React.FC<{ info?: OPDS1.ProblemDocument }> = ({
             p: [3, 4]
           }}
         >
-          <PalaceWebCatalogLogo sx={{ mb: 3 }} />
+          {showLogo && <PalaceWebCatalogLogo sx={{ mb: 3 }} />}
           <H1>
             {status} {t("error.error", "Error:")} {title}
           </H1>

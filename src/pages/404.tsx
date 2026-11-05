@@ -7,6 +7,7 @@ function NotFoundPage() {
   const { t } = useTranslation();
   return (
     <ErrorComponent
+      showLogo
       info={{
         status: 404,
         title: t("404.title", "Page Not Found"),

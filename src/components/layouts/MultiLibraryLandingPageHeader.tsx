@@ -21,17 +21,13 @@ const MultiLibraryLandingPageHeader: React.FC<
       <Stack direction="column" sx={{ mb: 3 }}>
         {heading ? (
           <>
-            <div sx={{ flex: 1, minWidth: 0 }}>
-              <PalaceWebCatalogLogo />
-            </div>
+            <PalaceWebCatalogLogo />
             <h1 sx={{ mt: 3 }}>{heading}</h1>
           </>
         ) : (
-          <div sx={{ flex: 1, minWidth: 0 }}>
-            <h1>
-              <PalaceWebCatalogLogo />
-            </h1>
-          </div>
+          <h1>
+            <PalaceWebCatalogLogo />
+          </h1>
         )}
       </Stack>
       <div>

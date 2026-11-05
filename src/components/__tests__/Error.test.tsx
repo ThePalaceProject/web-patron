@@ -29,9 +29,10 @@ test("renders page loader when error code is 401", () => {
   expect(headingEl).toHaveTextContent("Loading...");
 });
 
-test("displays Palace Web Catalog logo", () => {
+test("displays Palace Web Catalog logo when showLogo is set", () => {
   const utils = render(
     <Error
+      showLogo
       info={{
         status: 404,
         title: "Page Not Found",
@@ -41,4 +42,19 @@ test("displays Palace Web Catalog logo", () => {
   );
   const logo = utils.getByRole("img", { name: "Palace Web Catalog" });
   expect(logo).toBeInTheDocument();
+});
+
+test("hides Palace Web Catalog logo by default", () => {
+  const utils = render(
+    <Error
+      info={{
+        status: 404,
+        title: "Page Not Found",
+        detail: "The requested url is not available"
+      }}
+    />
+  );
+  expect(
+    utils.queryByRole("img", { name: "Palace Web Catalog" })
+  ).not.toBeInTheDocument();
 });
