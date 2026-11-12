@@ -42,6 +42,12 @@ import {
 import { useTranslation } from "next-i18next/pages";
 import MultiLibraryLandingPageHeader from "./layouts/MultiLibraryLandingPageHeader";
 
+/*
+ * Shows the My Libraries heading and buttons, and the add mode Done button,
+ * in all caps. Use this one value for all of them, so the buttons match.
+ */
+const UPPERCASE_HEADER = true;
+
 const MultiLibraryHome: React.FC = () => {
   const { t } = useTranslation();
   const searchInputRef = React.useRef<HTMLInputElement>(null);
@@ -441,7 +447,7 @@ const MultiLibraryHome: React.FC = () => {
             onReorderingChange={setReordering}
             emptyFocusRef={searchInputRef}
             headingRef={myLibrariesHeadingRef}
-            uppercaseHeader
+            uppercaseHeader={UPPERCASE_HEADER}
             actions={
               <span sx={{ position: "relative", display: "inline-flex" }}>
                 <Button
@@ -558,7 +564,9 @@ const MultiLibraryHome: React.FC = () => {
                       "Done, back to My Libraries"
                     )}
                     aria-keyshortcuts="Escape"
-                    sx={{ textTransform: "uppercase" }}
+                    sx={{
+                      ...(UPPERCASE_HEADER && { textTransform: "uppercase" })
+                    }}
                   >
                     {t("multiLibraryHome.addLibrary.done", "Done")}
                   </Button>
