@@ -302,3 +302,98 @@ test("ignores reordering when the page does not handle it", () => {
   expect(screen.queryByRole("button", { name: /Reorder/ })).toBeNull();
   expect(screen.queryByRole("button", { name: /^Move / })).toBeNull();
 });
+
+test("shows actions before Reorder and trailing actions after it", () => {
+  pin("alpha", "beta");
+  render(
+    <Section
+      libraries={[lib("alpha"), lib("beta")]}
+      renderItem={renderTitle}
+      onReorderingChange={() => undefined}
+      actions={<button>Leading</button>}
+      trailingActions={<button>Trailing</button>}
+    />
+  );
+
+  expect(
+    screen.getAllByRole("button").map(button => button.textContent)
+  ).toEqual(["Leading", "Reorder", "Trailing"]);
+});
+
+test("hides both kinds of actions while reordering", () => {
+  pin("alpha", "beta");
+  render(
+    <Section
+      libraries={[lib("alpha"), lib("beta")]}
+      renderItem={renderTitle}
+      reordering
+      onReorderingChange={() => undefined}
+      actions={<button>Leading</button>}
+      trailingActions={<button>Trailing</button>}
+    />
+  );
+
+  expect(screen.queryByRole("button", { name: "Leading" })).toBeNull();
+  expect(screen.queryByRole("button", { name: "Trailing" })).toBeNull();
+  expect(
+    screen.getByRole("button", { name: "Done reordering My Libraries" })
+  ).toBeInTheDocument();
+});
+
+test.each([true, false])(
+  "uppercaseHeader %p sets all caps on the heading and buttons",
+  uppercaseHeader => {
+    pin("alpha", "beta");
+    render(
+      <Section
+        libraries={[lib("alpha"), lib("beta")]}
+        renderItem={renderTitle}
+        onReorderingChange={() => undefined}
+        uppercaseHeader={uppercaseHeader}
+      />
+    );
+
+    const isUppercase = (element: HTMLElement) =>
+      getComputedStyle(element).textTransform === "uppercase";
+    expect(
+      isUppercase(screen.getByRole("heading", { name: "My Libraries" }))
+    ).toBe(uppercaseHeader);
+    expect(
+      isUppercase(screen.getByRole("button", { name: "Reorder My Libraries" }))
+    ).toBe(uppercaseHeader);
+  }
+);
+
+test("puts trailing actions, or Done while reordering, at the right end", async () => {
+  pin("alpha", "beta");
+  const Reorderable = () => {
+    const [reordering, setReordering] = React.useState(false);
+    return (
+      <Section
+        libraries={[lib("alpha"), lib("beta")]}
+        renderItem={renderTitle}
+        reordering={reordering}
+        onReorderingChange={setReordering}
+        trailingActions={<button>Trailing</button>}
+      />
+    );
+  };
+  const { user } = setup(<Reorderable />);
+  const marginLeft = (element: HTMLElement) =>
+    getComputedStyle(element).marginLeft;
+
+  const reorder = screen.getByRole("button", { name: "Reorder My Libraries" });
+  expect(marginLeft(reorder)).not.toBe("auto");
+  expect(
+    marginLeft(screen.getByRole("button", { name: "Trailing" }).parentElement!)
+  ).toBe("auto");
+
+  await user.click(reorder);
+
+  const done = screen.getByRole("button", {
+    name: "Done reordering My Libraries"
+  });
+  expect(done).toBe(reorder);
+  expect(done).toHaveFocus();
+  expect(marginLeft(done)).toBe("auto");
+});

@@ -182,56 +182,45 @@ test("the opt-out checkbox is cleared when the warning reopens", async () => {
   ).not.toBeChecked();
 });
 
-describe("onToggle", () => {
+describe("onPin", () => {
   test("is called after a direct pin", async () => {
     localStorage.setItem(HIDE_PUBLIC_WARNING_KEY, "true");
-    const onToggle = jest.fn();
-    const { user } = setup(<PinButton library={library} onToggle={onToggle} />);
+    const onPin = jest.fn();
+    const { user } = setup(<PinButton library={library} onPin={onPin} />);
 
     await user.click(pinButton());
 
-    expect(onToggle).toHaveBeenCalledTimes(1);
+    expect(onPin).toHaveBeenCalledTimes(1);
   });
 
   test("is called after confirming the warning", async () => {
-    const onToggle = jest.fn();
-    const { user } = setup(<PinButton library={library} onToggle={onToggle} />);
+    const onPin = jest.fn();
+    const { user } = setup(<PinButton library={library} onPin={onPin} />);
 
     await user.click(pinButton());
     await user.click(screen.getByRole("button", { name: "Pin Library" }));
 
-    expect(onToggle).toHaveBeenCalledTimes(1);
+    expect(onPin).toHaveBeenCalledTimes(1);
   });
 
-  test("is called after confirming a signed-in unpin", async () => {
-    pinLibraries(library);
-    seedCredentials(library.slug);
-    const onToggle = jest.fn();
-    const { user } = setup(<PinButton library={library} onToggle={onToggle} />);
+  test("is not called when the warning is canceled", async () => {
+    const onPin = jest.fn();
+    const { user } = setup(<PinButton library={library} onPin={onPin} />);
 
-    await user.click(unpinButton());
-    await user.click(
-      screen.getByRole("button", { name: "Unpin and Sign Out" })
-    );
-
-    expect(onToggle).toHaveBeenCalledTimes(1);
-  });
-
-  test.each([
-    ["the warning", false],
-    ["the signed-in unpin", true]
-  ])("is not called when %s is cancelled", async (_, signedIn) => {
-    if (signedIn) {
-      pinLibraries(library);
-      seedCredentials(library.slug);
-    }
-    const onToggle = jest.fn();
-    const { user } = setup(<PinButton library={library} onToggle={onToggle} />);
-
-    await user.click(signedIn ? unpinButton() : pinButton());
+    await user.click(pinButton());
     await user.click(screen.getByRole("button", { name: "Cancel" }));
 
-    expect(onToggle).not.toHaveBeenCalled();
+    expect(onPin).not.toHaveBeenCalled();
+  });
+
+  test("is not called after an unpin", async () => {
+    pinLibraries(library);
+    const onPin = jest.fn();
+    const { user } = setup(<PinButton library={library} onPin={onPin} />);
+
+    await user.click(unpinButton());
+
+    expect(onPin).not.toHaveBeenCalled();
   });
 });
 

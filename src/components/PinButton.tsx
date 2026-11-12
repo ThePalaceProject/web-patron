@@ -29,8 +29,8 @@ interface PinButtonProps {
    * are cleared, with no server-side logout.
    */
   signOut?: () => void | Promise<void>;
-  /** Called after this button pins or unpins its library. */
-  onToggle?: () => void;
+  /** Called after this button pins its library. */
+  onPin?: () => void;
   className?: string;
 }
 
@@ -43,7 +43,7 @@ interface PinButtonProps {
 const PinButton: React.FC<PinButtonProps> = ({
   library,
   signOut,
-  onToggle,
+  onPin,
   className
 }) => {
   const { t } = useTranslation();
@@ -69,7 +69,7 @@ const PinButton: React.FC<PinButtonProps> = ({
         title: library.title
       })
     );
-    onToggle?.();
+    onPin?.();
   };
 
   const unpin = () => {
@@ -87,7 +87,6 @@ const PinButton: React.FC<PinButtonProps> = ({
         ? `${unpinned} ${t("pinButton.nonePinned", "No libraries are pinned.")}`
         : unpinned
     );
-    onToggle?.();
   };
 
   // Some browsers (Firefox and Safari on macOS) do not focus a clicked

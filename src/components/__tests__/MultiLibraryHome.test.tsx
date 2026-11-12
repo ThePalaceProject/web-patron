@@ -221,7 +221,7 @@ describe("MultiLibraryHome", () => {
       mockLibraries([alpha, beta]);
     });
 
-    it("pinning a library adds it to My Libraries above the list", async () => {
+    it("pinning a library adds it to My Libraries and focuses its Unpin button", async () => {
       const { user } = setup(<MultiLibraryHome />);
       expect(
         screen.queryByRole("heading", { name: "My Libraries" })
@@ -298,22 +298,34 @@ describe("MultiLibraryHome", () => {
       expect(hasStoredCredentials("alpha")).toBe(false);
     });
 
-    it("pinning from search results clears the search and hides the list", async () => {
+    it("with a pin, shows My Libraries without the search or the list", () => {
       pinLibraries(beta);
+      render(<MultiLibraryHome />);
+
+      expect(
+        within(myLibrariesSection()).getByRole("link", { name: "Beta Library" })
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole("heading", { name: "Find another library:" })
+      ).toBeNull();
+      expect(screen.queryByRole("searchbox")).toBeNull();
+      expect(screen.queryByRole("link", { name: "Alpha Library" })).toBeNull();
+    });
+
+    it("pinning the first library hides the search", async () => {
       const { user } = setup(<MultiLibraryHome />);
       typeFilter("alp");
+
       await user.click(
         screen.getByRole("button", {
           name: "Pin Alpha Library to My Libraries"
         })
       );
 
-      expect(
-        screen.getByRole("searchbox", { name: /Filter libraries/ })
-      ).toHaveValue("");
+      expect(screen.queryByRole("searchbox")).toBeNull();
       expect(
         screen.getAllByRole("link").map(link => link.getAttribute("href"))
-      ).toEqual(["/beta", "/alpha"]);
+      ).toEqual(["/alpha"]);
       expect(
         within(myLibrariesSection()).getByRole("button", {
           name: "Unpin Alpha Library from My Libraries"
@@ -321,92 +333,19 @@ describe("MultiLibraryHome", () => {
       ).toHaveFocus();
     });
 
-    it("a pin from another tab keeps the typed search and its focus", () => {
-      pinLibraries(beta);
-      render(<MultiLibraryHome />);
-      const searchbox = screen.getByRole("searchbox", {
-        name: /Filter libraries/
-      });
-      act(() => searchbox.focus());
-      typeFilter("alp");
-
-      pinLibraries(beta, alpha);
-      act(() => {
-        window.dispatchEvent(
-          new StorageEvent("storage", { key: PINNED_LIBRARIES_KEY })
-        );
-      });
-
-      expect(myLibrariesSection()).toHaveTextContent("Alpha Library");
-      expect(searchbox).toHaveValue("alp");
-      expect(searchbox).toHaveFocus();
-    });
-
-    it("unpinning from My Libraries clears the search", async () => {
+    it("shows Share, Reorder, and Add library in that order", () => {
       pinLibraries(alpha, beta);
-      const { user } = setup(<MultiLibraryHome />);
-      typeFilter("alp");
-
-      await user.click(
-        within(myLibrariesSection()).getByRole("button", {
-          name: "Unpin Beta Library from My Libraries"
-        })
-      );
-
-      expect(
-        screen.getByRole("searchbox", { name: /Filter libraries/ })
-      ).toHaveValue("");
-      // Beta was last in the list, so focus moves to the previous library.
-      expect(
-        within(myLibrariesSection()).getByRole("button", {
-          name: "Unpin Alpha Library from My Libraries"
-        })
-      ).toHaveFocus();
-    });
-
-    it("clearing the search hides the list again", () => {
-      pinLibraries(beta);
-      render(<MultiLibraryHome />);
-      typeFilter("alp");
-      expect(screen.getAllByRole("link")).toHaveLength(2);
-
-      typeFilter("");
-      expect(screen.getAllByRole("link")).toHaveLength(1);
-    });
-
-    it.each([
-      [false, "Choose a library: Filter libraries"],
-      [true, "Find another library: Filter libraries"]
-    ])("names the search box from its heading (pinned: %p)", (pinned, name) => {
-      if (pinned) pinLibraries(beta);
-      render(<MultiLibraryHome />);
-      expect(screen.getByRole("searchbox", { name })).toBeInTheDocument();
-    });
-
-    it("with a pin, hides the library list until a filter is typed", () => {
-      pinLibraries(beta);
       render(<MultiLibraryHome />);
 
-      expect(
-        screen.getByRole("heading", { name: "Find another library:" })
-      ).toBeInTheDocument();
-      expect(screen.queryByRole("link", { name: "Alpha Library" })).toBeNull();
-
-      const searchbox = screen.getByRole("searchbox", {
-        name: /Filter libraries/
-      });
-      expect(searchbox).not.toHaveAttribute("aria-controls");
-      expect(searchbox).toHaveAccessibleDescription(
-        "Matching libraries appear as you type."
-      );
-      typeFilter("alp");
-      expect(
-        screen.getAllByRole("link").map(link => link.getAttribute("href"))
-      ).toContain("/alpha");
-      expect(searchbox).toHaveAttribute(
-        "aria-controls",
-        "library-filter-results"
-      );
+      const headerButtons = within(myLibrariesSection())
+        .getAllByRole("button")
+        .map(button => button.getAttribute("aria-label"))
+        .filter(name => name && !/^(Pin|Unpin) /.test(name));
+      expect(headerButtons).toEqual([
+        "Share My Libraries",
+        "Reorder My Libraries",
+        "Add library to My Libraries"
+      ]);
     });
 
     it("unpinning the last library moves focus to the search input and announces it", async () => {
@@ -440,6 +379,349 @@ describe("MultiLibraryHome", () => {
     });
   });
 
+  describe("add mode", () => {
+    const alpha = lib("alpha", "Alpha Library");
+    const beta = lib("beta", "Beta Library");
+    const gamma = lib("gamma", "Gamma Library");
+
+    beforeEach(() => {
+      localStorage.setItem(HIDE_PUBLIC_WARNING_KEY, "true");
+      mockLibraries([alpha, beta, gamma]);
+    });
+
+    const addLibraryButton = () =>
+      screen.getByRole("button", { name: "Add library to My Libraries" });
+    const searchbox = () =>
+      screen.getByRole("searchbox", { name: /Filter libraries/ });
+
+    const startAdding = async (...pins: ClientLibrary[]) => {
+      pinLibraries(...pins);
+      const utils = setup(<MultiLibraryHome />);
+      await utils.user.click(addLibraryButton());
+      return utils;
+    };
+
+    it.each([
+      [false, "Choose a library: Filter libraries"],
+      [true, "Find another library: Filter libraries"]
+    ])(
+      "names the search box from its heading (adding: %p)",
+      async (adding, name) => {
+        if (adding) await startAdding(beta);
+        else render(<MultiLibraryHome />);
+        expect(screen.getByRole("searchbox", { name })).toBeInTheDocument();
+      }
+    );
+
+    it("hides My Libraries and shows every library, with focus in the search", async () => {
+      await startAdding(beta);
+
+      expect(
+        screen.queryByRole("heading", { name: "My Libraries" })
+      ).toBeNull();
+      expect(searchbox()).toHaveFocus();
+      expect(searchbox()).toHaveAttribute(
+        "aria-controls",
+        "library-filter-results"
+      );
+      expect(searchbox()).not.toHaveAccessibleDescription();
+      expect(
+        screen.getAllByRole("link").map(link => link.getAttribute("href"))
+      ).toEqual(["/alpha", "/beta", "/gamma"]);
+    });
+
+    it("Done returns to My Libraries and focuses Add library", async () => {
+      const { user } = await startAdding(beta);
+
+      const done = screen.getByRole("button", {
+        name: "Done, back to My Libraries"
+      });
+      expect(done).toHaveAttribute("aria-keyshortcuts", "Escape");
+      await user.click(done);
+
+      expect(myLibrariesSection()).toHaveTextContent("Beta Library");
+      expect(screen.queryByRole("searchbox")).toBeNull();
+      expect(addLibraryButton()).toHaveFocus();
+    });
+
+    it("Escape in the search acts as Done, even with text typed", async () => {
+      const { user } = await startAdding(beta);
+      typeFilter("alp");
+
+      await user.keyboard("{Escape}");
+
+      expect(myLibrariesSection()).toBeInTheDocument();
+      expect(screen.queryByRole("searchbox")).toBeNull();
+      expect(addLibraryButton()).toHaveFocus();
+    });
+
+    it.each([
+      [
+        "a library link",
+        () => screen.getByRole("link", { name: "Alpha Library" })
+      ],
+      [
+        "a pin button",
+        () =>
+          screen.getByRole("button", {
+            name: "Pin Alpha Library to My Libraries"
+          })
+      ],
+      [
+        "the Done button",
+        () => screen.getByRole("button", { name: "Done, back to My Libraries" })
+      ]
+    ])("Escape on %s acts as Done", async (_, target) => {
+      const { user } = await startAdding(beta);
+      act(() => target().focus());
+
+      await user.keyboard("{Escape}");
+
+      expect(screen.queryByRole("searchbox")).toBeNull();
+      expect(addLibraryButton()).toHaveFocus();
+    });
+
+    it("Escape outside the search area does nothing", async () => {
+      const { user } = await startAdding(beta);
+      act(() => (document.activeElement as HTMLElement).blur());
+
+      await user.keyboard("{Escape}");
+
+      expect(searchbox()).toBeInTheDocument();
+    });
+
+    it("Escape in a pin dialog closes only the dialog", async () => {
+      localStorage.removeItem(HIDE_PUBLIC_WARNING_KEY);
+      const { user } = await startAdding(beta);
+
+      await user.click(
+        screen.getByRole("button", {
+          name: "Pin Alpha Library to My Libraries"
+        })
+      );
+      await screen.findByRole("alertdialog");
+      await user.keyboard("{Escape}");
+
+      await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull());
+      expect(searchbox()).toBeInTheDocument();
+      expect(readPinnedLibraries().map(entry => entry.id)).toEqual([
+        "urn:beta"
+      ]);
+    });
+
+    it.each([
+      ["directly", false],
+      ["after the public computer warning", true]
+    ])(
+      "ends after a pin %s and focuses the new Unpin button",
+      async (_, withWarning) => {
+        if (withWarning) localStorage.removeItem(HIDE_PUBLIC_WARNING_KEY);
+        const { user } = await startAdding(beta);
+        typeFilter("alp");
+
+        await user.click(
+          screen.getByRole("button", {
+            name: "Pin Alpha Library to My Libraries"
+          })
+        );
+        if (withWarning) {
+          await user.click(screen.getByRole("button", { name: "Pin Library" }));
+        }
+
+        expect(readPinnedLibraries().map(entry => entry.id)).toEqual([
+          "urn:beta",
+          "urn:alpha"
+        ]);
+        expect(screen.queryByRole("searchbox")).toBeNull();
+        await waitFor(() =>
+          expect(
+            within(myLibrariesSection()).getByRole("button", {
+              name: "Unpin Alpha Library from My Libraries"
+            })
+          ).toHaveFocus()
+        );
+      }
+    );
+
+    it("stays open after an unpin that leaves a pin", async () => {
+      const { user } = await startAdding(beta, gamma);
+      typeFilter("gam");
+
+      await user.click(
+        screen.getByRole("button", {
+          name: "Unpin Gamma Library from My Libraries"
+        })
+      );
+
+      expect(readPinnedLibraries().map(entry => entry.id)).toEqual([
+        "urn:beta"
+      ]);
+      expect(searchbox()).toHaveValue("gam");
+      expect(
+        screen.getByRole("button", {
+          name: "Pin Gamma Library to My Libraries"
+        })
+      ).toHaveFocus();
+      expect(
+        screen.queryByRole("heading", { name: "My Libraries" })
+      ).toBeNull();
+    });
+
+    it("a pin from another tab keeps the typed search and its focus", async () => {
+      await startAdding(beta);
+      typeFilter("alp");
+
+      pinLibraries(beta, alpha);
+      act(() => {
+        window.dispatchEvent(
+          new StorageEvent("storage", { key: PINNED_LIBRARIES_KEY })
+        );
+      });
+
+      expect(searchbox()).toHaveValue("alp");
+      expect(searchbox()).toHaveFocus();
+    });
+
+    it("moves focus from Done to the search when another tab unpins the last library", async () => {
+      await startAdding(beta);
+      act(() =>
+        screen
+          .getByRole("button", { name: "Done, back to My Libraries" })
+          .focus()
+      );
+
+      pinLibraries();
+      act(() => {
+        window.dispatchEvent(
+          new StorageEvent("storage", { key: PINNED_LIBRARIES_KEY })
+        );
+      });
+
+      expect(
+        screen.getByRole("heading", { name: "Choose a library:" })
+      ).toBeInTheDocument();
+      expect(searchbox()).toHaveFocus();
+    });
+
+    it("ends when a ?pins link is confirmed", async () => {
+      pinLibraries(beta);
+      const router = { query: {}, replace: jest.fn() };
+      const { user, rerender } = setup(<MultiLibraryHome />, { router });
+      await user.click(addLibraryButton());
+
+      router.query = { pins: "alpha" };
+      rerender(<MultiLibraryHome />);
+      await screen.findByRole("alertdialog", { name: "Add to My Libraries" });
+      await user.click(screen.getByRole("button", { name: "Add libraries" }));
+
+      expect(screen.queryByRole("searchbox")).toBeNull();
+      expect(myLibrariesSection()).toHaveTextContent("Alpha Library");
+      await waitFor(() =>
+        expect(
+          screen.getByRole("heading", { name: "My Libraries" })
+        ).toHaveFocus()
+      );
+    });
+
+    it("ends when the last library is unpinned", async () => {
+      const { user } = await startAdding(beta);
+      typeFilter("bet");
+
+      await user.click(
+        screen.getByRole("button", {
+          name: "Unpin Beta Library from My Libraries"
+        })
+      );
+
+      expect(
+        screen.getByRole("heading", { name: "Choose a library:" })
+      ).toBeInTheDocument();
+      expect(searchbox()).toHaveValue("bet");
+      expect(
+        screen.getByRole("button", { name: "Pin Beta Library to My Libraries" })
+      ).toHaveFocus();
+
+      // A new pin shows My Libraries, not add mode.
+      await user.click(
+        screen.getByRole("button", { name: "Pin Beta Library to My Libraries" })
+      );
+      expect(myLibrariesSection()).toHaveTextContent("Beta Library");
+      expect(screen.queryByRole("searchbox")).toBeNull();
+    });
+  });
+
+  describe("lost focus after a change in another tab", () => {
+    const beta = lib("beta", "Beta Library");
+
+    beforeEach(() => {
+      mockLibraries([beta]);
+    });
+
+    const searchbox = () =>
+      screen.getByRole("searchbox", { name: /Filter libraries/ });
+    const changePinsInAnotherTab = (...pins: ClientLibrary[]) => {
+      pinLibraries(...pins);
+      act(() => {
+        window.dispatchEvent(
+          new StorageEvent("storage", { key: PINNED_LIBRARIES_KEY })
+        );
+      });
+    };
+
+    it.each(["Add library to My Libraries", "Share My Libraries"])(
+      "moves focus from %s to the search when the last library is unpinned",
+      name => {
+        pinLibraries(beta);
+        render(<MultiLibraryHome />);
+        act(() => screen.getByRole("button", { name }).focus());
+
+        changePinsInAnotherTab();
+
+        expect(
+          screen.getByRole("heading", { name: "Choose a library:" })
+        ).toBeInTheDocument();
+        expect(searchbox()).toHaveFocus();
+      }
+    );
+
+    it("moves focus from the search to My Libraries when the first library is pinned", () => {
+      render(<MultiLibraryHome />);
+      act(() => searchbox().focus());
+
+      changePinsInAnotherTab(beta);
+
+      expect(screen.queryByRole("searchbox")).toBeNull();
+      expect(
+        screen.getByRole("heading", { name: "My Libraries" })
+      ).toHaveFocus();
+    });
+
+    it.each<[string, ClientLibrary[], ClientLibrary[]]>([
+      ["the first library is pinned", [], [beta]],
+      ["the last library is unpinned", [beta], []]
+    ])("does not move focus when nothing had it and %s", (_, before, after) => {
+      pinLibraries(...before);
+      render(<MultiLibraryHome />);
+
+      changePinsInAnotherTab(...after);
+
+      expect(document.body).toHaveFocus();
+    });
+
+    it("does not move focus after a click on plain text when the last library is unpinned", async () => {
+      pinLibraries(beta);
+      render(<MultiLibraryHome />);
+      const share = screen.getByRole("button", { name: "Share My Libraries" });
+      act(() => share.focus());
+      await act(async () => share.blur());
+
+      changePinsInAnotherTab();
+
+      expect(searchbox()).toBeInTheDocument();
+      expect(document.body).toHaveFocus();
+    });
+  });
+
   describe("reordering My Libraries", () => {
     const alpha = lib("alpha", "Alpha Library");
     const beta = lib("beta", "Beta Library");
@@ -464,6 +746,17 @@ describe("MultiLibraryHome", () => {
       render(<MultiLibraryHome />);
       expect(
         screen.queryByRole("button", { name: "Reorder My Libraries" })
+      ).toBeNull();
+    });
+
+    it("hides Share and Add library while reordering", async () => {
+      await startReordering(alpha, beta);
+
+      expect(
+        screen.queryByRole("button", { name: "Share My Libraries" })
+      ).toBeNull();
+      expect(
+        screen.queryByRole("button", { name: "Add library to My Libraries" })
       ).toBeNull();
     });
 
@@ -564,7 +857,7 @@ describe("MultiLibraryHome", () => {
       pinLibraries(alpha);
       syncFromStorage();
       expect(
-        screen.getByRole("searchbox", { name: /Filter libraries/ })
+        screen.getByRole("button", { name: "Add library to My Libraries" })
       ).toBeInTheDocument();
       pinLibraries(alpha, beta);
       syncFromStorage();
@@ -576,25 +869,6 @@ describe("MultiLibraryHome", () => {
         within(myLibrariesSection()).getByRole("link", {
           name: "Alpha Library"
         })
-      ).toBeInTheDocument();
-    });
-
-    it("hides Find another library while reordering", async () => {
-      const { user } = await startReordering(alpha, beta);
-
-      expect(
-        screen.queryByRole("heading", { name: "Find another library:" })
-      ).toBeNull();
-      expect(screen.queryByRole("searchbox")).toBeNull();
-
-      await user.click(
-        screen.getByRole("button", { name: "Done reordering My Libraries" })
-      );
-      expect(
-        screen.getByRole("heading", { name: "Find another library:" })
-      ).toBeInTheDocument();
-      expect(
-        screen.getByRole("searchbox", { name: /Filter libraries/ })
       ).toBeInTheDocument();
     });
 
@@ -828,29 +1102,6 @@ describe("MultiLibraryHome", () => {
       expect(replace.mock.calls[0][0].query.pins).toBeUndefined();
     });
 
-    it("hides the Share button while reordering", () => {
-      pinLibraries(lib("alpha", "Alpha Library"), lib("beta", "Beta Library"));
-      mockLibraries([
-        lib("alpha", "Alpha Library"),
-        lib("beta", "Beta Library")
-      ]);
-      render(<MultiLibraryHome />);
-
-      expect(
-        screen.getByRole("button", { name: "Share My Libraries" })
-      ).toBeInTheDocument();
-
-      fireEvent.click(
-        screen.getByRole("button", { name: "Reorder My Libraries" })
-      );
-
-      expect(
-        screen.queryByRole("button", {
-          name: "Share My Libraries"
-        })
-      ).toBeNull();
-    });
-
     it("copies a link carrying the pinned entries in order", async () => {
       pinLibraries(lib("beta", "Beta Library"), lib("alpha", "Alpha Library"));
       mockLibraries([
@@ -981,34 +1232,6 @@ describe("MultiLibraryHome", () => {
       ).toHaveFocus();
     });
 
-    it("keeps the typed search when a promoted library is pinned", () => {
-      mockLibraries([
-        lib("alpha", "Alpha Library"),
-        lib("beta", "Beta Library")
-      ]);
-
-      render(<MultiLibraryHome />, {
-        router: { query: { promote: "alpha" } }
-      });
-      typeFilter("bet");
-
-      const section = screen
-        .getByRole("heading", { name: "Promoted libraries" })
-        .closest("section")!;
-      fireEvent.click(
-        within(section).getByRole("button", {
-          name: "Pin Alpha Library to My Libraries"
-        })
-      );
-
-      expect(readPinnedLibraries().map(entry => entry.id)).toEqual([
-        "urn:alpha"
-      ]);
-      expect(
-        screen.getByRole("searchbox", { name: /Filter libraries/ })
-      ).toHaveValue("bet");
-    });
-
     it("shows a stored pin in the group while pinning is disabled", () => {
       pinLibraries(lib("alpha", "Alpha Library"));
       mockLibraries([lib("alpha", "Alpha Library")]);
@@ -1122,6 +1345,25 @@ describe("MultiLibraryHome", () => {
         ).toBeNull();
       }
     );
+
+    it("hides the promoted group in add mode", () => {
+      pinLibraries(lib("alpha", "Alpha Library"));
+      mockLibraries([
+        lib("alpha", "Alpha Library"),
+        lib("gamma", "Gamma Library")
+      ]);
+
+      render(<MultiLibraryHome />, {
+        router: { query: { promote: "gamma" } }
+      });
+      fireEvent.click(
+        screen.getByRole("button", { name: "Add library to My Libraries" })
+      );
+
+      expect(
+        screen.queryByRole("heading", { name: "Promoted libraries" })
+      ).toBeNull();
+    });
 
     it("hides the promoted group while reordering", () => {
       pinLibraries(lib("alpha", "Alpha Library"), lib("beta", "Beta Library"));

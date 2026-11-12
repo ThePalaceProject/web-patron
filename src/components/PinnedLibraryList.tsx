@@ -64,10 +64,17 @@ interface PinnedLibraryListProps {
    */
   emptyFocusRef?: React.RefObject<HTMLElement | null>;
   /**
-   * Extra section-level controls for the header row, shown beside the
+   * Extra section-level controls for the header row, shown before the
    * Reorder button and hidden while reordering.
    */
   actions?: React.ReactNode;
+  /**
+   * Extra section-level controls for the header row, shown at its end, on
+   * the right, and hidden while reordering.
+   */
+  trailingActions?: React.ReactNode;
+  /** Shows the heading and the header row buttons in all caps. */
+  uppercaseHeader?: boolean;
   /** Receives the "My Libraries" heading, which is focusable. */
   headingRef?: React.RefObject<HTMLHeadingElement | null>;
 }
@@ -117,6 +124,8 @@ const PinnedLibraryList: React.FC<PinnedLibraryListProps> = ({
   onReorderingChange,
   emptyFocusRef,
   actions,
+  trailingActions,
+  uppercaseHeader = false,
   headingRef: headingRefProp
 }) => {
   const { t } = useTranslation();
@@ -275,21 +284,51 @@ const PinnedLibraryList: React.FC<PinnedLibraryListProps> = ({
       <div
         sx={{
           display: "flex",
-          alignItems: "baseline",
-          justifyContent: "space-between",
-          maxWidth: LIBRARY_CARD_LIST_MAX_WIDTH
+          flexWrap: "wrap",
+          // Centers the buttons on the heading text, so they line up with
+          // or without their hover and focus background.
+          alignItems: "center",
+          columnGap: 2,
+          rowGap: 1,
+          mb: 2,
+          maxWidth: LIBRARY_CARD_LIST_MAX_WIDTH,
+          // Browsers reset text-transform on buttons, so they are named too.
+          ...(uppercaseHeader && {
+            "& h2, & button": { textTransform: "uppercase" }
+          })
         }}
       >
-        <h2 ref={headingRef} tabIndex={-1}>
+        <h2 ref={headingRef} tabIndex={-1} sx={{ my: 0, mr: 2 }}>
           {t("library.myLibraries", "My Libraries", { ns: "common" })}
         </h2>
-        <div sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        {/*
+         * The buttons wrap as one group. The group does not shrink, so when
+         * it does not fit beside the heading, it moves to the next line. It
+         * then grows to the full width, which keeps its right end at the
+         * right edge of the cards.
+         */}
+        <div
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            gap: 2,
+            flex: "1 0 auto",
+            maxWidth: "100%"
+          }}
+        >
           {!isReordering && actions}
           {canReorder && (
+            // While reordering, the Done button sits at the right end of
+            // the row, where the trailing actions show otherwise. It stays
+            // the same element as the Reorder button, so focus stays on it
+            // when the mode changes. Keep `sx` an object in both modes,
+            // because adding or removing `sx` remounts the button.
             <Button
               variant="ghost"
               color="ui.black"
               onClick={() => onReorderingChange?.(!isReordering)}
+              sx={{ ml: isReordering ? "auto" : undefined }}
               aria-label={
                 isReordering
                   ? t(
@@ -303,6 +342,18 @@ const PinnedLibraryList: React.FC<PinnedLibraryListProps> = ({
                 ? t("pinnedLibraryList.done", "Done")
                 : t("pinnedLibraryList.reorder", "Reorder")}
             </Button>
+          )}
+          {!isReordering && trailingActions && (
+            <div
+              sx={{
+                ml: "auto",
+                display: "flex",
+                alignItems: "center",
+                gap: 2
+              }}
+            >
+              {trailingActions}
+            </div>
           )}
         </div>
       </div>

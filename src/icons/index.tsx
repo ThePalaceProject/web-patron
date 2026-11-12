@@ -1,4 +1,5 @@
 export { default as Account } from "./Account";
+export { default as Add } from "./Add";
 export { default as ArrowRight } from "./ArrowRight";
 export { default as ArrowForward } from "./ArrowForward";
 export { default as Book } from "./Book";
