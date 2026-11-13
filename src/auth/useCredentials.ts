@@ -17,7 +17,7 @@ import { useTranslation } from "next-i18next/pages";
  *    changing the cookie wouldn't do this.
  *  - Searches for credentials embedded in the browser url. If
  *    it finds a token, it extracts it and sets it as the current
- *    credentials.
+ *    credentials. Then it removes the token from the url.
  */
 export default function useCredentials(slug: string | null) {
   const { t } = useTranslation("common");
@@ -47,6 +47,25 @@ export default function useCredentials(slug: string | null) {
     setCredentialsState(undefined);
     clearCredentialStorage(slug);
   }, [slug]);
+
+  // use credentials from browser url if they exist
+  const { token: urlToken, methodType: urlMethodType } =
+    getUrlCredentials(router, authMethods) ?? {};
+
+  // Store the URL credentials, then remove them from the URL. Do not remove
+  // them during render. Keep `router` in the dependencies, so the effect
+  // retries after each route change while the token is still in the URL. Do
+  // not replace it with `router.asPath`, which stays the same when a route
+  // change keeps the URL.
+  // Keep this effect above the error effect below. Effects run in order, so
+  // the error effect's redirect to login then starts after this URL cleanup,
+  // and the cleanup cannot cancel it.
+  React.useEffect(() => {
+    if (urlToken && urlMethodType) {
+      setCredentials({ token: urlToken, methodType: urlMethodType });
+      clearUrlCredentials(router);
+    }
+  }, [urlToken, urlMethodType, setCredentials, router]);
 
   // Check for SAML/Clever error in URL and redirect to login with error message.
   // Uses a ref to ensure we only process each error once (prevent infinite loops)
@@ -92,16 +111,6 @@ export default function useCredentials(slug: string | null) {
       processedErrorRef.current = null;
     }
   }, [router.query.error, initLogin, t]);
-
-  // use credentials from browser url if they exist
-  const { token: urlToken, methodType: urlMethodType } =
-    getUrlCredentials(router, authMethods) ?? {};
-
-  React.useEffect(() => {
-    if (urlToken && urlMethodType) {
-      setCredentials({ token: urlToken, methodType: urlMethodType });
-    }
-  }, [urlToken, urlMethodType, setCredentials]);
 
   // URL credentials are exposed synchronously so child components (e.g.
   // AuthProtectedRoute) don't redirect to login before the useEffect above
@@ -200,6 +209,9 @@ export function generateToken(username: string, password?: string) {
 
 /**
  * URL CREDENTIALS
+ *
+ * Read credentials from the URL without side effects. Use clearUrlCredentials
+ * to remove them after they are stored.
  */
 function getUrlCredentials(
   router: NextRouter,
@@ -208,14 +220,26 @@ function getUrlCredentials(
   /* TODO: throw error if access tokens exist at the same time as this is an invalid state that shouldn't be reached */
   return IS_SERVER
     ? undefined
-    : (lookForCleverCredentials(router) ??
+    : (lookForCleverCredentials() ??
         lookForRedirectAuthCredentials(router, authMethods));
 }
 
+/**
+ * Removes sign-in credentials from the URL (the access token query param and
+ * the hash), so that they do not sign the patron in again after sign out.
+ * Call this after storing the credentials.
+ */
+function clearUrlCredentials(router: NextRouter): void {
+  const { [REDIRECT_LOGIN_QUERY_PARAM]: _, ...restQuery } = router.query;
+  router.replace(
+    { pathname: router.pathname, query: restQuery, hash: "" },
+    undefined,
+    { shallow: true }
+  );
+}
+
 // check for clever credentials
-function lookForCleverCredentials(
-  router: NextRouter
-): AuthCredentials | undefined {
+function lookForCleverCredentials(): AuthCredentials | undefined {
   if (!IS_SERVER) {
     const accessTokenKey = "access_token=";
     if (window?.location?.hash) {
@@ -226,13 +250,6 @@ function lookForCleverCredentials(
           .slice(accessTokenStart + accessTokenKey.length)
           .split("&")[0];
         const token = `Bearer ${accessToken}`;
-
-        // Clear Clever hash from URL to avoid re-authentication after sign out.
-        router.replace(
-          { pathname: router.pathname, query: router.query, hash: "" },
-          undefined,
-          { shallow: true }
-        );
 
         return { token, methodType: OPDS1.CleverAuthType };
       }
@@ -248,16 +265,6 @@ function lookForRedirectAuthCredentials(
 ): AuthCredentials | undefined {
   const { [REDIRECT_LOGIN_QUERY_PARAM]: accessToken } = router.query;
   if (accessToken) {
-    if (!IS_SERVER && typeof window !== "undefined") {
-      // Clear token from URL to avoid re-authentication after sign out.
-      const { [REDIRECT_LOGIN_QUERY_PARAM]: _, ...restQuery } = router.query;
-      router.replace(
-        { pathname: router.pathname, query: restQuery },
-        undefined,
-        { shallow: true }
-      );
-    }
-
     // Determine which redirect auth type to use based on order in authentication document.
     // We authenticate with the first supported auth type, so use that order here.
     const redirectAuthMethod = authMethods.find(

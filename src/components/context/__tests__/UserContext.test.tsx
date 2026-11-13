@@ -149,10 +149,113 @@ test("extracts SAML tokens from the url", () => {
 
   // Should have used router.replace to clear the SAML token from the URL.
   expect(mockReplace).toHaveBeenCalledWith(
-    { pathname: "/testlib/loans", query: {} },
+    { pathname: "/testlib/loans", query: {}, hash: "" },
     undefined,
     { shallow: true }
   );
+});
+
+const urlTokenCases = [
+  {
+    name: "SAML",
+    hash: "",
+    query: { access_token: "url-token" },
+    methodType: OPDS1.SamlAuthType
+  },
+  {
+    name: "Clever",
+    hash: "#access_token=url-token",
+    query: {},
+    methodType: OPDS1.CleverAuthType
+  }
+];
+
+test.each(urlTokenCases)(
+  "stores $name tokens before it removes them from the url",
+  ({ hash, query, methodType }) => {
+    window.location.hash = hash;
+    const storedAtReplace: (string | null)[] = [];
+    const replace = jest.fn(() => {
+      storedAtReplace.push(localStorage.getItem("CPW_AUTH_COOKIE/testlib"));
+    });
+    useRouterSpy.mockReturnValue({
+      replace,
+      query,
+      pathname: "/testlib"
+    } as any);
+
+    renderUserContext();
+
+    expect(storedAtReplace).toEqual([
+      str({ token: "Bearer url-token", methodType })
+    ]);
+  }
+);
+
+test.each(urlTokenCases)(
+  "removes $name tokens again when a route change leaves them in the url",
+  ({ hash, query, methodType }) => {
+    window.location.hash = hash;
+    const replace = jest.fn();
+    const routerWithToken = () =>
+      ({ replace, query, pathname: "/testlib" }) as any;
+    useRouterSpy.mockReturnValue(routerWithToken());
+
+    const { rerender } = renderUserContext();
+    useRouterSpy.mockReturnValue(routerWithToken());
+    rerender(<UserProvider>child</UserProvider>);
+
+    expect(replace).toHaveBeenCalledTimes(2);
+    expect(replace).toHaveBeenLastCalledWith(
+      { pathname: "/testlib", query: {}, hash: "" },
+      undefined,
+      { shallow: true }
+    );
+    expect(localStorage.getItem("CPW_AUTH_COOKIE/testlib")).toBe(
+      str({ token: "Bearer url-token", methodType })
+    );
+  }
+);
+
+test.each(urlTokenCases)(
+  "does nothing on a route change after the $name token is removed",
+  ({ hash, query }) => {
+    window.location.hash = hash;
+    const replace = jest.fn();
+    useRouterSpy.mockReturnValue({
+      replace,
+      query,
+      pathname: "/testlib"
+    } as any);
+
+    const { rerender } = renderUserContext();
+    window.location.hash = "";
+    useRouterSpy.mockReturnValue({
+      replace,
+      query: {},
+      pathname: "/testlib"
+    } as any);
+    rerender(<UserProvider>child</UserProvider>);
+
+    expect(replace).toHaveBeenCalledTimes(1);
+    expect(Cookie.set).toHaveBeenCalledTimes(1);
+  }
+);
+
+test("removes a url token before it redirects to login for a url error", () => {
+  const replace = jest.fn();
+  useRouterSpy.mockReturnValue({
+    replace,
+    query: { access_token: "url-token", error: "not-json" },
+    pathname: "/testlib"
+  } as any);
+
+  renderUserContext();
+
+  expect(replace.mock.calls.map(([url]) => (url as any).pathname)).toEqual([
+    "/testlib",
+    "/[library]/login"
+  ]);
 });
 
 test("extracts OIDC tokens when only OIDC is configured", () => {
@@ -197,7 +300,7 @@ test("extracts OIDC tokens when only OIDC is configured", () => {
 
   // Should have used router.replace to clear the OIDC token from the URL.
   expect(mockReplace).toHaveBeenCalledWith(
-    { pathname: "/testlib/loans", query: {} },
+    { pathname: "/testlib/loans", query: {}, hash: "" },
     undefined,
     { shallow: true }
   );
