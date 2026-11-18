@@ -9,6 +9,9 @@ class MyDocument extends Document {
     return (
       <Html>
         <Head>
+          <link rel="icon" href="/favicon.ico" sizes="32x32" />
+          <link rel="icon" type="image/svg+xml" href="/icon.svg" sizes="any" />
+          <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
           <GTMScript gtmId={gtmId} />
         </Head>
         <body>
